@@ -20,7 +20,7 @@ namespace Sharpmake
 {
     public class DependencyTracker
     {
-        public static readonly DependencyTracker Instance = new DependencyTracker();
+        public static DependencyTracker Instance { get; private set; } = new DependencyTracker();
 
         public static bool ShowDependenciesFromExtern = true;
         public static bool ShowDependenciesToExtern = true;
@@ -48,6 +48,11 @@ namespace Sharpmake
         public DependencyTracker()
         {
             _projects = new Dictionary<string, TrackedProject>();
+        }
+
+        public static void ResetSingleton()
+        {
+            Instance = new DependencyTracker();
         }
 
         public void UpdateConfiguration(Project project, Project.Configuration config)
