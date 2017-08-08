@@ -1,2 +1,16 @@
-# Auto detect text files and perform LF normalization
+# Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.cs text
+*.py text
+*.md text
+*.txt text
+*.yml text
+
+# Declare files that will always have CRLF line endings on checkout.
+*.sln text eol=crlf
+*.bat text eof=crlf
+*.reg text eof=crlf
+*.csproj text eof=crlf
