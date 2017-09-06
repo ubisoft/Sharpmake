@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,6 +98,9 @@ namespace Sharpmake.Generators.FastBuild
         private static UniqueList<string> s_masterBffCustomSections = new UniqueList<string>(); // section that is not ordered
         private static Dictionary<string, CompilerSettings> s_masterCompilerSettings = new Dictionary<string, CompilerSettings>();
         private static Strings s_masterBffFilenames = new Strings();
+
+        public const string CurrentBffPathVariable = ".CurrentBffPath";
+        public const string CurrentBffPathKey = "$CurrentBffPath$";
 
         public static bool IsMasterBffFilename(string filename)
         {
@@ -293,9 +296,20 @@ namespace Sharpmake.Generators.FastBuild
 
                     foreach (var projectBffFullPath in totalIncludeList)
                     {
-                        string projectBffRelativeFromMasterBff = Util.PathGetRelative(masterBffPath, projectBffFullPath, true);
+                        string projectFullPath = Path.GetDirectoryName(projectBffFullPath);
+                        var projectPathRelativeFromMasterBff = Util.PathGetRelative(masterBffPath, projectFullPath, true);
 
-                        result.AppendLine($"#include \"{projectBffRelativeFromMasterBff}\"");
+                        string bffKeyRelative = Path.Combine(CurrentBffPathKey, Path.GetFileName(projectBffFullPath));
+
+                        string include = string.Join(
+                            Environment.NewLine,
+                            "{",
+                            $"    {CurrentBffPathVariable} = \"{projectPathRelativeFromMasterBff}\"",
+                            $"    #include \"{bffKeyRelative}\"",
+                            "}"
+                        );
+
+                        result.AppendLine(include);
                     }
 
                     fastBuildMasterBffDependencies = result.ToString();
