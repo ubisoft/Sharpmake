@@ -1,0 +1,1 @@
+reg.exe import %~d0%~p0visualstudio.sharpmake.reg

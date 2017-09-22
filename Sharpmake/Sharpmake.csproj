@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
+    <ProjectGuid>{15F793C7-9E88-64A9-591C-7244FCC6B771}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sharpmake</RootNamespace>
+    <AssemblyName>Sharpmake</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\debug</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\release</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Utilities.v4.0">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Analyzer\Analyzer.cs" />
+    <Compile Include="Assembler.cs" />
+    <Compile Include="Attributes.cs" />
+    <Compile Include="BuildContext\BaseBuildContext.cs" />
+    <Compile Include="BuildContext\ConfigureDependencyAnalyzer.cs" />
+    <Compile Include="BuildContext\GenerateAll.cs" />
+    <Compile Include="BuildContext\RedirectOutput.cs" />
+    <Compile Include="BuildContext\RegressionTest.cs" />
+    <Compile Include="Builder.cs" />
+    <Compile Include="CommandLine.cs" />
+    <Compile Include="Configurable.cs" />
+    <Compile Include="ConfigureCollection.cs" />
+    <Compile Include="DebugBreaks.cs" />
+    <Compile Include="DebugProjectGenerator.cs" />
+    <Compile Include="DependencyTracker.cs" />
+    <Compile Include="DotNetDependency.cs" />
+    <Compile Include="Exception.cs" />
+    <Compile Include="ExtensionLoader.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FakeFileTree.cs" />
+    <Compile Include="FastBuildSettings.cs" />
+    <Compile Include="GenerationOutput.cs" />
+    <Compile Include="GeneratorManager.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ICommandLineInterface.cs" />
+    <Compile Include="IFastBuildCompilerSettings.cs" />
+    <Compile Include="IPlatformDescriptor.cs" />
+    <Compile Include="IResolverHelper.cs" />
+    <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
+    <Compile Include="Options.AndroidMakefile.cs" />
+    <Compile Include="Options.CSharp.cs" />
+    <Compile Include="Options.Makefile.cs" />
+    <Compile Include="Options.Vc.cs" />
+    <Compile Include="Options.XCode.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="PackageReferences.cs" />
+    <Compile Include="PlatformAttributes.cs" />
+    <Compile Include="PlatformEventArgs.cs" />
+    <Compile Include="PlatformExceptions.cs" />
+    <Compile Include="PlatformRegistry.cs" />
+    <Compile Include="Project.Configuration.cs" />
+    <Compile Include="Project.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegexCache.cs" />
+    <Compile Include="Resolver.cs" />
+    <Compile Include="Solution.Configuration.cs" />
+    <Compile Include="Solution.cs" />
+    <Compile Include="Strings.cs" />
+    <Compile Include="Target.cs" />
+    <Compile Include="ThreadPool.cs" />
+    <Compile Include="Tools.cs" />
+    <Compile Include="TrackedConfiguration.cs" />
+    <Compile Include="TrackedProject.cs" />
+    <Compile Include="UniqueList.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="VariableAssignment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleNuGet\SimpleNuGet.csproj">
+      <Project>{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}</Project>
+      <Name>SimpleNuGet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,16 @@
+{
+  "frameworks": {
+    "net45": { },
+    "net462": { }
+  },
+  "runtimes": {
+    "win-x64": { },
+    "win-x86": { },
+    "win-anycpu": { },
+    "win": { }
+  },
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1",
+    "NUnit": "3.6.0"
+  }
+}

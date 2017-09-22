@@ -1,0 +1,2873 @@
+﻿// Copyright (c) 2017 Ubisoft Entertainment
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using SimpleNuGet;
+using StartActionSetting = Sharpmake.Project.Configuration.CsprojUserFileSettings.StartActionSetting;
+
+namespace Sharpmake.Generators.VisualStudio
+{
+    public partial class CSproj
+    {
+        private const string TTExtension = ".tt";
+
+        internal interface IResolvable
+        {
+            string Resolve(Resolver resolver);
+        }
+
+        internal class ItemGroups
+        {
+            internal ItemGroup<Reference> References = new ItemGroup<Reference>();
+            internal ItemGroup<Service> Services = new ItemGroup<Service>();
+            internal ItemGroup<Compile> Compiles = new ItemGroup<Compile>();
+            internal ItemGroup<ProjectReference> ProjectReferences = new ItemGroup<ProjectReference>();
+            internal ItemGroup<BootstrapperPackage> BootstrapperPackages = new ItemGroup<BootstrapperPackage>();
+            internal ItemGroup<EmbeddedResource> EmbeddedResources = new ItemGroup<EmbeddedResource>();
+            internal ItemGroup<Page> Pages = new ItemGroup<Page>();
+            internal ItemGroup<Resource> Resources = new ItemGroup<Resource>();
+            internal ItemGroup<None> Nones = new ItemGroup<None>();
+            internal ItemGroup<Content> Contents = new ItemGroup<Content>();
+            internal ItemGroup<Vsct> Vscts = new ItemGroup<Vsct>();
+            internal ItemGroup<VsdConfigXml> VsdConfigXmls = new ItemGroup<VsdConfigXml>();
+            internal ItemGroup<WebReference> WebReferences = new ItemGroup<WebReference>();
+            internal ItemGroup<WebReferenceUrl> WebReferenceUrls = new ItemGroup<WebReferenceUrl>();
+            internal ItemGroup<ComReference> ComReferences = new ItemGroup<ComReference>();
+            internal ItemGroup<EntityDeploy> EntityDeploys = new ItemGroup<EntityDeploy>();
+            internal ItemGroup<WCFMetadataStorage> WCFMetadataStorages = new ItemGroup<WCFMetadataStorage>();
+            internal ItemGroup<SplashScreen> AppSplashScreen = new ItemGroup<SplashScreen>();
+            internal ItemGroup<ItemTemplate> PackageReferences = new ItemGroup<ItemTemplate>();
+            internal ItemGroup<Analyzer> Analyzers = new ItemGroup<Analyzer>();
+            internal ItemGroup<VSIXSourceItem> VSIXSourceItems = new ItemGroup<VSIXSourceItem>();
+            internal ItemGroup<FolderInclude> FolderIncludes = new ItemGroup<FolderInclude>();
+
+            internal string Resolve(Resolver resolver)
+            {
+                var writer = new StringWriter();
+                writer.Write(References.Resolve(resolver));
+                writer.Write(Services.Resolve(resolver));
+                writer.Write(Compiles.Resolve(resolver));
+                writer.Write(Vscts.Resolve(resolver));
+                writer.Write(VsdConfigXmls.Resolve(resolver));
+                writer.Write(Nones.Resolve(resolver));
+                writer.Write(EntityDeploys.Resolve(resolver));
+                writer.Write(Pages.Resolve(resolver));
+                writer.Write(Resources.Resolve(resolver));
+                writer.Write(EmbeddedResources.Resolve(resolver));
+                writer.Write(BootstrapperPackages.Resolve(resolver));
+                writer.Write(ProjectReferences.Resolve(resolver));
+                writer.Write(WebReferences.Resolve(resolver));
+                writer.Write(WebReferenceUrls.Resolve(resolver));
+                writer.Write(ComReferences.Resolve(resolver));
+                writer.Write(Contents.Resolve(resolver));
+                writer.Write(AppSplashScreen.Resolve(resolver));
+                writer.Write(PackageReferences.Resolve(resolver));
+                writer.Write(Analyzers.Resolve(resolver));
+                writer.Write(VSIXSourceItems.Resolve(resolver));
+                writer.Write(FolderIncludes.Resolve(resolver));
+
+                if (WCFMetadataStorages.Count > 0)
+                {
+                    writer.Write(Template.ItemGroups.ItemGroupBegin);
+                    writer.Write(Template.ItemGroups.WCFMetadata);
+                    writer.Write(Template.ItemGroups.ItemGroupEnd);
+
+                    writer.Write(WCFMetadataStorages.Resolve(resolver));
+                }
+
+                return writer.ToString();
+            }
+
+            internal class ItemGroup<T> : UniqueList<T>, IResolvable where T : IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    if (Count <= 0)
+                        return string.Empty;
+                    var writer = new StringWriter();
+                    writer.Write(Template.ItemGroups.ItemGroupBegin);
+                    var sortedValues = SortedValues;
+                    foreach (T elem in sortedValues)
+                    {
+                        writer.Write(elem.Resolve(resolver));
+                    }
+                    writer.Write(Template.ItemGroups.ItemGroupEnd);
+                    return writer.ToString();
+                }
+            }
+
+            internal class ItemGroupItem : IComparable<ItemGroupItem>, IEquatable<ItemGroupItem>
+            {
+                public string Include;
+                public string LinkFolder = string.Empty;
+
+                private bool IsLink { get { return Include.StartsWith(".."); } }
+
+                private string Link
+                {
+                    get
+                    {
+                        string filename = Path.GetFileName(Include);
+                        return Path.Combine(LinkFolder, filename);
+                    }
+                }
+
+                protected Resolver.ScopedParameter LinkParameter(Resolver resolver)
+                {
+                    return IsLink ? resolver.NewScopedParameter("link", Link) : null;
+                }
+
+                protected void AddLinkIfNeeded(StringWriter writer)
+                {
+                    if (IsLink)
+                        writer.Write(Template.ItemGroups.Link);
+                }
+
+                #region Equality members
+
+                public bool Equals(ItemGroupItem other)
+                {
+                    if (ReferenceEquals(null, other)) return false;
+                    if (ReferenceEquals(this, other)) return true;
+                    return string.Equals(Include, other.Include);
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (ReferenceEquals(null, obj)) return false;
+                    if (ReferenceEquals(this, obj)) return true;
+                    if (obj.GetType() != GetType()) return false;
+                    return Equals((ItemGroupItem)obj);
+                }
+
+                public override int GetHashCode()
+                {
+                    return (Include != null ? Include.GetHashCode() : 0);
+                }
+
+                public static bool operator ==(ItemGroupItem left, ItemGroupItem right)
+                {
+                    return Equals(left, right);
+                }
+
+                public static bool operator !=(ItemGroupItem left, ItemGroupItem right)
+                {
+                    return !Equals(left, right);
+                }
+
+                #endregion
+
+                public int CompareTo(ItemGroupItem other)
+                {
+                    return string.CompareOrdinal(Include, other.Include);
+                }
+            }
+
+            internal class WebReferenceUrl : ItemGroupItem, IResolvable
+            {
+                public string UrlBehavior;
+                public string RelPath;
+                public string UpdateFromURL;
+                public string ServiceLocationURL;
+                public string CachedDynamicPropName;
+                public string CachedAppSettingsObjectName;
+                public string CachedSettingsPropName;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("urlBehavior", UrlBehavior))
+                    using (resolver.NewScopedParameter("relPath", RelPath))
+                    using (resolver.NewScopedParameter("updateFromURL", UpdateFromURL))
+                    using (resolver.NewScopedParameter("serviceLocationURL", ServiceLocationURL))
+                    using (resolver.NewScopedParameter("cachedDynamicPropName", CachedDynamicPropName))
+                    using (resolver.NewScopedParameter("cachedAppSettingsObjectName", CachedAppSettingsObjectName))
+                    using (resolver.NewScopedParameter("cachedSettingsPropName", CachedSettingsPropName))
+                    {
+                        var writer = new StringWriter();
+
+                        writer.Write(Template.WebReferenceUrlBegin);
+                        writer.Write(Template.UrlBehavior);
+                        writer.Write(Template.RelPath);
+                        writer.Write(Template.UpdateFromURL);
+                        if (CachedDynamicPropName != null)
+                            writer.Write(Template.CachedDynamicPropName);
+                        writer.Write(Template.CachedAppSettingsObjectName);
+                        writer.Write(Template.CachedSettingsPropName);
+                        writer.Write(Template.WebReferenceUrlEnd);
+
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class ComReference : ItemGroupItem, IResolvable
+            {
+                public Guid Guid;
+                public int VersionMajor;
+                public int VersionMinor;
+                public int Lcid;
+                public string WrapperTool;
+                public bool? Private;
+                public bool? EmbedInteropTypes;
+
+                public string Resolve(Resolver resolver)
+                {
+                    string privateValue = RemoveLineTag;
+                    if (Private.HasValue)
+                        privateValue = Private.ToString().ToLower();
+
+                    string embedInteropTypesValue = RemoveLineTag;
+                    if (EmbedInteropTypes.HasValue)
+                        embedInteropTypesValue = EmbedInteropTypes.ToString();
+
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("guid", Guid))
+                    using (resolver.NewScopedParameter("versionMajor", VersionMajor))
+                    using (resolver.NewScopedParameter("versionMinor", VersionMinor))
+                    using (resolver.NewScopedParameter("lcid", Lcid))
+                    using (resolver.NewScopedParameter("wrapperTool", WrapperTool))
+                    using (resolver.NewScopedParameter("private", privateValue))
+                    using (resolver.NewScopedParameter("EmbedInteropTypes", embedInteropTypesValue))
+                    {
+                        var writer = new StringWriter();
+
+                        writer.Write(Template.COMReference);
+
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class WebReference : ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.SimpleWebReference);
+                    }
+                }
+            }
+
+            internal class FolderInclude : ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("folder", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.Folder);
+                    }
+                }
+            }
+
+            internal class Reference : ItemGroupItem, IResolvable
+            {
+                public bool? SpecificVersion;
+                public string HintPath;
+                public bool? Private;
+
+                public string Resolve(Resolver resolver)
+                {
+                    var writer = new StringWriter();
+
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("specificVersion", SpecificVersion))
+                    using (resolver.NewScopedParameter("hintPath", HintPath))
+                    using (resolver.NewScopedParameter("private", Private))
+                    {
+                        if (SpecificVersion == null && string.IsNullOrEmpty(HintPath) && Private == null)
+                            writer.Write(Template.ItemGroups.SimpleReference);
+                        else
+                        {
+                            writer.Write(Template.ItemGroups.ReferenceBegin);
+                            if (SpecificVersion.HasValue)
+                                writer.Write(Template.ItemGroups.SpecificVersion);
+                            if (!string.IsNullOrEmpty(HintPath))
+                                writer.Write(Template.ItemGroups.HintPath);
+                            if (Private.HasValue)
+                                writer.Write(Template.ItemGroups.Private);
+
+                            writer.Write(Template.ItemGroups.ReferenceEnd);
+                        }
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class SplashScreen : ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (var writer = new StringWriter())
+                    {
+                        using (resolver.NewScopedParameter("include", Include))
+                        {
+                            if (!string.IsNullOrWhiteSpace(Include))
+                                writer.Write(Template.ItemGroups.SplashScreen);
+
+                            return resolver.Resolve(writer.ToString());
+                        }
+                    }
+                }
+            }
+
+            internal class Content : ItemGroupItem, IResolvable
+            {
+                public string Generator;
+                public string LastGenOutput;
+                public string CopyToOutputDirectory;
+                public string IncludeInVsix;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("copyToOutputDirectory", CopyToOutputDirectory))
+                    using (resolver.NewScopedParameter("includeInVsix", IncludeInVsix))
+                    using (resolver.NewScopedParameter("generator", Generator))
+                    using (resolver.NewScopedParameter("lastGenOutput", LastGenOutput))
+                    using (LinkParameter(resolver))
+                    {
+                        var builder = new StringBuilder();
+                        var writer = new StringWriter(builder);
+
+                        if (Generator != null)
+                            writer.Write(Template.ItemGroups.Generator);
+                        if (LastGenOutput != null)
+                            writer.Write(Template.ItemGroups.LastGenOutput);
+                        if (CopyToOutputDirectory != null)
+                            writer.Write(Template.ItemGroups.CopyToOutputDirectory);
+                        if (IncludeInVsix != null)
+                            writer.Write(Template.ItemGroups.IncludeInVsix);
+                        AddLinkIfNeeded(writer);
+
+                        if (builder.Length == 0)
+                            return resolver.Resolve(Template.ItemGroups.ContentSimple);
+
+                        builder.Insert(0, Template.ItemGroups.ContentBegin);
+                        writer.Write(Template.ItemGroups.ContentEnd);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class Analyzer : ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (LinkParameter(resolver))
+                    {
+                        var builder = new StringBuilder();
+                        var writer = new StringWriter(builder);
+
+                        writer.Write(Template.ItemGroups.Analyzer);
+
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class Vsct : ItemGroupItem, IResolvable
+            {
+                public string ResourceName = "Menus.ctmenu";
+                public string SubType = "Designer";
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("resourceName", ResourceName))
+                    using (resolver.NewScopedParameter("subType", SubType))
+                    {
+                        var writer = new StringWriter();
+                        writer.Write(Template.ItemGroups.VsctCompileBegin);
+                        writer.Write(Template.ItemGroups.ResourceName);
+                        writer.Write(Template.ItemGroups.SubType);
+                        writer.Write(Template.ItemGroups.VsctCompileEnd);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class VsdConfigXml : ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        var writer = new StringWriter();
+                        writer.Write(Template.ItemGroups.VsdConfigXmlSimple);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class None : ItemGroupItem, IResolvable
+            {
+                public string Generator;
+                public string LastGenOutput;
+                public string DependentUpon = null;
+                public string CopyToOutputDirectory = null;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("lastGenOutput", LastGenOutput))
+                    using (resolver.NewScopedParameter("generator", Generator))
+                    using (resolver.NewScopedParameter("dependentUpon", DependentUpon))
+                    using (resolver.NewScopedParameter("copyToOutputDirectory", CopyToOutputDirectory))
+                    using (LinkParameter(resolver))
+                    {
+                        var builder = new StringBuilder();
+                        var writer = new StringWriter(builder);
+
+                        if (Generator != null)
+                            writer.Write(Template.ItemGroups.Generator);
+                        if (LastGenOutput != null)
+                            writer.Write(Template.ItemGroups.LastGenOutput);
+                        if (DependentUpon != null)
+                            writer.Write(Template.ItemGroups.DependentUpon);
+                        if (CopyToOutputDirectory != null)
+                            writer.Write(Template.ItemGroups.CopyToOutputDirectory);
+                        AddLinkIfNeeded(writer);
+
+                        if (builder.Length == 0)
+                            return resolver.Resolve(Template.ItemGroups.SimpleNone);
+
+                        builder.Insert(0, Template.ItemGroups.NoneItemGroupBegin);
+                        writer.Write(Template.ItemGroups.NoneItemGroupEnd);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class Service : ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.Service);
+                    }
+                }
+            }
+
+            internal class Compile : ItemGroupItem, IResolvable
+            {
+                public bool? AutoGen;
+                public bool? DesignTime = null;
+                public bool? DesignTimeSharedInput = null;
+                public string DependentUpon;
+                public string SubType = null;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("autoGen", AutoGen))
+                    using (resolver.NewScopedParameter("designTime", DesignTime))
+                    using (resolver.NewScopedParameter("designTimeSharedInput", DesignTimeSharedInput))
+                    using (resolver.NewScopedParameter("dependentUpon", DependentUpon))
+                    using (resolver.NewScopedParameter("subType", SubType))
+                    using (LinkParameter(resolver))
+                    {
+                        var builder = new StringBuilder();
+                        var writer = new StringWriter(builder);
+
+                        if (AutoGen.HasValue)
+                            writer.Write(Template.ItemGroups.AutoGen);
+                        if (DesignTime.HasValue)
+                            writer.Write(Template.ItemGroups.DesignTime);
+                        if (DesignTimeSharedInput.HasValue)
+                            writer.Write(Template.ItemGroups.DesignTimeSharedInput);
+                        if (DependentUpon != null)
+                            writer.Write(Template.ItemGroups.DependentUpon);
+                        if (SubType != null)
+                            writer.Write(Template.ItemGroups.SubType);
+                        AddLinkIfNeeded(writer);
+
+                        if (builder.Length == 0)
+                            return resolver.Resolve(Template.ItemGroups.SimpleCompile);
+
+                        builder.Insert(0, Template.ItemGroups.CompileBegin);
+                        writer.Write(Template.ItemGroups.CompileEnd);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class ProjectReference : ItemGroupItem, IResolvable
+            {
+                public Guid Project;
+                public string Name;
+                public bool Private = false;
+                public bool? ReferenceOutputAssembly = true;
+                public string IncludeOutputGroupsInVSIX = null;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("projectGUID", Project.ToString("B").ToUpper()))
+                    using (resolver.NewScopedParameter("projectRefName", Name))
+                    using (resolver.NewScopedParameter("private", Private.ToString().ToLower()))
+                    using (resolver.NewScopedParameter("ReferenceOutputAssembly", ReferenceOutputAssembly))
+                    using (resolver.NewScopedParameter("IncludeOutputGroupsInVSIX", IncludeOutputGroupsInVSIX))
+                    {
+                        var writer = new StringWriter();
+
+                        writer.Write(Template.ItemGroups.ProjectReferenceBegin);
+                        writer.Write(Template.ItemGroups.ProjectGUID);
+                        writer.Write(Template.ItemGroups.ProjectRefName);
+                        if (!Private)
+                            writer.Write(Template.ItemGroups.Private);
+                        if (ReferenceOutputAssembly.HasValue)
+                            writer.Write(Template.ItemGroups.ReferenceOutputAssembly);
+                        if (IncludeOutputGroupsInVSIX != null)
+                            writer.Write(Template.ItemGroups.IncludeOutputGroupsInVSIX);
+                        writer.Write(Template.ItemGroups.ProjectReferenceEnd);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class ItemTemplate : IResolvable, IComparable<ItemTemplate>, IEquatable<ItemTemplate>
+            {
+                private readonly string _template;
+
+                public ItemTemplate(string template)
+                {
+                    _template = template;
+                }
+
+                public string Resolve(Resolver resolver)
+                {
+                    return resolver.Resolve(_template);
+                }
+
+                public int CompareTo(ItemTemplate other)
+                {
+                    if (ReferenceEquals(this, other)) return 0;
+                    if (ReferenceEquals(null, other)) return 1;
+                    return string.Compare(_template, other._template, StringComparison.OrdinalIgnoreCase);
+                }
+
+                public bool Equals(ItemTemplate other)
+                {
+                    if (ReferenceEquals(null, other)) return false;
+                    if (ReferenceEquals(this, other)) return true;
+                    return string.Equals(_template, other._template, StringComparison.OrdinalIgnoreCase);
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (ReferenceEquals(null, obj)) return false;
+                    if (ReferenceEquals(this, obj)) return true;
+                    if (obj.GetType() != this.GetType()) return false;
+                    return Equals((ItemTemplate)obj);
+                }
+
+                public override int GetHashCode()
+                {
+                    return StringComparer.OrdinalIgnoreCase.GetHashCode(_template);
+                }
+            }
+
+            //Available field which could be supported
+            //https://msdn.microsoft.com/en-us/library/ms164294.aspx
+            internal class BootstrapperPackage : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public bool Visible = true;
+                public string ProductName = null;
+                public bool Install = true;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("visible", Visible))
+                    using (resolver.NewScopedParameter("productName", ProductName))
+                    using (resolver.NewScopedParameter("install", Install))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.BootstrapperPackage);
+                    }
+                }
+            }
+
+            internal class EmbeddedResource : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public string DependUpon = null;
+                public string MergeWithCto = null;
+                public string Generator = null;
+                public string LastGenOutput = null;
+                public string SubType = "Designer";
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("generator", Generator))
+                    using (resolver.NewScopedParameter("lastGenOutput", LastGenOutput))
+                    using (resolver.NewScopedParameter("subType", SubType))
+                    using (resolver.NewScopedParameter("dependentUpon", DependUpon))
+                    using (resolver.NewScopedParameter("mergeWithCto", MergeWithCto))
+                    using (LinkParameter(resolver))
+                    {
+                        var builder = new StringBuilder();
+                        var writer = new StringWriter(builder);
+
+                        if (!string.IsNullOrEmpty(Generator))
+                            writer.Write(Template.ItemGroups.Generator);
+                        if (!string.IsNullOrWhiteSpace(LastGenOutput))
+                            writer.Write(Template.ItemGroups.LastGenOutput);
+                        if (!string.IsNullOrWhiteSpace(SubType))
+                            writer.Write(Template.ItemGroups.SubType);
+                        if (!string.IsNullOrWhiteSpace(DependUpon))
+                            writer.Write(Template.ItemGroups.DependentUpon);
+                        if (!string.IsNullOrWhiteSpace(MergeWithCto))
+                            writer.Write(Template.ItemGroups.MergeWithCto);
+                        AddLinkIfNeeded(writer);
+
+                        if (builder.Length == 0)
+                            return resolver.Resolve(Template.ItemGroups.SimpleEmbeddedResource);
+
+                        builder.Insert(0, Template.ItemGroups.EmbeddedResourceBegin);
+                        builder.Append(Template.ItemGroups.EmbeddedResourceEnd);
+
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class Page : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public bool? AutoGen;
+                public string DependentUpon = null;
+                public string Generator = "MSBuild:Compile";
+                public string SubType = "Designer";
+                public bool IsApplicationDefinition = false;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("generator", Generator))
+                    using (resolver.NewScopedParameter("subType", SubType))
+                    using (resolver.NewScopedParameter("autoGen", AutoGen))
+                    using (resolver.NewScopedParameter("dependentUpon", DependentUpon))
+                    using (LinkParameter(resolver))
+                    {
+                        var writer = new StringWriter();
+                        if (!IsApplicationDefinition)
+                        {
+                            writer.Write(Template.ItemGroups.PageBegin);
+                            if (AutoGen != null)
+                                writer.Write(Template.ItemGroups.AutoGen);
+                            if (DependentUpon != null)
+                                writer.Write(Template.ItemGroups.DependentUpon);
+                            writer.Write(Template.ItemGroups.Generator);
+                            writer.Write(Template.ItemGroups.SubType);
+                            AddLinkIfNeeded(writer);
+                            writer.Write(Template.ItemGroups.PageEnd);
+                        }
+                        else
+                        {
+                            writer.Write(Template.ItemGroups.ApplicationDefinitionBegin);
+                            if (AutoGen != null)
+                                writer.Write(Template.ItemGroups.AutoGen);
+                            if (DependentUpon != null)
+                                writer.Write(Template.ItemGroups.DependentUpon);
+                            writer.Write(Template.ItemGroups.Generator);
+                            writer.Write(Template.ItemGroups.SubType);
+                            AddLinkIfNeeded(writer);
+                            writer.Write(Template.ItemGroups.ApplicationDefinitionEnd);
+                        }
+
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class Resource : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("resource", Include))
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (LinkParameter(resolver))
+                    {
+                        var builder = new StringBuilder();
+                        var writer = new StringWriter(builder);
+
+                        AddLinkIfNeeded(writer);
+
+                        if (builder.Length == 0)
+                            return resolver.Resolve(Template.ItemGroups.SimpleResource);
+
+                        builder.Insert(0, Template.ItemGroups.ResourceBegin);
+                        builder.Append(Template.ItemGroups.ResourceEnd);
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class EntityDeploy : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public string Generator = "EntityModelCodeGenerator";
+                public string LastGenOutput = null;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("generator", Generator))
+                    using (resolver.NewScopedParameter("lastGenOutput", LastGenOutput))
+                    {
+                        var writer = new StringWriter();
+                        writer.Write(Template.ItemGroups.EntityDeployBegin);
+                        writer.Write(Template.ItemGroups.Generator);
+                        writer.Write(Template.ItemGroups.LastGenOutput);
+                        writer.Write(Template.ItemGroups.EntityDeployEnd);
+
+                        return resolver.Resolve(writer.ToString());
+                    }
+                }
+            }
+
+            internal class WCFMetadataStorage : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("storage", Include))
+                        return resolver.Resolve(Template.ItemGroups.WCFMetadataStorage);
+                }
+            }
+
+            internal class VSIXSourceItem : ItemGroups.ItemGroupItem, IResolvable
+            {
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("vsixSourceItem", Include))
+                        return resolver.Resolve(Template.ItemGroups.VSIXSourceItem);
+                }
+            }
+        }
+
+        internal class Choose : IResolvable
+        {
+            public Dictionary<string, List<IResolvable>> Choices = new Dictionary<string, List<IResolvable>>();
+
+            public string Resolve(Resolver resolver)
+            {
+                var writer = new StringWriter();
+
+                writer.Write(Template.ItemGroups.ChooseBegin);
+
+                foreach (KeyValuePair<string, List<IResolvable>> keyValuePair in Choices)
+                {
+                    using (resolver.NewScopedParameter("condition", keyValuePair.Key))
+                    {
+                        writer.Write(resolver.Resolve(Template.ItemGroups.ChooseConditionBegin));
+
+                        var itemGroupWriter = new StringWriter();
+
+                        itemGroupWriter.Write(Template.ItemGroups.ItemGroupBegin);
+                        foreach (IResolvable item in keyValuePair.Value)
+                        {
+                            itemGroupWriter.Write(item.Resolve(resolver));
+                        }
+                        itemGroupWriter.Write(Template.ItemGroups.ItemGroupEnd);
+
+                        // Fix indentation here...
+                        List<string> itemGroupResult = itemGroupWriter.ToString().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(s => "    " + s).ToList();
+                        itemGroupResult.ForEach(s => writer.WriteLine(s));
+
+                        writer.Write(Template.ItemGroups.ChooseConditionEnd);
+                    }
+                }
+
+                writer.Write(Template.ItemGroups.ChooseEnd);
+
+                return resolver.Resolve(writer.ToString());
+            }
+        }
+
+        public void Generate(Builder builder, CSharpProject project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
+        {
+            _builder = builder;
+
+            var fileInfo = new FileInfo(projectFile);
+            string projectPath = fileInfo.Directory.FullName;
+            string projectFileName = fileInfo.Name;
+
+            Generate(project, configurations, projectPath, projectFileName, generatedFiles, skipFiles);
+            _builder = null;
+        }
+
+        private Project.Configuration _projectConfiguration;
+        private List<Project.Configuration> _projectConfigurationList;
+        private string _projectPath;
+        private string _projectPathCapitalized;
+        private Builder _builder;
+        public const string ProjectExtension = ".csproj";
+        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+
+
+        private void SelectOption(params Options.OptionAction[] options)
+        {
+            Options.SelectOption(_projectConfiguration, options);
+        }
+
+        private static void Write(string value, TextWriter writer, Resolver resolver)
+        {
+            string resolvedValue = resolver.Resolve(value);
+            var reader = new StringReader(resolvedValue);
+            string str = reader.ReadToEnd();
+            writer.Write(str);
+            writer.Flush();
+        }
+
+        private string ReadGuidFromProjectFile(Project.Configuration dependency)
+        {
+            var guidFromProjectFile = Sln.ReadGuidFromProjectFile(dependency.ProjectFullFileNameWithExtension);
+            return (string.IsNullOrEmpty(guidFromProjectFile)) ? RemoveLineTag : guidFromProjectFile;
+        }
+
+        private void Generate(
+            CSharpProject project,
+            List<Project.Configuration> unsortedConfigurations,
+            string projectPath,
+            string projectFile,
+            List<string> generatedFiles,
+            List<string> skipFiles
+        )
+        {
+            var itemGroups = new ItemGroups();
+
+            // Need to sort by name and platform
+            List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
+
+            // valid that 2 conf name in the same project don't have the same name
+            var configurationNameMapping = new Dictionary<string, Project.Configuration>();
+            string assemblyName = null;
+            foreach (Project.Configuration conf in configurations)
+            {
+                if (assemblyName == null)
+                    assemblyName = conf.AssemblyName;
+                else if (assemblyName != conf.AssemblyName)
+                    throw new Error("The assemblyName can't be different between configurations of a same project. {0} != {1} in {2}", assemblyName, conf.AssemblyName, projectFile);
+
+                //set the default outputType
+                if (conf.Output == Project.Configuration.OutputType.Exe)
+                    conf.Output = Project.Configuration.OutputType.DotNetConsoleApp;
+                if (conf.Output == Project.Configuration.OutputType.Dll)
+                    throw new Error("OutputType for C# projects must be either DotNetClassLibrary, DotNetConsoleApp or DotNetWindowsApp");
+
+                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project);
+
+                configurationNameMapping[projectUniqueName] = conf;
+
+                // set generator information
+                conf.GeneratorSetGeneratedInformation("exe", "exe", "dll", "pdb");
+            }
+
+            string outputType;
+            switch (configurations[0].Output)
+            {
+                case Project.Configuration.OutputType.DotNetWindowsApp:
+                    outputType = "WinExe";
+                    break;
+                case Project.Configuration.OutputType.DotNetClassLibrary:
+                    outputType = "Library";
+                    break;
+                case Project.Configuration.OutputType.DotNetConsoleApp:
+                default:
+                    outputType = "Exe";
+                    break;
+            }
+
+            string projectTypeGuids = RemoveLineTag;
+            switch (project.ProjectTypeGuids)
+            {
+                case CSharpProjectType.Test: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.CSharpTestProject); break;
+                case CSharpProjectType.Vsix: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VsixProject); break;
+                case CSharpProjectType.Vsto: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VstoProject); break;
+                case CSharpProjectType.Wpf: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WpfProject); break;
+                case CSharpProjectType.Wcf: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WcfProject); break;
+                case CSharpProjectType.AspNetMvc5: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.AspNetMvc5Project); break;
+            }
+
+            var resolver = new Resolver();
+
+            // source control
+
+            string sccProjectName = RemoveLineTag;
+            string sccLocalPath = RemoveLineTag;
+            string sccProvider = RemoveLineTag;
+            if (project.PerforceRootPath != null)
+            {
+                sccProjectName = "Perforce Project";
+                sccLocalPath = Util.PathGetRelative(projectPath, project.PerforceRootPath);
+                sccProvider = "MSSCCI:Perforce SCM";
+            }
+
+            _projectPath = projectPath;
+            _projectPathCapitalized = Util.GetCapitalizedPath(projectPath);
+            _projectConfigurationList = configurations;
+
+            var memoryStream = new MemoryStream();
+            var writer = new StreamWriter(memoryStream);
+
+            //shouldn't be a problem since you can't have 2 different target frameworks or ToolsVersion in the same projectFile
+            ITarget target = configurations[0].Target;
+            var targetFramework = target.GetFragment<DotNetFramework>();
+            var targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
+            var devenv = target.GetFragment<DevEnv>();
+            using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))
+            using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
+            {
+                // xml begin header
+                switch (devenv)
+                {
+                    case DevEnv.vs2010:
+                    case DevEnv.vs2012:
+                    case DevEnv.vs2013:
+                    case DevEnv.vs2015:
+                        Write(Template.Project.ProjectBegin, writer, resolver);
+                        break;
+                    case DevEnv.vs2017:
+                        Write(Template.Project.ProjectBeginVs2017, writer, resolver);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            // generate all configuration options onces...
+            var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
+
+            foreach (Project.Configuration conf in _projectConfigurationList)
+            {
+                _projectConfiguration = conf;
+                Options.ExplicitOptions option = GenerateOptions(project, conf);
+                _projectConfiguration = null;
+                options.Add(conf, option);
+            }
+            using (resolver.NewScopedParameter("project", project))
+            using (resolver.NewScopedParameter("guid", configurations[0].ProjectGuid))
+            using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
+            using (resolver.NewScopedParameter("sccLocalPath", sccLocalPath))
+            using (resolver.NewScopedParameter("sccProvider", sccProvider))
+            using (resolver.NewScopedParameter("options", options[_projectConfigurationList[0]]))
+            using (resolver.NewScopedParameter("outputType", outputType))
+            using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))
+            using (resolver.NewScopedParameter("projectTypeGuids", projectTypeGuids))
+            using (resolver.NewScopedParameter("assemblyName", assemblyName))
+            using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project)))
+            {
+                Write(Template.Project.ProjectDescription, writer, resolver);
+            }
+
+            if (!string.IsNullOrEmpty(project.ApplicationIcon))
+            {
+                using (resolver.NewScopedParameter("iconpath", project.ApplicationIcon))
+                    Write(Template.ApplicationIcon, writer, resolver);
+            }
+
+            string appManifest = project.ApplicationManifest;
+
+            if (!string.IsNullOrEmpty(appManifest))
+            {
+                appManifest = project.ResolvedNoneFullFileNames.FirstOrDefault(s => s.Contains(appManifest));
+                if (appManifest != null)
+                {
+                    appManifest = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(appManifest));
+                    using (resolver.NewScopedParameter("applicationmanifest", appManifest))
+                        Write(Template.ApplicationManifest, writer, resolver);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(project.StartupObject))
+            {
+                using (resolver.NewScopedParameter("startupobject", project.StartupObject))
+                    Write(Template.StartupObject, writer, resolver);
+            }
+
+            if (project.NoWin32Manifest)
+            {
+                Write(Template.NoWin32Manifest, writer, resolver);
+            }
+
+            if (project.UseMSBuild14IfAvailable)
+            {
+                Write(Template.MSBuild14PropertyGroup, writer, resolver);
+            }
+
+            WriteCustomProperties(project, writer, resolver);
+
+            if (project.ProjectTypeGuids == CSharpProjectType.Wcf)
+            {
+                string wcfAutoStart = RemoveLineTag;
+                if (project.WcfAutoStart.HasValue)
+                    wcfAutoStart = project.WcfAutoStart.ToString();
+                using (resolver.NewScopedParameter("AutoStart", wcfAutoStart))
+                using (resolver.NewScopedParameter("WCFExtensionGUID", ProjectTypeGuids.WindowsCommunicationFoundation.ToString("B").ToUpper()))
+                    Write(Template.ProjectExtensionsWcf, writer, resolver);
+            }
+
+            if (project.ProjectTypeGuids == CSharpProjectType.Vsto)
+            {
+                var vstoProject = project as CSharpVstoProject;
+
+                if (vstoProject == null)
+                    throw new InvalidDataException("VSTO project was not correctly initialized. Use CSharpVstoProject instead of CSharpProject");
+
+                using (resolver.NewScopedParameter("AddInNamespace", project.RootNamespace))
+                using (resolver.NewScopedParameter("OfficeApplication", vstoProject.Application.ToString()))
+                using (resolver.NewScopedParameter("OfficeSDKVersion", vstoProject.OfficeSdkVersion))
+                    Write(Template.ProjectExtensionsVsto, writer, resolver);
+            }
+
+            if (project.ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
+            {
+                var aspnetProject = project as AspNetProject;
+
+                if (aspnetProject == null)
+                    throw new InvalidDataException("AspNet project was not correctly initialized. Use AspNetProject instead of CSharpProject");
+
+                Func<bool?, string> toEnableDisable = (value) => value.HasValue ? (value.Value ? "enabled" : "disabled") : RemoveLineTag;
+
+                using (resolver.NewScopedParameter("MvcBuildViews", aspnetProject.MvcBuildViews?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("UseIISExpress", aspnetProject.UseIISExpress?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("IISExpressSSLPort", aspnetProject.IISExpressSSLPort?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("IISExpressAnonymousAuthentication", toEnableDisable(aspnetProject.IISExpressAnonymousAuthentication)))
+                using (resolver.NewScopedParameter("IISExpressWindowsAuthentication", toEnableDisable(aspnetProject.IISExpressWindowsAuthentication)))
+                using (resolver.NewScopedParameter("IISExpressUseClassicPipelineMode", aspnetProject.IISExpressUseClassicPipelineMode?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("UseGlobalApplicationHostFile", aspnetProject.UseGlobalApplicationHostFile?.ToString() ?? RemoveLineTag))
+                    Write(Template.Project.ProjectAspNetMvcDescription, writer, resolver);
+            }
+
+            // user file
+            string projectFilePath = Path.Combine(projectPath, projectFile) + ProjectExtension;
+            UserFile uf = new UserFile(projectFilePath);
+            uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
+
+            // configuration general
+            foreach (Project.Configuration conf in _projectConfigurationList)
+            {
+                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (resolver.NewScopedParameter("conf", conf))
+                using (resolver.NewScopedParameter("options", options[conf]))
+                {
+                    Write(Template.Project.ProjectConfigurationsGeneral, writer, resolver);
+                }
+
+                foreach (var dependencies in new[] { conf.DotNetPublicDependencies, conf.DotNetPrivateDependencies })
+                {
+                    foreach (var dependency in dependencies)
+                    {
+                        var dependencyConfiguration = dependency.Configuration;
+
+                        if (!Util.IsDotNet(dependencyConfiguration))
+                            continue;
+
+                        string dependencyExtension = Util.GetProjectFileExtension(dependencyConfiguration);
+                        string projectFullFileNameWithExtension = Util.GetCapitalizedPath(dependencyConfiguration.ProjectFullFileName + dependencyExtension);
+                        string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized,
+                                                                            projectFullFileNameWithExtension);
+
+                        // If dependency project is marked as [Compile], read the GUID from the project file
+                        if (dependencyConfiguration.Project.GetType().IsDefined(typeof(Compile), false) && dependencyConfiguration.ProjectGuid == null)
+                            dependencyConfiguration.ProjectGuid = ReadGuidFromProjectFile(dependencyConfiguration);
+
+                        // FIXME : MsBuild does not seem to properly detect ReferenceOutputAssembly setting. 
+                        // It may try to recompile the project if the output file of the dependency is missing. 
+                        // To counter this, the CopyLocal field is forced to false for build-only dependencies. 
+                        bool isPrivate = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences) && dependency.ReferenceOutputAssembly != false;
+
+                        string includeOutputGroupsInVsix = null;
+                        if (isPrivate && project.ProjectTypeGuids == CSharpProjectType.Vsix)
+                        {
+                            // Includes debug symbols of private (i.e. copy local) referenced projects in the VSIX.
+                            // This WILL override default values of <IncludeOutputGroupsInVSIX> and <IncludeOutputGroupsInVSIXLocalOnly> from Microsoft.VsSDK.targets,
+                            // so if the VSIXs stop working, this may be the cause...
+                            includeOutputGroupsInVsix = "DebugSymbolsProjectOutputGroup;BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup";
+                        }
+
+                        itemGroups.ProjectReferences.Add(new ItemGroups.ProjectReference
+                        {
+                            Include = relativeToProjectFile,
+                            Name = dependencyConfiguration.ProjectName,
+                            Private = isPrivate,
+                            Project = new Guid(dependencyConfiguration.ProjectGuid),
+                            ReferenceOutputAssembly = dependency.ReferenceOutputAssembly,
+                            IncludeOutputGroupsInVSIX = includeOutputGroupsInVsix,
+                        });
+                    }
+                }
+
+                foreach (var projectFileName in conf.ProjectReferencesByPath.Concat(conf.NuGetPackageProjectReferencesByPath))
+                {
+                    string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectFileName);
+                    string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized,
+                                                                        projectFullFileNameWithExtension);
+                    string projectGuid = Sln.ReadGuidFromProjectFile(projectFileName);
+                    itemGroups.ProjectReferences.Add(new ItemGroups.ProjectReference
+                    {
+                        Include = relativeToProjectFile,
+                        Name = Path.GetFileNameWithoutExtension(projectFileName),
+                        Private =
+                            project.DependenciesCopyLocal.HasFlag(
+                                Project.DependenciesCopyLocalTypes
+                                             .ProjectReferences),
+                        Project = new Guid(projectGuid),
+                    });
+                }
+            }
+
+            if (project.RunPostBuildEvent != Options.CSharp.RunPostBuildEvent.OnBuildSuccess)
+            {
+                using (resolver.NewScopedParameter("RunPostBuildEvent", Enum.GetName(typeof(Options.CSharp.RunPostBuildEvent), project.RunPostBuildEvent)))
+                    Write(Template.Project.ProjectConfigurationsRunPostBuildEvent, writer, resolver);
+            }
+
+            GenerateFiles(project, configurations, itemGroups, generatedFiles, skipFiles);
+
+            #region <Choose> section
+            Dictionary<string, List<IResolvable>> choiceDict =
+                configurations.SelectMany(c => c.ConditionalReferencesByPath.Select(p => new Tuple<string, string>(c.ConditionalReferencesByPathCondition, p)))
+                .GroupBy(t => t.Item1).ToDictionary(g => g.Key, g => g.Select(p => new ItemGroups.Reference
+                {
+                    Include = Path.GetFileNameWithoutExtension(p.Item2),
+                    SpecificVersion = false,
+                    HintPath = Util.PathGetRelative(_projectPathCapitalized, p.Item2),
+                    Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences) ? default(bool?) : false
+                } as IResolvable).ToList());
+
+            if (choiceDict.Count != 0)
+            {
+                Choose choose = new Choose
+                {
+                    Choices = choiceDict
+                };
+                writer.Write(choose.Resolve(resolver));
+            }
+            #endregion
+
+            writer.Write(itemGroups.Resolve(resolver));
+
+            var importProjects = project.ImportProjects;
+            if (project.ProjectTypeGuids == CSharpProjectType.Vsix)
+            {
+                // Copy in new list to avoid concurrent access
+                var newImportProjects = new UniqueList<ImportProject>();
+                newImportProjects.AddRange(importProjects);
+                importProjects = newImportProjects;
+                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets", Condition = @"'$(VSToolsPath)' != ''" });
+            }
+
+            Trace.Assert(importProjects.Count > 0);
+
+            foreach (var import in importProjects)
+            {
+                using (resolver.NewScopedParameter("project", project))
+                using (resolver.NewScopedParameter("importProject", import.Project))
+                {
+                    if (!string.IsNullOrEmpty(import.Condition))
+                        using (resolver.NewScopedParameter("importCondition", import.Condition))
+                        {
+                            Write(Template.Project.ImportProjectItem, writer, resolver);
+                        }
+                    else
+                        Write(Template.Project.ImportProjectItemSimple, writer, resolver);
+                }
+            }
+
+            foreach (var element in project.UsingTasks)
+            {
+                using (resolver.NewScopedParameter("project", project))
+                using (resolver.NewScopedParameter("usingTaskElement", element))
+                {
+                    Write(Template.UsingTaskElement.UsingTask, writer, resolver);
+                }
+            }
+
+            foreach (var element in project.CustomTargets)
+            {
+                using (resolver.NewScopedParameter("targetElement", element))
+                {
+                    Write(Template.TargetElement.CustomTarget, writer, resolver);
+                }
+            }
+
+            if (project.ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
+            {
+                var aspnetProject = project as AspNetProject;
+
+                if (aspnetProject == null)
+                    throw new InvalidDataException("AspNet project was not correctly initialized. Use AspNetProject instead of CSharpProject");
+
+                using (resolver.NewScopedParameter("UseIIS", aspnetProject.UseIIS?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("AutoAssignPort", aspnetProject.AutoAssignPort?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("DevelopmentServerPort", aspnetProject.DevelopmentServerPort?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("DevelopmentServerVPath", aspnetProject.DevelopmentServerVPath ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("IISUrl", aspnetProject.IISUrl ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("NTLMAuthentication", aspnetProject.NTLMAuthentication?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("UseCustomServer", aspnetProject.UseCustomServer?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("SaveServerSettingsInUserFile", aspnetProject.SaveServerSettingsInUserFile?.ToString() ?? RemoveLineTag))
+                using (resolver.NewScopedParameter("AspNetMvc5ExtensionGUID", ProjectTypeGuids.AspNetMvc5.ToString("B").ToUpper()))
+                    Write(Template.ProjectExtensionsAspNetMvc5, writer, resolver);
+            }
+
+            WriteEvents(options, writer, resolver);
+            Write(Template.Project.ProjectEnd, writer, resolver);
+            // Write the project file
+            writer.Flush();
+
+            var cleanMemoryStream = Util.RemoveLineTags(memoryStream, RemoveLineTag);
+            var projectFileInfo = new FileInfo(Path.Combine(projectPath, projectFile + ProjectExtension));
+            if (_builder.Context.WriteGeneratedFile(project.GetType(), projectFileInfo, cleanMemoryStream))
+                generatedFiles.Add(projectFileInfo.FullName);
+            else
+                skipFiles.Add(projectFileInfo.FullName);
+
+            writer.Close();
+        }
+
+        private static void WriteCustomProperties(Project project, StreamWriter writer, Resolver resolver)
+        {
+            if (project.CustomProperties.Any())
+            {
+                Write(Template.CustomPropertiesStart, writer, resolver);
+                foreach (var key in project.CustomProperties.Keys)
+                {
+                    resolver.SetParameter("custompropertyname", key);
+                    resolver.SetParameter("custompropertyvalue", project.CustomProperties[key]);
+                    Write(Template.CustomProperty, writer, resolver);
+                }
+                Write(Template.CustomPropertiesEnd, writer, resolver);
+            }
+        }
+
+        private void GenerateFiles(
+            CSharpProject project,
+            List<Project.Configuration> configurations,
+            ItemGroups itemGroups,
+            List<string> generatedFiles,
+            List<string> skipFiles
+        )
+        {
+            #region Content
+            foreach (var file in project.ResolvedContentFullFileNames)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, file);
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, LinkFolder = project.GetLinkFolder(include) });
+            }
+
+
+            foreach (var content in project.AdditionalContentAlwaysCopy)
+            {
+                var includePath = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = includePath, CopyToOutputDirectory = "Always", LinkFolder = project.GetLinkFolder(includePath) });
+            }
+
+            foreach (var content in project.AdditionalContentCopyIfNewer)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, CopyToOutputDirectory = "PreserveNewest", LinkFolder = project.GetLinkFolder(include) });
+            }
+
+            foreach (var content in project.AdditionalContent)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content)), LinkFolder = project.GetLinkFolder(include) });
+            }
+
+            foreach (var content in project.AdditionalContentAlwaysIncludeInVsix)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, IncludeInVsix = "true", LinkFolder = project.GetLinkFolder(include) });
+            }
+
+            foreach (var content in project.AdditionalNoneAlwaysCopy)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
+                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = "Always", LinkFolder = project.GetLinkFolder(include) });
+            }
+
+            foreach (var content in project.AdditionalNoneCopyIfNewer)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
+                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = "PreserveNewest", LinkFolder = project.GetLinkFolder(include) });
+            }
+
+            if (!string.IsNullOrWhiteSpace(project.ApplicationSplashScreen))
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(project.ApplicationSplashScreen));
+                itemGroups.AppSplashScreen.Add(new ItemGroups.SplashScreen { Include = include });
+            }
+
+            foreach (var analyzerDllFilePath in project.AnalyzerDllFilePaths)
+            {
+                string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(analyzerDllFilePath));
+                itemGroups.Analyzers.Add(new ItemGroups.Analyzer { Include = include });
+            }
+            #endregion
+
+            if (configurations.SelectMany(config => config.AdditionalNone).Any(noneInclude => !configurations.First().AdditionalNone.Contains(noneInclude)))
+            {
+                throw new NotImplementedException("The None files are not the same between the configurations");
+            }
+
+            foreach (var vsctFile in project.VsctCompileFiles)
+            {
+                itemGroups.Vscts.Add(new ItemGroups.Vsct { Include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(vsctFile)) });
+            }
+
+            foreach (var vsdConfigXmlFile in project.VsdConfigXmlFiles)
+            {
+                itemGroups.VsdConfigXmls.Add(new ItemGroups.VsdConfigXml { Include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(vsdConfigXmlFile)) });
+            }
+
+            foreach (var vsixSourceItem in project.VSIXSourceItems)
+            {
+                itemGroups.VSIXSourceItems.Add(new ItemGroups.VSIXSourceItem { Include = vsixSourceItem });
+            }
+
+            HashSet<string> allContents = new HashSet<string>(itemGroups.Contents.Select(c => c.Include));
+
+            List<string> resolvedSources = project.ResolvedSourceFiles.Select(source => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(source))).ToList();
+            List<string> resolvedResources = project.ResourceFiles.Concat(project.ResolvedResourcesFullFileNames).Select(resource => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(resource))).Distinct().ToList();
+            List<string> resolvedEmbeddedResource = project.ResourceFiles.Concat(project.AdditionalEmbeddedResource).Concat(project.AdditionalEmbeddedAssemblies).Select(f => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(f))).Distinct().ToList();
+            List<string> resolvedNoneFiles =
+                (project.ResolvedNoneFullFileNames.Select(file => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(file))))
+                .Concat(project.AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))))
+                .Where(f => !allContents.Contains(f)).Distinct().ToList();
+
+            //Add the None files from the configuration
+            resolvedNoneFiles = resolvedNoneFiles.Concat(
+                configurations.First().AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f)))).ToList();
+
+            #region exclusions
+            // None file exclusions
+            List<Regex> exclusionRegexs = project.SourceFilesExcludeRegex.Concat(project.SourceNoneFilesExcludeRegex).Select(p => new Regex(p, RegexOptions.Compiled | RegexOptions.IgnoreCase)).ToList();
+            resolvedNoneFiles = resolvedNoneFiles.Where(f =>
+            {
+                string filePath = Util.PathGetAbsolute(_projectPath, f);
+                return exclusionRegexs.All(r => !r.IsMatch(filePath));
+            }).ToList();
+            #endregion
+
+            var remainingSourcesFiles = new List<string>(resolvedSources);
+            var remainingResourcesFiles = new List<string>(resolvedResources);
+            var remainingEmbeddedResourcesFiles = new List<string>(resolvedEmbeddedResource);
+            var remainingNoneFiles = new List<string>(resolvedNoneFiles);
+
+            #region global file association
+            List<FileAssociation> fileAssociations = FullFileNameAssociation(remainingSourcesFiles.Concat(resolvedResources).Concat(resolvedEmbeddedResource).Concat(resolvedNoneFiles));
+
+            foreach (FileAssociation fileAssociation in fileAssociations)
+            {
+                if (fileAssociation.Type == FileAssociationType.Unknown)
+                    continue;
+
+                switch (fileAssociation.Type)
+                {
+                    case FileAssociationType.Xaml:
+                        {
+                            string linkedCsFile = fileAssociation.GetFilenameWithExtension(".xaml.cs");
+                            string xaml = fileAssociation.GetFilenameWithExtension(".xaml");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = linkedCsFile,
+                                DependentUpon = Path.GetFileName(xaml),
+                                LinkFolder = GetProjectLinkedFolder(linkedCsFile, _projectPathCapitalized, project.SourceRootPath)
+                            });
+
+                            itemGroups.Pages.Add(new ItemGroups.Page
+                            {
+                                Include = xaml,
+                                IsApplicationDefinition = project.ApplicationDefinitionFilenames.Any(f => f.Equals(Path.GetFileName(xaml), StringComparison.InvariantCultureIgnoreCase)),
+                                LinkFolder = GetProjectLinkedFolder(xaml, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            remainingSourcesFiles.Remove(xaml);
+                            remainingSourcesFiles.Remove(linkedCsFile);
+                            break;
+                        }
+                    case FileAssociationType.Designer:
+                        {
+                            string designerFile = fileAssociation.GetFilenameWithExtension(".designer.cs");
+                            string csFile = fileAssociation.GetFilenameWithExtension(".cs");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = designerFile,
+                                DependentUpon = Path.GetFileName(csFile),
+                                LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            remainingSourcesFiles.Remove(designerFile);
+                            string resXFile = fileAssociation.GetFilenameWithExtension(".resx");
+                            if (resXFile != null)
+                            {
+                                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
+                                {
+                                    Include = resXFile,
+                                    DependUpon = Path.GetFileName(csFile),
+                                    LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath)
+                                });
+                                remainingEmbeddedResourcesFiles.Remove(resXFile);
+                                remainingResourcesFiles.Remove(resXFile);
+                            }
+                            break;
+                        }
+                    case FileAssociationType.VSTOMain:
+                        {
+                            string mainAddinCode = fileAssociation.GetFilenameWithExtension(".cs");
+                            string designerCode = fileAssociation.GetFilenameWithExtension(".Designer.cs");
+                            string designerXml = fileAssociation.GetFilenameWithExtension(".Designer.xml");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = mainAddinCode,
+                                SubType = "Code",
+                                LinkFolder =
+                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = designerCode,
+                                DependentUpon = designerXml,
+                                LinkFolder =
+                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            itemGroups.Nones.Add(new ItemGroups.None
+                            {
+                                Include = designerXml,
+                                DependentUpon = mainAddinCode,
+                                LinkFolder =
+                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            remainingSourcesFiles.Remove(mainAddinCode);
+                            remainingSourcesFiles.Remove(designerCode);
+                            remainingNoneFiles.Remove(designerXml);
+                            break;
+                        }
+                    case FileAssociationType.VSTORibbon:
+                        {
+                            string xmlFile = fileAssociation.GetFilenameWithExtension(".xml");
+                            string csFile = fileAssociation.GetFilenameWithExtension(".cs");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = csFile,
+                                LinkFolder = GetProjectLinkedFolder(csFile, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
+                            {
+                                Include = xmlFile,
+                                SubType = "Designer",
+                                Generator = RemoveLineTag,
+                                LinkFolder = GetProjectLinkedFolder(csFile, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            remainingEmbeddedResourcesFiles.Remove(xmlFile);
+                            remainingNoneFiles.Remove(xmlFile);
+                            break;
+                        }
+                    case FileAssociationType.ResX:
+                        {
+                            string csFile = fileAssociation.GetFilenameWithExtension(".cs");
+                            string resXFile = fileAssociation.GetFilenameWithExtension(".resx");
+                            itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
+                            {
+                                Include = resXFile,
+                                DependUpon = Path.GetFileName(csFile),
+                                LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath)
+                            });
+                            remainingEmbeddedResourcesFiles.Remove(resXFile);
+                            remainingResourcesFiles.Remove(resXFile);
+                            break;
+                        }
+                    case FileAssociationType.AutoGenResX:
+                        {
+                            string designerFile = fileAssociation.GetFilenameWithExtension(".designer.cs");
+                            string resXFile = fileAssociation.GetFilenameWithExtension(".resx");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = designerFile,
+                                DependentUpon = Path.GetFileName(resXFile),
+                                LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project.SourceRootPath),
+                                AutoGen = true
+                            });
+                            itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
+                            {
+                                Include = resXFile,
+                                Generator = "ResXFileCodeGenerator",
+                                MergeWithCto = resXFile.EndsWith("VSPackage.resx", StringComparison.InvariantCultureIgnoreCase) ? "true" : null,
+                                LastGenOutput = Path.GetFileName(designerFile),
+                                LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath),
+                                SubType = "Designer"
+                            });
+                            remainingSourcesFiles.Remove(designerFile);
+                            remainingEmbeddedResourcesFiles.Remove(resXFile);
+                            remainingResourcesFiles.Remove(resXFile);
+                            break;
+                        }
+                    case FileAssociationType.Settings:
+                        {
+                            string file = fileAssociation.GetFilenameWithExtension(".settings");
+                            string generatedFile = fileAssociation.GetFilenameWithExtension(".designer.cs");
+                            AddNoneGeneratedItem(itemGroups, file, generatedFile, "SettingsSingleFileGenerator", true, _projectPathCapitalized, project);
+                            remainingSourcesFiles.Remove(generatedFile);
+                            remainingNoneFiles.Remove(file);
+                            break;
+                        }
+                    case FileAssociationType.WCF:
+                        {
+                            string file = fileAssociation.GetFilenameWithExtension(".svcmap");
+                            string generatedFile = fileAssociation.GetFilenameWithExtension(".cs");
+                            AddNoneGeneratedItem(itemGroups, file, generatedFile, "WCF Proxy Generator", false, _projectPathCapitalized, project);
+                            remainingSourcesFiles.Remove(generatedFile);
+                            remainingNoneFiles.Remove(file);
+
+                            string wcfStorage = Path.GetDirectoryName(file);
+                            Trace.Assert(wcfStorage.StartsWith("Service References\\"));
+
+                            itemGroups.WCFMetadataStorages.Add(new ItemGroups.WCFMetadataStorage { Include = wcfStorage });
+                            break;
+                        }
+                    case FileAssociationType.Edmx:
+                        {
+                            string edmxFile = fileAssociation.GetFilenameWithExtension(".edmx");
+                            string generatedFile = fileAssociation.GetFilenameWithExtension(".designer.cs");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = generatedFile,
+                                AutoGen = true,
+                                DesignTime = true,
+                                DependentUpon = Path.GetFileName(edmxFile)
+                            });
+
+                            itemGroups.EntityDeploys.Add(new ItemGroups.EntityDeploy
+                            {
+                                Include = edmxFile,
+                                Generator = "EntityModelCodeGenerator",
+                                LastGenOutput = Path.GetFileName(generatedFile)
+                            });
+
+                            remainingSourcesFiles.Remove(generatedFile);
+                            remainingSourcesFiles.Remove(edmxFile);
+                            remainingNoneFiles.Remove(edmxFile);
+
+                            string diagramFile = fileAssociation.GetFilenameWithExtension(".edmx.diagram");
+                            if (diagramFile != null)
+                            {
+                                itemGroups.Nones.Add(new ItemGroups.None { Include = diagramFile, DependentUpon = Path.GetFileName(edmxFile) });
+                                remainingNoneFiles.Remove(diagramFile);
+                            }
+
+                            string ttFile = fileAssociation.GetFilenameWithExtension(TTExtension);
+                            if (ttFile != null)
+                            {
+                                string csModelFile = fileAssociation.GetFilenameWithExtension(".cs");
+                                Trace.Assert(csModelFile != null);
+
+                                itemGroups.Nones.Add(new ItemGroups.None
+                                {
+                                    Include = ttFile,
+                                    Generator = "TextTemplatingFileGenerator",
+                                    DependentUpon = Path.GetFileName(edmxFile),
+                                    LastGenOutput = Path.GetFileName(csModelFile)
+                                });
+
+                                itemGroups.Compiles.Add(new ItemGroups.Compile
+                                {
+                                    Include = csModelFile,
+                                    AutoGen = true,
+                                    DesignTime = true,
+                                    DependentUpon = Path.GetFileName(ttFile)
+                                });
+
+                                // Extract all potential generated classes generated for model from .edmx definition
+                                XDocument edmxDoc = XDocument.Load(Path.Combine(_projectPathCapitalized, edmxFile));
+                                XNamespace edmxNS = "http://schemas.microsoft.com/ado/2009/11/edmx";
+                                XNamespace edmNS = "http://schemas.microsoft.com/ado/2009/11/edm";
+                                XElement cm = edmxDoc.Descendants(edmxNS + "ConceptualModels").FirstOrDefault();
+                                List<string> modelCsFiles = new List<string>();
+                                if (cm != null)
+                                {
+                                    string modelDir = Path.GetDirectoryName(ttFile);
+                                    modelCsFiles = cm.Descendants(edmNS + "EntitySet").Select(x => x.Attribute("EntityType").Value)
+                                        .Where(f => !string.IsNullOrEmpty(f))
+                                        .Select(f => Path.Combine(modelDir, f.Split('.').Last() + ".cs"))
+                                        .Where(f => File.Exists(Path.Combine(_projectPathCapitalized, edmxFile)))
+                                        .ToList();
+                                }
+
+                                modelCsFiles.ForEach(f => itemGroups.Compiles.Add(new ItemGroups.Compile
+                                {
+                                    Include = f,
+                                    DependentUpon = Path.GetFileName(ttFile)
+                                }));
+
+                                remainingSourcesFiles.Remove(csModelFile);
+                                remainingSourcesFiles.RemoveAll(f => modelCsFiles.Contains(f));
+                                remainingNoneFiles.Remove(ttFile);
+                            }
+
+                            string contextttFile = fileAssociation.GetFilenameWithExtension(".context.tt");
+                            if (contextttFile != null)
+                            {
+                                string csModelFile = fileAssociation.GetFilenameWithExtension(".context.cs");
+                                Trace.Assert(csModelFile != null);
+
+                                itemGroups.Nones.Add(new ItemGroups.None
+                                {
+                                    Include = contextttFile,
+                                    Generator = "TextTemplatingFileGenerator",
+                                    DependentUpon = Path.GetFileName(edmxFile),
+                                    LastGenOutput = Path.GetFileName(csModelFile)
+                                });
+
+                                itemGroups.Compiles.Add(new ItemGroups.Compile
+                                {
+                                    Include = csModelFile,
+                                    AutoGen = true,
+                                    DesignTime = true,
+                                    DependentUpon = Path.GetFileName(contextttFile)
+                                });
+
+                                remainingNoneFiles.Remove(contextttFile);
+                                remainingSourcesFiles.Remove(csModelFile);
+                            }
+
+                            break;
+                        }
+                    case FileAssociationType.Asax:
+                        {
+                            string linkedCsFile = fileAssociation.GetFilenameWithExtension(".asax.cs");
+                            string asax = fileAssociation.GetFilenameWithExtension(".asax");
+                            itemGroups.Compiles.Add(new ItemGroups.Compile
+                            {
+                                Include = linkedCsFile,
+                                DependentUpon = Path.GetFileName(asax),
+                                LinkFolder = GetProjectLinkedFolder(linkedCsFile, _projectPathCapitalized, project.SourceRootPath)
+                            });
+
+                            itemGroups.Contents.Add(new ItemGroups.Content
+                            {
+                                Include = asax,
+                            });
+                            remainingSourcesFiles.Remove(asax);
+                            remainingSourcesFiles.Remove(linkedCsFile);
+                            break;
+                        }
+                    default:
+                        {
+                            throw new ArgumentException(string.Format("Unsupported fileassociation type {0}", fileAssociation.Type));
+                        }
+                }
+            }
+            #endregion
+
+            CsProjSubTypesInfos csProjSubTypesInfos = DetermineWindowsFormsSubTypes(configurations, remainingSourcesFiles);
+
+            if (csProjSubTypesInfos?.SubTypeInfos.Count > 0)
+            {
+                AllCsProjSubTypesInfos.Add(csProjSubTypesInfos);
+            }
+
+            #region remaining files
+
+            //tt files
+            List<string> ttFiles = remainingNoneFiles.Where(f => f.ToLower().EndsWith(TTExtension)).ToList();
+            foreach (string ttFile in ttFiles)
+            {
+                bool runtimeTemplate = project.AdditionalRuntimeTemplates.Contains(ttFile);
+                string expectedExtension =
+                    runtimeTemplate ? ".cs" :
+                    Util.GetTextTemplateDirectiveParam(Path.Combine(_projectPath, ttFile), "output", "extension") ?? ".cs";
+                string fileNameWithoutExtension = ttFile.Substring(0, ttFile.Length - TTExtension.Length);
+                string generatedFile = fileNameWithoutExtension + expectedExtension;
+                string generator = runtimeTemplate
+                                        ? "TextTemplatingFilePreprocessor"
+                                        : "TextTemplatingFileGenerator";
+
+                //Add the generated file if its in the remaining files.
+                bool generatedFileFound = remainingSourcesFiles.Concat(remainingResourcesFiles)
+                    .Concat(remainingEmbeddedResourcesFiles)
+                    .Concat(remainingNoneFiles).Contains(generatedFile);
+                AddContentGeneratedItem(itemGroups, ttFile, generatedFile, generator, false, _projectPathCapitalized, project, generatedFileFound);
+
+
+                remainingNoneFiles.Remove(ttFile);
+                if (generatedFileFound)
+                {
+                    //Remove generated file wherever it is.                
+                    remainingEmbeddedResourcesFiles.Remove(generatedFile);
+                    remainingResourcesFiles.Remove(generatedFile);
+                    remainingSourcesFiles.Remove(generatedFile);
+                    remainingNoneFiles.Remove(generatedFile);
+                }
+                else
+                {
+                    _builder.LogWarningLine(
+                        @"Warning: The generated file {0} for template file {1} is not found. Please generate and submit the file using Visual Studio.",
+                        generatedFile,
+                        ttFile);
+                }
+            }
+
+            //xaml files
+            var xamlFiles = remainingSourcesFiles.Where(src => src.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase)).ToList();//tolist to enable removal in the foreach
+            foreach (var xaml in xamlFiles)
+            {
+                //single XamlFile
+                itemGroups.Pages.Add(new ItemGroups.Page
+                {
+                    Include = xaml,
+                    IsApplicationDefinition = project.ApplicationDefinitionFilenames.Any(f => f.Equals(xaml, StringComparison.InvariantCultureIgnoreCase)),
+                    LinkFolder = GetProjectLinkedFolder(xaml, _projectPathCapitalized, project.SourceRootPath)
+                });
+                remainingSourcesFiles.Remove(xaml);
+            }
+
+            foreach (var remainingSourcesFile in remainingSourcesFiles)
+            {
+                itemGroups.Compiles.Add(new ItemGroups.Compile
+                {
+                    Include = remainingSourcesFile,
+                    SubType = csProjSubTypesInfos?.SubTypeInfos.Find(s => string.Equals(s.FileName, remainingSourcesFile))?.SubType,
+                    LinkFolder = GetProjectLinkedFolder(remainingSourcesFile, _projectPathCapitalized, project.SourceRootPath)
+                });
+            }
+
+            //resources
+            foreach (var file in remainingResourcesFiles)
+            {
+                // Have also as Resource for WPF
+                if (project.IncludeResxAsResources || !file.EndsWith(".resx", StringComparison.OrdinalIgnoreCase))
+                {
+                    itemGroups.Resources.Add(new ItemGroups.Resource
+                    {
+                        Include = file,
+                        LinkFolder = GetProjectLinkedFolder(file, _projectPathCapitalized, project.SourceRootPath)
+                    });
+                }
+            }
+
+            foreach (var file in remainingEmbeddedResourcesFiles)
+            {
+                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
+                {
+                    Include = file,
+                    MergeWithCto = file.Equals("VSPackage.resx", StringComparison.InvariantCultureIgnoreCase) ? "true" : null,
+                    LinkFolder = project.GetLinkFolder(file)
+                });
+            }
+
+            foreach (var file in remainingNoneFiles)
+            {
+                itemGroups.Nones.Add(new ItemGroups.None { Include = file, LinkFolder = project.GetLinkFolder(file) });
+            }
+            #endregion
+
+            #region References
+
+            var referencesByName = new List<ItemGroups.Reference>();
+            configurations.ForEach(
+                conf => referencesByName.AddRange(
+                    conf.ReferencesByName.Select(
+                    str => new ItemGroups.Reference
+                    {
+                        Include = str,
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
+                    })));
+            itemGroups.References.AddRange(referencesByName);
+
+            var referencesByNameExternal = new List<ItemGroups.Reference>();
+            configurations.ForEach(
+                conf => referencesByNameExternal.AddRange(
+                    conf.ReferencesByNameExternal.Select(
+                    str => new ItemGroups.Reference
+                    {
+                        Include = str,
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
+                    })));
+            itemGroups.References.AddRange(referencesByNameExternal);
+
+            var referencesByPath = new List<ItemGroups.Reference>();
+
+            foreach (var conf in configurations)
+            {
+                referencesByPath.AddRange(
+                    conf.ReferencesByPath.Select(Util.GetCapitalizedPath)
+                    .Select(str => new ItemGroups.Reference
+                    {
+                        Include = Path.GetFileNameWithoutExtension(str),
+                        SpecificVersion = false,
+                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                    }));
+
+                referencesByPath.AddRange(
+                    project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath)
+                    .Select(str => new ItemGroups.Reference
+                    {
+                        Include = Path.GetFileNameWithoutExtension(str),
+                        SpecificVersion = false,
+                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+                        Private = false
+                    }));
+            }
+
+            itemGroups.References.AddRange(referencesByPath);
+
+            var sourceDir = new DirectoryInfo(project.SourceRootPath);
+            var webReferencesDir = sourceDir.EnumerateDirectories("Web References");
+            itemGroups.WebReferences.AddRange(
+                webReferencesDir.Select(dir => new ItemGroups.WebReference { Include = string.Format(@"{0}\", dir.Name) }));
+            itemGroups.WebReferences.AddRange(
+                project.WebReferences.Select(str => new ItemGroups.WebReference { Include = str }));
+
+            itemGroups.FolderIncludes.AddRange(project.AdditionalFolders.Select(str => new ItemGroups.FolderInclude { Include = str }));
+
+            foreach (var url in project.WebReferenceUrls)
+            {
+                itemGroups.WebReferenceUrls.Add(
+                    new ItemGroups.WebReferenceUrl
+                    {
+                        Include = url.Name,
+                        UrlBehavior = url.UrlBehavior,
+                        RelPath = url.RelPath,
+                        UpdateFromURL = url.UpdateFromURL,
+                        ServiceLocationURL = url.ServiceLocationURL,
+                        CachedDynamicPropName = url.CachedDynamicPropName,
+                        CachedAppSettingsObjectName = url.CachedAppSettingsObjectName,
+                        CachedSettingsPropName = url.CachedSettingsPropName
+                    });
+            }
+
+            bool propagationFlag = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences);
+            foreach (var comRef in project.ComReferences)
+            {
+                bool? privateValue = comRef.Private;
+                if (!privateValue.HasValue && propagationFlag)
+                {
+                    // Only use the project propagation flag is not explicit value was provided and if the project propagation flag is set.
+                    privateValue = propagationFlag;
+                }
+                itemGroups.ComReferences.Add(
+                    new ItemGroups.ComReference
+                    {
+                        Include = comRef.Name,
+                        Guid = comRef.Guid,
+                        VersionMajor = comRef.VersionMajor,
+                        VersionMinor = comRef.VersionMinor,
+                        Lcid = comRef.Lcid,
+                        WrapperTool = comRef.WrapperTool.ToString(),
+                        Private = privateValue,
+                        EmbedInteropTypes = comRef.EmbedInteropTypes,
+                    });
+            }
+
+            GeneratePackageReferences(project, configurations, itemGroups, generatedFiles, skipFiles);
+
+            itemGroups.Services.AddRange(project.Services.Select(s => new ItemGroups.Service { Include = s }));
+
+            itemGroups.BootstrapperPackages.AddRange(project.BootstrapperPackages.Select(
+                b =>
+                new ItemGroups.BootstrapperPackage()
+                {
+                    Include = b.Include,
+                    Install = b.Install,
+                    ProductName = b.ProductName,
+                    Visible = b.Visible,
+                }
+                ));
+            #endregion
+        }
+
+        private void GeneratePackageReferences(
+            Project project,
+            List<Project.Configuration> configurations,
+            ItemGroups itemGroups,
+            List<string> generatedFiles,
+            List<string> skipFiles
+        )
+        {
+            Project.Configuration configuration = configurations[0];
+            var devenv = configuration.Target.GetFragment<DevEnv>();
+            if (devenv >= DevEnv.vs2017)
+            {
+                var resolver = new Resolver();
+                foreach (var packageReference in configuration.ReferencesByNuGetPackage)
+                {
+                    itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver, Template.PackageReference)));
+                }
+            }
+            else if (devenv == DevEnv.vs2015)
+            {
+                var frameworkFlags = project.Targets.TargetPossibilities.Select(f => f.GetFragment<DotNetFramework>()).Aggregate((x, y) => x | y);
+                var projectJsonPath = GenerateProjectJson(configuration, frameworkFlags, generatedFiles, skipFiles);
+                if (projectJsonPath != null)
+                {
+                    string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(projectJsonPath));
+                    itemGroups.Nones.Add(new ItemGroups.None { Include = include });
+                }
+            }
+        }
+
+        private string GenerateProjectJson(
+            Project.Configuration conf,
+            DotNetFramework frameworks,
+            List<string> generatedFiles,
+            List<string> skipFiles
+        )
+        {
+            var projectJsonPath = Path.Combine(_projectPath, "project.json");
+            var projectJsonLockPath = Path.Combine(_projectPath, "project.lock.json");
+
+            // No NuGet references and no trace of a previous project.json
+            if (conf.ReferencesByNuGetPackage.Count == 0)
+            {
+                if (!File.Exists(projectJsonPath))
+                    return null;
+            }
+
+            lock (s_projectJsonLock)
+            {
+                if (conf.ReferencesByNuGetPackage.Count == 0)
+                {
+                    var fi = new FileInfo(projectJsonPath);
+                    if (!fi.IsReadOnly) // Do not delete project.json submitted in P4
+                    {
+                        File.Delete(projectJsonPath);
+                        File.Delete(projectJsonLockPath);
+                    }
+                    return null;
+                }
+
+                if (IsGenerateNeeded(projectJsonPath))
+                {
+                    var pjson = new ProjectJson();
+
+                    // frameworks
+                    DotNetFramework[] dnfs = ((DotNetFramework[])Enum.GetValues(typeof(DotNetFramework))).Where(f => frameworks.HasFlag(f)).ToArray();
+                    foreach (var dnf in dnfs)
+                        pjson.Frameworks.Add(dnf.ToFolderName());
+
+                    // runtimes
+                    pjson.Runtimes.Add("win-x64");
+                    pjson.Runtimes.Add("win-x86");
+                    pjson.Runtimes.Add("win-anycpu");
+                    pjson.Runtimes.Add("win");
+
+                    // dependencies
+                    foreach (var packageRef in conf.ReferencesByNuGetPackage.SortedValues)
+                        pjson.Dependencies.Add(packageRef.Name, new VersionRange(packageRef.Version));
+
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        using (StreamWriter writer = new StreamWriter(stream))
+                        {
+                            writer.Write(pjson.WriteToString());
+                            writer.Flush();
+                            stream.Position = 0;
+
+                            bool written = _builder.Context.WriteGeneratedFile(pjson.GetType(), new FileInfo(projectJsonPath), stream);
+                            if (written)
+                                generatedFiles.Add(projectJsonPath);
+                            else
+                                skipFiles.Add(projectJsonPath);
+                        }
+                    }
+                }
+            }
+
+            return projectJsonPath;
+        }
+
+        private static readonly HashSet<string> s_projectJsonGenerated = new HashSet<string>();
+        private static readonly object s_projectJsonLock = new object();
+
+        private static bool IsGenerateNeeded(string projectJsonPath)
+        {
+            if (!s_projectJsonGenerated.Contains(projectJsonPath))
+            {
+                s_projectJsonGenerated.Add(projectJsonPath);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static void AddNoneGeneratedItem(ItemGroups itemGroups, string file, string generatedFile, string generator, bool designTimeSharedInput, string projectPath, Project project)
+        {
+            Trace.Assert(!string.IsNullOrEmpty(file) && !string.IsNullOrEmpty(generatedFile));
+            itemGroups.Nones.Add(new ItemGroups.None
+            {
+                Include = file,
+                Generator = generator,
+                LastGenOutput = Path.GetFileName(generatedFile),
+                LinkFolder = GetProjectLinkedFolder(file, projectPath, project.SourceRootPath)
+            });
+            var compile = new ItemGroups.Compile
+            {
+                Include = generatedFile,
+                AutoGen = true,
+                DependentUpon = Path.GetFileName(file),
+                LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project.SourceRootPath)
+            };
+            if (designTimeSharedInput)
+                compile.DesignTimeSharedInput = true;
+            else
+                compile.DesignTime = true;
+            itemGroups.Compiles.Add(compile);
+        }
+
+
+        /// <summary>
+        /// Add the template file and the generated file to the project
+        /// when requested by addGeneratedFile.
+        /// .cs, .xaml and other are threated as different items.
+        /// </summary>
+        private static void AddContentGeneratedItem(
+            ItemGroups itemGroups,
+            string templateFile,
+            string generatedFile,
+            string generator,
+            bool designTimeSharedInput,
+            string projectPath,
+            CSharpProject project,
+            bool addGeneratedFile)
+        {
+            Trace.Assert(!string.IsNullOrEmpty(templateFile) && !string.IsNullOrEmpty(generatedFile));
+            itemGroups.Contents.Add(new ItemGroups.Content
+            {
+                Include = templateFile,
+                Generator = generator,
+                LastGenOutput = Path.GetFileName(generatedFile),
+                LinkFolder = GetProjectLinkedFolder(templateFile, projectPath, project.SourceRootPath)
+            });
+
+            if (!addGeneratedFile)
+                return;
+            var generatedFileExtension = Path.GetExtension(generatedFile).ToLower();
+
+            //TODO Give some kind of additional TT directive to specify the build action directly?
+            //For now everything is none but cs and xaml.
+            switch (generatedFileExtension)
+            {
+                case ".cs":
+                    {
+                        var compile = new ItemGroups.Compile
+                        {
+                            Include = generatedFile,
+                            AutoGen = true,
+                            DependentUpon = Path.GetFileName(templateFile),
+                            LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project.SourceRootPath)
+                        };
+                        if (designTimeSharedInput)
+                            compile.DesignTimeSharedInput = true;
+                        else
+                            compile.DesignTime = true;
+                        itemGroups.Compiles.Add(compile);
+                        break;
+                    }
+                case ".xaml":
+                    {
+                        itemGroups.Pages.Add(new ItemGroups.Page
+                        {
+                            Include = generatedFile,
+                            AutoGen = true,
+                            DependentUpon = Path.GetFileName(templateFile),
+                            LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project.SourceRootPath),
+                        });
+                        break;
+                    }
+                default:
+                    {
+                        itemGroups.Nones.Add(new ItemGroups.None
+                        {
+                            Include = generatedFile,
+                            LinkFolder = project.GetLinkFolder(generatedFile),
+                            DependentUpon = Path.GetFileName(templateFile),
+                        });
+                        break;
+                    }
+            }
+        }
+
+        [DebuggerDisplay("[{Type}]{BaseFilePath}")]
+        private class FileAssociation
+        {
+            public string BaseFilePath;
+            public FileAssociationType Type;
+            public List<string> Extensions;
+
+            public string GetFilenameWithExtension(string ext)
+            {
+                string foundExt = Extensions.FirstOrDefault(e => e.Equals(ext, StringComparison.OrdinalIgnoreCase));
+                if (foundExt == null)
+                    return null;
+                return BaseFilePath + foundExt;
+            }
+        }
+
+        private enum FileAssociationType
+        {
+            Unknown,
+            Xaml,
+            ResX,
+            AutoGenResX,
+            Designer,
+            Settings,
+            WCF,
+            Edmx,
+            VSTORibbon,
+            VSTOMain,
+            Asax,
+        };
+
+        private static readonly List<Tuple<FileAssociationType, string[]>> s_fileExtensionsToType = new List<Tuple<FileAssociationType, string[]>>()
+        {
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.Designer, new []{".cs", ".resx", ".designer.cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.VSTOMain, new []{".cs", ".designer.xml", ".designer.cs" }),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.ResX, new []{".resx", ".cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.AutoGenResX, new []{".resx", ".designer.cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.Xaml, new []{".xaml", ".xaml.cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.Settings, new []{".settings", ".designer.cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.WCF, new []{".svcmap", ".cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.Edmx, new []{".edmx", ".designer.cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.Designer, new []{".cs", ".designer.cs"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.VSTORibbon, new []{".cs", ".xml"}),
+            new Tuple<FileAssociationType, string[]>(FileAssociationType.Asax, new []{".asax", ".asax.cs"}),
+        };
+
+        private static readonly string[] s_additionalFileExtensions = { ".tt", ".context.tt", ".context.cs", ".edmx.diagram" };
+
+        private static List<FileAssociation> FullFileNameAssociation(IEnumerable<string> relatedFullFileNames)
+        {
+            List<string> supportedExts =
+                s_fileExtensionsToType.SelectMany(t => t.Item2)
+                .Concat(s_additionalFileExtensions)
+                .Distinct().OrderByDescending(s => s.Length).ToList();
+
+            var group = relatedFullFileNames
+                .Where(s => supportedExts.Any(x => s.EndsWith(x, StringComparison.OrdinalIgnoreCase)))
+                .GroupBy(s =>
+                {
+                    string dirName = Path.GetDirectoryName(s);
+                    string filename = Path.GetFileName(s);
+                    string ext = supportedExts.First(e => filename.EndsWith(e, StringComparison.OrdinalIgnoreCase));
+                    filename = filename.Substring(0, filename.LastIndexOf(ext, StringComparison.OrdinalIgnoreCase));
+                    return Path.Combine(dirName, filename);
+                });
+
+            return group.Where(g => g.Count() > 1)
+                .Select(g =>
+                {
+                    IEnumerable<string> exts = g.Select(s => s.Replace(g.Key, string.Empty));
+                    return new FileAssociation()
+                    {
+                        BaseFilePath = g.Key,
+                        Type = GetFileAssociationType(exts),
+                        Extensions = exts.ToList()
+                    };
+                })
+                .ToList();
+        }
+
+        private static FileAssociationType GetFileAssociationType(IEnumerable<string> fileExtensions)
+        {
+            var exts = fileExtensions.Select(s => s.ToLower()).ToList();
+
+            Tuple<FileAssociationType, string[]> detectedType = s_fileExtensionsToType.FirstOrDefault(t => t.Item2.All(e => exts.Contains(e)));
+            if (detectedType != null)
+            {
+                return detectedType.Item1;
+            }
+            return FileAssociationType.Unknown;
+        }
+
+        private static string GetProjectLinkedFolder(string sourceFile, string projectPath, string sourceRootPath)
+        {
+            // Exit out early if the file is not a relative path.
+            if (!sourceFile.StartsWith(".."))
+                return string.Empty;
+
+            string absoluteFile = Util.PathGetAbsolute(projectPath, sourceFile);
+
+            var directoryName = Path.GetDirectoryName(absoluteFile);
+            if (directoryName.StartsWith(sourceRootPath, StringComparison.OrdinalIgnoreCase))
+                return directoryName.Substring(sourceRootPath.Length).Trim(Util._pathSeparators);
+
+            return Path.GetFileName(directoryName);
+        }
+
+        private void WriteEvents(Dictionary<Project.Configuration, Options.ExplicitOptions> options, StreamWriter writer, Resolver resolver)
+        {
+            var firstConf = _projectConfigurationList.First();
+
+            if ((firstConf.Project is CSharpProject) && (firstConf.Project as CSharpProject).ConfigurationSpecificEvents)
+            {
+                foreach (var conf in _projectConfigurationList)
+                {
+                    WriteEvents(conf, options[conf], true, writer, resolver);
+                }
+            }
+            else
+            {
+                WriteEvents(firstConf, options[firstConf], false, writer, resolver);
+            }
+        }
+
+        private void WriteEvents(Project.Configuration conf, Options.ExplicitOptions options, bool conditional, StreamWriter writer, Resolver resolver)
+        {
+            using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+            using (resolver.NewScopedParameter("conf", conf))
+            using (resolver.NewScopedParameter("options", options))
+            {
+                if (conf.EventPreBuild.Count != 0)
+                    Write(conditional ? Template.Project.ProjectConfigurationsPreBuildEventConditional : Template.Project.ProjectConfigurationsPreBuildEvent, writer, resolver);
+
+                if (conf.EventPostBuild.Count != 0)
+                    Write(conditional ? Template.Project.ProjectConfigurationsPostBuildEventConditional : Template.Project.ProjectConfigurationsPostBuildEvent, writer, resolver);
+            }
+        }
+
+        [Serializable]
+        public class CsProjSubTypesInfos
+        {
+            public string CsProjFullPath;
+            public DateTime LastWriteTime;
+            public List<SubTypeInfo> SubTypeInfos;
+
+            [Serializable]
+            public class SubTypeInfo
+            {
+                public string FileName;
+                public DateTime LastWriteTime;
+                public string SubType;
+            }
+        }
+
+        private static readonly Regex s_winFormSubTypeRegex = new Regex("// SHARPMAKE GENERATED CSPROJ SUBTYPE : <SubType>([A-Za-z]*)</SubType>");
+        private static object s_allCachedCsProjSubTypesInfosLock = new object();
+        private static List<CsProjSubTypesInfos> s_allCachedCsProjSubTypesInfos;
+        public static ConcurrentBag<CsProjSubTypesInfos> AllCsProjSubTypesInfos { get; } = new ConcurrentBag<CsProjSubTypesInfos>();
+
+        private CsProjSubTypesInfos DetermineWindowsFormsSubTypes(List<Project.Configuration> configurations, List<string> sourceFiles)
+        {
+            lock (s_allCachedCsProjSubTypesInfosLock)
+            {
+                if (s_allCachedCsProjSubTypesInfos == null)
+                {
+                    var concurentBagTypes = (ConcurrentBag<CsProjSubTypesInfos>)Util.DeserializeAllCsprojSubTypes();
+                    var listTypes = concurentBagTypes?.ToList();
+                    s_allCachedCsProjSubTypesInfos = listTypes?.Where(p => p != null).ToList() ?? new List<CsProjSubTypesInfos>();
+                }
+            }
+
+            List<string> unresolvedSourceFiles = new List<string>();
+            Project.Configuration config = configurations.First();
+            string csProjFullPath = config.ProjectFullFileNameWithExtension;
+            string projectPath = config.ProjectPath;
+
+            if (!File.Exists(csProjFullPath))
+            {
+                return null;
+            }
+
+            CsProjSubTypesInfos cachedCsprojSubTypesInfos = s_allCachedCsProjSubTypesInfos.Find(p => p.CsProjFullPath == csProjFullPath);
+            DateTime csProjLastWriteTime = File.GetLastWriteTime(csProjFullPath);
+
+            if (cachedCsprojSubTypesInfos != null && cachedCsprojSubTypesInfos.LastWriteTime.Equals(csProjLastWriteTime))
+            {
+                return cachedCsprojSubTypesInfos;
+            }
+
+            CsProjSubTypesInfos csProjSubTypesInfos = new CsProjSubTypesInfos
+            {
+                CsProjFullPath = csProjFullPath,
+                LastWriteTime = csProjLastWriteTime,
+                SubTypeInfos = new List<CsProjSubTypesInfos.SubTypeInfo>()
+            };
+
+            foreach (string sourceFile in sourceFiles)
+            {
+                // Skip .designer.cs files as we know they are not Windows Form files.
+                if (sourceFile.EndsWith(".designer.cs", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                string sourceFilePath = Path.Combine(projectPath, sourceFile);
+
+                // Skip missing files
+                if (!File.Exists(sourceFilePath))
+                    continue;
+
+                DateTime sourceFileLastWriteTime = File.GetLastWriteTime(sourceFilePath);
+                CsProjSubTypesInfos.SubTypeInfo matchingCachedSubTypeInfo = cachedCsprojSubTypesInfos ==
+                    null ? new CsProjSubTypesInfos.SubTypeInfo() : cachedCsprojSubTypesInfos.SubTypeInfos.Find(s => string.Equals(s.FileName, sourceFile, StringComparison.OrdinalIgnoreCase));
+
+                if (matchingCachedSubTypeInfo != null && matchingCachedSubTypeInfo.LastWriteTime.Equals(sourceFileLastWriteTime))
+                {
+                    csProjSubTypesInfos.SubTypeInfos.Add(matchingCachedSubTypeInfo);
+                    continue;
+                }
+
+                string sourceFileData = File.ReadAllText(sourceFilePath);
+                Match match = s_winFormSubTypeRegex.Match(sourceFileData);
+
+                if (match.Success)
+                {
+                    string subType = match.Groups[1].Value;
+                    CsProjSubTypesInfos.SubTypeInfo subTypesInfo = new CsProjSubTypesInfos.SubTypeInfo
+                    {
+                        FileName = sourceFile,
+                        LastWriteTime = sourceFileLastWriteTime,
+                        SubType = subType
+                    };
+                    csProjSubTypesInfos.SubTypeInfos.Add(subTypesInfo);
+                }
+                else
+                {
+                    unresolvedSourceFiles.Add(sourceFile);
+                }
+            }
+
+            if (unresolvedSourceFiles.Count > 0)
+            {
+                Dictionary<string, string> csprojSubTypes = ExtractSubTypesFromCsProjFile(csProjFullPath);
+
+                foreach (KeyValuePair<string, string> subType in csprojSubTypes)
+                {
+                    string matchingSourceFile = unresolvedSourceFiles.Find(s => s == subType.Key);
+
+                    if (string.IsNullOrEmpty(matchingSourceFile))
+                        continue;
+
+                    CsProjSubTypesInfos.SubTypeInfo subTypesInfo = new CsProjSubTypesInfos.SubTypeInfo
+                    {
+                        FileName = matchingSourceFile,
+                        LastWriteTime = File.GetLastWriteTime(Path.Combine(projectPath, matchingSourceFile)),
+                        SubType = subType.Value
+                    };
+                    csProjSubTypesInfos.SubTypeInfos.Add(subTypesInfo);
+                }
+            }
+
+            return csProjSubTypesInfos;
+        }
+
+        private static Dictionary<string, string> ExtractSubTypesFromCsProjFile(string csProjFile)
+        {
+            Dictionary<string, string> subTypes = new Dictionary<string, string>();
+
+            if (!File.Exists(csProjFile))
+                return subTypes;
+
+            XDocument csProjXml;
+            try
+            {
+                csProjXml = XDocument.Load(csProjFile);
+            }
+            catch (Exception)
+            {
+                // Malformed Xml (could happen because of a multithreading issue)
+                return subTypes;
+            }
+
+            XElement projectElement = csProjXml.Root;
+            Trace.Assert(projectElement != null);
+
+            List<XElement> itemGroupElements = projectElement.Elements()
+                .Where(e => e.Name.LocalName == "ItemGroup")
+                .Where(l => l.Elements().All(e => e.Name.LocalName == "Compile")).ToList();
+
+            foreach (XElement itemGroupElement in itemGroupElements)
+            {
+                List<XElement> compileElements = itemGroupElement.Elements().ToList();
+                foreach (XElement compileElement in compileElements)
+                {
+                    XAttribute includeAttribute = compileElement.Attribute("Include");
+                    XElement subTypeElement = compileElement.Elements().ToList().Find(e => e.Name.LocalName == "SubType");
+
+                    if (includeAttribute == null || subTypeElement == null)
+                        continue;
+
+                    subTypes.Add(includeAttribute.Value, subTypeElement.Value);
+                }
+            }
+
+            return subTypes;
+        }
+
+        public class ProjectFile
+        {
+            public string FileName;
+            public string FileNameSourceRelative;
+            public string DirectorySourceRelative;
+            public string FileNameProjectRelative;
+
+            public ProjectFile(string fileName, string projectPathCapitalized, string projectSourceCapitalized)
+            {
+                FileName = Project.GetCapitalizedFile(fileName);
+
+                FileNameProjectRelative = Util.PathGetRelative(projectPathCapitalized, FileName);
+                FileNameSourceRelative = Util.PathGetRelative(projectSourceCapitalized, FileName);
+
+                int lastPathSeparator = FileNameSourceRelative.LastIndexOf(Util.WindowsSeparator);
+                if (lastPathSeparator != -1)
+                {
+                    DirectorySourceRelative = FileNameSourceRelative.Substring(0, lastPathSeparator);
+                    DirectorySourceRelative = DirectorySourceRelative.Trim('.', Util.WindowsSeparator);
+                }
+                else
+                    DirectorySourceRelative = "";
+            }
+        }
+
+        #region DependencyCopy
+        private void ProcessDependencyCopy(CSharpProject project, Project.Configuration conf)
+        {
+            if (conf.Output == Project.Configuration.OutputType.DotNetWindowsApp || conf.ExecuteTargetCopy)
+            {
+                string outputDirectoryRelative = Util.PathGetRelative(_projectPath, conf.TargetPath);
+
+                foreach (string copyFile in conf.ResolvedTargetCopyFiles)
+                {
+                    string copyFileDirectory = Path.GetDirectoryName(copyFile);
+
+                    if (string.Compare(copyFileDirectory, conf.TargetPath, StringComparison.OrdinalIgnoreCase) != 0)
+                    {
+                        string relativeCopyFile = Util.PathGetRelative(_projectPath, copyFile);
+
+                        if (conf.CopyDependenciesBuildStep == null)
+                        {
+                            conf.CopyDependenciesBuildStep = new Project.Configuration.FileCustomBuild();
+                            conf.CopyDependenciesBuildStep.Description = "Copy files to output paths...";
+                        }
+
+                        conf.EventPostBuild.Add(conf.CreateTargetCopyCommand(relativeCopyFile, outputDirectoryRelative, _projectPath));
+                        conf.CopyDependenciesBuildStep.Inputs.Add(relativeCopyFile);
+                        conf.CopyDependenciesBuildStep.Outputs.Add(Path.Combine(outputDirectoryRelative, Path.GetFileName(copyFile)));
+                    }
+                }
+
+                var envVarResolver = PlatformRegistry.Get<IPlatformDescriptor>(Platform.win64).GetPlatformEnvironmentResolver(
+                    new VariableAssignment("project", project),
+                    new VariableAssignment("target", conf),
+                    new VariableAssignment("conf", conf));
+
+                foreach (var customEvent in conf.ResolvedEventPostBuildExe)
+                {
+                    if (customEvent is Project.Configuration.BuildStepExecutable)
+                    {
+                        var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
+
+                        string relativeExecutableFile = Util.PathGetRelative(_projectPath, execEvent.ExecutableFile);
+                        conf.EventPostBuild.Add(
+                            string.Format(
+                                "{0} {1}",
+                                Util.SimplifyPath(envVarResolver.Resolve(relativeExecutableFile)),
+                                envVarResolver.Resolve(execEvent.ExecutableOtherArguments)
+                            )
+                        );
+                    }
+                    else if (customEvent is Project.Configuration.BuildStepCopy)
+                    {
+                        var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
+                        conf.EventPostBuild.Add(copyEvent.GetCopyCommand(_projectPath, envVarResolver));
+                    }
+                    else
+                    {
+                        throw new Error("Invalid type in PostBuild steps");
+                    }
+                }
+            }
+        }
+        #endregion 
+
+        #region Options
+
+
+
+        private Options.ExplicitOptions GenerateOptions(CSharpProject project, Project.Configuration conf)
+        {
+            var options = new Options.ExplicitOptions();
+
+            #region General
+
+            // Default defines...
+            switch (conf.Platform)
+            {
+                case Platform.win32:
+                    options.ExplicitDefines.Add("WIN32");
+                    break;
+                case Platform.win64:
+                    options.ExplicitDefines.Add("WIN64");
+                    break;
+                default:
+                    break;
+            }
+
+            if (project is CSharpVstoProject)
+            {
+                options.ExplicitDefines.Add("VSTO40");
+            }
+
+            if (conf.DefaultOption == Options.DefaultTarget.Debug)
+            {
+                options.ExplicitDefines.Add("DEBUG");
+                options.ExplicitDefines.Add("TRACE");
+            }
+            else // Release
+            {
+                options.ExplicitDefines.Add("TRACE");
+            }
+            //Output
+            var simpleOutputType = Project.Configuration.SimpleOutputType(conf.Output);
+            switch (simpleOutputType)
+            {
+                case Project.Configuration.OutputType.Exe:
+                    options["ConfigurationType"] = "Application";
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    if (conf.Platform != Platform.win32 && conf.Platform != Platform.win64 && conf.Platform != Platform.anycpu)
+                        throw new Error("Only win32 and win64 platform support dll output type: {0}", conf.Target);
+                    options["ConfigurationType"] = "DynamicLibrary";
+                    break;
+            }
+
+            string outputDirectoryRelative = Util.PathGetRelative(_projectPath, conf.TargetPath);
+            string outputLibDirectoryRelative = Util.PathGetRelative(_projectPath, conf.TargetLibraryPath);
+
+            options["OutputDirectory"] = conf.Output == Project.Configuration.OutputType.Lib ? outputLibDirectoryRelative : outputDirectoryRelative;
+
+            //IntermediateDirectory
+            string intermediateDirectory = Util.PathGetRelative(_projectPath, conf.IntermediatePath);
+            options["IntermediateDirectory"] = intermediateDirectory;
+
+            options["StartWorkingDirectory"] = string.IsNullOrEmpty(conf.StartWorkingDirectory) ? RemoveLineTag : conf.StartWorkingDirectory;
+
+            ProcessDependencyCopy(project, conf);
+
+            options["PreBuildEvent"] = conf.EventPreBuild.Count == 0 ? RemoveLineTag : conf.EventPreBuild.JoinStrings(Environment.NewLine, escapeXml: true);
+            options["PreBuildEventDescription"] = conf.EventPreBuildDescription != string.Empty ? conf.EventPreBuildDescription : RemoveLineTag;
+            options["PreBuildEventEnable"] = conf.EventPreBuildExcludedFromBuild ? "false" : "true";
+
+            options["PostBuildEvent"] = conf.EventPostBuild.Count == 0 ? RemoveLineTag : Util.JoinStrings(conf.EventPostBuild, Environment.NewLine, escapeXml: true);
+            options["PostBuildEventDescription"] = conf.EventPostBuildDescription != string.Empty ? conf.EventPostBuildDescription : RemoveLineTag;
+            options["PostBuildEventEnable"] = conf.EventPostBuildExcludedFromBuild ? "false" : "true";
+
+            #endregion
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.CreateVsixContainer.Enabled, () => { options["CreateVsixContainer"] = "True"; }),
+            Options.Option(Options.CSharp.CreateVsixContainer.Disabled, () => { options["CreateVsixContainer"] = RemoveLineTag; })
+            );
+
+            options["VsixType"] = (project.ProjectTypeGuids == CSharpProjectType.Vsix && project.VSIXProjectVersion != -1) ? string.Format("v{0}", project.VSIXProjectVersion) : RemoveLineTag;
+
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.GeneratePkgDefFile.Enabled, () => { options["GeneratePkgDefFile"] = "True"; }),
+            Options.Option(Options.CSharp.GeneratePkgDefFile.Disabled, () => { options["GeneratePkgDefFile"] = "False"; }),
+            Options.Option(Options.CSharp.GeneratePkgDefFile.None, () => { options["GeneratePkgDefFile"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.IncludeAssemblyInVSIXContainer.Enabled, () => { options["IncludeAssemblyInVSIXContainer"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.IncludeAssemblyInVSIXContainer.Disabled, () => { options["IncludeAssemblyInVSIXContainer"] = "False"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.DeployExtension.Enabled, () => { options["DeployExtension"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.DeployExtension.Disabled, () => { options["DeployExtension"] = "False"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.DefaultConfiguration.Debug, () => { options["DefaultConfiguration"] = "Debug"; }),
+            Options.Option(Options.CSharp.DefaultConfiguration.Release, () => { options["DefaultConfiguration"] = "Release"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.DebugType.Full, () => { options["DebugType"] = "full"; }),
+            Options.Option(Options.CSharp.DebugType.Pdbonly, () => { options["DebugType"] = "pdbonly"; }),
+            Options.Option(Options.CSharp.DebugType.None, () => { options["DebugType"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.ErrorReport.Prompt, () => { options["ErrorReport"] = "prompt"; }),
+            Options.Option(Options.CSharp.ErrorReport.Queue, () => { options["ErrorReport"] = "queue"; }),
+            Options.Option(Options.CSharp.ErrorReport.None, () => { options["ErrorReport"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.InstallFrom.Web, () => { options["InstallFrom"] = "Web"; }),
+            Options.Option(Options.CSharp.InstallFrom.Disk, () => { options["InstallFrom"] = "Disk"; }),
+            Options.Option(Options.CSharp.InstallFrom.Unc, () => { options["InstallFrom"] = "Unc"; }),
+            Options.Option(Options.CSharp.InstallFrom.None, () => { options["InstallFrom"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.UpdateMode.Foreground, () => { options["UpdateMode"] = "Foreground"; }),
+            Options.Option(Options.CSharp.UpdateMode.Other, () => { options["UpdateMode"] = RemoveLineTag; })
+            );
+
+
+            SelectOption(
+            Options.Option(Options.CSharp.UpdateIntervalUnits.Days, () => { options["UpdateIntervalUnits"] = "Days"; }),
+            Options.Option(Options.CSharp.UpdateIntervalUnits.None, () => { options["UpdateIntervalUnits"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.SignAssembly.Enabled, () => { options["SignAssembly"] = "true"; }),
+            Options.Option(Options.CSharp.SignAssembly.Disabled, () => { options["SignAssembly"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.WarningLevel.Level0, () => { options["WarningLevel"] = "TurnOffAllWarnings"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level1, () => { options["WarningLevel"] = "1"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level2, () => { options["WarningLevel"] = "2"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level3, () => { options["WarningLevel"] = "3"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level4, () => { options["WarningLevel"] = "4"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.LanguageVersion.LatestMajorVersion, () => { options["LanguageVersion"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.LanguageVersion.LatestMinorVersion, () => { options["LanguageVersion"] = "latest"; }),
+            Options.Option(Options.CSharp.LanguageVersion.ISO1, () => { options["LanguageVersion"] = "ISO-1"; }),
+            Options.Option(Options.CSharp.LanguageVersion.ISO2, () => { options["LanguageVersion"] = "ISO-2"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp3, () => { options["LanguageVersion"] = "3"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp4, () => { options["LanguageVersion"] = "4"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp5, () => { options["LanguageVersion"] = "5"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp6, () => { options["LanguageVersion"] = "6"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7, () => { options["LanguageVersion"] = "7"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.Install.Enabled, () => { options["Install"] = "true"; }),
+            Options.Option(Options.CSharp.Install.Disabled, () => { options["Install"] = RemoveLineTag; })
+            );
+            SelectOption(
+            Options.Option(Options.CSharp.UpdateEnabled.Enabled, () => { options["UpdateEnabled"] = "true"; }),
+            Options.Option(Options.CSharp.UpdateEnabled.Disabled, () => { options["UpdateEnabled"] = RemoveLineTag; })
+            );
+            SelectOption(
+            Options.Option(Options.CSharp.UpdatePeriodically.Enabled, () => { options["UpdatePeriodically"] = "true"; }),
+            Options.Option(Options.CSharp.UpdatePeriodically.Disabled, () => { options["UpdatePeriodically"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.UpdateRequired.Enabled, () => { options["UpdateRequired"] = "true"; }),
+            Options.Option(Options.CSharp.UpdateRequired.Disabled, () => { options["UpdateRequired"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.CopyOutputSymbolsToOutputDirectory.Enabled, () => { options["CopyOutputSymbolsToOutputDirectory"] = "true"; }),
+            Options.Option(Options.CSharp.CopyOutputSymbolsToOutputDirectory.Disabled, () => { options["CopyOutputSymbolsToOutputDirectory"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.MapFileExtensions.Enabled, () => { options["MapFileExtensions"] = "true"; }),
+            Options.Option(Options.CSharp.MapFileExtensions.Disabled, () => { options["MapFileExtensions"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.IsWebBootstrapper.Enabled, () => { options["IsWebBootstrapper"] = "true"; }),
+            Options.Option(Options.CSharp.IsWebBootstrapper.Disabled, () => { options["IsWebBootstrapper"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.PublishWizardCompleted.Enabled, () => { options["PublishWizardCompleted"] = "true"; }),
+            Options.Option(Options.CSharp.PublishWizardCompleted.Disabled, () => { options["PublishWizardCompleted"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.OpenBrowserOnPublish.Enabled, () => { options["OpenBrowserOnPublish"] = "true"; }),
+            Options.Option(Options.CSharp.OpenBrowserOnPublish.Disabled, () => { options["OpenBrowserOnPublish"] = RemoveLineTag; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.CreateDesktopShortcut.Enabled, () => { options["CreateDesktopShortcut"] = "true"; }),
+            Options.Option(Options.CSharp.CreateDesktopShortcut.Disabled, () => { options["CreateDesktopShortcut"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.UseCodeBase.Enabled, () => { options["UseCodeBase"] = "true"; }),
+            Options.Option(Options.CSharp.UseCodeBase.Disabled, () => { options["UseCodeBase"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch.Enabled, () => { options["ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch.Disabled, () => { options["ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch"] = "None"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.DebugSymbols.Enabled, () => { options["DebugSymbols"] = "true"; }),
+            Options.Option(Options.CSharp.DebugSymbols.Disabled, () => { options["DebugSymbols"] = "false"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.Optimize.Enabled, () => { options["Optimize"] = "true"; }),
+            Options.Option(Options.CSharp.Optimize.Disabled, () => { options["Optimize"] = "false"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.AllowUnsafeBlocks.Enabled, () => { options["AllowUnsafeBlocks"] = "true"; }),
+            Options.Option(Options.CSharp.AllowUnsafeBlocks.Disabled, () => { options["AllowUnsafeBlocks"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.Prefer32Bit.Enabled, () => { options["Prefer32Bit"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.Prefer32Bit.Disabled, () => { options["Prefer32Bit"] = "false"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.DisableFastUpToDateCheck.Enabled, () => { options["DisableFastUpToDateCheck"] = "true"; }),
+            Options.Option(Options.CSharp.DisableFastUpToDateCheck.Disabled, () => { options["DisableFastUpToDateCheck"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.TreatWarningsAsErrors.Enabled, () => { options["TreatWarningsAsErrors"] = "true"; }),
+            Options.Option(Options.CSharp.TreatWarningsAsErrors.Disabled, () => { options["TreatWarningsAsErrors"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.UseApplicationTrust.Enabled, () => { options["UseApplicationTrust"] = "true"; }),
+            Options.Option(Options.CSharp.UseApplicationTrust.Disabled, () => { options["UseApplicationTrust"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.BootstrapperEnabled.Enabled, () => { options["BootstrapperEnabled"] = "true"; }),
+            Options.Option(Options.CSharp.BootstrapperEnabled.Disabled, () => { options["BootstrapperEnabled"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.DllBaseAddress.x11000000, () => { options["BaseAddress"] = "285212672"; }),
+            Options.Option(Options.CSharp.DllBaseAddress.x12000000, () => { options["BaseAddress"] = "301989888"; }),
+            Options.Option(Options.CSharp.DllBaseAddress.None, () => { options["BaseAddress"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.FileAlignment.None, () => { options["FileAlignment"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.FileAlignment.Value512, () => { options["FileAlignment"] = "512"; }),
+            Options.Option(Options.CSharp.FileAlignment.Value1024, () => { options["FileAlignment"] = "1024"; }),
+            Options.Option(Options.CSharp.FileAlignment.Value2048, () => { options["FileAlignment"] = "2048"; }),
+            Options.Option(Options.CSharp.FileAlignment.Value4096, () => { options["FileAlignment"] = "4096"; }),
+            Options.Option(Options.CSharp.FileAlignment.Value8192, () => { options["FileAlignment"] = "8192"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.RegisterOutputPackage.Enabled, () => { options["RegisterOutputPackage"] = "True"; }),
+            Options.Option(Options.CSharp.RegisterOutputPackage.Disabled, () => { options["RegisterOutputPackage"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.RegisterWithCodebase.Enabled, () => { options["RegisterWithCodebase"] = "True"; }),
+            Options.Option(Options.CSharp.RegisterWithCodebase.Disabled, () => { options["RegisterWithCodebase"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.AutoGenerateBindingRedirects.Enabled, () => { options["AutoGenerateBindingRedirects"] = "True"; }),
+            Options.Option(Options.CSharp.AutoGenerateBindingRedirects.Disabled, () => { options["AutoGenerateBindingRedirects"] = RemoveLineTag; })
+            );
+
+            // Options.CSharp.OriginatorKeyFile
+            options["AssemblyOriginatorKeyFile"] = Options.StringOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf);
+            options["MinimumVisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.MinimumVisualStudioVersion>(conf);
+            options["OldToolsVersion"] = Options.StringOption.Get<Options.CSharp.OldToolsVersion>(conf);
+            options["ApplicationRevision"] = Options.StringOption.Get<Options.CSharp.ApplicationRevision>(conf);
+            options["ApplicationVersion"] = Options.StringOption.Get<Options.CSharp.ApplicationVersion>(conf);
+            options["VsToolsPath"] = Options.StringOption.Get<Options.CSharp.VsToolsPath>(conf);
+            options["VisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.VisualStudioVersion>(conf);
+            options["InstallUrl"] = Options.StringOption.Get<Options.CSharp.InstallURL>(conf);
+            options["SupportUrl"] = Options.StringOption.Get<Options.CSharp.SupportUrl>(conf);
+            options["ProductName"] = Options.StringOption.Get<Options.CSharp.ProductName>(conf);
+            options["PublisherName"] = Options.StringOption.Get<Options.CSharp.PublisherName>(conf);
+            options["WebPage"] = Options.StringOption.Get<Options.CSharp.WebPage>(conf);
+            options["BootstrapperComponentsUrl"] = Options.StringOption.Get<Options.CSharp.BootstrapperComponentsUrl>(conf);
+            options["MinimumRequiredVersion"] = Options.StringOption.Get<Options.CSharp.MinimumRequiredVersion>(conf);
+            options["NoWarn"] = Options.StringOption.Get<Options.CSharp.SuppressWarning>(conf);
+            options["ConcordSDKDir"] = Options.StringOption.Get<Options.CSharp.ConcordSDKDir>(conf);
+            options["UpdateInterval"] = Options.IntOption.Get<Options.CSharp.UpdateInterval>(conf);
+            options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
+
+            // concat defines, don't add options.Defines since they are automaticly added by VS
+            Strings defines = new Strings();
+            defines.AddRange(options.ExplicitDefines);
+            defines.AddRange(conf.Defines);
+
+            options["PreprocessorDefinitions"] = defines.JoinStrings(";").Replace(@"""", @"\&quot;");
+
+            return options;
+        }
+        #endregion
+
+        private class UserFile : UserFileBase
+        {
+            public UserFile(string projectFilePath) : base(projectFilePath)
+            {
+            }
+
+            protected override void GenerateConfigurationContent(IFileGenerator fileGenerator, Project.Configuration conf)
+            {
+                switch (conf.CsprojUserFile.StartAction)
+                {
+                    case StartActionSetting.Program:
+                        fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithProgram);
+                        break;
+                    case StartActionSetting.URL:
+                        fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithUrl);
+                        break;
+                    default:
+                        fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithProject);
+                        break;
+                }
+            }
+
+            protected override bool HasContentForConfiguration(Project.Configuration conf, out bool overwriteFile)
+            {
+                overwriteFile = conf.CsprojUserFile?.OverwriteExistingFile ?? true;
+                return conf.CsprojUserFile != null;
+            }
+        }
+    }
+}
