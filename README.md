@@ -8,10 +8,7 @@ Sharpmake is a solution to generate Visual Studio project files for C++, C#, VSI
 It is similar to Premake, but in C#. Originally developed on AC3 in 2011,
 it is used by most projects within Ubisoft.
 
-Note: Sharpmake was presented at UDC. You can go directly at 18:00
-in http://ubitube/Movie.aspx?movieID=4936. It's not a tutorial, just an overview
-going in enough detail to understand Sharpmake advantages.
-
+For a more complete introduction, refer to [Intro.md](Intro.md).
 
 ## Installation and documentation
 
