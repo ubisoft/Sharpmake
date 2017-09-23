@@ -1,0 +1,11 @@
+os: Visual Studio 2015
+
+platform:
+  - Win32
+
+before_build:
+  - cmd: git clean -ffxd
+
+build_script:
+  - cmd: nuget restore Sharpmake.sln
+  - cmd: \"$VS140COMNTOOLS\..\IDE\devenv.com" /Build "Release" Sharpmake.sln
