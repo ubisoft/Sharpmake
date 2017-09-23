@@ -7,6 +7,5 @@ before_build:
   - cmd: git clean -ffxd
 
 build_script:
-  - cmd: nuget help
-  - cmd: nuget restore Sharpmake.sln
+  - cmd: nuget restore Sharpmake.UnitTests/Sharpmake.UnitTests.csproj
   - cmd: echo "Building..." && "%VS140COMNTOOLS%\..\IDE\devenv.com" /Build "Release" Sharpmake.sln
