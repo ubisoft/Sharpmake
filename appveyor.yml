@@ -8,4 +8,4 @@ before_build:
 
 build_script:
   - cmd: nuget restore Sharpmake.sln
-  - cmd: \"$VS140COMNTOOLS\..\IDE\devenv.com" /Build "Release" Sharpmake.sln
+  - cmd: \"%VS140COMNTOOLS%\..\IDE\devenv.com" /Build "Release" Sharpmake.sln
