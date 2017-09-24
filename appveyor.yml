@@ -11,3 +11,28 @@ before_build:
 
 build_script:
   - cmd: echo "Building..." && "%VS140COMNTOOLS%\..\IDE\devenv.com" /Build "Release" Sharpmake.sln
+
+test: off
+artifacts:
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.Application.exe
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.Application.exe,config
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.Application.pdb
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.CommonPlatforms.dll
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.CommonPlatforms.pdb
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.dll
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.pdb
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.Generators.dll
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\Sharpmake.Generators.pdb
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\SimpleNuGet.dll
+    name: Sharpmake
+  - path: Sharpmake\Sharpmake.Application\bin\release\SimpleNuGet.pdb
+    name: Sharpmake
