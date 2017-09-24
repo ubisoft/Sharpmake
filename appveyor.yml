@@ -16,7 +16,7 @@ test: off
 artifacts:
   - path: Sharpmake.Application\bin\release\Sharpmake.Application.exe
     name: Sharpmake
-  - path: Sharpmake.Application\bin\release\Sharpmake.Application.exe,config
+  - path: Sharpmake.Application\bin\release\Sharpmake.Application.exe.config
     name: Sharpmake
   - path: Sharpmake.Application\bin\release\Sharpmake.Application.pdb
     name: Sharpmake
