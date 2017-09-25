@@ -9,7 +9,9 @@ before_build:
 build_script:
   - cmd: echo "Building..." && "%VS140COMNTOOLS%\..\IDE\devenv.com" /Build "Release" Sharpmake.sln
 
-test: off
+test_script:
+  - cmd: nunit3-console Sharpmake.UnitTests\bin\release\Sharpmake.UnitTests.dll --result=myresults.xml;format=AppVeyor
+
 artifacts:
   - path: Sharpmake.Application\bin\release\Sharpmake.Application.exe
     name: Sharpmake
