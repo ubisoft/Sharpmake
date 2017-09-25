@@ -1,9 +1,6 @@
 os: Visual Studio 2015
 
-platform:
-  - Win32
-
-version: 1.0.{build}
+version: 0.0.{build}
 
 before_build:
   - cmd: git clean -ffxd
