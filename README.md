@@ -1,4 +1,4 @@
-# Sharpmake [![build status](https://gitlab-ncsa.ubisoft.org/alexandrie/sharpmake/badges/master/build.svg)](https://gitlab-ncsa.ubisoft.org/alexandrie/sharpmake/commits/master)
+# Sharpmake
 
 
 ## Introduction
@@ -12,6 +12,4 @@ For a more complete introduction, refer to [Intro.md](Intro.md).
 
 ## Installation and documentation
 
-Please refer to [OVERVIEW.md](docs/OVERVIEW.md) for an in-depth documentation about Sharpmake. You
-can also find that documentation on the the official
-[Ubisoft Confluence page](https://mdc-web-tomcat17.ubisoft.org/confluence/display/alex/Sharpmake).
+Please refer to [OVERVIEW.md](docs/OVERVIEW.md) for an in-depth documentation about Sharpmake.
