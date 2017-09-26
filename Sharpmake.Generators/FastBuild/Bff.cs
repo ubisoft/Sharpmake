@@ -288,8 +288,8 @@ namespace Sharpmake.Generators.FastBuild
                         totalIncludeList.AddRange(includeList.Value.Values);
 
                         // need to add current BFF in case not already in the list.
-                            totalIncludeList.Add(includeList.Key);
-                        }
+                        totalIncludeList.Add(includeList.Key);
+                    }
 
                     foreach (var projectBffFullPath in totalIncludeList)
                     {
@@ -585,7 +585,8 @@ namespace Sharpmake.Generators.FastBuild
             var context = new BffGenerationContext(builder, project, projectPath);
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName);
             string fastBuildClrSupport = Util.IsDotNet(firstConf) ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
-            var confSourceFiles = GetGeneratedFiles(context, configurations);
+            List<Vcxproj.ProjectFile> filesInNonDefaultSection;
+            var confSourceFiles = GetGeneratedFiles(context, configurations, out filesInNonDefaultSection);
 
             var bffPreBuildSection = new Dictionary<string, string>();
             var bffCustomPreBuildSection = new Dictionary<string, string>();
@@ -613,7 +614,7 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
                 {
-                    var unityTuple = GetUnityTupleConfig(conf);
+                    var unityTuple = GetDefaultTupleConfig(conf);
                     var confSubConfigs = confSourceFiles[conf];
                     ConfigureUnities(context, confSubConfigs[unityTuple]);
                 }
@@ -648,8 +649,9 @@ namespace Sharpmake.Generators.FastBuild
                         throw new Error("Sharpmake-FastBuild: Configuration " + conf + " is configured for blobbing by fastbuild and sharpmake. This is illegal.");
                     }
 
-                    var unityTuple = GetUnityTupleConfig(conf);
+                    var defaultTuple = GetDefaultTupleConfig(conf);
                     var confSubConfigs = confSourceFiles[conf];
+
                     // We will need as many "sub"-libraries as subConfigs to generate the final library
                     int subConfigIndex = 0;
                     Strings subConfigLibs = new Strings();
@@ -665,6 +667,8 @@ namespace Sharpmake.Generators.FastBuild
 
                     foreach (var tuple in confSubConfigs.Keys)
                     {
+                        bool isDefaultTuple = defaultTuple.Equals(tuple);
+
                         bool isUsePrecomp = tuple.Item1 && conf.PrecompSource != null;
                         bool isCompileAsCFile = tuple.Item2;
                         bool isCompileAsCPPFile = tuple.Item3;
@@ -675,7 +679,7 @@ namespace Sharpmake.Generators.FastBuild
                         bool isCompileAsNonCLRFile = tuple.Rest.Item1;
 
                         // For now, this will do.
-                        if (conf.FastBuildBlobbed && unityTuple.Equals(tuple) && !isUnity)
+                        if (conf.FastBuildBlobbed && isDefaultTuple && !isUnity)
                         {
                             isUnity = true;
                         }
@@ -690,11 +694,14 @@ namespace Sharpmake.Generators.FastBuild
 
                         ProjectOptionsGenerator.VcxprojCmdLineOptions confCmdLineOptions = cmdLineOptions[conf];
 
+                        Strings fastBuildCompilerInputPatternList = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
+                        Strings fastBuildCompilerInputPatternTransformedList = new Strings(fastBuildCompilerInputPatternList.Select((s) => { return "*" + s; }));
+
+                        string fastBuildCompilerInputPattern = FBuildCollectionFormat(fastBuildCompilerInputPatternTransformedList, 32);
+
                         string fastBuildPrecompiledSourceFile = FileGeneratorUtilities.RemoveLineTag;
-                        string fastBuildSourceFiles = FileGeneratorUtilities.RemoveLineTag;
-                        string fastBuildResourceFiles = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompileAsC = FileGeneratorUtilities.RemoveLineTag;
-                        string fastBuildUnityName = isUnity ? GetUnityName(conf) : FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildUnityName = isUnity ? GetUnityName(conf) : null;
 
                         string previousExceptionSettings = confCmdLineOptions["ExceptionHandling"];
                         switch (exceptionsSetting)
@@ -710,8 +717,6 @@ namespace Sharpmake.Generators.FastBuild
                                 break;
                         }
 
-                        bool projectHasResourceFiles = false;
-
                         bool isNoBlobImplicitConfig = false;
                         if (conf.FastBuildNoBlobStrategy == Project.Configuration.InputFileStrategy.Exclude &&
                             conf.IsBlobbed == false &&
@@ -722,43 +727,6 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 isNoBlobImplicitConfig = true;
                             }
-                        }
-
-                        {
-                            List<string> fastbuildSourceFilesList = new List<string>();
-                            List<string> fastbuildResourceFilesList = new List<string>();
-
-                            var sourceFiles = confSubConfigs[tuple];
-                            foreach (Vcxproj.ProjectFile sourceFile in sourceFiles)
-                            {
-                                string sourceFileName = Util.GetConvertedRelativePath(projectPath, sourceFile.FileNameProjectRelative, masterBffPath, true, project.RootPath);
-
-                                if (isUsePrecomp && conf.PrecompSource != null && sourceFile.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    fastBuildPrecompiledSourceFile = sourceFileName;
-                                }
-                                else if (String.Compare(sourceFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0)
-                                {
-                                    if (microsoftPlatformBff.SupportsResourceFiles)
-                                    {
-                                        fastbuildResourceFilesList.Add(sourceFileName);
-                                        projectHasResourceFiles = true;
-                                    }
-                                }
-                                else
-                                {
-                                    // TODO: use SourceFileExtension array instead of ".cpp"
-                                    if ((String.Compare(sourceFile.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) != 0) ||
-                                        conf.ResolvedSourceFilesBlobExclude.Contains(sourceFile.FileName) ||
-                                        (!isUnity && !isNoBlobImplicitConfig))
-                                    {
-                                        fastbuildSourceFilesList.Add(sourceFileName);
-                                    }
-                                }
-                            }
-
-                            fastBuildSourceFiles = FBuildFormatList(fastbuildSourceFilesList, 32);
-                            fastBuildResourceFiles = FBuildFormatList(fastbuildResourceFilesList, 30);
                         }
 
                         Options.ExplicitOptions confOptions = options[conf];
@@ -864,8 +832,6 @@ namespace Sharpmake.Generators.FastBuild
                                 break;
                         }
 
-                        if (projectHasResourceFiles)
-                            resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
                         string fastBuildCompilerPCHOptions = isUsePrecomp ? Template.ConfigurationFile.UsePrecomp : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptionsClang = isUsePrecomp ? Template.ConfigurationFile.UsePrecompClang : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildLinkerOutputFile = fastBuildOutputFile;
@@ -1080,16 +1046,37 @@ namespace Sharpmake.Generators.FastBuild
                             linkObjects = (confOptions["UseLibraryDependencyInputs"] == "true");
                         }
 
+                        Strings inputPaths = new Strings();
                         string fastBuildInputPath = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildInputExcludedFiles = FileGeneratorUtilities.RemoveLineTag;
-                        if (isNoBlobImplicitConfig)
                         {
-                            fastBuildInputPath = sourceFilesRelativeInputPath;
-
                             Strings excludedSourceFiles = new Strings();
-                            excludedSourceFiles.AddRange(conf.ResolvedSourceFilesBlobExclude);
+                            if (isNoBlobImplicitConfig && isDefaultTuple)
+                            {
+                                inputPaths.Add(sourceFilesRelativeInputPath);
+                                inputPaths.AddRange(project.AdditionalSourceRootPaths.Select((p) => Util.GetConvertedRelativePath(p, "", masterBffPath, true, project.RootPath)));
+
+                                excludedSourceFiles.AddRange(filesInNonDefaultSection.Select((f) => { return f.FileName; }));
+                            }
+
+                            if (isDefaultTuple && conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Exclude && conf.FastBuildBlobbed)
+                            {
+                                // Adding the folders excluded from unity to the folders to build without unity(building each file individually)
+                                inputPaths.AddRange(project.SourcePathsBlobExclude.Select((p) => Util.GetConvertedRelativePath(p, "", masterBffPath, true, project.RootPath)));
+                            }
+
+                            if (project.SourceFilesFiltersRegex.Count == 0)
+                            {
+                                fastBuildInputPath = FBuildCollectionFormat(inputPaths, 32);
+                            }
+                            else
+                            {
+                                inputPaths.Clear();
+                            }
+
                             excludedSourceFiles.AddRange(conf.ResolvedSourceFilesBuildExclude);
                             excludedSourceFiles.AddRange(conf.PrecompSourceExclude);
+
                             Strings excludedSourceFilesRelative = new Strings();
 
                             // Converting the excluded filenames to relative path to the input path so that this
@@ -1103,14 +1090,72 @@ namespace Sharpmake.Generators.FastBuild
                             // well I guess we are stuck with this.                                                    
                             foreach (string file in excludedSourceFiles.SortedValues)
                             {
-                                string sourceFileRelative = Util.PathGetRelative(context.ProjectSourceCapitalized, file, true);
-                                if (!sourceFileRelative.StartsWith(".."))
-                                    excludedSourceFilesRelative.Add(sourceFileRelative);
+                                string fileExtension = Path.GetExtension(file);
+                                if (project.SourceFilesCompileExtensions.Contains(fileExtension))
+                                {
+                                    string inputPathRelative;
+                                    if (IsFileIsInputPathList(masterBffPath, inputPaths, file, out inputPathRelative))
+                                    {
+                                        excludedSourceFilesRelative.Add(inputPathRelative);
+                                    }
+                                }
                             }
-                            // TODO: use SourceFileExtension array instead of ".cpp"
                             if (excludedSourceFilesRelative.Count > 0)
-                                fastBuildInputExcludedFiles = FBuildCollectionFormat(excludedSourceFilesRelative, 34, ".cpp");
+                            {
+                                Strings includedExtensions = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
+                                fastBuildInputExcludedFiles = FBuildCollectionFormat(excludedSourceFilesRelative, 34, includedExtensions);
+                            }
                         }
+
+                        bool projectHasResourceFiles = false;
+                        string fastBuildSourceFiles = FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildResourceFiles = FileGeneratorUtilities.RemoveLineTag;
+
+                        {
+                            List<string> fastbuildSourceFilesList = new List<string>();
+                            List<string> fastbuildResourceFilesList = new List<string>();
+
+                            var sourceFiles = confSubConfigs[tuple];
+                            foreach (Vcxproj.ProjectFile sourceFile in sourceFiles)
+                            {
+                                string sourceFileName = Util.GetConvertedRelativePath(projectPath, sourceFile.FileNameProjectRelative, masterBffPath, true, project.RootPath);
+
+                                if (isUsePrecomp && conf.PrecompSource != null && sourceFile.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    fastBuildPrecompiledSourceFile = sourceFileName;
+                                }
+                                else if (String.Compare(sourceFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0)
+                                {
+                                    if (microsoftPlatformBff.SupportsResourceFiles)
+                                    {
+                                        fastbuildResourceFilesList.Add(sourceFileName);
+                                        projectHasResourceFiles = true;
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO: use SourceFileExtension array instead of ".cpp"
+                                    if ((String.Compare(sourceFile.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) != 0) ||
+                                        conf.ResolvedSourceFilesBlobExclude.Contains(sourceFile.FileName) ||
+                                        (!isUnity && !isNoBlobImplicitConfig))
+                                    {
+                                        if (!IsRelativeFilenameInInputPathList(inputPaths, sourceFileName))
+                                        {
+                                            fastbuildSourceFilesList.Add(sourceFileName);
+                                        }
+                                    }
+                                }
+                            }
+                            fastBuildSourceFiles = FBuildFormatList(fastbuildSourceFilesList, 32);
+                            fastBuildResourceFiles = FBuildFormatList(fastbuildResourceFilesList, 30);
+                        }
+
+                        if (projectHasResourceFiles)
+                            resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
+
+                        // It is useless to have an input pattern defined if there is no input path
+                        if (fastBuildInputPath == FileGeneratorUtilities.RemoveLineTag)
+                            fastBuildCompilerInputPattern = FileGeneratorUtilities.RemoveLineTag;
 
                         string fastBuildObjectListResourceDependencies = FormatListPartForTag(resourceFilesSections, 32, true);
 
@@ -1132,6 +1177,7 @@ namespace Sharpmake.Generators.FastBuild
                                 using (bffGenerator.Declare("fastBuildLinkerLinkObjects", linkObjects ? "true" : "false"))
                                 using (bffGenerator.Declare("fastBuildPartialLibInfo", partialLibInfo))
                                 using (bffGenerator.Declare("fastBuildInputPath", fastBuildInputPath))
+                                using (bffGenerator.Declare("fastBuildCompilerInputPattern", fastBuildCompilerInputPattern))
                                 using (bffGenerator.Declare("fastBuildInputExcludedFiles", fastBuildInputExcludedFiles))
                                 using (bffGenerator.Declare("fastBuildSourceFiles", fastBuildSourceFiles))
                                 using (bffGenerator.Declare("fastBuildResourceFiles", fastBuildResourceFiles))
@@ -1146,7 +1192,7 @@ namespace Sharpmake.Generators.FastBuild
                                 using (bffGenerator.Declare("fastBuildOutputType", outputType))
                                 using (bffGenerator.Declare("fastBuildLibrarianAdditionalInputs", librarianAdditionalInputs))
                                 using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
-                                using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName))
+                                using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName ?? FileGeneratorUtilities.RemoveLineTag))
                                 using (bffGenerator.Declare("fastBuildClangFileLanguage", clangFileLanguage))
                                 using (bffGenerator.Declare("fastBuildClangStd", clangStd))
                                 using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
@@ -1270,12 +1316,28 @@ namespace Sharpmake.Generators.FastBuild
                                         switch (conf.Output)
                                         {
                                             case Project.Configuration.OutputType.Exe:
-                                            {
-                                                if (subConfigIndex == confSubConfigs.Keys.Count - 1)
+                                                {
+                                                    if (subConfigIndex == confSubConfigs.Keys.Count - 1)
+                                                    {
+                                                        beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
+                                                    }
+                                                    else
+                                                    {
+                                                        // in the case the lib has the flag force to be an objectlist, change the template
+                                                        if (useObjectLists)
+                                                            beginSectionType = Template.ConfigurationFile.ObjectListBeginSection;
+                                                        else
+                                                            beginSectionType = Template.ConfigurationFile.LibBeginSection;
+                                                        outputLib = true;
+                                                    }
+                                                }
+                                                break;
+                                            case Project.Configuration.OutputType.Dll:
                                                 {
                                                     beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
                                                 }
-                                                else
+                                                break;
+                                            case Project.Configuration.OutputType.Lib:
                                                 {
                                                     // in the case the lib has the flag force to be an objectlist, change the template
                                                     if (useObjectLists)
@@ -1284,22 +1346,6 @@ namespace Sharpmake.Generators.FastBuild
                                                         beginSectionType = Template.ConfigurationFile.LibBeginSection;
                                                     outputLib = true;
                                                 }
-                                            }
-                                                break;
-                                            case Project.Configuration.OutputType.Dll:
-                                            {
-                                                beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
-                                            }
-                                                break;
-                                            case Project.Configuration.OutputType.Lib:
-                                            {
-                                                // in the case the lib has the flag force to be an objectlist, change the template
-                                                if (useObjectLists)
-                                                    beginSectionType = Template.ConfigurationFile.ObjectListBeginSection;
-                                                else
-                                                    beginSectionType = Template.ConfigurationFile.LibBeginSection;
-                                                outputLib = true;
-                                            }
                                                 break;
                                         }
 
@@ -1630,7 +1676,8 @@ namespace Sharpmake.Generators.FastBuild
                 fastbuildUnityInputExcludePathList.Add(Util.GetConvertedRelativePath(projectPath, conf.BlobPath, masterBffPath, true, project.RootPath));
             }
 
-            fastBuildUnityInputExcludePath = FBuildCollectionFormat(fastbuildUnityInputExcludePathList, spaceLength);
+            fastbuildUnityInputExcludePathList.AddRange(project.SourcePathsBlobExclude.Select((excludedPath) => Util.GetConvertedRelativePath(excludedPath, "", masterBffPath, true, project.RootPath)));
+            fastBuildUnityInputExcludePath = FBuildCollectionFormat(fastbuildUnityInputExcludePathList, spaceLength:spaceLength);
 
             // Conditional statement depending on the blobbing strategy
             if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Include)
@@ -1652,6 +1699,15 @@ namespace Sharpmake.Generators.FastBuild
             }
             else
             {
+                // Fastbuild will process as unity all files contained in source Root folder and all additional roots.
+                Strings unityInputPaths = new Strings();
+                unityInputPaths.Add(sourceFilesRelativeInputPath);
+                unityInputPaths.AddRange(project.AdditionalSourceRootPaths.Select((p) => Util.GetConvertedRelativePath(p, "", masterBffPath, true, project.RootPath)));
+
+                // Remove any excluded paths(exclusion has priority)
+                unityInputPaths.RemoveRange(fastbuildUnityInputExcludePathList);
+                fastBuildUnityPaths = FBuildCollectionFormat(unityInputPaths, spaceLength);
+
                 Strings excludedSourceFiles = new Strings();
 
                 excludedSourceFiles.AddRange(conf.ResolvedSourceFilesBlobExclude);
@@ -1668,41 +1724,23 @@ namespace Sharpmake.Generators.FastBuild
                 //
                 // Note: Ideally fastbuild should expect relative paths to the bff file path instead of the .UnityInputPath but
                 // well I guess we are stuck with this.
-                foreach(string file in excludedSourceFiles.SortedValues)
+                foreach (string file in excludedSourceFiles.SortedValues)
                 {
-                    string sourceFileRelative = Util.PathGetRelative(context.ProjectSourceCapitalized, file, true);
-                    if(!sourceFileRelative.StartsWith("..", StringComparison.Ordinal))
-                        excludedSourceFilesRelative.Add(sourceFileRelative);
-                }
-                // TODO: use SourceFileExtension array instead of ".cpp"
-                if (excludedSourceFilesRelative.Count > 0)
-                    fastBuildUnityInputExcludedfiles = FBuildCollectionFormat(excludedSourceFilesRelative, spaceLength, ".cpp");
-
-                // manually add files outside of source directory
-                List<string> explicitSourceFiles = new List<string>();
-
-                foreach (var file in sourceFiles)
-                {
-                    if (
-                        // cpp files only
-                        // TODO: use SourceFileExtension array instead of ".cpp"
-                        (string.Compare(file.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) == 0) &&
-                        // not precomp
-                        ((conf.PrecompSource == null || !file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase)) &&
-                         // outside of directory
-                         !file.FileName.StartsWith(context.ProjectSourceCapitalized) &&
-                         // not exclude from build
-                         !excludedSourceFiles.Contains(file.FileName)))
+                    string inputPathRelative;
+                    if (IsFileIsInputPathList(masterBffPath, unityInputPaths, file, out inputPathRelative))
                     {
-                        string sourceFileRelative = Util.PathGetRelative(masterBffPath, file.FileName, true);
-                        explicitSourceFiles.Add(sourceFileRelative);
+                        excludedSourceFilesRelative.Add(inputPathRelative);
                     }
                 }
-                if (explicitSourceFiles.Count != 0)
-                    fastBuildUnityInputFiles = FBuildFormatList(explicitSourceFiles, spaceLength);
+                if (excludedSourceFilesRelative.Count > 0)
+                    fastBuildUnityInputExcludedfiles = FBuildCollectionFormat(excludedSourceFilesRelative, spaceLength, project.SourceFilesBlobExtensions);
+            }
 
-                fastBuildUnityPaths = sourceFilesRelativeInputPath;
-
+            if (fastBuildUnityInputFiles == FileGeneratorUtilities.RemoveLineTag &&
+                fastBuildUnityPaths      == FileGeneratorUtilities.RemoveLineTag)
+            {
+                // no input path nor files => no unity
+                return;
             }
 
             Unity unityFile = new Unity
@@ -1743,7 +1781,7 @@ namespace Sharpmake.Generators.FastBuild
         }
 
         // For now, this will do.
-        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>> GetUnityTupleConfig(Project.Configuration conf)
+        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>> GetDefaultTupleConfig(Project.Configuration conf)
         {
             bool isConsumeWinRTExtensions = false;
             bool isCompileAsCLRFile = false;
@@ -1812,20 +1850,24 @@ namespace Sharpmake.Generators.FastBuild
             return strBuilder.ToString();
         }
 
-        private static string FBuildCollectionFormat(Strings collection, int spaceLength, string pattern = "*")
+        private static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null)
         {
             // Select items.
             List<string> items = new List<string>(collection.Count);
 
             foreach (string collectionItem in collection.SortedValues)
             {
-                if (pattern != "*" && collectionItem.Contains(pattern))
+                if (includedExtensions == null)
                 {
                     items.Add(collectionItem);
                 }
-                else if (pattern == "*")
+                else
                 {
-                    items.Add(collectionItem);
+                    string extension = Path.GetExtension(collectionItem);
+                    if (includedExtensions.Contains(extension))
+                    {
+                        items.Add(collectionItem);
+                    }
                 }
             }
 
@@ -1913,10 +1955,12 @@ namespace Sharpmake.Generators.FastBuild
         private static Dictionary<Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>
         GetGeneratedFiles(
             IGenerationContext context,
-            List<Project.Configuration> configurations
+            List<Project.Configuration> configurations,
+            out List<Vcxproj.ProjectFile> filesInNonDefaultSections
         )
         {
             var confSubConfigs = new Dictionary<Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>(); // What the fuck?
+            filesInNonDefaultSections = new List<Vcxproj.ProjectFile>();
 
             // Add source files
             List<Vcxproj.ProjectFile> allFiles = new List<Vcxproj.ProjectFile>();
@@ -1989,6 +2033,12 @@ namespace Sharpmake.Generators.FastBuild
                             subConfigs.Add(tuple, subConfigFiles);
                         }
                         subConfigFiles.Add(file);
+
+                        var defaultTuple = GetDefaultTupleConfig(conf);
+                        if (!tuple.Equals(defaultTuple))
+                        {
+                            filesInNonDefaultSections.Add(file);
+                        }
                     }
                 }
             }
@@ -1999,7 +2049,7 @@ namespace Sharpmake.Generators.FastBuild
                 if (conf.FastBuildBlobbed)
                 {
                     // For now, this will do.
-                    var tuple = GetUnityTupleConfig(conf);
+                    var tuple = GetDefaultTupleConfig(conf);
 
                     Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
                     if (!confSubConfigs.TryGetValue(conf, out subConfigs))
@@ -2030,6 +2080,40 @@ namespace Sharpmake.Generators.FastBuild
                 return "'" + copyPattern + "'";
 
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
+        }
+
+        private bool IsFileIsInputPathList(
+            string masterBffPath,
+            Strings inputPaths,
+            string filename,
+            out string sourceFileRelative
+        )
+        {
+            // Convert each of file paths to each of the input paths and try to
+            // find the first one not starting from ..(ie the file is in the tested input path)
+            foreach (string inputPath in inputPaths)
+            {
+                string inputAbsPath = Util.PathGetAbsolute(masterBffPath, inputPath);
+                string sourceFileRelativeTmp = Util.PathGetRelative(inputAbsPath, filename, true);
+                if (!sourceFileRelativeTmp.StartsWith(".."))
+                {
+                    sourceFileRelative = sourceFileRelativeTmp;
+                    return true;
+                }
+            }
+
+            sourceFileRelative = string.Empty;
+            return false;
+        }
+        private bool IsRelativeFilenameInInputPathList(Strings inputPaths, string filename)
+        {
+            foreach (string inputPath in inputPaths)
+            {
+                if (filename.StartsWith(inputPath))
+                    return true;
+            }
+
+            return false;
         }
     }
 }
