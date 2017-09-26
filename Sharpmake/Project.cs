@@ -96,6 +96,7 @@ namespace Sharpmake
 
         protected Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
         public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm");         // File that match this regex compile
+        public Strings SourceFilesCPPExtensions = new Strings(".cpp", ".cc");
 
         public Strings SourceFilesFilters = null;                                        // if !=  null, include only file in this filter
 
@@ -131,6 +132,7 @@ namespace Sharpmake
         public Strings SourceFilesBlobExclude = new Strings();
         public Strings SourceFilesBlobExcludeRegex = new Strings();
         public Strings SourceFilesBlobExtensions = new Strings(".cpp");
+        public Strings SourcePathsBlobExclude = new Strings();                          // List of paths excluded from blobs. This maps cleanly to UnityInputExcludePath but is also supported in msbuild.
 
         public Strings ResourceFiles = new Strings();
         public Strings ResourceFilesExtensions = new Strings();
@@ -602,6 +604,16 @@ namespace Sharpmake
                 {
                     if (entry.Value.PartialExclusions.Contains(sourceFile))
                         noBlobbebSourceFiles.Add(sourceFile);
+                }
+
+                foreach (string blobExcludedPath in SourcePathsBlobExclude)
+                {
+                    string excludedPath = Util.SimplifyPath(blobExcludedPath);
+                    if (sourceFile.StartsWith(excludedPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        noBlobbebSourceFiles.Add(sourceFile);
+                        break;
+                    }
                 }
             }
 

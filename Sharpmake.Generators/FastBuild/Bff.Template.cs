@@ -211,7 +211,8 @@ Compiler( '[fastbuildCompilerName]' )
                 public static string CompilerOptionsCommon = @"
     .CompilerInputUnity       = '[fastBuildUnityName]'
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputPath        = '[fastBuildInputPath]'
+    .CompilerInputPath        = [fastBuildInputPath]
+    .CompilerInputPattern     = [fastBuildCompilerInputPattern]
     .CompilerInputExcludedFiles = [fastBuildInputExcludedFiles]
     .CompilerInputFiles       = [fastBuildSourceFiles]
 
@@ -484,7 +485,7 @@ Exec( '[fastBuildPreBuildName]' )
                 public static string UnitySection = @"
 Unity( '[unityFile.UnityName]' )
 {
-    .UnityInputPath                     = '[unityFile.UnityInputPath]'
+    .UnityInputPath                     = [unityFile.UnityInputPath]
     .UnityInputExcludePath              = [unityFile.UnityInputExcludePath]
     .UnityInputExcludePattern           = '[unityFile.UnityInputExcludePattern]'
     .UnityInputPattern                  = '[unityFile.UnityInputPattern]'
