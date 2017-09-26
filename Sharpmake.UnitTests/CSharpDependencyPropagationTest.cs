@@ -52,9 +52,10 @@ namespace SharpmakeUnitTests
                 GetGeneratorsManager
             );
 
-            // HACK: Explicitely reference something from CommonPlatforms to get
-            // visual studio to load the assembly
+            // Force the test to load and register CommonPlatforms.dll as a Sharpmake extension
+            // because sometimes you get the "no implementation of XX for platform YY."
             var platformDotNetType = typeof(DotNetPlatform);
+            PlatformRegistry.RegisterExtensionAssembly(platformDotNetType.Assembly);
 
             Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 
