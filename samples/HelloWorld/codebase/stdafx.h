@@ -1,13 +1,6 @@
-#if defined(WIN32) || defined(WIN64)
-#include <stdio.h>
-#include <tchar.h>
-#endif
+#if !defined(_STDAFX_H)
+#define _STDAFX_H
 
-#ifdef _XBOX
-#include <xtl.h>
-#include <xboxmath.h>
-#endif
+#include <cstdio>
 
-#ifdef SN_TARGET_PS3_SPU
-#include <cell/spurs/job_chain.h>
-#endif
+#endif // _STDAFX_H

@@ -1012,11 +1012,6 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["OutputFileName"] = outputFileName;
             context.Options["OutputFileExtension"] = "." + outputExtension;
 
-            // Remove?
-            context.Options["ImageXexOutput"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["X360RemotePath"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["X360LayoutFile"] = FileGeneratorUtilities.RemoveLineTag;
-
             context.Options["AdditionalDeploymentFolders"] = "";
 
             switch (context.Configuration.Output)
@@ -1220,22 +1215,6 @@ namespace Sharpmake.Generators.VisualStudio
                 //AdditionalDependencies                      
                 //                                            AdditionalDependencies="lib1;lib2"      "lib1;lib2" 
                 SelectAdditionalDependenciesOption(context, optionsContext, libFiles, ignoreSpecificLibraryNames);
-
-                // TODO OS
-                //AdditionalNSODependencies (NX)
-                if (context.Configuration.AdditionalNSOFiles.Count > 0)
-                {
-                    context.Options["AdditionalNSODependencies"] = string.Join(";", context.Configuration.AdditionalNSOFiles);
-                }
-                else
-                {
-                    context.Options["AdditionalNSODependencies"] = FileGeneratorUtilities.RemoveLineTag;
-                }
-
-                if (context.Configuration.MetadataSource == null)
-                    context.Options["NXMetafile"] = FileGeneratorUtilities.RemoveLineTag;
-                else
-                    context.Options["NXMetafile"] = context.Configuration.MetadataSource;
             }
 
             // Set module definition
@@ -2122,7 +2101,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["GenerateDebugInformation"] =
                 (
                     context.DevelopmentEnvironment >= DevEnv.vs2015 &&
-                    context.Configuration.Platform != Platform.orbis // Why?
+                    context.Configuration.Platform.IsUsingClang()
                 ) ? "No" : "false";
                 context.Options["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["LinkerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;

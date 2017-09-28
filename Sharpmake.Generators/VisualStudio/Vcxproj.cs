@@ -150,26 +150,7 @@ namespace Sharpmake.Generators.VisualStudio
                 bool hasNvShieldConfiguration = false;
                 foreach (Project.Configuration conf in configurations)
                 {
-                    string projectName = null;
-                    if (projectName == null)
-                        projectName = conf.ProjectName;
-                    else if (projectName != conf.ProjectName)
-                        throw new Error("Project configurations in the same project files must be the same: {0} != {1} in {2}", projectName, conf.ProjectName, ProjectFileName);
-
-                    Project.Configuration otherConf;
-
-                    // Since ps3 use a fake Win32 platform, we cannot support having 2 configurations ps3 and win32 with the same name.
                     var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project) + conf.Target.GetFragment<DevEnv>();
-
-                    if (configurationNameMapping.TryGetValue(projectUniqueName, out otherConf))
-                    {
-                        var differBy = Util.MakeDifferenceString(conf, otherConf);
-                        throw new Error(
-                            "Project {0} ({5} in {6}) have 2 configurations with the same name: \"{1}\" for {2} and {3}"
-                            + Environment.NewLine + "Nb: ps3 and win32 cannot have same conf name: {4}",
-                            Project.Name, conf.Name, otherConf.Target, conf.Target, differBy, ProjectFileName, ProjectDirectory);
-                    }
-
                     configurationNameMapping[projectUniqueName] = conf;
                 }
 

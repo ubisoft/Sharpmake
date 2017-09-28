@@ -590,7 +590,7 @@ namespace Sharpmake
                 {
                     Disable,
                     [Default]
-                    Normal, // There is only a difference on PS3 between Normal/Full
+                    Normal,
                     Full
                 }
 

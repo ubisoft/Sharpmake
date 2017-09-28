@@ -261,25 +261,6 @@ namespace Sharpmake.Generators.VisualStudio
                 return solutionFileInfo.FullName;
             }
 
-            // Since ps3 use a fake Win32 platform, we cannot have 2 configurations
-            // with the same name within the solution, ex: Debug|Win32 and Debug|PS3
-            // So in that case, validate that all solution name are unique
-            if (solutionConfigurations.Any(conf => (conf.Platform == Platform.ps3 || conf.Platform == Platform.ps3spu)))
-            {
-                var solutionNameMapping = new Dictionary<string, Solution.Configuration>();
-                foreach (Solution.Configuration conf in solutionConfigurations)
-                {
-                    Solution.Configuration otherConf;
-
-                    string configurationPlatformAndName = conf.Name + "|" + conf.PlatformName;
-
-                    if (solutionNameMapping.TryGetValue(configurationPlatformAndName, out otherConf))
-                        throw new Error("Solution {0} has 2 configurations with the same name: \"{1}\" for {2} and {3}", solution.Name, conf.Name, otherConf.Target, conf.Target);
-
-                    solutionNameMapping[configurationPlatformAndName] = conf;
-                }
-            }
-
             List<Solution.ResolvedProject> resolvedPathReferences = ResolveReferencesByPath(solutionProjects, solutionConfigurations[0].ProjectReferencesByPath);
 
             var guidlist = solutionProjects.Select(p => p.UserData["Guid"]);
