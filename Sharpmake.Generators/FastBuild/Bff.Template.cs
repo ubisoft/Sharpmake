@@ -155,7 +155,6 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.BaseAddress]' 
                             + ' [cmdLineOptions.RandomizedBaseAddress]' 
                             + ' [cmdLineOptions.FixedBaseAddress]' 
-                            + ' /NXCOMPAT'
                             + ' [cmdLineOptions.ImportLibrary]'
                             + ' [cmdLineOptions.TargetMachine]'
                             + ' /errorReport:queue'

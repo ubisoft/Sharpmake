@@ -190,12 +190,10 @@ namespace Sharpmake
     <PreBuildEventUseInBuild>[options.PreBuildEventEnable]</PreBuildEventUseInBuild>
     <PreLinkEventUseInBuild>[options.PreLinkEventEnable]</PreLinkEventUseInBuild>
     <LinkIncremental>[options.LinkIncremental]</LinkIncremental>
-    <ImageXexOutput>[options.ImageXexOutput]</ImageXexOutput>
     <OutputFile>[options.OutputFile]</OutputFile>
     <EmbedManifest>[options.EmbedManifest]</EmbedManifest>
     <IgnoreImportLibrary>[options.IgnoreImportLibrary]</IgnoreImportLibrary>
     <RunCodeAnalysis>[options.RunCodeAnalysis]</RunCodeAnalysis>
-    <RemoteRoot>[options.X360RemotePath]</RemoteRoot>
     <CustomBuildBeforeTargets>[options.CustomBuildStepBeforeTargets]</CustomBuildBeforeTargets>
     <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
     <ExecutablePath>[options.ExecutablePath]</ExecutablePath>

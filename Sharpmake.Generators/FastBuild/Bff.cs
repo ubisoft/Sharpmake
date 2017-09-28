@@ -1575,9 +1575,6 @@ namespace Sharpmake.Generators.FastBuild
         /// Method that allows to determine for a speicified dependency if it's a library or an object list. if a dep is within 
         /// the list, the second condition check if objects is present which means that the current dependency is considered to be 
         /// a force objectlist.
-        /// eg: dependencie {'objects_system_engine_orbis_2012_d_fb'} , dep = system_engine_orbis_2012_d_fb -> return false
-        ///     dependencie {'lib_system_engine_orbis_2012_d_fb'} ,     dep = system_engine_orbis_2012_d_fb -> return true
-        ///     dependencie {'system_engine_orbis_2012_d_fb'} ,         dep = system_engine_orbis_2012_d_fb -> return true
         /// </summary>
         /// <param name="dependencies">all the dependencies of a specific project configuration</param>
         /// <param name="dep">additional dependency clear of additional suffix</param>
