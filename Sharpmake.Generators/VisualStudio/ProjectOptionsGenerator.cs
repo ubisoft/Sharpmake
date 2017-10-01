@@ -1860,7 +1860,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                     var cmdAdditionalLibDirectories = libDirs.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, linkOption));
 
-                    context.CommandLineOptions["AdditionalLibraryDirectories"] = string.Join(" ", cmdAdditionalLibDirectories);
+                    context.CommandLineOptions["AdditionalLibraryDirectories"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdAdditionalLibDirectories);
                 }
             }
         }
