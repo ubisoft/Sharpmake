@@ -1518,7 +1518,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 var cmdManifests = manifestInputs.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, "/manifestinput:"));
 
-                context.CommandLineOptions["ManifestInputs"] = string.Join(" ", cmdManifests);
+                context.CommandLineOptions["ManifestInputs"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdManifests);
             }
             else
             {
