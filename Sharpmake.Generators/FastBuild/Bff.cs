@@ -825,58 +825,52 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildLinkerOutputFile = fastBuildOutputFile;
                         string fastBuildStampExecutable = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildStampArguments = FileGeneratorUtilities.RemoveLineTag;
-                        string fastBuildTargetSubTargets = FileGeneratorUtilities.RemoveLineTag;
+                        var fastBuildTargetSubTargets = new List<string>();
                         {
-                            StringBuilder result = new StringBuilder();
-                            result.Append("\n");
                             foreach (KeyValuePair<string, string> copy in conf.EventPostBuildCopies)
                             {
                                 string fastBuildCopyAlias = GetFastBuildCopyAlias(copy.Key, copy.Value);
-                                result.Append("                  '" + fastBuildCopyAlias + "',\n");
+                                fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
                             }
                             foreach (var preEvent in conf.EventPreBuildExecute)
                             {
                                 string fastBuildPreBuildAlias = preEvent.Key;
-                                result.Append("                  '" + fastBuildPreBuildAlias + "',\n");
+                                fastBuildTargetSubTargets.Add(fastBuildPreBuildAlias);
                             }
                             foreach (var customPreEvent in conf.EventCustomPrebuildExecute)
                             {
                                 string fastBuildCustomPreBuildAlias = customPreEvent.Key;
-                                result.Append("                  '" + fastBuildCustomPreBuildAlias + "',\n");
+                                fastBuildTargetSubTargets.Add(fastBuildCustomPreBuildAlias);
                             }
 
-                            foreach (var d in fastBuildProjectExeUtilityDependencyList)
-                                result.Append("                  '" + d + "',\n");
+                            fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
 
                             if (conf.Output == Project.Configuration.OutputType.Lib && useObjectLists)
-                                result.Append("                  '" + fastBuildOutputFileShortName + "_objects',\n");
+                                fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_objects");
                             else
-                                result.Append("                  '" + fastBuildOutputFileShortName + "_" + outputType + "',\n");
+                                fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_" + outputType);
 
 
                             foreach (var postEvent in conf.EventPostBuildExecute)
                             {
                                 string fastBuildPostBuildAlias = postEvent.Key;
-                                result.Append("                  '" + fastBuildPostBuildAlias + "',\n");
+                                fastBuildTargetSubTargets.Add(fastBuildPostBuildAlias);
                             }
 
                             if (conf.Output != Project.Configuration.OutputType.Dll)
                             {
                                 foreach (var subConfig in subConfigObjectList)
                                 {
-                                    if (!result.ToString().Contains(subConfig))
-                                    {
-                                        if (useObjectLists)
-                                            result.Append("                  '" + subConfig + "_objects',\n");
-                                        else
-                                            result.Append("                  '" + subConfig + "_" + outputType + "',\n");
-                                    }
+                                    string subTarget;
+                                    if (useObjectLists)
+                                        subTarget = subConfig + "_objects";
+                                    else
+                                        subTarget = subConfig + "_" + outputType;
+
+                                    if (!fastBuildTargetSubTargets.Contains(subTarget))
+                                        fastBuildTargetSubTargets.Add(subTarget);
                                 }
                             }
-
-                            if (result.Length > 1)
-                                result.Remove(result.Length - 2, 2);
-                            fastBuildTargetSubTargets = result.ToString();
                         }
 
                         // Remove from cmdLineOptions["AdditionalDependencies"] dependencies that are already listed in fastBuildProjectDependencyList
@@ -1520,7 +1514,7 @@ namespace Sharpmake.Generators.FastBuild
                                         }
 
                                         // Write Target Alias
-                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", fastBuildTargetSubTargets))
+                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", FBuildFormatList(fastBuildTargetSubTargets, 15)))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                         }

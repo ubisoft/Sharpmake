@@ -393,8 +393,7 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 //=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]' )
 {
-    .Targets = { [fastBuildTargetSubTargets]
-               }
+    .Targets = [fastBuildTargetSubTargets]
 }
 
 ";
