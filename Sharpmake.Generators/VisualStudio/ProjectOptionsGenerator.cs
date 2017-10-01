@@ -1516,13 +1516,9 @@ namespace Sharpmake.Generators.VisualStudio
                 if (embedManifest == Options.Vc.Linker.EmbedManifest.No)
                     throw new NotImplementedException("Sharpmake does not support manifestinputs without embedding the manifest!");
 
-                StringBuilder result = new StringBuilder();
-                foreach (string manifest in manifestInputs)
-                {
-                    result.Append(@"/manifestinput:""" + manifest + @""" ");
-                }
-                result.Remove(result.Length - 1, 1);
-                context.CommandLineOptions["ManifestInputs"] = result.ToString();
+                var cmdManifests = manifestInputs.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, "/manifestinput:"));
+
+                context.CommandLineOptions["ManifestInputs"] = string.Join(" ", cmdManifests);
             }
             else
             {
