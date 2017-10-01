@@ -314,13 +314,10 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["AdditionalUsingDirectories"] = additionalUsingDirectories.Count > 0 ? string.Join(";", additionalUsingDirectories.Select(s => Util.PathGetRelative(context.ProjectDirectory, s))) : FileGeneratorUtilities.RemoveLineTag;
 
             additionalUsingDirectories.AddRange(optionsContext.PlatformVcxproj.GetCxUsingPath(context));
-            if (additionalUsingDirectories.Count > 0)
+            if (additionalUsingDirectories.Count > 0 && optionsContext.Resolver != null)
             {
-                StringBuilder result = new StringBuilder();
-                foreach (string additionalUsingDirectory in additionalUsingDirectories)
-                    result.Append(@"/AI""" + additionalUsingDirectory + @""" ");
-                result.Remove(result.Length - 1, 1);
-                context.CommandLineOptions["AdditionalUsingDirectories"] = result.ToString();
+                var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, "/AI"));
+                context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join(" ", cmdAdditionalUsingDirectories);
             }
             else
             {
