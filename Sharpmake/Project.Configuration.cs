@@ -878,8 +878,11 @@ namespace Sharpmake
                 // workaround for export projects: they do not generate pdb, so no need to resolve their paths
                 if (!Project.GetType().IsDefined(typeof(Export), false))
                 {
-                    Util.ResolvePath(Project.SharpmakeCsPath, ref LinkerPdbFilePath);
-                    Util.ResolvePath(Project.SharpmakeCsPath, ref CompilerPdbFilePath);
+                    // Reset to the default if the script set it to an empty string.
+                    if (!string.IsNullOrEmpty(LinkerPdbFilePath))
+                        Util.ResolvePath(Project.SharpmakeCsPath, ref LinkerPdbFilePath);
+                    if (!string.IsNullOrEmpty(CompilerPdbFilePath))
+                        Util.ResolvePath(Project.SharpmakeCsPath, ref CompilerPdbFilePath);
                 }
                 if (PrecompHeaderOutputFolder != null)
                     Util.ResolvePath(Project.SharpmakeCsPath, ref PrecompHeaderOutputFolder);

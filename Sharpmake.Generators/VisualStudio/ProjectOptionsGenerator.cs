@@ -2077,14 +2077,27 @@ namespace Sharpmake.Generators.VisualStudio
                     cmdLineOptionsLinkerProgramDatabaseFile = Util.GetConvertedRelativePath(context.ProjectDirectory, cmdLineOptionsLinkerProgramDatabaseFile, masterBffPath, true, context.Project.RootPath);
                 }
 
-                context.Options["CompilerProgramDatabaseFile"] = optionsCompilerProgramDatabaseFile;
-                context.Options["LinkerProgramDatabaseFile"] = optionsLinkerProgramDatabaseFile;
+                context.Options["CompilerProgramDatabaseFile"] = string.IsNullOrEmpty(optionsCompilerProgramDatabaseFile)
+                    ? FileGeneratorUtilities.RemoveLineTag
+                    : optionsCompilerProgramDatabaseFile;
+                context.Options["LinkerProgramDatabaseFile"] = string.IsNullOrEmpty(optionsLinkerProgramDatabaseFile)
+                    ? FileGeneratorUtilities.RemoveLineTag
+                    : optionsLinkerProgramDatabaseFile;
                 context.CommandLineOptions["GenerateDebugInformation"] = isFastLink ? "/DEBUG:FASTLINK" : "/DEBUG";
 
                 // %2 is converted by FastBuild
                 // Output name of object being compiled, as specified by CompilerOutputPath and the name of discovered objects depending on the Compiler input options (extension is also replace with CompilerOutputExtension).
-                context.CommandLineOptions["CompilerProgramDatabaseFile"] = @"/Fd""" + (FastBuildSettings.EnableFastLinkPDBSupport && isFastLink ? @"%2.pdb" : cmdLineOptionsCompilerProgramDatabaseFile) + @"""";
-                context.CommandLineOptions["LinkerProgramDatabaseFile"] = @"/PDB:""" + cmdLineOptionsLinkerProgramDatabaseFile + @"""";
+                if (FastBuildSettings.EnableFastLinkPDBSupport && isFastLink)
+                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = @"/Fd""%2.pdb""";
+                else if (!string.IsNullOrEmpty(cmdLineOptionsCompilerProgramDatabaseFile))
+                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = $@"/Fd""{cmdLineOptionsCompilerProgramDatabaseFile}.pdb""";
+                else
+                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
+
+                if (!string.IsNullOrEmpty(cmdLineOptionsLinkerProgramDatabaseFile))
+                    context.CommandLineOptions["LinkerProgramDatabaseFile"] = $@"/PDB:""{cmdLineOptionsLinkerProgramDatabaseFile}""";
+                else
+                    context.CommandLineOptions["LinkerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
             };
 
             context.SelectOption
