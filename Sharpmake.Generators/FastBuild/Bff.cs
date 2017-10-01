@@ -123,14 +123,11 @@ namespace Sharpmake.Generators.FastBuild
 
         public static string GetMasterBffFileName(Project.Configuration conf)
         {
-            // Note: There is a bug in fastbuild and we can't have 
             StringBuilder filenameBuilder = new StringBuilder(128);
             filenameBuilder.Append(FastBuildSettings.MasterBffFileName);
             if (FastBuildSettings.IncludeCompilerInMasterBFFFilename)
-            {
-                filenameBuilder.Append('.');
-                filenameBuilder.Append(conf.Compiler);
-            }
+                filenameBuilder.Append($".{conf.Compiler}");
+
             string bffFileName = filenameBuilder.ToString();
             return GetBffFileName(GetMasterBffPath(conf), bffFileName);
         }
