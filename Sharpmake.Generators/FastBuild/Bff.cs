@@ -24,30 +24,6 @@ using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.FastBuild
 {
-    // This makefile command generator is for supporting legacy code without any client code change.
-    internal class FastBuildDefaultMakeCommandGenerator : FastBuildMakeCommandGenerator
-    {
-        public override string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
-        {
-            Project project = conf.Project;
-            string fastBuildShortProjectName = Bff.GetShortProjectName(project, conf);
-            string fastBuildExecutable = Bff.GetFastBuildExecutableRelativeToMasterBffPath(conf);
-
-
-            string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
-
-            return string.Format(@"{0}{1} {2} {3}", fastBuildExecutable, rebuildCmd, fastBuildShortProjectName, fastbuildArguments);
-        }
-    }
-
-    internal static class UtilityMethods
-    {
-        public static bool TestPlatformFlags(this UniqueList<Platform> platforms, Platform platformFlags)
-        {
-            return platforms.Any(platform => platformFlags.HasFlag(platform));
-        }
-    }
-
     public partial class Bff
     {
         class BffGenerationContext : IGenerationContext

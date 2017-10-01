@@ -11,6 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System.IO;
+using System.Linq;
+
 namespace Sharpmake.Generators.FastBuild
 {
     partial class Bff
@@ -85,6 +89,29 @@ namespace Sharpmake.Generators.FastBuild
                     && string.Equals(UnityNumFiles,                       unity.UnityNumFiles)
                     && string.Equals(UnityPCH,                            unity.UnityPCH);
             }
+        }
+
+        // This makefile command generator is for supporting legacy code without any client code change.
+        internal class FastBuildDefaultMakeCommandGenerator : FastBuildMakeCommandGenerator
+        {
+            public override string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
+            {
+                Project project = conf.Project;
+                string fastBuildShortProjectName = Bff.GetShortProjectName(project, conf);
+                string fastBuildExecutable = Bff.GetFastBuildExecutableRelativeToMasterBffPath(conf);
+
+                string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
+
+                return $"{fastBuildExecutable}{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
+            }
+        }
+    }
+
+    internal static class UtilityMethods
+    {
+        public static bool TestPlatformFlags(this UniqueList<Platform> platforms, Platform platformFlags)
+        {
+            return platforms.Any(platform => platformFlags.HasFlag(platform));
         }
     }
 }
