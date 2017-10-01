@@ -1834,50 +1834,33 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectAdditionalLibraryDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            var libDirs = new List<string>(context.Configuration.LibraryPaths);
+            context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+            var libDirs = new OrderableStrings(context.Configuration.LibraryPaths);
             libDirs.AddRange(context.Configuration.DependenciesLibraryPaths);
             libDirs.AddRange(optionsContext.PlatformVcxproj.GetLibraryPaths(context));
-            var relativeAdditionalLibraryDirectories = Util.PathGetRelative(context.ProjectDirectory, libDirs).ToList();
 
-            if (relativeAdditionalLibraryDirectories.Any())
+            if (libDirs.Any())
             {
-                string addLibDirsStr = string.Join(";", relativeAdditionalLibraryDirectories);
-                context.Options["AdditionalLibraryDirectories"] = addLibDirsStr;
+                var relativeAdditionalLibraryDirectories = Util.PathGetRelative(context.ProjectDirectory, libDirs);
+                context.Options["AdditionalLibraryDirectories"] = string.Join(";", relativeAdditionalLibraryDirectories);
             }
-            else
-            {
-                context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            }
-
-            relativeAdditionalLibraryDirectories.AddRange(optionsContext.PlatformVcxproj.GetPlatformLibraryPaths(context));
 
             if (optionsContext.Resolver != null)
             {
-                var addLibDirs = relativeAdditionalLibraryDirectories.Select(path => optionsContext.Resolver.Resolve(path)).ToArray();
-                if (addLibDirs.Length > 0)
+                libDirs.AddRange(optionsContext.PlatformVcxproj.GetPlatformLibraryPaths(context));
+                if (libDirs.Count > 0)
                 {
-                    StringBuilder result = new StringBuilder();
-
-                    string linkOption = "";
+                    string linkOption;
                     if (!PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
                         linkOption = @"/LIBPATH:";
                     else
                         linkOption = @"-L";
 
-                    bool first = true;
-                    foreach (string additionalLibraryDirectory in addLibDirs)
-                    {
-                        if (!first)
-                            result.Append(" ");
-                        else
-                            first = false;
+                    var cmdAdditionalLibDirectories = libDirs.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, linkOption));
 
-                        string convertedRelativePath = Util.GetConvertedRelativePath(context.ProjectDirectory, additionalLibraryDirectory, Bff.GetMasterBffPath(context.Configuration), true, context.Project.RootPath);
-                        result.Append($@"{linkOption}""{convertedRelativePath}""");
-
-                    }
-
-                    context.CommandLineOptions["AdditionalLibraryDirectories"] = result.ToString();
+                    context.CommandLineOptions["AdditionalLibraryDirectories"] = string.Join(" ", cmdAdditionalLibDirectories);
                 }
             }
         }
