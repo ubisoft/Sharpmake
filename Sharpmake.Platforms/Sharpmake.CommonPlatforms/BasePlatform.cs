@@ -120,7 +120,7 @@ namespace Sharpmake
 
         public IEnumerable<string> GetIncludePaths(IGenerationContext context)
         {
-            return MakePathsRelative(context, GetIncludePathsImpl);
+            return GetIncludePathsImpl(context);
         }
 
         public IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context)
@@ -288,11 +288,6 @@ namespace Sharpmake
         protected virtual IEnumerable<string> GetPlatformIncludePathsImpl(IGenerationContext context)
         {
             yield break;
-        }
-
-        private IEnumerable<string> MakePathsRelative(IGenerationContext context, Func<IGenerationContext, IEnumerable<string>> func)
-        {
-            return Util.PathGetRelative(context.ProjectDirectory, new OrderableStrings(func(context)));
         }
 
         #endregion

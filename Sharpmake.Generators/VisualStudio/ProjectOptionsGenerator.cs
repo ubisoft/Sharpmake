@@ -851,52 +851,34 @@ namespace Sharpmake.Generators.VisualStudio
         private static void SelectAdditionalIncludeDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             var includePaths = new OrderableStrings(optionsContext.PlatformVcxproj.GetIncludePaths(context));
-            context.Options["AdditionalIncludeDirectories"] = includePaths.Count > 0 ? includePaths.JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
-
-            var platformIncludePaths = optionsContext.PlatformVcxproj.GetPlatformIncludePaths(context);
-
+            context.Options["AdditionalIncludeDirectories"] = includePaths.Count > 0 ? Util.PathGetRelative(context.ProjectDirectory, includePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            if (optionsContext.Resolver != null)
-            {
-                var dirs = new List<string>();
-                dirs.AddRange(includePaths);
-                dirs.AddRange(platformIncludePaths);
-                
-                if (dirs.Any())
-                {
-                    StringBuilder result = new StringBuilder();
-                    foreach (string additionalIncludeDirectory in dirs)
-                    {
-                        string path = Util.GetConvertedRelativePath(context.ProjectDirectory, additionalIncludeDirectory, optionsContext.BaseProjectPath, true, context.Project.RootPath);
-                        if (optionsContext.PlatformDescriptor.IsUsingClang)
-                            result.Append($@"-I""{path}"" ");
-                        else
-                            result.Append($@"/I""{path}"" ");
-                    }
-
-                    result.Remove(result.Length - 1, 1);
-                    context.CommandLineOptions["AdditionalIncludeDirectories"] = result.ToString();
-                }
-            }
-
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
             if (optionsContext.Resolver != null)
             {
-                if (platformIncludePaths.Any())
+                string cmdLineIncludePrefix = optionsContext.PlatformDescriptor.IsUsingClang ? "-I" : "/I";
+                Func<string, string> cmdLineConvertIncludePathsFunc = additionalIncludeDirectory =>
                 {
-                    StringBuilder result = new StringBuilder();
-                    foreach (string additionalIncludeDirectory in platformIncludePaths)
-                    {
-                        string path = Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(additionalIncludeDirectory), optionsContext.BaseProjectPath, true, context.Project.RootPath);
-                        if (optionsContext.PlatformDescriptor.IsUsingClang)
-                            result.Append($@"-I""{path}"" ");
-                        else
-                            result.Append($@"/I""{path}"" ");
-                    }
+                    // if the include is below the global root, we compute the relative path,
+                    // otherwise it's probably a system include for which we keep the full path
+                    string resolvedInclude = optionsContext.Resolver.Resolve(additionalIncludeDirectory);
+                    if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                        resolvedInclude = Util.PathGetRelative(optionsContext.BaseProjectPath, resolvedInclude, true);
+                    return $@"{cmdLineIncludePrefix}""{resolvedInclude}""";
+                };
 
-                    result.Remove(result.Length - 1, 1);
-                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = result.ToString();
-                }
+                var platformIncludePaths = optionsContext.PlatformVcxproj.GetPlatformIncludePaths(context).Select(cmdLineConvertIncludePathsFunc).ToArray();
+
+                var dirs = new List<string>();
+                dirs.AddRange(includePaths.Select(cmdLineConvertIncludePathsFunc));
+                dirs.AddRange(platformIncludePaths);
+
+                if (dirs.Any())
+                    context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join(" ", dirs);
+
+                if (platformIncludePaths.Any())
+                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join(" ", platformIncludePaths);
             }
         }
 
