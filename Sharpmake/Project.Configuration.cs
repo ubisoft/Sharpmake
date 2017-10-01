@@ -593,8 +593,13 @@ namespace Sharpmake
 
             public class FileCustomBuild
             {
+                public FileCustomBuild(string description = "Copy files...")
+                {
+                    Description = description;
+                }
+
+                public string Description;
                 public Strings CommandLines = new Strings();
-                public string Description = "";
                 public Strings Inputs = new Strings();
                 public Strings Outputs = new Strings();
                 public bool LinkObjects = false;
