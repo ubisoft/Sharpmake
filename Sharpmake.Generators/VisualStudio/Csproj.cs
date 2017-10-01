@@ -2452,8 +2452,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                         if (conf.CopyDependenciesBuildStep == null)
                         {
-                            conf.CopyDependenciesBuildStep = new Project.Configuration.FileCustomBuild();
-                            conf.CopyDependenciesBuildStep.Description = "Copy files to output paths...";
+                            conf.CopyDependenciesBuildStep = new Project.Configuration.FileCustomBuild("Copy files to output paths...");
                         }
 
                         conf.EventPostBuild.Add(conf.CreateTargetCopyCommand(relativeCopyFile, outputDirectoryRelative, _projectPath));
