@@ -848,6 +848,16 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.HasClrSupport = clrSupport;
         }
 
+        private static string CmdLineConvertIncludePathsFunc(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, string include, string prefix)
+        {
+            // if the include is below the global root, we compute the relative path,
+            // otherwise it's probably a system include for which we keep the full path
+            string resolvedInclude = optionsContext.Resolver.Resolve(include);
+            if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                resolvedInclude = Util.PathGetRelative(optionsContext.BaseProjectPath, resolvedInclude, true);
+            return $@"{prefix}""{resolvedInclude}""";
+        }
+
         private static void SelectAdditionalIncludeDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             var includePaths = new OrderableStrings(optionsContext.PlatformVcxproj.GetIncludePaths(context));
@@ -858,20 +868,11 @@ namespace Sharpmake.Generators.VisualStudio
             if (optionsContext.Resolver != null)
             {
                 string cmdLineIncludePrefix = optionsContext.PlatformDescriptor.IsUsingClang ? "-I" : "/I";
-                Func<string, string> cmdLineConvertIncludePathsFunc = additionalIncludeDirectory =>
-                {
-                    // if the include is below the global root, we compute the relative path,
-                    // otherwise it's probably a system include for which we keep the full path
-                    string resolvedInclude = optionsContext.Resolver.Resolve(additionalIncludeDirectory);
-                    if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
-                        resolvedInclude = Util.PathGetRelative(optionsContext.BaseProjectPath, resolvedInclude, true);
-                    return $@"{cmdLineIncludePrefix}""{resolvedInclude}""";
-                };
 
-                var platformIncludePaths = optionsContext.PlatformVcxproj.GetPlatformIncludePaths(context).Select(cmdLineConvertIncludePathsFunc).ToArray();
+                var platformIncludePaths = optionsContext.PlatformVcxproj.GetPlatformIncludePaths(context).Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, cmdLineIncludePrefix)).ToArray();
 
                 var dirs = new List<string>();
-                dirs.AddRange(includePaths.Select(cmdLineConvertIncludePathsFunc));
+                dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, cmdLineIncludePrefix)));
                 dirs.AddRange(platformIncludePaths);
 
                 if (dirs.Any())
