@@ -875,7 +875,7 @@ namespace Sharpmake.Generators.VisualStudio
                 dirs.AddRange(platformIncludePaths);
 
                 if (dirs.Any())
-                    context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join(" ", dirs);
+                    context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
 
                 if (platformIncludePaths.Any())
                     context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", platformIncludePaths);
