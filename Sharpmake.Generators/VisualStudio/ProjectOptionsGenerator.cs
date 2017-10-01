@@ -317,7 +317,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (additionalUsingDirectories.Count > 0 && optionsContext.Resolver != null)
             {
                 var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, "/AI"));
-                context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join(" ", cmdAdditionalUsingDirectories);
+                context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
             }
             else
             {
