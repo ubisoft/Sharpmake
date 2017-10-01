@@ -242,8 +242,7 @@ Compiler( '[fastbuildCompilerName]' )
 ";
 
                 public static string LibrarianAdditionalInputs = @"
-    .LibrarianAdditionalInputs = { [fastBuildLibrarianAdditionalInputs]
-                                 }
+    .LibrarianAdditionalInputs = [fastBuildLibrarianAdditionalInputs]
 ";
 
                 public static string LibrarianOptions = @"

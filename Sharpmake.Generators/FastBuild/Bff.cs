@@ -765,7 +765,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         string partialLibInfo = "";
                         string partialLibs = FileGeneratorUtilities.RemoveLineTag;
-                        string librarianAdditionalInputs = "";
+                        string librarianAdditionalInputs = FileGeneratorUtilities.RemoveLineTag; // TODO: implement
                         string fastBuildObjectListDependencies = FileGeneratorUtilities.RemoveLineTag;
                         if (confSubConfigs.Keys.Count > 1)
                         {
@@ -787,8 +787,6 @@ namespace Sharpmake.Generators.FastBuild
                                     result.Append("                                   '" + subConfigLib + "',\n");
                                 if (result.Length > 1)
                                     result.Remove(result.Length - 2, 2);
-                                // WARNING: check on other projects if removing that line is safe
-                                //librarianAdditionalInputs = result.ToString();
 
                                 result.Clear();
                                 int i = 0;
