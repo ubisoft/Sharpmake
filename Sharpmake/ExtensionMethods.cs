@@ -296,7 +296,7 @@ namespace Sharpmake
                     case KitsRootEnum.KitsRoot81:
                         {
                             string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
-                            return String.Format(@"{0};{1}Include\shared;{1}Include\um;{1}Include\WinRT;", visualStudioInclude, kitsRoot);
+                            return String.Format(@"{0};{1}Include\shared;{1}Include\um;{1}Include\WinRT;{1}..\10\Include\10.0.10240.0\ucrt", visualStudioInclude, kitsRoot);
                         }
                     case KitsRootEnum.KitsRoot10:
                         {
@@ -364,7 +364,7 @@ namespace Sharpmake
                     case KitsRootEnum.KitsRoot81:
                         {
                             string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
-                            return string.Format(@"{0};{1}lib\winv6.3\um\{2};{1}References\CommonConfiguration\Neutral;", visualStudioLib, kitsRoot, targetPlatform);
+                            return string.Format(@"{0};{1}..\10\lib\10.0.10240.0\ucrt\{2};{1}lib\winv6.3\um\{2};{1}References\CommonConfiguration\Neutral;", visualStudioLib, kitsRoot, targetPlatform);
                         }
                     case KitsRootEnum.KitsRoot10:
                         {
