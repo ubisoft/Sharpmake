@@ -178,6 +178,7 @@ namespace SharpmakeGen
             conf.AddProject<Samples.CPPCLIProject>(target);
             conf.AddProject<Samples.CSharpHelloWorldProject>(target);
             conf.AddProject<Samples.CSharpVsixProject>(target);
+            conf.AddProject<Samples.FastBuildProject>(target);
             conf.AddProject<Samples.HelloWorldProject>(target);
             conf.AddProject<Samples.PackageReferencesProject>(target);
             conf.AddProject<Samples.SharpmakeGenProject>(target);

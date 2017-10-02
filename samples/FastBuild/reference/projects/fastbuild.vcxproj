@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="FastBuild_Debug|x64">
+      <Configuration>FastBuild_Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="FastBuild_Release|x64">
+      <Configuration>FastBuild_Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MSBuild_Debug|x64">
+      <Configuration>MSBuild_Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MSBuild_Release|x64">
+      <Configuration>MSBuild_Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{823177B7-7E5F-8EA6-CD56-DD135FAD2075}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>FastBuild</RootNamespace>
+    <ProjectName>FastBuild</ProjectName>
+    <ApplicationEnvironment>title</ApplicationEnvironment>
+    <WindowsSdkDir_10>C:\Program Files (x86)\Windows Kits\10\</WindowsSdkDir_10>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FastBuild_Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FastBuild_Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MSBuild_Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MSBuild_Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FastBuild_Debug|x64'">
+    <OutDir>output\win64\fastbuild_debug\</OutDir>
+    <IntDir>obj\win64\debug\</IntDir>
+    <NMakeBuildCommandLine>cd ..
+FBuild.exe FastBuild_Debug_win64 -vs -summary -config fbuild.vs2015.bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd ..
+FBuild.exe -clean FastBuild_Debug_win64 -vs -summary -config fbuild.vs2015.bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" >NUL 2>NUL
+del "obj\win64\debug\*.obj" >NUL 2>NUL
+del "obj\win64\debug\*.a" >NUL 2>NUL
+del "obj\win64\debug\*.lib" >NUL 2>NUL
+del "output\win64\fastbuild_debug\fastbuild.exe" >NUL 2>NUL
+del "output\win64\fastbuild_debug\fastbuild.elf" >NUL 2>NUL
+del "output\win64\fastbuild_debug\fastbuild.exp" >NUL 2>NUL
+del "output\win64\fastbuild_debug\fastbuild.ilk" >NUL 2>NUL
+del "output\win64\fastbuild_debug\fastbuild.lib" >NUL 2>NUL
+del "output\win64\fastbuild_debug\fastbuild.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\win64\fastbuild_debug\fastbuild.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <TargetFileName>fastbuild.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FastBuild_Release|x64'">
+    <OutDir>output\win64\fastbuild_release\</OutDir>
+    <IntDir>obj\win64\release\</IntDir>
+    <NMakeBuildCommandLine>cd ..
+FBuild.exe FastBuild_Release_win64 -vs -summary -config fbuild.vs2015.bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd ..
+FBuild.exe -clean FastBuild_Release_win64 -vs -summary -config fbuild.vs2015.bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" >NUL 2>NUL
+del "obj\win64\release\*.obj" >NUL 2>NUL
+del "obj\win64\release\*.a" >NUL 2>NUL
+del "obj\win64\release\*.lib" >NUL 2>NUL
+del "output\win64\fastbuild_release\fastbuild.exe" >NUL 2>NUL
+del "output\win64\fastbuild_release\fastbuild.elf" >NUL 2>NUL
+del "output\win64\fastbuild_release\fastbuild.exp" >NUL 2>NUL
+del "output\win64\fastbuild_release\fastbuild.ilk" >NUL 2>NUL
+del "output\win64\fastbuild_release\fastbuild.lib" >NUL 2>NUL
+del "output\win64\fastbuild_release\fastbuild.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\win64\fastbuild_release\fastbuild.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <TargetFileName>fastbuild.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MSBuild_Debug|x64'">
+    <TargetName>fastbuild</TargetName>
+    <OutDir>output\win64\msbuild_debug\</OutDir>
+    <IntDir>obj\win64\debug\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\win64\msbuild_debug\fastbuild.exe</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MSBuild_Release|x64'">
+    <TargetName>fastbuild</TargetName>
+    <OutDir>output\win64\msbuild_release\</OutDir>
+    <IntDir>obj\win64\release\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\win64\msbuild_release\fastbuild.exe</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MSBuild_Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <AdditionalOptions></AdditionalOptions>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>obj\win64\debug\FastBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\debug\fastbuild_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\win64\msbuild_debug\fastbuild.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ProgramDatabaseFile>output\win64\msbuild_debug\fastbuild.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalOptions></AdditionalOptions>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\win64\msbuild_debug\fastbuild.map</MapFileName>
+      <BaseAddress></BaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MSBuild_Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <AdditionalOptions></AdditionalOptions>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>obj\win64\release\FastBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\release\fastbuild_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\win64\msbuild_release\fastbuild.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ProgramDatabaseFile>output\win64\msbuild_release\fastbuild.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalOptions></AdditionalOptions>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\win64\msbuild_release\fastbuild.map</MapFileName>
+      <BaseAddress></BaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\alpha.h" />
+    <ClInclude Include="..\codebase\beta.h" />
+    <ClInclude Include="..\codebase\chi.h" />
+    <ClInclude Include="..\codebase\delta.h" />
+    <ClInclude Include="..\codebase\epsilon.h" />
+    <ClInclude Include="..\codebase\eta.h" />
+    <ClInclude Include="..\codebase\gamma.h" />
+    <ClInclude Include="..\codebase\iota.h" />
+    <ClInclude Include="..\codebase\kappa.h" />
+    <ClInclude Include="..\codebase\lambda.h" />
+    <ClInclude Include="..\codebase\mu.h" />
+    <ClInclude Include="..\codebase\nu.h" />
+    <ClInclude Include="..\codebase\omega.h" />
+    <ClInclude Include="..\codebase\omicron.h" />
+    <ClInclude Include="..\codebase\phi.h" />
+    <ClInclude Include="..\codebase\pi.h" />
+    <ClInclude Include="..\codebase\precomp.h" />
+    <ClInclude Include="..\codebase\psi.h" />
+    <ClInclude Include="..\codebase\rho.h" />
+    <ClInclude Include="..\codebase\sigma.h" />
+    <ClInclude Include="..\codebase\tau.h" />
+    <ClInclude Include="..\codebase\theta.h" />
+    <ClInclude Include="..\codebase\upsilon.h" />
+    <ClInclude Include="..\codebase\xi.h" />
+    <ClInclude Include="..\codebase\zeta.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\codebase\alpha.cpp" />
+    <ClCompile Include="..\codebase\beta.cpp" />
+    <ClCompile Include="..\codebase\chi.cpp" />
+    <ClCompile Include="..\codebase\delta.cpp" />
+    <ClCompile Include="..\codebase\epsilon.cpp" />
+    <ClCompile Include="..\codebase\eta.cpp" />
+    <ClCompile Include="..\codebase\gamma.cpp" />
+    <ClCompile Include="..\codebase\iota.cpp" />
+    <ClCompile Include="..\codebase\kappa.cpp" />
+    <ClCompile Include="..\codebase\lambda.cpp" />
+    <ClCompile Include="..\codebase\main.cpp" />
+    <ClCompile Include="..\codebase\mu.cpp" />
+    <ClCompile Include="..\codebase\nu.cpp" />
+    <ClCompile Include="..\codebase\omega.cpp" />
+    <ClCompile Include="..\codebase\omicron.cpp" />
+    <ClCompile Include="..\codebase\phi.cpp" />
+    <ClCompile Include="..\codebase\pi.cpp" />
+    <ClCompile Include="..\codebase\precomp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FastBuild_Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FastBuild_Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MSBuild_Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MSBuild_Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\codebase\psi.cpp" />
+    <ClCompile Include="..\codebase\rho.cpp" />
+    <ClCompile Include="..\codebase\sigma.cpp" />
+    <ClCompile Include="..\codebase\tau.cpp" />
+    <ClCompile Include="..\codebase\theta.cpp" />
+    <ClCompile Include="..\codebase\upsilon.cpp" />
+    <ClCompile Include="..\codebase\xi.cpp" />
+    <ClCompile Include="..\codebase\zeta.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fastbuild.bff" />
+    <None Include="f:\github\brousseau\sharpmake\samples\fastbuild\fbuild.vs2015.bff" />
+    <None Include="f:\github\brousseau\sharpmake\samples\fastbuild\fbuild.vs2015-globalsettings.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

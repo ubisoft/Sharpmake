@@ -1,6 +1,4 @@
-using System;
 using Sharpmake;
-using SharpmakeGen.Platforms;
 
 namespace SharpmakeGen.Samples
 {
@@ -60,6 +58,15 @@ namespace SharpmakeGen.Samples
         public CSharpVsixProject()
         {
             Name = "CSharpVsix";
+        }
+    }
+
+    [Generate]
+    public class FastBuildProject : SampleProject
+    {
+        public FastBuildProject()
+        {
+            Name = "FastBuild";
         }
     }
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\codebase\alpha.cpp" />
+    <ClCompile Include="..\codebase\beta.cpp" />
+    <ClCompile Include="..\codebase\chi.cpp" />
+    <ClCompile Include="..\codebase\delta.cpp" />
+    <ClCompile Include="..\codebase\epsilon.cpp" />
+    <ClCompile Include="..\codebase\eta.cpp" />
+    <ClCompile Include="..\codebase\gamma.cpp" />
+    <ClCompile Include="..\codebase\iota.cpp" />
+    <ClCompile Include="..\codebase\kappa.cpp" />
+    <ClCompile Include="..\codebase\lambda.cpp" />
+    <ClCompile Include="..\codebase\main.cpp" />
+    <ClCompile Include="..\codebase\mu.cpp" />
+    <ClCompile Include="..\codebase\nu.cpp" />
+    <ClCompile Include="..\codebase\omega.cpp" />
+    <ClCompile Include="..\codebase\omicron.cpp" />
+    <ClCompile Include="..\codebase\phi.cpp" />
+    <ClCompile Include="..\codebase\pi.cpp" />
+    <ClCompile Include="..\codebase\precomp.cpp" />
+    <ClCompile Include="..\codebase\psi.cpp" />
+    <ClCompile Include="..\codebase\rho.cpp" />
+    <ClCompile Include="..\codebase\sigma.cpp" />
+    <ClCompile Include="..\codebase\tau.cpp" />
+    <ClCompile Include="..\codebase\theta.cpp" />
+    <ClCompile Include="..\codebase\upsilon.cpp" />
+    <ClCompile Include="..\codebase\xi.cpp" />
+    <ClCompile Include="..\codebase\zeta.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\alpha.h" />
+    <ClInclude Include="..\codebase\beta.h" />
+    <ClInclude Include="..\codebase\chi.h" />
+    <ClInclude Include="..\codebase\delta.h" />
+    <ClInclude Include="..\codebase\epsilon.h" />
+    <ClInclude Include="..\codebase\eta.h" />
+    <ClInclude Include="..\codebase\gamma.h" />
+    <ClInclude Include="..\codebase\iota.h" />
+    <ClInclude Include="..\codebase\kappa.h" />
+    <ClInclude Include="..\codebase\lambda.h" />
+    <ClInclude Include="..\codebase\mu.h" />
+    <ClInclude Include="..\codebase\nu.h" />
+    <ClInclude Include="..\codebase\omega.h" />
+    <ClInclude Include="..\codebase\omicron.h" />
+    <ClInclude Include="..\codebase\phi.h" />
+    <ClInclude Include="..\codebase\pi.h" />
+    <ClInclude Include="..\codebase\precomp.h" />
+    <ClInclude Include="..\codebase\psi.h" />
+    <ClInclude Include="..\codebase\rho.h" />
+    <ClInclude Include="..\codebase\sigma.h" />
+    <ClInclude Include="..\codebase\tau.h" />
+    <ClInclude Include="..\codebase\theta.h" />
+    <ClInclude Include="..\codebase\upsilon.h" />
+    <ClInclude Include="..\codebase\xi.h" />
+    <ClInclude Include="..\codebase\zeta.h" />
+  </ItemGroup>
+</Project>

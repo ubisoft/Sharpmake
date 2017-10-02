@@ -13,6 +13,8 @@ call :UpdateRef samples HelloWorld        HelloWorld.sharpmake.cs        referen
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpVsix        CSharpVsix.sharpmake.cs        reference CSharpVsix
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples Fastbuild         Fastbuild.sharpmake.cs         reference Fastbuild
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences PackageReferences.sharpmake.cs reference PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 :: that one is special, the root is the current folder

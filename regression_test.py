@@ -59,6 +59,7 @@ tests = [
     Test("CSharpHelloWorld", "HelloWorld.sharpmake.cs"),
     Test("HelloWorld", "HelloWorld.sharpmake.cs"),
     Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
+    Test("Fastbuild", "Fastbuild.sharpmake.cs"),
     Test("PackageReferences", "PackageReferences.sharpmake.cs"),
     Test("SharpmakeGen", "SharpmakeGen.sharpmake.cs", "..")
 ]

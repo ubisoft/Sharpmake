@@ -1,0 +1,322 @@
+
+//=================================================================================================================
+// FastBuild FASTBuild config file
+//=================================================================================================================
+#once
+
+
+Unity( 'FastBuild_unity_FB4D0669' )
+{
+    .UnityInputPath                     = 'codebase'
+    .UnityInputExcludePath              = 'projects.blob'
+    .UnityInputIsolateWritableFiles     =  true
+    .UnityInputIsolateWritableFilesLimit = 10
+    .UnityOutputPath                    = 'projects\unity'
+    .UnityOutputPattern                 = 'fastbuild_unity_fb4d0669*.cpp'
+    .UnityNumFiles                      =  3
+    .UnityPCH                           = 'precomp.h'
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+// ObjectList FastBuild_Debug_win64_objects
+//=================================================================================================================
+ObjectList( 'FastBuild_Debug_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = 'projects\obj\win64\debug\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include" /I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\include" /I"C:\Program Files (x86)\Windows Kits\8.1\Include\shared" /I"C:\Program Files (x86)\Windows Kits\8.1\Include\um" /I"C:\Program Files (x86)\Windows Kits\8.1\Include\WinRT" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64" /D"_CONSOLE" /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /EHsc'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd"projects\obj\win64\debug\fastbuild_compiler.pdb.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Precompiled Headers options
+    // ---------------------------
+    .PCHInputFile           = 'codebase\precomp.cpp'
+    .PCHOutputFile          = 'projects\obj\win64\debug\FastBuild.pch'
+    .PCHOptions             = '"%1" /Fp"%2" /Fo"%3" /c'
+                            + ' /Yc"precomp.h"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' /Yu"precomp.h" /Fp"$PCHOutputFile$"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'FastBuild_unity_FB4D0669'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+// Executable FastBuild_Debug_win64_Executable
+//=================================================================================================================
+Executable( 'FastBuild_Debug_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = 'projects\obj\win64\debug\'
+    .Libraries              = { 
+                                'FastBuild_Debug_win64_objects'
+                              }
+    .LinkerOutput           = 'projects\output\win64\fastbuild_debug\fastbuild.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2" "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\amd64" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\lib\amd64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\ucrt\x64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\8.1\References\CommonConfiguration\Neutral"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:"projects\obj\win64\debug\fastbuild.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:"projects\output\win64\fastbuild_debug\fastbuild.pdb"'
+                            + ' /MAP":projects\output\win64\fastbuild_debug\fastbuild.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE' 
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+                            + ' '
+}
+
+
+//=================================================================================================================
+// Alias FastBuild_Debug_win64
+//=================================================================================================================
+Alias( 'FastBuild_Debug_win64' )
+{
+    .Targets = { 
+                  'FastBuild_Debug_win64_Executable'
+               }
+}
+
+
+//=================================================================================================================
+// ObjectList FastBuild_Release_win64_objects
+//=================================================================================================================
+ObjectList( 'FastBuild_Release_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = 'projects\obj\win64\release\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include" /I"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\include" /I"C:\Program Files (x86)\Windows Kits\8.1\Include\shared" /I"C:\Program Files (x86)\Windows Kits\8.1\Include\um" /I"C:\Program Files (x86)\Windows Kits\8.1\Include\WinRT" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG" /D"WIN64" /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /EHsc'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd"projects\obj\win64\release\fastbuild_compiler.pdb.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Precompiled Headers options
+    // ---------------------------
+    .PCHInputFile           = 'codebase\precomp.cpp'
+    .PCHOutputFile          = 'projects\obj\win64\release\FastBuild.pch'
+    .PCHOptions             = '"%1" /Fp"%2" /Fo"%3" /c'
+                            + ' /Yc"precomp.h"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' /Yu"precomp.h" /Fp"$PCHOutputFile$"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'FastBuild_unity_FB4D0669'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+// Executable FastBuild_Release_win64_Executable
+//=================================================================================================================
+Executable( 'FastBuild_Release_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = 'projects\obj\win64\release\'
+    .Libraries              = { 
+                                'FastBuild_Release_win64_objects'
+                              }
+    .LinkerOutput           = 'projects\output\win64\fastbuild_release\fastbuild.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2" "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\amd64" /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\lib\amd64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.10240.0\ucrt\x64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x64" /LIBPATH:"C:\Program Files (x86)\Windows Kits\8.1\References\CommonConfiguration\Neutral"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:"projects\obj\win64\release\fastbuild.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:"projects\output\win64\fastbuild_release\fastbuild.pdb"'
+                            + ' /MAP":projects\output\win64\fastbuild_release\fastbuild.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE' 
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+                            + ' '
+}
+
+
+//=================================================================================================================
+// Alias FastBuild_Release_win64
+//=================================================================================================================
+Alias( 'FastBuild_Release_win64' )
+{
+    .Targets = { 
+                  'FastBuild_Release_win64_Executable'
+               }
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////
