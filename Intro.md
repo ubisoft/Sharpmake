@@ -81,7 +81,7 @@ If you ever wonder why these are not deduced from dependants, it is made that wa
 In the project, you have one or more Configure functions.  They take a Target, which is the input, and the Configuration, which is the output.  The function is executed for every Target added to that project.
 
 ```csharp
-class MyProject
+class MyProject : Project
 {
     ...
     [Configure]
@@ -170,6 +170,86 @@ If this line is changed into this:
 ```
 
 Then Sharpmake will generate a file for each platform.  There is nothing more to do.
+
+
+# Solutions
+
+The configuration and generation of .sln files is done in a similar fashion to .vcxproj and .csproj files.  Instead of Project class, the Solution class is used:
+
+```csharp
+[Generate]
+class MySolution : Solution
+{    
+    public MySolution() : base(typeof(Target))
+    {
+        AddTargets(new Target(
+            BuildSystem.MSBuild | BuildSystem.FastBuild,
+            Optimization.Debug | Optimization.Release | Optimization.Retail,
+            ...);
+    }
+    [Configure]
+    public void Configure(Configuration conf, Target target)
+    {
+        conf.AddProject<MyProject>(target);
+    }
+}
+```
+
+# Main
+
+The entry point is the Main, a function called once and found in the main .sharpmake.cs file passed to Sharpmake.exe:
+
+```csharp
+static class Main
+{
+    [Sharpmake.Main]
+    public static void SharpmakeMain(Sharpmake.Arguments arguments)
+    {
+        arguments.Generate<MySolution>();
+    }
+}
+```
+
+Sharpmake arguments can then be used to generate different things.  Sharpmake has built-in support for easy custom command line arguments as well:
+
+```csharp
+class MyArguments
+{
+    public bool SomeOption = false;
+
+    [CommandLine.Option("someoption", @"Some option: ex: /someoption(<true|false>)")]
+    public void CommandLineGenerateMapFile(bool value)
+    {
+        SomeOption = value;
+    }
+}
+
+static class Main
+{
+    public static MyArguments Arguments = new MyArguments();
+
+    [Sharpmake.Main]
+    public static void SharpmakeMain(Sharpmake.Arguments arguments)
+    {
+        CommandLine.ExecuteOnObject(Arguments);
+        ...
+        if (Arguments.SomeOption) ...
+    }
+}
+```
+# Includes
+
+From the main file and from any included file, you can include other Sharpmake files:
+
+```csharp
+[module: Sharpmake.Include("otherfile.sharpmake.cs")]
+```
+
+In any file it's also possible to refer to any dll:
+
+```csharp
+[module: Sharpmake.Reference("Sharpmake.ShellTools.dll")]
+```
 
 It concludes that quick overview of Sharpmake.
 
