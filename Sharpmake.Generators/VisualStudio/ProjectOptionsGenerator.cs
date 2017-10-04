@@ -855,6 +855,44 @@ namespace Sharpmake.Generators.VisualStudio
             return $@"{prefix}""{resolvedInclude}""";
         }
 
+        public static List<KeyValuePair<string, string>> ConvertPostBuildCopiesToRelative(Project.Configuration conf, string relativeTo)
+        {
+            var relativePostBuildCopies = new List<KeyValuePair<string, string>>();
+            if (!conf.ResolvedTargetCopyFiles.Any() && conf.CopyDependenciesBuildStep == null && !conf.EventPostBuildCopies.Any())
+                return relativePostBuildCopies;
+
+            relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFiles.Select(x => new KeyValuePair<string, string>(x, conf.TargetPath)));
+            relativePostBuildCopies.AddRange(conf.EventPostBuildCopies);
+
+            for (int i = 0; i < relativePostBuildCopies.Count;)
+            {
+                string sourceFileFullPath = relativePostBuildCopies[i].Key;
+                string dstDir = relativePostBuildCopies[i].Value;
+
+                // discard if the source is already in the destination folder
+                string sourceFileDirectory = Path.GetDirectoryName(sourceFileFullPath);
+                if (string.Compare(sourceFileDirectory, dstDir, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    relativePostBuildCopies.RemoveAt(i);
+                    continue;
+                }
+
+                // keep the full path for the source if outside of the global root
+                string sourcePath;
+                if (sourceFileFullPath.StartsWith(conf.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                    sourcePath = Util.PathGetRelative(relativeTo, sourceFileFullPath, true);
+                else
+                    sourcePath = sourceFileFullPath;
+
+                string relativeDstDir = Util.PathGetRelative(relativeTo, dstDir);
+                relativePostBuildCopies[i] = new KeyValuePair<string, string>(sourcePath, relativeDstDir);
+
+                ++i;
+            }
+
+            return relativePostBuildCopies;
+        }
+
         private static void SelectAdditionalIncludeDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             var includePaths = new OrderableStrings(optionsContext.PlatformVcxproj.GetIncludePaths(context));
@@ -1544,34 +1582,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.ExecuteTargetCopy)
             {
-                foreach (string copyFile in context.Configuration.ResolvedTargetCopyFiles)
-                {
-                    string copyFileDirectory = Path.GetDirectoryName(copyFile);
-                    if (String.Compare(copyFileDirectory, context.Configuration.TargetPath, StringComparison.OrdinalIgnoreCase) != 0)
-                    {
-                        string relativeCopyFile = Util.PathGetRelative(context.ProjectDirectory, copyFile);
-                        if (context.Configuration.IsFastBuild)
-                        {
-                            string targetFileName = Path.Combine(optionsContext.OutputDirectoryRelative, Path.GetFileName(copyFile));
-                            relativeCopyFile = Util.GetConvertedRelativePath(context.ProjectDirectory, relativeCopyFile, optionsContext.BaseProjectPath, true, context.Project.RootPath);
-                            targetFileName = Util.GetConvertedRelativePath(context.ProjectDirectory, targetFileName, optionsContext.BaseProjectPath, true, context.Project.RootPath);
-                            context.Configuration.EventPostBuildCopies.Add(new KeyValuePair<string, string>(optionsContext.Resolver.Resolve(relativeCopyFile), optionsContext.Resolver.Resolve(targetFileName)));
-                        }
-                        else
-                        {
-                            if (context.Configuration.CopyDependenciesBuildStep == null)
-                            {
-                                context.Configuration.CopyDependenciesBuildStep = new Project.Configuration.FileCustomBuild();
-                                context.Configuration.CopyDependenciesBuildStep.Description = "Copy files to output paths...";
-                            }
-
-                            context.Configuration.CopyDependenciesBuildStep.CommandLines.Add(context.Configuration.CreateTargetCopyCommand(relativeCopyFile, optionsContext.OutputDirectoryRelative, context.ProjectDirectory));
-                            context.Configuration.CopyDependenciesBuildStep.Inputs.Add(relativeCopyFile);
-                            context.Configuration.CopyDependenciesBuildStep.Outputs.Add(Path.Combine(optionsContext.OutputDirectoryRelative, Path.GetFileName(copyFile)));
-                        }
-                    }
-                }
-
                 foreach (var customEvent in context.Configuration.ResolvedEventPreBuildExe)
                 {
                     if (context.Configuration.IsFastBuild && optionsContext.Resolver != null)

@@ -577,7 +577,7 @@ namespace Sharpmake.Generators.FastBuild
 
             var bffPreBuildSection = new Dictionary<string, string>();
             var bffCustomPreBuildSection = new Dictionary<string, string>();
-            var bffMasterSection = new Dictionary<string, string>();
+            var bffMasterPerPlatformSections = new Dictionary<KeyValuePair<DevEnv, Platform>, Dictionary<string, string>>();
             var bffCompilerSection = new Dictionary<string, Tuple<string, Platform>>();
 
             // Generate all configuration options onces...
@@ -625,6 +625,9 @@ namespace Sharpmake.Generators.FastBuild
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
+
+                var devEnvPlatformPair = new KeyValuePair<DevEnv, Platform>(conf.Compiler, conf.Platform);
+                var bffMasterSection = bffMasterPerPlatformSections.GetValueOrAdd(devEnvPlatformPair, new Dictionary<string, string>());
 
                 string masterBffPath = Bff.GetMasterBffPath(conf);
                 string sourceFilesRelativeInputPath = Util.GetConvertedRelativePath(projectPath, context.ProjectSourceCapitalized, masterBffPath, true, project.RootPath);
@@ -824,11 +827,32 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildStampArguments = FileGeneratorUtilities.RemoveLineTag;
                         var fastBuildTargetSubTargets = new List<string>();
                         {
-                            foreach (KeyValuePair<string, string> copy in conf.EventPostBuildCopies)
+                            if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
                             {
-                                string fastBuildCopyAlias = GetFastBuildCopyAlias(copy.Key, copy.Value);
-                                fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
+                                if(conf.CopyDependenciesBuildStep != null)
+                                    throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
+
+                                var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffPath);
+                                foreach (var copy in copies)
+                                {
+                                    var sourceFile = copy.Key;
+                                    var destinationFolder = copy.Value;
+
+                                    var destinationFile = Path.Combine(destinationFolder, Path.GetFileName(sourceFile));
+
+                                    string fastBuildCopyAlias = GetFastBuildCopyAlias(sourceFile, destinationFile);
+                                    fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
+
+                                    using (bffGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
+                                    using (bffGenerator.Declare("fastBuildCopySource", sourceFile))
+                                    using (bffGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                    {
+                                        if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
+                                            bffMasterSection.Add(fastBuildCopyAlias, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.CopyFileSection));
+                                    }
+                                }
                             }
+
                             foreach (var preEvent in conf.EventPreBuildExecute)
                             {
                                 string fastBuildPreBuildAlias = preEvent.Key;
@@ -1383,20 +1407,6 @@ namespace Sharpmake.Generators.FastBuild
 
                                         bffGenerator.Write(Template.ConfigurationFile.EndSection);
 
-                                        foreach (KeyValuePair<string, string> copy in conf.EventPostBuildCopies)
-                                        {
-                                            string fastBuildCopyAlias = GetFastBuildCopyAlias(copy.Key, copy.Value);
-                                            {
-                                                using (bffGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
-                                                using (bffGenerator.Declare("fastBuildCopySource", copy.Key))
-                                                using (bffGenerator.Declare("fastBuildCopyDest", copy.Value))
-                                                {
-                                                    if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
-                                                        bffMasterSection.Add(fastBuildCopyAlias, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.CopyFileSection));
-                                                }
-                                            }
-                                        }
-
                                         foreach (var postEvent in conf.EventPostBuildExecute)
                                         {
                                             if (postEvent.Value is Project.Configuration.BuildStepExecutable)
@@ -1519,7 +1529,6 @@ namespace Sharpmake.Generators.FastBuild
                                         lock (s_masterBffLock)
                                         {
                                             UniqueList<string> list;
-                                            var devEnvPlatformPair = new KeyValuePair<DevEnv, Platform>(conf.Compiler, conf.Platform);
                                             if (!s_masterBffCopySections.TryGetValue(devEnvPlatformPair, out list))
                                             {
                                                 list = new UniqueList<string>();
