@@ -2438,58 +2438,49 @@ namespace Sharpmake.Generators.VisualStudio
         #region DependencyCopy
         private void ProcessDependencyCopy(CSharpProject project, Project.Configuration conf)
         {
-            if (conf.Output == Project.Configuration.OutputType.DotNetWindowsApp || conf.ExecuteTargetCopy)
+            if (conf.Output != Project.Configuration.OutputType.DotNetWindowsApp && !conf.ExecuteTargetCopy)
+                return;
+
+            if (conf.CopyDependenciesBuildStep != null)
+                throw new NotImplementedException("CopyDependenciesBuildStep are not implemented with csproj.");
+
+            var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, conf.TargetPath);
+            foreach (var copy in copies)
             {
-                string outputDirectoryRelative = Util.PathGetRelative(_projectPath, conf.TargetPath);
+                var sourceFile = copy.Key;
+                var destinationFolder = copy.Value;
 
-                foreach (string copyFile in conf.ResolvedTargetCopyFiles)
+                conf.EventPostBuild.Add(conf.CreateTargetCopyCommand(sourceFile, destinationFolder, _projectPath));
+            }
+
+            var envVarResolver = PlatformRegistry.Get<IPlatformDescriptor>(Platform.win64).GetPlatformEnvironmentResolver(
+                new VariableAssignment("project", project),
+                new VariableAssignment("target", conf),
+                new VariableAssignment("conf", conf));
+
+            foreach (var customEvent in conf.ResolvedEventPostBuildExe)
+            {
+                if (customEvent is Project.Configuration.BuildStepExecutable)
                 {
-                    string copyFileDirectory = Path.GetDirectoryName(copyFile);
+                    var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
 
-                    if (string.Compare(copyFileDirectory, conf.TargetPath, StringComparison.OrdinalIgnoreCase) != 0)
-                    {
-                        string relativeCopyFile = Util.PathGetRelative(_projectPath, copyFile);
-
-                        if (conf.CopyDependenciesBuildStep == null)
-                        {
-                            conf.CopyDependenciesBuildStep = new Project.Configuration.FileCustomBuild("Copy files to output paths...");
-                        }
-
-                        conf.EventPostBuild.Add(conf.CreateTargetCopyCommand(relativeCopyFile, outputDirectoryRelative, _projectPath));
-                        conf.CopyDependenciesBuildStep.Inputs.Add(relativeCopyFile);
-                        conf.CopyDependenciesBuildStep.Outputs.Add(Path.Combine(outputDirectoryRelative, Path.GetFileName(copyFile)));
-                    }
+                    string relativeExecutableFile = Util.PathGetRelative(_projectPath, execEvent.ExecutableFile);
+                    conf.EventPostBuild.Add(
+                        string.Format(
+                            "{0} {1}",
+                            Util.SimplifyPath(envVarResolver.Resolve(relativeExecutableFile)),
+                            envVarResolver.Resolve(execEvent.ExecutableOtherArguments)
+                        )
+                    );
                 }
-
-                var envVarResolver = PlatformRegistry.Get<IPlatformDescriptor>(Platform.win64).GetPlatformEnvironmentResolver(
-                    new VariableAssignment("project", project),
-                    new VariableAssignment("target", conf),
-                    new VariableAssignment("conf", conf));
-
-                foreach (var customEvent in conf.ResolvedEventPostBuildExe)
+                else if (customEvent is Project.Configuration.BuildStepCopy)
                 {
-                    if (customEvent is Project.Configuration.BuildStepExecutable)
-                    {
-                        var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
-
-                        string relativeExecutableFile = Util.PathGetRelative(_projectPath, execEvent.ExecutableFile);
-                        conf.EventPostBuild.Add(
-                            string.Format(
-                                "{0} {1}",
-                                Util.SimplifyPath(envVarResolver.Resolve(relativeExecutableFile)),
-                                envVarResolver.Resolve(execEvent.ExecutableOtherArguments)
-                            )
-                        );
-                    }
-                    else if (customEvent is Project.Configuration.BuildStepCopy)
-                    {
-                        var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
-                        conf.EventPostBuild.Add(copyEvent.GetCopyCommand(_projectPath, envVarResolver));
-                    }
-                    else
-                    {
-                        throw new Error("Invalid type in PostBuild steps");
-                    }
+                    var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
+                    conf.EventPostBuild.Add(copyEvent.GetCopyCommand(_projectPath, envVarResolver));
+                }
+                else
+                {
+                    throw new Error("Invalid type in PostBuild steps");
                 }
             }
         }

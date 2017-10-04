@@ -1394,8 +1394,36 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            var copyDependenciesBuildStepDictionary = new Dictionary<Project.Configuration, Project.Configuration.FileCustomBuild>();
+            foreach (var conf in context.ProjectConfigurations)
+            {
+                if (conf.IsFastBuild) // copies handled in bff
+                    continue;
+
+                if (conf.Output != Project.Configuration.OutputType.Exe && !conf.ExecuteTargetCopy)
+                    continue;
+
+                var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, context.ProjectDirectory);
+                if (!copies.Any())
+                    continue;
+
+                var copyDependenciesBuildStep = copyDependenciesBuildStepDictionary.GetValueOrAdd(conf, new Project.Configuration.FileCustomBuild("Copy files to output paths..."));
+                if (conf.CopyDependenciesBuildStep != null)
+                    copyDependenciesBuildStep = conf.CopyDependenciesBuildStep;
+
+                foreach (var copy in copies)
+                {
+                    var sourceFile = copy.Key;
+                    var destinationFolder = copy.Value;
+
+                    copyDependenciesBuildStep.CommandLines.Add(conf.CreateTargetCopyCommand(sourceFile, destinationFolder, context.ProjectDirectory));
+                    copyDependenciesBuildStep.Inputs.Add(sourceFile);
+                    copyDependenciesBuildStep.Outputs.Add(Path.Combine(destinationFolder, Path.GetFileName(sourceFile)));
+                }
+            }
+
             // Write the "copy dependencies" build step (as a custom build tool on a dummy file, to make sure the copy is always done when needed)
-            bool hasDependenciesToCopy = context.ProjectConfigurations.Any(conf => conf.CopyDependenciesBuildStep != null);
+            bool hasDependenciesToCopy = copyDependenciesBuildStepDictionary.Any();
             var dependenciesFileGenerator = new FileGenerator(fileGenerator.Resolver); // borrowing resolver
             if (hasDependenciesToCopy)
             {
@@ -1407,12 +1435,10 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildBegin);
 
-                    foreach (Project.Configuration conf in context.ProjectConfigurations)
+                    foreach (var pair in copyDependenciesBuildStepDictionary)
                     {
-                        Project.Configuration.FileCustomBuild copyDependencies = conf.CopyDependenciesBuildStep;
-
-                        if (copyDependencies == null)
-                            continue;
+                        var conf = pair.Key;
+                        Project.Configuration.FileCustomBuild copyDependencies = pair.Value;
 
                         using (fileGenerator.Declare("conf", conf))
                         using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
