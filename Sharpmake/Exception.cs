@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Runtime.Serialization;
 
 namespace Sharpmake
 {
@@ -44,8 +45,12 @@ namespace Sharpmake
             if (!condition)
                 throw new Error(message, args);
         }
+
+        protected Error(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
     }
 
+    [Serializable]
     public class InternalError : Exception
     {
         public InternalError()
@@ -63,6 +68,9 @@ namespace Sharpmake
         public InternalError(Exception innerException, string message, params object[] args)
             : base(String.Format(message, args), innerException)
         { }
+
+        protected InternalError(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
 
         public static void Valid(bool condition)
         {
