@@ -78,6 +78,8 @@ namespace Sharpmake.Generators.FastBuild
         public const string CurrentBffPathVariable = ".CurrentBffPath";
         public const string CurrentBffPathKey = "$CurrentBffPath$";
 
+        public static IUnityResolver UnityResolver = new HashUnityResolver();
+
         public static bool IsMasterBffFilename(string filename)
         {
             return s_masterBffFilenames.Contains(filename);
@@ -601,7 +603,7 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
                 {
-                    var unityTuple = GetDefaultTupleConfig(conf);
+                    var unityTuple = GetDefaultTupleConfig();
                     var confSubConfigs = confSourceFiles[conf];
                     ConfigureUnities(context, confSubConfigs[unityTuple]);
                 }
@@ -639,7 +641,7 @@ namespace Sharpmake.Generators.FastBuild
                         throw new Error("Sharpmake-FastBuild: Configuration " + conf + " is configured for blobbing by fastbuild and sharpmake. This is illegal.");
                     }
 
-                    var defaultTuple = GetDefaultTupleConfig(conf);
+                    var defaultTuple = GetDefaultTupleConfig();
                     var confSubConfigs = confSourceFiles[conf];
 
                     // We will need as many "sub"-libraries as subConfigs to generate the final library
@@ -1758,18 +1760,11 @@ namespace Sharpmake.Generators.FastBuild
             if (_unities.Count == 0)
                 return;
 
-            // first we merge the fragment values of all configurations sharing a unity
-            foreach (var unityFile in _unities)
-            {
-                var unity = unityFile.Key;
-
-                unity.UnityName = $"{project.Name}_unity_{unity.GetHashCode():X8}";
-                unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
-            }
+            UnityResolver.ResolveUnities(project, ref _unities);
         }
 
         // For now, this will do.
-        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>> GetDefaultTupleConfig(Project.Configuration conf)
+        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>> GetDefaultTupleConfig()
         {
             bool isConsumeWinRTExtensions = false;
             bool isCompileAsCLRFile = false;
@@ -2022,7 +2017,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
                         subConfigFiles.Add(file);
 
-                        var defaultTuple = GetDefaultTupleConfig(conf);
+                        var defaultTuple = GetDefaultTupleConfig();
                         if (!tuple.Equals(defaultTuple))
                         {
                             filesInNonDefaultSections.Add(file);
@@ -2037,7 +2032,7 @@ namespace Sharpmake.Generators.FastBuild
                 if (conf.FastBuildBlobbed)
                 {
                     // For now, this will do.
-                    var tuple = GetDefaultTupleConfig(conf);
+                    var tuple = GetDefaultTupleConfig();
 
                     Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
                     if (!confSubConfigs.TryGetValue(conf, out subConfigs))
