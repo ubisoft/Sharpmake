@@ -1652,11 +1652,6 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildUnityCount = unityCount.ToString(CultureInfo.InvariantCulture);
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude);
-            if (!string.IsNullOrEmpty(conf.BlobPath))
-            {
-                // TODO: only exclude if under the inclusion path, otherwise useless: maybe with IsFileIsInputPathList
-                fastbuildUnityInputExcludePathList.Add(conf.BlobPath);
-            }
 
             // Conditional statement depending on the blobbing strategy
             if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Include)
@@ -1681,6 +1676,10 @@ namespace Sharpmake.Generators.FastBuild
                 // Fastbuild will process as unity all files contained in source Root folder and all additional roots.
                 var unityInputPaths = new Strings(context.ProjectSourceCapitalized);
                 unityInputPaths.AddRange(project.AdditionalSourceRootPaths);
+
+                // check if there's some static blobs lying around to exclude
+                if (IsFileInInputPathList(unityInputPaths, conf.BlobPath))
+                    fastbuildUnityInputExcludePathList.Add(conf.BlobPath);
 
                 // Remove any excluded paths(exclusion has priority)
                 unityInputPaths.RemoveRange(fastbuildUnityInputExcludePathList);
