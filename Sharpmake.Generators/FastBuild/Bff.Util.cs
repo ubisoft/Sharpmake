@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Sharpmake.Generators.FastBuild
 {
@@ -103,6 +106,94 @@ namespace Sharpmake.Generators.FastBuild
                 string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
 
                 return $"{fastBuildExecutable}{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
+            }
+        }
+
+        public interface IUnityResolver
+        {
+            void ResolveUnities(Project project, ref Dictionary<Unity, List<Project.Configuration>> unities);
+        }
+
+        public class HashUnityResolver : IUnityResolver
+        {
+            public void ResolveUnities(Project project, ref Dictionary<Unity, List<Project.Configuration>> unities)
+            {
+                foreach (var unityFile in unities)
+                {
+                    var unity = unityFile.Key;
+
+                    unity.UnityName = $"{project.Name}_unity_{unity.GetHashCode():X8}";
+                    unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
+                }
+            }
+        }
+
+        public class FragmentUnityResolver : IUnityResolver
+        {
+            public void ResolveUnities(Project project, ref Dictionary<Unity, List<Project.Configuration>> unities)
+            {
+                // we need to compute the missing member values in the Unity objects:
+                // UnityName and UnityOutputPattern
+                var masks = new List<Tuple<Unity, int[]>>();
+
+                List<FieldInfo> fragmentsInfos = null;
+
+                // first we merge the fragment values of all configurations sharing a unity
+                foreach (var unityFile in unities)
+                {
+                    var configurations = unityFile.Value;
+
+                    // get the fragment info from the first configuration target,
+                    // which works as they all share the same Target type
+                    if (fragmentsInfos == null)
+                        fragmentsInfos = new List<FieldInfo>(configurations.First().Target.GetFragmentFieldInfo());
+
+                    var fragments = configurations.Select(x => x.Target.GetFragmentsValue()).ToList();
+                    var merged = fragments[0];
+                    for (int i = 1; i < fragments.Count; ++i)
+                    {
+                        var toMerge = fragments[i];
+                        for (int j = 0; j < toMerge.Length; ++j)
+                            merged[j] |= toMerge[j];
+                    }
+                    masks.Add(Tuple.Create(unityFile.Key, merged));
+                }
+
+                // then, figure out which fragments are different *across* unities
+                var differentFragmentIndices = new UniqueList<int>();
+                var fragmentValuesComparisonBase = masks[0].Item2;
+                for (int i = 1; i < masks.Count; ++i)
+                {
+                    var fragmentValues = masks[i].Item2;
+                    for (int j = 0; j < fragmentValues.Length; ++j)
+                    {
+                        if (fragmentValuesComparisonBase[j] != fragmentValues[j])
+                            differentFragmentIndices.Add(j);
+                    }
+                }
+
+                // finally, create a unity name that only contains the varying fragments
+                foreach (var unityFile in masks)
+                {
+                    var unity = unityFile.Item1;
+                    var fragments = unityFile.Item2;
+
+                    string fragmentString = string.Empty;
+                    for (int i = 0; i < fragments.Length; ++i)
+                    {
+                        // if not a differentiating fragment, skip
+                        if (!differentFragmentIndices.Contains(i))
+                            continue;
+
+                        // Convert from int to the fragment enum type, so we can ToString() them.
+                        // Fragments are enums by contract, so Enum.ToObject works
+                        var typedFragment = Enum.ToObject(fragmentsInfos[i].FieldType, fragments[i]);
+
+                        fragmentString += "_" + typedFragment.ToString().Replace(",", "").Replace(" ", "");
+                    }
+                    unity.UnityName = project.Name + fragmentString + "_unity";
+                    unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
+                }
             }
         }
     }
