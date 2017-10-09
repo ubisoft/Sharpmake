@@ -1051,38 +1051,37 @@ namespace Sharpmake.Generators.FastBuild
                             linkObjects = (confOptions["UseLibraryDependencyInputs"] == "true");
                         }
 
-                        Strings inputPaths = new Strings();
+                        Strings fullInputPaths = new Strings();
                         string fastBuildInputPath = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildInputExcludedFiles = FileGeneratorUtilities.RemoveLineTag;
                         {
                             Strings excludedSourceFiles = new Strings();
                             if (isNoBlobImplicitConfig && isDefaultTuple)
                             {
-                                inputPaths.Add(sourceFilesRelativeInputPath);
-                                inputPaths.AddRange(project.AdditionalSourceRootPaths.Select((p) => Util.GetConvertedRelativePath(p, "", masterBffPath, true, project.RootPath)));
+                                fullInputPaths.Add(context.ProjectSourceCapitalized);
+                                fullInputPaths.AddRange(project.AdditionalSourceRootPaths.Select(Util.GetCapitalizedPath));
 
-                                excludedSourceFiles.AddRange(filesInNonDefaultSection.Select((f) => { return f.FileName; }));
+                                excludedSourceFiles.AddRange(filesInNonDefaultSection.Select(f => f.FileName));
                             }
 
                             if (isDefaultTuple && conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Exclude && conf.FastBuildBlobbed)
                             {
                                 // Adding the folders excluded from unity to the folders to build without unity(building each file individually)
-                                inputPaths.AddRange(project.SourcePathsBlobExclude.Select((p) => Util.GetConvertedRelativePath(p, "", masterBffPath, true, project.RootPath)));
+                                fullInputPaths.AddRange(project.SourcePathsBlobExclude.Select(Util.GetCapitalizedPath));
                             }
 
                             if (project.SourceFilesFiltersRegex.Count == 0)
                             {
-                                fastBuildInputPath = FBuildCollectionFormat(inputPaths, 32);
+                                var relativePaths = new Strings(fullInputPaths.Select(p => Util.PathGetRelative(masterBffPath, p, true)));
+                                fastBuildInputPath = FBuildCollectionFormat(relativePaths, 32);
                             }
                             else
                             {
-                                inputPaths.Clear();
+                                fullInputPaths.Clear();
                             }
 
                             excludedSourceFiles.AddRange(conf.ResolvedSourceFilesBuildExclude);
                             excludedSourceFiles.AddRange(conf.PrecompSourceExclude);
-
-                            Strings excludedSourceFilesRelative = new Strings();
 
                             // Converting the excluded filenames to relative path to the input path so that this
                             // can work properly with subst usage when running with fastbuild caching active. 
@@ -1093,16 +1092,14 @@ namespace Sharpmake.Generators.FastBuild
                             //
                             // Note: Ideally fastbuild should expect relative paths to the bff file path instead of the .UnityInputPath but
                             // well I guess we are stuck with this.                                                    
+                            var excludedSourceFilesRelative = new Strings();
                             foreach (string file in excludedSourceFiles.SortedValues)
                             {
                                 string fileExtension = Path.GetExtension(file);
                                 if (project.SourceFilesCompileExtensions.Contains(fileExtension))
                                 {
-                                    string inputPathRelative;
-                                    if (IsFileIsInputPathList(masterBffPath, inputPaths, file, out inputPathRelative))
-                                    {
-                                        excludedSourceFilesRelative.Add(inputPathRelative);
-                                    }
+                                    if (IsFileInInputPathList(fullInputPaths, file))
+                                        excludedSourceFilesRelative.Add(Util.PathGetRelative(masterBffPath, file, true));
                                 }
                             }
                             if (excludedSourceFilesRelative.Count > 0)
@@ -1144,10 +1141,8 @@ namespace Sharpmake.Generators.FastBuild
                                         conf.ResolvedSourceFilesBlobExclude.Contains(sourceFile.FileName) ||
                                         (!isUnity && !isNoBlobImplicitConfig))
                                     {
-                                        if (!IsRelativeFilenameInInputPathList(inputPaths, sourceFileName))
-                                        {
+                                        if (!IsFileInInputPathList(fullInputPaths, sourceFile.FileName))
                                             fastbuildSourceFilesList.Add(sourceFileName);
-                                        }
                                     }
                                 }
                             }
@@ -1643,9 +1638,6 @@ namespace Sharpmake.Generators.FastBuild
                 return;
 
             string masterBffPath = Bff.GetMasterBffPath(conf);
-            string projectPath = new FileInfo(Util.GetCapitalizedPath(conf.BffFullFileName)).Directory.FullName;
-            string sourceFilesRelativeInputPath = Util.GetConvertedRelativePath(projectPath, context.ProjectSourceCapitalized, masterBffPath, true, project.RootPath);
-
             const int spaceLength = 42;
 
             string fastBuildUnityInputFiles = FileGeneratorUtilities.RemoveLineTag;
@@ -1659,15 +1651,12 @@ namespace Sharpmake.Generators.FastBuild
             if(unityCount > 0)
                 fastBuildUnityCount = unityCount.ToString(CultureInfo.InvariantCulture);
 
-            var fastbuildUnityInputExcludePathList = new Strings();
+            var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude);
             if (!string.IsNullOrEmpty(conf.BlobPath))
             {
                 // TODO: only exclude if under the inclusion path, otherwise useless: maybe with IsFileIsInputPathList
-                fastbuildUnityInputExcludePathList.Add(Util.GetConvertedRelativePath(projectPath, conf.BlobPath, masterBffPath, true, project.RootPath));
+                fastbuildUnityInputExcludePathList.Add(conf.BlobPath);
             }
-
-            fastbuildUnityInputExcludePathList.AddRange(project.SourcePathsBlobExclude.Select((excludedPath) => Util.GetConvertedRelativePath(excludedPath, "", masterBffPath, true, project.RootPath)));
-            fastBuildUnityInputExcludePath = FBuildCollectionFormat(fastbuildUnityInputExcludePathList, spaceLength:spaceLength);
 
             // Conditional statement depending on the blobbing strategy
             if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Include)
@@ -1690,20 +1679,19 @@ namespace Sharpmake.Generators.FastBuild
             else
             {
                 // Fastbuild will process as unity all files contained in source Root folder and all additional roots.
-                Strings unityInputPaths = new Strings();
-                unityInputPaths.Add(sourceFilesRelativeInputPath);
-                unityInputPaths.AddRange(project.AdditionalSourceRootPaths.Select((p) => Util.GetConvertedRelativePath(p, "", masterBffPath, true, project.RootPath)));
+                var unityInputPaths = new Strings(context.ProjectSourceCapitalized);
+                unityInputPaths.AddRange(project.AdditionalSourceRootPaths);
 
                 // Remove any excluded paths(exclusion has priority)
                 unityInputPaths.RemoveRange(fastbuildUnityInputExcludePathList);
-                fastBuildUnityPaths = FBuildCollectionFormat(unityInputPaths, spaceLength);
+                var unityInputRelativePaths = new Strings(unityInputPaths.Select(p => Util.PathGetRelative(masterBffPath, p, true)));
+                fastBuildUnityPaths = FBuildCollectionFormat(unityInputRelativePaths, spaceLength);
 
-                Strings excludedSourceFiles = new Strings();
-
-                excludedSourceFiles.AddRange(conf.ResolvedSourceFilesBlobExclude);
+                var excludedSourceFiles = new Strings(conf.ResolvedSourceFilesBlobExclude);
                 excludedSourceFiles.AddRange(conf.ResolvedSourceFilesBuildExclude);
                 excludedSourceFiles.AddRange(conf.PrecompSourceExclude);
-                Strings excludedSourceFilesRelative = new Strings();
+
+                var excludedSourceFilesRelative = new Strings();
 
                 // Converting the excluded filenames to relative path to the input path so that this
                 // can work properly with subst usage when running with fastbuild caching active.
@@ -1716,11 +1704,8 @@ namespace Sharpmake.Generators.FastBuild
                 // well I guess we are stuck with this.
                 foreach (string file in excludedSourceFiles.SortedValues)
                 {
-                    string inputPathRelative;
-                    if (IsFileIsInputPathList(masterBffPath, unityInputPaths, file, out inputPathRelative))
-                    {
-                        excludedSourceFilesRelative.Add(inputPathRelative);
-                    }
+                    if (IsFileInInputPathList(unityInputPaths, file))
+                        excludedSourceFilesRelative.Add(Util.PathGetRelative(masterBffPath, file, true));
                 }
                 if (excludedSourceFilesRelative.Count > 0)
                     fastBuildUnityInputExcludedfiles = FBuildCollectionFormat(excludedSourceFilesRelative, spaceLength, project.SourceFilesBlobExtensions);
@@ -1733,10 +1718,16 @@ namespace Sharpmake.Generators.FastBuild
                 return;
             }
 
+            if (fastbuildUnityInputExcludePathList.Any())
+            {
+                var unityInputExcludePathRelative = new Strings(fastbuildUnityInputExcludePathList.Select(p => Util.PathGetRelative(masterBffPath, p, true)));
+                fastBuildUnityInputExcludePath = FBuildCollectionFormat(unityInputExcludePathRelative, spaceLength);
+            }
+
             Unity unityFile = new Unity
             {
                 // Note that the UnityName and UnityOutputPattern are intentionally left empty: they will be set in the Resolve
-                UnityOutputPath = Util.GetConvertedRelativePath(projectPath, conf.FastBuildUnityPath, masterBffPath, true, project.RootPath),
+                UnityOutputPath = Util.PathGetRelative(masterBffPath, conf.FastBuildUnityPath, true),
                 UnityInputIsolateWritableFiles = conf.FastBuildUnityInputIsolateWritableFiles.ToString().ToLower(),
                 UnityInputIsolateWritableFilesLimit = conf.FastBuildUnityInputIsolateWritableFiles ? conf.FastBuildUnityInputIsolateWritableFilesLimit.ToString() : FileGeneratorUtilities.RemoveLineTag,
                 UnityPCH = conf.PrecompHeader ?? FileGeneratorUtilities.RemoveLineTag,
@@ -1747,7 +1738,7 @@ namespace Sharpmake.Generators.FastBuild
                 UnityInputExcludedFiles = fastBuildUnityInputExcludedfiles
             };
 
-            // _unitites being a dictionary, a new entry will be created only
+            // _unities being a dictionary, a new entry will be created only
             // if the combination of options forming that unity was never seen before
             var confListForUnity = _unities.GetValueOrAdd(unityFile, new List<Project.Configuration>());
 
@@ -2065,34 +2056,14 @@ namespace Sharpmake.Generators.FastBuild
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
         }
 
-        private bool IsFileIsInputPathList(
-            string masterBffPath,
-            Strings inputPaths,
-            string filename,
-            out string sourceFileRelative
-        )
+        private bool IsFileInInputPathList(Strings inputPaths, string path)
         {
             // Convert each of file paths to each of the input paths and try to
             // find the first one not starting from ..(ie the file is in the tested input path)
-            foreach (string inputPath in inputPaths)
+            foreach (string inputAbsPath in inputPaths)
             {
-                string inputAbsPath = Util.PathGetAbsolute(masterBffPath, inputPath);
-                string sourceFileRelativeTmp = Util.PathGetRelative(inputAbsPath, filename, true);
+                string sourceFileRelativeTmp = Util.PathGetRelative(inputAbsPath, path, true);
                 if (!sourceFileRelativeTmp.StartsWith(".."))
-                {
-                    sourceFileRelative = sourceFileRelativeTmp;
-                    return true;
-                }
-            }
-
-            sourceFileRelative = string.Empty;
-            return false;
-        }
-        private bool IsRelativeFilenameInInputPathList(Strings inputPaths, string filename)
-        {
-            foreach (string inputPath in inputPaths)
-            {
-                if (filename.StartsWith(inputPath))
                     return true;
             }
 
