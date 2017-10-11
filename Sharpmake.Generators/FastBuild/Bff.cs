@@ -932,14 +932,14 @@ namespace Sharpmake.Generators.FastBuild
                                     }
                                     else
                                     {
-                                        string recomposedName = Util.SimplifyPath(additionalDependency);
+                                        string recomposedName = additionalDependency;
                                         if (additionalDependency.StartsWith("-l", StringComparison.Ordinal))
                                             recomposedName = "lib" + recomposedName.Substring(2);
 
                                         if (Path.GetExtension(recomposedName) == string.Empty)
                                             recomposedName = recomposedName + ".a";
 
-                                        finalDependencies.Add(@"""" + Util.PathMakeStandard(recomposedName) + @"""");
+                                        finalDependencies.Add(@"""" + recomposedName + @"""");
                                     }
                                 }
                             }
