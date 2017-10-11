@@ -928,7 +928,7 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     if (clangPlatformBff == null)
                                     {
-                                        finalDependencies.Add(additionalDependency);
+                                        finalDependencies.Add(@"""" + additionalDependency + @"""");
                                     }
                                     else
                                     {
@@ -939,13 +939,13 @@ namespace Sharpmake.Generators.FastBuild
                                         if (Path.GetExtension(recomposedName) == string.Empty)
                                             recomposedName = recomposedName + ".a";
 
-                                        finalDependencies.Add(Util.PathMakeStandard(recomposedName));
+                                        finalDependencies.Add(@"""" + Util.PathMakeStandard(recomposedName) + @"""");
                                     }
                                 }
                             }
 
                             if(finalDependencies.Any())
-                                confCmdLineOptions["AdditionalDependencies"] = "\"" + string.Join("\" \"", finalDependencies) + "\"";
+                                confCmdLineOptions["AdditionalDependencies"] = string.Join($"'{Environment.NewLine}                            + ' ", finalDependencies);
                             else
                                 confCmdLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
                         }
