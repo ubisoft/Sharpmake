@@ -788,22 +788,17 @@ namespace Sharpmake.Generators.VisualStudio
             context.CommandLineOptions["PreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
             if (defines.Count > 0)
             {
-                StringBuilder fastBuildDefines = new StringBuilder();
+                var fastBuildDefines = new List<string>();
                 string platformDefineSwitch = optionsContext.PlatformDescriptor.IsUsingClang ? "-D" : "/D";
 
-                bool first = true;
                 foreach (string define in defines)
                 {
                     if (string.IsNullOrWhiteSpace(define))
                         continue;
 
-                    if (!first)
-                        fastBuildDefines.Append(" ");
-                    else
-                        first = false;
-                    fastBuildDefines.AppendFormat(@"{0}""{1}""", platformDefineSwitch, define.Replace(@"""", @"\"""));
+                    fastBuildDefines.Add(string.Format(@"{0}""{1}""", platformDefineSwitch, define.Replace(@"""", @"\""")));
                 }
-                context.CommandLineOptions["PreprocessorDefinitions"] = fastBuildDefines.ToString();
+                context.CommandLineOptions["PreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildDefines);
             }
 
             // UndefineAllPreprocessorDefinitions
