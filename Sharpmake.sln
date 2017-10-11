@@ -1,5 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{33508DDB-C422-746D-6776-CCB54DBB91EB}"
@@ -31,6 +33,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleExeLibDependency", "samples\SimpleExeLibDependency\SimpleExeLibDependency.csproj", "{128E20D6-0408-DD6C-4BA5-0B7A051E6734}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleNuGet", "SimpleNuGet\SimpleNuGet.csproj", "{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.Durango", "Sharpmake.Platforms\Sharpmake.Durango\Sharpmake.Durango.csproj", "{50769915-B3FF-4C7E-B804-F0294A456920}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.NvShield", "Sharpmake.Platforms\Sharpmake.NvShield\Sharpmake.NvShield.csproj", "{C05B1136-5243-BFF8-F39B-24AB8261FD54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.X360", "Sharpmake.Platforms\Sharpmake.X360\Sharpmake.X360.csproj", "{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,6 +102,18 @@ Global
 		{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50769915-B3FF-4C7E-B804-F0294A456920}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50769915-B3FF-4C7E-B804-F0294A456920}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50769915-B3FF-4C7E-B804-F0294A456920}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50769915-B3FF-4C7E-B804-F0294A456920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -108,5 +128,8 @@ Global
 		{3B476462-28E6-4640-4257-7942657699ED} = {6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}
 		{C2F8D8B8-29F8-4117-62B6-F6E3E63C225B} = {33508DDB-C422-746D-6776-CCB54DBB91EB}
 		{128E20D6-0408-DD6C-4BA5-0B7A051E6734} = {33508DDB-C422-746D-6776-CCB54DBB91EB}
+		{50769915-B3FF-4C7E-B804-F0294A456920} = {6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}
+		{C05B1136-5243-BFF8-F39B-24AB8261FD54} = {6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}
+		{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED} = {6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}
 	EndGlobalSection
 EndGlobal
