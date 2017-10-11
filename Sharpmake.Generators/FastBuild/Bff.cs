@@ -366,7 +366,9 @@ namespace Sharpmake.Generators.FastBuild
                 Project.FastBuildMasterGeneratedFiles.Add(bffFileInfo.FullName);
             }
             else
+            {
                 Project.FastBuildUpToDateFileCount++;
+            }
         }
 
         private static void WriteMasterSettingsSection(IFileGenerator masterBffGenerator, MasterBffInfo masterBffInfo)
@@ -471,7 +473,9 @@ namespace Sharpmake.Generators.FastBuild
                 if (FastBuildSettings.EnableVS2012EnumBugWorkaround &&
                     compiler.Value.DevEnv == DevEnv.vs2012 &&
                     compilerPlatform.HasFlag(Platform.win64))
+                {
                     fastBuildVS2012EnumBugWorkaround = ".VS2012EnumBugFix = true";
+                }
 
                 using (masterBffGenerator.Declare("fastbuildCompilerName", compiler.Key))
                 using (masterBffGenerator.Declare("fastBuildVisualStudioEnvironment", compilerSettings.RootPath))
