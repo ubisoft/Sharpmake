@@ -25,11 +25,56 @@ namespace SharpmakeGen.Platforms
     }
 
     [Generate]
-    public class GenericProject : PlatformProject
+    public class CommonPlatformsProject : PlatformProject
     {
-        public GenericProject()
+        public CommonPlatformsProject()
         {
             Name = "Sharpmake.CommonPlatforms";
+        }
+    }
+
+    [Generate]
+    public class DurangoProject : PlatformProject
+    {
+        public DurangoProject()
+        {
+            Name = "Sharpmake.Durango";
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.AddPrivateDependency<CommonPlatformsProject>(target);
+        }
+    }
+    
+    [Generate]
+    public class NvShieldProject : PlatformProject
+    {
+        public NvShieldProject()
+        {
+            Name = "Sharpmake.NvShield";
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.AddPrivateDependency<CommonPlatformsProject>(target);
+        }
+    }
+
+    [Generate]
+    public class X360Project : PlatformProject
+    {
+        public X360Project()
+        {
+            Name = "Sharpmake.X360";
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.AddPrivateDependency<CommonPlatformsProject>(target);
         }
     }
 }

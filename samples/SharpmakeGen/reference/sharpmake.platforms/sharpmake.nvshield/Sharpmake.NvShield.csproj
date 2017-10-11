@@ -4,11 +4,11 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{50769915-B3FF-4C7E-B804-F0294A456920}</ProjectGuid>
+    <ProjectGuid>{C05B1136-5243-BFF8-F39B-24AB8261FD54}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake</RootNamespace>
-    <AssemblyName>Sharpmake.Durango</AssemblyName>
+    <AssemblyName>Sharpmake.NvShield</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -42,14 +42,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DurangoCommandLineInterface.cs" />
-    <Compile Include="DurangoExtensions.cs" />
-    <Compile Include="DurangoPlatform.Vcxproj.Template.cs" />
-    <Compile Include="DurangoPlatform.cs" />
-    <Compile Include="GlobalSettings.cs" />
+    <Compile Include="NvShieldPlatform.Vcxproj.Template.cs" />
+    <Compile Include="NvShieldPlatform.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Sharpmake.Generators\Sharpmake.Generators.csproj">

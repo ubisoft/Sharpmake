@@ -114,7 +114,7 @@ namespace SharpmakeGen
             base.ConfigureAll(conf, target);
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
-            conf.AddPrivateDependency<Platforms.GenericProject>(target);
+            conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
 
             conf.ReferencesByNuGetPackage.Add("NUnit", "3.4.1");
             conf.ReferencesByNuGetPackage.Add("NUnit.Console", "3.4.1");
@@ -140,7 +140,7 @@ namespace SharpmakeGen
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
-            conf.AddPrivateDependency<Platforms.GenericProject>(target);
+            conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
         }
     }
 
@@ -173,6 +173,11 @@ namespace SharpmakeGen
             conf.AddProject<SharpmakeGeneratorsProject>(target);
             conf.AddProject<SharpmakeUnitTestsProject>(target);
             conf.AddProject<SimpleNuGetProject>(target);
+
+            conf.AddProject<Platforms.CommonPlatformsProject>(target);
+            conf.AddProject<Platforms.DurangoProject>(target);
+            conf.AddProject<Platforms.NvShieldProject>(target);
+            conf.AddProject<Platforms.X360Project>(target);
 
             conf.AddProject<Samples.ConfigureOrderProject>(target);
             conf.AddProject<Samples.CPPCLIProject>(target);
