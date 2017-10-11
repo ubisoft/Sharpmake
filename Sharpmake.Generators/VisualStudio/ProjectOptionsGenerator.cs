@@ -1875,9 +1875,14 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        private static void SelectAdditionalDependenciesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, OrderableStrings libraryFiles, Strings ignoreSpecificLibraryNames)
+        private static void SelectAdditionalDependenciesOption(
+            IGenerationContext context,
+            ProjectOptionsGenerationContext optionsContext,
+            OrderableStrings libraryFiles,
+            Strings ignoreSpecificLibraryNames
+        )
         {
-            // convert all root paths to be relative to the vcxproj
+            // convert all root paths to be relative to the project folder
             var convertedPaths = new HashSet<string>();
             for (int i = 0; i < libraryFiles.Count; ++i)
             {
@@ -1893,32 +1898,20 @@ namespace Sharpmake.Generators.VisualStudio
             libraryFiles.Sort();
 
             List<string> additionalDependencies = new List<string>(libraryFiles.Count);
-            List<string> cmdLineAdditionalDependencies = new List<string>(libraryFiles.Count);
-            for (int i = 0; i < libraryFiles.Count; ++i)
+            foreach (string libraryFile in libraryFiles)
             {
-                string libname = libraryFiles[i];
-
                 // We've got two kinds of way of listing a library:
                 // - With a filename without extension we must add the potential prefix and potential extension.
                 //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
                 // - With a filename with the lib extension (.a or .lib), we shouldn't touch it as it's already set by the script.
-                if (Path.GetExtension(libname) != optionsContext.PlatformLibraryExtension)
-                    libname = optionsContext.PlatformPrefixExtension + libname + optionsContext.PlatformOutputLibraryExtension;
+                string decoratedName = libraryFile;
+                if (Path.GetExtension(libraryFile) != optionsContext.PlatformLibraryExtension)
+                    decoratedName = optionsContext.PlatformPrefixExtension + libraryFile + optionsContext.PlatformOutputLibraryExtension;
 
-                if (!ignoreSpecificLibraryNames.Contains(libname))
-                {
-                    additionalDependencies.Add(libname);
-
-                    // Rebase any full path for FastBuild.
-                    if (Path.IsPathRooted(libname))
-                        libname = Util.GetConvertedRelativePath(context.ProjectDirectory, libname, optionsContext.BaseProjectPath, true, context.Project.RootPath);
-
-                    cmdLineAdditionalDependencies.Add(libname);
-                }
+                if (!ignoreSpecificLibraryNames.Contains(decoratedName))
+                    additionalDependencies.Add(decoratedName);
                 else
-                {
-                    ignoreSpecificLibraryNames.Remove(libname);
-                }
+                    ignoreSpecificLibraryNames.Remove(decoratedName);
             }
 
             context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies);
@@ -1930,11 +1923,15 @@ namespace Sharpmake.Generators.VisualStudio
                 // Joins the list of dependencies with a ; and then re-split them after a resolve.
                 // We have to do it that way because a token can be resolved into a
                 // semicolon -separated list of dependencies.
-                string[] addDeps = optionsContext.Resolver.Resolve(string.Join(";", cmdLineAdditionalDependencies.Concat(platformAdditionalDependencies))).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                if (addDeps.Any())
+                string[] resolvedAdditionalDependencies = optionsContext.Resolver.Resolve(
+                        string.Join(";", additionalDependencies.Concat(platformAdditionalDependencies))
+                    ).Split(new [] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (resolvedAdditionalDependencies.Any())
                 {
-                    StringBuilder result = new StringBuilder();
-                    foreach (string additionalDependency in addDeps)
+                    var finalDependencies = new List<string>();
+
+                    foreach (string additionalDependency in resolvedAdditionalDependencies)
                     {
                         string dependencyPath = additionalDependency;
 
@@ -1943,11 +1940,10 @@ namespace Sharpmake.Generators.VisualStudio
                         if (convertedPaths.Contains(additionalDependency))
                             dependencyPath = Util.GetConvertedRelativePath(context.ProjectDirectory, additionalDependency, optionsContext.BaseProjectPath, true, context.Project.RootPath);
 
-                        result.Append(@"""" + dependencyPath + @""" ");
+                        finalDependencies.Add(dependencyPath);
                     }
 
-                    result.Remove(result.Length - 1, 1);
-                    context.CommandLineOptions["AdditionalDependencies"] = result.ToString();
+                    context.CommandLineOptions["AdditionalDependencies"] = string.Join(";", finalDependencies);
                 }
             }
 

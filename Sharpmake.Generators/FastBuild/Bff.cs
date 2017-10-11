@@ -647,6 +647,7 @@ namespace Sharpmake.Generators.FastBuild
 
                     var defaultTuple = GetDefaultTupleConfig();
                     var confSubConfigs = confSourceFiles[conf];
+                    ProjectOptionsGenerator.VcxprojCmdLineOptions confCmdLineOptions = cmdLineOptions[conf];
 
                     // We will need as many "sub"-libraries as subConfigs to generate the final library
                     int subConfigIndex = 0;
@@ -660,6 +661,13 @@ namespace Sharpmake.Generators.FastBuild
                             bffGenerator.Write(Template.ConfigurationFile.PlatformBeginSection);
                     }
                     List<string> resourceFilesSections = new List<string>();
+
+                    var additionalDependencies = new List<string>();
+                    {
+                        string confCmdLineOptionsAddDeps = confCmdLineOptions["AdditionalDependencies"];
+                        if (confCmdLineOptionsAddDeps != FileGeneratorUtilities.RemoveLineTag)
+                            additionalDependencies = confCmdLineOptionsAddDeps.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    }
 
                     foreach (var tuple in confSubConfigs.Keys)
                     {
@@ -687,8 +695,6 @@ namespace Sharpmake.Generators.FastBuild
                         Trace.Assert(!isCompileAsCPPFile, "Sharpmake-FastBuild : CompiledAsCPP isn't yet supported.");
                         Trace.Assert(!isCompileAsCLRFile, "Sharpmake-FastBuild : CompiledAsCLR isn't yet supported.");
                         Trace.Assert(!isCompileAsNonCLRFile, "Sharpmake-FastBuild : !CompiledAsCLR isn't yet supported.");
-
-                        ProjectOptionsGenerator.VcxprojCmdLineOptions confCmdLineOptions = cmdLineOptions[conf];
 
                         Strings fastBuildCompilerInputPatternList = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
                         Strings fastBuildCompilerInputPatternTransformedList = new Strings(fastBuildCompilerInputPatternList.Select((s) => { return "*" + s; }));
@@ -901,23 +907,16 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         // Remove from cmdLineOptions["AdditionalDependencies"] dependencies that are already listed in fastBuildProjectDependencyList
-                        string confCmdLineOptionsAddDeps = confCmdLineOptions["AdditionalDependencies"];
-                        if (confCmdLineOptionsAddDeps != FileGeneratorUtilities.RemoveLineTag)
                         {
-                            Regex pathSeparatorRegex = new Regex(@"\""(.*?)\""", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
-
-                            StringBuilder result = new StringBuilder();
-
-                            Match match = pathSeparatorRegex.Match(confCmdLineOptionsAddDeps);
-                            for (; match.Success; match = match.NextMatch())
+                            var finalDependencies = new List<string>();
+                            foreach (var additionalDependency in additionalDependencies)
                             {
-                                string additionalDependency = match.Groups[1].ToString();
-
                                 // Properly compute dependency identifier
                                 int subStringStartIndex = 0;
                                 int subStringLength = additionalDependency.Length;
                                 if (additionalDependency.EndsWith(".lib", StringComparison.OrdinalIgnoreCase))
                                     subStringLength -= 4;
+
                                 if (additionalDependency.StartsWith("-l", StringComparison.Ordinal))
                                 {
                                     subStringStartIndex = 2;
@@ -929,27 +928,26 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     if (clangPlatformBff == null)
                                     {
-                                        result.Append(@"""" + additionalDependency + @""" ");
+                                        finalDependencies.Add(additionalDependency);
                                     }
                                     else
                                     {
+                                        string recomposedName = Util.SimplifyPath(additionalDependency);
                                         if (additionalDependency.StartsWith("-l", StringComparison.Ordinal))
-                                        {
-                                            additionalDependency = "lib" + additionalDependency.Substring(2);
-                                        }
-                                        if (Path.GetExtension(additionalDependency) == String.Empty)
-                                            additionalDependency = additionalDependency + ".a";
+                                            recomposedName = "lib" + recomposedName.Substring(2);
 
-                                        result.Append(@"""" + Util.SimplifyPath(Util.PathMakeStandard(additionalDependency)) + @""" ");
+                                        if (Path.GetExtension(recomposedName) == string.Empty)
+                                            recomposedName = recomposedName + ".a";
+
+                                        finalDependencies.Add(Util.PathMakeStandard(recomposedName));
                                     }
                                 }
                             }
 
-                            if (result.Length > 0)
-                                result.Remove(result.Length - 1, 1);
-
-                            string finalDeps = result.ToString();
-                            confCmdLineOptions["AdditionalDependencies"] = finalDeps.Length > 0 ? finalDeps : FileGeneratorUtilities.RemoveLineTag;
+                            if(finalDependencies.Any())
+                                confCmdLineOptions["AdditionalDependencies"] = "\"" + string.Join("\" \"", finalDependencies) + "\"";
+                            else
+                                confCmdLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
                         }
 
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
