@@ -56,16 +56,6 @@ namespace Sharpmake
             }
             public override bool HasUserAccountControlSupport => true;
 
-            public override IEnumerable<string> GetPlatformLibraryPaths(IGenerationContext context)
-            {
-                var dirs = new List<string>(base.GetPlatformLibraryPaths(context));
-                var dotnet = Util.IsDotNet(context.Configuration) ? context.Configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
-                string platformDirsStr = context.DevelopmentEnvironment.GetWindowsLibraryPath(context.Configuration.Platform, dotnet);
-                dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
-
-                return dirs;
-            }
-
             public override IEnumerable<string> GetPlatformLibraryFiles(IGenerationContext context)
             {
                 yield return "kernel32.lib";

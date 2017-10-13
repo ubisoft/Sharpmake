@@ -11,9 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System.Collections.Generic;
+
 namespace Sharpmake
 {
-    public static partial class Linux
+    public static class Linux
     {
         [PlatformImplementation(Platform.linux,
             typeof(IPlatformDescriptor),
@@ -46,6 +49,11 @@ namespace Sharpmake
                     default:
                         return "a";
                 }
+            }
+
+            public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            {
+                yield break;
             }
             #endregion
 

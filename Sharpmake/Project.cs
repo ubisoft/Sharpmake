@@ -1415,11 +1415,11 @@ namespace Sharpmake
                     var allLibraryFiles = new OrderableStrings(conf.LibraryFiles);
                     var allLibraryPaths = new OrderableStrings(conf.LibraryPaths);
 
-                    // TODO: figure out a clean way to get the platform specific library paths
-                    // var platformLibraryPaths = PlatformRegistry.Get<>(conf.Platform).GetPlatformLibraryPaths();
-                    // allLibraryPaths.AddRange(platformLibraryPaths);
+                    var configTasks = PlatformRegistry.Get<Configuration.IConfigurationTasks>(conf.Platform);
+                    var platformLibraryPaths = configTasks.GetPlatformLibraryPaths(conf);
+                    allLibraryPaths.AddRange(platformLibraryPaths);
 
-                    string platformLibExtension = PlatformRegistry.Get<Configuration.IConfigurationTasks>(conf.Platform).GetDefaultOutputExtension(Configuration.OutputType.Lib);
+                    string platformLibExtension = "." + configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
                         if (!folder.StartsWith("$") && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))

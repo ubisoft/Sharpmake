@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
@@ -55,6 +56,16 @@ namespace Sharpmake
                 default:
                     return outputType.ToString().ToLower();
             }
+        }
+
+        public virtual IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+        {
+            var dirs = new List<string>();
+            var dotnet = Util.IsDotNet(configuration) ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
+            string platformDirsStr = configuration.Target.GetFragment<DevEnv>().GetWindowsLibraryPath(configuration.Target.GetPlatform(), dotnet);
+            dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
+
+            return dirs;
         }
         #endregion
 

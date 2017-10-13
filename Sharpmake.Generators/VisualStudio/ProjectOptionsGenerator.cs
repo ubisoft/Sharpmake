@@ -1852,7 +1852,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (optionsContext.Resolver != null)
             {
-                libDirs.AddRange(optionsContext.PlatformVcxproj.GetPlatformLibraryPaths(context));
+                var configTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+                libDirs.AddRange(configTasks.GetPlatformLibraryPaths(context.Configuration));
                 if (libDirs.Count > 0)
                 {
                     string linkOption;

@@ -21,6 +21,7 @@ namespace Sharpmake
     {
         [PlatformImplementation(Platform.x360,
             typeof(IPlatformDescriptor),
+            typeof(Project.Configuration.IConfigurationTasks),
             typeof(IPlatformVcxproj))]
         public sealed partial class X360Platform : BaseMicrosoftPlatform
         {

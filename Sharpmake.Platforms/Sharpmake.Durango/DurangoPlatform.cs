@@ -25,12 +25,22 @@ namespace Sharpmake
     {
         [PlatformImplementation(Platform.durango,
             typeof(IPlatformDescriptor),
+            typeof(Project.Configuration.IConfigurationTasks),
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IMicrosoftPlatformBff),
             typeof(IPlatformVcxproj))]
         public sealed partial class DurangoPlatform : BaseMicrosoftPlatform, IFastBuildCompilerSettings
         {
+            public override IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            {
+                var dirs = new List<string>();
+                string platformDirsStr = configuration.Target.GetFragment<DevEnv>().GetDurangoLibraryPath();
+                dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
+
+                return dirs;
+            }
+
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Durango";
             public override bool IsPcPlatform => false;
@@ -188,15 +198,6 @@ namespace Sharpmake
             public override IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)
             {
                 yield return "_DURANGO";
-            }
-
-            public override IEnumerable<string> GetPlatformLibraryPaths(IGenerationContext context)
-            {
-                var dirs = new List<string>(base.GetPlatformLibraryPaths(context));
-                string platformDirsStr = context.DevelopmentEnvironment.GetDurangoLibraryPath();
-                dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
-
-                return dirs;
             }
 
             public override IEnumerable<string> GetCxUsingPath(IGenerationContext context)

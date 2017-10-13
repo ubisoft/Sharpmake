@@ -11,9 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System.Collections.Generic;
+
 namespace Sharpmake
 {
-    public static partial class Apple
+    public static class Apple
     {
         [PlatformImplementation(Platform.mac,
             typeof(IPlatformDescriptor),
@@ -72,6 +75,11 @@ namespace Sharpmake
                     default:
                         return outputType.ToString().ToLower();
                 }
+            }
+
+            public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            {
+                yield break;
             }
             #endregion
         }

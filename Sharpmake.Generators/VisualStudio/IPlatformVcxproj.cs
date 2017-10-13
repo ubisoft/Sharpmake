@@ -30,7 +30,6 @@ namespace Sharpmake.Generators.VisualStudio
         IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context);
 
         IEnumerable<string> GetLibraryPaths(IGenerationContext context);
-        IEnumerable<string> GetPlatformLibraryPaths(IGenerationContext context);
 
         IEnumerable<string> GetLibraryFiles(IGenerationContext context);
         IEnumerable<string> GetPlatformLibraryFiles(IGenerationContext context);
