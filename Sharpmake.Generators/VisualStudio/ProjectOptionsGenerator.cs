@@ -2090,7 +2090,7 @@ namespace Sharpmake.Generators.VisualStudio
                 if (FastBuildSettings.EnableFastLinkPDBSupport && isFastLink)
                     context.CommandLineOptions["CompilerProgramDatabaseFile"] = @"/Fd""%2.pdb""";
                 else if (!string.IsNullOrEmpty(cmdLineOptionsCompilerProgramDatabaseFile))
-                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = $@"/Fd""{cmdLineOptionsCompilerProgramDatabaseFile}.pdb""";
+                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = $@"/Fd""{cmdLineOptionsCompilerProgramDatabaseFile}""";
                 else
                     context.CommandLineOptions["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
 
