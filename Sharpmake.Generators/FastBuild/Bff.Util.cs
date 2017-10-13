@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Sharpmake.Generators.FastBuild
 {
@@ -220,5 +221,136 @@ namespace Sharpmake.Generators.FastBuild
         {
             return platforms.Any(platform => platformFlags.HasFlag(platform));
         }
+
+        public static bool IsSupportedFastBuildPlatform(this Platform platform)
+        {
+            return PlatformRegistry.Has<IPlatformBff>(platform);
+        }
+
+        public static string GetFastBuildCopyAlias(string sourceFileName, string destinationFolder)
+        {
+            string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetHashCode().ToString("X8"));
+            return fastBuildCopyAlias;
+        }
+
+        public static string GetBffFileCopyPattern(string copyPattern)
+        {
+            if (string.IsNullOrEmpty(copyPattern))
+                return copyPattern;
+
+            string[] patterns = copyPattern.Split(null);
+
+            if (patterns == null || patterns.Length < 2)
+                return "'" + copyPattern + "'";
+
+            return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
+        }
+
+        public static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true)
+        {
+            var dependencies = new UniqueList<Project.Configuration>();
+            GetOrderedFlattenedProjectDependenciesInternal(conf, dependencies, allDependencies);
+            return dependencies;
+        }
+
+        private static void GetOrderedFlattenedProjectDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies, bool allDependencies)
+        {
+            if (conf.IsFastBuild)
+            {
+                IEnumerable<Project.Configuration> confDependencies = allDependencies ? conf.ResolvedDependencies : conf.ConfigurationDependencies;
+
+                if (confDependencies.Contains(conf))
+                    throw new Error("Cyclic dependency detected in project " + conf);
+
+                if (!allDependencies)
+                {
+                    UniqueList<Project.Configuration> tmpDeps = new UniqueList<Project.Configuration>();
+                    foreach (var dep in confDependencies)
+                    {
+                        GetOrderedFlattenedProjectDependenciesInternal(dep, tmpDeps, true);
+                        tmpDeps.Add(dep);
+                    }
+                    foreach (var dep in tmpDeps)
+                    {
+                        if (dep.IsFastBuild && confDependencies.Contains(dep) && (conf != dep))
+                            dependencies.Add(dep);
+                    }
+                }
+                else
+                {
+                    foreach (var dep in confDependencies)
+                    {
+                        if (dependencies.Contains(dep))
+                            continue;
+
+                        GetOrderedFlattenedProjectDependenciesInternal(dep, dependencies, true);
+                        if (dep.IsFastBuild)
+                            dependencies.Add(dep);
+                    }
+                }
+            }
+        }
+
+        public static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null)
+        {
+            // Select items.
+            List<string> items = new List<string>(collection.Count);
+
+            foreach (string collectionItem in collection.SortedValues)
+            {
+                if (includedExtensions == null)
+                {
+                    items.Add(collectionItem);
+                }
+                else
+                {
+                    string extension = Path.GetExtension(collectionItem);
+                    if (includedExtensions.Contains(extension))
+                    {
+                        items.Add(collectionItem);
+                    }
+                }
+            }
+
+            return FBuildFormatList(items, spaceLength);
+        }
+
+        public static string FBuildFormatList(List<string> items, int spaceLength)
+        {
+            if (items.Count == 0)
+                return FileGeneratorUtilities.RemoveLineTag;
+
+            StringBuilder strBuilder = new StringBuilder(1024 * 16);
+
+            //
+            // Write all selected items.
+            //
+
+            if (items.Count == 1)
+            {
+                strBuilder.AppendFormat("'{0}'", items.First());
+            }
+            else
+            {
+                string indent = new string(' ', spaceLength);
+
+                strBuilder.Append("{");
+                strBuilder.AppendLine();
+
+                int itemIndex = 0;
+                foreach (string item in items)
+                {
+                    strBuilder.AppendFormat("{0}    '{1}'", indent, item);
+                    if (++itemIndex < items.Count)
+                        strBuilder.AppendLine(",");
+                    else
+                        strBuilder.AppendLine();
+                }
+                strBuilder.AppendFormat("{0}}}", indent);
+            }
+
+            return strBuilder.ToString();
+        }
+
     }
 }

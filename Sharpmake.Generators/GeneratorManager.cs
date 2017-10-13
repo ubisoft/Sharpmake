@@ -41,6 +41,9 @@ namespace Sharpmake.Generators
         private Bff _bffGenerator = null;
         public Bff BffGenerator => _bffGenerator ?? (_bffGenerator = new Bff());
 
+        private MasterBff _masterBffGenerator = null;
+        public MasterBff MasterBffGenerator => _masterBffGenerator ?? (_masterBffGenerator = new MasterBff());
+
         // singleton 
         private XCWorkspace _xcodeWorkspaceGenerator = null;
         public XCWorkspace XCWorkspaceGenerator => _xcodeWorkspaceGenerator ?? (_xcodeWorkspaceGenerator = new XCWorkspace());
@@ -163,7 +166,7 @@ namespace Sharpmake.Generators
 
                             if (hasFastBuildConfig)
                             {
-                                BffGenerator.GenerateMasterBff(
+                                MasterBffGenerator.GenerateMasterBff(
                                     builder,
                                     solution,
                                     configurations,

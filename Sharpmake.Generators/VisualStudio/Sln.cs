@@ -317,7 +317,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 string fastBuildSolutionFolderName = "FastBuildMasterBff"; // TODO: make this configurable
                 string fastBuildMasterBffPath = solutionFile + FastBuildSettings.FastBuildConfigFileExtension; // TODO: make a better method
-                string fastBuildGlobalSettingsPath = FastBuild.Bff.GetGlobalBffConfigFileName(fastBuildMasterBffPath);
+                string fastBuildGlobalSettingsPath = FastBuild.MasterBff.GetGlobalBffConfigFileName(fastBuildMasterBffPath);
 
                 using (fileGenerator.Declare("folderName", fastBuildSolutionFolderName))
                 using (fileGenerator.Declare("folderGuid", Util.BuildGuid(fastBuildSolutionFolderName)))
