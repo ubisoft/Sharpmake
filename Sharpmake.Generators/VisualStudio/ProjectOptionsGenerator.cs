@@ -2051,12 +2051,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
-                var toolsetVersion = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration);
-                context.Options["GenerateDebugInformation"] = isFastLink ? "DebugFastLink" :
-                    (
-                        toolsetVersion == Options.Vc.General.PlatformToolset.v140 &&
-                        !PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang
-                    ) ? "Debug" : "true";
+                context.Options["GenerateDebugInformation"] = isFastLink ? "DebugFastLink" : "true";
 
                 context.SelectOption
                 (
@@ -2113,11 +2108,7 @@ namespace Sharpmake.Generators.VisualStudio
             }),
             Options.Option(Options.Vc.Linker.GenerateDebugInformation.Disable, () =>
             {
-                context.Options["GenerateDebugInformation"] =
-                (
-                    context.DevelopmentEnvironment >= DevEnv.vs2015 &&
-                    context.Configuration.Platform.IsUsingClang()
-                ) ? "No" : "false";
+                context.Options["GenerateDebugInformation"] = "false";
                 context.Options["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["LinkerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["FullProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
