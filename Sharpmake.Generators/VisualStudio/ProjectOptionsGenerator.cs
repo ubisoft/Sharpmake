@@ -257,7 +257,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.WholeProgramOptimization.Update, () => { context.Options["WholeProgramOptimization"] = "PGUpdate"; context.Options["CompilerWholeProgramOptimization"] = "true"; context.CommandLineOptions["CompilerWholeProgramOptimization"] = "/GL"; })
             );
 
-            optionsContext.PlatformVcxproj.SelectApplcationFormatOptions(context);
+            optionsContext.PlatformVcxproj.SelectApplicationFormatOptions(context);
             optionsContext.PlatformVcxproj.SelectBuildType(context);
 
             context.Options["ExecutablePath"] = FileGeneratorUtilities.RemoveLineTag;

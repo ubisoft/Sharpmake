@@ -52,7 +52,7 @@ namespace Sharpmake.Generators.VisualStudio
         void SetupPlatformTargetOptions(IGenerationContext context);
         void SelectCompilerOptions(IGenerationContext context);
         void SelectLinkerOptions(IGenerationContext context);
-        void SelectApplcationFormatOptions(IGenerationContext context);
+        void SelectApplicationFormatOptions(IGenerationContext context);
         void SelectBuildType(IGenerationContext context);
 
         void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);

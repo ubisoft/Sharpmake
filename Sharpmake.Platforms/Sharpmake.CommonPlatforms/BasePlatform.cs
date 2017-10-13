@@ -165,7 +165,7 @@ namespace Sharpmake
         {
         }
 
-        public virtual void SelectApplcationFormatOptions(IGenerationContext context)
+        public virtual void SelectApplicationFormatOptions(IGenerationContext context)
         {
         }
 
