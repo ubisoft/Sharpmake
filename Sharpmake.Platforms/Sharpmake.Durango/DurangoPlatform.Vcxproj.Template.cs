@@ -167,7 +167,6 @@ namespace Sharpmake
     <PreBuildEventUseInBuild>[options.PreBuildEventEnable]</PreBuildEventUseInBuild>
     <PreLinkEventUseInBuild>[options.PreLinkEventEnable]</PreLinkEventUseInBuild>
     <LinkIncremental>[options.LinkIncremental]</LinkIncremental>
-    <ImageXexOutput>[options.ImageXexOutput]</ImageXexOutput>
     <OutputFile>[options.OutputFile]</OutputFile>
     <IncludePath>[options.IncludePath]</IncludePath>
     <ReferencePath>[options.ReferencePath]</ReferencePath>

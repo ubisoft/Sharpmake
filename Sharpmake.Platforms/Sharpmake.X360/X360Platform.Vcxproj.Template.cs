@@ -163,6 +163,33 @@ namespace Sharpmake
       <OutputFile>[options.OutputFile]</OutputFile>
     </Lib>
 ";
+
+            private const string _projectConfigurationsGeneral2 =
+                @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <TargetName>[options.OutputFileName]</TargetName>
+    <OutDir>[options.OutputDirectory]\</OutDir>
+    <IntDir>[options.IntermediateDirectory]\</IntDir>
+    <TargetExt>[options.OutputFileExtension]</TargetExt>
+    <GenerateManifest>[options.GenerateManifest]</GenerateManifest>
+    <PostBuildEventUseInBuild>[options.PostBuildEventEnable]</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>[options.PreBuildEventEnable]</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>[options.PreLinkEventEnable]</PreLinkEventUseInBuild>
+    <LinkIncremental>[options.LinkIncremental]</LinkIncremental>
+    <ImageXexOutput>[options.ImageXexOutput]</ImageXexOutput>
+    <OutputFile>[options.OutputFile]</OutputFile>
+    <EmbedManifest>[options.EmbedManifest]</EmbedManifest>
+    <IgnoreImportLibrary>[options.IgnoreImportLibrary]</IgnoreImportLibrary>
+    <RunCodeAnalysis>[options.RunCodeAnalysis]</RunCodeAnalysis>
+    <RemoteRoot>[options.X360RemotePath]</RemoteRoot>
+    <CustomBuildBeforeTargets>[options.CustomBuildStepBeforeTargets]</CustomBuildBeforeTargets>
+    <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
+    <ExecutablePath>[options.ExecutablePath]</ExecutablePath>
+    <IncludePath>[options.IncludePath]</IncludePath>
+    <LibraryPath>[options.LibraryPath]</LibraryPath>
+    <ExcludePath>[options.ExcludePath]</ExcludePath>
+    <DisableFastUpToDateCheck>[options.DisableFastUpToDateCheck]</DisableFastUpToDateCheck>
+  </PropertyGroup>
+";
         }
     }
 }

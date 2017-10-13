@@ -120,18 +120,19 @@ namespace Sharpmake
                 context.Options["ImageXexOutput"] = "$(OutDir)$(TargetName).xex";
 
                 Options.Linker.RemotePath remotePath = Sharpmake.Options.GetObject<Options.Linker.RemotePath>(context.Configuration);
-                if (remotePath != null)
-                    context.Options["X360RemotePath"] = remotePath.Value;
+                context.Options["X360RemotePath"] = remotePath != null ? remotePath.Value : FileGeneratorUtilities.RemoveLineTag;
 
                 Options.Linker.AdditionalDeploymentFolders additionalDeploymentFolders = Sharpmake.Options.GetObject<Options.Linker.AdditionalDeploymentFolders>(context.Configuration);
                 if (additionalDeploymentFolders != null)
                     context.Options["AdditionalDeploymentFolders"] = additionalDeploymentFolders.Value;
 
                 Options.Linker.LayoutFile layoutFilepath = Sharpmake.Options.GetObject<Options.Linker.LayoutFile>(context.Configuration);
-                if (layoutFilepath != null)
-                    context.Options["X360LayoutFile"] = layoutFilepath.Value;
-                else
-                    context.Options["X360LayoutFile"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["X360LayoutFile"] = layoutFilepath != null ? layoutFilepath.Value : FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            public override void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator)
+            {
+                generator.Write(_projectConfigurationsGeneral2);
             }
 
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
