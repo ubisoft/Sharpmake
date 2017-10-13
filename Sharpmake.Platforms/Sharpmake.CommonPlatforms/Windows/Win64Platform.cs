@@ -24,6 +24,7 @@ namespace Sharpmake
     {
         [PlatformImplementation(Platform.win64,
             typeof(IPlatformDescriptor),
+            typeof(Project.Configuration.IConfigurationTasks),
             typeof(IFastBuildCompilerSettings),
             typeof(IWindowsFastBuildCompilerSettings),
             typeof(IPlatformBff),

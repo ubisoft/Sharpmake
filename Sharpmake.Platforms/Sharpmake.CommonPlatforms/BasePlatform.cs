@@ -103,11 +103,6 @@ namespace Sharpmake
             yield break;
         }
 
-        public virtual IEnumerable<string> GetPlatformLibraryPaths(IGenerationContext context)
-        {
-            yield break;
-        }
-
         public virtual IEnumerable<string> GetLibraryFiles(IGenerationContext context)
         {
             yield break;

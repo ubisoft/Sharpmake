@@ -69,6 +69,11 @@ namespace Sharpmake
                     return outputType.ToString().ToLower();
             }
         }
+
+        public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+        {
+            yield break;
+        }
         #endregion
 
         #region IPlatformBff implementation

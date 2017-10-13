@@ -99,6 +99,7 @@ namespace Sharpmake
             {
                 void SetupLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
                 string GetDefaultOutputExtension(OutputType outputType);
+                IEnumerable<string> GetPlatformLibraryPaths(Configuration configuration);
             }
 
             private static int s_count = 0;

@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System.Collections.Generic;
 using Sharpmake.Generators;
 using Sharpmake.Generators.VisualStudio;
 
@@ -49,6 +51,11 @@ namespace Sharpmake
             public void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
                 DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+            }
+
+            public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            {
+                yield break;
             }
             #endregion
 
