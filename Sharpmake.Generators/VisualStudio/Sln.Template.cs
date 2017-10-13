@@ -55,6 +55,14 @@ namespace Sharpmake.Generators.VisualStudio
 @"		{[projectDependencyGuid]} = {[projectDependencyGuid]}
 ";
 
+                public static string SolutionItemBegin =
+@"	ProjectSection(SolutionItems) = preProject
+";
+
+                public static string SolutionItem =
+@"		[solutionItemPath] = [solutionItemPath]
+";
+
                 public static string ProjectSectionEnd =
 @"	EndProjectSection
 ";
@@ -65,7 +73,6 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectFolder =
 @"Project(""{2150E333-8FDC-42A3-9474-1A3956D46DE8}"") = ""[folderName]"", ""[folderName]"", ""{[folderGuid]}""
-EndProject
 ";
 
                 public static string HeaderEnd =
