@@ -1314,6 +1314,20 @@ namespace Sharpmake
             foreach (Project.Configuration conf in Configurations)
             {
                 conf.SetDefaultOutputExtension();
+
+                if (conf.IsFastBuild && SourceFilesFiltersRegex.Count > 0)
+                {
+                    if (conf.FastBuildBlobbed)
+                    {
+                        if (conf.FastBuildBlobbingStrategy != Configuration.InputFileStrategy.Include)
+                            throw new Error("conf.FastBuildBlobbingStrategy must be set to Configuration.InputFileStrategy.Include when SourceFilesFiltersRegex is not empty. Config:" + conf);
+                    }
+                    else
+                    {
+                        if (conf.FastBuildNoBlobStrategy != Configuration.InputFileStrategy.Include)
+                            throw new Error("conf.FastBuildNoBlobStrategy must be set to Configuration.InputFileStrategy.Include when SourceFilesFiltersRegex is not empty. Config:" + conf);
+                    }
+                }
             }
         }
 
