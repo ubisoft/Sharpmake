@@ -59,6 +59,7 @@
     <Compile Include="FastBuild\IClangPlatformBff.cs" />
     <Compile Include="FastBuild\IMicrosoftPlatformBff.cs" />
     <Compile Include="FastBuild\IPlatformBff.cs" />
+    <Compile Include="FastBuild\MasterBff.cs" />
     <Compile Include="FileGenerator.cs" />
     <Compile Include="FileGeneratorUtilities.cs" />
     <Compile Include="GeneratorManager.cs" />
