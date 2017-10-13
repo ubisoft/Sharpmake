@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System.Collections.Generic;
+using System.Linq;
 using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.Generic;
@@ -138,7 +139,14 @@ namespace Sharpmake.Generators
                 {
                     case DevEnv.make:
                         {
-                            MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            MakefileGenerator.Generate(
+                                builder,
+                                solution,
+                                configurations,
+                                solutionFile,
+                                generatedFiles,
+                                skipFiles
+                            );
                         }
                         break;
                     case DevEnv.vs2010:
@@ -147,7 +155,33 @@ namespace Sharpmake.Generators
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                         {
-                            SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            bool hasFastBuildConfig = configurations.Any(
+                                x => x.IncludedProjectInfos.Any(
+                                    y => y.Configuration.IsFastBuild
+                                )
+                            );
+
+                            if (hasFastBuildConfig)
+                            {
+                                BffGenerator.GenerateMasterBff(
+                                    builder,
+                                    solution,
+                                    configurations,
+                                    solutionFile,
+                                    generatedFiles,
+                                    skipFiles
+                                );
+                            }
+
+                            SlnGenerator.Generate(
+                                builder,
+                                solution,
+                                configurations,
+                                solutionFile,
+                                hasFastBuildConfig && FastBuildSettings.IncludeBFFInProjects,
+                                generatedFiles,
+                                skipFiles
+                            );
                         }
                         break;
                     default:

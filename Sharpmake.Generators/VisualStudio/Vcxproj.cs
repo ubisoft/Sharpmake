@@ -428,23 +428,16 @@ namespace Sharpmake.Generators.VisualStudio
                             fastBuildCommandLineOptions += " -fastcancel";
 
                         if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
-                        {
-                            fastBuildCommandLineOptions += " ";
-                            fastBuildCommandLineOptions += conf.FastBuildCustomArgs;
-                        }
-                        string masterBffPath = Bff.GetMasterBffPath(conf);
-                        string masterBffFullName = Bff.GetMasterBffFileName(conf);
-                        string relativeMasterBffFile = Util.PathGetRelative(masterBffPath, masterBffFullName, true);
-                        string relativeMasterBffPath = Util.PathGetRelative(context.ProjectDirectory, masterBffPath, true);
-                        if (relativeMasterBffFile != "fbuild.bff")
-                            fastBuildCommandLineOptions += " -config " + relativeMasterBffFile;
+                            fastBuildCommandLineOptions += " " + conf.FastBuildCustomArgs;
 
                         fastBuildCommandLineOptions += FastBuildCustomArguments;
 
-                        // Make the commandline written in the bff available.
+                        // Make the commandline written in the bff available, except the master bff -config
                         Bff.SetCommandLineArguments(conf, fastBuildCommandLineOptions);
 
-                        using (fileGenerator.Declare("relativeMasterBffPath", relativeMasterBffPath))
+                        fastBuildCommandLineOptions += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
+
+                        using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
                         using (fileGenerator.Declare("fastBuildMakeCommandBuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, fastBuildCommandLineOptions)))
                         using (fileGenerator.Declare("fastBuildMakeCommandRebuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, fastBuildCommandLineOptions)))
                         {
@@ -512,8 +505,8 @@ namespace Sharpmake.Generators.VisualStudio
             // TODO: make a better check
             if (hasNonFastBuildConfig)
                 GenerateFilesSection(context, fileGenerator, generatedFiles, skipFiles);
-            else
-                GenerateBffFilesSection(context, fileGenerator, generatedFiles, skipFiles, false);
+            else if(hasFastBuildConfig)
+                GenerateBffFilesSection(context, fileGenerator);
 
             // Import platform makefiles.
             foreach (var platform in context.PresentPlatforms.Values)
@@ -860,26 +853,17 @@ namespace Sharpmake.Generators.VisualStudio
                 platforms.GeneratePlatformReferences(context, fileGenerator);
         }
 
-        private void GenerateBffFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator, IList<string> generatedFiles, IList<string> skipFiles, bool lookIfHasAnyFastBuild)
+        private void GenerateBffFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
         {
             // Add FastBuild bff file to Project
-            var firstConf = context.ProjectConfigurations.First();
-            if (firstConf.IsFastBuild && FastBuildSettings.IncludeBFFInProjects)
+            if (FastBuildSettings.IncludeBFFInProjects)
             {
                 string fastBuildFile = Bff.GetBffFileName(".", context.Configuration.BffFileName);
                 fastBuildFile = Util.SimplifyPath(fastBuildFile);
 
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                using (fileGenerator.Declare("fastBuildFile", fastBuildFile))
-                    fileGenerator.Write(Template.Project.ProjectFilesFastBuildFile);
-
-                if (firstConf.IsMainProject) // add the master bff file to the main project of the solution
                 {
-                    string masterBffFileName = Bff.GetMasterBffFileName(firstConf);
-                    using (fileGenerator.Declare("fastBuildFile", masterBffFileName))
-                        fileGenerator.Write(Template.Project.ProjectFilesFastBuildFile);
-
-                    using (fileGenerator.Declare("fastBuildFile", Bff.GetGlobalBffConfigFileName(masterBffFileName)))
+                    using (fileGenerator.Declare("fastBuildFile", fastBuildFile))
                         fileGenerator.Write(Template.Project.ProjectFilesFastBuildFile);
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
@@ -1494,10 +1478,8 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
 
             // for the configuration that are fastbuild but external and requires to add the bff files
-            bool lookIfHasAnyFastBuild = false;
-            if (context.ProjectConfigurations.First().IsMainProject) // main project might mix fastbuild and non-fastbuild
-                lookIfHasAnyFastBuild = context.ProjectConfigurations.Any(x => x.IsFastBuild);
-            GenerateBffFilesSection(context, fileGenerator, generatedFiles, skipFiles, lookIfHasAnyFastBuild);
+            if(context.ProjectConfigurations.Any(x => x.IsFastBuild))
+                GenerateBffFilesSection(context, fileGenerator);
 
             var allFileLists = new List<Tuple<string, List<ProjectFile>>>();
             allFileLists.Add(new Tuple<string, List<ProjectFile>>(hasCustomBuildForAllSources ? "CustomBuild" : "ClCompile", sourceFiles));

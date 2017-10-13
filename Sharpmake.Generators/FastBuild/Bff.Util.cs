@@ -101,11 +101,18 @@ namespace Sharpmake.Generators.FastBuild
             {
                 Project project = conf.Project;
                 string fastBuildShortProjectName = Bff.GetShortProjectName(project, conf);
-                string fastBuildExecutable = Bff.GetFastBuildExecutableRelativeToMasterBffPath(conf);
+
+                string makePath = FastBuildSettings.FastBuildMakeCommand;
+                if (!Path.IsPathRooted(FastBuildSettings.FastBuildMakeCommand))
+                    makePath = conf.Project.RootPath + Path.DirectorySeparatorChar + FastBuildSettings.FastBuildMakeCommand;
+                makePath = Util.SimplifyPath(makePath);
+
+                string fastBuildExecutable = Util.PathGetRelative(conf.ProjectPath, makePath, true);
 
                 string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
 
-                return $"{fastBuildExecutable}{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
+                // $(ProjectDir) has a trailing slash
+                return $@"$(ProjectDir){fastBuildExecutable}{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
             }
         }
 
@@ -195,6 +202,15 @@ namespace Sharpmake.Generators.FastBuild
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
                 }
             }
+        }
+
+        public static string CurrentBffPathKeyCombine(string relativePath)
+        {
+            string simplified = Util.SimplifyPath(relativePath);
+            if (simplified == ".")
+                return Bff.CurrentBffPathKey;
+
+            return Path.Combine(Bff.CurrentBffPathKey, relativePath);
         }
     }
 

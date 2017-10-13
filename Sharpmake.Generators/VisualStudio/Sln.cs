@@ -95,6 +95,7 @@ namespace Sharpmake.Generators.VisualStudio
             Solution solution,
             List<Solution.Configuration> configurations,
             string solutionFile,
+            bool addMasterBff,
             List<string> generatedFiles,
             List<string> skipFiles
         )
@@ -106,7 +107,7 @@ namespace Sharpmake.Generators.VisualStudio
             string solutionFileName = fileInfo.Name;
 
             bool updated;
-            string solutionFileResult = Generate(solution, configurations, solutionPath, solutionFileName, out updated);
+            string solutionFileResult = Generate(solution, configurations, solutionPath, solutionFileName, addMasterBff, out updated);
             if (updated)
                 generatedFiles.Add(solutionFileResult);
             else
@@ -239,6 +240,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<Solution.Configuration> solutionConfigurations,
             string solutionPath,
             string solutionFile,
+            bool addMasterBff,
             out bool updated
         )
         {
@@ -289,6 +291,7 @@ namespace Sharpmake.Generators.VisualStudio
                 using (fileGenerator.Declare("folderGuid", folder.Guid.ToString().ToUpper()))
                 {
                     fileGenerator.Write(Template.Solution.ProjectFolder);
+                    fileGenerator.Write(Template.Solution.ProjectEnd);
                 }
             }
 
@@ -307,6 +310,28 @@ namespace Sharpmake.Generators.VisualStudio
                         fileGenerator.Write(Template.Solution.ProjectBegin);
                         fileGenerator.Write(Template.Solution.ProjectEnd);
                     }
+                }
+            }
+
+            if (addMasterBff)
+            {
+                string fastBuildSolutionFolderName = "FastBuildMasterBff"; // TODO: make this configurable
+                string fastBuildMasterBffPath = solutionFile + FastBuildSettings.FastBuildConfigFileExtension; // TODO: make a better method
+                string fastBuildGlobalSettingsPath = FastBuild.Bff.GetGlobalBffConfigFileName(fastBuildMasterBffPath);
+
+                using (fileGenerator.Declare("folderName", fastBuildSolutionFolderName))
+                using (fileGenerator.Declare("folderGuid", Util.BuildGuid(fastBuildSolutionFolderName)))
+                {
+                    fileGenerator.Write(Template.Solution.ProjectFolder);
+                    {
+                        fileGenerator.Write(Template.Solution.SolutionItemBegin);
+                        using (fileGenerator.Declare("solutionItemPath", fastBuildMasterBffPath))
+                            fileGenerator.Write(Template.Solution.SolutionItem);
+                        using (fileGenerator.Declare("solutionItemPath", fastBuildGlobalSettingsPath))
+                            fileGenerator.Write(Template.Solution.SolutionItem);
+                        fileGenerator.Write(Template.Solution.ProjectSectionEnd);
+                    }
+                    fileGenerator.Write(Template.Solution.ProjectEnd);
                 }
             }
 

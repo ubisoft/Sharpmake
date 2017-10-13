@@ -35,7 +35,6 @@ namespace Sharpmake.Generators.VisualStudio
             public string PlatformLibraryExtension { get; }
             public string PlatformOutputLibraryExtension { get; }
             public string PlatformPrefixExtension { get; }
-            public string BaseProjectPath { get; }
             public IPlatformDescriptor PlatformDescriptor { get; }
             public IPlatformVcxproj PlatformVcxproj { get; }
 
@@ -55,8 +54,6 @@ namespace Sharpmake.Generators.VisualStudio
                 PlatformLibraryExtension = platformLibraryExtension;
                 PlatformOutputLibraryExtension = platformOutputLibraryExtension;
                 PlatformPrefixExtension = platformPrefixExtension;
-
-                BaseProjectPath = Bff.GetMasterBffPath(conf);
             }
         }
 
@@ -132,7 +129,7 @@ namespace Sharpmake.Generators.VisualStudio
             //IntermediateDirectory
             optionsContext.IntermediateDirectoryRelative = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.IntermediatePath);
             context.Options["IntermediateDirectory"] = optionsContext.IntermediateDirectoryRelative;
-            context.CommandLineOptions["IntermediateDirectory"] = Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.IntermediateDirectoryRelative, optionsContext.BaseProjectPath, true, context.Project.RootPath);
+            context.CommandLineOptions["IntermediateDirectory"] = Bff.CurrentBffPathKeyCombine(optionsContext.IntermediateDirectoryRelative);
 
             optionsContext.TargetName = context.Configuration.TargetFileFullName;
             context.Options["LayoutDir"] = !string.IsNullOrEmpty(context.Configuration.LayoutDir) ? context.Configuration.LayoutDir : FileGeneratorUtilities.RemoveLineTag;
@@ -846,7 +843,7 @@ namespace Sharpmake.Generators.VisualStudio
             // otherwise it's probably a system include for which we keep the full path
             string resolvedInclude = optionsContext.Resolver.Resolve(include);
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
-                resolvedInclude = Util.PathGetRelative(optionsContext.BaseProjectPath, resolvedInclude, true);
+                resolvedInclude = Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
             return $@"{prefix}""{resolvedInclude}""";
         }
 
@@ -1008,7 +1005,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string outputFolder = string.IsNullOrEmpty(context.Configuration.PrecompHeaderOutputFolder) ? optionsContext.IntermediateDirectoryRelative : Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PrecompHeaderOutputFolder);
                 context.Options["PrecompiledHeaderFile"] = outputFolder + Util.WindowsSeparator + context.Configuration.Project.Name + ".pch";
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = context.Options["PrecompiledHeaderThrough"];
-                context.CommandLineOptions["PrecompiledHeaderFile"] = Util.GetConvertedRelativePath(context.ProjectDirectory, context.Options["PrecompiledHeaderFile"], optionsContext.BaseProjectPath, true, context.Project.RootPath);
+                context.CommandLineOptions["PrecompiledHeaderFile"] = Bff.CurrentBffPathKeyCombine(context.Options["PrecompiledHeaderFile"]);
 
                 if (!optionsContext.PlatformDescriptor.HasPrecompiledHeaderSupport)
                     throw new Error("Precompiled header not supported for spu configuration: {0}", context.Configuration);
@@ -1037,8 +1034,9 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + outputFileName + "." + outputExtension;
                     if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
                     {
-                        context.Options["ImportLibrary"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".lib";
-                        context.CommandLineOptions["ImportLibrary"] = "/IMPLIB:" + Util.GetConvertedRelativePath(context.ProjectDirectory, context.Options["ImportLibrary"], optionsContext.BaseProjectPath, true, context.Project.RootPath);
+                        string importLibRelative = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".lib";
+                        context.Options["ImportLibrary"] = importLibRelative;
+                        context.CommandLineOptions["ImportLibrary"] = "/IMPLIB:" + Bff.CurrentBffPathKeyCombine(importLibRelative);
                     }
                     break;
                 case Project.Configuration.OutputType.Lib:
@@ -1235,7 +1233,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 var filePath = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.ModuleDefinitionFile);
                 context.Options["ModuleDefinitionFile"] = filePath;
-                context.CommandLineOptions["ModuleDefinitionFile"] = "/DEF:" + Util.GetConvertedRelativePath(context.ProjectDirectory, context.Configuration.ModuleDefinitionFile, optionsContext.BaseProjectPath, true, context.Project.RootPath);
+                context.CommandLineOptions["ModuleDefinitionFile"] = "/DEF:" + Bff.CurrentBffPathKeyCombine(filePath);
             }
             else
             {
@@ -1435,7 +1433,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.CommandLineOptions["GenerateWindowsMetadata"] = "/WINMD";
 
                 // TODO: fix this! the $ variables above will never be resolved by fastbuild
-                context.CommandLineOptions["WindowsMetadataFile"] = @"/WINMDFILE:""" + Util.GetConvertedRelativePath(context.ProjectDirectory, windowsMetadataFile, optionsContext.BaseProjectPath, true, context.Project.RootPath) + @"""";
+                context.CommandLineOptions["WindowsMetadataFile"] = @"/WINMDFILE:""" + Bff.CurrentBffPathKeyCombine(windowsMetadataFile) + @"""";
             }),
             Options.Option(Options.Vc.Linker.GenerateWindowsMetadata.Disable, () =>
             {
@@ -1537,8 +1535,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (context.Configuration.AdditionalManifestFiles.Count > 0)
             {
                 context.Options["AdditionalManifestFiles"] = string.Join(";", Util.PathGetRelative(context.ProjectDirectory, context.Configuration.AdditionalManifestFiles));
-                foreach (string additionalManifestFile in context.Configuration.AdditionalManifestFiles)
-                    manifestInputs.Add(Util.GetConvertedRelativePath(context.ProjectDirectory, additionalManifestFile, optionsContext.BaseProjectPath, true, context.Project.RootPath));
+                manifestInputs.AddRange(context.Configuration.AdditionalManifestFiles);
             }
             else
                 context.Options["AdditionalManifestFiles"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1738,8 +1735,8 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void IntermediateCopyStep(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, Project.Configuration.BuildStepCopy customEvent, Vcxproj.BuildStep buildStep, bool isDirectory = false)
         {
-            customEvent.DestinationPath = Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(customEvent.DestinationPath), optionsContext.BaseProjectPath, true);
-            customEvent.SourcePath = Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(customEvent.SourcePath), optionsContext.BaseProjectPath, true);
+            customEvent.DestinationPath = Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.DestinationPath)));
+            customEvent.SourcePath = Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.SourcePath)));
 
             var newCustomEvent = new Project.Configuration.BuildStepCopy(customEvent);
 
@@ -1755,11 +1752,12 @@ namespace Sharpmake.Generators.VisualStudio
             var customEvent = (Project.Configuration.BuildStepExecutable)executableBuildStep;
 
             var newCustomEvent = new Project.Configuration.BuildStepExecutable(
-                Util.SimplifyPath(Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(customEvent.ExecutableFile), optionsContext.BaseProjectPath, true)),
-                Util.SimplifyPath(Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(customEvent.ExecutableInputFileArgumentOption), optionsContext.BaseProjectPath, true)),
-                Util.SimplifyPath(Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(customEvent.ExecutableOutputFileArgumentOption), optionsContext.BaseProjectPath, true)),
+                Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableFile))),
+                Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableInputFileArgumentOption))),
+                Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableOutputFileArgumentOption))),
                 optionsContext.Resolver.Resolve(customEvent.ExecutableOtherArguments),
-                customEvent.ExecutableWorkingDirectory == String.Empty ? FileGeneratorUtilities.RemoveLineTag : Util.GetConvertedRelativePath(context.ProjectDirectory, optionsContext.Resolver.Resolve(customEvent.ExecutableWorkingDirectory), optionsContext.BaseProjectPath, true));
+                customEvent.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableWorkingDirectory)))
+            );
 
             newCustomEvent.FastBuildUseStdOutAsOutput = customEvent.FastBuildUseStdOutAsOutput;
 
@@ -1931,9 +1929,9 @@ namespace Sharpmake.Generators.VisualStudio
                         string dependencyPath = additionalDependency;
 
                         // if the path to this dependency was converted
-                        // convert it again to make it relative to the master bff
+                        // convert it again to make it relative to the bff
                         if (convertedPaths.Contains(additionalDependency))
-                            dependencyPath = Util.GetConvertedRelativePath(context.ProjectDirectory, additionalDependency, optionsContext.BaseProjectPath, true, context.Project.RootPath);
+                            dependencyPath = Bff.CurrentBffPathKeyCombine(additionalDependency);
 
                         finalDependencies.Add(dependencyPath);
                     }
@@ -1978,7 +1976,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     string manifestFile = optionsContext.IntermediateDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + context.Configuration.ManifestFileSuffix;
                     context.Options["ManifestFile"] = manifestFile;
-                    context.CommandLineOptions["ManifestFile"] = @"/ManifestFile:""" + Util.GetConvertedRelativePath(context.ProjectDirectory, manifestFile, Bff.GetMasterBffPath(context.Configuration), true, context.Project.RootPath) + @"""";
+                    context.CommandLineOptions["ManifestFile"] = @"/ManifestFile:""" + Bff.CurrentBffPathKeyCombine(manifestFile) + @"""";
                 }
                 else
                 {
@@ -2028,10 +2026,8 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     optionsCompilerProgramDatabaseFile = Util.PathGetRelative(context.ProjectDirectory, optionsCompilerProgramDatabaseFile, true);
                     optionsLinkerProgramDatabaseFile = Util.PathGetRelative(context.ProjectDirectory, optionsLinkerProgramDatabaseFile, true);
-
-                    string masterBffPath = Bff.GetMasterBffPath(context.Configuration);
-                    cmdLineOptionsCompilerProgramDatabaseFile = Util.GetConvertedRelativePath(context.ProjectDirectory, cmdLineOptionsCompilerProgramDatabaseFile, masterBffPath, true, context.Project.RootPath);
-                    cmdLineOptionsLinkerProgramDatabaseFile = Util.GetConvertedRelativePath(context.ProjectDirectory, cmdLineOptionsLinkerProgramDatabaseFile, masterBffPath, true, context.Project.RootPath);
+                    cmdLineOptionsCompilerProgramDatabaseFile = Bff.CurrentBffPathKeyCombine(optionsCompilerProgramDatabaseFile);
+                    cmdLineOptionsLinkerProgramDatabaseFile = Bff.CurrentBffPathKeyCombine(optionsLinkerProgramDatabaseFile);
                 }
 
                 context.Options["CompilerProgramDatabaseFile"] = string.IsNullOrEmpty(optionsCompilerProgramDatabaseFile)
@@ -2087,15 +2083,15 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["GenerateMapFile"] = "true";
                 string mapFile = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".map";
                 context.Options["MapFileName"] = mapFile;
-                mapFile = Util.GetConvertedRelativePath(context.ProjectDirectory, mapFile, Bff.GetMasterBffPath(context.Configuration), true, context.Project.RootPath);
 
+                string mapFileBffRelative = Bff.CurrentBffPathKeyCombine(mapFile);
                 if (PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
                 {
-                    context.CommandLineOptions["GenerateMapFile"] = @"-Wl,-Map=""" + mapFile + @"""";
+                    context.CommandLineOptions["GenerateMapFile"] = @"-Wl,-Map=""" + mapFileBffRelative + @"""";
                 }
                 else
                 {
-                    context.CommandLineOptions["GenerateMapFile"] = @"/MAP"":" + mapFile + @"""";
+                    context.CommandLineOptions["GenerateMapFile"] = @"/MAP"":" + mapFileBffRelative + @"""";
                 }
             };
 
