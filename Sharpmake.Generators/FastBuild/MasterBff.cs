@@ -157,8 +157,10 @@ namespace Sharpmake.Generators.FastBuild
 
                     foreach (var preEvent in conf.EventPreBuildExecute)
                     {
-                        if (preEvent.Value is Project.Configuration.BuildStepExecutable execCommand)
+                        if (preEvent.Value is Project.Configuration.BuildStepExecutable)
                         {
+                            var execCommand = preEvent.Value as Project.Configuration.BuildStepExecutable;
+
                             using (fileGenerator.Declare("fastBuildPreBuildName", preEvent.Key))
                             using (fileGenerator.Declare("fastBuildPrebuildExeFile", execCommand.ExecutableFile))
                             using (fileGenerator.Declare("fastBuildPreBuildInputFile", execCommand.ExecutableInputFileArgumentOption))
@@ -171,8 +173,10 @@ namespace Sharpmake.Generators.FastBuild
                                     bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
                             }
                         }
-                        else if (preEvent.Value is Project.Configuration.BuildStepCopy copyCommand)
+                        else if (preEvent.Value is Project.Configuration.BuildStepCopy)
                         {
+                            var copyCommand = preEvent.Value as Project.Configuration.BuildStepCopy;
+
                             using (fileGenerator.Declare("fastBuildCopyAlias", preEvent.Key))
                             using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
                             using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
