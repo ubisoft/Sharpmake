@@ -32,6 +32,7 @@ namespace SharpmakeGen
 
             conf.ReferencesByName.Add("System");
 
+            conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
         }
     }
