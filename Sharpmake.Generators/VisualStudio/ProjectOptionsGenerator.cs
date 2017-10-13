@@ -1981,6 +1981,8 @@ namespace Sharpmake.Generators.VisualStudio
                     context.CommandLineOptions["AdditionalDependencies"] = result.ToString();
                 }
             }
+
+            optionsContext.PlatformVcxproj.SelectPlatformAdditionalDependenciesOptions(context);
         }
 
         private static void SelectGenerateManifestOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)

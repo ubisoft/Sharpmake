@@ -165,6 +165,10 @@ namespace Sharpmake
         {
         }
 
+        public virtual void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
+        {
+        }
+
         public virtual void SelectApplicationFormatOptions(IGenerationContext context)
         {
         }
