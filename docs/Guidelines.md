@@ -196,7 +196,7 @@ If doing multiple Configure functions, it is strongly recommanded to avoid depen
 
 ### Dependency System
 
-The dependency system is offering tools to write things about a library a single time, making sure dependent projects get all the required preprocessor definitions, includes, etc.  It is suggested to use the dependency system to write things only once. 
+The dependency system is offering tools to write things about a library a single time, making sure dependent projects get all the required preprocessor definitions, includes, etc.  It is suggested to use the dependency system to write things only once.
 
 For example, while Sharpmake allows you to do the following:
 
