@@ -753,7 +753,10 @@ namespace Sharpmake
 
             // FastBuild configuration
             public bool IsFastBuild = false;
+
+            [Obsolete("Sharpmake will determine the projects to build.")]
             public bool IsMainProject = false;
+
             public bool FastBuildBlobbed = true;
             [Obsolete("Use FastBuildDistribution instead.")]
             public bool FastBuildDisableDistribution = false;

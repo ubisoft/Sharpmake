@@ -122,13 +122,14 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.OutputLibraryDirectoryRelative = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.TargetLibraryPath);
             if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
                 context.Options["OutputDirectory"] = optionsContext.OutputLibraryDirectoryRelative;
-            else
+            else if (context.Configuration.Output != Project.Configuration.OutputType.None)
                 context.Options["OutputDirectory"] = optionsContext.OutputDirectoryRelative;
-
+            else
+                context.Options["OutputDirectory"] = FileGeneratorUtilities.RemoveLineTag;
 
             //IntermediateDirectory
             optionsContext.IntermediateDirectoryRelative = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.IntermediatePath);
-            context.Options["IntermediateDirectory"] = optionsContext.IntermediateDirectoryRelative;
+            context.Options["IntermediateDirectory"] = context.Configuration.Output != Project.Configuration.OutputType.None ? optionsContext.IntermediateDirectoryRelative : FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["IntermediateDirectory"] = Bff.CurrentBffPathKeyCombine(optionsContext.IntermediateDirectoryRelative);
 
             optionsContext.TargetName = context.Configuration.TargetFileFullName;
@@ -180,6 +181,9 @@ namespace Sharpmake.Generators.VisualStudio
                     break;
                 case Project.Configuration.OutputType.Utility:
                     context.Options["ConfigurationType"] = "Utility";
+                    break;
+                case Project.Configuration.OutputType.None:
+                    context.Options["ConfigurationType"] = context.Configuration.IsFastBuild ? "Makefile" : FileGeneratorUtilities.RemoveLineTag;
                     break;
             }
         }
@@ -1043,10 +1047,10 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Options["OutputFile"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + outputFileName + "." + outputExtension;
                     break;
                 case Project.Configuration.OutputType.Utility:
+                case Project.Configuration.OutputType.None:
                     context.Options["OutputFile"] = FileGeneratorUtilities.RemoveLineTag;
                     context.Options["OutputFileExtension"] = FileGeneratorUtilities.RemoveLineTag;
-                    break;
-                case Project.Configuration.OutputType.None:
+                    context.Options["OutputFileName"] = FileGeneratorUtilities.RemoveLineTag;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

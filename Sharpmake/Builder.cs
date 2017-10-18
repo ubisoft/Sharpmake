@@ -488,6 +488,12 @@ namespace Sharpmake
             }
         }
 
+        internal void RegisterGeneratedProject(Project project)
+        {
+            lock (_generatedProjects)
+                _generatedProjects.Add(project);
+        }
+
         private static void LogObject(TextWriter writer, string prefix, object obj)
         {
             Type type = obj.GetType();
@@ -730,6 +736,9 @@ namespace Sharpmake
                 var projects = new List<Project>(_projects.Values);
                 var solutions = new List<Solution>(_solutions.Values);
 
+                // Append generated projects, if any
+                projects.AddRange(_generatedProjects);
+
                 // Pre event
                 EventPreGeneration?.Invoke(projects, solutions);
 
@@ -898,6 +907,8 @@ namespace Sharpmake
 
         internal Dictionary<Type, Project> _projects = new Dictionary<Type, Project>();
         internal Dictionary<Type, Solution> _solutions = new Dictionary<Type, Solution>();
+
+        private List<Project> _generatedProjects = new List<Project>();
 
         private bool _linked = false;
         private readonly Func<IGeneratorManager> _getGeneratorsManagerCallBack;
