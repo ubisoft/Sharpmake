@@ -298,8 +298,11 @@ namespace Sharpmake.Generators.FastBuild
                             var orderedProjectDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false);
                             foreach (var depProjConfig in orderedProjectDeps)
                             {
-                                Trace.Assert(depProjConfig.Project != project, "Sharpmake-FastBuild : Project dependencies refers to itself.");
-                                Trace.Assert(conf.ResolvedDependencies.Contains(depProjConfig));
+                                if (depProjConfig.Project == project)
+                                    throw new Error("Sharpmake-FastBuild : Project dependencies refers to itself.");
+                                if (!conf.ResolvedDependencies.Contains(depProjConfig))
+                                    throw new Error("Sharpmake-FastBuild : dependency was not resolved.");
+
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
@@ -412,9 +415,20 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
 
                             if (conf.Output == Project.Configuration.OutputType.Lib && useObjectLists)
+                            {
                                 fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_objects");
+                            }
+                            else if (conf.Output == Project.Configuration.OutputType.None && project is FastBuildAllProject)
+                            {
+                                // filter to only get the configurations of projects that were explicitely added, not the dependencies
+                                var minResolvedConf = conf.ResolvedPrivateDependencies.Where(x => conf.UnResolvedPrivateDependencies.ContainsKey(x.Project.GetType()));
+                                foreach (var dep in minResolvedConf)
+                                    fastBuildTargetSubTargets.Add(GetShortProjectName(dep.Project, dep));
+                            }
                             else
+                            {
                                 fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_" + outputType);
+                            }
 
                             foreach (var postEvent in conf.EventPostBuildExecute)
                             {
@@ -986,6 +1000,16 @@ namespace Sharpmake.Generators.FastBuild
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                         }
+                                    }
+                                }
+                                break;
+                            case Project.Configuration.OutputType.None:
+                                {
+                                    // Write Target Alias
+                                    using (resolver.NewScopedParameter("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
+                                    using (resolver.NewScopedParameter("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                    {
+                                        bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                     }
                                 }
                                 break;

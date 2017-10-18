@@ -1607,6 +1607,15 @@ namespace Sharpmake
         #endregion
     }
 
+    [Sharpmake.Generate]
+    internal class FastBuildAllProject : Project
+    {
+        public FastBuildAllProject(Type targetType)
+            : base(targetType)
+        {
+        }
+    }
+
     public class WebReferenceUrl
     {
         public string Name;
