@@ -25,9 +25,9 @@ only available for Windows. With .NET Core and .NET Standard though, it is
 our hope that it will eventually cross the platform barrier. In the
 meanwhile, you may have luck using it with Mono.
 
-Sharpmake was developped internally at Ubisoft for Assassin's Creed 3 in
-2011. After experimenting with the other existing tools, it became clear that
-none of these solutions was performant enough to generate the number of
+Sharpmake was developed internally at Ubisoft for Assassin's Creed 3 in 2011.
+After experimenting with the other existing tools, it became clear that none
+of these solutions were performant enough to generate the number of
 configurations needed (at least not in a trivial way) and that a custom
 generator was needed.
 
@@ -51,7 +51,7 @@ Sharpmake originally had support for game consoles, but Ubisoft pulled it out
 because those could not be open sourced. Sharpmake now has an extension system
 that allows support for these consoles to be added back at runtime.
 
-If you need support for these platforms and are an authorized developper, you
+If you need support for these platforms and are an authorized developer, you
 can contact the SDK provider to get platform extension for Sharpmake.
 
 
@@ -77,4 +77,4 @@ If you want to add support for an additional platform, please make sure that
 the platform is open and that you are not breaking your NDA. Ubisoft has not
 published platform support for most video game consoles for that exact reason.
 We will not accept merge requests for new platforms that are not completely
-open for developmemt.
+open for development.
