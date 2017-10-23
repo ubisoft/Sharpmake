@@ -2,11 +2,34 @@
 
 
 ## Introduction
-Sharpmake is a solution to generate Visual Studio project files for C++, C#,
-VSIX, as well as FastBuild bff files, and linux makefiles.
+Sharpmake is a generator for Visual Studio projects and solutions. It is
+similar to CMake and Premake, but it is designed for **speed** and
+**scale**. Sharpmake has been used at Ubisoft to generate several thousands
+of *vcxproj*, *csproj* and *sln* files in a matter of seconds, and each of
+these projects can support a large number of Visual Studio configurations as
+well.
 
-It is similar to Premake, but in C#. Originally developed on Assassin's Creed 3
-in 2011, Sharpmake is today used by most projects at Ubisoft.
+That makes Sharpmake ideal for the development of multi-platform games, where
+the number of platforms, the different levels of optimization, the multiple
+rendering APIs on PC and the level editor can quickly multiply the number of
+configurations a given code base must support. Sharpmake generates all those
+configurations at once, very quickly. Thus, it becomes trivial to generate
+and regenerate the entire project.
+
+Sharpmake uses C# for scripting, hence the name. That means that you can edit
+your scripts in Visual Studio (or Visual Studio Code) and have a complete
+IntelliSense programming experience.
+
+Sharpmake can also generate makefiles and Xcode projects, but it is currently
+only available for Windows. With .NET Core and .NET Standard though, it is
+our hope that it will eventually cross the platform barrier. In the
+meanwhile, you may have luck using it with Mono.
+
+Sharpmake was developped internally at Ubisoft for Assassin's Creed 3 in
+2011. After experimenting with the other existing tools, it became clear that
+none of these solutions was performant enough to generate the number of
+configurations needed (at least not in a trivial way) and that a custom
+generator was needed.
 
 
 ## Documentation
