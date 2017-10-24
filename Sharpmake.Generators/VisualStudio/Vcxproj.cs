@@ -731,6 +731,9 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     foreach (var dependency in dotNetDependencies)
                     {
+                        if (dependency.Project.GetType().IsDefined(typeof(Export), false))
+                            continue; // Can't generate a project dependency for export projects(the project doesn't exist!!).
+
                         string include = Util.PathGetRelative(firstConf.ProjectPath, dependency.ProjectFullFileNameWithExtension);
 
                         // If dependency project is marked as [Compile], read the GUID from the project file
