@@ -78,6 +78,8 @@
     <Compile Include="VisualStudio\Csproj.cs" />
     <Compile Include="VisualStudio\IPlatformVcxproj.cs" />
     <Compile Include="VisualStudio\IVcxprojGenerationContext.cs" />
+    <Compile Include="VisualStudio\ProjectJson.cs" />
+    <Compile Include="VisualStudio\ProjectJson.Template.cs" />
     <Compile Include="VisualStudio\ProjectOptionsGenerator.cs" />
     <Compile Include="VisualStudio\Pyproj.Template.cs" />
     <Compile Include="VisualStudio\Pyproj.cs" />
