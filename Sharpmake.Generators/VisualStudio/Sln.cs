@@ -589,6 +589,13 @@ namespace Sharpmake.Generators.VisualStudio
 
             fileGenerator.Write(Template.Solution.GlobalEnd);
 
+            // On VS2017, there is a GUID for solutions that contain VSIX.
+            if (solutionConfigurations.FirstOrDefault()?.Target.GetFragment<DevEnv>() == DevEnv.vs2017)
+            {
+                if (solutionProjects.OfType<CSharpProject>().Any(project => project.ProjectTypeGuids == CSharpProjectType.Vsix))
+                    fileGenerator.Write(Template.Solution.ExtensibilityGlobals);
+            }
+
             // Write the solution file
             updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator.ToMemoryStream());
 
