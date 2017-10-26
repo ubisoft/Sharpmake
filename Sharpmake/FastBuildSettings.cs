@@ -90,17 +90,20 @@ namespace Sharpmake
         /// <summary>
         /// Include the IDE version in master bff filename
         /// </summary>
+        [Obsolete("MasterBff is now named after the solution")]
         public static bool IncludeCompilerInMasterBFFFilename = true;
 
         /// <summary>
         /// Separate the Master bff content per platform
         /// </summary>
+        [Obsolete("MasterBff contains what its solution contains")]
         public static bool SeparateMasterBFFPerPlatform = false;
 
         /// <summary>
         /// The path of the master BFF is the folder relative to the source tree root.
         /// ex: "\projects" for scimitar AC source trees.
         /// </summary>
+        [Obsolete("MasterBff is now in the same folder as the solution")]
         public static string FastBuildMasterBFFPath = null; // PLEASE OVERRIDE this in your Sharpmake main
 
         /// <summary>
