@@ -20,7 +20,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using SimpleNuGet;
 using StartActionSetting = Sharpmake.Project.Configuration.CsprojUserFileSettings.StartActionSetting;
 
 namespace Sharpmake.Generators.VisualStudio
@@ -1914,98 +1913,14 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else if (devenv == DevEnv.vs2015)
             {
-                var frameworkFlags = project.Targets.TargetPossibilities.Select(f => f.GetFragment<DotNetFramework>()).Aggregate((x, y) => x | y);
-                var projectJsonPath = GenerateProjectJson(configuration, frameworkFlags, generatedFiles, skipFiles);
-                if (projectJsonPath != null)
+                var projectJson = new ProjectJson();
+                projectJson.Generate(_builder, (CSharpProject)project, configurations, _projectPath, generatedFiles, skipFiles);
+                if (projectJson.IsGenerated)
                 {
-                    string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(projectJsonPath));
+                    string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(projectJson.ProjectJsonPath));
                     itemGroups.Nones.Add(new ItemGroups.None { Include = include });
                 }
             }
-        }
-
-        private string GenerateProjectJson(
-            Project.Configuration conf,
-            DotNetFramework frameworks,
-            List<string> generatedFiles,
-            List<string> skipFiles
-        )
-        {
-            var projectJsonPath = Path.Combine(_projectPath, "project.json");
-            var projectJsonLockPath = Path.Combine(_projectPath, "project.lock.json");
-
-            // No NuGet references and no trace of a previous project.json
-            if (conf.ReferencesByNuGetPackage.Count == 0)
-            {
-                if (!File.Exists(projectJsonPath))
-                    return null;
-            }
-
-            lock (s_projectJsonLock)
-            {
-                if (conf.ReferencesByNuGetPackage.Count == 0)
-                {
-                    var fi = new FileInfo(projectJsonPath);
-                    if (!fi.IsReadOnly) // Do not delete project.json submitted in P4
-                    {
-                        File.Delete(projectJsonPath);
-                        File.Delete(projectJsonLockPath);
-                    }
-                    return null;
-                }
-
-                if (IsGenerateNeeded(projectJsonPath))
-                {
-                    var pjson = new ProjectJson();
-
-                    // frameworks
-                    DotNetFramework[] dnfs = ((DotNetFramework[])Enum.GetValues(typeof(DotNetFramework))).Where(f => frameworks.HasFlag(f)).ToArray();
-                    foreach (var dnf in dnfs)
-                        pjson.Frameworks.Add(dnf.ToFolderName());
-
-                    // runtimes
-                    pjson.Runtimes.Add("win-x64");
-                    pjson.Runtimes.Add("win-x86");
-                    pjson.Runtimes.Add("win-anycpu");
-                    pjson.Runtimes.Add("win");
-
-                    // dependencies
-                    foreach (var packageRef in conf.ReferencesByNuGetPackage.SortedValues)
-                        pjson.Dependencies.Add(packageRef.Name, new VersionRange(packageRef.Version));
-
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        using (StreamWriter writer = new StreamWriter(stream))
-                        {
-                            writer.Write(pjson.WriteToString());
-                            writer.Flush();
-                            stream.Position = 0;
-
-                            bool written = _builder.Context.WriteGeneratedFile(pjson.GetType(), new FileInfo(projectJsonPath), stream);
-                            if (written)
-                                generatedFiles.Add(projectJsonPath);
-                            else
-                                skipFiles.Add(projectJsonPath);
-                        }
-                    }
-                }
-            }
-
-            return projectJsonPath;
-        }
-
-        private static readonly HashSet<string> s_projectJsonGenerated = new HashSet<string>();
-        private static readonly object s_projectJsonLock = new object();
-
-        private static bool IsGenerateNeeded(string projectJsonPath)
-        {
-            if (!s_projectJsonGenerated.Contains(projectJsonPath))
-            {
-                s_projectJsonGenerated.Add(projectJsonPath);
-                return true;
-            }
-
-            return false;
         }
 
         private static void AddNoneGeneratedItem(ItemGroups itemGroups, string file, string generatedFile, string generator, bool designTimeSharedInput, string projectPath, Project project)
