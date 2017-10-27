@@ -97,6 +97,7 @@ namespace Sharpmake.Generators.FastBuild
             var masterBffCustomSections = new UniqueList<string>(); // section that is not ordered
 
             string projectRootPath = null;
+            bool mustGenerateFastbuild = false;
 
             foreach (var solutionProject in solutionProjects)
             {
@@ -114,8 +115,10 @@ namespace Sharpmake.Generators.FastBuild
 
                 foreach (var conf in solutionProject.Configurations)
                 {
-                    if (!conf.IsFastBuild || !conf.Platform.IsSupportedFastBuildPlatform() || conf.DoNotGenerateFastBuild)
+                    if (!conf.IsFastBuildEnabledProjectConfig())
                         continue;
+
+                    mustGenerateFastbuild = true;
 
                     string bffFullFileNameCapitalized = Util.GetCapitalizedPath(conf.BffFullFileName);
                     string projectBffFullPath = $"{bffFullFileNameCapitalized}{FastBuildSettings.FastBuildConfigFileExtension}";
@@ -255,6 +258,9 @@ namespace Sharpmake.Generators.FastBuild
                     }
                 }
             }
+
+            if (!mustGenerateFastbuild)
+                throw new Error("Sharpmake-FastBuild : Trying to generate a MasterBff with none of its projects having a FastBuild configuration, or having a platform supporting it, or all of them having conf.DoNotGenerateFastBuild = true");
 
             masterBffCopySections.AddRange(bffMasterSection.Values);
             masterBffCopySections.AddRange(bffPreBuildSection.Values);

@@ -227,6 +227,11 @@ namespace Sharpmake.Generators.FastBuild
             return PlatformRegistry.Has<IPlatformBff>(platform);
         }
 
+        public static bool IsFastBuildEnabledProjectConfig(this Project.Configuration conf)
+        {
+            return conf.IsFastBuild && conf.Platform.IsSupportedFastBuildPlatform() && !conf.DoNotGenerateFastBuild;
+        }
+
         public static string GetFastBuildCopyAlias(string sourceFileName, string destinationFolder)
         {
             string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetHashCode().ToString("X8"));
@@ -356,7 +361,7 @@ namespace Sharpmake.Generators.FastBuild
         {
             bool hasFastBuildConfig = configurations.Any(
                 x => x.IncludedProjectInfos.Any(
-                    y => y.Configuration.IsFastBuild
+                    y => IsFastBuildEnabledProjectConfig(y.Configuration)
                 )
             );
             return hasFastBuildConfig;
