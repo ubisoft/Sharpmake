@@ -28,7 +28,7 @@ namespace Sharpmake.Generators.FastBuild
         private class MasterBffInfo
         {
             // Dependency dictionary based on the include string (many projects might be in one .bff or a single project might generate many
-            public Dictionary<string, Strings> BffIncludeToDependencyIncludes = new Dictionary<string, Strings>();
+            public Dictionary<string, Dictionary<string, int>> BffIncludeToDependencyIncludes = new Dictionary<string, Dictionary<string, int>>();
             public DevEnv? DevEnv;
             public UniqueList<Platform> Platforms = new UniqueList<Platform>();
             public List<string> AllConfigsSections = new List<string>(); // All Configs section when running with a source file filter
@@ -99,22 +99,28 @@ namespace Sharpmake.Generators.FastBuild
             string projectRootPath = null;
             bool mustGenerateFastbuild = false;
 
-            foreach (var solutionProject in solutionProjects)
+            foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
             {
-                var project = solutionProject.Project;
-
-                // Export projects do not have any bff
-                if (project.GetType().IsDefined(typeof(Export), false))
-                    continue;
-
-                // When the project has a source file filter, only keep it if the file list is not empty
-                if (project.SourceFilesFilters != null && (project.SourceFilesFiltersCount == 0 || project.SkipProjectWhenFiltersActive))
-                    continue;
-
-                projectRootPath = project.RootPath;
-
-                foreach (var conf in solutionProject.Configurations)
+                foreach (var solutionProject in solutionProjects)
                 {
+                    var project = solutionProject.Project;
+
+                    // Export projects do not have any bff
+                    if (project.GetType().IsDefined(typeof(Export), false))
+                        continue;
+
+                    // When the project has a source file filter, only keep it if the file list is not empty
+                    if (project.SourceFilesFilters != null && (project.SourceFilesFiltersCount == 0 || project.SkipProjectWhenFiltersActive))
+                        continue;
+
+                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
+                    bool perfectMatch = includedProject != null && solutionProject.Configurations.Contains(includedProject.Configuration);
+                    if (!perfectMatch)
+                        continue;
+
+                    projectRootPath = project.RootPath;
+
+                    var conf = includedProject.Configuration;
                     if (!conf.IsFastBuildEnabledProjectConfig())
                         continue;
 
@@ -127,7 +133,7 @@ namespace Sharpmake.Generators.FastBuild
                     var devEnv = conf.Target.GetFragment<DevEnv>();
                     if (masterBffInfo.DevEnv == null)
                         masterBffInfo.DevEnv = devEnv;
-                    else if(devEnv != masterBffInfo.DevEnv)
+                    else if (devEnv != masterBffInfo.DevEnv)
                         throw new Error($"Master bff {masterBffFileName} cannot contain varying devEnvs: {masterBffInfo.DevEnv} {devEnv}!");
 
                     if (FastBuildSettings.WriteAllConfigsSection)
@@ -236,25 +242,39 @@ namespace Sharpmake.Generators.FastBuild
                         }
                     }
 
-                    var currentBffDependencyIncludes = masterBffInfo.BffIncludeToDependencyIncludes.GetValueOrAdd(projectBffFullPath, new Strings());
-
-                    // Generate bff include list
-                    // --------------------------------------
-                    var orderedProjectDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf);
-                    foreach (var depProjConfig in orderedProjectDeps)
+                    if (includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes)
                     {
-                        // Export projects should not have any master bff
-                        if (depProjConfig.Project.GetType().IsDefined(typeof(Export), false))
-                            continue;
+                        var currentBffDependencyIncludes = masterBffInfo.BffIncludeToDependencyIncludes.GetValueOrAdd(projectBffFullPath, new Dictionary<string,int>());
 
-                        // When the project has a source file filter, only keep it if the file list is not empty
-                        if (depProjConfig.Project.SourceFilesFilters != null && (depProjConfig.Project.SourceFilesFiltersCount == 0 || depProjConfig.Project.SkipProjectWhenFiltersActive))
-                            continue;
+                        // Generate bff include list
+                        // --------------------------------------
+                        var orderedProjectDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf);
+                        int order = 0;
+                        foreach (var depProjConfig in orderedProjectDeps)
+                        {
+                            // Export projects should not have any master bff
+                            if (depProjConfig.Project.GetType().IsDefined(typeof(Export), false))
+                                continue;
 
-                        Trace.Assert(depProjConfig.Project != project, "Sharpmake-FastBuild : Project dependencies refers to itself.");
+                            // When the project has a source file filter, only keep it if the file list is not empty
+                            if (depProjConfig.Project.SourceFilesFilters != null && (depProjConfig.Project.SourceFilesFiltersCount == 0 || depProjConfig.Project.SkipProjectWhenFiltersActive))
+                                continue;
 
-                        string depBffFullFileNameCapitalized = Util.GetCapitalizedPath(depProjConfig.BffFullFileName);
-                        currentBffDependencyIncludes.Add($"{depBffFullFileNameCapitalized}{FastBuildSettings.FastBuildConfigFileExtension}");
+                            Trace.Assert(depProjConfig.Project != project, "Sharpmake-FastBuild : Project dependencies refers to itself.");
+
+                            string depBffFullFileNameCapitalized = Util.GetCapitalizedPath(depProjConfig.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
+                            int previousOrder;
+                            if(currentBffDependencyIncludes.TryGetValue(depBffFullFileNameCapitalized, out previousOrder))
+                            {
+                                if (order > previousOrder)
+                                    currentBffDependencyIncludes[depBffFullFileNameCapitalized] = order;
+                            }
+                            else
+                            {
+                                currentBffDependencyIncludes.Add(depBffFullFileNameCapitalized, order);
+                            }
+                            ++order;
+                        }
                     }
                 }
             }
@@ -276,14 +296,19 @@ namespace Sharpmake.Generators.FastBuild
 
             if (masterBffInfo.BffIncludeToDependencyIncludes.Count > 0)
             {
-                foreach (var includeList in masterBffInfo.BffIncludeToDependencyIncludes)
+                foreach (var bffToDependencyIncludes in masterBffInfo.BffIncludeToDependencyIncludes)
                 {
-                    Trace.Assert(!includeList.Value.Contains(includeList.Key), "Sharpmake-FastBuild: Circular dependency detected!");
+                    var currentBff = bffToDependencyIncludes.Key;
+                    var dependenciesDictionary = bffToDependencyIncludes.Value;
+                    Trace.Assert(!dependenciesDictionary.ContainsKey(currentBff), "Sharpmake-FastBuild: Circular dependency detected!");
 
-                    totalIncludeList.AddRange(includeList.Value.Values);
+                    var includeList = dependenciesDictionary.ToList();
+                    includeList.Sort((a, b) => a.Value.CompareTo(b.Value));
+
+                    totalIncludeList.AddRange(includeList.Select(x => x.Key));
 
                     // need to add current BFF in case not already in the list.
-                    totalIncludeList.Add(includeList.Key);
+                    totalIncludeList.Add(currentBff);
                 }
 
                 foreach (var projectBffFullPath in totalIncludeList)
