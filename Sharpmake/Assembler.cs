@@ -385,19 +385,28 @@ namespace Sharpmake
                         string referenceRelativePath = match.Groups["REFERENCE"].ToString();
                         string referencePath = "";
 
+                        // Try next to the source file that reference it (if relative path)
                         if (!Path.IsPathRooted(referenceRelativePath))
                             referencePath = Util.PathGetAbsolute(sourceFilePath.DirectoryName, referenceRelativePath);
 
                         if (!File.Exists(referencePath))
                         {
+                            // Try next to the Sharpmake binary
                             referencePath = Util.PathGetAbsolute(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), referenceRelativePath);
+
                             if (!File.Exists(referencePath))
                             {
-                                // try using .net framework locations
-                                referencePath = GetAssemblyDllPath(referenceRelativePath);
+                                // Try in the current working directory
+                                referencePath = Util.PathGetAbsolute(Directory.GetCurrentDirectory(), referenceRelativePath);
 
-                                if (referencePath == null)
-                                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Reference file not found: {0}", referenceRelativePath);
+                                if (!File.Exists(referencePath))
+                                {
+                                    // Try using .net framework locations
+                                    referencePath = GetAssemblyDllPath(referenceRelativePath);
+
+                                    if (referencePath == null)
+                                        throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Reference file not found: {0}", referenceRelativePath);
+                                }
                             }
                         }
 
