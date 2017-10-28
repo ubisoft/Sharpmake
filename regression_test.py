@@ -120,4 +120,5 @@ def launch_tests():
     finally:
         os.chdir(entry_path)
 
-launch_tests()
+exit_code = launch_tests()
+sys.exit(exit_code)
