@@ -48,7 +48,7 @@ namespace Sharpmake.Generators.FastBuild
 
             _masterBffBuilder = builder;
 
-            FileInfo fileInfo = new FileInfo(solutionFile + FastBuildSettings.FastBuildConfigFileExtension);
+            FileInfo fileInfo = new FileInfo(solutionFile);
             string masterBffPath = fileInfo.Directory.FullName;
             string masterBffFileName = fileInfo.Name;
 
@@ -73,10 +73,11 @@ namespace Sharpmake.Generators.FastBuild
             Solution solution,
             List<Solution.Configuration> solutionConfigurations,
             string masterBffPath,
-            string masterBffFileName,
+            string masterBffFileNameWithoutExtension,
             out bool updated
         )
         {
+            string masterBffFileName = masterBffFileNameWithoutExtension + FastBuildSettings.FastBuildConfigFileExtension;
             string masterBffFullPath = Util.GetCapitalizedPath(masterBffPath + Path.DirectorySeparatorChar + masterBffFileName);
 
             // Global configuration file is in the same directory as the master bff but filename suffix added to its filename.
@@ -382,6 +383,8 @@ namespace Sharpmake.Generators.FastBuild
             s_masterBffFilenames.Add(masterBffFileName);
             FileInfo bffFileInfo = new FileInfo(masterBffFullPath);
             updated = _masterBffBuilder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream);
+
+            solution.PostGenerationCallback?.Invoke(masterBffPath, masterBffFileNameWithoutExtension, FastBuildSettings.FastBuildConfigFileExtension);
 
             return bffFileInfo.FullName;
         }
