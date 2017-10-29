@@ -2086,7 +2086,8 @@ namespace Sharpmake.Generators.VisualStudio
             Action enableMapOption = () =>
             {
                 context.Options["GenerateMapFile"] = "true";
-                string mapFile = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".map";
+                string targetNamePrefix = optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output);
+                string mapFile = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + targetNamePrefix + optionsContext.TargetName + ".map";
                 context.Options["MapFileName"] = mapFile;
 
                 string mapFileBffRelative = Bff.CurrentBffPathKeyCombine(mapFile);
