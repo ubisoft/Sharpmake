@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Sharpmake.Generators.Generic
 {
-    public partial class MakeApplication
+    public partial class MakeApplication : ISolutionGenerator
     {
         private Builder _builder;
         private string _solutionExtension = ".mk";

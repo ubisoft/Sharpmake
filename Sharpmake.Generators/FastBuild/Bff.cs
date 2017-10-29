@@ -24,7 +24,7 @@ using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.FastBuild
 {
-    public partial class Bff
+    public partial class Bff : IProjectGenerator
     {
         class BffGenerationContext : IGenerationContext
         {

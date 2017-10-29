@@ -16,7 +16,7 @@ using System.IO;
 
 namespace Sharpmake.Generators.Apple
 {
-    public partial class XCWorkspace
+    public partial class XCWorkspace : ISolutionGenerator
     {
         // Solution _Solution;
         private Builder _builder;

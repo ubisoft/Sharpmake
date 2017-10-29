@@ -352,5 +352,14 @@ namespace Sharpmake.Generators.FastBuild
             return strBuilder.ToString();
         }
 
+        public static bool HasFastBuildConfig(List<Solution.Configuration> configurations)
+        {
+            bool hasFastBuildConfig = configurations.Any(
+                x => x.IncludedProjectInfos.Any(
+                    y => y.Configuration.IsFastBuild
+                )
+            );
+            return hasFastBuildConfig;
+        }
     }
 }
