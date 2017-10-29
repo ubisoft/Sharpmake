@@ -24,7 +24,7 @@ using StartActionSetting = Sharpmake.Project.Configuration.CsprojUserFileSetting
 
 namespace Sharpmake.Generators.VisualStudio
 {
-    public partial class CSproj
+    public partial class CSproj : IProjectGenerator
     {
         private const string TTExtension = ".tt";
 
@@ -803,7 +803,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        public void Generate(Builder builder, CSharpProject project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
+        public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
         {
             _builder = builder;
 
@@ -811,7 +811,10 @@ namespace Sharpmake.Generators.VisualStudio
             string projectPath = fileInfo.Directory.FullName;
             string projectFileName = fileInfo.Name;
 
-            Generate(project, configurations, projectPath, projectFileName, generatedFiles, skipFiles);
+            if (!(project is CSharpProject))
+                throw new ArgumentException("Project is not a CSharpProject");
+
+            Generate((CSharpProject)project, configurations, projectPath, projectFileName, generatedFiles, skipFiles);
             _builder = null;
         }
 

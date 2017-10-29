@@ -831,12 +831,7 @@ namespace Sharpmake
 
                     if (project.SourceFilesFilters == null || (project.SourceFilesFiltersCount != 0 && !project.SkipProjectWhenFiltersActive))
                     {
-                        if (project is CSharpProject)
-                            _getGeneratorsManagerCallBack().Generate(this, (CSharpProject)project, configurations, projectFile, output.Generated, output.Skipped);
-                        else if (project is PythonProject)
-                            _getGeneratorsManagerCallBack().Generate(this, (PythonProject)project, configurations, projectFile, output.Generated, output.Skipped);
-                        else
-                            _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
+                        _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
                     }
                 }
                 catch (Exception ex)

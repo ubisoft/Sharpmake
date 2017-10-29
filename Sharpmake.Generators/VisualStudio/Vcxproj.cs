@@ -24,7 +24,7 @@ using Sharpmake.Generators.FastBuild;
 
 namespace Sharpmake.Generators.VisualStudio
 {
-    public partial class Vcxproj
+    public partial class Vcxproj : IProjectGenerator
     {
         public enum BuildStep
         {

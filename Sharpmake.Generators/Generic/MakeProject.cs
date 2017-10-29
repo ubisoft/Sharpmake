@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace Sharpmake.Generators.Generic
 {
-    public partial class MakeProject
+    public partial class MakeProject : IProjectGenerator
     {
         private const string SolutionExtension = ".mk";
         private const string RemoveLineTag = "REMOVE_LINE_TAG";

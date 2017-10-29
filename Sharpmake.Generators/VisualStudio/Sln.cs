@@ -77,7 +77,7 @@ namespace Sharpmake.Generators.VisualStudio
         public static Guid[] AspNetMvc5Project = { AspNetMvc5, WindowsCSharp };
     }
 
-    public partial class Sln
+    public partial class Sln : ISolutionGenerator
     {
         private readonly List<SolutionFolder> _rootSolutionFolders = new List<SolutionFolder>();
         private readonly List<SolutionFolder> _solutionFolders = new List<SolutionFolder>();
@@ -95,7 +95,6 @@ namespace Sharpmake.Generators.VisualStudio
             Solution solution,
             List<Solution.Configuration> configurations,
             string solutionFile,
-            bool addMasterBff,
             List<string> generatedFiles,
             List<string> skipFiles
         )
@@ -105,6 +104,7 @@ namespace Sharpmake.Generators.VisualStudio
             FileInfo fileInfo = new FileInfo(solutionFile);
             string solutionPath = fileInfo.Directory.FullName;
             string solutionFileName = fileInfo.Name;
+            bool addMasterBff = FastBuildSettings.IncludeBFFInProjects && FastBuild.UtilityMethods.HasFastBuildConfig(configurations);
 
             bool updated;
             string solutionFileResult = Generate(solution, configurations, solutionPath, solutionFileName, addMasterBff, out updated);

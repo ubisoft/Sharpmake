@@ -8,7 +8,7 @@ using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.FastBuild
 {
-    public class MasterBff
+    public class MasterBff : ISolutionGenerator
     {
         private Builder _masterBffBuilder = null;
         private static Strings s_masterBffFilenames = new Strings();
@@ -34,7 +34,7 @@ namespace Sharpmake.Generators.FastBuild
             public List<string> AllConfigsSections = new List<string>(); // All Configs section when running with a source file filter
         }
 
-        public void GenerateMasterBff(
+        public void Generate(
             Builder builder,
             Solution solution,
             List<Solution.Configuration> solutionConfigurations,
@@ -69,7 +69,7 @@ namespace Sharpmake.Generators.FastBuild
             _masterBffBuilder = null;
         }
 
-        public string GenerateMasterBffFile(
+        private string GenerateMasterBffFile(
             Solution solution,
             List<Solution.Configuration> solutionConfigurations,
             string masterBffPath,
