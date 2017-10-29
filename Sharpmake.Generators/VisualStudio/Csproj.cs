@@ -1831,9 +1831,12 @@ namespace Sharpmake.Generators.VisualStudio
             itemGroups.References.AddRange(referencesByPath);
 
             var sourceDir = new DirectoryInfo(project.SourceRootPath);
-            var webReferencesDir = sourceDir.EnumerateDirectories("Web References");
-            itemGroups.WebReferences.AddRange(
-                webReferencesDir.Select(dir => new ItemGroups.WebReference { Include = string.Format(@"{0}\", dir.Name) }));
+            if (sourceDir.Exists)
+            {
+                var webReferencesDir = sourceDir.EnumerateDirectories("Web References");
+                itemGroups.WebReferences.AddRange(
+                    webReferencesDir.Select(dir => new ItemGroups.WebReference {Include = $@"{dir.Name}\"}));
+            }
             itemGroups.WebReferences.AddRange(
                 project.WebReferences.Select(str => new ItemGroups.WebReference { Include = str }));
 
