@@ -644,9 +644,18 @@ namespace Sharpmake
                 }
             }
 
-            public abstract class BuildStepBase
+            public abstract class BuildStepBase : IComparable
             {
                 public bool IsNameSpecific { get; set; }
+
+                // Override this to control the order of BuildStep execution in Build Events
+                public virtual int CompareTo(object obj)
+                {
+                    if (obj == null)
+                        return 1;
+
+                    return 0;
+                }
             }
 
 
@@ -783,16 +792,16 @@ namespace Sharpmake
             public IEnumerable<string> ResolvedTargetDependsFiles => _resolvedTargetDependsFiles;
 
             private UniqueList<BuildStepBase> _resolvedEventPreBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventPreBuildExe => _resolvedEventPreBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventPreBuildExe => _resolvedEventPreBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventPostBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventPostBuildExe => _resolvedEventPostBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventPostBuildExe => _resolvedEventPostBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventCustomPreBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventCustomPreBuildExe => _resolvedEventCustomPreBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventCustomPreBuildExe => _resolvedEventCustomPreBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventCustomPostBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventCustomPostBuildExe => _resolvedEventCustomPostBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventCustomPostBuildExe => _resolvedEventCustomPostBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedExecFiles = new UniqueList<BuildStepBase>();
             public IEnumerable<BuildStepBase> ResolvedExecFiles => _resolvedExecFiles;
