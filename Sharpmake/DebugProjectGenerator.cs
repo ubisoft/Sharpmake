@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 
@@ -242,9 +243,13 @@ namespace Sharpmake
         }
     }
 
+    [Serializable]
     public class AssemblyVersionException : Exception
     {
         public AssemblyVersionException() : base() { }
         public AssemblyVersionException(string msg) : base(msg) { }
+
+        protected AssemblyVersionException(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace Sharpmake.Application
 {
@@ -20,11 +21,15 @@ namespace Sharpmake.Application
     {
         public class Argument
         {
+            [Serializable]
             public class Error : Exception
             {
                 public Error(string message, params object[] args)
                     : base(string.Format(message, args))
                 { }
+
+                protected Error(SerializationInfo info, StreamingContext context)
+                    : base(info, context) { }
             }
 
             public enum InputType
