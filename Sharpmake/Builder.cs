@@ -119,6 +119,8 @@ namespace Sharpmake
 
         public BuildContext.BaseBuildContext Context { get; private set; }
 
+        private readonly BuilderExtension _builderExt;
+
         private ConcurrentDictionary<Type, GenerationOutput> _generationReport = new ConcurrentDictionary<Type, GenerationOutput>();
         private HashSet<Type> _buildScheduledType = new HashSet<Type>();
 
@@ -144,6 +146,7 @@ namespace Sharpmake
             _getGeneratorsManagerCallBack().InitializeBuilder(this);
             Trace.Assert(Instance == null);
             Instance = this;
+            _builderExt = new BuilderExtension(this);
 
             if (_multithreaded)
             {

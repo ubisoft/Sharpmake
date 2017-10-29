@@ -58,6 +58,7 @@
     <Compile Include="BuildContext\RedirectOutput.cs" />
     <Compile Include="BuildContext\RegressionTest.cs" />
     <Compile Include="Builder.cs" />
+    <Compile Include="BuilderExtension.cs" />
     <Compile Include="CommandLine.cs" />
     <Compile Include="Configurable.cs" />
     <Compile Include="ConfigureCollection.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexCache.cs" />
     <Compile Include="Resolver.cs" />
+    <Compile Include="SharpmakeExtension.cs" />
     <Compile Include="Solution.Configuration.cs" />
     <Compile Include="Solution.cs" />
     <Compile Include="Strings.cs" />
