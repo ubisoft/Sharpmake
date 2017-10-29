@@ -14,7 +14,7 @@
 using System;
 using System.Linq;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet
 {
     /// <summary>
     /// Simple implementation of package dependencies

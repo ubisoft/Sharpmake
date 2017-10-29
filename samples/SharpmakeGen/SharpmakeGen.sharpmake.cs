@@ -50,7 +50,7 @@ namespace SharpmakeGen
             base.ConfigureAll(conf, target);
             conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.v4.0");
 
-            conf.AddPrivateDependency<SimpleNuGetProject>(target);
+            conf.AddPrivateDependency<SharpmakeNuGetProject>(target);
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
         }
@@ -72,16 +72,16 @@ namespace SharpmakeGen
                 "System.Xml.Linq"
             );
             conf.AddPrivateDependency<SharpmakeProject>(target);
-            conf.AddPrivateDependency<SimpleNuGetProject>(target);
+            conf.AddPrivateDependency<SharpmakeNuGetProject>(target);
         }
     }
 
     [Generate]
-    public class SimpleNuGetProject : SharpmakeBaseProject
+    public class SharpmakeNuGetProject : SharpmakeBaseProject
     {
-        public SimpleNuGetProject()
+        public SharpmakeNuGetProject()
         {
-            Name = "SimpleNuGet";
+            Name = "Sharpmake.NuGet";
         }
 
         public override void ConfigureAll(Configuration conf, Target target)
@@ -173,7 +173,7 @@ namespace SharpmakeGen
             conf.AddProject<SharpmakeProject>(target);
             conf.AddProject<SharpmakeGeneratorsProject>(target);
             conf.AddProject<SharpmakeUnitTestsProject>(target);
-            conf.AddProject<SimpleNuGetProject>(target);
+            conf.AddProject<SharpmakeNuGetProject>(target);
 
             conf.AddProject<Platforms.CommonPlatformsProject>(target);
             conf.AddProject<Platforms.DurangoProject>(target);

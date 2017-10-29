@@ -15,9 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SimpleNuGet.Impl;
+using Sharpmake.NuGet.Impl;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet
 {
     /// <summary>
     /// Packages in %userprofile%/.nuget/PackageAsSource.json are typically added

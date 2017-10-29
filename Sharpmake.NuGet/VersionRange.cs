@@ -15,7 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet
 {
     /// <summary>
     /// Version range
