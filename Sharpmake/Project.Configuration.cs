@@ -110,7 +110,6 @@ namespace Sharpmake
             public Configuration()
             {
                 PrecompSourceExcludeExtension.Add(".asm");
-                ReferencesByNuGetPackage = new PackageReferences(this);
             }
 
             public static OutputType SimpleOutputType(OutputType type)
@@ -1159,8 +1158,7 @@ namespace Sharpmake
             public Strings ForceUsingFiles = new Strings();
 
             // NuGet packages (only C# for now)
-            public PackageReferences ReferencesByNuGetPackage;
-            internal Strings NuGetPackageProjectReferencesByPath = new Strings();
+            public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
 
             public bool? ReferenceOutputAssembly = null;
 

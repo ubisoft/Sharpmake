@@ -50,8 +50,6 @@ namespace SharpmakeGen
             base.ConfigureAll(conf, target);
             conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.v4.0");
 
-            conf.AddPrivateDependency<SharpmakeNuGetProject>(target);
-
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
         }
     }
@@ -72,7 +70,6 @@ namespace SharpmakeGen
                 "System.Xml.Linq"
             );
             conf.AddPrivateDependency<SharpmakeProject>(target);
-            conf.AddPrivateDependency<SharpmakeNuGetProject>(target);
         }
     }
 

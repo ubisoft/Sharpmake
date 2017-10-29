@@ -90,10 +90,6 @@
     <Compile Include="VisualStudio\Vcxproj.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sharpmake.NuGet\Sharpmake.NuGet.csproj">
-      <Project>{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}</Project>
-      <Name>Sharpmake.NuGet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj">
       <Project>{15F793C7-9E88-64A9-591C-7244FCC6B771}</Project>
       <Name>Sharpmake</Name>

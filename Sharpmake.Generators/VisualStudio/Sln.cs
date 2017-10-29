@@ -657,13 +657,8 @@ namespace Sharpmake.Generators.VisualStudio
             var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
 
             // user's projects references
-            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath);
+            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath).Distinct();
             resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(projectByPath));
-
-            // nuget packages projects references
-            var nugetProjectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.NuGetPackageProjectReferencesByPath).Distinct();
-            resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(nugetProjectByPath)
-                                                .Select(r => { r.SolutionFolder = "PackagesAsSources"; return r; }));
 
             foreach (Solution.ResolvedProject resolvedProject in resolvedPathReferences)
             {
