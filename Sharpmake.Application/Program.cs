@@ -461,8 +461,6 @@ namespace Sharpmake.Application
                     LogWriteLine("    {0}", file);
             }
 
-            PackageReferences.LogPackagesVersionsDiscrepancy();
-
             LogWriteLine("  Results:");
             if (generatedProjectFiles.Count > 0 || skippedProjectFiles.Count > 0)
             {

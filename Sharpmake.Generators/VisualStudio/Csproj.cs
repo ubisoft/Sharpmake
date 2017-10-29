@@ -1116,7 +1116,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
-                foreach (var projectFileName in conf.ProjectReferencesByPath.Concat(conf.NuGetPackageProjectReferencesByPath))
+                foreach (var projectFileName in conf.ProjectReferencesByPath)
                 {
                     string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectFileName);
                     string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized,
