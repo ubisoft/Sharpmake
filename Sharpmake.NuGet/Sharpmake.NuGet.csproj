@@ -4,11 +4,11 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}</ProjectGuid>
+    <ProjectGuid>{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleNuGet</RootNamespace>
-    <AssemblyName>SimpleNuGet</AssemblyName>
+    <RootNamespace>Sharpmake.NuGet</RootNamespace>
+    <AssemblyName>Sharpmake.NuGet</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

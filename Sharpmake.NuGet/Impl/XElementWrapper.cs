@@ -20,7 +20,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace SimpleNuGet.Impl
+namespace Sharpmake.NuGet.Impl
 {
     /// <summary>
     /// Provides a typed interface around a XElement.

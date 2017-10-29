@@ -78,8 +78,8 @@
     <Compile Include="VisualStudio\Csproj.cs" />
     <Compile Include="VisualStudio\IPlatformVcxproj.cs" />
     <Compile Include="VisualStudio\IVcxprojGenerationContext.cs" />
-    <Compile Include="VisualStudio\ProjectJson.cs" />
     <Compile Include="VisualStudio\ProjectJson.Template.cs" />
+    <Compile Include="VisualStudio\ProjectJson.cs" />
     <Compile Include="VisualStudio\ProjectOptionsGenerator.cs" />
     <Compile Include="VisualStudio\Pyproj.Template.cs" />
     <Compile Include="VisualStudio\Pyproj.cs" />
@@ -90,13 +90,13 @@
     <Compile Include="VisualStudio\Vcxproj.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sharpmake.NuGet\Sharpmake.NuGet.csproj">
+      <Project>{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}</Project>
+      <Name>Sharpmake.NuGet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj">
       <Project>{15F793C7-9E88-64A9-591C-7244FCC6B771}</Project>
       <Name>Sharpmake</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleNuGet\SimpleNuGet.csproj">
-      <Project>{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}</Project>
-      <Name>SimpleNuGet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

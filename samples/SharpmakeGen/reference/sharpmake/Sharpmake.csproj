@@ -107,9 +107,9 @@
     <Compile Include="VariableAssignment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleNuGet\SimpleNuGet.csproj">
-      <Project>{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}</Project>
-      <Name>SimpleNuGet</Name>
+    <ProjectReference Include="..\Sharpmake.NuGet\Sharpmake.NuGet.csproj">
+      <Project>{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}</Project>
+      <Name>Sharpmake.NuGet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

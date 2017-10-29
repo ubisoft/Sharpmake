@@ -16,9 +16,9 @@ using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
-using SimpleNuGet.Impl;
+using Sharpmake.NuGet.Impl;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet
 {
     /// <summary>
     /// A semantic version identifies a package build

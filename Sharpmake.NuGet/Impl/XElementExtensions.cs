@@ -11,24 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System.Collections.Generic;
-using SimpleNuGet;
+using System;
+using System.Xml.Linq;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet.Impl
 {
-    /// <summary>
-    /// Dependency between packages
-    /// </summary>
-    public interface INuGetDependency
+    internal static class XElementExtensions
     {
-        /// <summary>
-        /// The package ID of the dependency.
-        /// </summary>
-        string Name { get; }
-
-        /// <summary>
-        /// The range of versions acceptable as a dependency. See Dependency versions for exact syntax.
-        /// </summary>
-        VersionRange VersionRange { get; }
+        public static string GetOptionalAttributeValue(this XElement element, string localName, string namespaceName = null)
+        {
+            XAttribute attr;
+            if (String.IsNullOrEmpty(namespaceName))
+            {
+                attr = element.Attribute(localName);
+            }
+            else
+            {
+                attr = element.Attribute(XName.Get(localName, namespaceName));
+            }
+            return attr != null ? attr.Value : null;
+        }
     }
 }

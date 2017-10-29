@@ -15,7 +15,7 @@ using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 
-namespace SimpleNuGet.Impl
+namespace Sharpmake.NuGet.Impl
 {
     internal class TypeConverterCache
     {

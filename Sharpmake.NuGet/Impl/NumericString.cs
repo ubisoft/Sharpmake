@@ -14,7 +14,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SimpleNuGet.Impl
+namespace Sharpmake.NuGet.Impl
 {
     /// <summary>
     /// Sorts text in a way Test9 comes before Test10
