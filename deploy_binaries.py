@@ -108,7 +108,6 @@ copy_list = [
     BinarySite("Sharpmake", "Sharpmake"),
     BinarySite("Sharpmake.Application", "Sharpmake.Application"),
     BinarySite("Sharpmake.Generators", "Sharpmake.Generators"),
-    BinarySite("Sharpmake.NuGet", "Sharpmake.NuGet")
 ]
 
 # Add the platforms to the list of files to copy.

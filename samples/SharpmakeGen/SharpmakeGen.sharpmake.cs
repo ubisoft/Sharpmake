@@ -74,30 +74,6 @@ namespace SharpmakeGen
     }
 
     [Generate]
-    public class SharpmakeNuGetProject : SharpmakeBaseProject
-    {
-        public SharpmakeNuGetProject()
-        {
-            Name = "Sharpmake.NuGet";
-        }
-
-        public override void ConfigureAll(Configuration conf, Target target)
-        {
-            base.ConfigureAll(conf, target);
-
-            conf.ReferencesByName.Add(
-                "System.Core",
-                "System.Data",
-                "System.Data.DataSetExtensions",
-                "System.Net.Http",
-                "System.Runtime.Serialization",
-                "System.Xml",
-                "System.Xml.Linq"
-            );
-        }
-    }
-
-    [Generate]
     public class SharpmakeUnitTestsProject : SharpmakeBaseProject
     {
         public SharpmakeUnitTestsProject()
@@ -170,7 +146,6 @@ namespace SharpmakeGen
             conf.AddProject<SharpmakeProject>(target);
             conf.AddProject<SharpmakeGeneratorsProject>(target);
             conf.AddProject<SharpmakeUnitTestsProject>(target);
-            conf.AddProject<SharpmakeNuGetProject>(target);
 
             conf.AddProject<Platforms.CommonPlatformsProject>(target);
             conf.AddProject<Platforms.DurangoProject>(target);
