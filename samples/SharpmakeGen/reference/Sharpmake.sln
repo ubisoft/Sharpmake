@@ -26,8 +26,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.Durango", "Sharpm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.Generators", "Sharpmake.Generators\Sharpmake.Generators.csproj", "{844F66DE-B015-340E-720A-8E158B517E93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.NuGet", "Sharpmake.NuGet\Sharpmake.NuGet.csproj", "{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.NvShield", "Sharpmake.Platforms\Sharpmake.NvShield\Sharpmake.NvShield.csproj", "{C05B1136-5243-BFF8-F39B-24AB8261FD54}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpmake.UnitTests", "Sharpmake.UnitTests\Sharpmake.UnitTests.csproj", "{BE99068F-E9D0-EF2F-1ECE-CAAA3D6E2DF0}"
@@ -88,10 +86,6 @@ Global
 		{844F66DE-B015-340E-720A-8E158B517E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{844F66DE-B015-340E-720A-8E158B517E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{844F66DE-B015-340E-720A-8E158B517E93}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4DDFA6FA-D217-3CF5-0E65-BB401B9D4A01}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C05B1136-5243-BFF8-F39B-24AB8261FD54}.Release|Any CPU.ActiveCfg = Release|Any CPU
