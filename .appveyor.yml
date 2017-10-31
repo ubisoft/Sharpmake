@@ -2,20 +2,50 @@
 
 image: Visual Studio 2015
 
+version: 0.0.{build}
+
 platform:
-- Any CPU
+ - Any CPU
 
 configuration:
-- Debug
-- Release
+ - Debug
+ - Release
+
+assembly_info:
+  patch: true
+  file: 'Sharpmake**\AssemblyInfo.*'
+  assembly_version: '1.0.{build}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
 
 before_build:
-- cmd: dotnet restore
+ - cmd: dotnet restore
 
 build:
   project: Sharpmake.sln
   verbosity: minimal
 
-after_test:
-- cmd: python regression_test.py
+after_build:
+  - cmd: 7z a Sharpmake_%CONFIGURATION%.zip %APPVEYOR_BUILD_FOLDER%\Sharpmake.Application\bin\%CONFIGURATION%\*
 
+after_test:
+ - cmd: python regression_test.py
+
+artifacts:
+  - path: Sharpmake_*.zip
+    name: Sharpmake
+    type: zip
+
+deploy:
+  release: Sharpmake-v$(appveyor_build_version)
+  description: 'Prebuilt sharpmake for Windows'
+  provider: GitHub
+  auth_token:
+    secure: 1vWe/XVH31N4HDjazKrGdEFBzVJu6Z7YyEZIBv+p3YNOKkywICcj/6G/D1CzWC6I
+  artifact: Sharpmake_Release.zip
+  draft: false
+  prerelease: false
+  on:
+    configuration: release
+#    branch: master
+#    appveyor_repo_tag: true
