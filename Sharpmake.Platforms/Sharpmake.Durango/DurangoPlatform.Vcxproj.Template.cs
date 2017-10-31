@@ -36,7 +36,7 @@ namespace Sharpmake
       <CompileAsWinRT>[options.CompileAsWinRT]</CompileAsWinRT>
       <WarningLevel>[options.WarningLevel]</WarningLevel>
       <Optimization>[options.Optimization]</Optimization>
-      <PreprocessorDefinitions>[options.PreprocessorDefinitions];$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>$(Console_SdkPackagesRoot);$(Console_SdkWindowsMetadataPath);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
