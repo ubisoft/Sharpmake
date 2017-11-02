@@ -2,7 +2,7 @@
 
 image: Visual Studio 2015
 
-version: 0.0.{build}
+version: 0.1.{build}
 
 platform:
  - Any CPU
@@ -10,6 +10,11 @@ platform:
 configuration:
  - Debug
  - Release
+
+branches:
+  only:
+    - master
+    - dev
 
 assembly_info:
   patch: true
