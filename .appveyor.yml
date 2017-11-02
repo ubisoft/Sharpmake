@@ -26,7 +26,8 @@ build:
   verbosity: minimal
 
 after_build:
-  - cmd: 7z a Sharpmake_%CONFIGURATION%.zip %APPVEYOR_BUILD_FOLDER%\Sharpmake.Application\bin\%CONFIGURATION%\*
+  - cmd: python deploy_binaries.py -c %APPVEYOR_BUILD_FOLDER% -d
+  - cmd: 7z a Sharpmake_%CONFIGURATION%.zip %APPVEYOR_BUILD_FOLDER%\Binaries\*
 
 after_test:
  - cmd: python regression_test.py
