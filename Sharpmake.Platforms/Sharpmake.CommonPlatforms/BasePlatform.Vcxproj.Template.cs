@@ -48,6 +48,8 @@ namespace Sharpmake
       <RuntimeLibrary>[options.RuntimeLibrary]</RuntimeLibrary>
       <StructMemberAlignment>[options.StructMemberAlignment]</StructMemberAlignment>
       <BufferSecurityCheck>[options.BufferSecurityCheck]</BufferSecurityCheck>
+      <SDLCheck>[options.AdvancedSecurityCheck]</SDLCheck>
+      <ControlFlowGuard>[options.ControlFlowGuard]</ControlFlowGuard>
       <FunctionLevelLinking>[options.EnableFunctionLevelLinking]</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>[options.EnableEnhancedInstructionSet]</EnableEnhancedInstructionSet>
       <FloatingPointModel>[options.FloatingPointModel]</FloatingPointModel>

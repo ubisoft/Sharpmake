@@ -300,6 +300,8 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.RuntimeLibrary]'
             + ' [cmdLineOptions.StructMemberAlignment]'
             + ' [cmdLineOptions.BufferSecurityCheck]'
+            + ' [cmdLineOptions.AdvancedSecurityCheck]'
+            + ' [cmdLineOptions.ControlFlowGuard]'
             + ' [cmdLineOptions.EnableFunctionLevelLinking]'
             + ' [cmdLineOptions.EnableEnhancedInstructionSet]'
             + ' [cmdLineOptions.FloatingPointModel]'

@@ -611,6 +611,24 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.BufferSecurityCheck.Disable, () => { context.Options["BufferSecurityCheck"] = "false"; context.CommandLineOptions["BufferSecurityCheck"] = "/GS-"; })
             );
 
+            //Options.Vc.Compiler.AdvancedSecurityCheck.
+            //    Enable                                  AdvancedSecurityCheck="true"                      /sdl overrides /GS-
+            //    Disable                                 AdvancedSecurityCheck="false"                     /sdl-
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.AdvancedSecurityCheck.Enable, () => { context.Options["AdvancedSecurityCheck"] = "true"; context.CommandLineOptions["AdvancedSecurityCheck"] = "/sdl"; }),
+            Options.Option(Options.Vc.Compiler.AdvancedSecurityCheck.Disable, () => { context.Options["AdvancedSecurityCheck"] = "false"; context.CommandLineOptions["AdvancedSecurityCheck"] = "/sdl-"; })
+            );
+
+            //Options.Vc.Compiler.ControlFlowGuard.
+            //    Enable                                  ControlFlowGuard="true"                       /guard:cf
+            //    Disable                                 ControlFlowGuard="false"                      /guard:cf-
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.ControlFlowGuard.Enable, () => { context.Options["ControlFlowGuard"] = "Guard"; context.CommandLineOptions["ControlFlowGuard"] = "/guard:cf"; }),
+            Options.Option(Options.Vc.Compiler.ControlFlowGuard.Disable, () => { context.Options["ControlFlowGuard"] = "false"; context.CommandLineOptions["ControlFlowGuard"] = "/guard:cf-"; })
+            );
+
             //Options.Vc.Compiler.OptimizeGlobalData.
             //    Disable                                 /Gw- in AdditionalOptions
             //    Enable                                  /Gw in AdditionalOptions
