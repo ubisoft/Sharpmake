@@ -853,7 +853,7 @@ namespace Sharpmake
 
         public static void LogWrite(string msg, params object[] args)
         {
-            string message = string.Format(msg, args);
+            string message = args.Length > 0 ? string.Format(msg, args) : msg;
 
             Console.WriteLine(message);
             if (Debugger.IsAttached)
