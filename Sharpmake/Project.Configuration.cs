@@ -557,9 +557,6 @@ namespace Sharpmake
             public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
             public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
 
-            public abstract class BuildStepManagers
-            { }
-
             // container for executable 
             [Resolver.Resolvable]
             public class BuildStepExecutable : BuildStepBase
