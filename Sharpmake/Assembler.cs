@@ -370,6 +370,8 @@ namespace Sharpmake
 
                         if (!Path.IsPathRooted(includeFilename))
                             resolvedIncludeFilename = Util.PathGetAbsolute(sourceFilePath.DirectoryName, includeFilename);
+                        else
+                            resolvedIncludeFilename = includeFilename;
 
                         if (!File.Exists(resolvedIncludeFilename))
                             resolvedIncludeFilename = Util.GetCapitalizedPath(resolvedIncludeFilename);
