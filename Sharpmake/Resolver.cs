@@ -511,18 +511,15 @@ namespace Sharpmake
                             SetResolved(memberPath);
                         }
                     }
-                    else if (fieldInfo.FieldType.GetInterface(typeof(IList<string>).Name) != null)
+                    else if (fieldValue is IList<string>)
                     {
                         if (CanWriteFieldValue(fieldInfo))
                         {
                             SetResolving(memberPath);
                             IList<string> values = fieldValue as IList<string>;
 
-                            if (values != null)
-                            {
-                                for (int i = 0; i < values.Count; ++i)
-                                    values[i] = Resolve(values[i], fallbackValue);
-                            }
+                            for (int i = 0; i < values.Count; ++i)
+                                values[i] = Resolve(values[i], fallbackValue);
 
                             SetResolved(memberPath);
                         }
@@ -566,16 +563,14 @@ namespace Sharpmake
 
                             SetResolved(memberPath);
                         }
-                        else if (propertyInfo.PropertyType.GetInterface(typeof(IList<string>).Name) != null)
+                        else if (propertyValue is IList<string>)
                         {
                             SetResolving(memberPath);
                             IList<string> values = propertyValue as IList<string>;
 
-                            if (values != null)
-                            {
-                                for (int i = 0; i < values.Count; ++i)
-                                    values[i] = Resolve(values[i], fallbackValue);
-                            }
+                            for (int i = 0; i < values.Count; ++i)
+                                values[i] = Resolve(values[i], fallbackValue);
+
                             SetResolved(memberPath);
                         }
                         else if (propertyInfo.PropertyType.IsClass)
