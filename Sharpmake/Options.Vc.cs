@@ -29,16 +29,20 @@ namespace Sharpmake
                     v100, // Visual Studio 2010
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     v110, // Visual Studio 2012
+                    [DevEnvVersion(minimum = DevEnv.vs2012)]
+                    v110_xp, // Visual Studio 2012 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2013)]
                     v120, // Visual Studio 2013
+                    [DevEnvVersion(minimum = DevEnv.vs2013)]
+                    v120_xp, // Visual Studio 2013 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     v140, // Visual Studio 2015
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    v140_xp, // Visual Studio 2015
+                    v140_xp, // Visual Studio 2015 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     v141, // Visual Studio 2017
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
-                    v141_xp, // Visual Studio 2017
+                    v141_xp, // Visual Studio 2017 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     LLVM_vs2012 // LLVM from Visual Studio 2012
                 }
