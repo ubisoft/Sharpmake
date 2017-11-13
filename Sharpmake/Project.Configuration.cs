@@ -98,7 +98,8 @@ namespace Sharpmake
         {
             public interface IConfigurationTasks
             {
-                void SetupLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
+                void SetupDynamicLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
+                void SetupStaticLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
                 string GetDefaultOutputExtension(OutputType outputType);
                 IEnumerable<string> GetPlatformLibraryPaths(Configuration configuration);
             }
@@ -1508,13 +1509,7 @@ namespace Sharpmake
                                 )
                                 {
                                     if (explicitDependenciesGlobal || !compile)
-                                    {
-                                        if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                                            DependenciesLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-
-                                        if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                                            DependenciesLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
-                                    }
+                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
                                 }
@@ -1534,7 +1529,7 @@ namespace Sharpmake
                                 if (dependency.ExportDllSymbols && (isImmediate || hasPublicPathToRoot || !goesThroughDLL))
                                 {
                                     if (explicitDependenciesGlobal || !compile)
-                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupLibraryPaths(this, dependencySetting, dependency);
+                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupDynamicLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
 

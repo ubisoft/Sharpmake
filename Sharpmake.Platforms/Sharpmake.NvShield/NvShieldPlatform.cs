@@ -48,7 +48,12 @@ namespace Sharpmake
                         return "a";
                 }
             }
-            public void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            {
+                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+            }
+
+            public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
                 DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
             }

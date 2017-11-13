@@ -39,7 +39,12 @@ namespace Sharpmake
             #endregion
 
             #region Project.Configuration.IConfigurationTasks implementation.
-            public void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            {
+                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+            }
+
+            public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
                 DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
             }
