@@ -460,9 +460,12 @@ namespace Sharpmake
                     [Default]
                     CPP11,
                     CPP14,
+                    CPP17,
                     GNU98,
                     GNU11,
-                    GNU14
+                    GNU14,
+                    GNU17,
+                    Latest
                 }
             }
 

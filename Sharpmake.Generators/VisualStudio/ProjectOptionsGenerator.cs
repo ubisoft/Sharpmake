@@ -209,6 +209,9 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.Options["CharacterSet"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["CharacterSet"] = FileGeneratorUtilities.RemoveLineTag;
+
+                context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
             }
             else
             {
@@ -221,6 +224,29 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.CharacterSet.Default, () => { context.Options["CharacterSet"] = "NotSet"; context.CommandLineOptions["CharacterSet"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.Vc.General.CharacterSet.Unicode, () => { context.Options["CharacterSet"] = "Unicode"; context.CommandLineOptions["CharacterSet"] = @"/D""_UNICODE"" /D""UNICODE"""; }),
                 Options.Option(Options.Vc.General.CharacterSet.MultiByte, () => { context.Options["CharacterSet"] = "MultiByte"; context.CommandLineOptions["CharacterSet"] = @"/D""_MBCS"""; })
+                );
+
+                //Options.Vc.Compiler.CppLanguageStandard.
+                //    CPP98                                   LanguageStandard=""
+                //    CPP11                                   LanguageStandard=""
+                //    CPP14                                   LanguageStandard="stdcpp14"                                    /std:c++14
+                //    CPP17                                   LanguageStandard="stdcpp17"                                    /std:c++17
+                //    GNU98                                   LanguageStandard=""
+                //    GNU11                                   LanguageStandard=""
+                //    GNU14                                   LanguageStandard="stdcpp14"                                    /std:c++14
+                //    GNU17                                   LanguageStandard="stdcpp17"                                    /std:c++17
+                //    Latest                                  LanguageStandard="stdcpplatest"                                /std:c++latest
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP98, () => { context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP11, () => { context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { context.Options["LanguageStandard"] = "stdcpp14"; context.CommandLineOptions["LanguageStandard"] = "/std:c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { context.Options["LanguageStandard"] = "stdcpp17"; context.CommandLineOptions["LanguageStandard"] = "/std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { context.Options["LanguageStandard"] = "stdcpp14"; context.CommandLineOptions["LanguageStandard"] = "/std:c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { context.Options["LanguageStandard"] = "stdcpp17"; context.CommandLineOptions["LanguageStandard"] = "/std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { context.Options["LanguageStandard"] = "stdcpplatest"; context.CommandLineOptions["LanguageStandard"] = "/std:c++latest"; })
                 );
             }
 
