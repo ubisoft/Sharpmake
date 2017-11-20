@@ -135,7 +135,8 @@ namespace Sharpmake
 
                                 executable = @"$RootPath$\cl.exe";
                                 var fastBuildCompilerSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.durango);
-                                rootPath = fastBuildCompilerSettings.BinPath[devEnv];
+
+                                fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out rootPath);
                             }
                             break;
                         default:
