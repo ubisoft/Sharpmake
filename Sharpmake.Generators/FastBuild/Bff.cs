@@ -381,6 +381,9 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildLinkerOutputFile = fastBuildOutputFile;
                         string fastBuildStampExecutable = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildStampArguments = FileGeneratorUtilities.RemoveLineTag;
+
+                        var postBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
+
                         var fastBuildTargetSubTargets = new List<string>();
                         {
                             if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
@@ -401,16 +404,12 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            foreach (var preEvent in conf.EventPreBuildExecute)
-                            {
-                                string fastBuildPreBuildAlias = preEvent.Key;
-                                fastBuildTargetSubTargets.Add(fastBuildPreBuildAlias);
-                            }
-                            foreach (var customPreEvent in conf.EventCustomPrebuildExecute)
-                            {
-                                string fastBuildCustomPreBuildAlias = customPreEvent.Key;
-                                fastBuildTargetSubTargets.Add(fastBuildCustomPreBuildAlias);
-                            }
+                            // the pre-steps are written in the master bff, we only need to refer their aliases
+                            fastBuildTargetSubTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
+                            fastBuildTargetSubTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
+
+                            fastBuildTargetSubTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
+                            fastBuildTargetSubTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
 
                             fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
 
@@ -430,10 +429,30 @@ namespace Sharpmake.Generators.FastBuild
                                 fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_" + outputType);
                             }
 
-                            foreach (var postEvent in conf.EventPostBuildExecute)
+                            foreach (var eventPair in conf.EventPostBuildExecute)
                             {
-                                string fastBuildPostBuildAlias = postEvent.Key;
-                                fastBuildTargetSubTargets.Add(fastBuildPostBuildAlias);
+                                fastBuildTargetSubTargets.Add(eventPair.Key);
+                                postBuildEvents.Add(eventPair.Key, eventPair.Value);
+                            }
+
+                            foreach (var buildEvent in conf.ResolvedEventPostBuildExe)
+                            {
+                                string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild);
+                                fastBuildTargetSubTargets.Add(eventKey);
+                                postBuildEvents.Add(eventKey, buildEvent);
+                            }
+
+                            foreach (var eventPair in conf.EventCustomPostBuildExecute)
+                            {
+                                fastBuildTargetSubTargets.Add(eventPair.Key);
+                                postBuildEvents.Add(eventPair.Key, eventPair.Value);
+                            }
+
+                            foreach (var buildEvent in conf.ResolvedEventCustomPostBuildExe)
+                            {
+                                string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction);
+                                fastBuildTargetSubTargets.Add(eventKey);
+                                postBuildEvents.Add(eventKey, buildEvent);
                             }
 
                             if (conf.Output != Project.Configuration.OutputType.Dll)
@@ -960,33 +979,36 @@ namespace Sharpmake.Generators.FastBuild
 
                                         bffGenerator.Write(Template.ConfigurationFile.EndSection);
 
-                                        foreach (var postEvent in conf.EventPostBuildExecute)
+                                        foreach (var postBuildEvent in postBuildEvents)
                                         {
-                                            if (postEvent.Value is Project.Configuration.BuildStepExecutable)
+                                            if (postBuildEvent.Value is Project.Configuration.BuildStepExecutable)
                                             {
-                                                var execCommand = postEvent.Value as Project.Configuration.BuildStepExecutable;
+                                                var execCommand = postBuildEvent.Value as Project.Configuration.BuildStepExecutable;
 
-                                                using (bffGenerator.Declare("fastBuildPreBuildName", postEvent.Key))
-                                                using (bffGenerator.Declare("fastBuildPrebuildExeFile", execCommand.ExecutableFile))
-                                                using (bffGenerator.Declare("fastBuildPreBuildInputFile", execCommand.ExecutableInputFileArgumentOption))
-                                                using (bffGenerator.Declare("fastBuildPreBuildOutputFile", execCommand.ExecutableOutputFileArgumentOption))
+                                                using (bffGenerator.Declare("fastBuildPreBuildName", postBuildEvent.Key))
+                                                using (bffGenerator.Declare("fastBuildPrebuildExeFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableFile))))
+                                                using (bffGenerator.Declare("fastBuildPreBuildInputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableInputFileArgumentOption))))
+                                                using (bffGenerator.Declare("fastBuildPreBuildOutputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableOutputFileArgumentOption))))
                                                 using (bffGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
-                                                using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory))
+                                                using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableWorkingDirectory))))
                                                 using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
                                                 }
                                             }
-                                            else if (postEvent.Value is Project.Configuration.BuildStepCopy)
+                                            else if (postBuildEvent.Value is Project.Configuration.BuildStepCopy)
                                             {
-                                                var copyCommand = postEvent.Value as Project.Configuration.BuildStepCopy;
+                                                var copyCommand = postBuildEvent.Value as Project.Configuration.BuildStepCopy;
 
-                                                using (bffGenerator.Declare("fastBuildCopyAlias", postEvent.Key))
-                                                using (bffGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
-                                                using (bffGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
-                                                using (bffGenerator.Declare("fastBuildCopyDirName", postEvent.Key))
-                                                using (bffGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(copyCommand.SourcePath)))
-                                                using (bffGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(copyCommand.DestinationPath)))
+                                                string sourcePath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.SourcePath));
+                                                string destinationPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.DestinationPath));
+
+                                                using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
+                                                using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
+                                                using (bffGenerator.Declare("fastBuildCopyDest", destinationPath))
+                                                using (bffGenerator.Declare("fastBuildCopyDirName", postBuildEvent.Key))
+                                                using (bffGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(sourcePath)))
+                                                using (bffGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(destinationPath)))
                                                 using (bffGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
                                                 using (bffGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
                                                 {

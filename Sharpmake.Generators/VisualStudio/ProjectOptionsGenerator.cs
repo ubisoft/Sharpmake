@@ -1607,56 +1607,11 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["PrePostLinkEventDescription"] = context.Configuration.EventPrePostLinkDescription != String.Empty ? context.Configuration.EventPrePostLinkDescription : FileGeneratorUtilities.RemoveLineTag;
             context.Options["PrePostLinkEventEnable"] = context.Configuration.EventPrePostLinkExcludedFromBuild ? "false" : "true";
 
-            if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.ExecuteTargetCopy)
+            if (!context.Configuration.IsFastBuild)
             {
-                foreach (var customEvent in context.Configuration.ResolvedEventPreBuildExe)
+                if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.ExecuteTargetCopy)
                 {
-                    if (context.Configuration.IsFastBuild && optionsContext.Resolver != null)
-                    {
-                        if (customEvent is Project.Configuration.BuildStepExecutable)
-                        {
-                            ResolveExecutable(context, optionsContext, customEvent, Vcxproj.BuildStep.PreBuild);
-                        }
-                        else if (customEvent is Project.Configuration.BuildStepCopy)
-                        {
-                            ResolveCopy(context, optionsContext, customEvent, Vcxproj.BuildStep.PreBuild);
-                        }
-                    }
-                    else
-                    {
-                        if (customEvent is Project.Configuration.BuildStepExecutable)
-                        {
-                            var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
-
-                            string relativeExecutableFile = Util.PathGetRelative(context.ProjectDirectory, execEvent.ExecutableFile);
-                            context.Configuration.EventPreBuild.Add(String.Format(relativeExecutableFile + @" {0}", execEvent.ExecutableOtherArguments));
-                        }
-                        else if (customEvent is Project.Configuration.BuildStepCopy)
-                        {
-                            var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
-                            context.Configuration.EventPreBuild.Add(copyEvent.GetCopyCommand(context.ProjectDirectory, optionsContext.Resolver));
-                        }
-                        else
-                        {
-                            throw new Error("Invalid type in Prebuild steps");
-                        }
-                    }
-                }
-
-                foreach (var customEvent in context.Configuration.ResolvedEventPostBuildExe)
-                {
-                    if (context.Configuration.IsFastBuild && optionsContext.Resolver != null)
-                    {
-                        if (customEvent is Project.Configuration.BuildStepExecutable)
-                        {
-                            ResolveExecutable(context, optionsContext, customEvent, Vcxproj.BuildStep.PostBuild);
-                        }
-                        else if (customEvent is Project.Configuration.BuildStepCopy)
-                        {
-                            ResolveCopy(context, optionsContext, customEvent, Vcxproj.BuildStep.PostBuild);
-                        }
-                    }
-                    else
+                    foreach (var customEvent in context.Configuration.ResolvedEventPreBuildExe)
                     {
                         if (customEvent is Project.Configuration.BuildStepExecutable)
                         {
@@ -1665,8 +1620,34 @@ namespace Sharpmake.Generators.VisualStudio
                             string relativeExecutableFile = Util.PathGetRelative(context.ProjectDirectory, execEvent.ExecutableFile);
                             string eventString = string.Format(
                                 "{0} {1}",
-                                Util.SimplifyPath(optionsContext.Resolver.Resolve(relativeExecutableFile)),
-                                optionsContext.Resolver.Resolve(execEvent.ExecutableOtherArguments)
+                                Util.SimplifyPath(relativeExecutableFile),
+                                execEvent.ExecutableOtherArguments
+                            );
+
+                            context.Configuration.EventPreBuild.Add(eventString);
+                        }
+                        else if (customEvent is Project.Configuration.BuildStepCopy)
+                        {
+                            var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
+                            context.Configuration.EventPreBuild.Add(copyEvent.GetCopyCommand(context.ProjectDirectory, optionsContext.Resolver));
+                        }
+                        else
+                        {
+                            throw new Error("Unsupported type of build event found in Prebuild steps: " + customEvent.GetType().Name);
+                        }
+                    }
+
+                    foreach (var customEvent in context.Configuration.ResolvedEventPostBuildExe)
+                    {
+                        if (customEvent is Project.Configuration.BuildStepExecutable)
+                        {
+                            var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
+
+                            string relativeExecutableFile = Util.PathGetRelative(context.ProjectDirectory, execEvent.ExecutableFile);
+                            string eventString = string.Format(
+                                "{0} {1}",
+                                Util.SimplifyPath(relativeExecutableFile),
+                                execEvent.ExecutableOtherArguments
                             );
 
                             if (!context.Configuration.EventPostBuild.Contains(eventString))
@@ -1682,55 +1663,25 @@ namespace Sharpmake.Generators.VisualStudio
                         }
                         else
                         {
-                            throw new Error("Invalid type in PostBuild steps");
+                            throw new Error("Unsupported type of build event found in PostBuild steps: " + customEvent.GetType().Name);
                         }
                     }
                 }
 
-                foreach (var customEvent in context.Configuration.ResolvedEventCustomPreBuildExe)
+                if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.Output == Project.Configuration.OutputType.Dll)
                 {
-                    if (context.Configuration.IsFastBuild && optionsContext.Resolver != null)
+                    if (context.Configuration.PostBuildStampExe != null)
                     {
-                        if (customEvent is Project.Configuration.BuildStepExecutable)
-                        {
-                            ResolveExecutable(context, optionsContext, customEvent, Vcxproj.BuildStep.PreBuildCustomAction);
-                        }
-                        else if (customEvent is Project.Configuration.BuildStepCopy)
-                        {
-                            ResolveCopy(context, optionsContext, customEvent, Vcxproj.BuildStep.PreBuildCustomAction);
-                        }
+                        context.Configuration.EventPostBuild.Insert(0,
+                            string.Format(
+                                "{0} {1} {2} {3}",
+                                Util.SimplifyPath(Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PostBuildStampExe.ExecutableFile)),
+                                context.Configuration.PostBuildStampExe.ExecutableInputFileArgumentOption,
+                                context.Configuration.PostBuildStampExe.ExecutableOutputFileArgumentOption,
+                                context.Configuration.PostBuildStampExe.ExecutableOtherArguments
+                            )
+                        );
                     }
-                }
-
-                foreach (var customEvent in context.Configuration.ResolvedEventCustomPostBuildExe)
-                {
-                    if (context.Configuration.IsFastBuild && optionsContext.Resolver != null)
-                    {
-                        if (customEvent is Project.Configuration.BuildStepExecutable)
-                        {
-                            ResolveExecutable(context, optionsContext, customEvent, Vcxproj.BuildStep.PostBuildCustomAction);
-                        }
-                        else if (customEvent is Project.Configuration.BuildStepCopy)
-                        {
-                            ResolveCopy(context, optionsContext, customEvent, Vcxproj.BuildStep.PostBuildCustomAction);
-                        }
-                    }
-                }
-            }
-
-            if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.Output == Project.Configuration.OutputType.Dll)
-            {
-                if (context.Configuration.PostBuildStampExe != null && !context.Configuration.IsFastBuild)
-                {
-                    context.Configuration.EventPostBuild.Insert(0,
-                        string.Format(
-                            "{0} {1} {2} {3}",
-                            Util.SimplifyPath(Util.PathGetRelative(context.ProjectDirectory, optionsContext.Resolver.Resolve(context.Configuration.PostBuildStampExe.ExecutableFile))),
-                            context.Configuration.PostBuildStampExe.ExecutableInputFileArgumentOption,
-                            context.Configuration.PostBuildStampExe.ExecutableOutputFileArgumentOption,
-                            context.Configuration.PostBuildStampExe.ExecutableOtherArguments
-                        )
-                    );
                 }
             }
 
@@ -1755,79 +1706,11 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["CustomBuildStepTreatOutputAsContent"] = context.Configuration.CustomBuildStepTreatOutputAsContent != String.Empty ? context.Configuration.CustomBuildStepTreatOutputAsContent : FileGeneratorUtilities.RemoveLineTag;
         }
 
-        private void ResolveCopy(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, Project.Configuration.BuildStepBase copyBuildStep, Vcxproj.BuildStep buildStep)
+        public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)
         {
-            var customEvent = (Project.Configuration.BuildStepCopy)copyBuildStep;
-            var copyCustomEvent = new Project.Configuration.BuildStepCopy(customEvent);
+            if (!eventBuildStep.IsResolved)
+                throw new Error("Event hasn't been resolved!");
 
-            var isFolder = !copyCustomEvent.DestinationPath.Substring(copyCustomEvent.DestinationPath.LastIndexOf(@"\", System.StringComparison.Ordinal)).Contains(".");
-
-            if (isFolder || Directory.Exists(copyCustomEvent.SourcePath) && (Directory.Exists(copyCustomEvent.DestinationPath)))
-                IntermediateCopyStep(context, optionsContext, copyCustomEvent, buildStep, true);
-            else
-                IntermediateCopyStep(context, optionsContext, copyCustomEvent, buildStep);
-        }
-
-        private void IntermediateCopyStep(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, Project.Configuration.BuildStepCopy customEvent, Vcxproj.BuildStep buildStep, bool isDirectory = false)
-        {
-            customEvent.DestinationPath = Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.DestinationPath)));
-            customEvent.SourcePath = Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.SourcePath)));
-
-            var newCustomEvent = new Project.Configuration.BuildStepCopy(customEvent);
-
-            if (isDirectory)
-                newCustomEvent.IsFileCopy = false;
-
-            var copyName = GetBuildStepName(context, optionsContext, newCustomEvent, buildStep);
-            AddEventToBuildStep(context, newCustomEvent, buildStep, copyName);
-        }
-
-        private void ResolveExecutable(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, Project.Configuration.BuildStepBase executableBuildStep, Vcxproj.BuildStep buildStep)
-        {
-            var customEvent = (Project.Configuration.BuildStepExecutable)executableBuildStep;
-
-            var newCustomEvent = new Project.Configuration.BuildStepExecutable(
-                Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableFile))),
-                Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableInputFileArgumentOption))),
-                Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableOutputFileArgumentOption))),
-                optionsContext.Resolver.Resolve(customEvent.ExecutableOtherArguments),
-                customEvent.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, optionsContext.Resolver.Resolve(customEvent.ExecutableWorkingDirectory)))
-            );
-
-            newCustomEvent.FastBuildUseStdOutAsOutput = customEvent.FastBuildUseStdOutAsOutput;
-
-            var execName = GetBuildStepName(context, optionsContext, newCustomEvent, buildStep);
-            AddEventToBuildStep(context, newCustomEvent, buildStep, execName);
-        }
-
-        private void AddEventToBuildStep(IGenerationContext context, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep, string eventName)
-        {
-            switch (buildStep)
-            {
-                case Vcxproj.BuildStep.PostBuild:
-                    if (!context.Configuration.EventPostBuildExecute.ContainsKey(eventName))
-                        context.Configuration.EventPostBuildExecute.Add(eventName, eventBuildStep);
-                    break;
-
-                case Vcxproj.BuildStep.PostBuildCustomAction:
-                    if (!context.Configuration.EventCustomPostBuildExecute.ContainsKey(eventName))
-                        context.Configuration.EventCustomPostBuildExecute.Add(eventName, eventBuildStep);
-                    break;
-
-                case Vcxproj.BuildStep.PreBuild:
-                    if (!context.Configuration.EventPreBuildExecute.ContainsKey(eventName))
-                        context.Configuration.EventPreBuildExecute.Add(eventName, eventBuildStep);
-                    break;
-
-                case Vcxproj.BuildStep.PreBuildCustomAction:
-                    if (!context.Configuration.EventCustomPrebuildExecute.ContainsKey(eventName))
-                        context.Configuration.EventCustomPrebuildExecute.Add(eventName, eventBuildStep);
-                    break;
-            }
-        }
-
-        private string GetBuildStepName(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)
-        {
             if (eventBuildStep is Project.Configuration.BuildStepExecutable)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepExecutable;
@@ -1836,13 +1719,13 @@ namespace Sharpmake.Generators.VisualStudio
                 if (buildStep == Vcxproj.BuildStep.PostBuild || buildStep == Vcxproj.BuildStep.PostBuildCustomAction || cEvent.IsNameSpecific)
                 {
                     execName = @"Exec_"
-                               + cEvent.ExecutableFile.Substring(cEvent.ExecutableFile.LastIndexOf(@"\") + 1);
-                    execName += "_" + (context.Configuration.TargetPath + context.Configuration.TargetFileFullName).GetHashCode().ToString("X8");
+                               + cEvent.ExecutableFile.Substring(cEvent.ExecutableFile.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
+                    execName += "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
                 }
                 else
                 {
                     execName = @"Exec_"
-                           + cEvent.ExecutableFile.Substring(cEvent.ExecutableFile.LastIndexOf(@"\") + 1);
+                           + cEvent.ExecutableFile.Substring(cEvent.ExecutableFile.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
                     execName += "_" + (execName).GetHashCode().ToString("X8");
                 }
                 execName = execName.Replace('.', '_');
@@ -1857,7 +1740,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (buildStep == Vcxproj.BuildStep.PostBuild || buildStep == Vcxproj.BuildStep.PostBuildCustomAction || cEvent.IsNameSpecific)
                 {
-                    copyName = "Copy_" + (optionsContext.Resolver.Resolve(context.Configuration.TargetFileFullName) + cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (conf.TargetFileFullName + cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
                 }
                 else
                 {
