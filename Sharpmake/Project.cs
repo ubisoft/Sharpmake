@@ -1646,7 +1646,8 @@ namespace Sharpmake
         public enum WrapperToolEnum
         {
             tlbimp,
-            primary
+            primary,
+            aximp
         }
     }
 
