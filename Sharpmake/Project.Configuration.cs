@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -603,6 +604,7 @@ namespace Sharpmake
             }
 
             // container for copy
+            [Resolver.Resolvable]
             public class BuildStepCopy : BuildStepBase
             {
                 public BuildStepCopy(BuildStepCopy buildStepCopy)
@@ -639,11 +641,24 @@ namespace Sharpmake
                     string destinationRelativePath = Util.PathGetRelative(workingPath, resolver.Resolve(DestinationPath));
                     return string.Format("robocopy.exe /xo /ns /nc /np /njh /njs /ndl /nfl {0} {1} {2} >nul", sourceRelativePath, destinationRelativePath, CopyPattern);
                 }
+
+                internal override void Resolve(Resolver resolver)
+                {
+                    base.Resolve(resolver);
+
+                    // TODO: that test is very dodgy. Please remove this, and have the user set the property instead, or even create a new BuildStepCopyDir type
+                    var destinationIsFolder = !DestinationPath.Substring(DestinationPath.LastIndexOf(@"\", StringComparison.Ordinal)).Contains(".");
+                    bool isFolderCopy = destinationIsFolder || (Util.DirectoryExists(SourcePath) && Util.DirectoryExists(DestinationPath));
+                    if (isFolderCopy)
+                        IsFileCopy = false;
+                }
             }
 
             public abstract class BuildStepBase : IComparable
             {
                 public bool IsNameSpecific { get; set; }
+
+                public bool IsResolved { get; private set; } = false;
 
                 // Override this to control the order of BuildStep execution in Build Events
                 public virtual int CompareTo(object obj)
@@ -652,6 +667,16 @@ namespace Sharpmake
                         return 1;
 
                     return 0;
+                }
+
+                internal virtual void Resolve(Resolver resolver)
+                {
+                    if (IsResolved)
+                        return;
+
+                    resolver.Resolve(this);
+
+                    IsResolved = true;
                 }
             }
 
@@ -873,8 +898,6 @@ namespace Sharpmake
                 resolver.SetParameter("conf", this);
                 resolver.SetParameter("target", Target);
                 resolver.Resolve(this);
-                resolver.RemoveParameter("conf");
-                resolver.RemoveParameter("target");
 
                 Util.ResolvePath(Project.SharpmakeCsPath, ref ProjectPath);
                 if (DebugBreaks.ShouldBreakOnProjectPath(DebugBreaks.Context.Resolving, Path.Combine(ProjectPath, ProjectFileName) + (Project is CSharpProject ? ".csproj" : ".vcxproj"), this))
@@ -934,10 +957,36 @@ namespace Sharpmake
 
                 _resolvedTargetDependsFiles.AddRange(TargetDependsFiles);
                 _resolvedTargetCopyFiles.AddRange(TargetCopyFiles);
-                _resolvedEventPreBuildExe.AddRange(EventPreBuildExe);
-                _resolvedEventPostBuildExe.AddRange(EventPostBuildExe);
-                _resolvedEventCustomPreBuildExe.AddRange(EventCustomPreBuildExe);
-                _resolvedEventCustomPostBuildExe.AddRange(EventCustomPostBuildExe);
+
+                foreach (var tuple in new[] {
+                    Tuple.Create(EventPreBuildExe,        _resolvedEventPreBuildExe),
+                    Tuple.Create(EventPostBuildExe,       _resolvedEventPostBuildExe),
+                    Tuple.Create(EventCustomPreBuildExe,  _resolvedEventCustomPreBuildExe),
+                    Tuple.Create(EventCustomPostBuildExe, _resolvedEventCustomPostBuildExe),
+                })
+                {
+                    UniqueList<BuildStepBase> eventsToResolve = tuple.Item1;
+                    UniqueList<BuildStepBase> resolvedEvents = tuple.Item2;
+
+                    foreach (BuildStepBase eventToResolve in eventsToResolve)
+                        eventToResolve.Resolve(resolver);
+
+                    resolvedEvents.AddRange(eventsToResolve);
+                }
+
+                foreach (var eventDictionary in new[]{
+                    EventPreBuildExecute,
+                    EventCustomPrebuildExecute,
+                    EventPostBuildExecute,
+                    EventCustomPostBuildExecute
+                })
+                {
+                    foreach (KeyValuePair<string, BuildStepBase> eventPair in eventDictionary)
+                        eventPair.Value.Resolve(resolver);
+                }
+
+                if(PostBuildStampExe != null)
+                    PostBuildStampExe.Resolve(resolver);
 
                 string dependencyExtension = Util.GetProjectFileExtension(this);
                 ProjectFullFileNameWithExtension = ProjectFullFileName + dependencyExtension;
@@ -949,6 +998,9 @@ namespace Sharpmake
                     PrecompHeader = Util.SimplifyPath(PrecompHeader);
                 if (PrecompSource != null)
                     PrecompSource = Util.SimplifyPath(PrecompSource);
+
+                resolver.RemoveParameter("conf");
+                resolver.RemoveParameter("target");
             }
 
             private void SetDependency(
