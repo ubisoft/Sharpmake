@@ -1613,6 +1613,10 @@ namespace Sharpmake
         public FastBuildAllProject(Type targetType)
             : base(targetType)
         {
+            // disable automatic source files discovery
+            SourceFilesExtensions.Clear();
+            ResourceFilesExtensions.Clear();
+            PRIFilesExtensions.Clear();
         }
     }
 

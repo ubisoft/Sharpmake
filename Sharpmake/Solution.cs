@@ -409,6 +409,7 @@ namespace Sharpmake
                         {
                             Name = FastBuildAllProjectName,
                             RootPath = firstProject.Project.RootPath,
+                            SourceRootPath = firstProject.Project.RootPath,
                             IsFileNameToLower = firstProject.Project.IsFileNameToLower
                         };
                     }
