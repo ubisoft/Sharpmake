@@ -216,6 +216,10 @@ namespace Sharpmake
 
             StringBuilder builder = null;
 
+            // Support escape char for MemberPath
+            // [[MyString]] will convert to [MyString]
+            bool containsEscaped = false;
+
             while (true)
             {
                 int startMatch = 0;
@@ -266,7 +270,16 @@ namespace Sharpmake
                         }
                     }
 
-                    if (isValidMember)
+                    // A string is escaped if the _PathBeginStrings/_PathEndStrings char is doubled (ie [[ ]])
+                    // Also make sure that matchTypeIndex is a char, not a string
+                    bool isEscaped = _pathBeginStrings[matchTypeIndex].Length == 1 &&
+                                     memberStartIndex > 1 && endMatch < str.Length - 1 &&
+                                     str[memberStartIndex - 2] == str[memberStartIndex - 1] &&
+                                     str[endMatch] == str[endMatch + 1];
+
+                    containsEscaped |= isEscaped;
+
+                    if (isValidMember && !isEscaped)
                     {
                         string resolveResult = GetMemberStringValue(str.Substring(memberStartIndex, endMatch - memberStartIndex), fallbackValue == null) ?? fallbackValue?.ToString();
                         if (resolveResult == null)
@@ -289,7 +302,7 @@ namespace Sharpmake
                 }
 
                 if (nbrReplacements == 0 && currentSearchIndex == 0)
-                    return str;
+                    break;
 
                 builder.Append(str, currentSearchIndex, strLength - currentSearchIndex);
                 str = builder.ToString();
@@ -297,6 +310,25 @@ namespace Sharpmake
 
                 if (nbrReplacements == 0)
                     break;
+            }
+
+            if (!containsEscaped)
+                return str;
+
+            // Now that we have done all replace, convert all escaped char.
+            foreach (string beginStr in _pathBeginStrings)
+            {
+                if (beginStr.Length != 1)
+                    continue;
+                string escapedStr = beginStr + beginStr;
+                str = str.Replace(escapedStr, beginStr);
+            }
+
+            foreach (char endChar in _pathEndCharacters)
+            {
+                string endStr = string.Empty + endChar;
+                string escapedStr = endStr + endStr;
+                str = str.Replace(escapedStr, endStr);
             }
 
             return str;
