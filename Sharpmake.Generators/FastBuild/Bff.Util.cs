@@ -260,38 +260,38 @@ namespace Sharpmake.Generators.FastBuild
 
         private static void GetOrderedFlattenedProjectDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies, bool allDependencies)
         {
-            if (conf.IsFastBuild)
+            if (!conf.IsFastBuild)
+                return;
+
+            var confDependencies = allDependencies ? conf.ResolvedDependencies.ToList() : conf.ConfigurationDependencies.ToList();
+
+            if (confDependencies.Contains(conf))
+                throw new Error("Cyclic dependency detected in project " + conf);
+
+            if (!allDependencies)
             {
-                IEnumerable<Project.Configuration> confDependencies = allDependencies ? conf.ResolvedDependencies : conf.ConfigurationDependencies;
-
-                if (confDependencies.Contains(conf))
-                    throw new Error("Cyclic dependency detected in project " + conf);
-
-                if (!allDependencies)
+                var tmpDeps = new UniqueList<Project.Configuration>();
+                foreach (Project.Configuration dep in confDependencies)
                 {
-                    UniqueList<Project.Configuration> tmpDeps = new UniqueList<Project.Configuration>();
-                    foreach (var dep in confDependencies)
-                    {
-                        GetOrderedFlattenedProjectDependenciesInternal(dep, tmpDeps, true);
-                        tmpDeps.Add(dep);
-                    }
-                    foreach (var dep in tmpDeps)
-                    {
-                        if (dep.IsFastBuild && confDependencies.Contains(dep) && (conf != dep))
-                            dependencies.Add(dep);
-                    }
+                    GetOrderedFlattenedProjectDependenciesInternal(dep, tmpDeps, true);
+                    tmpDeps.Add(dep);
                 }
-                else
+                foreach (Project.Configuration dep in tmpDeps)
                 {
-                    foreach (var dep in confDependencies)
-                    {
-                        if (dependencies.Contains(dep))
-                            continue;
+                    if (dep.IsFastBuild && confDependencies.Contains(dep) && (conf != dep))
+                        dependencies.Add(dep);
+                }
+            }
+            else
+            {
+                foreach (Project.Configuration dep in confDependencies)
+                {
+                    if (dependencies.Contains(dep))
+                        continue;
 
-                        GetOrderedFlattenedProjectDependenciesInternal(dep, dependencies, true);
-                        if (dep.IsFastBuild)
-                            dependencies.Add(dep);
-                    }
+                    GetOrderedFlattenedProjectDependenciesInternal(dep, dependencies, true);
+                    if (dep.IsFastBuild)
+                        dependencies.Add(dep);
                 }
             }
         }
