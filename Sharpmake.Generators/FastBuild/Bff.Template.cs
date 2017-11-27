@@ -312,6 +312,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.ForceConformanceInForLoopScope]'
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.OpenMP]'
+            + ' [cmdLineOptions.LanguageStandard]'
             // Output Files options
             // ---------------------------
             + ' [cmdLineOptions.CompilerProgramDatabaseFile]'
