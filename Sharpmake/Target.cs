@@ -232,6 +232,7 @@ namespace Sharpmake
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0: return "10.0.10586.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0: return "10.0.14393.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0: return "10.0.15063.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0: return "10.0.16299.0";
                 default:
                     throw new ArgumentOutOfRangeException("WindowsTargetPlatformVersion");
             }

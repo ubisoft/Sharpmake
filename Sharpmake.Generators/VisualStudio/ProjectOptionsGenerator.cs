@@ -149,7 +149,8 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.10240.0"; }),
                 Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.10586.0"; }),
                 Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.14393.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.15063.0"; })
+                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.15063.0"; }),
+                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.16299.0"; })
                 );
         }
 
