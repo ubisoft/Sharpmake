@@ -451,12 +451,17 @@ namespace Sharpmake
                     CPP98,
                     [Default]
                     CPP11,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
                     CPP14,
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
                     CPP17,
                     GNU98,
                     GNU11,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
                     GNU14,
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
                     GNU17,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Latest
                 }
             }
