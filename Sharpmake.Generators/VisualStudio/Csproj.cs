@@ -1355,7 +1355,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<string> resolvedNoneFiles =
                 (project.ResolvedNoneFullFileNames.Select(file => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(file))))
                 .Concat(project.AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))))
-                .Where(f => !allContents.Contains(f)).Distinct().ToList();
+                .Where(f => !allContents.Contains(f) && !resolvedResources.Contains(f) && !resolvedEmbeddedResource.Contains(f)).Distinct().ToList();
 
             //Add the None files from the configuration
             resolvedNoneFiles = resolvedNoneFiles.Concat(
