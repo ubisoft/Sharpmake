@@ -379,7 +379,7 @@ namespace Sharpmake
                 throw new InternalError();
 
             // Keep track of assemblies explicitly referenced by compiled files
-            _referenceList = assembler.References.ToDictionary(fullpath => AssemblyName.GetAssemblyName(fullpath).FullName.ToString(), fullpath => fullpath);
+            _referenceList = assembler.References.Distinct().ToDictionary(fullpath => AssemblyName.GetAssemblyName(fullpath).FullName.ToString(), fullpath => fullpath);
 
             // load platforms if they were passed as references
             using (var extensionLoader = new ExtensionLoader())
