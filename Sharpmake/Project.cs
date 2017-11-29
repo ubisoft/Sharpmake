@@ -1718,6 +1718,14 @@ namespace Sharpmake
             SourceFilesExtensions.Add(".asax");
         }
 
+        public AspNetProject(Type targetType)
+            : base(targetType)
+        {
+            ProjectTypeGuids = CSharpProjectType.AspNetMvc5;
+            ResourceFilesExtensions.Add(".cshtml", ".js", ".pubxml");
+            SourceFilesExtensions.Add(".asax");
+        }
+
         public void AddCommonWebExtensions()
         {
             ResourceFilesExtensions.Add(".css", ".map", ".eot", ".svg", ".ttf", ".woff", ".woff2", ".ico", ".png");
