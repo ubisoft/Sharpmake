@@ -1188,26 +1188,32 @@ namespace Sharpmake
                 return dependencyConf;
             }
 
-            private void GetRecursiveDependencies(HashSet<Configuration> resolved)
+            private void GetRecursiveDependencies(
+                HashSet<Configuration> resolved,
+                HashSet<Configuration> unresolved
+            )
             {
                 foreach (Configuration c in ResolvedDependencies)
                 {
-                    if(resolved.Contains(c))
+                    if (resolved.Contains(c))
                         continue;
 
-                    c.GetRecursiveDependencies(resolved);
+                    if (!unresolved.Add(c))
+                        throw new Error($"Cyclic dependency detected while following dependency chain of configuration: {this}");
+
+                    c.GetRecursiveDependencies(resolved, unresolved);
+
                     resolved.Add(c);
+                    unresolved.Remove(c);
                 }
             }
-
 
             internal List<Configuration> GetRecursiveDependencies()
             {
                 var result = new HashSet<Configuration>();
-                GetRecursiveDependencies(result);
+                GetRecursiveDependencies(result, new HashSet<Configuration>());
 
-                List<Configuration> dependencies = new List<Configuration>(result);
-                return dependencies;
+                return result.ToList();
             }
 
             public Strings ProjectReferencesByPath = new Strings();
