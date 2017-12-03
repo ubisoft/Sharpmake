@@ -317,6 +317,16 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            Solution.ResolvedProject fastBuildAllProjectForSolutionDependency = null;
+            if(solution.FastBuildAllSlnDependencyFromExe)
+            {
+                var fastBuildAllProjects = solutionProjects.Where(p => p.Project is FastBuildAllProject).ToArray();
+                if (fastBuildAllProjects.Length > 1)
+                    throw new Error("More than one FastBuildAll project");
+                if (fastBuildAllProjects.Length == 1)
+                    fastBuildAllProjectForSolutionDependency = fastBuildAllProjects[0];
+            }
+
             using (fileGenerator.Declare("solution", solution))
             using (fileGenerator.Declare("solutionGuid", solutionGuid))
             {
@@ -330,6 +340,19 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("projectTypeGuid", resolvedProject.UserData["TypeGuid"]))
                     {
                         fileGenerator.Write(Template.Solution.ProjectBegin);
+
+                        if (fastBuildAllProjectForSolutionDependency != null)
+                        {
+                            bool writeDependencyToFastBuildAll = resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe);
+                            if (writeDependencyToFastBuildAll)
+                            {
+                                fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
+                                using (fileGenerator.Declare("projectDependencyGuid", fastBuildAllProjectForSolutionDependency.UserData["Guid"]))
+                                    fileGenerator.Write(Template.Solution.ProjectDependency);
+                                fileGenerator.Write(Template.Solution.ProjectSectionEnd);
+                            }
+                        }
+
                         fileGenerator.Write(Template.Solution.ProjectEnd);
                     }
                 }
