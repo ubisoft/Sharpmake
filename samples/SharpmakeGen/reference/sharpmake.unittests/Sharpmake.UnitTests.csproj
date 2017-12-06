@@ -50,6 +50,7 @@
     <Compile Include="CSharpDependencyPropagationTest.cs" />
     <Compile Include="CommandLineTest.cs" />
     <Compile Include="DependencyPropagationTest.cs" />
+    <Compile Include="KitsRootPathsTests.cs" />
     <Compile Include="ResolverTest.cs" />
     <Compile Include="UtilTest.cs" />
   </ItemGroup>

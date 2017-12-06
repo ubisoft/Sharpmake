@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -79,6 +79,7 @@
     <Compile Include="IPlatformDescriptor.cs" />
     <Compile Include="IResolverHelper.cs" />
     <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
+    <Compile Include="KitsRootPaths.cs" />
     <Compile Include="Options.AndroidMakefile.cs" />
     <Compile Include="Options.CSharp.cs" />
     <Compile Include="Options.Makefile.cs" />
