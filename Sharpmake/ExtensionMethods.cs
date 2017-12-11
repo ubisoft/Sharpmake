@@ -425,6 +425,55 @@ namespace Sharpmake
         {
             return Path.Combine(GetVisualStudioDir(visualVersion), "Common7\\Tools");
         }
+
+        /// <summary>
+        /// Gets whether a <see cref="DevEnv"/> is a Visual Studio version.
+        /// </summary>
+        /// <param name="devEnv">The <see cref="DevEnv"/> to check.</param>
+        /// <returns>`true` if <paramref name="devEnv"/> is a Visual Studio version, `false` otherwise.</returns>
+        public static bool IsVisualStudio(this DevEnv devEnv)
+        {
+            switch (devEnv)
+            {
+                case DevEnv.vs2010:
+                case DevEnv.vs2012:
+                case DevEnv.vs2013:
+                case DevEnv.vs2015:
+                case DevEnv.vs2017:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether two <see cref="DevEnv"/> values generate ABI-compatible binaries with
+        /// their respective C++ compiler.
+        /// </summary>
+        /// <param name="devEnv">The <see cref="DevEnv"/> to check for ABI-compatibility.</param>
+        /// <param name="other">The other <see cref="DevEnv"/> to check for ABI-compatibility with.</param>
+        /// <returns>`true` if ABI-compatible, `false` otherwise.</returns>
+        /// <exception cref="ArgumentException"><paramref name="devEnv"/> is not a Visual Studio version.</exception>
+        /// <remarks>
+        /// Only works for Visual Studio versions because other DevEnvs (such as Eclipse) are not
+        /// shipped with a compiler version.
+        /// </remarks>
+        public static bool IsAbiCompatibleWith(this DevEnv devEnv, DevEnv other)
+        {
+            if (!devEnv.IsVisualStudio())
+                throw new ArgumentException($"{devEnv} is not a Visual Studio DevEnv.");
+
+            // a devenv is compatible with itself (identity check)
+            if (devEnv == other)
+                return true;
+
+            // VS2017 is guaranteed by Microsoft to be ABI-compatible with VS2015 for C++.
+            if (devEnv == DevEnv.vs2015 && other == DevEnv.vs2017 || devEnv == DevEnv.vs2017 && other == DevEnv.vs2015)
+                return true;
+
+            return false;
+        }
     }
 
 }
