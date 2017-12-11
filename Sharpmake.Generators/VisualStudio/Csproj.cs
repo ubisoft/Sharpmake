@@ -2754,8 +2754,8 @@ namespace Sharpmake.Generators.VisualStudio
             options["ConcordSDKDir"] = Options.StringOption.Get<Options.CSharp.ConcordSDKDir>(conf);
             options["UpdateInterval"] = Options.IntOption.Get<Options.CSharp.UpdateInterval>(conf);
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
-            options["ManifestKeyFile"] = GetStringOption<Options.CSharp.ManifestKeyFile>(conf);
-            options["ManifestCertificateThumbprint"] = GetStringOption<Options.CSharp.ManifestCertificateThumbprint>(conf);
+            options["ManifestKeyFile"] = Options.StringOption.Get<Options.CSharp.ManifestKeyFile>(conf);
+            options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
 
             // concat defines, don't add options.Defines since they are automaticly added by VS
             Strings defines = new Strings();
