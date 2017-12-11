@@ -945,7 +945,7 @@ namespace Sharpmake
                 string dependencyExtension = Util.GetProjectFileExtension(this);
                 ProjectFullFileNameWithExtension = ProjectFullFileName + dependencyExtension;
 
-                if (!this.Project.GetType().IsDefined(typeof(Compile), false))
+                if (string.IsNullOrEmpty(ProjectGuid) && !this.Project.GetType().IsDefined(typeof(Compile), false))
                     ProjectGuid = Util.BuildGuid(ProjectFullFileNameWithExtension, Project.GuidReferencePath);
 
                 if (PrecompHeader != null)
