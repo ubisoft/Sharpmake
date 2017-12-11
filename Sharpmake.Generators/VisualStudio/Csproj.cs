@@ -523,7 +523,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Resolve(Resolver resolver)
                 {
                     using (resolver.NewScopedParameter("include", Include))
-                    using (resolver.NewScopedParameter("projectGUID", Project.ToString("B").ToUpper()))
+                    using (resolver.NewScopedParameter("projectGUID", Project.ToString("B")))
                     using (resolver.NewScopedParameter("projectRefName", Name))
                     using (resolver.NewScopedParameter("private", Private.ToString().ToLower()))
                     using (resolver.NewScopedParameter("ReferenceOutputAssembly", ReferenceOutputAssembly))
