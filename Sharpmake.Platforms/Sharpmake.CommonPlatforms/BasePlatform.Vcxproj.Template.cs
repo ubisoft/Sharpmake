@@ -121,7 +121,7 @@ namespace Sharpmake
       <HeapCommitSize>[options.HeapCommitSize]</HeapCommitSize>
       <StackReserveSize>[options.StackReserveSize]</StackReserveSize>
       <StackCommitSize>[options.StackCommitSize]</StackCommitSize>
-      <LargeAddressAware>true</LargeAddressAware>
+      <LargeAddressAware>[options.LargeAddressAware]</LargeAddressAware>
       <MapFileName>[options.MapFileName]</MapFileName>
       <ImportLibrary>[options.ImportLibrary]</ImportLibrary>
       <FunctionOrder>[options.FunctionOrder]</FunctionOrder>
@@ -129,6 +129,7 @@ namespace Sharpmake
       <DelayLoadDLLs>[options.DelayLoadedDLLs]</DelayLoadDLLs>
       <BaseAddress>[options.BaseAddress]</BaseAddress>
       <UACExecutionLevel>[options.UACExecutionLevel]</UACExecutionLevel>
+      <AllowIsolation>[options.AllowIsolation]</AllowIsolation>
     </Link>
 ";
 
