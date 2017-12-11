@@ -38,8 +38,8 @@ namespace Sharpmake
       <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
       <IgnoreStandardIncludePath>[options.IgnoreStandardIncludePath]</IgnoreStandardIncludePath>
       <PreprocessToFile>[options.GeneratePreprocessedFile]</PreprocessToFile>
-      <PreprocessSuppressLineNumbers>[options.KeepComments]</PreprocessSuppressLineNumbers>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>[options.PreprocessSuppressLineNumbers]</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>[options.KeepComments]</PreprocessKeepComments>
       <StringPooling>[options.StringPooling]</StringPooling>
       <MinimalRebuild>[options.MinimalRebuild]</MinimalRebuild>
       <ExceptionHandling>[options.ExceptionHandling]</ExceptionHandling>
