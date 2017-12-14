@@ -2409,18 +2409,20 @@ namespace Sharpmake.Generators.VisualStudio
                     var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
 
                     string relativeExecutableFile = Util.PathGetRelative(conf.TargetPath, execEvent.ExecutableFile);
-                    conf.EventPostBuild.Add(
-                        string.Format(
-                            "{0} {1}",
-                            Util.SimplifyPath(envVarResolver.Resolve(relativeExecutableFile)),
-                            envVarResolver.Resolve(execEvent.ExecutableOtherArguments)
-                        )
+                    string eventString = string.Format(
+                        "{0} {1}",
+                        Util.SimplifyPath(envVarResolver.Resolve(relativeExecutableFile)),
+                        envVarResolver.Resolve(execEvent.ExecutableOtherArguments)
                     );
+                    if (!conf.EventPostBuild.Contains(eventString))
+                        conf.EventPostBuild.Add(eventString);
                 }
                 else if (customEvent is Project.Configuration.BuildStepCopy)
                 {
                     var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
-                    conf.EventPostBuild.Add(copyEvent.GetCopyCommand(conf.TargetPath, envVarResolver));
+                    string eventString = copyEvent.GetCopyCommand(conf.TargetPath, envVarResolver);
+                    if (!conf.EventPostBuild.Contains(eventString))
+                        conf.EventPostBuild.Add(eventString);
                 }
                 else
                 {
