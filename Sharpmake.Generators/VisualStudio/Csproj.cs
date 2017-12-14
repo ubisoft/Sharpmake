@@ -2376,6 +2376,32 @@ namespace Sharpmake.Generators.VisualStudio
                 new VariableAssignment("target", conf),
                 new VariableAssignment("conf", conf));
 
+            foreach (var customEvent in conf.ResolvedEventPreBuildExe)
+            {
+                if (customEvent is Project.Configuration.BuildStepExecutable)
+                {
+                    var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
+
+                    string relativeExecutableFile = Util.PathGetRelative(conf.TargetPath, execEvent.ExecutableFile);
+                    conf.EventPreBuild.Add(
+                        string.Format(
+                            "{0} {1}",
+                            Util.SimplifyPath(envVarResolver.Resolve(relativeExecutableFile)),
+                            envVarResolver.Resolve(execEvent.ExecutableOtherArguments)
+                        )
+                    );
+                }
+                else if (customEvent is Project.Configuration.BuildStepCopy)
+                {
+                    var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
+                    conf.EventPreBuild.Add(copyEvent.GetCopyCommand(conf.TargetPath, envVarResolver));
+                }
+                else
+                {
+                    throw new Error("Invalid type in PreBuild steps");
+                }
+            }
+
             foreach (var customEvent in conf.ResolvedEventPostBuildExe)
             {
                 if (customEvent is Project.Configuration.BuildStepExecutable)
