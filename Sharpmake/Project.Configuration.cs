@@ -640,7 +640,34 @@ namespace Sharpmake
                 {
                     string sourceRelativePath = Util.PathGetRelative(workingPath, resolver.Resolve(SourcePath));
                     string destinationRelativePath = Util.PathGetRelative(workingPath, resolver.Resolve(DestinationPath));
-                    return string.Format("robocopy.exe /xo /ns /nc /np /njh /njs /ndl /nfl {0} {1} {2} >nul", sourceRelativePath, destinationRelativePath, CopyPattern);
+
+                    return string.Join(" ",
+                        "robocopy.exe",
+
+                        // file selection options
+                        "/xo",  // /XO :: eXclude Older files.
+
+                        // logging options
+                        "/ns",  // /NS :: No Size - don't log file sizes.
+                        "/nc",  // /NC :: No Class - don't log file classes.
+                        "/np",  // /NP :: No Progress - don't display percentage copied.
+                        "/njh", // /NJH :: No Job Header.
+                        "/njs", // /NJS :: No Job Summary.
+                        "/ndl", // /NDL :: No Directory List - don't log directory names.
+                        "/nfl", // /NFL :: No File List - don't log file names.
+
+                        // parameters
+                        "\"" + sourceRelativePath + "\"",
+                        "\"" + destinationRelativePath + "\"",
+                        "\"" + CopyPattern + "\"",
+
+                        "> nul", // hide all remaining stdout to nul
+
+                        // Error handling: any value greater than 7 indicates that there was at least one failure during the copy operation.
+                        // The type nul is used to clear the errorlevel to 0
+                        // see https://ss64.com/nt/robocopy-exit.html for more info
+                        "& if %ERRORLEVEL% GEQ 8 (echo Copy failed & exit 1) else (type nul>nul)"
+                    );
                 }
 
                 internal override void Resolve(Resolver resolver)
@@ -648,7 +675,9 @@ namespace Sharpmake
                     base.Resolve(resolver);
 
                     // TODO: that test is very dodgy. Please remove this, and have the user set the property instead, or even create a new BuildStepCopyDir type
-                    var destinationIsFolder = !DestinationPath.Substring(DestinationPath.LastIndexOf(@"\", StringComparison.Ordinal)).Contains(".");
+                    int index = DestinationPath.LastIndexOf(@"\", StringComparison.Ordinal);
+                    var destinationFolder = index < 0 ? DestinationPath : DestinationPath.Substring(index);
+                    var destinationIsFolder = !destinationFolder.Contains(".");
                     bool isFolderCopy = destinationIsFolder || (Util.DirectoryExists(SourcePath) && Util.DirectoryExists(DestinationPath));
                     if (isFolderCopy)
                         IsFileCopy = false;
