@@ -25,18 +25,21 @@ namespace Sharpmake
         // NuGet package reference
         // https://docs.microsoft.com/fr-fr/nuget/consume-packages/package-references-in-project-files
         // <PackageReference> is new in VS2017 but in VS2015 you can use project.json (which comes from .NET Core toolchain)
+        // For VS2012 you can use packages.config and references
         // to add dependencies for .NET Framework applications
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version)
+            internal PackageReference(string name, string version, string dotNetHint)
             {
                 Name = name;
                 Version = version;
+                DotNetHint = dotNetHint;
             }
 
             public string Name { get; internal set; }
             public string Version { get; internal set; }
+            public string DotNetHint { get; internal set; }
 
             public string Resolve(Resolver resolver, string template)
             {
@@ -59,13 +62,13 @@ namespace Sharpmake
 
         private readonly UniqueList<PackageReference> _packageReferences = new UniqueList<PackageReference>();
 
-        public void Add(string packageName, string version)
+        public void Add(string packageName, string version, string dotNetHint = null)
         {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
             if (existingPackage == null)
             {
-                _packageReferences.Add(new PackageReference(packageName, version));
+                _packageReferences.Add(new PackageReference(packageName, version, dotNetHint));
                 return;
             }
 
