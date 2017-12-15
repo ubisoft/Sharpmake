@@ -1924,6 +1924,28 @@ namespace Sharpmake.Generators.VisualStudio
                     itemGroups.Nones.Add(new ItemGroups.None { Include = include });
                 }
             }
+            else if (devenv == DevEnv.vs2012)
+            {
+                var packagesConfig = new PackagesConfig();
+                packagesConfig.Generate(_builder, (CSharpProject)project, configurations, _projectPath, generatedFiles, skipFiles);
+                if (packagesConfig.IsGenerated)
+                {
+                    string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(packagesConfig.PackagesConfigPath));
+                    itemGroups.Nones.Add(new ItemGroups.None { Include = include });
+                }
+                foreach (var references in configuration.ReferencesByNuGetPackage)
+                {
+                    string dotNetHint = references.DotNetHint;
+                    if (string.IsNullOrWhiteSpace(dotNetHint))
+                    {
+                        var frameworkFlags = project.Targets.TargetPossibilities.Select(f => f.GetFragment<DotNetFramework>()).Aggregate((x, y) => x | y);
+                        DotNetFramework dnfs = ((DotNetFramework[])Enum.GetValues(typeof(DotNetFramework))).First(f => frameworkFlags.HasFlag(f));
+                        dotNetHint = dnfs.ToFolderName();
+                    }
+                    string hintPath = Path.Combine("$(SolutionDir)packages", references.Name + "." + references.Version, "lib", dotNetHint, references.Name + ".dll");
+                    itemGroups.References.Add(new ItemGroups.Reference { Include = references.Name, HintPath = hintPath });
+                }
+            }
         }
 
         private static void AddNoneGeneratedItem(ItemGroups itemGroups, string file, string generatedFile, string generator, bool designTimeSharedInput, string projectPath, Project project)
