@@ -1,0 +1,6 @@
+<ui version="4.0" >
+ <class>QPrivateWidget</class>
+ <widget class="QWidget" name="QPrivateWidget" />
+ <resources/>
+ <connections/>
+</ui>

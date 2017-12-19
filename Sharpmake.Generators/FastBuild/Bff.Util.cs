@@ -357,6 +357,46 @@ namespace Sharpmake.Generators.FastBuild
             return strBuilder.ToString();
         }
 
+        public static void WriteCustomBuildStepAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project.Configuration.CustomFileBuildStep buildStep, Func<string, bool> functor)
+        {
+            var relativeBuildStep = buildStep.MakePathRelative(bffGenerator.Resolver,
+                (path, commandRelative) =>
+            {
+                string relativePath = Util.SimplifyPath(Util.PathGetRelative(projectRoot, path));
+                if (commandRelative)
+                    return Bff.CurrentBffPathKeyCombine(relativePath);
+                else
+                    return relativePath;
+            });
+
+            using (bffGenerator.Declare("fastBuildPreBuildName", relativeBuildStep.Description))
+            using (bffGenerator.Declare("fastBuildPrebuildExeFile", relativeBuildStep.Executable))
+            using (bffGenerator.Declare("fastBuildPreBuildInputFile", relativeBuildStep.KeyInput))
+            using (bffGenerator.Declare("fastBuildPreBuildOutputFile", relativeBuildStep.Output))
+            using (bffGenerator.Declare("fastBuildPreBuildArguments", relativeBuildStep.ExecutableArguments))
+            // This is normally the project directory.
+            using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", FileGeneratorUtilities.RemoveLineTag))
+            using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", FileGeneratorUtilities.RemoveLineTag))
+            {
+                functor(relativeBuildStep.Description);
+            }
+        }
+
+        public static void WriteConfigCustomBuildStepsAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project project, Project.Configuration config, Func<string, bool> functor)
+        {
+            using (bffGenerator.Resolver.NewScopedParameter("project", project))
+            using (bffGenerator.Resolver.NewScopedParameter("config", config))
+            using (bffGenerator.Resolver.NewScopedParameter("target", config.Target))
+            {
+                foreach (var customBuildStep in config.CustomFileBuildSteps)
+                {
+                    if (customBuildStep.Filter == Project.Configuration.CustomFileBuildStep.ProjectFilter.ExcludeBFF)
+                        continue;
+                    UtilityMethods.WriteCustomBuildStepAsGenericExecutable(projectRoot, bffGenerator, customBuildStep, functor);
+                }
+            }
+        }
+
         public static bool HasFastBuildConfig(List<Solution.Configuration> configurations)
         {
             bool hasFastBuildConfig = configurations.Any(

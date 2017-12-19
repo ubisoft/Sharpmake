@@ -73,6 +73,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class QTFileCustomBuildProject : SampleProject
+    {
+        public QTFileCustomBuildProject()
+        {
+            Name = "QTFileCustomBuild";
+        }
+    }
+
+    [Generate]
     public class PackageReferencesProject : SampleProject
     {
         public PackageReferencesProject()

@@ -170,6 +170,58 @@ namespace Sharpmake.Generators.VisualStudio
         public const string ProjectExtension = ".vcxproj";
         private const string ProjectFilterExtension = ".filters";
         private const string CopyDependenciesExtension = "_runtimedependencies.txt";
+        public const string EventSeparator = "&#x0D;&#x0A;";
+
+        // Vcxproj only allows one file command per input file, so we collapse
+        // the commands into a single command per file.
+        public class CombinedCustomFileBuildStep
+        {
+            public string Commands = "";
+            public string Description = "";
+            public string Outputs = "";
+            public string AdditionalInputs = "";
+        };
+
+        public static Dictionary<string, CombinedCustomFileBuildStep> CombineCustomFileBuildSteps(string referencePath, Resolver resolver, IEnumerable<Project.Configuration.CustomFileBuildStep> buildSteps)
+        {
+            // Map from relative input file to command to run on that file, for this configuration.
+            var steps = new Dictionary<string, CombinedCustomFileBuildStep>();
+
+            foreach (var customBuildStep in buildSteps)
+            {
+                var relativeBuildStep = customBuildStep.MakePathRelative(resolver, (path, commandRelative) => Util.SimplifyPath(Util.PathGetRelative(referencePath, path)));
+                relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
+                // Build the command.
+                string command = string.Format(
+                    "{0} {1}",
+                    relativeBuildStep.Executable,
+                    relativeBuildStep.ExecutableArguments
+                );
+
+                command = Util.EscapeXml(command) + EventSeparator;
+                CombinedCustomFileBuildStep combinedCustomBuildStep;
+                // This needs to be project relative to work.
+                string FileKey = Util.SimplifyPath(Util.PathGetRelative(referencePath, customBuildStep.KeyInput));
+                if (!steps.TryGetValue(FileKey, out combinedCustomBuildStep))
+                {
+                    combinedCustomBuildStep = new CombinedCustomFileBuildStep();
+                    steps.Add(FileKey, combinedCustomBuildStep);
+                }
+                else
+                {
+                    // Add separators.
+                    combinedCustomBuildStep.Description += ";";
+                    combinedCustomBuildStep.Outputs += ";";
+                    combinedCustomBuildStep.AdditionalInputs += ";";
+                }
+                combinedCustomBuildStep.Commands += command;
+                combinedCustomBuildStep.Description += relativeBuildStep.Description;
+                combinedCustomBuildStep.Outputs = Util.EscapeXml(relativeBuildStep.Output);
+                combinedCustomBuildStep.AdditionalInputs = Util.EscapeXml(relativeBuildStep.AdditionalInputs.JoinStrings(";"));
+            }
+
+            return steps;
+        }
 
         /// <summary>
         /// Generate a pseudo Guid base on relative path from the Project CsPath to the generated files
@@ -992,6 +1044,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<ProjectFile> PRIFiles = new List<ProjectFile>();
             List<ProjectFile> XResourcesReswFiles = new List<ProjectFile>();
             List<ProjectFile> XResourcesImgFiles = new List<ProjectFile>();
+            List<ProjectFile> customBuildFiles = new List<ProjectFile>();
 
             foreach (string file in context.Project.NatvisFiles)
             {
@@ -1013,6 +1066,24 @@ namespace Sharpmake.Generators.VisualStudio
 
             allFiles.Sort((ProjectFile l, ProjectFile r) => { return string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCulture); });
 
+            // Gather files with custom build steps.
+            var configurationCustomFileBuildSteps = new Dictionary<Project.Configuration, Dictionary<string, CombinedCustomFileBuildStep>>();
+            Strings configurationCustomBuildFiles = new Strings();
+            foreach (Project.Configuration config in context.ProjectConfigurations)
+            {
+                using (fileGenerator.Resolver.NewScopedParameter("project", context.Project))
+                using (fileGenerator.Resolver.NewScopedParameter("config", config))
+                using (fileGenerator.Resolver.NewScopedParameter("target", config.Target))
+                {
+                    var customFileBuildSteps = CombineCustomFileBuildSteps(context.ProjectDirectory, fileGenerator.Resolver, config.CustomFileBuildSteps.Where(step => step.Filter != Project.Configuration.CustomFileBuildStep.ProjectFilter.BFFOnly));
+                    configurationCustomFileBuildSteps.Add(config, customFileBuildSteps);
+                    foreach (var customBuildSetup in customFileBuildSteps)
+                    {
+                        configurationCustomBuildFiles.Add(customBuildSetup.Key);
+                    }
+                }
+            }
+
             // type -> files
             var customSourceFiles = new Dictionary<string, List<ProjectFile>>();
             foreach (ProjectFile projectFile in allFiles)
@@ -1027,6 +1098,10 @@ namespace Sharpmake.Generators.VisualStudio
                         customSourceFiles[type] = files;
                     }
                     files.Add(projectFile);
+                }
+                else if (configurationCustomBuildFiles.Contains(projectFile.FileNameProjectRelative))
+                {
+                    customBuildFiles.Add(projectFile);
                 }
                 else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
                          (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
@@ -1085,6 +1160,45 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
+
+            if (customBuildFiles.Count > 0)
+            {
+                // Write custom build steps
+                fileGenerator.Write(Template.Project.ProjectFilesBegin);
+
+                foreach (ProjectFile file in customBuildFiles)
+                {
+                    using (fileGenerator.Declare("file", file.FileNameProjectRelative))
+                    using (fileGenerator.Declare("filetype", FileGeneratorUtilities.RemoveLineTag))
+                    {
+                        fileGenerator.Write(Template.Project.ProjectFilesCustomBuildBegin);
+
+                        foreach (Project.Configuration conf in context.ProjectConfigurations)
+                        {
+                            CombinedCustomFileBuildStep buildStep;
+                            if (configurationCustomFileBuildSteps[conf].TryGetValue(file.FileNameProjectRelative, out buildStep))
+                            {
+                                using (fileGenerator.Declare("conf", conf))
+                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                                using (fileGenerator.Declare("description", buildStep.Description))
+                                using (fileGenerator.Declare("command", buildStep.Commands))
+                                using (fileGenerator.Declare("inputs", buildStep.AdditionalInputs))
+                                using (fileGenerator.Declare("outputs", buildStep.Outputs))
+                                {
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildDescription);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildCommand);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildInputs);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputs);
+                                }
+                            }
+                        }
+
+                        fileGenerator.Write(Template.Project.ProjectFilesCustomBuildEnd);
+                    }
+                }
+
+                fileGenerator.Write(Template.Project.ProjectFilesEnd);
+            }
 
             // Write natvis files
             if (context.Project.NatvisFiles.Count > 0 && context.ProjectConfigurations.Any(conf => conf.Target.HaveFragment<DevEnv>() && conf.Target.GetFragment<DevEnv>() >= DevEnv.vs2015))
@@ -1486,6 +1600,7 @@ namespace Sharpmake.Generators.VisualStudio
             allFileLists.Add(new Tuple<string, List<ProjectFile>>("PRIResource", XResourcesReswFiles));
             allFileLists.Add(new Tuple<string, List<ProjectFile>>("Image", XResourcesImgFiles));
             allFileLists.Add(new Tuple<string, List<ProjectFile>>(hasCustomBuildForAllIncludes ? "CustomBuild" : "ClInclude", includeFiles));
+            allFileLists.Add(new Tuple<string, List<ProjectFile>>("CustomBuild", customBuildFiles));
             if (NatvisFiles.Count > 0)
                 allFileLists.Add(new Tuple<string, List<ProjectFile>>("Natvis", NatvisFiles));
             if (PRIFiles.Count > 0)

@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Retail|x64">
+      <Configuration>Retail</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EB571A6D-86D9-C9B3-7168-5B7C8952AE30}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>QTFileCustomBuild</RootNamespace>
+    <ProjectName>QTFileCustomBuild</ProjectName>
+    <ApplicationEnvironment>title</ApplicationEnvironment>
+    <WindowsSdkDir_10>C:\Program Files (x86)\Windows Kits\10\</WindowsSdkDir_10>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>qtfilecustombuild</TargetName>
+    <OutDir>output\win64\debug\</OutDir>
+    <IntDir>obj\win64\debug\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\win64\debug\qtfilecustombuild.exe</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>qtfilecustombuild</TargetName>
+    <OutDir>output\win64\release\</OutDir>
+    <IntDir>obj\win64\release\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\win64\release\qtfilecustombuild.exe</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
+    <TargetName>qtfilecustombuild</TargetName>
+    <OutDir>output\win64\retail\</OutDir>
+    <IntDir>obj\win64\retail\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\win64\retail\qtfilecustombuild.exe</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>QT_SHARED;WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>obj\qtfilecustombuild\qt;obj\win64\qt\debug;..\qt\5.9.2\msvc2017_64\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <AdditionalOptions></AdditionalOptions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>obj\win64\debug\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\debug\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\win64\debug\qtfilecustombuild.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ProgramDatabaseFile>output\win64\debug\qtfilecustombuild.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalOptions></AdditionalOptions>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\win64\debug\qtfilecustombuild.map</MapFileName>
+      <BaseAddress></BaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PreprocessorDefinitions>NDEBUG;QT_NO_DEBUG;QT_SHARED;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>obj\qtfilecustombuild\qt;obj\win64\qt\release;..\qt\5.9.2\msvc2017_64\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <AdditionalOptions></AdditionalOptions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>obj\win64\release\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\release\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\win64\release\qtfilecustombuild.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ProgramDatabaseFile>output\win64\release\qtfilecustombuild.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalOptions></AdditionalOptions>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\win64\release\qtfilecustombuild.map</MapFileName>
+      <BaseAddress></BaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PreprocessorDefinitions>NDEBUG;QT_NO_DEBUG;QT_SHARED;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>obj\qtfilecustombuild\qt;obj\win64\qt\retail;..\qt\5.9.2\msvc2017_64\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <AdditionalOptions></AdditionalOptions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>obj\win64\retail\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\retail\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\win64\retail\qtfilecustombuild.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ProgramDatabaseFile>output\win64\retail\qtfilecustombuild.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalOptions></AdditionalOptions>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\win64\retail\qtfilecustombuild.map</MapFileName>
+      <BaseAddress></BaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\stdafx.h" />
+    <ClInclude Include="obj\qtfilecustombuild\qt\ui_privatewidget.h" />
+    <ClInclude Include="obj\win64\qt\debug\privatewidget.moc" />
+    <ClInclude Include="obj\win64\qt\release\privatewidget.moc" />
+    <ClInclude Include="obj\win64\qt\retail\privatewidget.moc" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\codebase\exec.qrc">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rcc Debug exec.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\rcc.exe -name exec ..\codebase\exec.qrc -o obj\qtfilecustombuild\qt\qrc_exec.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\rcc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\qtfilecustombuild\qt\qrc_exec.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rcc Release exec.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\rcc.exe -name exec ..\codebase\exec.qrc -o obj\qtfilecustombuild\qt\qrc_exec.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\rcc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\qtfilecustombuild\qt\qrc_exec.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Rcc Retail exec.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\rcc.exe -name exec ..\codebase\exec.qrc -o obj\qtfilecustombuild\qt\qrc_exec.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\rcc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\qtfilecustombuild\qt\qrc_exec.cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\codebase\floatanglespinbox.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug floatanglespinbox.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\debug -f..\codebase\floatanglespinbox.h -fstdafx.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\debug\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\moc_floatanglespinbox.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release floatanglespinbox.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\release -f..\codebase\floatanglespinbox.h -fstdafx.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\release\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\moc_floatanglespinbox.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail floatanglespinbox.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\retail -f..\codebase\floatanglespinbox.h -fstdafx.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\retail\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\moc_floatanglespinbox.cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\codebase\floatcosanglespinbox.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug floatcosanglespinbox.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\debug -f..\codebase\floatcosanglespinbox.h -fstdafx.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\debug\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\moc_floatcosanglespinbox.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release floatcosanglespinbox.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\release -f..\codebase\floatcosanglespinbox.h -fstdafx.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\release\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\moc_floatcosanglespinbox.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail floatcosanglespinbox.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\retail -f..\codebase\floatcosanglespinbox.h -fstdafx.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\retail\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\moc_floatcosanglespinbox.cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\codebase\privatewidget.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug privatewidget.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\debug -f..\codebase\privatewidget.h -fstdafx.h ..\codebase\privatewidget.h -o obj\win64\qt\debug\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\moc_privatewidget.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release privatewidget.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\release -f..\codebase\privatewidget.h -fstdafx.h ..\codebase\privatewidget.h -o obj\win64\qt\release\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\moc_privatewidget.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail privatewidget.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\retail -f..\codebase\privatewidget.h -fstdafx.h ..\codebase\privatewidget.h -o obj\win64\qt\retail\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\moc_privatewidget.cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\codebase\privatewidget.ui">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic Debug privatewidget.ui</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\uic.exe ..\codebase\privatewidget.ui -o obj\qtfilecustombuild\qt\ui_privatewidget.h&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\uic.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\qtfilecustombuild\qt\ui_privatewidget.h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic Release privatewidget.ui</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\uic.exe ..\codebase\privatewidget.ui -o obj\qtfilecustombuild\qt\ui_privatewidget.h&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\uic.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\qtfilecustombuild\qt\ui_privatewidget.h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Uic Retail privatewidget.ui</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\uic.exe ..\codebase\privatewidget.ui -o obj\qtfilecustombuild\qt\ui_privatewidget.h&#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\uic.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\qtfilecustombuild\qt\ui_privatewidget.h</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="obj\qtfilecustombuild\qt\privatewidget.inl">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug privatewidget.cpp</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\debug  &#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\codebase\privatewidget.cpp;..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\privatewidget.moc</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release privatewidget.cpp</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\release  &#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\codebase\privatewidget.cpp;..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\privatewidget.moc</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail privatewidget.cpp</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I..\qt\5.9.2\msvc2017_64\include -Iobj\qtfilecustombuild\qt -Iobj\win64\qt\retail  &#x0D;&#x0A;</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\codebase\privatewidget.cpp;..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\privatewidget.moc</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\codebase\floatanglespinbox.cpp" />
+    <ClCompile Include="..\codebase\floatcosanglespinbox.cpp" />
+    <ClCompile Include="..\codebase\privatewidget.cpp" />
+    <ClCompile Include="..\codebase\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="obj\qtfilecustombuild\qt\qrc_exec.cpp" />
+    <ClCompile Include="obj\win64\qt\debug\moc_floatanglespinbox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\debug\moc_floatcosanglespinbox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\debug\moc_privatewidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\release\moc_floatanglespinbox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\release\moc_floatcosanglespinbox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\release\moc_privatewidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\retail\moc_floatanglespinbox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\retail\moc_floatcosanglespinbox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\retail\moc_privatewidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
