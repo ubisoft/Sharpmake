@@ -5,9 +5,7 @@
   </metadata>
   <files>
     <file src="bin\release\**" target="tools" />
-    <file src="bin\release\Sharpmake.dll" target="lib/net45" />
-    <file src="bin\release\Sharpmake.pdb" target="lib/net45" />
-    <file src="bin\release\Sharpmake.Generators.dll" target="lib/net45" />
-    <file src="bin\release\Sharpmake.Generators.pdb" target="lib/net45" />
+    <file src="bin\release\*.dll" target="lib/net45" />
+    <file src="bin\release\*.pdb" target="lib/net45" />
   </files>
 </package>
