@@ -157,6 +157,7 @@ namespace SharpmakeGen
             conf.AddProject<Samples.CSharpHelloWorldProject>(target);
             conf.AddProject<Samples.CSharpVsixProject>(target);
             conf.AddProject<Samples.HelloWorldProject>(target);
+            conf.AddProject<Samples.QTFileCustomBuildProject>(target);
             conf.AddProject<Samples.PackageReferencesProject>(target);
             conf.AddProject<Samples.SharpmakeGenProject>(target);
             conf.AddProject<Samples.SimpleExeLibDependencyProject>(target);

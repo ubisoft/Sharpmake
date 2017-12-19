@@ -740,6 +740,92 @@ namespace Sharpmake
             public string CustomBuildStepAfterTargets = "";
             public string CustomBuildStepTreatOutputAsContent = ""; // should be a bool
 
+            // This is all the data specific to a custom build step.
+            // The ones stored in the project configuration use absolute paths
+            // but we need relative paths when we're ready to export a specific
+            // project file.
+            public class CustomFileBuildStepData
+            {
+                // This lets us filter which type of project files should have
+                // this custom build step.   This is specifically used to deal with limitations of different build
+                // systems.   Visual studio only supports one build action per file, so if you need both compilation and
+                // some other build step such as QT or Documentation generation on the same file, you need to put the rule
+                // on a different input file that also depends on the real input file.   Fast build is key based instead of
+                // file based, so it can have two different operations on the same file.   If you need support for that,
+                // you can make two different custom build rules and have one specific to bff and the other excluding bff.
+                public enum ProjectFilter
+                {
+                    // Build step is used for both project file generation and fast build generation.
+                    AllProjects,
+                    ExcludeBFF,
+                    BFFOnly
+                };
+
+                // File custom builds are bound to a specific existing file.  They will run when the file is changed.
+                public string KeyInput = "";
+                // This is the executable that's going to be invoked as the custom build step.
+                public string Executable = "";
+                // These are the arguments to be passed to the executable.
+                // We support [input] and [output] tags in the executable arguments that will auto-resolve to the relative
+                // path to KeyInput and Output.
+                public string ExecutableArguments = "";
+                // This is what will appear in the project file under description, but it's also the key used
+                // for fast build, so it should be unique per build step if you want to use fast build.
+                public string Description = "";
+                // For fast build compatibility, we can only have one input and one output per custom command.
+                // This is what we tell the build system we're going to produce.
+                public string Output = "";
+                // This is not supported by BFF, but if excluded from BFF, additional files that will cause a re-run of this
+                // custom build step can be be specified here.
+                public Strings AdditionalInputs = new Strings();
+                // Filters if this step should run on 
+                public ProjectFilter Filter = ProjectFilter.AllProjects;
+
+            }
+
+            public class CustomFileBuildStep : CustomFileBuildStepData
+            {
+                // Initial resolve pass, in-place.
+                public virtual void Resolve(Resolver resolver)
+                {
+                    KeyInput = resolver.Resolve(KeyInput);
+                    Executable = resolver.Resolve(Executable);
+                    Description = resolver.Resolve(Description);
+                    Output = resolver.Resolve(Output);
+                    foreach(var input in AdditionalInputs.Values)
+                    {
+                        AdditionalInputs.UpdateValue(input, resolver.Resolve(input));
+                    }
+
+                    // We don't resolve arguments yet as we need the relative directly first.
+                }
+
+                // Pre-save make-relative pass, to set all fields relative to project path.
+                // This WILL get called multiple times, so it needs to write to different fields than
+                // the original input.
+                public virtual CustomFileBuildStepData MakePathRelative(Resolver resolver, Func<string, bool, string> MakeRelativeTool)
+                {
+                    var relativeData = new CustomFileBuildStepData();
+                    relativeData.KeyInput = MakeRelativeTool(KeyInput, true);
+                    relativeData.Executable = MakeRelativeTool(Executable, true);
+                    relativeData.Output = MakeRelativeTool(Output, true);
+                    using (resolver.NewScopedParameter("input", relativeData.KeyInput))
+                    using (resolver.NewScopedParameter("output", relativeData.Output))
+                    {
+                        relativeData.ExecutableArguments = resolver.Resolve(ExecutableArguments);
+                    }
+                    relativeData.Description = Description;
+                    foreach (var input in AdditionalInputs.Values)
+                    {
+                        relativeData.AdditionalInputs.Add(MakeRelativeTool(input, true));
+                    }
+                    relativeData.Filter = Filter;
+                    return relativeData;
+                }
+            };
+            // Specifies a list of custom builds steps that will be executed when this configuration is active.
+            public List<CustomFileBuildStep> CustomFileBuildSteps = new List<CustomFileBuildStep>();
+
             public string EventCustomBuildDescription = "";
             public Strings EventCustomBuild = new Strings();
             public string EventCustomBuildOutputs = "";
@@ -973,6 +1059,15 @@ namespace Sharpmake
                         eventToResolve.Resolve(resolver);
 
                     resolvedEvents.AddRange(eventsToResolve);
+                }
+
+                foreach (var customFileBuildStep in CustomFileBuildSteps)
+                {
+                    customFileBuildStep.Resolve(resolver);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.KeyInput);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Executable);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Output);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.AdditionalInputs);
                 }
 
                 foreach (var eventDictionary in new[]{

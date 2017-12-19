@@ -1594,7 +1594,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GeneratePostBuildOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            string eventSeparator = "&#x0D;&#x0A;";
+            string eventSeparator = Vcxproj.EventSeparator;
 
             context.Options["PreBuildEvent"] = context.Configuration.EventPreBuild.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.EventPreBuild.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
             context.Options["PreBuildEventDescription"] = context.Configuration.EventPreBuildDescription != String.Empty ? context.Configuration.EventPreBuildDescription : FileGeneratorUtilities.RemoveLineTag;

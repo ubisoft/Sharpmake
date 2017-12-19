@@ -979,6 +979,25 @@ namespace Sharpmake.Generators.FastBuild
 
                                         bffGenerator.Write(Template.ConfigurationFile.EndSection);
 
+                                        var fileCustomBuildKeys = new Strings();
+                                        UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
+                                            key =>
+                                            {
+                                                if (!fileCustomBuildKeys.Contains(key))
+                                                {
+                                                    fileCustomBuildKeys.Add(key);
+                                                    bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
+                                                }
+                                                else
+                                                {
+                                                    throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExcutableSection)));
+                                                }
+                                                return false;
+                                            });
+                                        // These are all pre-build steps, at least in principle, so insert them before the other build steps.
+                                        fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
+
+
                                         foreach (var postBuildEvent in postBuildEvents)
                                         {
                                             if (postBuildEvent.Value is Project.Configuration.BuildStepExecutable)
