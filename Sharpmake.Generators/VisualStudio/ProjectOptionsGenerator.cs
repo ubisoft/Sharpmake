@@ -433,7 +433,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.Inline.Default, () => { context.Options["InlineFunctionExpansion"] = "Default"; context.CommandLineOptions["InlineFunctionExpansion"] = FileGeneratorUtilities.RemoveLineTag; }),
             Options.Option(Options.Vc.Compiler.Inline.OnlyInline, () => { context.Options["InlineFunctionExpansion"] = "OnlyExplicitInline"; context.CommandLineOptions["InlineFunctionExpansion"] = "/Ob1"; }),
             Options.Option(Options.Vc.Compiler.Inline.AnySuitable, () => { context.Options["InlineFunctionExpansion"] = "AnySuitable"; context.CommandLineOptions["InlineFunctionExpansion"] = "/Ob2"; }),
-            Options.Option(Options.Vc.Compiler.Inline.Disable, () => { context.Options["InlineFunctionExpansion"] = "Disable"; context.CommandLineOptions["InlineFunctionExpansion"] = "/Ob0"; })
+            Options.Option(Options.Vc.Compiler.Inline.Disable, () => { context.Options["InlineFunctionExpansion"] = "Disabled"; context.CommandLineOptions["InlineFunctionExpansion"] = "/Ob0"; })
             );
 
             //Options.Vc.Compiler.Intrinsic.
