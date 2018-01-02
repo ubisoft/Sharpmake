@@ -63,10 +63,8 @@ namespace SharpmakeUnitTests
         public void LeavesVariablesUntouched()
         {
             string expectedResult = "$(Console_SdkPackagesRoot)";
-#if !__MonoCS__
-            expectedResult = expectedResult.ToLower();
-#endif
-
+            if (!Util.IsRunningInMono())
+                expectedResult = expectedResult.ToLower();
             Assert.That(Util.PathMakeStandard("$(Console_SdkPackagesRoot)"), Is.EqualTo(expectedResult));
         }
 
@@ -74,9 +72,8 @@ namespace SharpmakeUnitTests
         public void ProcessesPathWithTrailingBackslash()
         {
             string expectedResult = Path.Combine("rd", "project", "dev", "projects", "sharpmake", "..", "..", "extern", "Geometrics");
-#if !__MonoCS__
-            expectedResult = expectedResult.ToLower();
-#endif
+            if (!Util.IsRunningInMono())
+                expectedResult = expectedResult.ToLower();
             Assert.That(Util.PathMakeStandard(@"rd\project\dev\projects\sharpmake\..\..\extern\Geometrics\"), Is.EqualTo(expectedResult));
         }
 
@@ -84,9 +81,8 @@ namespace SharpmakeUnitTests
         public void ProcessesPathWithTrailingBackslashAndADot()
         {
             var expectedResult = Path.Combine("rd", "project", "dev", "projects", "sharpmake", "..", "..", "extern", "Microsoft.CNG", "Lib");
-#if !__MonoCS__
-            expectedResult = expectedResult.ToLower();
-#endif
+            if (!Util.IsRunningInMono())
+                expectedResult = expectedResult.ToLower();
             Assert.That(Util.PathMakeStandard(@"rd\project\dev\projects\sharpmake\..\..\extern\Microsoft.CNG\Lib\"), Is.EqualTo(expectedResult));
         }
 
@@ -94,9 +90,8 @@ namespace SharpmakeUnitTests
         public void ProcessesPathWithMultipleTrailingBackslashes()
         {
             var expectedResult = Path.Combine("rd", "project", "dev", "projects", "sharpmake", "..", "..", "extern", "Microsoft.CNG", "Lib");
-#if !__MonoCS__
-            expectedResult = expectedResult.ToLower();
-#endif
+            if (!Util.IsRunningInMono())
+                expectedResult = expectedResult.ToLower();
             Assert.That(Util.PathMakeStandard(@"rd\project\dev\projects\sharpmake\..\..\extern\Microsoft.CNG\Lib\\\"), Is.EqualTo(expectedResult));
         }
     }
@@ -290,7 +285,8 @@ namespace SharpmakeUnitTests
 
             var referenceFileFullPath = outputFileFullPath.ReplaceHeadPath(outputPath, referencePath);
 
-            Assert.That(referenceFileFullPath, Is.EqualTo(@"F:\OnePath\With\Reference\with\a\file.cs"));
+            Assert.That(referenceFileFullPath, Is.EqualTo(
+                Util.PathMakeStandard(@"F:\OnePath\With\Reference\with\a\file.cs")));
         }
 
         [Test]
@@ -302,7 +298,8 @@ namespace SharpmakeUnitTests
 
             var referenceFileFullPath = outputFileFullPath.ReplaceHeadPath(outputPath, referencePath);
 
-            Assert.That(referenceFileFullPath, Is.EqualTo(@"F:\OnePath\with\Reference\with\a\File.cs"));
+            Assert.That(referenceFileFullPath, Is.EqualTo(
+                Util.PathMakeStandard(@"F:\OnePath\with\Reference\with\a\File.cs")));
         }
 
         [Test]
@@ -314,7 +311,8 @@ namespace SharpmakeUnitTests
 
             var referenceFileFullPath = outputFileFullPath.ReplaceHeadPath(outputPath, referencePath);
 
-            Assert.That(referenceFileFullPath, Is.EqualTo(@"F:\OnePath\With\Reference\with\a\file.cs"));
+            Assert.That(referenceFileFullPath, Is.EqualTo(
+                Util.PathMakeStandard(@"F:\OnePath\With\Reference\with\a\file.cs")));
         }
     }
 

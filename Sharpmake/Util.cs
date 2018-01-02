@@ -73,11 +73,7 @@ namespace Sharpmake
 
         public static string PathMakeStandard(string path)
         {
-#if __MonoCS__
-            return PathMakeStandard(path, false);
-#else
-            return PathMakeStandard(path, true);
-#endif
+            return PathMakeStandard(path, !Util.IsRunningInMono());
         }
 
         /// <summary>
@@ -412,10 +408,10 @@ namespace Sharpmake
                         }
                         else
                         {
-#if __MonoCS__
-                            if(index == 0 && currentChar == Path.DirectorySeparatorChar && Path.IsPathRooted(path))
+                            if (Util.IsRunningInMono() &&
+                                index == 0 && currentChar == Path.DirectorySeparatorChar && Path.IsPathRooted(path))
                                 pathHelper.Append(currentChar);
-#endif // __MonoCS__
+
                             if (currentChar != Path.DirectorySeparatorChar || pathHelper.Length > 0)
                                 pathHelper.Append(currentChar);
                         }
@@ -1082,7 +1078,7 @@ namespace Sharpmake
             }
         }
 
-        public static StackFrame GetStackFrameTopMostTypeOf(Type type)
+        public static StackFrame GetStackFrameTopMostTypeOf(Type type, bool allowEmptyFileName = true)
         {
             if (type.IsGenericType)
             {
@@ -1096,7 +1092,8 @@ namespace Sharpmake
             {
                 StackFrame stackFrame = stackTrace.GetFrame(i);
                 MethodBase method = stackFrame.GetMethod();
-                if (method.DeclaringType == type)
+
+                if (method.DeclaringType == type && (allowEmptyFileName || !string.IsNullOrEmpty(stackFrame.GetFileName())))
                     return stackFrame;
             }
             return null;
@@ -1104,7 +1101,12 @@ namespace Sharpmake
 
         public static bool GetStackSourceFileTopMostTypeOf(Type type, out string sourceFile)
         {
-            StackFrame projectStackframe = GetStackFrameTopMostTypeOf(type);
+            // If the sought StackFrame was found, don't return it if its associated file name is unknown.
+            // This could happen in Mono when Sharpmake is invoked with /generateDebugSolution. In that case,
+            // sharpmake_sharpmake's ctor would be looked up and found in the call stack, but the StackFrame would
+            // refer to a null file name. On Windows, however, sharpmake_sharpmake's ctor simply does not appear in
+            // the call stack (as though its call is implicit or omitted)...
+            StackFrame projectStackframe = GetStackFrameTopMostTypeOf(type, allowEmptyFileName: false);
             if (projectStackframe != null)
             {
                 sourceFile = projectStackframe.GetFileName();
@@ -1715,11 +1717,12 @@ namespace Sharpmake
         /// <returns></returns>
         public static string ReplaceHeadPath(this string fullInputPath, string inputHeadPath, string replacementHeadPath)
         {
-            if (!string.IsNullOrEmpty(inputHeadPath) &&
-                inputHeadPath[inputHeadPath.Length - 1] != Path.DirectorySeparatorChar)
-            {
-                inputHeadPath += Path.DirectorySeparatorChar;
-            }
+            // Normalize paths before comparing and combining them, to prevent false mismatch between '\\' and '/'.
+            fullInputPath = Util.PathMakeStandard(fullInputPath);
+            inputHeadPath = Util.PathMakeStandard(inputHeadPath);
+            replacementHeadPath = Util.PathMakeStandard(replacementHeadPath);
+
+            inputHeadPath = EnsureTrailingSeparator(inputHeadPath);
 
             if (!fullInputPath.StartsWith(inputHeadPath, StringComparison.OrdinalIgnoreCase))
             {
@@ -1819,5 +1822,9 @@ namespace Sharpmake
                 return result;
             }
         }
+
+        // http://www.mono-project.com/docs/faq/technical/#how-can-i-detect-if-am-running-in-mono
+        private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
+        public static bool IsRunningInMono() => s_monoRuntimeExists;
     }
 }

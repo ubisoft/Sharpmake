@@ -76,7 +76,12 @@ namespace Sharpmake
                 }
                 else
                 {
-                    string pathToCompiler = devEnv.GetVisualStudioBinPath(Platform.win64).ReplaceHeadPath(rootPath, "$RootPath$");
+                    string pathToCompiler = devEnv.GetVisualStudioBinPath(Platform.win64);
+                    if (pathToCompiler.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        string rootRelative = pathToCompiler.Substring(rootPath.Length).TrimStart(Util._pathSeparators);
+                        pathToCompiler = Path.Combine("$RootPath$", rootRelative);
+                    }
 
                     Strings extraFiles = new Strings();
 
