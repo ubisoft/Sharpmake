@@ -68,7 +68,9 @@ namespace Sharpmake
             // find all folders and create associated projects types
             foreach (var source in allsources)
             {
-                string dir = Path.GetDirectoryName(source)?.ToLower();
+                string dir = Path.GetDirectoryName(source);
+                if (!string.IsNullOrEmpty(dir))
+                    dir = Util.PathMakeStandard(dir);
 
                 var existing = DebugProjects.FirstOrDefault(dp => dir.Contains(dp.Value.ProjectFolder));
                 if (existing.Equals(default(KeyValuePair<Type, ProjectContent>)))

@@ -423,17 +423,7 @@ namespace Sharpmake
         {
             for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
             {
-                string frameworkDirectory = null;
-#if !__MonoCS__
-                try
-                {
-                    frameworkDirectory = ToolLocationHelper.GetPathToDotNetFrameworkReferenceAssemblies((TargetDotNetFrameworkVersion)i);
-                }
-                catch (ArgumentException)
-#endif // if !__MonoCS__
-                {
-                    frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
-                }
+                string frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
                 if (frameworkDirectory != null)
                 {
                     string result = Path.Combine(frameworkDirectory, fileName);
