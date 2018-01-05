@@ -419,7 +419,7 @@ namespace Sharpmake
             }
         }
 
-        private static string GetAssemblyDllPath(string fileName)
+        public static string GetAssemblyDllPath(string fileName)
         {
             for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
             {
