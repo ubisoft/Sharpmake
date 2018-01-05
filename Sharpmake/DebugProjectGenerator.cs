@@ -62,6 +62,12 @@ namespace Sharpmake
             List<string> allsources = assembler.GetSourceFiles(MainSources);
 
             var references = new HashSet<string>();
+            if (assembler.UseDefaultReferences)
+            {
+                foreach (string defaultReference in Assembler.DefaultReferences)
+                    references.Add(Assembler.GetAssemblyDllPath(defaultReference));
+            }
+
             foreach (var assemblerRef in assembler.References)
                 references.Add(assemblerRef);
 
