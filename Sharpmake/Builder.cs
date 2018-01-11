@@ -613,7 +613,7 @@ namespace Sharpmake
                     foreach (Solution.Configuration conf in solution.Configurations)
                     {
                         LogObject(writer, "\t", conf);
-                        writer.WriteLine("\t{0,-100} {1}" + Path.DirectorySeparatorChar + "{2}.[solution_ext]", conf.Target.GetTargetString(), Util.PathGetRelative(logFile.Directory.FullName, conf.SolutionPath), conf.SolutionFileName);
+                        writer.WriteLine("\t{0,-100} {1}" + Path.DirectorySeparatorChar + "{2}.[solution_ext]", conf.Target.GetTargetString(), Util.PathGetRelative(logFile.Directory.FullName, conf.SolutionDirectory), conf.SolutionFileName);
 
                         foreach (Solution.Configuration.IncludedProjectInfo configurationProject in conf.IncludedProjectInfos)
                         {
