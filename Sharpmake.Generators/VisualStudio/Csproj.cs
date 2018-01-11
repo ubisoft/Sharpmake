@@ -1696,6 +1696,8 @@ namespace Sharpmake.Generators.VisualStudio
                 string expectedExtension =
                     runtimeTemplate ? ".cs" :
                     Util.GetTextTemplateDirectiveParam(Path.Combine(_projectPath, ttFile), "output", "extension") ?? ".cs";
+                if (!expectedExtension.StartsWith("."))
+                    expectedExtension = "." + expectedExtension;
                 string fileNameWithoutExtension = ttFile.Substring(0, ttFile.Length - TTExtension.Length);
                 string generatedFile = fileNameWithoutExtension + expectedExtension;
                 string generator = runtimeTemplate
