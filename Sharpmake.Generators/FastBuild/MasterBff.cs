@@ -278,105 +278,109 @@ namespace Sharpmake.Generators.FastBuild
                     if (FastBuildSettings.WriteAllConfigsSection)
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
 
-                    if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                    using (fileGenerator.Declare("conf", conf))
+                    using (fileGenerator.Declare("project", conf.Project))
                     {
-                        var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffDirectory);
-                        foreach (var copy in copies)
+                        if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
                         {
-                            var sourceFile = copy.Key;
-                            var sourceFileName = Path.GetFileName(sourceFile);
-                            var destinationFolder = copy.Value;
-                            var destinationFile = Path.Combine(destinationFolder, sourceFileName);
-
-                            // use the global root for alias computation, as the project has not idea in which master bff it has been included
-                            var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffDirectory, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
-                            string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
+                            var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffDirectory);
+                            foreach (var copy in copies)
                             {
-                                using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
-                                using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
-                                using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                var sourceFile = copy.Key;
+                                var sourceFileName = Path.GetFileName(sourceFile);
+                                var destinationFolder = copy.Value;
+                                var destinationFile = Path.Combine(destinationFolder, sourceFileName);
+
+                                // use the global root for alias computation, as the project has not idea in which master bff it has been included
+                                var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffDirectory, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
+                                string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
                                 {
-                                    if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
-                                        bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
+                                    using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
+                                    using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                    {
+                                        if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
+                                            bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    foreach (var preEvent in conf.EventPreBuildExecute)
-                    {
-                        if (preEvent.Value is Project.Configuration.BuildStepExecutable)
+                        foreach (var preEvent in conf.EventPreBuildExecute)
                         {
-                            var execCommand = preEvent.Value as Project.Configuration.BuildStepExecutable;
-
-                            using (fileGenerator.Declare("fastBuildPreBuildName", preEvent.Key))
-                            using (fileGenerator.Declare("fastBuildPrebuildExeFile", execCommand.ExecutableFile))
-                            using (fileGenerator.Declare("fastBuildPreBuildInputFile", execCommand.ExecutableInputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildOutputFile", execCommand.ExecutableOutputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
-                            using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory))
-                            using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                            if (preEvent.Value is Project.Configuration.BuildStepExecutable)
                             {
-                                if (!bffPreBuildSection.ContainsKey(preEvent.Key))
-                                    bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                                var execCommand = preEvent.Value as Project.Configuration.BuildStepExecutable;
+
+                                using (fileGenerator.Declare("fastBuildPreBuildName", preEvent.Key))
+                                using (fileGenerator.Declare("fastBuildPrebuildExeFile", execCommand.ExecutableFile))
+                                using (fileGenerator.Declare("fastBuildPreBuildInputFile", execCommand.ExecutableInputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildOutputFile", execCommand.ExecutableOutputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
+                                using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory))
+                                using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                                {
+                                    if (!bffPreBuildSection.ContainsKey(preEvent.Key))
+                                        bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                                }
+                            }
+                            else if (preEvent.Value is Project.Configuration.BuildStepCopy)
+                            {
+                                var copyCommand = preEvent.Value as Project.Configuration.BuildStepCopy;
+
+                                using (fileGenerator.Declare("fastBuildCopyAlias", preEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
+                                using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
+                                using (fileGenerator.Declare("fastBuildCopyDirName", preEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(copyCommand.SourcePath)))
+                                using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(copyCommand.DestinationPath)))
+                                using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
+                                using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                                {
+                                    if (!bffPreBuildSection.ContainsKey(preEvent.Key) && copyCommand.IsFileCopy)
+                                        bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    else if (!bffPreBuildSection.ContainsKey(preEvent.Key))
+                                        bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                }
                             }
                         }
-                        else if (preEvent.Value is Project.Configuration.BuildStepCopy)
-                        {
-                            var copyCommand = preEvent.Value as Project.Configuration.BuildStepCopy;
 
-                            using (fileGenerator.Declare("fastBuildCopyAlias", preEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
-                            using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
-                            using (fileGenerator.Declare("fastBuildCopyDirName", preEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(copyCommand.SourcePath)))
-                            using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(copyCommand.DestinationPath)))
-                            using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                            using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                        foreach (var customEvent in conf.EventCustomPrebuildExecute)
+                        {
+                            if (customEvent.Value is Project.Configuration.BuildStepExecutable)
                             {
-                                if (!bffPreBuildSection.ContainsKey(preEvent.Key) && copyCommand.IsFileCopy)
-                                    bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
-                                else if (!bffPreBuildSection.ContainsKey(preEvent.Key))
-                                    bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                var exeCommand = customEvent.Value as Project.Configuration.BuildStepExecutable;
+
+                                using (fileGenerator.Declare("fastBuildPreBuildName", customEvent.Key))
+                                using (fileGenerator.Declare("fastBuildPrebuildExeFile", exeCommand.ExecutableFile))
+                                using (fileGenerator.Declare("fastBuildPreBuildInputFile", exeCommand.ExecutableInputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildOutputFile", exeCommand.ExecutableOutputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildArguments", exeCommand.ExecutableOtherArguments))
+                                using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", exeCommand.ExecutableWorkingDirectory))
+                                using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", exeCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                                {
+                                    if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
+                                        bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                                }
                             }
-                        }
-                    }
-
-                    foreach (var customEvent in conf.EventCustomPrebuildExecute)
-                    {
-                        if (customEvent.Value is Project.Configuration.BuildStepExecutable)
-                        {
-                            var exeCommand = customEvent.Value as Project.Configuration.BuildStepExecutable;
-
-                            using (fileGenerator.Declare("fastBuildPreBuildName", customEvent.Key))
-                            using (fileGenerator.Declare("fastBuildPrebuildExeFile", exeCommand.ExecutableFile))
-                            using (fileGenerator.Declare("fastBuildPreBuildInputFile", exeCommand.ExecutableInputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildOutputFile", exeCommand.ExecutableOutputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildArguments", exeCommand.ExecutableOtherArguments))
-                            using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", exeCommand.ExecutableWorkingDirectory))
-                            using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", exeCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                            else if (customEvent.Value is Project.Configuration.BuildStepCopy)
                             {
-                                if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
-                                    bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
-                            }
-                        }
-                        else if (customEvent.Value is Project.Configuration.BuildStepCopy)
-                        {
-                            var copyCommand = customEvent.Value as Project.Configuration.BuildStepCopy;
+                                var copyCommand = customEvent.Value as Project.Configuration.BuildStepCopy;
 
-                            using (fileGenerator.Declare("fastBuildCopyAlias", customEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
-                            using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
-                            using (fileGenerator.Declare("fastBuildCopyDirName", customEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopyDirSourcePath", copyCommand.SourcePath))
-                            using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", copyCommand.DestinationPath))
-                            using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                            using (fileGenerator.Declare("fastBuildCopyDirPattern", copyCommand.CopyPattern))
-                            {
-                                if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key) && copyCommand.IsFileCopy)
-                                    bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
-                                else if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
-                                    bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                using (fileGenerator.Declare("fastBuildCopyAlias", customEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
+                                using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
+                                using (fileGenerator.Declare("fastBuildCopyDirName", customEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopyDirSourcePath", copyCommand.SourcePath))
+                                using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", copyCommand.DestinationPath))
+                                using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
+                                using (fileGenerator.Declare("fastBuildCopyDirPattern", copyCommand.CopyPattern))
+                                {
+                                    if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key) && copyCommand.IsFileCopy)
+                                        bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    else if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
+                                        bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                }
                             }
                         }
                     }

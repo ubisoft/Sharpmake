@@ -617,12 +617,12 @@ namespace Sharpmake
                     CopyPattern = buildStepCopy.CopyPattern;
                 }
 
-                public BuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*")
+                public BuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*", bool fileCopy = true)
                 {
                     SourcePath = sourcePath;
                     DestinationPath = destinationPath;
 
-                    IsFileCopy = true;
+                    IsFileCopy = fileCopy;
                     IsRecurse = true;
                     IsNameSpecific = isNameSpecific;
                     CopyPattern = copyPattern;
