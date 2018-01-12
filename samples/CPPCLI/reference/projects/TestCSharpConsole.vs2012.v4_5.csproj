@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="clrcppproj.vs2012.win32.v4_5.vcxproj">
-      <Project>{88E55890-455C-853D-6EAE-C521C9869F38}</Project>
+      <Project>{88e55890-455c-853d-6eae-c521c9869f38}</Project>
       <Name>CLRCPPProj</Name>
     </ProjectReference>
   </ItemGroup>

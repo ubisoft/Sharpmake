@@ -41,7 +41,7 @@ namespace SimpleExeLibDependency
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.SolutionFileName = "[solution.Name]_[target.DevEnv]_[target.Platform]";
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
+            conf.SolutionDirectory = @"[solution.SharpmakeCsPath]\projects";
             conf.AddProject<SimpleExeProject>(target);
         }
     }

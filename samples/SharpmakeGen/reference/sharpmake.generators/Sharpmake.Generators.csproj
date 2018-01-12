@@ -91,7 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj">
-      <Project>{15F793C7-9E88-64A9-591C-7244FCC6B771}</Project>
+      <Project>{15f793c7-9e88-64a9-591c-7244fcc6b771}</Project>
       <Name>Sharpmake</Name>
     </ProjectReference>
   </ItemGroup>

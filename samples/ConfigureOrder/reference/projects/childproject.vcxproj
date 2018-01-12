@@ -130,6 +130,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win32\release\childproject.map</MapFileName>
       <BaseAddress></BaseAddress>
+      <AllowIsolation>true</AllowIsolation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -120,7 +120,7 @@ namespace CSharpHelloWorld
                                                   Name,
                                                   "[target.DevEnv]",
                                                   "[target.Framework]");
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";
+            conf.SolutionDirectory = @"[solution.SharpmakeCsPath]\projects\";
 
             conf.AddProject<CSharpVsixProject>(target);
         }
