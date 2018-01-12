@@ -155,6 +155,13 @@ namespace Sharpmake
                 }
 
                 s_sharpmakeApplicationExePath = Process.GetCurrentProcess().MainModule.FileName;
+
+                if (Util.IsRunningInMono())
+                {
+                    // When running within Mono, s_sharpmakeApplicationExePath will at this point wrongly refer to the
+                    // mono (or mono-sgen) executable. Fix it so that it points to Sharpmake.Application.exe.
+                    s_sharpmakeApplicationExePath = $"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}";
+                }
             }
 
             conf.ReferencesByPath.Add(Assembler.DefaultReferences);
@@ -176,7 +183,8 @@ namespace Sharpmake
         {
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
-            conf.CsprojUserFile.StartArguments = $@"/sources(@""{string.Join(";", MainSources)}"")";
+            string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
+            conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote})";
             conf.CsprojUserFile.StartProgram = s_sharpmakeApplicationExePath;
         }
     }
