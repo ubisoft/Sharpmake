@@ -722,6 +722,8 @@ namespace Sharpmake.Generators.FastBuild
                             case Project.Configuration.OutputType.Exe:
                             case Project.Configuration.OutputType.Dll:
                                 using (bffGenerator.Declare("conf", conf))
+                                using (bffGenerator.Declare("project", project))
+                                using (bffGenerator.Declare("target", conf.Target))
                                 using (bffGenerator.Declare("$(ProjectName)", projectName))
                                 using (bffGenerator.Declare("options", confOptions))
                                 using (bffGenerator.Declare("cmdLineOptions", confCmdLineOptions))
