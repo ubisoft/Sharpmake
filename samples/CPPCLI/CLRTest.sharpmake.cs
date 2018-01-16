@@ -54,7 +54,7 @@ namespace CLR_SharpmakeTest
         {
             conf.SolutionFileName = "CPPCLI.[target.DevEnv].[target.Framework]";
 
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";
+            conf.SolutionDirectory = @"[solution.SharpmakeCsPath]\projects\";
 
             conf.AddProject<CLR_CPP_Proj>(target);
             conf.AddProject<OtherCSharpProj>(target);

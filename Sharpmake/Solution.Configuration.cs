@@ -13,7 +13,9 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Sharpmake
 {
@@ -22,19 +24,75 @@ namespace Sharpmake
         [Resolver.Resolvable]
         public class Configuration : Sharpmake.Configuration
         {
-            private static int s_count = 0;
-            public static int Count { get { return s_count; } }
+            /// <summary>
+            /// Gets the number of <see cref="Configuration"/> instances created so far during
+            /// Sharpmake's execution.
+            /// </summary>
+            public static int InstancesCount => s_instanceCount;
+            private static int s_instanceCount = 0;
 
+            /// <summary>
+            /// Creates a new <see cref="Configuration"/> instance.
+            /// </summary>
             public Configuration()
             {
-                System.Threading.Interlocked.Increment(ref s_count);
+                Interlocked.Increment(ref s_instanceCount);
             }
 
-            public Solution Solution { get { return Owner as Solution; } }
+            /// <summary>
+            /// Gets the <see cref="Solution"/> instance that owns this configuration.
+            /// </summary>
+            public Solution Solution => Owner as Solution;
 
-            public string Name = "[target.Name]";
-            public string SolutionFileName = "[solution.Name]";             // File name for the generated solution without extension, ex: "MySolution"
-            public string SolutionPath = "[solution.SharpmakeCsPath]";      // Path of SolutionFileName
+            /// <summary>
+            /// Gets or sets the name of this solution configuration.
+            /// </summary>
+            /// <remarks>
+            /// This name will be displayed in Visual Studio's configuration drop down list. (Or
+            /// other development tools that support multiple configuration per workspace.)
+            /// </remarks>
+            public string Name { get; set; } = "[target.Name]";
+
+            /// <summary>
+            /// Gets or sets the file name (without extension) of the solution that this
+            /// configuration must be written into.
+            /// </summary>
+            public string SolutionFileName { get; set; } = "[solution.Name]";
+
+            /// <summary>
+            /// Gets or sets the directory of the solution that this configuration must be written
+            /// into.
+            /// </summary>
+            public string SolutionDirectory { get; set; } = "[solution.SharpmakeCsPath]";
+
+            /// <summary>
+            /// Gets the file name (without extension) of the solution that this configuration must
+            /// be written info.
+            /// </summary>
+            public string SolutionFilePath => Path.Combine(SolutionDirectory, SolutionFileName);
+
+            /// <summary>
+            /// Gets or sets the directory of the master BFF for this solution configuration.
+            /// </summary>
+            public string MasterBffDirectory { get; set; } = "[conf.SolutionPath]";
+
+            /// <summary>
+            /// Gets or sets the file name (without extension) of the master BFF for this solution
+            /// configuration.
+            /// </summary>
+            public string MasterBffFileName { get; set; } = "[conf.SolutionFileName]";
+
+            /// <summary>
+            /// Gets the file path (without extension) of the master BFF for this solution
+            /// configuration.
+            /// </summary>
+            public string MasterBffFilePath => Path.Combine(MasterBffDirectory, MasterBffFileName);
+
+            /// <summary>
+            /// Gets the file path, with the file extension, of the master BFF for this solution
+            /// configuration.
+            /// </summary>
+            public string MasterBffFilePathWithExtension => MasterBffFilePath + FastBuildSettings.FastBuildConfigFileExtension;
 
             // Can be set to customize solution platform name
             private string _platformName = null;
@@ -165,10 +223,17 @@ namespace Sharpmake
                 resolver.RemoveParameter("conf");
                 resolver.RemoveParameter("target");
 
-                Util.ResolvePath(Solution.SharpmakeCsPath, ref SolutionPath);
+                string solutionDirectory = SolutionDirectory;
+                Util.ResolvePath(Solution.SharpmakeCsPath, ref solutionDirectory);
+                SolutionDirectory = solutionDirectory;
                 if (Solution.IsFileNameToLower)
                     SolutionFileName = SolutionFileName.ToLower();
             }
+
+            #region Deprecated
+            [Obsolete("Use " + nameof(SolutionDirectory) + ".")]
+            public string SolutionPath = "[solution.SharpmakeCsPath]";      // Path of SolutionFileName
+            #endregion
         }
     }
 }

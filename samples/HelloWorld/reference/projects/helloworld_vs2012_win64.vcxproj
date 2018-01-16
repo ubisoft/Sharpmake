@@ -132,6 +132,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win64\debug\helloworld.map</MapFileName>
       <BaseAddress></BaseAddress>
+      <AllowIsolation>true</AllowIsolation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

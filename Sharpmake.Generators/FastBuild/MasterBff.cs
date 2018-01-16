@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,13 +11,8 @@ namespace Sharpmake.Generators.FastBuild
 {
     public class MasterBff : ISolutionGenerator
     {
-        private Builder _masterBffBuilder = null;
-        private static Strings s_masterBffFilenames = new Strings();
-
-        public static bool IsMasterBffFilename(string filename)
-        {
-            return s_masterBffFilenames.Contains(filename);
-        }
+        private static readonly Dictionary<string, ConfigurationsPerBff> s_confsPerSolutions = new Dictionary<string, ConfigurationsPerBff>();
+        private static bool s_postGenerationHandlerInitialized = false;
 
         internal static string GetGlobalBffConfigFileName(string masterBffFileName)
         {
@@ -33,6 +29,100 @@ namespace Sharpmake.Generators.FastBuild
             public UniqueList<Platform> Platforms = new UniqueList<Platform>();
             public List<string> AllConfigsSections = new List<string>(); // All Configs section when running with a source file filter
         }
+        private class ConfigurationsPerBff : IEnumerable<Solution.Configuration>
+        {
+            public static IEnumerable<ConfigurationsPerBff> Create(Solution solution, IEnumerable<Solution.Configuration> configurations)
+            {
+                var confsPerBffs = from conf in configurations
+                                   group conf by conf.MasterBffFilePath into confsByBff
+                                   select new ConfigurationsPerBff(solution, confsByBff.Key, confsByBff);
+
+                foreach (var conf in confsPerBffs)
+                {
+                    if (conf.IsFastBuildEnabled())
+                        yield return conf;
+                }
+            }
+
+            public static IEnumerable<Solution.ResolvedProject> GetResolvedSolutionsProjects(IEnumerable<ConfigurationsPerBff> configurationsPerSolutions)
+            {
+                var result = new HashSet<Solution.ResolvedProject>();
+                foreach (var solution in configurationsPerSolutions)
+                {
+                    foreach (var project in solution.ResolvedProjects)
+                        result.Add(project);
+                }
+
+                return result;
+            }
+
+            public Solution Solution { get; }
+            public string BffFilePath { get; }
+            public string BffFilePathWithExtension => BffFilePath + FastBuildSettings.FastBuildConfigFileExtension;
+            public Solution.Configuration[] Configurations { get; private set; }
+            public Solution.ResolvedProject[] ResolvedProjects { get; }
+
+            public void Merge(ConfigurationsPerBff other)
+            {
+                Debug.Assert(other.Solution == Solution);
+                Debug.Assert(other.BffFilePath == BffFilePath);
+
+                var merged = new HashSet<Solution.Configuration>(Configurations);
+                foreach (var conf in other)
+                    merged.Add(conf);
+                Configurations = merged.ToArray();
+            }
+
+            public IEnumerator<Solution.Configuration> GetEnumerator()
+            {
+                return Configurations.Cast<Solution.Configuration>().GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return Configurations.GetEnumerator();
+            }
+
+            private ConfigurationsPerBff(Solution solution, string bffFilePath, IEnumerable<Solution.Configuration> configurations)
+            {
+                Solution = solution;
+                BffFilePath = Util.SimplifyPath(bffFilePath);
+                Configurations = configurations.ToArray();
+                ResolvedProjects = solution.GetResolvedProjects(this).ToArray();
+            }
+
+            private bool IsFastBuildEnabled()
+            {
+                foreach (var solutionConfiguration in this)
+                {
+                    foreach (var solutionProject in ResolvedProjects)
+                    {
+                        var project = solutionProject.Project;
+
+                        // Export projects do not have any bff
+                        if (project.GetType().IsDefined(typeof(Export), false))
+                            continue;
+
+                        // When the project has a source file filter, only keep it if the file list is not empty
+                        if (project.SourceFilesFilters != null && (project.SourceFilesFiltersCount == 0 || project.SkipProjectWhenFiltersActive))
+                            continue;
+
+                        Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
+                        bool perfectMatch = includedProject != null && solutionProject.Configurations.Contains(includedProject.Configuration);
+                        if (!perfectMatch)
+                            continue;
+
+                        var conf = includedProject.Configuration;
+                        if (!conf.IsFastBuildEnabledProjectConfig())
+                            continue;
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
 
         public void Generate(
             Builder builder,
@@ -46,45 +136,106 @@ namespace Sharpmake.Generators.FastBuild
             if (!FastBuildSettings.FastBuildSupportEnabled)
                 return;
 
-            _masterBffBuilder = builder;
+            //
+            // In every case, we need a BFF with the name of the generated solution to start a
+            // build from Visual Studio with the generated projects. If the name of the BFF to
+            // generate for that solution happens to be the same as the solution's name, we
+            // generate everything in that file. Otherwise, we generate the content of the BFF in
+            // the appropriate file and we generate an *additional* BFF with the same name as the
+            // solution which simply includes the "real" bff.
+            //
+            // The reason we have to do it like that is to enable building a specific project in
+            // Visual Studio. A project can be included in several solutions, and can be built
+            // differently depending on the solution. This means we can't generate a specific
+            // master BFF name in the project's make command because which BFF is needed depends on
+            // the solution, not the project. So instead, when VS builds a project, we use
+            // $(SolutionName).bff as the BFF make command.
+            //
+            // So, if you want a shared master BFF instead of doing it per-solution or change the
+            // name, that's great, but we *need* $(SolutionName).bff for things to work in Visual
+            // Studio, even if all it does is include the real BFF.
+            //
 
-            FileInfo fileInfo = new FileInfo(solutionFile);
-            string masterBffPath = fileInfo.Directory.FullName;
-            string masterBffFileName = fileInfo.Name;
-
-            bool updated;
-            string masterBffFileResult = GenerateMasterBffFile(solution, solutionConfigurations, masterBffPath, masterBffFileName, out updated);
-            if (updated)
+            IEnumerable<ConfigurationsPerBff> confsPerBffs = ConfigurationsPerBff.Create(solution, solutionConfigurations).ToArray();
+            var retargetedConfsPerBffs = new List<ConfigurationsPerBff>();
+            foreach (var confsPerBff in confsPerBffs)
             {
-                Project.FastBuildGeneratedFileCount++;
-                Project.FastBuildMasterGeneratedFiles.Add(masterBffFileName);
-                generatedFiles.Add(masterBffFileResult);
-            }
-            else
-            {
-                skipFiles.Add(masterBffFileResult);
-                Project.FastBuildUpToDateFileCount++;
-            }
+                if (confsPerBff.Configurations.Any(conf => conf.SolutionFilePath != conf.MasterBffFilePath))
+                {
+                    retargetedConfsPerBffs.Add(confsPerBff);
+                    GenerateIncludeBffFileForSolution(builder, solutionFile, confsPerBff, generatedFiles, skipFiles);
 
-            _masterBffBuilder = null;
+                    // First collect all solutions and sort them by master BFF, then once we have all of
+                    // them, the post-generation event handler will actually generate the BFF.
+                    lock (s_confsPerSolutions)
+                    {
+                        if (!s_postGenerationHandlerInitialized)
+                        {
+                            builder.Generated += Builder_Generated;
+                            s_postGenerationHandlerInitialized = true;
+                        }
+
+                        ConfigurationsPerBff other;
+                        if (s_confsPerSolutions.TryGetValue(confsPerBff.BffFilePath, out other))
+                            other.Merge(confsPerBff);
+                        else
+                            s_confsPerSolutions.Add(confsPerBff.BffFilePath, confsPerBff);
+                    }
+                }
+                else
+                {
+                    GenerateMasterBffFiles(builder, new[] { confsPerBff });
+                }
+            }
         }
 
-        private string GenerateMasterBffFile(
-            Solution solution,
-            List<Solution.Configuration> solutionConfigurations,
-            string masterBffPath,
-            string masterBffFileNameWithoutExtension,
-            out bool updated
-        )
+        private void GenerateIncludeBffFileForSolution(Builder builder, string solutionFilePath, ConfigurationsPerBff confsPerBff, IList<string> generatedFiles, IList<string> skippedFiles)
         {
-            string masterBffFileName = masterBffFileNameWithoutExtension + FastBuildSettings.FastBuildConfigFileExtension;
-            string masterBffFullPath = Util.GetCapitalizedPath(masterBffPath + Path.DirectorySeparatorChar + masterBffFileName);
+            var fileGenerator = new FileGenerator();
+            using (fileGenerator.Declare("solutionFileName", Path.GetFileName(solutionFilePath)))
+            using (fileGenerator.Declare("masterBffFilePath", confsPerBff.BffFilePathWithExtension))
+                fileGenerator.Write(Bff.Template.ConfigurationFile.IncludeMasterBff);
+
+            using (var bffFileStream = fileGenerator.ToMemoryStream())
+            {
+                string bffFilePath = solutionFilePath + FastBuildSettings.FastBuildConfigFileExtension;
+                var bffFileInfo = new FileInfo(bffFilePath);
+                if (builder.Context.WriteGeneratedFile(null, bffFileInfo, bffFileStream))
+                    generatedFiles.Add(bffFilePath);
+                else
+                    skippedFiles.Add(bffFilePath);
+            }
+        }
+
+        private static void GenerateMasterBffFiles(Builder builder, IEnumerable<ConfigurationsPerBff> confsPerSolutions)
+        {
+            foreach (var confsPerBff in confsPerSolutions)
+            {
+                string bffFilePath = confsPerBff.BffFilePath;
+                string bffFilePathWithExtension = Util.PathMakeStandard(bffFilePath + FastBuildSettings.FastBuildConfigFileExtension);
+                if (GenerateMasterBffFile(builder, confsPerBff))
+                {
+                    Project.FastBuildGeneratedFileCount++;
+                    Project.FastBuildMasterGeneratedFiles.Add(bffFilePathWithExtension);
+                }
+                else
+                {
+                    Project.FastBuildUpToDateFileCount++;
+                }
+            }
+        }
+
+        private static bool GenerateMasterBffFile(Builder builder, ConfigurationsPerBff configurationsPerBff)
+        {
+            string masterBffFilePath = Util.GetCapitalizedPath(configurationsPerBff.BffFilePathWithExtension);
+            string masterBffDirectory = Path.GetDirectoryName(masterBffFilePath);
+            string masterBffFileName = Path.GetFileName(masterBffFilePath);
 
             // Global configuration file is in the same directory as the master bff but filename suffix added to its filename.
-            string globalConfigFullPath = GetGlobalBffConfigFileName(masterBffFullPath);
+            string globalConfigFullPath = GetGlobalBffConfigFileName(masterBffFilePath);
             string globalConfigFileName = Path.GetFileName(globalConfigFullPath);
 
-            var solutionProjects = solution.GetResolvedProjects(solutionConfigurations);
+            var solutionProjects = configurationsPerBff.ResolvedProjects;
 
             // Start writing Bff
             var fileGenerator = new FileGenerator();
@@ -100,31 +251,18 @@ namespace Sharpmake.Generators.FastBuild
             string projectRootPath = null;
             bool mustGenerateFastbuild = false;
 
-            foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
+            foreach (Solution.Configuration solutionConfiguration in configurationsPerBff)
             {
                 foreach (var solutionProject in solutionProjects)
                 {
+                    var includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
+                    if (includedProject == null)
+                        continue;
+
                     var project = solutionProject.Project;
-
-                    // Export projects do not have any bff
-                    if (project.GetType().IsDefined(typeof(Export), false))
-                        continue;
-
-                    // When the project has a source file filter, only keep it if the file list is not empty
-                    if (project.SourceFilesFilters != null && (project.SourceFilesFiltersCount == 0 || project.SkipProjectWhenFiltersActive))
-                        continue;
-
-                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
-                    bool perfectMatch = includedProject != null && solutionProject.Configurations.Contains(includedProject.Configuration);
-                    if (!perfectMatch)
-                        continue;
+                    var conf = includedProject.Configuration;
 
                     projectRootPath = project.RootPath;
-
-                    var conf = includedProject.Configuration;
-                    if (!conf.IsFastBuildEnabledProjectConfig())
-                        continue;
-
                     mustGenerateFastbuild = true;
 
                     string bffFullFileNameCapitalized = Util.GetCapitalizedPath(conf.BffFullFileName);
@@ -140,112 +278,127 @@ namespace Sharpmake.Generators.FastBuild
                     if (FastBuildSettings.WriteAllConfigsSection)
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
 
-                    if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                    using (fileGenerator.Declare("conf", conf))
+                    using (fileGenerator.Declare("target", conf.Target))
+                    using (fileGenerator.Declare("project", conf.Project))
                     {
-                        var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffPath);
-                        foreach (var copy in copies)
+                        if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
                         {
-                            var sourceFile = copy.Key;
-                            var sourceFileName = Path.GetFileName(sourceFile);
-                            var destinationFolder = copy.Value;
-                            var destinationFile = Path.Combine(destinationFolder, sourceFileName);
-
-                            // use the global root for alias computation, as the project has not idea in which master bff it has been included
-                            var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
-                            string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
+                            var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffDirectory);
+                            foreach (var copy in copies)
                             {
-                                using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
-                                using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
-                                using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                var sourceFile = copy.Key;
+                                var sourceFileName = Path.GetFileName(sourceFile);
+                                var destinationFolder = copy.Value;
+                                var destinationFile = Path.Combine(destinationFolder, sourceFileName);
+
+                                // use the global root for alias computation, as the project has not idea in which master bff it has been included
+                                var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffDirectory, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
+                                string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
                                 {
-                                    if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
-                                        bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
+                                    using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
+                                    using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                    {
+                                        if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
+                                            bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    foreach (var preEvent in conf.EventPreBuildExecute)
-                    {
-                        if (preEvent.Value is Project.Configuration.BuildStepExecutable)
+                        foreach (var preEvent in conf.EventPreBuildExecute)
                         {
-                            var execCommand = preEvent.Value as Project.Configuration.BuildStepExecutable;
-
-                            using (fileGenerator.Declare("fastBuildPreBuildName", preEvent.Key))
-                            using (fileGenerator.Declare("fastBuildPrebuildExeFile", execCommand.ExecutableFile))
-                            using (fileGenerator.Declare("fastBuildPreBuildInputFile", execCommand.ExecutableInputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildOutputFile", execCommand.ExecutableOutputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
-                            using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory))
-                            using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                            if (preEvent.Value is Project.Configuration.BuildStepExecutable)
                             {
-                                if (!bffPreBuildSection.ContainsKey(preEvent.Key))
-                                    bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                                var execCommand = preEvent.Value as Project.Configuration.BuildStepExecutable;
+
+                                using (fileGenerator.Declare("fastBuildPreBuildName", preEvent.Key))
+                                using (fileGenerator.Declare("fastBuildPrebuildExeFile", execCommand.ExecutableFile))
+                                using (fileGenerator.Declare("fastBuildPreBuildInputFile", execCommand.ExecutableInputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildOutputFile", execCommand.ExecutableOutputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
+                                using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory))
+                                using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                                {
+                                    string eventKey = fileGenerator.Resolver.Resolve(preEvent.Key);
+                                    if (!bffPreBuildSection.ContainsKey(eventKey))
+                                        bffPreBuildSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                                }
+                            }
+                            else if (preEvent.Value is Project.Configuration.BuildStepCopy)
+                            {
+                                var copyCommand = preEvent.Value as Project.Configuration.BuildStepCopy;
+
+                                using (fileGenerator.Declare("fastBuildCopyAlias", preEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
+                                using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
+                                using (fileGenerator.Declare("fastBuildCopyDirName", preEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(copyCommand.SourcePath)))
+                                using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(copyCommand.DestinationPath)))
+                                using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
+                                using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                                {
+                                    string eventKey = fileGenerator.Resolver.Resolve(preEvent.Key);
+                                    if (!bffPreBuildSection.ContainsKey(eventKey))
+                                    {
+                                        if (copyCommand.IsFileCopy)
+                                            bffPreBuildSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                        else
+                                            bffPreBuildSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                    }
+                                }
                             }
                         }
-                        else if (preEvent.Value is Project.Configuration.BuildStepCopy)
-                        {
-                            var copyCommand = preEvent.Value as Project.Configuration.BuildStepCopy;
 
-                            using (fileGenerator.Declare("fastBuildCopyAlias", preEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
-                            using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
-                            using (fileGenerator.Declare("fastBuildCopyDirName", preEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(copyCommand.SourcePath)))
-                            using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(copyCommand.DestinationPath)))
-                            using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                            using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                        foreach (var customEvent in conf.EventCustomPrebuildExecute)
+                        {
+                            if (customEvent.Value is Project.Configuration.BuildStepExecutable)
                             {
-                                if (!bffPreBuildSection.ContainsKey(preEvent.Key) && copyCommand.IsFileCopy)
-                                    bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
-                                else if (!bffPreBuildSection.ContainsKey(preEvent.Key))
-                                    bffPreBuildSection.Add(preEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                var exeCommand = customEvent.Value as Project.Configuration.BuildStepExecutable;
+
+                                using (fileGenerator.Declare("fastBuildPreBuildName", customEvent.Key))
+                                using (fileGenerator.Declare("fastBuildPrebuildExeFile", exeCommand.ExecutableFile))
+                                using (fileGenerator.Declare("fastBuildPreBuildInputFile", exeCommand.ExecutableInputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildOutputFile", exeCommand.ExecutableOutputFileArgumentOption))
+                                using (fileGenerator.Declare("fastBuildPreBuildArguments", exeCommand.ExecutableOtherArguments))
+                                using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", exeCommand.ExecutableWorkingDirectory))
+                                using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", exeCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                                {
+                                    string eventKey = fileGenerator.Resolver.Resolve(customEvent.Key);
+                                    if (!bffCustomPreBuildSection.ContainsKey(eventKey))
+                                        bffCustomPreBuildSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                                }
                             }
-                        }
-                    }
-
-                    foreach (var customEvent in conf.EventCustomPrebuildExecute)
-                    {
-                        if (customEvent.Value is Project.Configuration.BuildStepExecutable)
-                        {
-                            var exeCommand = customEvent.Value as Project.Configuration.BuildStepExecutable;
-
-                            using (fileGenerator.Declare("fastBuildPreBuildName", customEvent.Key))
-                            using (fileGenerator.Declare("fastBuildPrebuildExeFile", exeCommand.ExecutableFile))
-                            using (fileGenerator.Declare("fastBuildPreBuildInputFile", exeCommand.ExecutableInputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildOutputFile", exeCommand.ExecutableOutputFileArgumentOption))
-                            using (fileGenerator.Declare("fastBuildPreBuildArguments", exeCommand.ExecutableOtherArguments))
-                            using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", exeCommand.ExecutableWorkingDirectory))
-                            using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", exeCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                            else if (customEvent.Value is Project.Configuration.BuildStepCopy)
                             {
-                                if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
-                                    bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
-                            }
-                        }
-                        else if (customEvent.Value is Project.Configuration.BuildStepCopy)
-                        {
-                            var copyCommand = customEvent.Value as Project.Configuration.BuildStepCopy;
+                                var copyCommand = customEvent.Value as Project.Configuration.BuildStepCopy;
 
-                            using (fileGenerator.Declare("fastBuildCopyAlias", customEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
-                            using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
-                            using (fileGenerator.Declare("fastBuildCopyDirName", customEvent.Key))
-                            using (fileGenerator.Declare("fastBuildCopyDirSourcePath", copyCommand.SourcePath))
-                            using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", copyCommand.DestinationPath))
-                            using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                            using (fileGenerator.Declare("fastBuildCopyDirPattern", copyCommand.CopyPattern))
-                            {
-                                if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key) && copyCommand.IsFileCopy)
-                                    bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
-                                else if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
-                                    bffCustomPreBuildSection.Add(customEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                using (fileGenerator.Declare("fastBuildCopyAlias", customEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopySource", copyCommand.SourcePath))
+                                using (fileGenerator.Declare("fastBuildCopyDest", copyCommand.DestinationPath))
+                                using (fileGenerator.Declare("fastBuildCopyDirName", customEvent.Key))
+                                using (fileGenerator.Declare("fastBuildCopyDirSourcePath", copyCommand.SourcePath))
+                                using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", copyCommand.DestinationPath))
+                                using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
+                                using (fileGenerator.Declare("fastBuildCopyDirPattern", copyCommand.CopyPattern))
+                                {
+                                    if (!bffCustomPreBuildSection.ContainsKey(customEvent.Key))
+                                    {
+                                        string eventKey = fileGenerator.Resolver.Resolve(customEvent.Key);
+                                        if (copyCommand.IsFileCopy)
+                                            bffCustomPreBuildSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                        else
+                                            bffCustomPreBuildSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                                    }
+                                }
                             }
                         }
                     }
 
                     if (includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes)
                     {
-                        var currentBffDependencyIncludes = masterBffInfo.BffIncludeToDependencyIncludes.GetValueOrAdd(projectBffFullPath, new Dictionary<string,int>());
+                        var currentBffDependencyIncludes = masterBffInfo.BffIncludeToDependencyIncludes.GetValueOrAdd(projectBffFullPath, new Dictionary<string, int>());
 
                         // Generate bff include list
                         // --------------------------------------
@@ -265,7 +418,7 @@ namespace Sharpmake.Generators.FastBuild
 
                             string depBffFullFileNameCapitalized = Util.GetCapitalizedPath(depProjConfig.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
                             int previousOrder;
-                            if(currentBffDependencyIncludes.TryGetValue(depBffFullFileNameCapitalized, out previousOrder))
+                            if (currentBffDependencyIncludes.TryGetValue(depBffFullFileNameCapitalized, out previousOrder))
                             {
                                 if (order > previousOrder)
                                     currentBffDependencyIncludes[depBffFullFileNameCapitalized] = order;
@@ -315,7 +468,7 @@ namespace Sharpmake.Generators.FastBuild
                 foreach (var projectBffFullPath in totalIncludeList)
                 {
                     string projectFullPath = Path.GetDirectoryName(projectBffFullPath);
-                    var projectPathRelativeFromMasterBff = Util.PathGetRelative(masterBffPath, projectFullPath, true);
+                    var projectPathRelativeFromMasterBff = Util.PathGetRelative(masterBffDirectory, projectFullPath, true);
 
                     string bffKeyRelative = Path.Combine(Bff.CurrentBffPathKey, Path.GetFileName(projectBffFullPath));
 
@@ -344,7 +497,7 @@ namespace Sharpmake.Generators.FastBuild
 
             }
 
-            GenerateMasterBffGlobalSettingsFile(globalConfigFullPath, masterBffInfo, masterCompilerSettings);
+            GenerateMasterBffGlobalSettingsFile(builder, globalConfigFullPath, masterBffInfo, masterCompilerSettings);
 
             using (fileGenerator.Declare("fastBuildProjectName", masterBffFileName))
             using (fileGenerator.Declare("fastBuildGlobalConfigurationInclude", $"#include \"{globalConfigFileName}\""))
@@ -380,17 +533,19 @@ namespace Sharpmake.Generators.FastBuild
             MemoryStream bffCleanMemoryStream = fileGenerator.ToMemoryStream();
 
             // Write master bff file
-            s_masterBffFilenames.Add(masterBffFileName);
-            FileInfo bffFileInfo = new FileInfo(masterBffFullPath);
-            updated = _masterBffBuilder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream);
+            FileInfo bffFileInfo = new FileInfo(masterBffFilePath);
+            bool updated = builder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream);
 
-            solution.PostGenerationCallback?.Invoke(masterBffPath, masterBffFileNameWithoutExtension, FastBuildSettings.FastBuildConfigFileExtension);
+            foreach (var confsPerSolution in configurationsPerBff)
+                confsPerSolution.Solution.PostGenerationCallback?.Invoke(masterBffDirectory, Path.GetFileNameWithoutExtension(masterBffFileName), FastBuildSettings.FastBuildConfigFileExtension);
 
-            return bffFileInfo.FullName;
+            return updated;
         }
 
-        private void GenerateMasterBffGlobalSettingsFile(
-            string masterBffGlobalConfigFile, MasterBffInfo masterBffInfo,
+        private static void GenerateMasterBffGlobalSettingsFile(
+            Builder builder,
+            string masterBffGlobalConfigFile,
+            MasterBffInfo masterBffInfo,
             Dictionary<string, CompilerSettings> masterCompilerSettings
         )
         {
@@ -405,7 +560,7 @@ namespace Sharpmake.Generators.FastBuild
 
             // Write master bff global settings file
             FileInfo bffFileInfo = new FileInfo(masterBffGlobalConfigFile);
-            if (_masterBffBuilder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream))
+            if (builder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream))
             {
                 Project.FastBuildGeneratedFileCount++;
                 Project.FastBuildMasterGeneratedFiles.Add(masterBffGlobalConfigFile);
@@ -416,7 +571,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private void WriteMasterSettingsSection(
+        private static void WriteMasterSettingsSection(
             FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo,
             Dictionary<string, CompilerSettings> masterCompilerSettings
         )
@@ -504,7 +659,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private void WriteMasterCompilerSection(
+        private static void WriteMasterCompilerSection(
             FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo,
             Dictionary<string, CompilerSettings> masterCompilerSettings
         )
@@ -568,12 +723,18 @@ namespace Sharpmake.Generators.FastBuild
                 masterBffGenerator.Write(new StringReader(copySection).ReadToEnd());
         }
 
-        private void WriteMasterCustomSection(IFileGenerator masterBffGenerator, UniqueList<string> masterBffCustomSections)
+        private static void WriteMasterCustomSection(IFileGenerator masterBffGenerator, UniqueList<string> masterBffCustomSections)
         {
             if (masterBffCustomSections.Count != 0)
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.CustomSectionHeader);
             foreach (var customSection in masterBffCustomSections)
                 masterBffGenerator.Write(new StringReader(customSection).ReadToEnd());
+        }
+
+        private static void Builder_Generated(object sender, GenerationEventArgs e)
+        {
+            Builder builder = (Builder)sender;
+            GenerateMasterBffFiles(builder, s_confsPerSolutions.Values);
         }
     }
 }

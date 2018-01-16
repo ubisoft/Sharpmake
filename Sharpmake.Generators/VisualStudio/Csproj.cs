@@ -523,7 +523,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Resolve(Resolver resolver)
                 {
                     using (resolver.NewScopedParameter("include", Include))
-                    using (resolver.NewScopedParameter("projectGUID", Project.ToString("B").ToUpper()))
+                    using (resolver.NewScopedParameter("projectGUID", Project.ToString("B")))
                     using (resolver.NewScopedParameter("projectRefName", Name))
                     using (resolver.NewScopedParameter("private", Private.ToString().ToLower()))
                     using (resolver.NewScopedParameter("ReferenceOutputAssembly", ReferenceOutputAssembly))
@@ -1696,6 +1696,8 @@ namespace Sharpmake.Generators.VisualStudio
                 string expectedExtension =
                     runtimeTemplate ? ".cs" :
                     Util.GetTextTemplateDirectiveParam(Path.Combine(_projectPath, ttFile), "output", "extension") ?? ".cs";
+                if (!expectedExtension.StartsWith("."))
+                    expectedExtension = "." + expectedExtension;
                 string fileNameWithoutExtension = ttFile.Substring(0, ttFile.Length - TTExtension.Length);
                 string generatedFile = fileNameWithoutExtension + expectedExtension;
                 string generator = runtimeTemplate
@@ -2672,6 +2674,24 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectOption
             (
+            Options.Option(Options.CSharp.GenerateManifests.Enabled, () => { options["GenerateManifests"] = "true"; }),
+            Options.Option(Options.CSharp.GenerateManifests.Disabled, () => { options["GenerateManifests"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.UseVSHostingProcess.Enabled, () => { options["UseVSHostingProcess"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.UseVSHostingProcess.Disabled, () => { options["UseVSHostingProcess"] = "false"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.SignManifests.Enabled, () => { options["SignManifests"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.SignManifests.Disabled, () => { options["SignManifests"] = "false"; })
+            );
+
+            SelectOption
+            (
             Options.Option(Options.CSharp.UseApplicationTrust.Enabled, () => { options["UseApplicationTrust"] = "true"; }),
             Options.Option(Options.CSharp.UseApplicationTrust.Disabled, () => { options["UseApplicationTrust"] = RemoveLineTag; })
             );
@@ -2736,6 +2756,8 @@ namespace Sharpmake.Generators.VisualStudio
             options["ConcordSDKDir"] = Options.StringOption.Get<Options.CSharp.ConcordSDKDir>(conf);
             options["UpdateInterval"] = Options.IntOption.Get<Options.CSharp.UpdateInterval>(conf);
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
+            options["ManifestKeyFile"] = Options.StringOption.Get<Options.CSharp.ManifestKeyFile>(conf);
+            options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
 
             // concat defines, don't add options.Defines since they are automaticly added by VS
             Strings defines = new Strings();

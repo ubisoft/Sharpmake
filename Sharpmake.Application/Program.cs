@@ -469,7 +469,7 @@ namespace Sharpmake.Application
                     LogWriteLine("    fastbuild                        {0,5} generated, {1,5} up-to-date", Project.FastBuildGeneratedFileCount, Project.FastBuildUpToDateFileCount);
             }
             if (generatedSolutionFiles.Count > 0 || skippedSolutionFiles.Count > 0)
-                LogWriteLine("    solutions ({0,5} configurations) {1,5} generated, {2,5} up-to-date", Solution.Configuration.Count, generatedSolutionFiles.Count, skippedSolutionFiles.Count);
+                LogWriteLine("    solutions ({0,5} configurations) {1,5} generated, {2,5} up-to-date", Solution.Configuration.InstancesCount, generatedSolutionFiles.Count, skippedSolutionFiles.Count);
 
             if (Project.BlobGenerated > 0 || Project.BlobUpdateToDate > 0)
                 LogWriteLine("    blobs                            {0,5} generated, {1,5} up-to-date", Project.BlobGenerated, Project.BlobUpdateToDate);

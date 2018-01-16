@@ -164,7 +164,7 @@ namespace SharpmakeGen
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.SolutionFileName = "[solution.Name]";
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\..\..\";
+            conf.SolutionDirectory = @"[solution.SharpmakeCsPath]\..\..\";
 
             conf.AddProject<SharpmakeApplicationProject>(target);
             conf.AddProject<SharpmakeProject>(target);

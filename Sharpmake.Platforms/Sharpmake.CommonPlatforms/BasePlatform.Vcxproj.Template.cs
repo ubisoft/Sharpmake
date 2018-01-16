@@ -38,8 +38,8 @@ namespace Sharpmake
       <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
       <IgnoreStandardIncludePath>[options.IgnoreStandardIncludePath]</IgnoreStandardIncludePath>
       <PreprocessToFile>[options.GeneratePreprocessedFile]</PreprocessToFile>
-      <PreprocessSuppressLineNumbers>[options.KeepComments]</PreprocessSuppressLineNumbers>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>[options.PreprocessSuppressLineNumbers]</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>[options.KeepComments]</PreprocessKeepComments>
       <StringPooling>[options.StringPooling]</StringPooling>
       <MinimalRebuild>[options.MinimalRebuild]</MinimalRebuild>
       <ExceptionHandling>[options.ExceptionHandling]</ExceptionHandling>
@@ -121,7 +121,7 @@ namespace Sharpmake
       <HeapCommitSize>[options.HeapCommitSize]</HeapCommitSize>
       <StackReserveSize>[options.StackReserveSize]</StackReserveSize>
       <StackCommitSize>[options.StackCommitSize]</StackCommitSize>
-      <LargeAddressAware>true</LargeAddressAware>
+      <LargeAddressAware>[options.LargeAddressAware]</LargeAddressAware>
       <MapFileName>[options.MapFileName]</MapFileName>
       <ImportLibrary>[options.ImportLibrary]</ImportLibrary>
       <FunctionOrder>[options.FunctionOrder]</FunctionOrder>
@@ -129,6 +129,7 @@ namespace Sharpmake
       <DelayLoadDLLs>[options.DelayLoadedDLLs]</DelayLoadDLLs>
       <BaseAddress>[options.BaseAddress]</BaseAddress>
       <UACExecutionLevel>[options.UACExecutionLevel]</UACExecutionLevel>
+      <AllowIsolation>[options.AllowIsolation]</AllowIsolation>
     </Link>
 ";
 

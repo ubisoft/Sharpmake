@@ -554,8 +554,6 @@ namespace Sharpmake
             // For projects merging multiple targets, sometimes what is wanted is to not generate
             // any FastBuild .bff files, but instead include the ones for all appropriate targets
             public bool DoNotGenerateFastBuild = false;
-            public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
-            public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
 
             public abstract class BuildStepManagers
             { }
@@ -619,12 +617,12 @@ namespace Sharpmake
                     CopyPattern = buildStepCopy.CopyPattern;
                 }
 
-                public BuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*")
+                public BuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*", bool fileCopy = true)
                 {
                     SourcePath = sourcePath;
                     DestinationPath = destinationPath;
 
-                    IsFileCopy = true;
+                    IsFileCopy = fileCopy;
                     IsRecurse = true;
                     IsNameSpecific = isNameSpecific;
                     CopyPattern = copyPattern;
@@ -945,7 +943,7 @@ namespace Sharpmake
                 string dependencyExtension = Util.GetProjectFileExtension(this);
                 ProjectFullFileNameWithExtension = ProjectFullFileName + dependencyExtension;
 
-                if (!this.Project.GetType().IsDefined(typeof(Compile), false))
+                if (string.IsNullOrEmpty(ProjectGuid) && !this.Project.GetType().IsDefined(typeof(Compile), false))
                     ProjectGuid = Util.BuildGuid(ProjectFullFileNameWithExtension, Project.GuidReferencePath);
 
                 if (PrecompHeader != null)
@@ -1603,6 +1601,11 @@ namespace Sharpmake
                 if (string.IsNullOrEmpty(OutputExtension))
                     OutputExtension = PlatformRegistry.Get<IConfigurationTasks>(Platform).GetDefaultOutputExtension(Output);
             }
+
+            #region Deprecated
+            [Obsolete("This delegate was used only by " + nameof(FastBuildFileIncludeCondition) + " which had no effect. It will be removed.")] public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
+            [Obsolete("This property could be set but was never used by Sharpmake. It will be removed.")] public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
+            #endregion
         }
     }
 }

@@ -58,6 +58,7 @@
     <Compile Include="BuildContext\RedirectOutput.cs" />
     <Compile Include="BuildContext\RegressionTest.cs" />
     <Compile Include="Builder.cs" />
+    <Compile Include="BuilderEventArgs.cs" />
     <Compile Include="BuilderExtension.cs" />
     <Compile Include="CommandLine.cs" />
     <Compile Include="Configurable.cs" />

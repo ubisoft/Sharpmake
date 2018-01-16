@@ -301,15 +301,25 @@ namespace Sharpmake.Generators.VisualStudio
                     fileGenerator.Write(Template.Solution.ProjectFolder);
                     if (masterBffFolder == folder)
                     {
-                        string fastBuildMasterBffPath = solutionFile + FastBuildSettings.FastBuildConfigFileExtension; // TODO: make a better method
-                        string fastBuildGlobalSettingsPath = FastBuild.MasterBff.GetGlobalBffConfigFileName(fastBuildMasterBffPath);
+                        ISet<string> bffFilesPaths = new SortedSet<string>();
+
+                        foreach (var conf in solutionConfigurations)
+                        {
+                            string masterBffFilePath = conf.MasterBffFilePathWithExtension;
+                            bffFilesPaths.Add(masterBffFilePath);
+                            bffFilesPaths.Add(FastBuild.MasterBff.GetGlobalBffConfigFileName(masterBffFilePath));
+                        }
+
+                        // This always needs to be created so make sure it's there.
+                        bffFilesPaths.Add(solutionFile + FastBuildSettings.FastBuildConfigFileExtension);
 
                         fileGenerator.Write(Template.Solution.SolutionItemBegin);
                         {
-                            using (fileGenerator.Declare("solutionItemPath", fastBuildMasterBffPath))
-                                fileGenerator.Write(Template.Solution.SolutionItem);
-                            using (fileGenerator.Declare("solutionItemPath", fastBuildGlobalSettingsPath))
-                                fileGenerator.Write(Template.Solution.SolutionItem);
+                            foreach (var path in bffFilesPaths)
+                            {
+                                using (fileGenerator.Declare("solutionItemPath", path))
+                                    fileGenerator.Write(Template.Solution.SolutionItem);
+                            }
                         }
                         fileGenerator.Write(Template.Solution.ProjectSectionEnd);
                     }
@@ -599,7 +609,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, List<Solution.Configuration> solutionConfigurations)
         {
-            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(solutionConfigurations);
+            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(solutionConfigurations).ToList();
 
             // Ensure all projects are always in the same order to avoid random shuffles
             solutionProjects.Sort((a, b) =>
@@ -616,7 +626,7 @@ namespace Sharpmake.Generators.VisualStudio
             var startupProjectGroups = confWithStartupProjects.GroupBy(conf => conf.StartupProject.Configuration.ProjectFullFileName).ToArray();
             if (startupProjectGroups.Length > 1)
             {
-                throw new Error("Solution {0} contains multiple startup projects; this is not supported. Startup projects: {1}", Path.Combine(solutionConfigurations[0].SolutionPath, solutionConfigurations[0].SolutionFileName), string.Join(", ", startupProjectGroups.Select(group => group.Key)));
+                throw new Error("Solution {0} contains multiple startup projects; this is not supported. Startup projects: {1}", Path.Combine(solutionConfigurations[0].SolutionDirectory, solutionConfigurations[0].SolutionFileName), string.Join(", ", startupProjectGroups.Select(group => group.Key)));
             }
 
             Solution.Configuration.IncludedProjectInfo startupProject = startupProjectGroups.Select(group => group.First().StartupProject).FirstOrDefault();

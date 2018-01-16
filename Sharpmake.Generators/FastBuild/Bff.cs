@@ -654,8 +654,9 @@ namespace Sharpmake.Generators.FastBuild
                                 string fileExtension = Path.GetExtension(file);
                                 if (project.SourceFilesCompileExtensions.Contains(fileExtension))
                                 {
-                                    if (IsFileInInputPathList(fullInputPaths, file))
-                                        excludedSourceFilesRelative.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, file)));
+                                    string relativePath = GetFilePathRelativeToInputPath(fullInputPaths, file);
+                                    if (!string.IsNullOrEmpty(relativePath))
+                                        excludedSourceFilesRelative.Add(relativePath);
                                 }
                             }
                             if (excludedSourceFilesRelative.Count > 0)
@@ -721,6 +722,8 @@ namespace Sharpmake.Generators.FastBuild
                             case Project.Configuration.OutputType.Exe:
                             case Project.Configuration.OutputType.Dll:
                                 using (bffGenerator.Declare("conf", conf))
+                                using (bffGenerator.Declare("project", project))
+                                using (bffGenerator.Declare("target", conf.Target))
                                 using (bffGenerator.Declare("$(ProjectName)", projectName))
                                 using (bffGenerator.Declare("options", confOptions))
                                 using (bffGenerator.Declare("cmdLineOptions", confCmdLineOptions))
@@ -1169,8 +1172,9 @@ namespace Sharpmake.Generators.FastBuild
                 // well I guess we are stuck with this.
                 foreach (string file in excludedSourceFiles.SortedValues)
                 {
-                    if (IsFileInInputPathList(unityInputPaths, file))
-                        excludedSourceFilesRelative.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, file, true)));
+                    string relativePath = GetFilePathRelativeToInputPath(unityInputPaths, file);
+                    if (!string.IsNullOrEmpty(relativePath))
+                        excludedSourceFilesRelative.Add(relativePath);
                 }
                 if (excludedSourceFilesRelative.Count > 0)
                     fastBuildUnityInputExcludedfiles = UtilityMethods.FBuildCollectionFormat(excludedSourceFilesRelative, spaceLength, project.SourceFilesBlobExtensions);
@@ -1397,7 +1401,7 @@ namespace Sharpmake.Generators.FastBuild
             return confSubConfigs;
         }
 
-        private bool IsFileInInputPathList(Strings inputPaths, string path)
+        private string GetFilePathRelativeToInputPath(Strings inputPaths, string path)
         {
             // Convert each of file paths to each of the input paths and try to
             // find the first one not starting from ..(ie the file is in the tested input path)
@@ -1405,10 +1409,15 @@ namespace Sharpmake.Generators.FastBuild
             {
                 string sourceFileRelativeTmp = Util.PathGetRelative(inputAbsPath, path, true);
                 if (!sourceFileRelativeTmp.StartsWith(".."))
-                    return true;
+                    return sourceFileRelativeTmp;
             }
 
-            return false;
+            return null;
+        }
+
+        private bool IsFileInInputPathList(Strings inputPaths, string path)
+        {
+            return GetFilePathRelativeToInputPath(inputPaths, path) != null;
         }
     }
 }

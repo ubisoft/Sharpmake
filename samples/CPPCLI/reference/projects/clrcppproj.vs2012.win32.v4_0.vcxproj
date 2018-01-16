@@ -159,6 +159,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win32\debug\clrcppproj.map</MapFileName>
       <BaseAddress></BaseAddress>
+      <AllowIsolation>true</AllowIsolation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -250,6 +251,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win32\release\clrcppproj.map</MapFileName>
       <BaseAddress></BaseAddress>
+      <AllowIsolation>true</AllowIsolation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

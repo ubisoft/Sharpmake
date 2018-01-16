@@ -143,7 +143,7 @@ namespace ConfigureOrdering
         [Configure()]
         public void ConfigureAll(Configuration conf, Target target)
         {
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
+            conf.SolutionDirectory = @"[solution.SharpmakeCsPath]\projects";
             conf.AddProject<FooBarProject>(target);
             conf.AddProject<ParentProject>(target);
             conf.AddProject<ChildProject>(target);

@@ -128,7 +128,7 @@ namespace Sharpmake
             return solution;
         }
 
-        public List<ResolvedProject> GetResolvedProjects(List<Configuration> solutionConfigurations)
+        public IEnumerable<ResolvedProject> GetResolvedProjects(IEnumerable<Configuration> solutionConfigurations)
         {
             if (!_dependenciesResolved)
                 throw new InternalError("Solution not resolved: {0}", GetType().FullName);
@@ -212,7 +212,7 @@ namespace Sharpmake
             foreach (Solution.Configuration solutionConfiguration in Configurations)
             {
                 // Build SolutionFilesMapping
-                string configurationFile = Path.Combine(solutionConfiguration.SolutionPath, solutionConfiguration.SolutionFileName);
+                string configurationFile = Path.Combine(solutionConfiguration.SolutionDirectory, solutionConfiguration.SolutionFileName);
 
                 var fileConfigurationList = SolutionFilesMapping.GetValueOrAdd(configurationFile, new List<Solution.Configuration>());
                 fileConfigurationList.Add(solutionConfiguration);
@@ -436,7 +436,7 @@ namespace Sharpmake
                     projectConf.IsFastBuild = true;
 
                     // output the project in the same folder as the solution, and the same name
-                    projectConf.ProjectPath = solutionConf.SolutionPath;
+                    projectConf.ProjectPath = solutionConf.SolutionDirectory;
                     if (string.IsNullOrWhiteSpace(FastBuildAllProjectFileSuffix))
                         throw new Error("FastBuildAllProjectFileSuffix cannot be left emtpy in solution " + solutionFile);
                     projectConf.ProjectFileName = solutionFile.Key + FastBuildAllProjectFileSuffix;

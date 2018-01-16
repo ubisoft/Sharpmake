@@ -54,6 +54,11 @@ namespace Sharpmake.Generators.VisualStudio
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
     <PublishUrl>[options.PublishUrl]</PublishUrl>
     <InstallUrl>[options.InstallUrl]</InstallUrl>
+    <ManifestKeyFile>[options.ManifestKeyFile]</ManifestKeyFile>
+    <ManifestCertificateThumbprint>[options.ManifestCertificateThumbprint]</ManifestCertificateThumbprint>
+    <GenerateManifests>[options.GenerateManifests]</GenerateManifests>
+    <SignManifests>[options.SignManifests]</SignManifests>
+    <UseVSHostingProcess>[options.UseVSHostingProcess]</UseVSHostingProcess>
     <ProductName>[options.ProductName]</ProductName>
     <PublisherName>[options.PublisherName]</PublisherName>
     <WebPage>[options.WebPage]</WebPage>

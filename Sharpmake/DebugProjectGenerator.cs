@@ -191,7 +191,7 @@ namespace Sharpmake
         [Configure()]
         public virtual void Configure(Configuration conf, Target target)
         {
-            conf.SolutionPath = DebugProjectGenerator.RootPath;
+            conf.SolutionDirectory = DebugProjectGenerator.RootPath;
             conf.SolutionFileName = "[solution.Name].[target.DevEnv]";
 
             foreach (var project in DebugProjectGenerator.DebugProjects)

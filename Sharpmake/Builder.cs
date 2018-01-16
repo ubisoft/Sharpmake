@@ -67,6 +67,7 @@ namespace Sharpmake
         public static Builder Instance;
 
         #region Events
+
         // Output events
         public delegate void OutputDelegate(string message, params object[] args);
         public event OutputDelegate EventOutputError;
@@ -75,33 +76,57 @@ namespace Sharpmake
         public event OutputDelegate EventOutputDebug;
         public event OutputDelegate EventOutputProfile;
 
-        // Configure events
-        public delegate void PreProjectConfigure(Project project);
-        public event PreProjectConfigure EventPreProjectConfigure;
-        public delegate void PostProjectConfigure(Project project, Project.Configuration conf);
-        public event PostProjectConfigure EventPostProjectConfigure;
-        public delegate void PreSolutionConfigure(Solution solution);
-        public event PreSolutionConfigure EventPreSolutionConfigure;
-        public delegate void PostSolutionConfigure(Solution solution, Solution.Configuration conf);
-        public event PostSolutionConfigure EventPostSolutionConfigure;
+        /// <summary>
+        /// Raised when a project is about to be configured.
+        /// </summary>
+        public event EventHandler<ProjectEventArgs> BeforeProjectConfiguration;
 
-        // Link events
-        public delegate void PreProjectLink(Project project);
-        public event PreProjectLink EventPreProjectLink;
-        public delegate void PostProjectLink(Project project);
-        public event PostProjectLink EventPostProjectLink;
-        public delegate void PreSolutionLink(Solution solution);
-        public event PreSolutionLink EventPreSolutionLink;
-        public delegate void PostSolutionLink(Solution solution);
-        public event PostSolutionLink EventPostSolutionLink;
+        /// <summary>
+        /// Raised after a project has been configured.
+        /// </summary>
+        public event EventHandler<ProjectConfigurationEventArgs> ProjectConfigured;
 
-        // Generate events
-        public delegate void PreGeneration(List<Project> projects, List<Solution> solutions);
-        public event PreGeneration EventPreGeneration;
-        public delegate void PostGeneration(List<Project> projects, List<Solution> solutions);
-        public event PostGeneration EventPostGeneration;
-        public delegate void PostGenerationReport(List<Project> projects, List<Solution> solutions, ConcurrentDictionary<Type, GenerationOutput> generationReport);
-        public event PostGenerationReport EventPostGenerationReport;
+        /// <summary>
+        /// Raised when a solution is about to be configured.
+        /// </summary>
+        public event EventHandler<SolutionEventArgs> BeforeSolutionConfiguration;
+
+        /// <summary>
+        /// Raised after a solution has been configured.
+        /// </summary>
+        public event EventHandler<SolutionConfigurationEventArgs> SolutionConfigured;
+
+        /// <summary>
+        /// Raised when a project is about to be linked.
+        /// </summary>
+        public event EventHandler<ProjectEventArgs> BeforeLinkProject;
+
+        /// <summary>
+        /// Raised when a project has been linked.
+        /// </summary>
+        public event EventHandler<ProjectEventArgs> ProjectLinked;
+
+        /// <summary>
+        /// Raised when a solution is about to be linked.
+        /// </summary>
+        public event EventHandler<SolutionEventArgs> BeforeLinkSolution;
+
+        /// <summary>
+        /// Raised when a solution has been linked.
+        /// </summary>
+        public event EventHandler<SolutionEventArgs> SolutionLinked;
+
+        /// <summary>
+        /// Raised before the generation process.
+        /// </summary>
+        public event EventHandler<GenerationEventArgs> BeforeGeneration;
+
+        /// <summary>
+        /// Raised when the <see cref="Builder"/> is not generating projects, solutions and
+        /// reports.
+        /// </summary>
+        public event EventHandler<GenerationEventArgs> Generated;
+
         #endregion
 
         public Arguments Arguments = null;
@@ -429,7 +454,7 @@ namespace Sharpmake
                 Project project = Project.CreateProject(type, Arguments.FragmentMasks);
 
                 // Pre event
-                EventPreProjectConfigure?.Invoke(project);
+                OnBeforeProjectConfiguration(project);
 
                 project.PreConfigure();
 
@@ -439,10 +464,10 @@ namespace Sharpmake
                 project.AfterConfigure();
 
                 // Post event
-                if (EventPostProjectConfigure != null)
+                if (EventPostProjectConfigure != null && ProjectConfigured != null)
                 {
                     foreach (Project.Configuration conf in project.Configurations)
-                        EventPostProjectConfigure?.Invoke(project, conf);
+                        OnProjectConfigured(project, conf);
                 }
 
                 // Resolve [*]
@@ -469,16 +494,16 @@ namespace Sharpmake
                 Solution solution = Solution.CreateProject(type, Arguments.FragmentMasks);
 
                 // Pre event
-                EventPreSolutionConfigure?.Invoke(solution);
+                OnBeforeSolutionConfiguration(solution);
 
                 // Create and Configure all possible configurations.
                 solution.InvokeConfiguration(Context);
 
                 // Post event
-                if (EventPostSolutionConfigure != null)
+                if (EventPostSolutionConfigure != null && SolutionConfigured != null)
                 {
                     foreach (Solution.Configuration conf in solution.Configurations)
-                        EventPostSolutionConfigure?.Invoke(solution, conf);
+                        OnSolutionConfigured(solution, conf);
                 }
 
                 // Resolve [*]
@@ -588,7 +613,7 @@ namespace Sharpmake
                     foreach (Solution.Configuration conf in solution.Configurations)
                     {
                         LogObject(writer, "\t", conf);
-                        writer.WriteLine("\t{0,-100} {1}" + Path.DirectorySeparatorChar + "{2}.[solution_ext]", conf.Target.GetTargetString(), Util.PathGetRelative(logFile.Directory.FullName, conf.SolutionPath), conf.SolutionFileName);
+                        writer.WriteLine("\t{0,-100} {1}" + Path.DirectorySeparatorChar + "{2}.[solution_ext]", conf.Target.GetTargetString(), Util.PathGetRelative(logFile.Directory.FullName, conf.SolutionDirectory), conf.SolutionFileName);
 
                         foreach (Solution.Configuration.IncludedProjectInfo configurationProject in conf.IncludedProjectInfos)
                         {
@@ -612,12 +637,12 @@ namespace Sharpmake
             using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| link project {1}", ms, project.Name); }))
             {
                 // Pre event
-                EventPreProjectLink?.Invoke(project);
+                OnBeforeLinkProject(project);
 
                 project.Link(this);
 
                 // Post event
-                EventPostProjectLink?.Invoke(project);
+                OnProjectLinked(project);
             }
         }
 
@@ -626,12 +651,12 @@ namespace Sharpmake
             using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| link solution {1}", ms, solution.Name); }))
             {
                 // Pre event
-                EventPreSolutionLink?.Invoke(solution);
+                OnBeforeLinkSolution(solution);
 
                 solution.Link(this);
 
                 // Post event
-                EventPostSolutionLink?.Invoke(solution);
+                OnSolutionLinked(solution);
             }
         }
 
@@ -740,7 +765,7 @@ namespace Sharpmake
                 projects.AddRange(_generatedProjects);
 
                 // Pre event
-                EventPreGeneration?.Invoke(projects, solutions);
+                OnBeforeGeneration(projects, solutions, _generationReport);
 
                 // start with huge solutions to balance task with small one at the end.
                 solutions.Sort((s0, s1) => s1.Configurations.Count.CompareTo(s0.Configurations.Count));
@@ -756,11 +781,19 @@ namespace Sharpmake
                     _tasks.Wait();
 
                 // Post events
-                EventPostGeneration?.Invoke(projects, solutions);
-                EventPostGenerationReport?.Invoke(projects, solutions, _generationReport);
+                OnGenerated(projects, solutions, _generationReport);
 
                 return _generationReport;
             }
+        }
+
+        private void OnGenerated(IEnumerable<Project> projects, IEnumerable<Solution> solutions, ConcurrentDictionary<Type, GenerationOutput> generationReport)
+        {
+            var projectList = projects.ToList();
+            var solutionList = solutions.ToList();
+            EventPostGeneration?.Invoke(projectList, solutionList);
+            EventPostGenerationReport?.Invoke(projectList, solutionList, generationReport);
+            Generated?.Invoke(this, new GenerationEventArgs(solutions, projects, generationReport));
         }
 
         private void GenerateSolutionFile(object arg)
@@ -874,6 +907,64 @@ namespace Sharpmake
             }
         }
 
+        #region Event raising
+
+        private void OnBeforeProjectConfiguration(Project project)
+        {
+            EventPreProjectConfigure?.Invoke(project);
+            BeforeProjectConfiguration?.Invoke(this, new ProjectEventArgs(project));
+        }
+
+        private void OnProjectConfigured(Project project, Project.Configuration conf)
+        {
+            EventPostProjectConfigure?.Invoke(project, conf);
+            ProjectConfigured?.Invoke(this, new ProjectConfigurationEventArgs(project, conf));
+        }
+
+        private void OnBeforeSolutionConfiguration(Solution solution)
+        {
+            EventPreSolutionConfigure?.Invoke(solution);
+            BeforeSolutionConfiguration?.Invoke(this, new SolutionEventArgs(solution));
+        }
+
+        private void OnSolutionConfigured(Solution solution, Solution.Configuration conf)
+        {
+            EventPostSolutionConfigure?.Invoke(solution, conf);
+            SolutionConfigured?.Invoke(this, new SolutionConfigurationEventArgs(solution, conf));
+        }
+
+        private void OnBeforeLinkProject(Project project)
+        {
+            EventPreProjectLink?.Invoke(project);
+            BeforeLinkProject?.Invoke(this, new ProjectEventArgs(project));
+        }
+
+        private void OnProjectLinked(Project project)
+        {
+            EventPostProjectLink?.Invoke(project);
+            ProjectLinked?.Invoke(this, new ProjectEventArgs(project));
+        }
+
+        private void OnBeforeLinkSolution(Solution solution)
+        {
+            EventPreSolutionLink?.Invoke(solution);
+            BeforeLinkSolution?.Invoke(this, new SolutionEventArgs(solution));
+        }
+
+        private void OnSolutionLinked(Solution solution)
+        {
+            EventPostSolutionLink?.Invoke(solution);
+            SolutionLinked?.Invoke(this, new SolutionEventArgs(solution));
+        }
+
+        private void OnBeforeGeneration(List<Project> projects, List<Solution> solutions, ConcurrentDictionary<Type, GenerationOutput> generationReport)
+        {
+            EventPreGeneration?.Invoke(projects, solutions);
+            BeforeGeneration?.Invoke(this, new GenerationEventArgs(solutions, projects, generationReport));
+        }
+
+        #endregion
+
         #region Log
 
         public void LogWriteLine(string message, params object[] args)
@@ -912,6 +1003,38 @@ namespace Sharpmake
 
         private bool _linked = false;
         private readonly Func<IGeneratorManager> _getGeneratorsManagerCallBack;
+
+        #endregion
+
+        #region Deprecated events
+
+        // Configure events
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PreProjectConfigure(Project project);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PostProjectConfigure(Project project, Project.Configuration conf);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PreSolutionConfigure(Solution solution);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PostSolutionConfigure(Solution solution, Solution.Configuration conf);
+        [Obsolete("Replace by " + nameof(BeforeProjectConfiguration) + ".")] public event PreProjectConfigure EventPreProjectConfigure;
+        [Obsolete("Replace by " + nameof(ProjectConfigured) + ".")] public event PostProjectConfigure EventPostProjectConfigure;
+        [Obsolete("Replace by " + nameof(BeforeSolutionConfiguration) + ".")] public event PreSolutionConfigure EventPreSolutionConfigure;
+        [Obsolete("Replace by " + nameof(SolutionConfigured) + ".")] public event PostSolutionConfigure EventPostSolutionConfigure;
+
+        // Link events
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PreProjectLink(Project project);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PostProjectLink(Project project);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PreSolutionLink(Solution solution);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PostSolutionLink(Solution solution);
+        [Obsolete("Replace by " + nameof(BeforeLinkProject) + ".")] public event PreProjectLink EventPreProjectLink;
+        [Obsolete("Replace by " + nameof(ProjectLinked) + ".")] public event PostProjectLink EventPostProjectLink;
+        [Obsolete("Replace by " + nameof(BeforeLinkSolution) + ".")] public event PreSolutionLink EventPreSolutionLink;
+        [Obsolete("Replace by " + nameof(SolutionLinked) + ".")] public event PostSolutionLink EventPostSolutionLink;
+
+        // Generate events
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PreGeneration(List<Project> projects, List<Solution> solutions);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PostGeneration(List<Project> projects, List<Solution> solutions);
+        [Obsolete("Used by the delegate-based events. Use the .NET-style events.")] public delegate void PostGenerationReport(List<Project> projects, List<Solution> solutions, ConcurrentDictionary<Type, GenerationOutput> generationReport);
+        [Obsolete("Replace by " + nameof(BeforeGeneration) + ".")] public event PreGeneration EventPreGeneration;
+        [Obsolete("Replace by " + nameof(Generated) + ".")] public event PostGeneration EventPostGeneration;
+        [Obsolete("Replace by " + nameof(Generated) + ".")] public event PostGenerationReport EventPostGenerationReport;
 
         #endregion
     }

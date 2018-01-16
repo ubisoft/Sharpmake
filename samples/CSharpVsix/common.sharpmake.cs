@@ -72,7 +72,7 @@ namespace Common
                 Name,
                 Common.GetDevEnvString(target.DevEnv),
                 target.Framework.ToVersionString());
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\codebase\";
+            conf.SolutionDirectory = @"[solution.SharpmakeCsPath]\codebase\";
         }
     }
 }

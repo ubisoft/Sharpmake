@@ -489,9 +489,9 @@ namespace Sharpmake.Generators.VisualStudio
             //    WithoutLineNumbers                      GeneratePreprocessedFile="2"                    /EP /P
             context.SelectOption
             (
-            Options.Option(Options.Vc.Compiler.GenerateProcessorFile.Disable, () => { context.Options["GeneratePreprocessedFile"] = "false"; context.CommandLineOptions["GeneratePreprocessedFile"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.Compiler.GenerateProcessorFile.WithLineNumbers, () => { context.Options["GeneratePreprocessedFile"] = "true"; context.CommandLineOptions["GeneratePreprocessedFile"] = "/P"; }),
-            Options.Option(Options.Vc.Compiler.GenerateProcessorFile.WithoutLineNumbers, () => { context.Options["GeneratePreprocessedFile"] = "true"; context.CommandLineOptions["GeneratePreprocessedFile"] = "/EP /P"; })
+            Options.Option(Options.Vc.Compiler.GenerateProcessorFile.Disable, () => { context.Options["GeneratePreprocessedFile"] = "false"; context.Options["PreprocessSuppressLineNumbers"] = "false"; context.CommandLineOptions["GeneratePreprocessedFile"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Compiler.GenerateProcessorFile.WithLineNumbers, () => { context.Options["GeneratePreprocessedFile"] = "true"; context.Options["PreprocessSuppressLineNumbers"] = "false"; context.CommandLineOptions["GeneratePreprocessedFile"] = "/P"; }),
+            Options.Option(Options.Vc.Compiler.GenerateProcessorFile.WithoutLineNumbers, () => { context.Options["GeneratePreprocessedFile"] = "true"; context.Options["PreprocessSuppressLineNumbers"] = "true"; context.CommandLineOptions["GeneratePreprocessedFile"] = "/EP /P"; })
             );
 
             //Options.Vc.Compiler.KeepComment.
@@ -1402,6 +1402,15 @@ namespace Sharpmake.Generators.VisualStudio
                     context.CommandLineOptions["StackCommitSize"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
+
+            //AllowIsolation
+            //    Disabled                                AllowIsolation=false                    /ALLOWISOLATION:NO
+            //    Enable                                  AllowIsolation=true                     /ALLOWISOLATION
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Linker.AllowIsolation.Enabled, () => { context.Options["AllowIsolation"] = "true"; context.CommandLineOptions["AllowIsolation"] = "/ALLOWISOLATION"; }),
+            Options.Option(Options.Vc.Linker.AllowIsolation.Disabled, () => { context.Options["AllowIsolation"] = "false"; context.CommandLineOptions["AllowIsolation"] = "/ALLOWISOLATION:NO"; })
+            );
 
             //LargeAddress
             //    Default                                 LargeAddressAware="0"
