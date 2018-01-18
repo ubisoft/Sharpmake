@@ -2368,7 +2368,7 @@ namespace Sharpmake.Generators.VisualStudio
                 var sourceFile = copy.Key;
                 var destinationFolder = copy.Value;
 
-                conf.EventPostBuild.Add(conf.CreateTargetCopyCommand(sourceFile, destinationFolder, _projectPath));
+                conf.EventPostBuild.Add(conf.CreateTargetCopyCommand(sourceFile, destinationFolder, conf.TargetPath));
             }
 
             var envVarResolver = PlatformRegistry.Get<IPlatformDescriptor>(Platform.win64).GetPlatformEnvironmentResolver(
@@ -2382,7 +2382,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     var execEvent = (Project.Configuration.BuildStepExecutable)customEvent;
 
-                    string relativeExecutableFile = Util.PathGetRelative(_projectPath, execEvent.ExecutableFile);
+                    string relativeExecutableFile = Util.PathGetRelative(conf.TargetPath, execEvent.ExecutableFile);
                     conf.EventPostBuild.Add(
                         string.Format(
                             "{0} {1}",
@@ -2394,7 +2394,7 @@ namespace Sharpmake.Generators.VisualStudio
                 else if (customEvent is Project.Configuration.BuildStepCopy)
                 {
                     var copyEvent = (Project.Configuration.BuildStepCopy)customEvent;
-                    conf.EventPostBuild.Add(copyEvent.GetCopyCommand(_projectPath, envVarResolver));
+                    conf.EventPostBuild.Add(copyEvent.GetCopyCommand(conf.TargetPath, envVarResolver));
                 }
                 else
                 {
