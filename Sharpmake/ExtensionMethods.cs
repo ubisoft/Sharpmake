@@ -175,8 +175,22 @@ namespace Sharpmake
             }
         }
 
+        private static ConcurrentDictionary<DevEnv, string> s_visualStudioDirOverrides = new ConcurrentDictionary<DevEnv, string>();
+        
+        public static void SetVisualStudioDirOverride(this DevEnv visualVersion, string path)
+        {
+            bool result = s_visualStudioDirOverrides.TryAdd(visualVersion, path);
+            if (!result)
+                throw new Error("Can't override a specific Visual Studio version directory more than once. Version: " + visualVersion);
+        }
+
         public static string GetVisualStudioDir(this DevEnv visualVersion)
         {
+            // First check if the visual studio path is overriden from default value.
+            string pathOverride;
+            if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
+                return pathOverride;
+
             string registryKeyString = string.Format(
                             @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
                             Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty);
