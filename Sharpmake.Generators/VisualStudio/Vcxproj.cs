@@ -1029,7 +1029,6 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator, IList<string> generatedFiles, IList<string> skipFiles)
         {
-            var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(context.Configuration.Platform);
             string filtersFileName = context.ProjectPath + ProjectExtension + ProjectFilterExtension;
             string copyDependenciesFileName = context.ProjectPath + CopyDependenciesExtension;
             string relativeCopyDependenciesFileName = Util.PathGetRelative(context.ProjectDirectory, copyDependenciesFileName, false);
@@ -1310,6 +1309,7 @@ namespace Sharpmake.Generators.VisualStudio
                             bool isCompileAsNonCLRFile = conf.ResolvedSourceFilesWithCompileAsNonCLROption.Contains(file.FileName);
                             bool objsInSubdirectories = conf.ObjectFileName != null && !isResource;
 
+                            var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
                             if (isPrecompSource && platformVcxproj.ExcludesPrecompiledHeadersFromBuild)
                                 isExcludeFromBuild = true;
                             if (!isExcludeFromBuild && !isResource)
