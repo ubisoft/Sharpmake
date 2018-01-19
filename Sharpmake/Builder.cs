@@ -338,19 +338,11 @@ namespace Sharpmake
             {
                 foreach (var dllName in references)
                 {
-                    try
+                    foreach (var assemblyFolder in assemblyFolders)
                     {
-                        foreach (var assemblyFolder in assemblyFolders)
-                        {
-                            var candidatePath = Path.Combine(assemblyFolder, dllName);
-                            if (File.Exists(candidatePath))
-                                extensionLoader.LoadExtension(candidatePath, false);
-                        }
-                        
-                    }
-                    catch (Error)
-                    {
-                        // skip non-sharpmake extension
+                        var candidatePath = Path.Combine(assemblyFolder, dllName);
+                        if (File.Exists(candidatePath))
+                            extensionLoader.LoadExtension(candidatePath, false);
                     }
                 }
             }
@@ -386,14 +378,7 @@ namespace Sharpmake
             {
                 foreach (var referencePath in assembler.References)
                 {
-                    try
-                    {
-                        extensionLoader.LoadExtension(referencePath, false);
-                    }
-                    catch (Error)
-                    {
-                        // skip non-sharpmake extension
-                    }
+                    extensionLoader.LoadExtension(referencePath, false);
                 }
             }
 

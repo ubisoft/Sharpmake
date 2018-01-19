@@ -137,7 +137,7 @@ namespace Sharpmake
             if (fastLoad)
             {
                 if (!IsExtension(assemblyPath))
-                    throw new Error($"{assemblyPath} is not a Sharpmake extension.");
+                    return null;
             }
 
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
@@ -145,7 +145,7 @@ namespace Sharpmake
             {
                 var validator = new ExtensionChecker();
                 if (!validator.IsSharpmakeExtension(assembly))
-                    throw new Error($"{assemblyPath} is not a Sharpmake extension.");
+                    return null;
             }
 
             return assembly;
@@ -173,7 +173,9 @@ namespace Sharpmake
                 {
                     try
                     {
-                        assemblies.Add(LoadExtension(dll, true));
+                        Assembly assembly = LoadExtension(dll, true);
+                        if (assembly != null)
+                            assemblies.Add(assembly);
                     }
                     catch (Exception ex)
                     {
