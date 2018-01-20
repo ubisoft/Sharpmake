@@ -269,7 +269,7 @@ namespace Sharpmake
                     break;
                 case KitsRootEnum.KitsRoot10:
                     paths.Add(Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10), "bin", targetPlatform));
-                    if(KitsRootPaths.WindowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                    if(KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion) <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
                         paths.Add(Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81), "bin", targetPlatform));
                     break;
                 default:
@@ -295,7 +295,7 @@ namespace Sharpmake
                 case KitsRootEnum.KitsRoot10:
                     {
                         string kitsRootPath;
-                        if (KitsRootPaths.WindowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                        if (KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion) <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
                             kitsRootPath = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81);
                         else
                             kitsRootPath = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
@@ -334,7 +334,8 @@ namespace Sharpmake
                     case KitsRootEnum.KitsRoot10:
                         {
                             string kitsRoot10 = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10));
-                            string platformVersion = KitsRootPaths.GetWindowsTargetPlatformVersion();
+                            Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
+                            string platformVersion = windowsTargetPlatformVersion.ToVersionString();
                             var paths = new List<string> {
                                 $@"{visualStudioInclude}",
                                 $@"{kitsRoot10}Include\{platformVersion}\um",     // $(UM_IncludePath)
@@ -343,7 +344,7 @@ namespace Sharpmake
                                 $@"{kitsRoot10}Include\{platformVersion}\ucrt",   // $(UniversalCRT_IncludePath)
                             };
 
-                            if (KitsRootPaths.WindowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                            if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
                             {
                                 //
                                 // Version 10.0.10240.0 and below only contain the UCRT libraries
@@ -409,7 +410,8 @@ namespace Sharpmake
                             }
 
                             string kitsRoot10 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
-                            string platformVersion = KitsRootPaths.GetWindowsTargetPlatformVersion();
+                            Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
+                            string platformVersion = windowsTargetPlatformVersion.ToVersionString();
                             var paths = new[]
                             {
                                 visualStudioLib,
@@ -418,7 +420,7 @@ namespace Sharpmake
                                 netFxPath
                             }.ToList();
 
-                            if (KitsRootPaths.WindowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                            if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
                             {
                                 string kitsRoot81 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81);
                                 paths.AddRange(new[] {
@@ -443,6 +445,21 @@ namespace Sharpmake
         public static string GetCommonToolsPath(this DevEnv visualVersion)
         {
             return Path.Combine(GetVisualStudioDir(visualVersion), "Common7\\Tools");
+        }
+
+        public static string ToVersionString(this Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion)
+        {
+            switch (windowsTargetPlatformVersion)
+            {
+                case Options.Vc.General.WindowsTargetPlatformVersion.v8_1: return "8.1";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0: return "10.0.10240.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0: return "10.0.10586.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0: return "10.0.14393.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0: return "10.0.15063.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0: return "10.0.16299.0";
+                default:
+                    throw new ArgumentOutOfRangeException(windowsTargetPlatformVersion.ToString());
+            }
         }
     }
 

@@ -333,7 +333,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (context.DevelopmentEnvironmentsRange.MinDevEnv >= DevEnv.vs2015)
             {
                 windowsSdkDir10 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
-                targetPlatformVersionString = KitsRootPaths.GetWindowsTargetPlatformVersion();
+                targetPlatformVersionString = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(context.DevelopmentEnvironmentsRange.MinDevEnv).ToVersionString();
             }
 
             string vc11TargetsPath = Template.Project.ProjectDescriptionVC11TargetsPath;
