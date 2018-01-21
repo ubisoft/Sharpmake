@@ -62,6 +62,7 @@ namespace Sharpmake.Generators.VisualStudio
         public static Guid AspNetMvc3 = new Guid("{E53F8FEA-EAE0-44A6-8774-FFD645390401}");
         public static Guid AspNetMvc4 = new Guid("{E3E379DF-F4C6-4180-9B81-6769533ABE47}");
         public static Guid AspNetMvc5 = new Guid("{349C5851-65DF-11DA-9384-00065B846F21}");
+        public static Guid Android = new Guid("{EAAC564B-F271-4B9C-99B6-F18BE0B11958}");
 
         public static string ToOption(Guid[] projectTypes)
         {
@@ -162,9 +163,10 @@ namespace Sharpmake.Generators.VisualStudio
             string fileExt = Path.GetExtension(filenameLC);
             switch (fileExt)
             {
-                case Vcxproj.ProjectExtension: guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper(); break;
-                case CSproj.ProjectExtension:  guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper();    break;
-                case Pyproj.ProjectExtension:  guid = ProjectTypeGuids.Python.ToString().ToUpper();           break;
+                case Vcxproj.ProjectExtension:      guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper();  break;
+                case CSproj.ProjectExtension:       guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper();     break;
+                case Pyproj.ProjectExtension:       guid = ProjectTypeGuids.Python.ToString().ToUpper();            break;
+                case Androidproj.ProjectExtension:  guid = ProjectTypeGuids.Android.ToString().ToUpper();           break;
                 default:
                     throw new Error("Unknown file extension {0} : unable to detect file type GUID [{1}]", fileExt, projectFile);
             }

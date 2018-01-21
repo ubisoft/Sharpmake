@@ -2056,4 +2056,37 @@ namespace Sharpmake
             InitPythonSpecifics();
         }
     }
+
+    /// <summary>
+    /// A package project for deployment on Android device.
+    /// </summary>
+    public class AndroidPackageProject : Project
+    {
+        public string AndroidManifest { get; set; } = "AndroidManifest.xml";
+
+        public string AntBuildRootDirectory { get; set; } = @"$(OutDir)Package\";
+
+        public string AntBuildXml { get; set; } = "build.xml";
+
+        public string AntProjectPropertiesFile { get; set; } = "project.properties";
+
+        /// <summary>
+        /// The project type to lookup in the dependencies of the package to be used as the application library.
+        /// This library is the first to be loaded when the package is started.
+        /// </summary>
+        /// <remarks>
+        /// It is an error if the specified type can't be found in the configuration dependencies.
+        /// </remarks>
+
+        public Type AppLibType { get; set; }
+
+        public AndroidPackageProject() : this(typeof(Target))
+        {
+        }
+
+        public AndroidPackageProject(Type targetType) : base(targetType)
+        {
+        }
+    }
+
 }

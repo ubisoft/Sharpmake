@@ -74,6 +74,8 @@
     <Compile Include="IFileGenerator.cs" />
     <Compile Include="IGenerationContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VisualStudio\Androidproj.Template.cs" />
+    <Compile Include="VisualStudio\Androidproj.cs" />
     <Compile Include="VisualStudio\Csproj.Template.cs" />
     <Compile Include="VisualStudio\Csproj.cs" />
     <Compile Include="VisualStudio\IPlatformVcxproj.cs" />
