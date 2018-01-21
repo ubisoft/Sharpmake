@@ -266,7 +266,7 @@ namespace Sharpmake
 
         private static Dictionary<string, List<MethodInfo>> GetMethodsMapping(Type type, bool isStatic)
         {
-            Dictionary<string, List<MethodInfo>> results = new Dictionary<string, List<MethodInfo>>();
+            Dictionary<string, List<MethodInfo>> results = new Dictionary<string, List<MethodInfo>>(StringComparer.OrdinalIgnoreCase);
 
             MethodInfo[] methodInfos = type.GetMethods();
 
