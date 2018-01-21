@@ -1509,6 +1509,8 @@ namespace Sharpmake
                 extension = ".csproj";
             else if (conf.Project is PythonProject)
                 extension = ".pyproj";
+            else if (conf.Project is AndroidPackageProject)
+                extension = ".androidproj";
             else
             {
                 switch (conf.Target.GetFragment<DevEnv>())

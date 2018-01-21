@@ -59,6 +59,10 @@ namespace Sharpmake.Generators
         public Makefile MakefileGenerator => _makefileGenerator ?? (_makefileGenerator = new Makefile());
         #endregion
 
+        // singleton
+        private Androidproj _AndroidprojGenerator = null;
+        public Androidproj AndroidprojGenerator => _AndroidprojGenerator ?? (_AndroidprojGenerator = new Androidproj());
+
         public void InitializeBuilder(Builder builder)
         {
             Bff.InitializeBuilder(builder);
@@ -79,9 +83,9 @@ namespace Sharpmake.Generators
             {
                 PyprojGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
             }
-            else if (configurations[0].Platform == Platform.android)
+            else if (project is AndroidPackageProject)
             {
-                MakeProjectGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
+                AndroidprojGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
             }
             else
             {
@@ -89,7 +93,10 @@ namespace Sharpmake.Generators
                 {
                     case DevEnv.make:
                         {
-                            MakefileGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
+                            if (configurations[0].Platform == Platform.android)
+                                MakeProjectGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
+                            else
+                                MakefileGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
                     case DevEnv.vs2010:
@@ -126,17 +133,16 @@ namespace Sharpmake.Generators
             {
                 XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
             }
-            else if (configurations[0].Platform == Platform.android)
-            {
-                MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-            }
             else
             {
                 switch (configurations[0].Target.GetFragment<DevEnv>())
                 {
                     case DevEnv.make:
                         {
-                            MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            if (configurations[0].Platform == Platform.android)
+                                MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            else
+                                MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
                     case DevEnv.vs2010:
