@@ -305,7 +305,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                         foreach (var conf in solutionConfigurations)
                         {
-                            string masterBffFilePath = conf.MasterBffFilePathWithExtension;
+                            string masterBffFilePath = conf.MasterBffFilePath + FastBuildSettings.FastBuildConfigFileExtension;
                             bffFilesPaths.Add(masterBffFilePath);
                             bffFilesPaths.Add(FastBuild.MasterBff.GetGlobalBffConfigFileName(masterBffFilePath));
                         }

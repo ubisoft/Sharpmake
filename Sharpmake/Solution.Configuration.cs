@@ -74,7 +74,7 @@ namespace Sharpmake
             /// <summary>
             /// Gets or sets the directory of the master BFF for this solution configuration.
             /// </summary>
-            public string MasterBffDirectory { get; set; } = "[conf.SolutionPath]";
+            public string MasterBffDirectory { get; set; } = "[conf.SolutionDirectory]";
 
             /// <summary>
             /// Gets or sets the file name (without extension) of the master BFF for this solution
@@ -87,12 +87,6 @@ namespace Sharpmake
             /// configuration.
             /// </summary>
             public string MasterBffFilePath => Path.Combine(MasterBffDirectory, MasterBffFileName);
-
-            /// <summary>
-            /// Gets the file path, with the file extension, of the master BFF for this solution
-            /// configuration.
-            /// </summary>
-            public string MasterBffFilePathWithExtension => MasterBffFilePath + FastBuildSettings.FastBuildConfigFileExtension;
 
             // Can be set to customize solution platform name
             private string _platformName = null;
@@ -232,7 +226,11 @@ namespace Sharpmake
 
             #region Deprecated
             [Obsolete("Use " + nameof(SolutionDirectory) + ".")]
-            public string SolutionPath = "[solution.SharpmakeCsPath]";      // Path of SolutionFileName
+            public string SolutionPath
+            {
+                get { return SolutionDirectory; }
+                set { SolutionDirectory = value; }
+            }
             #endregion
         }
     }

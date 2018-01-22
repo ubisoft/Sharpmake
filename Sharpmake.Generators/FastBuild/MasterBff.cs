@@ -163,7 +163,10 @@ namespace Sharpmake.Generators.FastBuild
                 if (confsPerBff.Configurations.Any(conf => conf.SolutionFilePath != conf.MasterBffFilePath))
                 {
                     retargetedConfsPerBffs.Add(confsPerBff);
-                    GenerateIncludeBffFileForSolution(builder, solutionFile, confsPerBff, generatedFiles, skipFiles);
+
+                    string bffIncludeFilePath = solutionFile + FastBuildSettings.FastBuildConfigFileExtension;
+                    if (!Util.PathIsSame(bffIncludeFilePath, confsPerBff.BffFilePathWithExtension))
+                        GenerateIncludeBffFileForSolution(builder, bffIncludeFilePath, confsPerBff, generatedFiles, skipFiles);
 
                     // First collect all solutions and sort them by master BFF, then once we have all of
                     // them, the post-generation event handler will actually generate the BFF.
@@ -189,16 +192,15 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private void GenerateIncludeBffFileForSolution(Builder builder, string solutionFilePath, ConfigurationsPerBff confsPerBff, IList<string> generatedFiles, IList<string> skippedFiles)
+        private void GenerateIncludeBffFileForSolution(Builder builder, string bffFilePath, ConfigurationsPerBff confsPerBff, IList<string> generatedFiles, IList<string> skippedFiles)
         {
             var fileGenerator = new FileGenerator();
-            using (fileGenerator.Declare("solutionFileName", Path.GetFileName(solutionFilePath)))
+            using (fileGenerator.Declare("solutionFileName", Path.GetFileNameWithoutExtension(bffFilePath)))
             using (fileGenerator.Declare("masterBffFilePath", confsPerBff.BffFilePathWithExtension))
                 fileGenerator.Write(Bff.Template.ConfigurationFile.IncludeMasterBff);
 
             using (var bffFileStream = fileGenerator.ToMemoryStream())
             {
-                string bffFilePath = solutionFilePath + FastBuildSettings.FastBuildConfigFileExtension;
                 var bffFileInfo = new FileInfo(bffFilePath);
                 if (builder.Context.WriteGeneratedFile(null, bffFileInfo, bffFileStream))
                     generatedFiles.Add(bffFilePath);
