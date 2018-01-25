@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
 using System.IO;
 
 namespace Sharpmake
@@ -114,10 +115,7 @@ namespace Sharpmake
                 }
             }
 
-            /// <summary>
-            /// XdkEditionRootVS2015
-            /// Allows overwriting the MSBuild files used. If unset, default points to "C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Platforms\Durango\"
-            /// </summary>
+            [Obsolete("Please use MSBuildGlobalSettings.SetCppPlatformFolder() instead")]
             public static string XdkEditionRootVS2015 { get; set; } = null;
         }
     }

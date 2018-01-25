@@ -376,6 +376,11 @@ namespace Sharpmake
             {
                 if (GlobalSettings.OverridenDurangoXDK)
                 {
+                    // close the current global settings
+                    generator.Write(Vcxproj.Template.Project.CustomPropertiesEnd);
+
+                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional, FileGeneratorUtilities.RemoveLineTag);
+
                     string durangoXdkKitPath = FileGeneratorUtilities.RemoveLineTag;
                     string xdkEditionTarget = FileGeneratorUtilities.RemoveLineTag;
                     string targetPlatformSdkPath = FileGeneratorUtilities.RemoveLineTag;
@@ -383,6 +388,14 @@ namespace Sharpmake
                     string gameOSFilePath = FileGeneratorUtilities.RemoveLineTag;
                     string durangoXdkTasks = FileGeneratorUtilities.RemoveLineTag;
                     string targetPlatformIdentifier = FileGeneratorUtilities.RemoveLineTag;
+
+                    string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.durango);
+                    if (!string.IsNullOrEmpty(platformFolder))
+                    {
+                        using (generator.Declare("custompropertyname", "_PlatformFolder"))
+                        using (generator.Declare("custompropertyvalue", platformFolder))
+                            generator.Write(Vcxproj.Template.Project.CustomProperty);
+                    }
 
                     if (!Util.IsDurangoSideBySideXDK())
                     {
@@ -416,7 +429,7 @@ namespace Sharpmake
                     using (generator.Declare("gameOSFilePath", gameOSFilePath))
                     using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
                     using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
-                    using (generator.Declare("xdkEditionRootVS2015", GlobalSettings.XdkEditionRootVS2015 ?? FileGeneratorUtilities.RemoveLineTag))
+                    using (generator.Declare("xdkEditionRootVS2015", platformFolder ?? FileGeneratorUtilities.RemoveLineTag))
                     {
                         generator.Write(_projectDescriptionPlatformSpecific);
                     }

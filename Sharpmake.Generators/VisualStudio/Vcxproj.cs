@@ -356,8 +356,11 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(Template.Project.ProjectDescription, FileGeneratorUtilities.RemoveLineTag);
             }
 
-            foreach (var platform in context.PresentPlatforms.Values)
-                platform.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
+            foreach (var platform in context.PresentPlatforms)
+            {
+                using (fileGenerator.Declare("platformName", Util.GetSimplePlatformString(platform.Key)))
+                    platform.Value.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
+            }
 
             fileGenerator.Write(Template.Project.ProjectDescriptionEnd, FileGeneratorUtilities.RemoveLineTag);
 

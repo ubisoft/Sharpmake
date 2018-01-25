@@ -15,9 +15,9 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Vcxproj
     {
-        internal static partial class Template
+        public static partial class Template
         {
-            internal static class Project
+            public static class Project
             {
                 public static string ProjectBegin =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -57,6 +57,10 @@ namespace Sharpmake.Generators.VisualStudio
     <WindowsSdkDir_10>[windowsSdkDir10]</WindowsSdkDir_10>
     <WindowsTargetPlatformVersion>[targetPlatformVersion]</WindowsTargetPlatformVersion>
     [vc11TargetsPath]
+";
+
+                public static string ProjectDescriptionStartPlatformConditional =
+    @"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='[platformName]'"">
 ";
 
                 public static string ProjectDescriptionEnd =
