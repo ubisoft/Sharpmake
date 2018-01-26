@@ -123,7 +123,7 @@ namespace Sharpmake
         private static string s_sharpmakeGeneratorDllPath;
         private static string s_sharpmakeApplicationExePath;
         private static bool s_useLocalSharpmake = false;
-        private static readonly Regex s_assemblyVersionRegex = new Regex(@"(.*) \((.*)\)", RegexOptions.Compiled);
+        private static readonly Regex s_assemblyVersionRegex = new Regex(@"([^\s]+)(?:\s*\((.+)\))?", RegexOptions.Compiled);
 
         /// <summary>
         /// Add references to Sharpmake to given configuration.
@@ -143,7 +143,9 @@ namespace Sharpmake
 
                 s_sharpmakePackageVersion = match.Groups[1].Value;
                 string assemblyProductVariation = match.Groups[2].Value;
-                s_sharpmakePackageName = $"{assemblyProductName}-{assemblyProductVariation}";
+                s_sharpmakePackageName = $"{assemblyProductName}";
+                if (!string.IsNullOrWhiteSpace(assemblyProductVariation))
+                    s_sharpmakePackageName += $"-{assemblyProductVariation}";
 
                 if (assemblyProductVariation == "LocalBuild")
                 {
