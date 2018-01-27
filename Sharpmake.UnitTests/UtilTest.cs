@@ -286,7 +286,7 @@ namespace SharpmakeUnitTests
             var referenceFileFullPath = outputFileFullPath.ReplaceHeadPath(outputPath, referencePath);
 
             Assert.That(referenceFileFullPath, Is.EqualTo(
-                Util.PathMakeStandard(@"F:\OnePath\With\Reference\with\a\file.cs")));
+                Util.PathMakeStandard(@"F:\OnePath\With\Reference\with\a\file.cs", false)));
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace SharpmakeUnitTests
             var referenceFileFullPath = outputFileFullPath.ReplaceHeadPath(outputPath, referencePath);
 
             Assert.That(referenceFileFullPath, Is.EqualTo(
-                Util.PathMakeStandard(@"F:\OnePath\with\Reference\with\a\File.cs")));
+                Util.PathMakeStandard(@"F:\OnePath\with\Reference\with\a\File.cs", false)));
         }
 
         [Test]
@@ -312,7 +312,7 @@ namespace SharpmakeUnitTests
             var referenceFileFullPath = outputFileFullPath.ReplaceHeadPath(outputPath, referencePath);
 
             Assert.That(referenceFileFullPath, Is.EqualTo(
-                Util.PathMakeStandard(@"F:\OnePath\With\Reference\with\a\file.cs")));
+                Util.PathMakeStandard(@"F:\OnePath\With\Reference\with\a\file.cs", false)));
         }
     }
 
