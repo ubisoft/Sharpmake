@@ -1671,6 +1671,71 @@ namespace Sharpmake.Generators.VisualStudio
                             remainingSourcesFiles.Remove(linkedCsFile);
                             break;
                         }
+                    case FileAssociationType.XSD:
+                        {
+                            string xsdFile = fileAssociation.GetFilenameWithExtension(".xsd");
+                            string xsxFile = fileAssociation.GetFilenameWithExtension(".xsx");
+
+                            if (xsxFile != null)
+                            {
+                                itemGroups.Nones.Add(new ItemGroups.None()
+                                {
+                                    Include = xsdFile
+                                });
+                                itemGroups.Nones.Add(new ItemGroups.None()
+                                {
+                                    Include = xsxFile,
+                                    DependentUpon = xsdFile
+                                });
+
+                                remainingNoneFiles.Remove(xsxFile);
+                            }
+                            else
+                            {
+                                string designerFile = fileAssociation.GetFilenameWithExtension(".designer.cs");
+                                string csFile = fileAssociation.GetFilenameWithExtension(".cs");
+                                string xscFile = fileAssociation.GetFilenameWithExtension(".xsc");
+                                string xssFile = fileAssociation.GetFilenameWithExtension(".xss");
+
+                                itemGroups.Nones.Add(new ItemGroups.None()
+                                {
+                                    Include = xsdFile,
+                                    Generator = "MSDataSetGenerator",
+                                    LastGenOutput = designerFile
+                                });
+                                itemGroups.Nones.Add(new ItemGroups.None()
+                                {
+                                    Include = xscFile,
+                                    DependentUpon = xsdFile
+                                });
+                                itemGroups.Nones.Add(new ItemGroups.None()
+                                {
+                                    Include = xssFile,
+                                    DependentUpon = xsdFile
+                                });
+
+                                itemGroups.Compiles.Add(new ItemGroups.Compile
+                                {
+                                    Include = designerFile,
+                                    DependentUpon = xsdFile,
+                                    AutoGen = true,
+                                    DesignTime = true
+                                });
+                                itemGroups.Compiles.Add(new ItemGroups.Compile
+                                {
+                                    Include = csFile,
+                                    DependentUpon = xsdFile
+                                });
+
+                                remainingSourcesFiles.Remove(designerFile);
+                                remainingSourcesFiles.Remove(csFile);
+                                remainingNoneFiles.Remove(xscFile);
+                                remainingNoneFiles.Remove(xssFile);
+                            }
+
+                            remainingNoneFiles.Remove(xsdFile);
+                            break;
+                        }
                     default:
                         {
                             throw new ArgumentException(string.Format("Unsupported fileassociation type {0}", fileAssociation.Type));
@@ -2074,21 +2139,24 @@ namespace Sharpmake.Generators.VisualStudio
             VSTORibbon,
             VSTOMain,
             Asax,
+            XSD
         };
 
         private static readonly List<Tuple<FileAssociationType, string[]>> s_fileExtensionsToType = new List<Tuple<FileAssociationType, string[]>>()
         {
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.Designer, new []{".cs", ".resx", ".designer.cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.VSTOMain, new []{".cs", ".designer.xml", ".designer.cs" }),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.ResX, new []{".resx", ".cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.AutoGenResX, new []{".resx", ".designer.cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.Xaml, new []{".xaml", ".xaml.cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.Settings, new []{".settings", ".designer.cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.WCF, new []{".svcmap", ".cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.Edmx, new []{".edmx", ".designer.cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.Designer, new []{".cs", ".designer.cs"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.VSTORibbon, new []{".cs", ".xml"}),
-            new Tuple<FileAssociationType, string[]>(FileAssociationType.Asax, new []{".asax", ".asax.cs"}),
+            Tuple.Create(FileAssociationType.XSD, new []{".xsd", ".cs", ".designer.cs", ".xsc", ".xss"}),
+            Tuple.Create(FileAssociationType.XSD, new []{".xsd", ".xsx" }),
+            Tuple.Create(FileAssociationType.Designer, new []{".cs", ".resx", ".designer.cs"}),
+            Tuple.Create(FileAssociationType.VSTOMain, new []{".cs", ".designer.xml", ".designer.cs" }),
+            Tuple.Create(FileAssociationType.ResX, new []{".resx", ".cs"}),
+            Tuple.Create(FileAssociationType.AutoGenResX, new []{".resx", ".designer.cs"}),
+            Tuple.Create(FileAssociationType.Xaml, new []{".xaml", ".xaml.cs"}),
+            Tuple.Create(FileAssociationType.Settings, new []{".settings", ".designer.cs"}),
+            Tuple.Create(FileAssociationType.WCF, new []{".svcmap", ".cs"}),
+            Tuple.Create(FileAssociationType.Edmx, new []{".edmx", ".designer.cs"}),
+            Tuple.Create(FileAssociationType.Designer, new []{".cs", ".designer.cs"}),
+            Tuple.Create(FileAssociationType.VSTORibbon, new []{".cs", ".xml"}),
+            Tuple.Create(FileAssociationType.Asax, new []{".asax", ".asax.cs"}),
         };
 
         private static readonly string[] s_additionalFileExtensions = { ".tt", ".context.tt", ".context.cs", ".edmx.diagram" };
