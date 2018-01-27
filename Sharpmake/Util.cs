@@ -544,12 +544,12 @@ namespace Sharpmake
 
         public static string PathGetAbsolute(string absolutePath, string relativePath)
         {
+            if (string.IsNullOrEmpty(relativePath))
+                return absolutePath;
+
             // Handle environment variables and string that contains more than 1 path
             if (relativePath.StartsWith("$", StringComparison.Ordinal) || relativePath.Count(x => x == ';') > 1)
                 return relativePath;
-
-            if (string.IsNullOrEmpty(relativePath))
-                return absolutePath;
 
             string cleanRelative = SimplifyPath(relativePath);
             if (Path.IsPathRooted(cleanRelative))
