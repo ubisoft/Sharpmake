@@ -1720,9 +1720,9 @@ namespace Sharpmake
         public static string ReplaceHeadPath(this string fullInputPath, string inputHeadPath, string replacementHeadPath)
         {
             // Normalize paths before comparing and combining them, to prevent false mismatch between '\\' and '/'.
-            fullInputPath = Util.PathMakeStandard(fullInputPath);
-            inputHeadPath = Util.PathMakeStandard(inputHeadPath);
-            replacementHeadPath = Util.PathMakeStandard(replacementHeadPath);
+            fullInputPath = Util.PathMakeStandard(fullInputPath, false);
+            inputHeadPath = Util.PathMakeStandard(inputHeadPath, false);
+            replacementHeadPath = Util.PathMakeStandard(replacementHeadPath, false);
 
             inputHeadPath = EnsureTrailingSeparator(inputHeadPath);
 
