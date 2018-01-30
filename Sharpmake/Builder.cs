@@ -177,6 +177,8 @@ namespace Sharpmake
 
         public void LoadAssemblies(params Assembly[] assemblies)
         {
+            const string mainCountErrorMessage = "sharpmake must contain one and only one static entry point method with [Sharpmake.Main] attribute. Make sure it's public.";
+
             MethodInfo mainMethodInfo = null;
 
             foreach (Assembly assembly in assemblies)
@@ -188,7 +190,7 @@ namespace Sharpmake
                         if (methodInfo != null && methodInfo.IsDefined(typeof(Main), false))
                         {
                             if (mainMethodInfo != null)
-                                throw new Error("sharpmake must contain one and only one static entry point method with [Sharpmake.Main] attribute. Make sure it's public.");
+                                throw new Error(mainCountErrorMessage);
 
                             if (!methodInfo.IsStatic)
                                 throw new Error("Sharpmake Main method should be static {0}", methodInfo.ToString());
@@ -202,6 +204,9 @@ namespace Sharpmake
                     }
                 }
             }
+
+            if (mainMethodInfo == null)
+                throw new Error(mainCountErrorMessage);
 
             try
             {
