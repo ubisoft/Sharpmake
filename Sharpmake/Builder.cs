@@ -177,33 +177,35 @@ namespace Sharpmake
 
         public void LoadAssemblies(params Assembly[] assemblies)
         {
-            List<MethodInfo> mainMethods = new List<MethodInfo>();
+            MethodInfo mainMethodInfo = null;
 
             foreach (Assembly assembly in assemblies)
             {
                 foreach (Type type in assembly.GetTypes())
                 {
-                    MethodInfo mainMethodInfo = type.GetMethod("SharpmakeMain");
-                    if (mainMethodInfo != null && mainMethodInfo.IsDefined(typeof(Main), false))
+                    foreach (MethodInfo methodInfo in type.GetMethods())
                     {
-                        if (!mainMethodInfo.IsStatic)
-                            throw new Error("SharpmakeMain method should be static {0}", mainMethodInfo.ToString());
+                        if (methodInfo != null && methodInfo.IsDefined(typeof(Main), false))
+                        {
+                            if (mainMethodInfo != null)
+                                throw new Error("sharpmake must contain one and only one static entry point method with [Sharpmake.Main] attribute. Make sure it's public.");
 
-                        if (mainMethodInfo.GetParameters().Length != 1 ||
-                            mainMethodInfo.GetParameters()[0].GetType() == typeof(Arguments))
-                            throw new Error("SharpmakeMain method should have one parameters of type Sharpmake.Builder: {0} in {1}", mainMethodInfo.ToString(), type.FullName);
+                            if (!methodInfo.IsStatic)
+                                throw new Error("Sharpmake Main method should be static {0}", methodInfo.ToString());
 
-                        mainMethods.Add(mainMethodInfo);
+                            if (methodInfo.GetParameters().Length != 1 ||
+                                methodInfo.GetParameters()[0].GetType() == typeof(Arguments))
+                                throw new Error("Sharpmake Main method should have one parameters of type Sharpmake.Builder: {0} in {1}", methodInfo.ToString(), type.FullName);
+
+                            mainMethodInfo = methodInfo;
+                        }
                     }
                 }
             }
 
-            if (mainMethods.Count != 1)
-                throw new Error("sharpmake must contain one and only one static entry point method called Main(Sharpmake.Builder) with [Sharpmake.Main] attribute. Make sure it's public.");
-
             try
             {
-                mainMethods[0].Invoke(null, new object[] { Arguments });
+                mainMethodInfo.Invoke(null, new object[] { Arguments });
             }
             catch (TargetInvocationException e)
             {
@@ -212,7 +214,7 @@ namespace Sharpmake
             }
 
             if (Arguments.TypesToGenerate.Count == 0)
-                throw new Error("sharpmake have nothing to generate! Make sure to add builder.Generate<[your_class]>(); in '{0}'.", mainMethods[0].ToString());
+                throw new Error("sharpmake have nothing to generate! Make sure to add builder.Generate<[your_class]>(); in '{0}'.", mainMethodInfo.ToString());
 
             Context.ConfigureOrder = Arguments.ConfigureOrder;
 
