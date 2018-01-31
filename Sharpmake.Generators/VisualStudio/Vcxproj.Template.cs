@@ -65,19 +65,22 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectDescriptionEnd =
 @"  </PropertyGroup>
-  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
 ";
 
-                public static string CustomPropertiesStart =
+                public static string AfterProjectDescriptions = 
+@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
+";
+
+                public static string PropertyGroupStart =
                 @"  <PropertyGroup>
+";
+
+                public static string PropertyGroupEnd =
+                @"  </PropertyGroup>
 ";
 
                 public static string CustomProperty =
                 @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
-";
-
-                public static string CustomPropertiesEnd =
-                @"  </PropertyGroup>
 ";
 
                 public static string ProjectEnd =

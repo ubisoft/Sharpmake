@@ -376,9 +376,6 @@ namespace Sharpmake
             {
                 if (GlobalSettings.OverridenDurangoXDK)
                 {
-                    // close the current global settings
-                    generator.Write(Vcxproj.Template.Project.CustomPropertiesEnd);
-
                     generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional, FileGeneratorUtilities.RemoveLineTag);
 
                     string durangoXdkKitPath = FileGeneratorUtilities.RemoveLineTag;
@@ -433,6 +430,8 @@ namespace Sharpmake
                     {
                         generator.Write(_projectDescriptionPlatformSpecific);
                     }
+
+                    generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
             }
 
