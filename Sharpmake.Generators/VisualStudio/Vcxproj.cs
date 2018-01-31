@@ -355,6 +355,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 fileGenerator.Write(Template.Project.ProjectDescription, FileGeneratorUtilities.RemoveLineTag);
             }
+            fileGenerator.Write(Template.Project.PropertyGroupEnd, FileGeneratorUtilities.RemoveLineTag);
 
             foreach (var platform in context.PresentPlatforms)
             {
@@ -362,7 +363,7 @@ namespace Sharpmake.Generators.VisualStudio
                     platform.Value.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
             }
 
-            fileGenerator.Write(Template.Project.ProjectDescriptionEnd, FileGeneratorUtilities.RemoveLineTag);
+            fileGenerator.Write(Template.Project.AfterProjectDescriptions, FileGeneratorUtilities.RemoveLineTag);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
@@ -624,14 +625,14 @@ namespace Sharpmake.Generators.VisualStudio
             if (context.Project.CustomProperties.Keys.Count == 0)
                 return;
 
-            fileGenerator.Write(Template.Project.CustomPropertiesStart);
+            fileGenerator.Write(Template.Project.PropertyGroupStart);
             foreach (var key in context.Project.CustomProperties.Keys)
             {
                 using (fileGenerator.Declare("custompropertyname", key))
                 using (fileGenerator.Declare("custompropertyvalue", context.Project.CustomProperties[key]))
                     fileGenerator.Write(Template.Project.CustomProperty);
             }
-            fileGenerator.Write(Template.Project.CustomPropertiesEnd);
+            fileGenerator.Write(Template.Project.PropertyGroupEnd);
         }
 
         private struct ProjectDependencyInfo
