@@ -67,7 +67,7 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </PropertyGroup>
 ";
 
-                public static string AfterProjectDescriptions = 
+                public static string ImportCppDefaultProps = 
 @"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
 ";
 
