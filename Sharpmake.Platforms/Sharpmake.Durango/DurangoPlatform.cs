@@ -376,8 +376,6 @@ namespace Sharpmake
             {
                 if (GlobalSettings.OverridenDurangoXDK)
                 {
-                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional, FileGeneratorUtilities.RemoveLineTag);
-
                     string durangoXdkKitPath = FileGeneratorUtilities.RemoveLineTag;
                     string xdkEditionTarget = FileGeneratorUtilities.RemoveLineTag;
                     string targetPlatformSdkPath = FileGeneratorUtilities.RemoveLineTag;
@@ -385,14 +383,8 @@ namespace Sharpmake
                     string gameOSFilePath = FileGeneratorUtilities.RemoveLineTag;
                     string durangoXdkTasks = FileGeneratorUtilities.RemoveLineTag;
                     string targetPlatformIdentifier = FileGeneratorUtilities.RemoveLineTag;
-
                     string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.durango);
-                    if (!string.IsNullOrEmpty(platformFolder))
-                    {
-                        using (generator.Declare("custompropertyname", "_PlatformFolder"))
-                        using (generator.Declare("custompropertyvalue", platformFolder))
-                            generator.Write(Vcxproj.Template.Project.CustomProperty);
-                    }
+                    string xdkEditionRootVS2015 = FileGeneratorUtilities.RemoveLineTag;
 
                     if (!Util.IsDurangoSideBySideXDK())
                     {
@@ -417,20 +409,31 @@ namespace Sharpmake
                         targetPlatformSdkPath = Util.GetDurangoExtensionXDK();
                     }
 
-                    using (generator.Declare("durangoXdkInstallPath", GlobalSettings.DurangoXDK))
-                    using (generator.Declare("sdkReferenceDirectoryRoot", GlobalSettings.XboxOneExtensionSDK))
-                    using (generator.Declare("durangoXdkKitPath", durangoXdkKitPath))
-                    using (generator.Declare("xdkEditionTarget", xdkEditionTarget))
-                    using (generator.Declare("targetPlatformSdkPath", targetPlatformSdkPath))
-                    using (generator.Declare("durangoXdkCompilers", durangoXdkCompilers))
-                    using (generator.Declare("gameOSFilePath", gameOSFilePath))
-                    using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
-                    using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
-                    using (generator.Declare("xdkEditionRootVS2015", platformFolder ?? FileGeneratorUtilities.RemoveLineTag))
+                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
                     {
-                        generator.Write(_projectDescriptionPlatformSpecific);
-                    }
+                        if (!string.IsNullOrEmpty(platformFolder))
+                        {
+                            xdkEditionRootVS2015 = platformFolder;
 
+                            using (generator.Declare("custompropertyname", "_PlatformFolder"))
+                            using (generator.Declare("custompropertyvalue", platformFolder))
+                                generator.Write(Vcxproj.Template.Project.CustomProperty);
+                        }
+
+                        using (generator.Declare("durangoXdkInstallPath", GlobalSettings.DurangoXDK))
+                        using (generator.Declare("sdkReferenceDirectoryRoot", GlobalSettings.XboxOneExtensionSDK))
+                        using (generator.Declare("durangoXdkKitPath", durangoXdkKitPath))
+                        using (generator.Declare("xdkEditionTarget", xdkEditionTarget))
+                        using (generator.Declare("targetPlatformSdkPath", targetPlatformSdkPath))
+                        using (generator.Declare("durangoXdkCompilers", durangoXdkCompilers))
+                        using (generator.Declare("gameOSFilePath", gameOSFilePath))
+                        using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
+                        using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
+                        using (generator.Declare("xdkEditionRootVS2015", xdkEditionRootVS2015))
+                        {
+                            generator.Write(_projectDescriptionPlatformSpecific);
+                        }
+                    }
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
             }
