@@ -355,7 +355,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 fileGenerator.Write(Template.Project.ProjectDescription, FileGeneratorUtilities.RemoveLineTag);
             }
-            fileGenerator.Write(Template.Project.PropertyGroupEnd, FileGeneratorUtilities.RemoveLineTag);
+            fileGenerator.Write(Template.Project.PropertyGroupEnd);
 
             foreach (var platform in context.PresentPlatforms)
             {
