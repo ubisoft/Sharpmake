@@ -175,8 +175,7 @@ namespace Sharpmake
             }
         }
 
-        private static ConcurrentDictionary<DevEnv, string> s_visualStudioDirOverrides = new ConcurrentDictionary<DevEnv, string>();
-        
+        private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioDirOverrides = new ConcurrentDictionary<DevEnv, string>();
         public static void SetVisualStudioDirOverride(this DevEnv visualVersion, string path)
         {
             bool result = s_visualStudioDirOverrides.TryAdd(visualVersion, path);
