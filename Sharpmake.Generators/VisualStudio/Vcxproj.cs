@@ -363,7 +363,7 @@ namespace Sharpmake.Generators.VisualStudio
                     platform.Value.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
             }
 
-            fileGenerator.Write(Template.Project.AfterProjectDescriptions, FileGeneratorUtilities.RemoveLineTag);
+            fileGenerator.Write(Template.Project.ImportCppDefaultProps, FileGeneratorUtilities.RemoveLineTag);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
