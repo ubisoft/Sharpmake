@@ -310,12 +310,21 @@ namespace Sharpmake
             // Invoke compilation of the source file.
             CompilerResults cr = provider.CompileAssemblyFromFile(cp, sourceFiles.ToArray());
 
-            if (cr.Errors.HasErrors)
+            if (cr.Errors.HasErrors || cr.Errors.HasWarnings)
             {
                 string errorMessage = "";
                 foreach (CompilerError ce in cr.Errors)
+                {
+                    if(ce.IsWarning)
+                        Builder.Instance.LogWarningLine(ce.ToString());
+                    else
+                        Builder.Instance.LogErrorLine(ce.ToString());
+
                     errorMessage += ce + Environment.NewLine;
-                throw new Error(errorMessage);
+                }
+
+                if(cr.Errors.HasErrors)
+                    throw new Error(errorMessage);
             }
 
             return cr.CompiledAssembly;
