@@ -115,8 +115,12 @@ namespace Sharpmake
                 }
             }
 
-            [Obsolete("Please use MSBuildGlobalSettings.SetCppPlatformFolder() instead")]
-            public static string XdkEditionRootVS2015 { get; set; } = null;
+            [Obsolete("Please use MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango) and MSBuildGlobalSettings.SetCppPlatformFolder(DevEnv.vs2015, Platform.durango, value) instead")]
+            public static string XdkEditionRootVS2015
+            {
+                get { return MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango); }
+                set { MSBuildGlobalSettings.SetCppPlatformFolder(DevEnv.vs2015, Platform.durango, value); }
+            }
         }
     }
 }
