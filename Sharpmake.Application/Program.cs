@@ -152,6 +152,10 @@ namespace Sharpmake.Application
                 if (DebugEnable)
                     PlatformRegistry.PlatformImplementationExtensionRegistered += LogPlatformImplementationExtensionRegistered;
 
+                // Log warnings and errors from builder
+                Assembler.EventOutputError += ErrorWrite;
+                Assembler.EventOutputWarning += WarningWrite;
+
                 CommandLine.ExecuteOnObject(parameters);
 
                 if (parameters.Exit)
