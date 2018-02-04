@@ -223,6 +223,14 @@ namespace Sharpmake
             return result;
         }
 
+        #region Internal
+
+        internal delegate void OutputDelegate(string message, params object[] args);
+        internal static event OutputDelegate EventOutputError;
+        internal static event OutputDelegate EventOutputWarning;
+
+        #endregion
+
         #region Private
 
         private List<string> _assemblyDirectory = new List<string>();
@@ -316,9 +324,9 @@ namespace Sharpmake
                 foreach (CompilerError ce in cr.Errors)
                 {
                     if(ce.IsWarning)
-                        Builder.Instance.LogWarningLine(ce.ToString());
+                        EventOutputWarning?.Invoke(ce + Environment.NewLine);
                     else
-                        Builder.Instance.LogErrorLine(ce.ToString());
+                        EventOutputError?.Invoke(ce + Environment.NewLine);
 
                     errorMessage += ce + Environment.NewLine;
                 }
