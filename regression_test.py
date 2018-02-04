@@ -110,7 +110,8 @@ def pause(timeout=None):
                     break
 
                 display = "Waiting for " + str(timeoutSeconds - s) + " seconds, press a key to continue ..."
-                print(display, end = "\r")
+                sys.stdout.write("\r" + display)
+                sys.stdout.flush()
 
                 poll_frequency = 100 # ms
                 for ms in range(0, int(1000/poll_frequency)):
