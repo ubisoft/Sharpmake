@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Sharpmake
 {
@@ -30,12 +31,16 @@ namespace Sharpmake
         /// </summary>
         /// <param name="devEnv">Visual studio version affected</param>
         /// <param name="platform">Platform affected</param>
+        /// <param name="value">The location of the MSBuild platform folder. Warning: this *must* end with a trailing separator</param>
         /// <returns></returns>
         public static void SetCppPlatformFolder(DevEnv devEnv, Platform platform, string value)
         {
+            if (value.Last() != Util.WindowsSeparator)
+                throw new Error($"_PlatformFolder '{value}' for {devEnv} and {platform} must end with a trailing backslash, as it is assumed by MSBuild files.");
+
             Tuple<DevEnv, Platform> key = Tuple.Create(devEnv, platform);
             if (!s_cppPlatformFolders.TryAdd(key, value))
-                throw new Error("You can't register more than once a platform folder for a specific combinaison. Key already registered: " + key.ToString());
+                throw new Error("You can't register more than once a platform folder for a specific combinaison. Key already registered: " + key);
         }
 
         /// <summary>
