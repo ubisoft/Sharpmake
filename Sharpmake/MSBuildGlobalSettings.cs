@@ -22,7 +22,7 @@ namespace Sharpmake
     /// </summary>
     public class MSBuildGlobalSettings
     {
-        private static ConcurrentDictionary<Tuple<DevEnv, Platform>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, Platform>, string>();
+        private static readonly ConcurrentDictionary<Tuple<DevEnv, Platform>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, Platform>, string>();
 
         /// <summary>
         /// Allows overwriting the MSBuild platform folder used for a given platform and Visual Studio version. 
