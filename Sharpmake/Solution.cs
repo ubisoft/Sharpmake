@@ -142,7 +142,7 @@ namespace Sharpmake
             {
                 foreach (Configuration.IncludedProjectInfo includedProjectInfo in solutionConfiguration.IncludedProjectInfos)
                 {
-                    if (solutionConfiguration.IncludeOnlyFilterProject && (includedProjectInfo.Project.SourceFilesFiltersCount == 0 || includedProjectInfo.Project.SkipProjectWhenFiltersActive))
+                    if (solutionConfiguration.IncludeOnlyFilterProject && !(includedProjectInfo.Project is FastBuildAllProject) && (includedProjectInfo.Project.SourceFilesFiltersCount == 0 || includedProjectInfo.Project.SkipProjectWhenFiltersActive))
                         continue;
 
                     ResolvedProject resolvedProject = result.Find(p => p.OriginalProjectFile == includedProjectInfo.Configuration.ProjectFullFileName);
@@ -244,6 +244,9 @@ namespace Sharpmake
                     hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
 
                     bool build = !projectConfiguration.IsExcludedFromBuild && !configurationProject.InactiveProject;
+                    if (solutionConfiguration.IncludeOnlyFilterProject && (configurationProject.Project.SourceFilesFiltersCount == 0 || configurationProject.Project.SkipProjectWhenFiltersActive))
+                        build = false;
+
                     if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
                     {
                         if (build)
@@ -291,11 +294,20 @@ namespace Sharpmake
                         }
 
                         bool depBuild = !dependencyConfiguration.IsExcludedFromBuild && !configurationProjectDependency.InactiveProject;
+
+                        if (solutionConfiguration.IncludeOnlyFilterProject && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive))
+                            depBuild = false;
+
                         if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
                         {
                             if (depBuild)
-                                configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
-                            else if(configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
+                            {
+                                if (projectConfiguration.Output == Project.Configuration.OutputType.Dll || projectConfiguration.Output == Project.Configuration.OutputType.Exe)
+                                    configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
+                                else
+                                    configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.Yes;
+                            }
+                            else if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
                                 configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.No;
                         }
                     }
