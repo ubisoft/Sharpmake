@@ -137,7 +137,7 @@ namespace Sharpmake.Generators.FastBuild
                     else if (devEnv != masterBffInfo.DevEnv)
                         throw new Error($"Master bff {masterBffFileName} cannot contain varying devEnvs: {masterBffInfo.DevEnv} {devEnv}!");
 
-                    if (FastBuildSettings.WriteAllConfigsSection)
+                    if (FastBuildSettings.WriteAllConfigsSection && includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes)
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
 
                     var preBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
@@ -520,14 +520,15 @@ namespace Sharpmake.Generators.FastBuild
 
         private static void MergeBffIncludeTreeRecursive(Project.Configuration conf, ref Dictionary<string, Strings> bffIncludesDependencies)
         {
+            string currentBffFullPath = Util.GetCapitalizedPath(conf.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
+            Strings currentBffIncludes = bffIncludesDependencies.GetValueOrAdd(currentBffFullPath, new Strings());
             MergeBffIncludeTreeRecursive(conf, ref bffIncludesDependencies, new HashSet<Project.Configuration>());
         }
 
         private static void MergeBffIncludeTreeRecursive(
             Project.Configuration conf,
             ref Dictionary<string, Strings> bffIncludesDependencies,
-            HashSet<Project.Configuration> visitedConfigurations
-        )
+            HashSet<Project.Configuration> visitedConfigurations)
         {
             string currentBffFullPath = Util.GetCapitalizedPath(conf.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
             foreach (Project.Configuration dependency in conf.ResolvedDependencies)
@@ -543,6 +544,9 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (dependency.Project.SourceFilesFilters != null && (dependency.Project.SourceFilesFiltersCount == 0 || dependency.Project.SkipProjectWhenFiltersActive))
                     continue;
+
+                if (conf.Project.SourceFilesFilters != null && (conf.Project.SourceFilesFiltersCount == 0 || conf.Project.SkipProjectWhenFiltersActive))
+                    continue; // Only keep used projects in filter mode. TODO: Make this cleaner.
 
                 string dependencyBffFullPath = Util.GetCapitalizedPath(dependency.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
                 Strings currentBffIncludes = bffIncludesDependencies.GetValueOrAdd(currentBffFullPath, new Strings());
