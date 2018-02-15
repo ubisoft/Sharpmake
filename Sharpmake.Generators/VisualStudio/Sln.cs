@@ -458,7 +458,7 @@ namespace Sharpmake.Generators.VisualStudio
             // write all project target and match then to a solution target
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBegin);
 
-            var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, int>();
+            var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>();
             foreach (Solution.ResolvedProject solutionProject in solutionProjects)
             {
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
@@ -508,7 +508,7 @@ namespace Sharpmake.Generators.VisualStudio
                     Project.Configuration projectConf = solutionProject.Project.GetConfiguration(projectTarget);
 
                     if(includedProject != null && includedProject.Configuration.IsFastBuild)
-                        solutionConfigurationFastBuildBuilt.GetValueOrAdd(solutionConfiguration, 0);
+                        solutionConfigurationFastBuildBuilt.GetValueOrAdd(solutionConfiguration, new List<string>());
 
                     Platform projectPlatform = projectTarget.GetPlatform();
 
@@ -547,7 +547,7 @@ namespace Sharpmake.Generators.VisualStudio
                             else
                             {
                                 if (build)
-                                    solutionConfigurationFastBuildBuilt[solutionConfiguration]++;
+                                    solutionConfigurationFastBuildBuilt[solutionConfiguration].Add(projectConf.Project.Name + " " + projectConf.Name);
                             }
                         }
 
@@ -567,10 +567,10 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var fb in solutionConfigurationFastBuildBuilt)
             {
                 var solutionConfiguration = fb.Key;
-                if (fb.Value == 0)
+                if (fb.Value.Count == 0)
                     Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has no FastBuild projects to build.");
-                else if (fb.Value > 1)
-                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({fb.Value}).");
+                else if (fb.Value.Count > 1)
+                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({string.Join(";", fb.Value)}).");
             }
 
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationEnd);
