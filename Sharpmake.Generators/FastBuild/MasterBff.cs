@@ -151,6 +151,7 @@ namespace Sharpmake.Generators.FastBuild
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
 
                     using (fileGenerator.Declare("conf", conf))
+                    using (fileGenerator.Declare("target", conf.Target))
                     using (fileGenerator.Declare("project", conf.Project))
                     {
 
@@ -317,8 +318,9 @@ namespace Sharpmake.Generators.FastBuild
                     using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : Util.PathGetRelative(relativeTo, execCommand.ExecutableWorkingDirectory)))
                     using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                     {
-                        if (!bffSection.ContainsKey(buildEvent.Key))
-                            bffSection.Add(buildEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
+                        string eventKey = fileGenerator.Resolver.Resolve(buildEvent.Key);
+                        if (!bffSection.ContainsKey(eventKey))
+                            bffSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.GenericExcutableSection));
                     }
                 }
                 else if (buildEvent.Value is Project.Configuration.BuildStepCopy)
@@ -337,10 +339,14 @@ namespace Sharpmake.Generators.FastBuild
                     using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
                     using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
                     {
-                        if (!bffSection.ContainsKey(buildEvent.Key) && copyCommand.IsFileCopy)
-                            bffSection.Add(buildEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
-                        else if (!bffSection.ContainsKey(buildEvent.Key))
-                            bffSection.Add(buildEvent.Key, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                        string eventKey = fileGenerator.Resolver.Resolve(buildEvent.Key);
+                        if (!bffSection.ContainsKey(eventKey))
+                        {
+                            if (copyCommand.IsFileCopy)
+                                bffSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                            else
+                                bffSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
+                        }
                     }
                 }
             }
