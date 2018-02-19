@@ -2843,6 +2843,24 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectOption
             (
+            Options.Option(Options.CSharp.GenerateManifests.Enabled, () => { options["GenerateManifests"] = "true"; }),
+            Options.Option(Options.CSharp.GenerateManifests.Disabled, () => { options["GenerateManifests"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.UseVSHostingProcess.Enabled, () => { options["UseVSHostingProcess"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.UseVSHostingProcess.Disabled, () => { options["UseVSHostingProcess"] = "false"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.SignManifests.Enabled, () => { options["SignManifests"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.SignManifests.Disabled, () => { options["SignManifests"] = "false"; })
+            );
+
+            SelectOption
+            (
             Options.Option(Options.CSharp.UseApplicationTrust.Enabled, () => { options["UseApplicationTrust"] = "true"; }),
             Options.Option(Options.CSharp.UseApplicationTrust.Disabled, () => { options["UseApplicationTrust"] = RemoveLineTag; })
             );
@@ -2907,8 +2925,10 @@ namespace Sharpmake.Generators.VisualStudio
             options["ConcordSDKDir"] = Options.StringOption.Get<Options.CSharp.ConcordSDKDir>(conf);
             options["UpdateInterval"] = Options.IntOption.Get<Options.CSharp.UpdateInterval>(conf);
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
+            options["ManifestKeyFile"] = Options.StringOption.Get<Options.CSharp.ManifestKeyFile>(conf);
+            options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
 
-            // concat defines, don't add options.Defines since they are automaticly added by VS
+            // concat defines, don't add options.Defines since they are automatically added by VS
             Strings defines = new Strings();
             defines.AddRange(options.ExplicitDefines);
             defines.AddRange(conf.Defines);
