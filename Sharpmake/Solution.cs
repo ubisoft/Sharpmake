@@ -131,7 +131,7 @@ namespace Sharpmake
             return solution;
         }
 
-        public List<ResolvedProject> GetResolvedProjects(List<Configuration> solutionConfigurations, out bool projectsWereFiltered)
+        public IEnumerable<ResolvedProject> GetResolvedProjects(IEnumerable<Configuration> solutionConfigurations, out bool projectsWereFiltered)
         {
             if (!_dependenciesResolved)
                 throw new InternalError("Solution not resolved: {0}", GetType().FullName);
