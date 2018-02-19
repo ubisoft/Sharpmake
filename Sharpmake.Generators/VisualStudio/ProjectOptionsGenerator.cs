@@ -1404,6 +1404,15 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            //AllowIsolation
+            //    Disabled                                AllowIsolation=false                    /ALLOWISOLATION:NO
+            //    Enable                                  AllowIsolation=true                     /ALLOWISOLATION
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Linker.AllowIsolation.Enabled, () => { context.Options["AllowIsolation"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["AllowIsolation"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Linker.AllowIsolation.Disabled, () => { context.Options["AllowIsolation"] = "false"; context.CommandLineOptions["AllowIsolation"] = "/ALLOWISOLATION:NO"; })
+            );
+
             //LargeAddress
             //    Default                                 LargeAddressAware="0"
             //    NotSupportLargerThan2Gb                 LargeAddressAware="1"                   /LARGEADDRESSAWARE:NO

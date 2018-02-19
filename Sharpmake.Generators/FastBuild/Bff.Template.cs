@@ -135,6 +135,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.HeapCommitSize]'
                             + ' [cmdLineOptions.StackReserveSize]'
                             + ' [cmdLineOptions.StackCommitSize]'
+                            + ' [cmdLineOptions.AllowIsolation]'
                             + ' [cmdLineOptions.LargeAddressAware]'
                             // Optimization
                             // ---------------------------

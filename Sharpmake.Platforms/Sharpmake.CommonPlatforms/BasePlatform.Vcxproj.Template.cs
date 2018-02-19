@@ -129,6 +129,7 @@ namespace Sharpmake
       <DelayLoadDLLs>[options.DelayLoadedDLLs]</DelayLoadDLLs>
       <BaseAddress>[options.BaseAddress]</BaseAddress>
       <UACExecutionLevel>[options.UACExecutionLevel]</UACExecutionLevel>
+      <AllowIsolation>[options.AllowIsolation]</AllowIsolation>
     </Link>
 ";
 
