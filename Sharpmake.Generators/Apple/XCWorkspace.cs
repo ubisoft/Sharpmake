@@ -13,6 +13,7 @@
 // limitations under the License.
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Sharpmake.Generators.Apple
 {
@@ -52,7 +53,7 @@ namespace Sharpmake.Generators.Apple
             FileInfo solutionFileContentsInfo = new FileInfo(solutionFileContentsPath);
 
             bool projectsWereFiltered;
-            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(configurations, out projectsWereFiltered);
+            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(configurations, out projectsWereFiltered).ToList();
             solutionProjects.Sort((a, b) => string.Compare(a.ProjectName, b.ProjectName)); // Ensure all projects are always in the same order to avoid random shuffles
 
             // Move the first executable project on top.
