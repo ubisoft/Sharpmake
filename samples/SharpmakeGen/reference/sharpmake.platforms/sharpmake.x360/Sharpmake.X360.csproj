@@ -51,15 +51,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Sharpmake.Generators\Sharpmake.Generators.csproj">
-      <Project>{844F66DE-B015-340E-720A-8E158B517E93}</Project>
+      <Project>{844f66de-b015-340e-720a-8e158b517e93}</Project>
       <Name>Sharpmake.Generators</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Sharpmake\Sharpmake.csproj">
-      <Project>{15F793C7-9E88-64A9-591C-7244FCC6B771}</Project>
+      <Project>{15f793c7-9e88-64a9-591c-7244fcc6b771}</Project>
       <Name>Sharpmake</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sharpmake.CommonPlatforms\Sharpmake.CommonPlatforms.csproj">
-      <Project>{3B476462-28E6-4640-4257-7942657699ED}</Project>
+      <Project>{3b476462-28e6-4640-4257-7942657699ed}</Project>
       <Name>Sharpmake.CommonPlatforms</Name>
     </ProjectReference>
   </ItemGroup>
