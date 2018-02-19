@@ -127,6 +127,13 @@ namespace Sharpmake.Generators.VisualStudio
 @"  <Import Project=""[importProject]"" Condition=""[importCondition]""/>
 ";
 
+                public static string VsixConfiguration =
+@"  <PropertyGroup>
+    <VSToolsPath Condition=""'$(VSToolsPath)' == ''"">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <UseCodebase>true</UseCodebase>
+  </PropertyGroup>
+";
+
                 public static string ProjectConfigurationsPreBuildEvent =
 
 @"  <PropertyGroup>

@@ -1177,6 +1177,11 @@ namespace Sharpmake.Generators.VisualStudio
             var importProjects = project.ImportProjects;
             if (project.ProjectTypeGuids == CSharpProjectType.Vsix)
             {
+                // Add an extra tag to setup VSIX on VS2017, which is generated on Visual Studio
+                // 2017. (This is likely a Microsoft hack to plug 2017 on the 2015 toolset.)
+                if (devenv.IsVisualStudio() && devenv >= DevEnv.vs2017)
+                    writer.Write(CSproj.Template.Project.VsixConfiguration);
+
                 // Copy in new list to avoid concurrent access
                 var newImportProjects = new UniqueList<ImportProject>();
                 newImportProjects.AddRange(importProjects);
@@ -1193,7 +1198,8 @@ namespace Sharpmake.Generators.VisualStudio
                 importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition="false"});
             }
 
-            Trace.Assert(importProjects.Count > 0);
+            if (importProjects.Count == 0)
+                throw new Error("ImportProjects must not be empty.");
 
             foreach (var import in importProjects)
             {
