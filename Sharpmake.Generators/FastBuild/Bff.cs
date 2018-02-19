@@ -736,116 +736,72 @@ namespace Sharpmake.Generators.FastBuild
 
                         string fastBuildObjectListResourceDependencies = FormatListPartForTag(resourceFilesSections, 32, true);
 
-                        switch (conf.Output)
+                        using (bffGenerator.Declare("conf", conf))
+                        using (bffGenerator.Declare("project", project))
+                        using (bffGenerator.Declare("target", conf.Target))
                         {
-                            case Project.Configuration.OutputType.Lib:
-                            case Project.Configuration.OutputType.Exe:
-                            case Project.Configuration.OutputType.Dll:
-                                using (bffGenerator.Declare("conf", conf))
-                                using (bffGenerator.Declare("$(ProjectName)", projectName))
-                                using (bffGenerator.Declare("options", confOptions))
-                                using (bffGenerator.Declare("cmdLineOptions", confCmdLineOptions))
-                                using (bffGenerator.Declare("fastBuildUsingPlatformConfig", "Using( " + fastBuildUsingPlatformConfig + " )"))
-                                using (bffGenerator.Declare("fastBuildProjectName", projectName))
-                                using (bffGenerator.Declare("fastBuildClrSupport", fastBuildClrSupport))
-                                using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
-                                using (bffGenerator.Declare("fastBuildOutputFile", fastBuildOutputFile))
-                                using (bffGenerator.Declare("fastBuildLinkerOutputFile", fastBuildLinkerOutputFile))
-                                using (bffGenerator.Declare("fastBuildLinkerLinkObjects", linkObjects ? "true" : "false"))
-                                using (bffGenerator.Declare("fastBuildPartialLibInfo", partialLibInfo))
-                                using (bffGenerator.Declare("fastBuildInputPath", fastBuildInputPath))
-                                using (bffGenerator.Declare("fastBuildCompilerInputPattern", fastBuildCompilerInputPattern))
-                                using (bffGenerator.Declare("fastBuildInputExcludedFiles", fastBuildInputExcludedFiles))
-                                using (bffGenerator.Declare("fastBuildSourceFiles", fastBuildSourceFiles))
-                                using (bffGenerator.Declare("fastBuildResourceFiles", fastBuildResourceFiles))
-                                using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
-                                using (bffGenerator.Declare("fastBuildProjectDependencies", fastBuildProjectDependencies))
-                                using (bffGenerator.Declare("fastBuildObjectListResourceDependencies", fastBuildObjectListResourceDependencies))
-                                using (bffGenerator.Declare("fastBuildObjectListDependencies", fastBuildObjectListDependencies))
-                                using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
-                                using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
-                                using (bffGenerator.Declare("fastBuildConsumeWinRTExtension", fastBuildConsumeWinRTExtension))
-                                using (bffGenerator.Declare("fastBuildPartialLibs", partialLibs))
-                                using (bffGenerator.Declare("fastBuildOutputType", outputType))
-                                using (bffGenerator.Declare("fastBuildLibrarianAdditionalInputs", librarianAdditionalInputs))
-                                using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
-                                using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName ?? FileGeneratorUtilities.RemoveLineTag))
-                                using (bffGenerator.Declare("fastBuildClangFileLanguage", clangFileLanguage))
-                                using (bffGenerator.Declare("fastBuildClangStd", clangStd))
-                                using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
-                                using (bffGenerator.Declare("fastBuildDeoptimizationWritableFilesWithToken", fastBuildDeoptimizationWritableFilesWithToken))
-                                using (bffGenerator.Declare("fastBuildCompilerForceUsing", fastBuildCompilerForceUsing))
-                                using (bffGenerator.Declare("fastBuildAdditionalCompilerOptionsFromCode", fastBuildAdditionalCompilerOptionsFromCode))
-                                using (bffGenerator.Declare("fastBuildStampExecutable", fastBuildStampExecutable))
-                                using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))
-                                {
-                                    if (projectHasResourceFiles)
+                            switch (conf.Output)
+                            {
+                                case Project.Configuration.OutputType.Lib:
+                                case Project.Configuration.OutputType.Exe:
+                                case Project.Configuration.OutputType.Dll:
+                                    using (bffGenerator.Declare("$(ProjectName)", projectName))
+                                    using (bffGenerator.Declare("options", confOptions))
+                                    using (bffGenerator.Declare("cmdLineOptions", confCmdLineOptions))
+                                    using (bffGenerator.Declare("fastBuildUsingPlatformConfig", "Using( " + fastBuildUsingPlatformConfig + " )"))
+                                    using (bffGenerator.Declare("fastBuildProjectName", projectName))
+                                    using (bffGenerator.Declare("fastBuildClrSupport", fastBuildClrSupport))
+                                    using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
+                                    using (bffGenerator.Declare("fastBuildOutputFile", fastBuildOutputFile))
+                                    using (bffGenerator.Declare("fastBuildLinkerOutputFile", fastBuildLinkerOutputFile))
+                                    using (bffGenerator.Declare("fastBuildLinkerLinkObjects", linkObjects ? "true" : "false"))
+                                    using (bffGenerator.Declare("fastBuildPartialLibInfo", partialLibInfo))
+                                    using (bffGenerator.Declare("fastBuildInputPath", fastBuildInputPath))
+                                    using (bffGenerator.Declare("fastBuildCompilerInputPattern", fastBuildCompilerInputPattern))
+                                    using (bffGenerator.Declare("fastBuildInputExcludedFiles", fastBuildInputExcludedFiles))
+                                    using (bffGenerator.Declare("fastBuildSourceFiles", fastBuildSourceFiles))
+                                    using (bffGenerator.Declare("fastBuildResourceFiles", fastBuildResourceFiles))
+                                    using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
+                                    using (bffGenerator.Declare("fastBuildProjectDependencies", fastBuildProjectDependencies))
+                                    using (bffGenerator.Declare("fastBuildObjectListResourceDependencies", fastBuildObjectListResourceDependencies))
+                                    using (bffGenerator.Declare("fastBuildObjectListDependencies", fastBuildObjectListDependencies))
+                                    using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
+                                    using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
+                                    using (bffGenerator.Declare("fastBuildConsumeWinRTExtension", fastBuildConsumeWinRTExtension))
+                                    using (bffGenerator.Declare("fastBuildPartialLibs", partialLibs))
+                                    using (bffGenerator.Declare("fastBuildOutputType", outputType))
+                                    using (bffGenerator.Declare("fastBuildLibrarianAdditionalInputs", librarianAdditionalInputs))
+                                    using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
+                                    using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName ?? FileGeneratorUtilities.RemoveLineTag))
+                                    using (bffGenerator.Declare("fastBuildClangFileLanguage", clangFileLanguage))
+                                    using (bffGenerator.Declare("fastBuildClangStd", clangStd))
+                                    using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
+                                    using (bffGenerator.Declare("fastBuildDeoptimizationWritableFilesWithToken", fastBuildDeoptimizationWritableFilesWithToken))
+                                    using (bffGenerator.Declare("fastBuildCompilerForceUsing", fastBuildCompilerForceUsing))
+                                    using (bffGenerator.Declare("fastBuildAdditionalCompilerOptionsFromCode", fastBuildAdditionalCompilerOptionsFromCode))
+                                    using (bffGenerator.Declare("fastBuildStampExecutable", fastBuildStampExecutable))
+                                    using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))
                                     {
-                                        bffGenerator.Write(Template.ConfigurationFile.ResourcesBeginSection);
-                                        bffGenerator.Write(Template.ConfigurationFile.ResourceCompilerExtraOptions);
-                                        bffGenerator.Write(Template.ConfigurationFile.ResourceCompilerOptions);
-                                        bffGenerator.Write(Template.ConfigurationFile.EndSection);
-                                    }
-
-                                    // Exe and DLL will always add an extra objectlist
-                                    if ((conf.Output == Project.Configuration.OutputType.Exe ||
-                                            conf.Output == Project.Configuration.OutputType.Dll) && subConfigIndex == confSubConfigs.Keys.Count - 1 // only last subconfig will generate objectlist
-                                    )
-                                    {
-                                        bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
-
-                                        if (conf.Platform.IsMicrosoft())
+                                        if (projectHasResourceFiles)
                                         {
-                                            bffGenerator.Write(fastBuildCompilerExtraOptions);
-                                            bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
-
-                                            if (isUsePrecomp)
-                                                bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
-                                            bffGenerator.Write(compilerOptions);
-                                            if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                                            {
-                                                if (isUsePrecomp)
-                                                    bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                bffGenerator.Write(fastBuildCompilerOptionsDeoptimize);
-                                                bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            //  CLANG Specific
-
-                                            // TODO: This checks twice if the platform supports Clang -- fix?
-                                            clangPlatformBff?.SetupClangOptions(bffGenerator);
-
-                                            if (conf.Platform.IsUsingClang())
-                                            {
-                                                if (isUsePrecomp)
-                                                    bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
-                                                bffGenerator.Write(compilerOptionsClang);
-                                                if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                                                {
-                                                    bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
-                                                    if (isUsePrecomp)
-                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                    bffGenerator.Write(compilerOptionsClangDeoptimized);
-                                                    bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
-                                                }
-                                            }
+                                            bffGenerator.Write(Template.ConfigurationFile.ResourcesBeginSection);
+                                            bffGenerator.Write(Template.ConfigurationFile.ResourceCompilerExtraOptions);
+                                            bffGenerator.Write(Template.ConfigurationFile.ResourceCompilerOptions);
+                                            bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
 
-                                        bffGenerator.Write(Template.ConfigurationFile.EndSection);
-                                    }
-
-                                    if (conf.Output == Project.Configuration.OutputType.Dll && subConfigIndex != confSubConfigs.Keys.Count - 1)
-                                    {
-                                        using (bffGenerator.Declare("objectListName", fastBuildOutputFileShortName))
+                                        // Exe and DLL will always add an extra objectlist
+                                        if ((conf.Output == Project.Configuration.OutputType.Exe ||
+                                                conf.Output == Project.Configuration.OutputType.Dll) && subConfigIndex == confSubConfigs.Keys.Count - 1 // only last subconfig will generate objectlist
+                                        )
                                         {
-                                            bffGenerator.Write(Template.ConfigurationFile.GenericObjectListBeginSection);
+                                            bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
 
                                             if (conf.Platform.IsMicrosoft())
                                             {
                                                 bffGenerator.Write(fastBuildCompilerExtraOptions);
                                                 bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
+
                                                 if (isUsePrecomp)
                                                     bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
                                                 bffGenerator.Write(compilerOptions);
@@ -859,7 +815,7 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                             else
                                             {
-                                                // CLANG Specific
+                                                //  CLANG Specific
 
                                                 // TODO: This checks twice if the platform supports Clang -- fix?
                                                 clangPlatformBff?.SetupClangOptions(bffGenerator);
@@ -869,36 +825,99 @@ namespace Sharpmake.Generators.FastBuild
                                                     if (isUsePrecomp)
                                                         bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
                                                     bffGenerator.Write(compilerOptionsClang);
-
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
                                                         bffGenerator.Write(compilerOptionsClangDeoptimized);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
-
-                                                // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
-
                                             }
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
-                                    }
-                                    else
-                                    {
-                                        bool outputLib = false;
-                                        string beginSectionType = null;
-                                        switch (conf.Output)
+
+                                        if (conf.Output == Project.Configuration.OutputType.Dll && subConfigIndex != confSubConfigs.Keys.Count - 1)
                                         {
-                                            case Project.Configuration.OutputType.Exe:
+                                            using (bffGenerator.Declare("objectListName", fastBuildOutputFileShortName))
+                                            {
+                                                bffGenerator.Write(Template.ConfigurationFile.GenericObjectListBeginSection);
+
+                                                if (conf.Platform.IsMicrosoft())
                                                 {
-                                                    if (subConfigIndex == confSubConfigs.Keys.Count - 1)
+                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
+                                                    bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
+                                                    if (isUsePrecomp)
+                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
+                                                    bffGenerator.Write(compilerOptions);
+                                                    if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
+                                                    {
+                                                        if (isUsePrecomp)
+                                                            bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
+                                                        bffGenerator.Write(fastBuildCompilerOptionsDeoptimize);
+                                                        bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    // CLANG Specific
+
+                                                    // TODO: This checks twice if the platform supports Clang -- fix?
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);
+
+                                                    if (conf.Platform.IsUsingClang())
+                                                    {
+                                                        if (isUsePrecomp)
+                                                            bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
+                                                        bffGenerator.Write(compilerOptionsClang);
+
+                                                        if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
+                                                        {
+                                                            if (isUsePrecomp)
+                                                                bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
+                                                            bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                            bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
+                                                        }
+                                                    }
+
+                                                    // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
+
+                                                }
+
+                                                bffGenerator.Write(Template.ConfigurationFile.EndSection);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            bool outputLib = false;
+                                            string beginSectionType = null;
+                                            switch (conf.Output)
+                                            {
+                                                case Project.Configuration.OutputType.Exe:
+                                                    {
+                                                        if (subConfigIndex == confSubConfigs.Keys.Count - 1)
+                                                        {
+                                                            beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
+                                                        }
+                                                        else
+                                                        {
+                                                            // in the case the lib has the flag force to be an objectlist, change the template
+                                                            if (useObjectLists)
+                                                                beginSectionType = Template.ConfigurationFile.ObjectListBeginSection;
+                                                            else
+                                                                beginSectionType = Template.ConfigurationFile.LibBeginSection;
+                                                            outputLib = true;
+                                                        }
+                                                    }
+                                                    break;
+                                                case Project.Configuration.OutputType.Dll:
                                                     {
                                                         beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
                                                     }
-                                                    else
+                                                    break;
+                                                case Project.Configuration.OutputType.Lib:
                                                     {
                                                         // in the case the lib has the flag force to be an objectlist, change the template
                                                         if (useObjectLists)
@@ -907,155 +926,140 @@ namespace Sharpmake.Generators.FastBuild
                                                             beginSectionType = Template.ConfigurationFile.LibBeginSection;
                                                         outputLib = true;
                                                     }
-                                                }
-                                                break;
-                                            case Project.Configuration.OutputType.Dll:
-                                                {
-                                                    beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
-                                                }
-                                                break;
-                                            case Project.Configuration.OutputType.Lib:
-                                                {
-                                                    // in the case the lib has the flag force to be an objectlist, change the template
-                                                    if (useObjectLists)
-                                                        beginSectionType = Template.ConfigurationFile.ObjectListBeginSection;
-                                                    else
-                                                        beginSectionType = Template.ConfigurationFile.LibBeginSection;
-                                                    outputLib = true;
-                                                }
-                                                break;
-                                        }
-
-                                        bffGenerator.Write(beginSectionType);
-
-                                        if (outputLib)
-                                        {
-                                            if (conf.Platform.IsMicrosoft())
-                                            {
-                                                bffGenerator.Write(fastBuildCompilerExtraOptions);
-                                                bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
-
-                                                if (isUsePrecomp)
-                                                    bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
-
-                                                bffGenerator.Write(compilerOptions);
-
-                                                bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
-                                                bffGenerator.Write(Template.ConfigurationFile.LibrarianOptions);
-                                                if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                                                {
-                                                    if (isUsePrecomp)
-                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                    bffGenerator.Write(fastBuildCompilerOptionsDeoptimize);
-                                                    bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
-                                                }
+                                                    break;
                                             }
-                                            else
+
+                                            bffGenerator.Write(beginSectionType);
+
+                                            if (outputLib)
                                             {
-                                                // TODO: This checks twice if the platform supports Clang -- fix?
-                                                clangPlatformBff?.SetupClangOptions(bffGenerator);
-
-                                                if (conf.Platform.IsUsingClang())
+                                                if (conf.Platform.IsMicrosoft())
                                                 {
-                                                    if (isUsePrecomp)
-                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
+                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
+                                                    bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
 
-                                                    bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsCommon);
-                                                    bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsClang);
+                                                    if (isUsePrecomp)
+                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
+
+                                                    bffGenerator.Write(compilerOptions);
+
+                                                    bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
+                                                    bffGenerator.Write(Template.ConfigurationFile.LibrarianOptions);
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(fastBuildCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
-                                                    bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
-                                                    bffGenerator.Write(Template.ConfigurationFile.LibrarianOptionsClang);
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            platformBff.SetupExtraLinkerSettings(bffGenerator, conf.Output, fastBuildOutputFile);
-                                        }
-
-                                        bffGenerator.Write(Template.ConfigurationFile.EndSection);
-
-                                        var fileCustomBuildKeys = new Strings();
-                                        UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
-                                            key =>
-                                            {
-                                                if (!fileCustomBuildKeys.Contains(key))
-                                                {
-                                                    fileCustomBuildKeys.Add(key);
-                                                    bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
                                                 }
                                                 else
                                                 {
-                                                    throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExcutableSection)));
-                                                }
-                                                return false;
-                                            });
-                                        // These are all pre-build steps, at least in principle, so insert them before the other build steps.
-                                        fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
+                                                    // TODO: This checks twice if the platform supports Clang -- fix?
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);
 
+                                                    if (conf.Platform.IsUsingClang())
+                                                    {
+                                                        if (isUsePrecomp)
+                                                            bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
 
-                                        foreach (var postBuildEvent in postBuildEvents)
-                                        {
-                                            if (postBuildEvent.Value is Project.Configuration.BuildStepExecutable)
-                                            {
-                                                var execCommand = postBuildEvent.Value as Project.Configuration.BuildStepExecutable;
-
-                                                using (bffGenerator.Declare("fastBuildPreBuildName", postBuildEvent.Key))
-                                                using (bffGenerator.Declare("fastBuildPrebuildExeFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableFile))))
-                                                using (bffGenerator.Declare("fastBuildPreBuildInputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableInputFileArgumentOption))))
-                                                using (bffGenerator.Declare("fastBuildPreBuildOutputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableOutputFileArgumentOption))))
-                                                using (bffGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
-                                                using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableWorkingDirectory))))
-                                                using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
-                                                {
-                                                    bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
+                                                        bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsCommon);
+                                                        bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsClang);
+                                                        if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
+                                                        {
+                                                            if (isUsePrecomp)
+                                                                bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
+                                                            bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                            bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
+                                                        }
+                                                        bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
+                                                        bffGenerator.Write(Template.ConfigurationFile.LibrarianOptionsClang);
+                                                    }
                                                 }
                                             }
-                                            else if (postBuildEvent.Value is Project.Configuration.BuildStepCopy)
+                                            else
                                             {
-                                                var copyCommand = postBuildEvent.Value as Project.Configuration.BuildStepCopy;
+                                                platformBff.SetupExtraLinkerSettings(bffGenerator, conf.Output, fastBuildOutputFile);
+                                            }
 
-                                                string sourcePath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.SourcePath));
-                                                string destinationPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.DestinationPath));
+                                            bffGenerator.Write(Template.ConfigurationFile.EndSection);
 
-                                                using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
-                                                using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
-                                                using (bffGenerator.Declare("fastBuildCopyDest", destinationPath))
-                                                using (bffGenerator.Declare("fastBuildCopyDirName", postBuildEvent.Key))
-                                                using (bffGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(sourcePath)))
-                                                using (bffGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(destinationPath)))
-                                                using (bffGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                                                using (bffGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                                            var fileCustomBuildKeys = new Strings();
+                                            UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
+                                                key =>
                                                 {
-                                                    bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
+                                                    if (!fileCustomBuildKeys.Contains(key))
+                                                    {
+                                                        fileCustomBuildKeys.Add(key);
+                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
+                                                    }
+                                                    else
+                                                    {
+                                                        throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExcutableSection)));
+                                                    }
+                                                    return false;
+                                                });
+                                            // These are all pre-build steps, at least in principle, so insert them before the other build steps.
+                                            fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
+
+
+                                            foreach (var postBuildEvent in postBuildEvents)
+                                            {
+                                                if (postBuildEvent.Value is Project.Configuration.BuildStepExecutable)
+                                                {
+                                                    var execCommand = postBuildEvent.Value as Project.Configuration.BuildStepExecutable;
+
+                                                    using (bffGenerator.Declare("fastBuildPreBuildName", postBuildEvent.Key))
+                                                    using (bffGenerator.Declare("fastBuildPrebuildExeFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableFile))))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildInputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableInputFileArgumentOption))))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildOutputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableOutputFileArgumentOption))))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
+                                                    using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableWorkingDirectory))))
+                                                    using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                                                    {
+                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
+                                                    }
                                                 }
+                                                else if (postBuildEvent.Value is Project.Configuration.BuildStepCopy)
+                                                {
+                                                    var copyCommand = postBuildEvent.Value as Project.Configuration.BuildStepCopy;
+
+                                                    string sourcePath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.SourcePath));
+                                                    string destinationPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.DestinationPath));
+
+                                                    using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
+                                                    using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
+                                                    using (bffGenerator.Declare("fastBuildCopyDest", destinationPath))
+                                                    using (bffGenerator.Declare("fastBuildCopyDirName", postBuildEvent.Key))
+                                                    using (bffGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(sourcePath)))
+                                                    using (bffGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(destinationPath)))
+                                                    using (bffGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
+                                                    using (bffGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                                                    {
+                                                        bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
+                                                    }
+                                                }
+                                            }
+
+                                            // Write Target Alias
+                                            using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                            {
+                                                bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                             }
                                         }
-
+                                    }
+                                    break;
+                                case Project.Configuration.OutputType.None:
+                                    {
                                         // Write Target Alias
-                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                        using (resolver.NewScopedParameter("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
+                                        using (resolver.NewScopedParameter("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                         }
                                     }
-                                }
-                                break;
-                            case Project.Configuration.OutputType.None:
-                                {
-                                    // Write Target Alias
-                                    using (resolver.NewScopedParameter("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
-                                    using (resolver.NewScopedParameter("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
-                                    {
-                                        bffGenerator.Write(Template.ConfigurationFile.TargetSection);
-                                    }
-                                }
-                                break;
+                                    break;
+                            }
                         }
 
                         confCmdLineOptions["ExceptionHandling"] = previousExceptionSettings;
