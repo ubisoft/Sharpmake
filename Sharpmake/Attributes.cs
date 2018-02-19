@@ -97,12 +97,27 @@ namespace Sharpmake
     }
 
 
-    [System.AttributeUsage(AttributeTargets.Enum)]
+    [AttributeUsage(AttributeTargets.Enum)]
     public class Fragment : Attribute
     {
     }
 
-    [System.AttributeUsage(AttributeTargets.Enum)]
+    /// <summary>
+    /// Marks elements of fragments that should not be considered individual fragments.
+    /// </summary>
+    /// <remarks>
+    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensure that
+    /// each element sets 1 and only 1 bit. However, it is often useful in a bit enum to combine
+    /// multiple bits together to create sets that go well together. To prevent Sharpmake from
+    /// considering those errors, you must decorate these enum members with
+    /// <see cref="CompositeFragmentAttribute"/>.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class CompositeFragmentAttribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Enum)]
     public class TolerateDoubleAttribute : Attribute
     {
     }
