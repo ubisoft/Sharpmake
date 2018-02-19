@@ -150,44 +150,50 @@ namespace Sharpmake.Generators.FastBuild
                     if (FastBuildSettings.WriteAllConfigsSection && includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes)
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
 
-                    var preBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
-                    if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                    using (fileGenerator.Declare("conf", conf))
+                    using (fileGenerator.Declare("project", conf.Project))
                     {
-                        var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffPath);
-                        foreach (var copy in copies)
-                        {
-                            var sourceFile = copy.Key;
-                            var sourceFileName = Path.GetFileName(sourceFile);
-                            var destinationFolder = copy.Value;
-                            var destinationFile = Path.Combine(destinationFolder, sourceFileName);
 
-                            // use the global root for alias computation, as the project has not idea in which master bff it has been included
-                            var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
-                            string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
+                        var preBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
+                        if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                        {
+                            var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffPath);
+                            foreach (var copy in copies)
                             {
-                                using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
-                                using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
-                                using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                var sourceFile = copy.Key;
+                                var sourceFileName = Path.GetFileName(sourceFile);
+                                var destinationFolder = copy.Value;
+                                var destinationFile = Path.Combine(destinationFolder, sourceFileName);
+
+                                // use the global root for alias computation, as the project has not idea in which master bff it has been included
+                                var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
+                                string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
                                 {
-                                    if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
-                                        bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
+                                    using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
+                                    using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                    {
+                                        if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
+                                            bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
+                                    }
                                 }
                             }
-                        }
 
-                        foreach (var eventPair in conf.EventPreBuildExecute)
-                        {
-                            preBuildEvents.Add(eventPair.Key, eventPair.Value);
-                        }
+                            foreach (var eventPair in conf.EventPreBuildExecute)
+                            {
+                                preBuildEvents.Add(eventPair.Key, eventPair.Value);
+                            }
 
-                        foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
-                        {
-                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild);
-                            preBuildEvents.Add(eventKey, buildEvent);
-                        }
+                            foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
+                            {
+                                string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild);
+                                preBuildEvents.Add(eventKey, buildEvent);
+                            }
 
-                        WriteEvents(fileGenerator, preBuildEvents, bffPreBuildSection, masterBffPath);
+                            WriteEvents(fileGenerator, preBuildEvents, bffPreBuildSection, masterBffPath);
+                        }
                     }
+
 
                     var customPreBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
                     foreach (var eventPair in conf.EventCustomPrebuildExecute)
