@@ -228,6 +228,16 @@ namespace Sharpmake
                 public PublishURL(string url) : base(url) { }
             }
 
+            public class ManifestKeyFile : StringOption
+            {
+                public ManifestKeyFile(string url) : base(url) { }
+            }
+
+            public class ManifestCertificateThumbprint : StringOption
+            {
+                public ManifestCertificateThumbprint(string url) : base(url) { }
+            }
+
             public class InstallURL : StringOption
             {
                 public InstallURL(string url) : base(url) { }
@@ -384,6 +394,28 @@ namespace Sharpmake
             {
                 Enabled,
                 [Default]
+                Disabled
+            }
+
+            public enum UseVSHostingProcess
+            {
+                [Default]
+                Enabled,
+                Disabled
+            }
+
+            public enum GenerateManifests
+            {
+
+                Enabled,
+                [Default]
+                Disabled
+            }
+
+            public enum SignManifests
+            {
+                [Default]
+                Enabled,
                 Disabled
             }
 
