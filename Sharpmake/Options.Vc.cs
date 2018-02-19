@@ -686,6 +686,12 @@ namespace Sharpmake
                     SupportLargerThan2Gb
                 }
 
+                public enum AllowIsolation
+                {
+                    [Default]
+                    Enabled,
+                    Disabled
+                }
 
                 public enum Reference
                 {
