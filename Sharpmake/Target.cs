@@ -20,18 +20,60 @@ using System.Reflection;
 
 namespace Sharpmake
 {
-    // Mandatory
+    /// <summary>
+    /// The development environments supported by Sharpmake generators.
+    /// </summary>
+    /// <remarks>
+    /// This fragment is mandatory in every target.
+    /// </remarks>
     [Fragment, Flags]
     public enum DevEnv
     {
+        /// <summary>
+        /// Visual Studio 2010.
+        /// </summary>
         vs2010 = 1 << 0,
+
+        /// <summary>
+        /// Visual Studio 2012
+        /// </summary>
         vs2012 = 1 << 1,
+
+        /// <summary>
+        /// Visual Studio 2013
+        /// </summary>
         vs2013 = 1 << 2,
+
+        /// <summary>
+        /// Visual Studio 2015
+        /// </summary>
         vs2015 = 1 << 3,
+
+        /// <summary>
+        /// Visual Studio 2017
+        /// </summary>
         vs2017 = 1 << 4,
+
+        /// <summary>
+        /// iOS project with Xcode.
+        /// </summary>
         xcode4ios = 1 << 5,
+
+        /// <summary>
+        /// Eclipse.
+        /// </summary>
         eclipse = 1 << 6,
-        make = 1 << 7
+
+        /// <summary>
+        /// GNU Makefiles.
+        /// </summary>
+        make = 1 << 7,
+
+        /// <summary>
+        /// All supported Visual Studio versions.
+        /// </summary>
+        [CompositeFragment]
+        VisualStudio = vs2010 | vs2012 | vs2013 | vs2015 | vs2017
     }
 
     // Mandatory
@@ -502,6 +544,10 @@ namespace Sharpmake
                     if (enumFields[i].Attributes.HasFlag(FieldAttributes.SpecialName))
                         continue;
 
+                    // combinations of fragments are not actual fragments so skip them
+                    if (enumFields[i].GetCustomAttribute<CompositeFragmentAttribute>() != null)
+                        continue;
+
                     int enumFieldValue = (int)enumFields[i].GetRawConstantValue();
 
                     if (enumFieldValue == 0)
@@ -538,7 +584,6 @@ namespace Sharpmake
                         }
                     }
                 }
-
 
                 fragmentsType.Add(field.FieldType);
             }
