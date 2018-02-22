@@ -87,7 +87,7 @@ namespace Ubisoft
         {
             conf.ReferencesByName.Add("System");
             conf.ReferencesByName.Add("Microsoft.Build.Utilities.v4.0");
-            conf.AddPrivateDependency<SimpleNuGet>(target);
+            //conf.AddPrivateDependency<SimpleNuGet>(target);
         }
 
         [Configure(), ConfigurePriority(42)]
@@ -110,10 +110,10 @@ namespace Ubisoft
         protected override void ExcludeOutputFiles() { }
     }
 
-    [Compile]
-    public class SimpleNuGet : CompileCsProject
-    {
-        public SimpleNuGet()
-            : base(@"[project.RootPath]\SimpleNuGet\SimpleNuGet.csproj") { }
-    }
+    //[Compile]
+    //public class SimpleNuGet : CompileCsProject
+    //{
+    //    public SimpleNuGet()
+    //        : base(@"[project.RootPath]\SimpleNuGet\SimpleNuGet.csproj") { }
+    //}
 }
