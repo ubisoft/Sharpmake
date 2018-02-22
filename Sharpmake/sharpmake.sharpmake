@@ -1,0 +1,119 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using Sharpmake;
+
+namespace Ubisoft
+{
+    public abstract class CommonSharpmakeProject : CSharpProject
+    {
+        protected CommonSharpmakeProject()
+        {
+            RootPath = @"[project.SharpmakeCsPath]\..";
+
+            AddTargets(new Target(
+                Platform.anycpu,
+                DevEnv.vs2015,
+                Optimization.Debug | Optimization.Release,
+                OutputType.Dll,
+                framework: DotNetFramework.v4_6_1));
+        }
+    }
+
+    public class CompileCsProject : CommonSharpmakeProject
+    {
+        public CompileCsProject(string path)
+        {
+            Name = Path.GetFileNameWithoutExtension(path);
+            SourceRootPath = Path.GetDirectoryName(path);
+        }
+
+        [Configure()]
+        public void Configure(Configuration conf, Target target)
+        {
+            conf.ProjectPath = @"[project.SourceRootPath]";
+            conf.ProjectFileName = Name;
+            conf.Output = Configuration.OutputType.DotNetClassLibrary;
+        }
+    }
+
+    [Generate]
+    public class SharpmakeProject : CommonSharpmakeProject
+    {
+        public Preferences Prefs { get; private set; }
+        public SharpmakeProject()
+        {
+            Name = string.Format("{0}.Gen", GetType().Name);
+            //SharpmakeCsPath refers to the current .sharpmake which is at root of the project source
+            SourceRootPath = "[project.SharpmakeCsPath]";
+
+            ResourcesPath = @"[project.SourceRootPath]\Resources";
+            ContentPath = @"[project.SourceRootPath]\Content";
+            // Unconvinced by this
+            DependenciesCopyLocal = DependenciesCopyLocalTypes.DotNetExtensions;
+
+            Prefs = new Preferences();
+
+            SourceFilesExtensions.Remove(".sharpmake");
+            NoneExtensions.Add(".sharpmake");
+        }
+
+        [Configure()]
+        public void ConfigureCompile(Configuration conf, Target target)
+        {
+            conf.Output = Configuration.OutputType.DotNetClassLibrary;
+
+            conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
+            conf.Options.Add(Options.CSharp.WarningLevel.Level4);
+            conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
+        }
+
+        [Configure()]
+        public void ConfigurePaths(Configuration conf, Target target)
+        {
+            conf.ProjectFileName = Name;
+            //Project Directory Path
+            conf.ProjectPath = @"[project.SharpmakeCsPath]";
+            conf.TargetPath = @"[conf.ProjectPath]\bin\[target.Platform]\[target.Optimization]";
+            conf.IntermediatePath = @"[conf.ProjectPath]\obj\[target.Platform]\[target.Optimization]";
+        }
+
+        [Configure()]
+        public void ConfigureDependencies(Configuration conf, Target target)
+        {
+            conf.ReferencesByName.Add("System");
+            conf.ReferencesByName.Add("Microsoft.Build.Utilities.v4.0");
+            conf.AddPrivateDependency<SimpleNuGet>(target);
+        }
+
+        [Configure(), ConfigurePriority(42)]
+        public void OverrideConfiguration(Configuration conf, Target target)
+        {
+            if (Preferences.ProjectConfigurationOverrider != null)
+                Preferences.ProjectConfigurationOverrider(this, conf, target);
+        }
+
+        public class Preferences
+        {
+            public delegate void ProjectOverrideConfigurationDelegate(
+                CSharpProject project,
+                Project.Configuration conf,
+                Target target);
+
+            public static ProjectOverrideConfigurationDelegate ProjectConfigurationOverrider;
+        }
+
+        protected override void ExcludeOutputFiles() { }
+    }
+
+    [Compile]
+    public class SimpleNuGet : CompileCsProject
+    {
+        public SimpleNuGet()
+            : base(@"[project.RootPath]\SimpleNuGet\SimpleNuGet.csproj") { }
+    }
+}

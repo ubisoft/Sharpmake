@@ -174,33 +174,62 @@ namespace Sharpmake
 
         public void LoadAssemblies(params Assembly[] assemblies)
         {
+            const string mainMethodName = "SharpmakeMain";
             List<MethodInfo> mainMethods = new List<MethodInfo>();
 
             foreach (Assembly assembly in assemblies)
             {
                 foreach (Type type in assembly.GetTypes())
                 {
-                    MethodInfo mainMethodInfo = type.GetMethod("SharpmakeMain");
-                    if (mainMethodInfo != null && mainMethodInfo.IsDefined(typeof(Main), false))
+                    MethodInfo mainMethodInfo = type.GetMethod(mainMethodName);
+                    if (mainMethodInfo != null 
+                        && mainMethodInfo.IsDefined(typeof(Main), false))
                     {
                         if (!mainMethodInfo.IsStatic)
-                            throw new Error("SharpmakeMain method should be static {0}", mainMethodInfo.ToString());
+                        {
+                            throw new Error("{0} method should be static {1}",
+                                mainMethodName,
+                                mainMethodInfo.ToString());
+                        }
 
-                        if (mainMethodInfo.GetParameters().Length != 1 ||
-                            mainMethodInfo.GetParameters()[0].GetType() == typeof(Arguments))
-                            throw new Error("SharpmakeMain method should have one parameters of type Sharpmake.Builder: {0} in {1}", mainMethodInfo.ToString(), type.FullName);
+                        if (mainMethodInfo.GetParameters().Length != 1 
+                            || mainMethodInfo.GetParameters()[0].GetType() == typeof(Arguments))
+                        {
+                            throw new Error("{0} method should have one parameters of type {1}: {2} in {3}",
+                                mainMethodName,
+                                typeof(Arguments).ToNiceTypeName(),
+                                mainMethodInfo.ToString(), type.FullName);
+                        }
 
                         mainMethods.Add(mainMethodInfo);
                     }
                 }
             }
+            bool useDefault = false;
+            if (mainMethods.Count == 0 && assemblies.Length == 1)
+            {
+                LogWarningLine(
+                    "No {0} method was found, generating all elements decorated with a {1} attribute instead.", 
+                    mainMethodName, 
+                    typeof(Generate).ToNiceTypeName());
+                useDefault = true;
+            }
 
-            if (mainMethods.Count != 1)
-                throw new Error("sharpmake must contain one and only one static entry point method called Main(Sharpmake.Builder) with [Sharpmake.Main] attribute. Make sure it's public.");
+            if (mainMethods.Count != 1 && !useDefault)
+            {
+                throw new Error(
+                    "sharpmake must contain one and only one static entry point method called {0}({1}) with [{2}] attribute. Make sure it's public.",
+                    mainMethodName,
+                    typeof(Sharpmake.Arguments).ToNiceTypeName(),
+                    typeof(Main).ToNiceTypeName());
+            }
 
             try
             {
-                mainMethods[0].Invoke(null, new object[] { Arguments });
+                if (!useDefault)
+                    mainMethods[0].Invoke(null, new object[] { Arguments });
+                else
+                    DefaultMain(Arguments, assemblies[0]);
             }
             catch (TargetInvocationException e)
             {
@@ -214,6 +243,16 @@ namespace Sharpmake
             Context.ConfigureOrder = Arguments.ConfigureOrder;
 
             BuildProjectAndSolution();
+        }
+
+        public static void DefaultMain(Sharpmake.Arguments args, Assembly dynAssembly)
+        {
+            foreach (Type type in dynAssembly
+                .GetTypes()
+                .Where(t => !t.IsAbstract && t.GetCustomAttribute<Generate>() != null))
+            {
+                args.Generate(type);
+            }
         }
 
         public void BuildProjectAndSolution()
