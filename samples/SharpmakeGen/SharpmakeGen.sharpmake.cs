@@ -32,6 +32,7 @@ namespace SharpmakeGen
 
             conf.ReferencesByName.Add("System");
 
+            conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
         }
     }
@@ -48,8 +49,6 @@ namespace SharpmakeGen
         {
             base.ConfigureAll(conf, target);
             conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.v4.0");
-
-            conf.AddPrivateDependency<SimpleNuGetProject>(target);
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
         }
@@ -71,31 +70,6 @@ namespace SharpmakeGen
                 "System.Xml.Linq"
             );
             conf.AddPrivateDependency<SharpmakeProject>(target);
-            conf.AddPrivateDependency<SimpleNuGetProject>(target);
-        }
-    }
-
-    [Generate]
-    public class SimpleNuGetProject : SharpmakeBaseProject
-    {
-        public SimpleNuGetProject()
-        {
-            Name = "SimpleNuGet";
-        }
-
-        public override void ConfigureAll(Configuration conf, Target target)
-        {
-            base.ConfigureAll(conf, target);
-
-            conf.ReferencesByName.Add(
-                "System.Core",
-                "System.Data",
-                "System.Data.DataSetExtensions",
-                "System.Net.Http",
-                "System.Runtime.Serialization",
-                "System.Xml",
-                "System.Xml.Linq"
-            );
         }
     }
 
@@ -172,7 +146,6 @@ namespace SharpmakeGen
             conf.AddProject<SharpmakeProject>(target);
             conf.AddProject<SharpmakeGeneratorsProject>(target);
             conf.AddProject<SharpmakeUnitTestsProject>(target);
-            conf.AddProject<SimpleNuGetProject>(target);
 
             conf.AddProject<Platforms.CommonPlatformsProject>(target);
             conf.AddProject<Platforms.DurangoProject>(target);
@@ -184,6 +157,7 @@ namespace SharpmakeGen
             conf.AddProject<Samples.CSharpHelloWorldProject>(target);
             conf.AddProject<Samples.CSharpVsixProject>(target);
             conf.AddProject<Samples.HelloWorldProject>(target);
+            conf.AddProject<Samples.QTFileCustomBuildProject>(target);
             conf.AddProject<Samples.PackageReferencesProject>(target);
             conf.AddProject<Samples.SharpmakeGenProject>(target);
             conf.AddProject<Samples.SimpleExeLibDependencyProject>(target);

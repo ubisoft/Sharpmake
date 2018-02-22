@@ -44,7 +44,12 @@ namespace Sharpmake
                 configuration.DependenciesLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
         }
 
-        void Project.Configuration.IConfigurationTasks.SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+        void Project.Configuration.IConfigurationTasks.SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+        {
+            SetupLibraryPaths(configuration, dependencySetting, dependency);
+        }
+
+        void Project.Configuration.IConfigurationTasks.SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
             SetupLibraryPaths(configuration, dependencySetting, dependency);
         }
@@ -68,6 +73,11 @@ namespace Sharpmake
                 default:
                     return outputType.ToString().ToLower();
             }
+        }
+
+        public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+        {
+            yield break;
         }
         #endregion
 

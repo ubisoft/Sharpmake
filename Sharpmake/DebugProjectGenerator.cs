@@ -155,6 +155,8 @@ namespace Sharpmake
                 s_sharpmakeApplicationExePath = Process.GetCurrentProcess().MainModule.FileName;
             }
 
+            conf.ReferencesByPath.Add(Assembler.DefaultReferences);
+
             if (s_useLocalSharpmake)
             {
                 conf.ReferencesByPath.Add(s_sharpmakeDllPath);

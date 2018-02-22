@@ -11,25 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
-using System.Xml.Linq;
 
-namespace SimpleNuGet.Impl
+using System;
+
+namespace Sharpmake
 {
-    internal static class XElementExtensions
-    {
-        public static string GetOptionalAttributeValue(this XElement element, string localName, string namespaceName = null)
-        {
-            XAttribute attr;
-            if (String.IsNullOrEmpty(namespaceName))
-            {
-                attr = element.Attribute(localName);
-            }
-            else
-            {
-                attr = element.Attribute(XName.Get(localName, namespaceName));
-            }
-            return attr != null ? attr.Value : null;
-        }
-    }
+    /// <summary>
+    /// Marks a .NET assembly as a host of Sharpmake extension types (platform implementations for Sharpmake generators, builder...).
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class SharpmakeExtensionAttribute : Attribute { }
 }

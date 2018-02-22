@@ -58,6 +58,7 @@ namespace Sharpmake
       <ForceConformanceInForLoopScope>[options.ForceConformanceInForLoopScope]</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
       <OpenMPSupport>[options.OpenMP]</OpenMPSupport>
+      <LanguageStandard>[options.LanguageStandard]</LanguageStandard>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <GenerateXMLDocumentationFiles>[options.GenerateXMLDocumentation]</GenerateXMLDocumentationFiles>

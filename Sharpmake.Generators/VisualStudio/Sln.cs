@@ -77,7 +77,7 @@ namespace Sharpmake.Generators.VisualStudio
         public static Guid[] AspNetMvc5Project = { AspNetMvc5, WindowsCSharp };
     }
 
-    public partial class Sln
+    public partial class Sln : ISolutionGenerator
     {
         private readonly List<SolutionFolder> _rootSolutionFolders = new List<SolutionFolder>();
         private readonly List<SolutionFolder> _solutionFolders = new List<SolutionFolder>();
@@ -104,9 +104,10 @@ namespace Sharpmake.Generators.VisualStudio
             FileInfo fileInfo = new FileInfo(solutionFile);
             string solutionPath = fileInfo.Directory.FullName;
             string solutionFileName = fileInfo.Name;
+            bool addMasterBff = FastBuildSettings.IncludeBFFInProjects && FastBuild.UtilityMethods.HasFastBuildConfig(configurations);
 
             bool updated;
-            string solutionFileResult = Generate(solution, configurations, solutionPath, solutionFileName, out updated);
+            string solutionFileResult = Generate(solution, configurations, solutionPath, solutionFileName, addMasterBff, out updated);
             if (updated)
                 generatedFiles.Add(solutionFileResult);
             else
@@ -239,6 +240,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<Solution.Configuration> solutionConfigurations,
             string solutionPath,
             string solutionFile,
+            bool addMasterBff,
             out bool updated
         )
         {
@@ -281,6 +283,14 @@ namespace Sharpmake.Generators.VisualStudio
                     break;
             }
 
+            SolutionFolder masterBffFolder = null;
+            if (addMasterBff)
+            {
+                masterBffFolder = GetSolutionFolder(solution.FastBuildMasterBffSolutionFolder);
+                if (masterBffFolder == null)
+                    throw new Error("FastBuildMasterBffSolutionFolder needs to be set in solution " + solutionFile);
+            }
+
             // Write all needed folders before the projects to make sure the proper startup project is selected.
             _solutionFolders.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.InvariantCultureIgnoreCase)); // Ensure folders are always in the same order to avoid random shuffles
             foreach (SolutionFolder folder in _solutionFolders)
@@ -289,7 +299,32 @@ namespace Sharpmake.Generators.VisualStudio
                 using (fileGenerator.Declare("folderGuid", folder.Guid.ToString().ToUpper()))
                 {
                     fileGenerator.Write(Template.Solution.ProjectFolder);
+                    if (masterBffFolder == folder)
+                    {
+                        string fastBuildMasterBffPath = solutionFile + FastBuildSettings.FastBuildConfigFileExtension; // TODO: make a better method
+                        string fastBuildGlobalSettingsPath = FastBuild.MasterBff.GetGlobalBffConfigFileName(fastBuildMasterBffPath);
+
+                        fileGenerator.Write(Template.Solution.SolutionItemBegin);
+                        {
+                            using (fileGenerator.Declare("solutionItemPath", fastBuildMasterBffPath))
+                                fileGenerator.Write(Template.Solution.SolutionItem);
+                            using (fileGenerator.Declare("solutionItemPath", fastBuildGlobalSettingsPath))
+                                fileGenerator.Write(Template.Solution.SolutionItem);
+                        }
+                        fileGenerator.Write(Template.Solution.ProjectSectionEnd);
+                    }
+                    fileGenerator.Write(Template.Solution.ProjectEnd);
                 }
+            }
+
+            Solution.ResolvedProject fastBuildAllProjectForSolutionDependency = null;
+            if(solution.FastBuildAllSlnDependencyFromExe)
+            {
+                var fastBuildAllProjects = solutionProjects.Where(p => p.Project is FastBuildAllProject).ToArray();
+                if (fastBuildAllProjects.Length > 1)
+                    throw new Error("More than one FastBuildAll project");
+                if (fastBuildAllProjects.Length == 1)
+                    fastBuildAllProjectForSolutionDependency = fastBuildAllProjects[0];
             }
 
             using (fileGenerator.Declare("solution", solution))
@@ -305,6 +340,19 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("projectTypeGuid", resolvedProject.UserData["TypeGuid"]))
                     {
                         fileGenerator.Write(Template.Solution.ProjectBegin);
+
+                        if (fastBuildAllProjectForSolutionDependency != null)
+                        {
+                            bool writeDependencyToFastBuildAll = resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe);
+                            if (writeDependencyToFastBuildAll)
+                            {
+                                fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
+                                using (fileGenerator.Declare("projectDependencyGuid", fastBuildAllProjectForSolutionDependency.UserData["Guid"]))
+                                    fileGenerator.Write(Template.Solution.ProjectDependency);
+                                fileGenerator.Write(Template.Solution.ProjectSectionEnd);
+                            }
+                        }
+
                         fileGenerator.Write(Template.Solution.ProjectEnd);
                     }
                 }
@@ -408,7 +456,7 @@ namespace Sharpmake.Generators.VisualStudio
             // write all project target and match then to a solution target
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBegin);
 
-            var pec = new Dictionary<Solution.Configuration, int>();
+            var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, int>();
             foreach (Solution.ResolvedProject solutionProject in solutionProjects)
             {
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
@@ -457,6 +505,9 @@ namespace Sharpmake.Generators.VisualStudio
 
                     Project.Configuration projectConf = solutionProject.Project.GetConfiguration(projectTarget);
 
+                    if(includedProject != null && includedProject.Configuration.IsFastBuild)
+                        solutionConfigurationFastBuildBuilt.GetValueOrAdd(solutionConfiguration, 0);
+
                     Platform projectPlatform = projectTarget.GetPlatform();
 
                     string configurationName;
@@ -484,11 +535,6 @@ namespace Sharpmake.Generators.VisualStudio
                         {
                             // nothing is built in python solutions
                         }
-                        else if (projectConf.IsFastBuild && !projectConf.IsMainProject)
-                        {
-                            // only one project can be built with FastBuild, the one marked with IsMainProject
-                            // TODO: deprecate IsMainProject, as the list of projects to build is known
-                        }
                         else if (perfectMatch)
                         {
                             build = includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes;
@@ -496,6 +542,11 @@ namespace Sharpmake.Generators.VisualStudio
                             // for fastbuild, only build the projects that cannot be built through dependency chain
                             if (!projectConf.IsFastBuild)
                                 build |= includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.YesThroughDependency;
+                            else
+                            {
+                                if (build)
+                                    solutionConfigurationFastBuildBuilt[solutionConfiguration]++;
+                            }
                         }
 
                         fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationActive);
@@ -509,6 +560,15 @@ namespace Sharpmake.Generators.VisualStudio
                         }
                     }
                 }
+            }
+
+            foreach (var fb in solutionConfigurationFastBuildBuilt)
+            {
+                var solutionConfiguration = fb.Key;
+                if (fb.Value == 0)
+                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has no FastBuild projects to build.");
+                else if (fb.Value > 1)
+                    Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({fb.Value}).");
             }
 
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationEnd);
@@ -632,13 +692,8 @@ namespace Sharpmake.Generators.VisualStudio
             var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
 
             // user's projects references
-            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath);
+            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath).Distinct();
             resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(projectByPath));
-
-            // nuget packages projects references
-            var nugetProjectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.NuGetPackageProjectReferencesByPath).Distinct();
-            resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(nugetProjectByPath)
-                                                .Select(r => { r.SolutionFolder = "PackagesAsSources"; return r; }));
 
             foreach (Solution.ResolvedProject resolvedProject in resolvedPathReferences)
             {

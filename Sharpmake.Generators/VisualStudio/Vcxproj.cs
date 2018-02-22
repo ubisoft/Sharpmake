@@ -24,7 +24,7 @@ using Sharpmake.Generators.FastBuild;
 
 namespace Sharpmake.Generators.VisualStudio
 {
-    public partial class Vcxproj
+    public partial class Vcxproj : IProjectGenerator
     {
         public enum BuildStep
         {
@@ -170,6 +170,58 @@ namespace Sharpmake.Generators.VisualStudio
         public const string ProjectExtension = ".vcxproj";
         private const string ProjectFilterExtension = ".filters";
         private const string CopyDependenciesExtension = "_runtimedependencies.txt";
+        public const string EventSeparator = "&#x0D;&#x0A;";
+
+        // Vcxproj only allows one file command per input file, so we collapse
+        // the commands into a single command per file.
+        public class CombinedCustomFileBuildStep
+        {
+            public string Commands = "";
+            public string Description = "";
+            public string Outputs = "";
+            public string AdditionalInputs = "";
+        };
+
+        public static Dictionary<string, CombinedCustomFileBuildStep> CombineCustomFileBuildSteps(string referencePath, Resolver resolver, IEnumerable<Project.Configuration.CustomFileBuildStep> buildSteps)
+        {
+            // Map from relative input file to command to run on that file, for this configuration.
+            var steps = new Dictionary<string, CombinedCustomFileBuildStep>();
+
+            foreach (var customBuildStep in buildSteps)
+            {
+                var relativeBuildStep = customBuildStep.MakePathRelative(resolver, (path, commandRelative) => Util.SimplifyPath(Util.PathGetRelative(referencePath, path)));
+                relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
+                // Build the command.
+                string command = string.Format(
+                    "{0} {1}",
+                    relativeBuildStep.Executable,
+                    relativeBuildStep.ExecutableArguments
+                );
+
+                command = Util.EscapeXml(command) + EventSeparator;
+                CombinedCustomFileBuildStep combinedCustomBuildStep;
+                // This needs to be project relative to work.
+                string FileKey = Util.SimplifyPath(Util.PathGetRelative(referencePath, customBuildStep.KeyInput));
+                if (!steps.TryGetValue(FileKey, out combinedCustomBuildStep))
+                {
+                    combinedCustomBuildStep = new CombinedCustomFileBuildStep();
+                    steps.Add(FileKey, combinedCustomBuildStep);
+                }
+                else
+                {
+                    // Add separators.
+                    combinedCustomBuildStep.Description += ";";
+                    combinedCustomBuildStep.Outputs += ";";
+                    combinedCustomBuildStep.AdditionalInputs += ";";
+                }
+                combinedCustomBuildStep.Commands += command;
+                combinedCustomBuildStep.Description += relativeBuildStep.Description;
+                combinedCustomBuildStep.Outputs = Util.EscapeXml(relativeBuildStep.Output);
+                combinedCustomBuildStep.AdditionalInputs = Util.EscapeXml(relativeBuildStep.AdditionalInputs.JoinStrings(";"));
+            }
+
+            return steps;
+        }
 
         /// <summary>
         /// Generate a pseudo Guid base on relative path from the Project CsPath to the generated files
@@ -428,23 +480,16 @@ namespace Sharpmake.Generators.VisualStudio
                             fastBuildCommandLineOptions += " -fastcancel";
 
                         if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
-                        {
-                            fastBuildCommandLineOptions += " ";
-                            fastBuildCommandLineOptions += conf.FastBuildCustomArgs;
-                        }
-                        string masterBffPath = Bff.GetMasterBffPath(conf);
-                        string masterBffFullName = Bff.GetMasterBffFileName(conf);
-                        string relativeMasterBffFile = Util.PathGetRelative(masterBffPath, masterBffFullName, true);
-                        string relativeMasterBffPath = Util.PathGetRelative(context.ProjectDirectory, masterBffPath, true);
-                        if (relativeMasterBffFile != "fbuild.bff")
-                            fastBuildCommandLineOptions += " -config " + relativeMasterBffFile;
+                            fastBuildCommandLineOptions += " " + conf.FastBuildCustomArgs;
 
                         fastBuildCommandLineOptions += FastBuildCustomArguments;
 
-                        // Make the commandline written in the bff available.
+                        // Make the commandline written in the bff available, except the master bff -config
                         Bff.SetCommandLineArguments(conf, fastBuildCommandLineOptions);
 
-                        using (fileGenerator.Declare("relativeMasterBffPath", relativeMasterBffPath))
+                        fastBuildCommandLineOptions += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
+
+                        using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
                         using (fileGenerator.Declare("fastBuildMakeCommandBuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, fastBuildCommandLineOptions)))
                         using (fileGenerator.Declare("fastBuildMakeCommandRebuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, fastBuildCommandLineOptions)))
                         {
@@ -512,8 +557,8 @@ namespace Sharpmake.Generators.VisualStudio
             // TODO: make a better check
             if (hasNonFastBuildConfig)
                 GenerateFilesSection(context, fileGenerator, generatedFiles, skipFiles);
-            else
-                GenerateBffFilesSection(context, fileGenerator, generatedFiles, skipFiles, false);
+            else if(hasFastBuildConfig)
+                GenerateBffFilesSection(context, fileGenerator);
 
             // Import platform makefiles.
             foreach (var platform in context.PresentPlatforms.Values)
@@ -860,26 +905,17 @@ namespace Sharpmake.Generators.VisualStudio
                 platforms.GeneratePlatformReferences(context, fileGenerator);
         }
 
-        private void GenerateBffFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator, IList<string> generatedFiles, IList<string> skipFiles, bool lookIfHasAnyFastBuild)
+        private void GenerateBffFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
         {
             // Add FastBuild bff file to Project
-            var firstConf = context.ProjectConfigurations.First();
-            if (firstConf.IsFastBuild && FastBuildSettings.IncludeBFFInProjects)
+            if (FastBuildSettings.IncludeBFFInProjects)
             {
                 string fastBuildFile = Bff.GetBffFileName(".", context.Configuration.BffFileName);
                 fastBuildFile = Util.SimplifyPath(fastBuildFile);
 
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                using (fileGenerator.Declare("fastBuildFile", fastBuildFile))
-                    fileGenerator.Write(Template.Project.ProjectFilesFastBuildFile);
-
-                if (firstConf.IsMainProject) // add the master bff file to the main project of the solution
                 {
-                    string masterBffFileName = Bff.GetMasterBffFileName(firstConf);
-                    using (fileGenerator.Declare("fastBuildFile", masterBffFileName))
-                        fileGenerator.Write(Template.Project.ProjectFilesFastBuildFile);
-
-                    using (fileGenerator.Declare("fastBuildFile", Bff.GetGlobalBffConfigFileName(masterBffFileName)))
+                    using (fileGenerator.Declare("fastBuildFile", fastBuildFile))
                         fileGenerator.Write(Template.Project.ProjectFilesFastBuildFile);
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
@@ -1008,6 +1044,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<ProjectFile> PRIFiles = new List<ProjectFile>();
             List<ProjectFile> XResourcesReswFiles = new List<ProjectFile>();
             List<ProjectFile> XResourcesImgFiles = new List<ProjectFile>();
+            List<ProjectFile> customBuildFiles = new List<ProjectFile>();
 
             foreach (string file in context.Project.NatvisFiles)
             {
@@ -1029,6 +1066,24 @@ namespace Sharpmake.Generators.VisualStudio
 
             allFiles.Sort((ProjectFile l, ProjectFile r) => { return string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCulture); });
 
+            // Gather files with custom build steps.
+            var configurationCustomFileBuildSteps = new Dictionary<Project.Configuration, Dictionary<string, CombinedCustomFileBuildStep>>();
+            Strings configurationCustomBuildFiles = new Strings();
+            foreach (Project.Configuration config in context.ProjectConfigurations)
+            {
+                using (fileGenerator.Resolver.NewScopedParameter("project", context.Project))
+                using (fileGenerator.Resolver.NewScopedParameter("config", config))
+                using (fileGenerator.Resolver.NewScopedParameter("target", config.Target))
+                {
+                    var customFileBuildSteps = CombineCustomFileBuildSteps(context.ProjectDirectory, fileGenerator.Resolver, config.CustomFileBuildSteps.Where(step => step.Filter != Project.Configuration.CustomFileBuildStep.ProjectFilter.BFFOnly));
+                    configurationCustomFileBuildSteps.Add(config, customFileBuildSteps);
+                    foreach (var customBuildSetup in customFileBuildSteps)
+                    {
+                        configurationCustomBuildFiles.Add(customBuildSetup.Key);
+                    }
+                }
+            }
+
             // type -> files
             var customSourceFiles = new Dictionary<string, List<ProjectFile>>();
             foreach (ProjectFile projectFile in allFiles)
@@ -1043,6 +1098,10 @@ namespace Sharpmake.Generators.VisualStudio
                         customSourceFiles[type] = files;
                     }
                     files.Add(projectFile);
+                }
+                else if (configurationCustomBuildFiles.Contains(projectFile.FileNameProjectRelative))
+                {
+                    customBuildFiles.Add(projectFile);
                 }
                 else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
                          (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
@@ -1101,6 +1160,45 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
+
+            if (customBuildFiles.Count > 0)
+            {
+                // Write custom build steps
+                fileGenerator.Write(Template.Project.ProjectFilesBegin);
+
+                foreach (ProjectFile file in customBuildFiles)
+                {
+                    using (fileGenerator.Declare("file", file.FileNameProjectRelative))
+                    using (fileGenerator.Declare("filetype", FileGeneratorUtilities.RemoveLineTag))
+                    {
+                        fileGenerator.Write(Template.Project.ProjectFilesCustomBuildBegin);
+
+                        foreach (Project.Configuration conf in context.ProjectConfigurations)
+                        {
+                            CombinedCustomFileBuildStep buildStep;
+                            if (configurationCustomFileBuildSteps[conf].TryGetValue(file.FileNameProjectRelative, out buildStep))
+                            {
+                                using (fileGenerator.Declare("conf", conf))
+                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                                using (fileGenerator.Declare("description", buildStep.Description))
+                                using (fileGenerator.Declare("command", buildStep.Commands))
+                                using (fileGenerator.Declare("inputs", buildStep.AdditionalInputs))
+                                using (fileGenerator.Declare("outputs", buildStep.Outputs))
+                                {
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildDescription);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildCommand);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildInputs);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputs);
+                                }
+                            }
+                        }
+
+                        fileGenerator.Write(Template.Project.ProjectFilesCustomBuildEnd);
+                    }
+                }
+
+                fileGenerator.Write(Template.Project.ProjectFilesEnd);
+            }
 
             // Write natvis files
             if (context.Project.NatvisFiles.Count > 0 && context.ProjectConfigurations.Any(conf => conf.Target.HaveFragment<DevEnv>() && conf.Target.GetFragment<DevEnv>() >= DevEnv.vs2015))
@@ -1394,8 +1492,36 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            var copyDependenciesBuildStepDictionary = new Dictionary<Project.Configuration, Project.Configuration.FileCustomBuild>();
+            foreach (var conf in context.ProjectConfigurations)
+            {
+                if (conf.IsFastBuild) // copies handled in bff
+                    continue;
+
+                if (conf.Output != Project.Configuration.OutputType.Exe && !conf.ExecuteTargetCopy)
+                    continue;
+
+                var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, context.ProjectDirectory);
+                if (!copies.Any())
+                    continue;
+
+                var copyDependenciesBuildStep = copyDependenciesBuildStepDictionary.GetValueOrAdd(conf, new Project.Configuration.FileCustomBuild("Copy files to output paths..."));
+                if (conf.CopyDependenciesBuildStep != null)
+                    copyDependenciesBuildStep = conf.CopyDependenciesBuildStep;
+
+                foreach (var copy in copies)
+                {
+                    var sourceFile = copy.Key;
+                    var destinationFolder = copy.Value;
+
+                    copyDependenciesBuildStep.CommandLines.Add(conf.CreateTargetCopyCommand(sourceFile, destinationFolder, context.ProjectDirectory));
+                    copyDependenciesBuildStep.Inputs.Add(sourceFile);
+                    copyDependenciesBuildStep.Outputs.Add(Path.Combine(destinationFolder, Path.GetFileName(sourceFile)));
+                }
+            }
+
             // Write the "copy dependencies" build step (as a custom build tool on a dummy file, to make sure the copy is always done when needed)
-            bool hasDependenciesToCopy = context.ProjectConfigurations.Any(conf => conf.CopyDependenciesBuildStep != null);
+            bool hasDependenciesToCopy = copyDependenciesBuildStepDictionary.Any();
             var dependenciesFileGenerator = new FileGenerator(fileGenerator.Resolver); // borrowing resolver
             if (hasDependenciesToCopy)
             {
@@ -1407,12 +1533,10 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildBegin);
 
-                    foreach (Project.Configuration conf in context.ProjectConfigurations)
+                    foreach (var pair in copyDependenciesBuildStepDictionary)
                     {
-                        Project.Configuration.FileCustomBuild copyDependencies = conf.CopyDependenciesBuildStep;
-
-                        if (copyDependencies == null)
-                            continue;
+                        var conf = pair.Key;
+                        Project.Configuration.FileCustomBuild copyDependencies = pair.Value;
 
                         using (fileGenerator.Declare("conf", conf))
                         using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
@@ -1468,16 +1592,15 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
 
             // for the configuration that are fastbuild but external and requires to add the bff files
-            bool lookIfHasAnyFastBuild = false;
-            if (context.ProjectConfigurations.First().IsMainProject) // main project might mix fastbuild and non-fastbuild
-                lookIfHasAnyFastBuild = context.ProjectConfigurations.Any(x => x.IsFastBuild);
-            GenerateBffFilesSection(context, fileGenerator, generatedFiles, skipFiles, lookIfHasAnyFastBuild);
+            if(context.ProjectConfigurations.Any(x => x.IsFastBuild))
+                GenerateBffFilesSection(context, fileGenerator);
 
             var allFileLists = new List<Tuple<string, List<ProjectFile>>>();
             allFileLists.Add(new Tuple<string, List<ProjectFile>>(hasCustomBuildForAllSources ? "CustomBuild" : "ClCompile", sourceFiles));
             allFileLists.Add(new Tuple<string, List<ProjectFile>>("PRIResource", XResourcesReswFiles));
             allFileLists.Add(new Tuple<string, List<ProjectFile>>("Image", XResourcesImgFiles));
             allFileLists.Add(new Tuple<string, List<ProjectFile>>(hasCustomBuildForAllIncludes ? "CustomBuild" : "ClInclude", includeFiles));
+            allFileLists.Add(new Tuple<string, List<ProjectFile>>("CustomBuild", customBuildFiles));
             if (NatvisFiles.Count > 0)
                 allFileLists.Add(new Tuple<string, List<ProjectFile>>("Natvis", NatvisFiles));
             if (PRIFiles.Count > 0)

@@ -11,9 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System.Collections.Generic;
+
 namespace Sharpmake
 {
-    public static partial class Linux
+    public static class Linux
     {
         [PlatformImplementation(Platform.linux,
             typeof(IPlatformDescriptor),
@@ -30,7 +33,12 @@ namespace Sharpmake
             #endregion
 
             #region Project.Configuration.IConfigurationTasks implementation
-            public void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            {
+                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+            }
+
+            public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
                 DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
             }
@@ -46,6 +54,11 @@ namespace Sharpmake
                     default:
                         return "a";
                 }
+            }
+
+            public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            {
+                yield break;
             }
             #endregion
 

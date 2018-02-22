@@ -47,3 +47,4 @@ _ReSharper*/
 *.orig
 .project
 project.lock.json
+Sharpmake.VC.db

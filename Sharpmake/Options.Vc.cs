@@ -29,12 +29,20 @@ namespace Sharpmake
                     v100, // Visual Studio 2010
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     v110, // Visual Studio 2012
+                    [DevEnvVersion(minimum = DevEnv.vs2012)]
+                    v110_xp, // Visual Studio 2012 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2013)]
                     v120, // Visual Studio 2013
+                    [DevEnvVersion(minimum = DevEnv.vs2013)]
+                    v120_xp, // Visual Studio 2013 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     v140, // Visual Studio 2015
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    v140_xp, // Visual Studio 2015 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     v141, // Visual Studio 2017
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    v141_xp, // Visual Studio 2017 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     LLVM_vs2012 // LLVM from Visual Studio 2012
                 }
@@ -45,7 +53,8 @@ namespace Sharpmake
                     v10_0_10240_0,
                     v10_0_10586_0,
                     v10_0_14393_0,
-                    v10_0_15063_0
+                    v10_0_15063_0,
+                    v10_0_16299_0
                 }
 
                 public enum CharacterSet
@@ -451,10 +460,18 @@ namespace Sharpmake
                     CPP98,
                     [Default]
                     CPP11,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
                     CPP14,
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    CPP17,
                     GNU98,
                     GNU11,
-                    GNU14
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    GNU14,
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    GNU17,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    Latest
                 }
             }
 

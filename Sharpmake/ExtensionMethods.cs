@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -63,6 +64,10 @@ namespace Sharpmake
                     return "4.6.1";
                 case DotNetFramework.v4_6_2:
                     return "4.6.2";
+                case DotNetFramework.v4_7:
+                    return "4.7";
+                case DotNetFramework.v4_7_1:
+                    return "4.7.1";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }
@@ -90,6 +95,10 @@ namespace Sharpmake
                     return "net461";
                 case DotNetFramework.v4_6_2:
                     return "net462";
+                case DotNetFramework.v4_7:
+                    return "net47";
+                case DotNetFramework.v4_7_1:
+                    return "net471";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }
@@ -152,6 +161,20 @@ namespace Sharpmake
             }
         }
 
+        public static string GetVSYear(this DevEnv visualVersion)
+        {
+            switch (visualVersion)
+            {
+                case DevEnv.vs2010: return "2010";
+                case DevEnv.vs2012: return "2012";
+                case DevEnv.vs2013: return "2013";
+                case DevEnv.vs2015: return "2015";
+                case DevEnv.vs2017: return "2017";
+                default:
+                    throw new Error("DevEnv " + visualVersion + " not recognized!");
+            }
+        }
+
         public static string GetVisualStudioDir(this DevEnv visualVersion)
         {
             string registryKeyString = string.Format(
@@ -165,29 +188,39 @@ namespace Sharpmake
             return Util.SimplifyPath(installDir);
         }
 
+        private static readonly ConcurrentDictionary<DevEnv,string> s_visualStudioVCRootPathCache = new ConcurrentDictionary<DevEnv, string>();
         public static string GetVisualStudioVCRootPath(this DevEnv visualVersion)
         {
-            string vsDir = visualVersion.GetVisualStudioDir();
-            switch (visualVersion)
+            string visualStudioVCRootPath = s_visualStudioVCRootPathCache.GetOrAdd(visualVersion, devEnv =>
             {
-                case DevEnv.vs2010:
-                case DevEnv.vs2012:
-                case DevEnv.vs2013:
-                case DevEnv.vs2015:
-                    return Path.Combine(vsDir, "VC");
+                string vsDir = visualVersion.GetVisualStudioDir();
+                switch (visualVersion)
+                {
+                    case DevEnv.vs2010:
+                    case DevEnv.vs2012:
+                    case DevEnv.vs2013:
+                    case DevEnv.vs2015:
+                        return Path.Combine(vsDir, "VC");
 
-                case DevEnv.vs2017:
-                    string compilerVersion = "14.10.25017"; // default fallback
-                    try
-                    {
-                        using (StreamReader file = new StreamReader(Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")))
-                            compilerVersion = file.ReadLine().Trim();
-                    }
-                    catch { }
+                    case DevEnv.vs2017:
+                        string compilerVersion = "14.10.25017"; // default fallback
+                        try
+                        {
+                            string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
+                            if (File.Exists(toolchainFile))
+                            {
+                                using (StreamReader file = new StreamReader(toolchainFile))
+                                    compilerVersion = file.ReadLine().Trim();
+                            }
+                        }
+                        catch { }
 
-                    return Path.Combine(vsDir, @"VC\Tools\MSVC", compilerVersion);
-            }
-            throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+                        return Path.Combine(vsDir, @"VC\Tools\MSVC", compilerVersion);
+                }
+                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+            });
+
+            return visualStudioVCRootPath;
         }
 
         public static string GetVisualStudioBinPath(this DevEnv visualVersion, Platform platform)

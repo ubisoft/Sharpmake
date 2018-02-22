@@ -97,14 +97,15 @@ namespace Sharpmake
                 public bool InactiveProject;
 
                 // resolved state, whether this project configuration is built in the solution
-                internal enum Build
+                public enum Build
                 {
                     Unknown,
                     No,
                     Yes,
                     YesThroughDependency
                 };
-                internal Build ToBuild = Build.Unknown;
+
+                public Build ToBuild { get; internal set; } = Build.Unknown;
             }
 
             //Holds the reference to the startup project. When the project will be resolved, 

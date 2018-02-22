@@ -60,6 +60,7 @@ tests = [
     Test("HelloWorld", "HelloWorld.sharpmake.cs"),
     Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
     Test("PackageReferences", "PackageReferences.sharpmake.cs"),
+    Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"),
     Test("SharpmakeGen", "SharpmakeGen.sharpmake.cs", "..")
 ]
 
@@ -120,4 +121,5 @@ def launch_tests():
     finally:
         os.chdir(entry_path)
 
-launch_tests()
+exit_code = launch_tests()
+sys.exit(exit_code)

@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
@@ -32,7 +33,12 @@ namespace Sharpmake
         #endregion
 
         #region Project.Configuration.IConfigurationTasks implementation
-        public void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+        public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+        {
+            DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+        }
+
+        public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
             DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
         }
@@ -55,6 +61,16 @@ namespace Sharpmake
                 default:
                     return outputType.ToString().ToLower();
             }
+        }
+
+        public virtual IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+        {
+            var dirs = new List<string>();
+            var dotnet = Util.IsDotNet(configuration) ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
+            string platformDirsStr = configuration.Target.GetFragment<DevEnv>().GetWindowsLibraryPath(configuration.Target.GetPlatform(), dotnet);
+            dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
+
+            return dirs;
         }
         #endregion
 

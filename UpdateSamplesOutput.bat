@@ -15,6 +15,8 @@ call :UpdateRef samples CSharpVsix        CSharpVsix.sharpmake.cs        referen
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences PackageReferences.sharpmake.cs reference PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples QTFileCustomBuild QTFileCustomBuild.sharpmake.cs reference QTFileCustomBuild
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 :: that one is special, the root is the current folder
 call :UpdateRef samples SharpmakeGen      SharpmakeGen.sharpmake.cs      reference %~dp0
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error

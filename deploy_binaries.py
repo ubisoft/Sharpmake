@@ -76,7 +76,7 @@ class BinarySite:
         self.path = os.path.join(root_dir, path)
 
     def copy_file(self, src):
-        if os.path.isfile(src):
+        if os.path.isfile(src) and os.path.normpath(os.path.dirname(src)) != os.path.normpath(target_dir):
             print("Copying {} to {}".format(os.path.join(root_dir, src), target_dir))
             shutil.copy2(src, target_dir)
 
@@ -108,7 +108,6 @@ copy_list = [
     BinarySite("Sharpmake", "Sharpmake"),
     BinarySite("Sharpmake.Application", "Sharpmake.Application"),
     BinarySite("Sharpmake.Generators", "Sharpmake.Generators"),
-    BinarySite("SimpleNuGet", "SimpleNuGet")
 ]
 
 # Add the platforms to the list of files to copy.

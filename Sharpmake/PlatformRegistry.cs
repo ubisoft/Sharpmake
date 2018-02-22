@@ -108,7 +108,7 @@ namespace Sharpmake
         /// <param name="extensionAssembly">The <see cref="Assembly"/> to scan.</param>
         /// <exception cref="ArgumentNullException"><paramref name="extensionAssembly"/> is `null`.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="extensionAssembly"/> was loaded in reflection-only.</exception>
-        /// <exception cref="NotSupportedException"><paramref name="extensionAssembly"/> is a dynamically </exception>
+        /// <exception cref="NotSupportedException"><paramref name="extensionAssembly"/> is a dynamically compiled assembly.</exception>
         public static void RegisterExtensionAssembly(Assembly extensionAssembly)
         {
             if (extensionAssembly == null)
@@ -116,10 +116,14 @@ namespace Sharpmake
             if (extensionAssembly.ReflectionOnly)
                 throw new InvalidOperationException("Cannot register extensions from an assembly that was loaded in reflection-only mode");
 
+            // Don't support loading dynamically compiled assemblies
+            if (extensionAssembly.IsDynamic)
+                return;
+
             // Don't support loading dynamically compiled assemblies because we need the location
             // to verify that we are not loading the same dll twice.
             if (extensionAssembly.Location == null)
-                throw new NotSupportedException("Dynamically compiled assemblies are not supported.");
+                throw new NotSupportedException("Assembly does not have any location : not supported.");
 
             // Has that assembly already been checked for platform stuff?
             if (_platformAssemblies.Any(assembly => assembly.Location == extensionAssembly.Location))

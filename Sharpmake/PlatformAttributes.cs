@@ -17,12 +17,6 @@ using System.Collections.Generic;
 namespace Sharpmake
 {
     /// <summary>
-    /// Marks a .NET assembly as a host of platform implementations for Sharpmake generators.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public class SharpmakeExtensionAttribute : Attribute { }
-
-    /// <summary>
     /// Marks a concrete class as an implementation of given interfaces for given platforms. This
     /// class must have a default constructor. Obviously, it also needs to actually implement the
     /// interface it pretends to!

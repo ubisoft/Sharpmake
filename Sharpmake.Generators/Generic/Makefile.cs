@@ -25,7 +25,7 @@ namespace Sharpmake.Generators.Generic
     /// <summary>
     ///
     /// </summary>
-    public partial class Makefile
+    public partial class Makefile : IProjectGenerator, ISolutionGenerator
     {
         private const string MakeExtension = ".make";
         private const string ObjectExtension = ".o";
@@ -115,7 +115,7 @@ namespace Sharpmake.Generators.Generic
                 fileGenerator.Write(Template.Solution.Header);
             }
 
-            fileGenerator.Write(Template.Solution.ProjectsVariableBegin);
+            fileGenerator.WriteVerbatim(Template.Solution.ProjectsVariableBegin);
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 using (fileGenerator.Declare("projectName", resolvedProject.ProjectName))
@@ -123,11 +123,11 @@ namespace Sharpmake.Generators.Generic
                     fileGenerator.Write(Template.Solution.ProjectsVariableElement);
                 }
             }
-            fileGenerator.Write(Template.Solution.ProjectsVariableEnd);
+            fileGenerator.WriteVerbatim(Template.Solution.ProjectsVariableEnd);
 
-            fileGenerator.Write(Template.Solution.PhonyTargets);
+            fileGenerator.WriteVerbatim(Template.Solution.PhonyTargets);
 
-            fileGenerator.Write(Template.Solution.AllRule);
+            fileGenerator.WriteVerbatim(Template.Solution.AllRule);
 
             // Projects rules
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
@@ -150,7 +150,7 @@ namespace Sharpmake.Generators.Generic
             }
 
             // Clean rule
-            fileGenerator.Write(Template.Solution.CleanRuleBegin);
+            fileGenerator.WriteVerbatim(Template.Solution.CleanRuleBegin);
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
@@ -160,10 +160,10 @@ namespace Sharpmake.Generators.Generic
                     fileGenerator.Write(Template.Solution.CleanRuleProject);
                 }
             }
-            fileGenerator.Write(Template.Solution.CleanRuleEnd);
+            fileGenerator.WriteVerbatim(Template.Solution.CleanRuleEnd);
 
             // Help rule
-            fileGenerator.Write(Template.Solution.HelpRuleBegin);
+            fileGenerator.WriteVerbatim(Template.Solution.HelpRuleBegin);
             foreach (Project.Configuration conf in solutionProjects.First().Configurations)
             {
                 // Optimizations enumeration rely on the fact that all projects share the same targets as the solution.
@@ -172,7 +172,7 @@ namespace Sharpmake.Generators.Generic
                     fileGenerator.Write(Template.Solution.HelpRuleConfiguration);
                 }
             }
-            fileGenerator.Write(Template.Solution.HelpRuleTargetsBegin);
+            fileGenerator.WriteVerbatim(Template.Solution.HelpRuleTargetsBegin);
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 using (fileGenerator.Declare("projectName", resolvedProject.ProjectName))
@@ -180,7 +180,7 @@ namespace Sharpmake.Generators.Generic
                     fileGenerator.Write(Template.Solution.HelpRuleTarget);
                 }
             }
-            fileGenerator.Write(Template.Solution.HelpRuleEnd);
+            fileGenerator.WriteVerbatim(Template.Solution.HelpRuleEnd);
 
             // Write the solution file
             updated = builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator.ToMemoryStream());

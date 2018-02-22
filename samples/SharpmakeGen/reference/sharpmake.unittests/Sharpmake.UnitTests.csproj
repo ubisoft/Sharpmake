@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -48,6 +50,7 @@
     <Compile Include="CSharpDependencyPropagationTest.cs" />
     <Compile Include="CommandLineTest.cs" />
     <Compile Include="DependencyPropagationTest.cs" />
+    <Compile Include="KitsRootPathsTests.cs" />
     <Compile Include="ResolverTest.cs" />
     <Compile Include="UtilTest.cs" />
   </ItemGroup>

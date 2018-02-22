@@ -24,6 +24,7 @@ namespace Sharpmake
     {
         [PlatformImplementation(Platform.win64,
             typeof(IPlatformDescriptor),
+            typeof(Project.Configuration.IConfigurationTasks),
             typeof(IFastBuildCompilerSettings),
             typeof(IWindowsFastBuildCompilerSettings),
             typeof(IPlatformBff),
@@ -53,14 +54,6 @@ namespace Sharpmake
                 string projectRootPath
             )
             {
-                var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
-                if (!fastBuildCompilerSettings.BinPath.ContainsKey(devEnv))
-                    fastBuildCompilerSettings.BinPath.Add(devEnv, devEnv.GetVisualStudioBinPath(Platform.win64));
-                if (!fastBuildCompilerSettings.LinkerPath.ContainsKey(devEnv))
-                    fastBuildCompilerSettings.LinkerPath.Add(devEnv, fastBuildCompilerSettings.BinPath[devEnv]);
-                if (!fastBuildCompilerSettings.ResCompiler.ContainsKey(devEnv))
-                    fastBuildCompilerSettings.ResCompiler.Add(devEnv, devEnv.GetWindowsResourceCompiler(Platform.win64));
-
                 CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, rootPath, devEnv, projectRootPath, false);
                 compilerSettings.PlatformFlags |= Platform.win64;
                 SetConfiguration(compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
@@ -194,10 +187,20 @@ namespace Sharpmake
                 if (!configurations.ContainsKey(configName))
                 {
                     var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
-                    string binPath = fastBuildCompilerSettings.BinPath[devEnv];
-                    string linkerPath = fastBuildCompilerSettings.LinkerPath[devEnv];
-                    string resCompiler = fastBuildCompilerSettings.ResCompiler[devEnv];
-                    configurations.Add(configName,
+                    string binPath;
+                    if (!fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out binPath))
+                        binPath = devEnv.GetVisualStudioBinPath(Platform.win64);
+
+                    string linkerPath;
+                    if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
+                        linkerPath = binPath;
+
+                    string resCompiler;
+                    if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
+                        resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
+
+                    configurations.Add(
+                        configName,
                         new CompilerSettings.Configuration(
                             Platform.win64,
                             binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath)),
@@ -208,7 +211,14 @@ namespace Sharpmake
                         )
                     );
 
-                    configurations.Add(".win64ConfigMasm", new CompilerSettings.Configuration(Platform.win64, compiler: @"$BinPath$\ml64.exe", usingOtherConfiguration: @".win64Config"));
+                    configurations.Add(
+                        ".win64ConfigMasm",
+                        new CompilerSettings.Configuration(
+                            Platform.win64,
+                            compiler: @"$BinPath$\ml64.exe",
+                            usingOtherConfiguration: @".win64Config"
+                        )
+                    );
                 }
             }
             #endregion

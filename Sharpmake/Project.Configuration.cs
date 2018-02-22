@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -97,8 +98,10 @@ namespace Sharpmake
         {
             public interface IConfigurationTasks
             {
-                void SetupLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
+                void SetupDynamicLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
+                void SetupStaticLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
                 string GetDefaultOutputExtension(OutputType outputType);
+                IEnumerable<string> GetPlatformLibraryPaths(Configuration configuration);
             }
 
             private static int s_count = 0;
@@ -109,7 +112,6 @@ namespace Sharpmake
             public Configuration()
             {
                 PrecompSourceExcludeExtension.Add(".asm");
-                ReferencesByNuGetPackage = new PackageReferences(this);
             }
 
             public static OutputType SimpleOutputType(OutputType type)
@@ -557,9 +559,6 @@ namespace Sharpmake
             public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
             public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
 
-            public abstract class BuildStepManagers
-            { }
-
             // container for executable 
             [Resolver.Resolvable]
             public class BuildStepExecutable : BuildStepBase
@@ -593,14 +592,20 @@ namespace Sharpmake
 
             public class FileCustomBuild
             {
+                public FileCustomBuild(string description = "Copy files...")
+                {
+                    Description = description;
+                }
+
+                public string Description;
                 public Strings CommandLines = new Strings();
-                public string Description = "";
                 public Strings Inputs = new Strings();
                 public Strings Outputs = new Strings();
                 public bool LinkObjects = false;
             }
 
             // container for copy
+            [Resolver.Resolvable]
             public class BuildStepCopy : BuildStepBase
             {
                 public BuildStepCopy(BuildStepCopy buildStepCopy)
@@ -637,11 +642,43 @@ namespace Sharpmake
                     string destinationRelativePath = Util.PathGetRelative(workingPath, resolver.Resolve(DestinationPath));
                     return string.Format("robocopy.exe /xo /ns /nc /np /njh /njs /ndl /nfl {0} {1} {2} >nul", sourceRelativePath, destinationRelativePath, CopyPattern);
                 }
+
+                internal override void Resolve(Resolver resolver)
+                {
+                    base.Resolve(resolver);
+
+                    // TODO: that test is very dodgy. Please remove this, and have the user set the property instead, or even create a new BuildStepCopyDir type
+                    var destinationIsFolder = !DestinationPath.Substring(DestinationPath.LastIndexOf(@"\", StringComparison.Ordinal)).Contains(".");
+                    bool isFolderCopy = destinationIsFolder || (Util.DirectoryExists(SourcePath) && Util.DirectoryExists(DestinationPath));
+                    if (isFolderCopy)
+                        IsFileCopy = false;
+                }
             }
 
-            public abstract class BuildStepBase
+            public abstract class BuildStepBase : IComparable
             {
                 public bool IsNameSpecific { get; set; }
+
+                public bool IsResolved { get; private set; } = false;
+
+                // Override this to control the order of BuildStep execution in Build Events
+                public virtual int CompareTo(object obj)
+                {
+                    if (obj == null)
+                        return 1;
+
+                    return 0;
+                }
+
+                internal virtual void Resolve(Resolver resolver)
+                {
+                    if (IsResolved)
+                        return;
+
+                    resolver.Resolve(this);
+
+                    IsResolved = true;
+                }
             }
 
 
@@ -692,7 +729,7 @@ namespace Sharpmake
             public UniqueList<BuildStepBase> EventCustomPostBuildExe = new UniqueList<BuildStepBase>();
             public Dictionary<string, BuildStepBase> EventPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public Dictionary<string, BuildStepBase> EventCustomPostBuildExecute = new Dictionary<string, BuildStepBase>();
-            public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>();
+            public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>(); // <path to file, destination folder>
             public BuildStepExecutable PostBuildStampExe = null;
 
             public List<string> CustomBuildStep = new List<string>();
@@ -702,6 +739,92 @@ namespace Sharpmake
             public string CustomBuildStepBeforeTargets = "";
             public string CustomBuildStepAfterTargets = "";
             public string CustomBuildStepTreatOutputAsContent = ""; // should be a bool
+
+            // This is all the data specific to a custom build step.
+            // The ones stored in the project configuration use absolute paths
+            // but we need relative paths when we're ready to export a specific
+            // project file.
+            public class CustomFileBuildStepData
+            {
+                // This lets us filter which type of project files should have
+                // this custom build step.   This is specifically used to deal with limitations of different build
+                // systems.   Visual studio only supports one build action per file, so if you need both compilation and
+                // some other build step such as QT or Documentation generation on the same file, you need to put the rule
+                // on a different input file that also depends on the real input file.   Fast build is key based instead of
+                // file based, so it can have two different operations on the same file.   If you need support for that,
+                // you can make two different custom build rules and have one specific to bff and the other excluding bff.
+                public enum ProjectFilter
+                {
+                    // Build step is used for both project file generation and fast build generation.
+                    AllProjects,
+                    ExcludeBFF,
+                    BFFOnly
+                };
+
+                // File custom builds are bound to a specific existing file.  They will run when the file is changed.
+                public string KeyInput = "";
+                // This is the executable that's going to be invoked as the custom build step.
+                public string Executable = "";
+                // These are the arguments to be passed to the executable.
+                // We support [input] and [output] tags in the executable arguments that will auto-resolve to the relative
+                // path to KeyInput and Output.
+                public string ExecutableArguments = "";
+                // This is what will appear in the project file under description, but it's also the key used
+                // for fast build, so it should be unique per build step if you want to use fast build.
+                public string Description = "";
+                // For fast build compatibility, we can only have one input and one output per custom command.
+                // This is what we tell the build system we're going to produce.
+                public string Output = "";
+                // This is not supported by BFF, but if excluded from BFF, additional files that will cause a re-run of this
+                // custom build step can be be specified here.
+                public Strings AdditionalInputs = new Strings();
+                // Filters if this step should run on 
+                public ProjectFilter Filter = ProjectFilter.AllProjects;
+
+            }
+
+            public class CustomFileBuildStep : CustomFileBuildStepData
+            {
+                // Initial resolve pass, in-place.
+                public virtual void Resolve(Resolver resolver)
+                {
+                    KeyInput = resolver.Resolve(KeyInput);
+                    Executable = resolver.Resolve(Executable);
+                    Description = resolver.Resolve(Description);
+                    Output = resolver.Resolve(Output);
+                    foreach(var input in AdditionalInputs.Values)
+                    {
+                        AdditionalInputs.UpdateValue(input, resolver.Resolve(input));
+                    }
+
+                    // We don't resolve arguments yet as we need the relative directly first.
+                }
+
+                // Pre-save make-relative pass, to set all fields relative to project path.
+                // This WILL get called multiple times, so it needs to write to different fields than
+                // the original input.
+                public virtual CustomFileBuildStepData MakePathRelative(Resolver resolver, Func<string, bool, string> MakeRelativeTool)
+                {
+                    var relativeData = new CustomFileBuildStepData();
+                    relativeData.KeyInput = MakeRelativeTool(KeyInput, true);
+                    relativeData.Executable = MakeRelativeTool(Executable, true);
+                    relativeData.Output = MakeRelativeTool(Output, true);
+                    using (resolver.NewScopedParameter("input", relativeData.KeyInput))
+                    using (resolver.NewScopedParameter("output", relativeData.Output))
+                    {
+                        relativeData.ExecutableArguments = resolver.Resolve(ExecutableArguments);
+                    }
+                    relativeData.Description = Description;
+                    foreach (var input in AdditionalInputs.Values)
+                    {
+                        relativeData.AdditionalInputs.Add(MakeRelativeTool(input, true));
+                    }
+                    relativeData.Filter = Filter;
+                    return relativeData;
+                }
+            };
+            // Specifies a list of custom builds steps that will be executed when this configuration is active.
+            public List<CustomFileBuildStep> CustomFileBuildSteps = new List<CustomFileBuildStep>();
 
             public string EventCustomBuildDescription = "";
             public Strings EventCustomBuild = new Strings();
@@ -748,7 +871,10 @@ namespace Sharpmake
 
             // FastBuild configuration
             public bool IsFastBuild = false;
+
+            [Obsolete("Sharpmake will determine the projects to build.")]
             public bool IsMainProject = false;
+
             public bool FastBuildBlobbed = true;
             [Obsolete("Use FastBuildDistribution instead.")]
             public bool FastBuildDisableDistribution = false;
@@ -775,16 +901,16 @@ namespace Sharpmake
             public IEnumerable<string> ResolvedTargetDependsFiles => _resolvedTargetDependsFiles;
 
             private UniqueList<BuildStepBase> _resolvedEventPreBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventPreBuildExe => _resolvedEventPreBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventPreBuildExe => _resolvedEventPreBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventPostBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventPostBuildExe => _resolvedEventPostBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventPostBuildExe => _resolvedEventPostBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventCustomPreBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventCustomPreBuildExe => _resolvedEventCustomPreBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventCustomPreBuildExe => _resolvedEventCustomPreBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventCustomPostBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventCustomPostBuildExe => _resolvedEventCustomPostBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventCustomPostBuildExe => _resolvedEventCustomPostBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedExecFiles = new UniqueList<BuildStepBase>();
             public IEnumerable<BuildStepBase> ResolvedExecFiles => _resolvedExecFiles;
@@ -859,8 +985,6 @@ namespace Sharpmake
                 resolver.SetParameter("conf", this);
                 resolver.SetParameter("target", Target);
                 resolver.Resolve(this);
-                resolver.RemoveParameter("conf");
-                resolver.RemoveParameter("target");
 
                 Util.ResolvePath(Project.SharpmakeCsPath, ref ProjectPath);
                 if (DebugBreaks.ShouldBreakOnProjectPath(DebugBreaks.Context.Resolving, Path.Combine(ProjectPath, ProjectFileName) + (Project is CSharpProject ? ".csproj" : ".vcxproj"), this))
@@ -920,10 +1044,45 @@ namespace Sharpmake
 
                 _resolvedTargetDependsFiles.AddRange(TargetDependsFiles);
                 _resolvedTargetCopyFiles.AddRange(TargetCopyFiles);
-                _resolvedEventPreBuildExe.AddRange(EventPreBuildExe);
-                _resolvedEventPostBuildExe.AddRange(EventPostBuildExe);
-                _resolvedEventCustomPreBuildExe.AddRange(EventCustomPreBuildExe);
-                _resolvedEventCustomPostBuildExe.AddRange(EventCustomPostBuildExe);
+
+                foreach (var tuple in new[] {
+                    Tuple.Create(EventPreBuildExe,        _resolvedEventPreBuildExe),
+                    Tuple.Create(EventPostBuildExe,       _resolvedEventPostBuildExe),
+                    Tuple.Create(EventCustomPreBuildExe,  _resolvedEventCustomPreBuildExe),
+                    Tuple.Create(EventCustomPostBuildExe, _resolvedEventCustomPostBuildExe),
+                })
+                {
+                    UniqueList<BuildStepBase> eventsToResolve = tuple.Item1;
+                    UniqueList<BuildStepBase> resolvedEvents = tuple.Item2;
+
+                    foreach (BuildStepBase eventToResolve in eventsToResolve)
+                        eventToResolve.Resolve(resolver);
+
+                    resolvedEvents.AddRange(eventsToResolve);
+                }
+
+                foreach (var customFileBuildStep in CustomFileBuildSteps)
+                {
+                    customFileBuildStep.Resolve(resolver);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.KeyInput);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Executable);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Output);
+                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.AdditionalInputs);
+                }
+
+                foreach (var eventDictionary in new[]{
+                    EventPreBuildExecute,
+                    EventCustomPrebuildExecute,
+                    EventPostBuildExecute,
+                    EventCustomPostBuildExecute
+                })
+                {
+                    foreach (KeyValuePair<string, BuildStepBase> eventPair in eventDictionary)
+                        eventPair.Value.Resolve(resolver);
+                }
+
+                if(PostBuildStampExe != null)
+                    PostBuildStampExe.Resolve(resolver);
 
                 string dependencyExtension = Util.GetProjectFileExtension(this);
                 ProjectFullFileNameWithExtension = ProjectFullFileName + dependencyExtension;
@@ -935,6 +1094,9 @@ namespace Sharpmake
                     PrecompHeader = Util.SimplifyPath(PrecompHeader);
                 if (PrecompSource != null)
                     PrecompSource = Util.SimplifyPath(PrecompSource);
+
+                resolver.RemoveParameter("conf");
+                resolver.RemoveParameter("target");
             }
 
             private void SetDependency(
@@ -1122,26 +1284,32 @@ namespace Sharpmake
                 return dependencyConf;
             }
 
-            private void GetRecursiveDependencies(HashSet<Configuration> resolved)
+            private void GetRecursiveDependencies(
+                HashSet<Configuration> resolved,
+                HashSet<Configuration> unresolved
+            )
             {
                 foreach (Configuration c in ResolvedDependencies)
                 {
-                    if(resolved.Contains(c))
+                    if (resolved.Contains(c))
                         continue;
 
-                    c.GetRecursiveDependencies(resolved);
+                    if (!unresolved.Add(c))
+                        throw new Error($"Cyclic dependency detected while following dependency chain of configuration: {this}");
+
+                    c.GetRecursiveDependencies(resolved, unresolved);
+
                     resolved.Add(c);
+                    unresolved.Remove(c);
                 }
             }
-
 
             internal List<Configuration> GetRecursiveDependencies()
             {
                 var result = new HashSet<Configuration>();
-                GetRecursiveDependencies(result);
+                GetRecursiveDependencies(result, new HashSet<Configuration>());
 
-                List<Configuration> dependencies = new List<Configuration>(result);
-                return dependencies;
+                return result.ToList();
             }
 
             public Strings ProjectReferencesByPath = new Strings();
@@ -1153,8 +1321,7 @@ namespace Sharpmake
             public Strings ForceUsingFiles = new Strings();
 
             // NuGet packages (only C# for now)
-            public PackageReferences ReferencesByNuGetPackage;
-            internal Strings NuGetPackageProjectReferencesByPath = new Strings();
+            public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
 
             public bool? ReferenceOutputAssembly = null;
 
@@ -1437,13 +1604,7 @@ namespace Sharpmake
                                 )
                                 {
                                     if (explicitDependenciesGlobal || !compile)
-                                    {
-                                        if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                                            DependenciesLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-
-                                        if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                                            DependenciesLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
-                                    }
+                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
                                 }
@@ -1463,7 +1624,7 @@ namespace Sharpmake
                                 if (dependency.ExportDllSymbols && (isImmediate || hasPublicPathToRoot || !goesThroughDLL))
                                 {
                                     if (explicitDependenciesGlobal || !compile)
-                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupLibraryPaths(this, dependencySetting, dependency);
+                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupDynamicLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
 

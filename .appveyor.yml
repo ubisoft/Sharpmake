@@ -1,0 +1,21 @@
+# Sharpmake AppVeyor CI configuration
+
+image: Visual Studio 2015
+
+platform:
+- Any CPU
+
+configuration:
+- Debug
+- Release
+
+before_build:
+- cmd: dotnet restore
+
+build:
+  project: Sharpmake.sln
+  verbosity: minimal
+
+after_test:
+- cmd: python regression_test.py
+

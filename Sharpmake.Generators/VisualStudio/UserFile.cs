@@ -46,13 +46,16 @@ namespace Sharpmake.Generators.VisualStudio
             bool needToWriteFile = false;
             bool overwriteFile = true;
 
-            fileGenerator.WriteLine(Template.UserFileHeader);
             foreach (Project.Configuration conf in configurations)
             {
                 bool overwriteFileConfig;
                 if (HasContentForConfiguration(conf, out overwriteFileConfig))
                 {
-                    needToWriteFile = true;
+                    if (!needToWriteFile)
+                    {
+                        fileGenerator.WriteLine(Template.UserFileHeader);
+                        needToWriteFile = true;
+                    }
                     overwriteFile &= overwriteFileConfig;
 
                     using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
@@ -65,10 +68,11 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
             }
-            fileGenerator.WriteLine(Template.UserFileFooter);
 
             if (needToWriteFile)
             {
+                fileGenerator.WriteLine(Template.UserFileFooter);
+
                 // remove all line that contain RemoveLineTag
                 fileGenerator.RemoveTaggedLines();
                 using (MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream())

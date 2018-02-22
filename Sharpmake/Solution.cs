@@ -13,7 +13,9 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Sharpmake
 {
@@ -37,6 +39,16 @@ namespace Sharpmake
         public string ClassName { get; private set; }                       // Solution Class Name, ex: "MySolution"
         public string SharpmakeCsFileName { get; private set; }             // File name of the c# project configuration, ex: "MyProject.cs"
         public string SharpmakeCsPath { get; private set; }                 // Path of the CsFileName, ex: "c:\dev\MyProject"
+
+        // FastBuild specific
+        public string FastBuildAllProjectName = "All";
+        public string FastBuildAllProjectFileSuffix = "_All"; // the fastbuild all project will be named after the solution, but the suffix can be custom. Warning: this cannot be empty!
+
+        public string FastBuildAllSolutionFolder = "FastBuild"; // set to null to add to the root
+        public string FastBuildMasterBffSolutionFolder = "FastBuild"; // Warning: this one cannot be null, VS doesn't accept floating files at the root of the solution!
+
+        // Experimental! Create solution dependencies from the FastBuild projects outputting Exe to the FastBuildAll project, to fix "F5" behavior in visual studio http://www.fastbuild.org/docs/functions/vssolution.html
+        public bool FastBuildAllSlnDependencyFromExe = false;
 
         private string _perforceRootPath = null;
         public string PerforceRootPath
@@ -136,14 +148,14 @@ namespace Sharpmake
                     ResolvedProject resolvedProject = result.Find(p => p.OriginalProjectFile == includedProjectInfo.Configuration.ProjectFullFileName);
                     if (resolvedProject == null)
                     {
-                        resolvedProject = new ResolvedProject();
-                        resolvedProject.Project = includedProjectInfo.Project;
-
-
-                        resolvedProject.TargetDefault = includedProjectInfo.Target;
-                        resolvedProject.OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName;
-                        resolvedProject.ProjectFile = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension);
-                        resolvedProject.ProjectName = includedProjectInfo.Configuration.ProjectName;
+                        resolvedProject = new ResolvedProject
+                        {
+                            Project             = includedProjectInfo.Project,
+                            TargetDefault       = includedProjectInfo.Target,
+                            OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName,
+                            ProjectFile         = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
+                            ProjectName         = includedProjectInfo.Configuration.ProjectName
+                        };
                         result.Add(resolvedProject);
                     }
 
@@ -199,6 +211,7 @@ namespace Sharpmake
             if (_dependenciesResolved)
                 return;
 
+            bool hasFastBuildProjectConf = false;
             foreach (Solution.Configuration solutionConfiguration in Configurations)
             {
                 // Build SolutionFilesMapping
@@ -228,6 +241,7 @@ namespace Sharpmake
 
                     configurationProject.Project = project;
                     configurationProject.Configuration = projectConfiguration;
+                    hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
 
                     bool build = !projectConfiguration.IsExcludedFromBuild && !configurationProject.InactiveProject;
                     if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
@@ -247,6 +261,7 @@ namespace Sharpmake
                             continue;
 
                         ITarget dependencyProjectTarget = dependencyConfiguration.Target;
+                        hasFastBuildProjectConf |= dependencyConfiguration.IsFastBuild;
 
                         Configuration.IncludedProjectInfo configurationProjectDependency = solutionConfiguration.GetProject(dependencyProjectType);
 
@@ -286,6 +301,10 @@ namespace Sharpmake
                     }
                 }
             }
+
+            if (hasFastBuildProjectConf)
+                    MakeFastBuildAllProjectIfNeeded(builder);
+
             _dependenciesResolved = true;
         }
 
@@ -339,6 +358,129 @@ namespace Sharpmake
             else
             {
                 throw new InternalError("Cannot locate cs source for type: {}", GetType().FullName);
+            }
+        }
+
+        private void MakeFastBuildAllProjectIfNeeded(Builder builder)
+        {
+            foreach (var solutionFile in SolutionFilesMapping)
+            {
+                var solutionConfigurations = solutionFile.Value;
+
+                bool generateFastBuildAll = false;
+                var projectsToBuildPerSolutionConfig = new List<Tuple<Solution.Configuration, List<Solution.Configuration.IncludedProjectInfo>>>();
+                foreach (var solutionConfiguration in solutionConfigurations)
+                {
+                    var configProjects = solutionConfiguration.IncludedProjectInfos;
+
+                    var fastBuildProjectConfsToBuild = configProjects.Where(
+                        configProject => (
+                            configProject.Configuration.IsFastBuild &&
+                            configProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes
+                        )
+                    ).ToList();
+
+                    if(fastBuildProjectConfsToBuild.Count == 0)
+                        continue;
+
+                    // if there's only one project to build, no need for the FastBuildAll
+                    generateFastBuildAll |= fastBuildProjectConfsToBuild.Count > 1;
+                    projectsToBuildPerSolutionConfig.Add(Tuple.Create(solutionConfiguration, fastBuildProjectConfsToBuild));
+                }
+
+                if (!generateFastBuildAll)
+                    continue;
+
+                builder.LogWriteLine("    extra FastBuildAll project added to solution " + Path.GetFileName(solutionFile.Key));
+
+                // Use the target type from the first solution configuration, as they all should have the same anyway
+                var firstSolutionConf = projectsToBuildPerSolutionConfig.First().Item1;
+
+                Project fastBuildAllProject = null;
+                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig)
+                {
+                    var solutionConf = projectsToBuildInSolutionConfig.Item1;
+                    var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
+
+                    var solutionTarget = solutionConf.Target;
+                    if (fastBuildAllProject == null)
+                    {
+                        var firstProject = projectConfigsToBuild.First();
+
+                        // Use the target type from the current solution configuration, as they all should have the same anyway
+                        fastBuildAllProject = new FastBuildAllProject(solutionConf.Target.GetType())
+                        {
+                            Name = FastBuildAllProjectName,
+                            RootPath = firstProject.Project.RootPath,
+                            SourceRootPath = firstProject.Project.RootPath,
+                            IsFileNameToLower = firstProject.Project.IsFileNameToLower
+                        };
+                    }
+                    else
+                    {
+                        // validate the asumption made above
+                        if (fastBuildAllProject.Targets.TargetType != firstSolutionConf.Target.GetType())
+                            throw new Error("Target type must match between all solution configurations");
+                    }
+
+                    fastBuildAllProject.AddTargets(solutionTarget);
+                }
+
+                fastBuildAllProject.Targets.BuildTargets();
+                fastBuildAllProject.InvokeConfiguration(builder.Context);
+
+                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig)
+                {
+                    var solutionConf = projectsToBuildInSolutionConfig.Item1;
+                    var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
+
+                    var solutionTarget = solutionConf.Target;
+                    var projectConf = fastBuildAllProject.GetConfiguration(solutionTarget);
+
+                    projectConf.IsFastBuild = true;
+
+                    // output the project in the same folder as the solution, and the same name
+                    projectConf.ProjectPath = solutionConf.SolutionPath;
+                    if (string.IsNullOrWhiteSpace(FastBuildAllProjectFileSuffix))
+                        throw new Error("FastBuildAllProjectFileSuffix cannot be left emtpy in solution " + solutionFile);
+                    projectConf.ProjectFileName = solutionFile.Key + FastBuildAllProjectFileSuffix;
+                    projectConf.SolutionFolder = FastBuildAllSolutionFolder;
+
+                    // the project doesn't output anything
+                    projectConf.Output = Project.Configuration.OutputType.None;
+
+                    // get some settings that are usually global from the first project
+                    // we could expose those, if we need to set them specifically for FastBuildAllProject
+                    var firstProject = projectConfigsToBuild.First();
+                    projectConf.FastBuildCustomArgs = firstProject.Configuration.FastBuildCustomArgs;
+                    projectConf.FastBuildCustomActionsBeforeBuildCommand = firstProject.Configuration.FastBuildCustomActionsBeforeBuildCommand;
+
+                    // add all the projects to build as private dependencies, and OnlyBuildOrder
+                    foreach (Configuration.IncludedProjectInfo projectConfigToBuild in projectConfigsToBuild)
+                    {
+                        // update the ToBuild, as now it is built through the "FastBuildAll" dependency
+                        projectConfigToBuild.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
+
+                        projectConf.AddPrivateDependency(projectConfigToBuild.Target, projectConfigToBuild.Project.GetType(), DependencySetting.OnlyBuildOrder);
+                    }
+
+                    // add the newly generated project to the solution config
+                    solutionConf.IncludedProjectInfos.Add(
+                        new Configuration.IncludedProjectInfo
+                        {
+                            Project = fastBuildAllProject,
+                            Configuration = projectConf,
+                            Target = solutionTarget,
+                            Type = fastBuildAllProject.GetType(),
+                            ToBuild = Configuration.IncludedProjectInfo.Build.Yes
+                        }
+                    );
+                }
+
+                fastBuildAllProject.Resolve(builder, false);
+                fastBuildAllProject.Link(builder);
+
+                builder.RegisterGeneratedProject(fastBuildAllProject);
             }
         }
 
