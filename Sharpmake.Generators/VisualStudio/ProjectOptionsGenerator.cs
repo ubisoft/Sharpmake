@@ -1796,7 +1796,7 @@ namespace Sharpmake.Generators.VisualStudio
         )
         {
             // convert all root paths to be relative to the project folder
-            var convertedPaths = new HashSet<string>();
+            var convertedPaths = new Strings();
             for (int i = 0; i < libraryFiles.Count; ++i)
             {
                 string libraryFile = libraryFiles[i];
@@ -1810,7 +1810,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             libraryFiles.Sort();
 
-            List<string> additionalDependencies = new List<string>(libraryFiles.Count);
+            var additionalDependencies = new Strings();
             foreach (string libraryFile in libraryFiles)
             {
                 // We've got two kinds of way of listing a library:
@@ -1842,7 +1842,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (resolvedAdditionalDependencies.Any())
                 {
-                    var finalDependencies = new List<string>();
+                    var finalDependencies = new Strings();
 
                     foreach (string additionalDependency in resolvedAdditionalDependencies)
                     {
