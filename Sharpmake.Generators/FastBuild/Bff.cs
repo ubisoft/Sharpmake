@@ -210,11 +210,11 @@ namespace Sharpmake.Generators.FastBuild
                     }
                     List<string> resourceFilesSections = new List<string>();
 
-                    var additionalDependencies = new List<string>();
+                    var additionalDependencies = new Strings();
                     {
                         string confCmdLineOptionsAddDeps = confCmdLineOptions["AdditionalDependencies"];
                         if (confCmdLineOptionsAddDeps != FileGeneratorUtilities.RemoveLineTag)
-                            additionalDependencies = confCmdLineOptionsAddDeps.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            additionalDependencies.Add(confCmdLineOptionsAddDeps.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
                     }
 
                     foreach (var tuple in confSubConfigs.Keys)
@@ -473,7 +473,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         // Remove from cmdLineOptions["AdditionalDependencies"] dependencies that are already listed in fastBuildProjectDependencyList
                         {
-                            var finalDependencies = new List<string>();
+                            var finalDependencies = new Strings();
                             foreach (var additionalDependency in additionalDependencies)
                             {
                                 // Properly compute dependency identifier
