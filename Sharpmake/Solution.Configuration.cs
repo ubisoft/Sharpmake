@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Sharpmake
@@ -73,6 +74,7 @@ namespace Sharpmake
                 AddProject(projectType, projectTarget, inactiveProject, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
             }
 
+            [DebuggerDisplay("{Project?.Name} {Configuration?.Name}")]
             public class IncludedProjectInfo
             {
                 // Type of the project, need this to resolve Project instance
