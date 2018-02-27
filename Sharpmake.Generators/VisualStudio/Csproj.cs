@@ -1043,10 +1043,10 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (project.ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
             {
-                var aspnetProject = project as AspNetProject;
+                var aspnetProject = project as IAspNetProject;
 
                 if (aspnetProject == null)
-                    throw new InvalidDataException("AspNet project was not correctly initialized. Use AspNetProject instead of CSharpProject");
+                    throw new InvalidDataException("AspNet project was not correctly initialized. Implement IAspNetProject interface");
 
                 Func<bool?, string> toEnableDisable = (value) => value.HasValue ? (value.Value ? "enabled" : "disabled") : RemoveLineTag;
 
@@ -1169,6 +1169,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             writer.Write(itemGroups.Resolve(resolver));
 
+            // TODO tjn move this outside ! we are generating .csproj, we shouldn't fill Import here
             var importProjects = project.ImportProjects;
             if (project.ProjectTypeGuids == CSharpProjectType.Vsix)
             {
@@ -1177,6 +1178,15 @@ namespace Sharpmake.Generators.VisualStudio
                 newImportProjects.AddRange(importProjects);
                 importProjects = newImportProjects;
                 importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets", Condition = @"'$(VSToolsPath)' != ''" });
+            }
+
+            if (project.ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
+            {
+                var newImportProjects = new UniqueList<ImportProject>();
+                newImportProjects.AddRange(importProjects);
+                importProjects = newImportProjects;
+                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", Condition = "'$(VSToolsPath)' != ''" });
+                importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition="false"});
             }
 
             Trace.Assert(importProjects.Count > 0);
@@ -1207,6 +1217,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             foreach (var element in project.CustomTargets)
             {
+                using (resolver.NewScopedParameter("project", project))
                 using (resolver.NewScopedParameter("targetElement", element))
                 {
                     Write(Template.TargetElement.CustomTarget, writer, resolver);
@@ -1215,7 +1226,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (project.ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
             {
-                var aspnetProject = project as AspNetProject;
+                var aspnetProject = project as IAspNetProject;
 
                 if (aspnetProject == null)
                     throw new InvalidDataException("AspNet project was not correctly initialized. Use AspNetProject instead of CSharpProject");
