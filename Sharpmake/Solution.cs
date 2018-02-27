@@ -239,12 +239,20 @@ namespace Sharpmake
                         );
                     }
 
-                    configurationProject.Project = project;
-                    configurationProject.Configuration = projectConfiguration;
+                    if(configurationProject.Project == null)
+                        configurationProject.Project = project;
+                    else if(configurationProject.Project != project)
+                        throw new Error("Tried to match more than one project to Project type.");
+
+                    if(configurationProject.Configuration == null)
+                        configurationProject.Configuration = projectConfiguration;
+                    else if(configurationProject.Configuration != projectConfiguration)
+                        throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
+
                     hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
 
                     bool build = !projectConfiguration.IsExcludedFromBuild && !configurationProject.InactiveProject;
-                    if (solutionConfiguration.IncludeOnlyFilterProject && (configurationProject.Project.SourceFilesFiltersCount == 0 || configurationProject.Project.SkipProjectWhenFiltersActive))
+                    if (build && solutionConfiguration.IncludeOnlyFilterProject && (configurationProject.Project.SourceFilesFiltersCount == 0 || configurationProject.Project.SkipProjectWhenFiltersActive))
                         build = false;
 
                     if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
@@ -258,7 +266,8 @@ namespace Sharpmake
                     var dependenciesConfiguration = configurationProject.Configuration.GetRecursiveDependencies();
                     foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
                     {
-                        Type dependencyProjectType = dependencyConfiguration.Project.GetType();
+                        Project dependencyProject = dependencyConfiguration.Project;
+                        Type dependencyProjectType = dependencyProject.GetType();
 
                         if (dependencyProjectType.IsDefined(typeof(Export), false))
                             continue;
@@ -268,14 +277,14 @@ namespace Sharpmake
 
                         Configuration.IncludedProjectInfo configurationProjectDependency = solutionConfiguration.GetProject(dependencyProjectType);
 
+                        // if that project was not explicitely added to the solution configuration, add it ourselves, as it is needed
                         if (configurationProjectDependency == null)
                         {
-                            var dependencyProject = builder.GetProject(dependencyProjectType);
                             configurationProjectDependency = new Configuration.IncludedProjectInfo
                             {
                                 Type = dependencyProjectType,
                                 Project = dependencyProject,
-                                Configuration = dependencyProject.GetConfiguration(dependencyProjectTarget),
+                                Configuration = dependencyConfiguration,
                                 Target = dependencyProjectTarget,
                                 InactiveProject = configurationProject.InactiveProject // inherit from the parent: no reason to mark dependencies for build if parent is inactive
                             };
@@ -291,6 +300,16 @@ namespace Sharpmake
                                                 solutionConfiguration.SolutionFileName,
                                                 solutionConfiguration.Target,
                                                 project.Name);
+
+                            if (configurationProjectDependency.Project == null)
+                                configurationProjectDependency.Project = dependencyProject;
+                            else if (configurationProjectDependency.Project != dependencyProject)
+                                throw new Error("Tried to match more than one project to Project type.");
+
+                            if (configurationProjectDependency.Configuration == null)
+                                configurationProjectDependency.Configuration = dependencyConfiguration;
+                            else if (configurationProjectDependency.Configuration != dependencyConfiguration)
+                                throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
                         }
 
                         bool depBuild = !dependencyConfiguration.IsExcludedFromBuild && !configurationProjectDependency.InactiveProject;
