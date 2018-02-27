@@ -283,6 +283,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public bool? SpecificVersion;
                 public string HintPath;
                 public bool? Private;
+                public bool? EmbedInteropTypes;
 
                 public string Resolve(Resolver resolver)
                 {
@@ -292,8 +293,9 @@ namespace Sharpmake.Generators.VisualStudio
                     using (resolver.NewScopedParameter("specificVersion", SpecificVersion))
                     using (resolver.NewScopedParameter("hintPath", HintPath))
                     using (resolver.NewScopedParameter("private", Private))
+                    using (resolver.NewScopedParameter("embedInteropTypes", EmbedInteropTypes))
                     {
-                        if (SpecificVersion == null && string.IsNullOrEmpty(HintPath) && Private == null)
+                        if (SpecificVersion == null && string.IsNullOrEmpty(HintPath) && Private == null && EmbedInteropTypes == null)
                             writer.Write(Template.ItemGroups.SimpleReference);
                         else
                         {
@@ -304,6 +306,8 @@ namespace Sharpmake.Generators.VisualStudio
                                 writer.Write(Template.ItemGroups.HintPath);
                             if (Private.HasValue)
                                 writer.Write(Template.ItemGroups.Private);
+                            if (EmbedInteropTypes.HasValue)
+                                writer.Write(Template.ItemGroups.EmbedInteropTypes);
 
                             writer.Write(Template.ItemGroups.ReferenceEnd);
                         }
@@ -1908,6 +1912,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             itemGroups.References.AddRange(referencesByPath);
 
+            var references = configurations.SelectMany(
+                conf => conf.DotNetReferences.Select(
+                    r => GetItemGroupsReference(r, project.DependenciesCopyLocal)));
+
+            itemGroups.References.AddRange(references);
+
             if (Util.DirectoryExists(Path.Combine(project.SourceRootPath, "Web References")))
                 itemGroups.WebReferences.Add(new ItemGroups.WebReference { Include = @"Web References\" });
 
@@ -1970,6 +1980,38 @@ namespace Sharpmake.Generators.VisualStudio
                 }
                 ));
             #endregion
+        }
+
+        private ItemGroups.Reference GetItemGroupsReference(DotNetReference reference, Project.DependenciesCopyLocalTypes projectDependenciesCopyLocal)
+        {
+            string hintPath = !string.IsNullOrEmpty(reference.HintPath)
+                ? Util.PathGetRelative(_projectPathCapitalized, reference.HintPath)
+                : null;
+
+            Project.DependenciesCopyLocalTypes typeToCheck = Project.DependenciesCopyLocalTypes.None;
+            switch (reference.Type)
+            {
+                case DotNetReference.ReferenceType.Project:
+                    typeToCheck = Project.DependenciesCopyLocalTypes.ProjectReferences; break;
+                case DotNetReference.ReferenceType.DotNet:
+                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetReferences; break;
+                case DotNetReference.ReferenceType.DotNetExtensions:
+                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetExtensions; break;
+                case DotNetReference.ReferenceType.External:
+                    typeToCheck = Project.DependenciesCopyLocalTypes.ExternalReferences; break;
+            }
+
+            bool? isPrivate = projectDependenciesCopyLocal.HasFlag(typeToCheck);
+
+            return new ItemGroups.Reference()
+            {
+                Include = reference.Include,
+                HintPath = hintPath,
+                LinkFolder = reference.LinkFolder,
+                Private = isPrivate,
+                SpecificVersion = reference.SpecificVersion,
+                EmbedInteropTypes = reference.EmbedInteropTypes,
+            };
         }
 
         private void GeneratePackageReferences(

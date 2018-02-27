@@ -421,6 +421,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string Private =
 @"      <Private>[private]</Private>
 ";
+                public static string EmbedInteropTypes =
+@"      <EmbedInteropTypes>[embedInteropTypes]</EmbedInteropTypes>
+";
                 public static string ReferenceOutputAssembly =
 @"      <ReferenceOutputAssembly>[ReferenceOutputAssembly]</ReferenceOutputAssembly>
 ";
