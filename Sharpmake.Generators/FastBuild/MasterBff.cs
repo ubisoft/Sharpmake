@@ -533,13 +533,13 @@ namespace Sharpmake.Generators.FastBuild
             string currentBffFullPath = Util.GetCapitalizedPath(conf.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
             foreach (Project.Configuration dependency in conf.ResolvedDependencies)
             {
+                if (dependency.Project.GetType().IsDefined(typeof(Export), false))
+                    continue;
+
                 if (!visitedConfigurations.Contains(dependency))
                     MergeBffIncludeTreeRecursive(dependency, ref bffIncludesDependencies, visitedConfigurations);
 
                 if (!dependency.IsFastBuild)
-                    continue;
-
-                if (dependency.Project.GetType().IsDefined(typeof(Export), false))
                     continue;
 
                 if (dependency.Project.SourceFilesFilters != null && (dependency.Project.SourceFilesFiltersCount == 0 || dependency.Project.SkipProjectWhenFiltersActive))
