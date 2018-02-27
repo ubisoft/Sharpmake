@@ -294,7 +294,7 @@ namespace Sharpmake
                         {
                             if (!configurationProjectDependency.Target.IsEqualTo(dependencyProjectTarget))
                                 throw new Error("In solution configuration (solution: {3}, config: {4}) the parent project {5} generates multiple dependency targets for the same child project {0}: {1} and {2}. Look for all AddPublicDependency() and AddPrivateDependency() calls for the child project and follow the dependency chain.",
-                                                configurationProjectDependency.Project.GetType().ToString(),
+                                                configurationProjectDependency.Project?.GetType().ToString(),
                                                 configurationProjectDependency.Target,
                                                 dependencyProjectTarget,
                                                 solutionConfiguration.SolutionFileName,
@@ -314,7 +314,7 @@ namespace Sharpmake
 
                         bool depBuild = !dependencyConfiguration.IsExcludedFromBuild && !configurationProjectDependency.InactiveProject;
 
-                        if (solutionConfiguration.IncludeOnlyFilterProject && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive))
+                        if (depBuild && solutionConfiguration.IncludeOnlyFilterProject && (dependencyProject.SourceFilesFiltersCount == 0 || dependencyProject.SkipProjectWhenFiltersActive))
                             depBuild = false;
 
                         if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
