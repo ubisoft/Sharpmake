@@ -16,6 +16,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Sharpmake
 {
@@ -94,7 +95,7 @@ namespace Sharpmake
         public Strings AdditionalSourceRootPaths = new Strings();  // More source directories to parse for files in addition to SourceRootPath
         public Strings SourceFiles = new Strings();                                     // Files in the project, may be full path of partial path from SourceRootPath
 
-        protected Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
+        protected internal Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
         public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm");         // File that match this regex compile
         public Strings SourceFilesCPPExtensions = new Strings(".cpp", ".cc");
 
@@ -1709,29 +1710,61 @@ namespace Sharpmake
         }
     }
 
-    public class AspNetProject : CSharpProject
+    public interface IAspNetProject
     {
-        public AspNetProject()
+        bool? MvcBuildViews { get; set; }
+        bool? UseIISExpress { get; set; }
+        int? IISExpressSSLPort { get; set; }
+        bool? IISExpressAnonymousAuthentication { get; set; }
+        bool? IISExpressWindowsAuthentication { get; set; }
+        bool? IISExpressUseClassicPipelineMode { get; set; }
+        bool? UseGlobalApplicationHostFile { get; set; }
+        bool? UseIIS { get; set; }
+        bool? AutoAssignPort { get; set; }
+        int? DevelopmentServerPort { get; set; }
+        string DevelopmentServerVPath { get; set; }
+        string IISUrl { get; set; }
+        bool? NTLMAuthentication { get; set; }
+        bool? UseCustomServer { get; set; }
+        bool? SaveServerSettingsInUserFile { get; set; }
+    }
+
+    public static class CSharpProjectExtensions
+    {
+        public static void InitAspNetProject(this CSharpProject aspNetProject)
         {
-            ProjectTypeGuids = CSharpProjectType.AspNetMvc5;
-            ResourceFilesExtensions.Add(".cshtml", ".js", ".pubxml");
-            SourceFilesExtensions.Add(".asax");
+            if (!(aspNetProject is IAspNetProject))
+                throw new Error($"project {aspNetProject.Name} does not implement IAspNetProject");
+
+            aspNetProject.ProjectTypeGuids = CSharpProjectType.AspNetMvc5;
+            aspNetProject.SourceFilesExtensions.Add(".asax");
+
+            string[] contentExtension = new[]
+            {
+                ".cshtml", ".js", ".map",
+                ".css", ".scss",
+                ".eot", ".svg", ".ttf", ".woff", ".woff2",
+                ".ico", ".png", ".jpg", ".gif", ".config"
+            };
+
+            aspNetProject.ContentExtension.Add(contentExtension);
+
+            aspNetProject.ResourceFilesExtensions.Remove(contentExtension);
+            aspNetProject.EmbeddedResourceExtensions.Remove(contentExtension);
+
+            aspNetProject.NoneExtensions.Add(".pubxml");
+
+            aspNetProject.CustomTargets.Add(new CSharpProject.CustomTargetElement()
+            {
+                Name = "MvcBuildViews",
+                TargetParameters = @"AfterTargets=""AfterBuild"" Condition=""'$(MvcBuildViews)' == 'true'""",
+                CustomTasks = @"<AspNetCompiler VirtualPath=""temp"" PhysicalPath=""$(WebProjectOutputDir)"" />"
+            });
+
+            aspNetProject.DependenciesCopyLocal = Project.DependenciesCopyLocalTypes.Default;
         }
 
-        public AspNetProject(Type targetType)
-            : base(targetType)
-        {
-            ProjectTypeGuids = CSharpProjectType.AspNetMvc5;
-            ResourceFilesExtensions.Add(".cshtml", ".js", ".pubxml");
-            SourceFilesExtensions.Add(".asax");
-        }
-
-        public void AddCommonWebExtensions()
-        {
-            ResourceFilesExtensions.Add(".css", ".map", ".eot", ".svg", ".ttf", ".woff", ".woff2", ".ico", ".png");
-        }
-
-        public void AddDefaultReferences(Configuration conf)
+        public static void AddAspNetReferences(CSharpProject.Configuration conf)
         {
             conf.ReferencesByName.Add("Microsoft.CSharp");
             conf.ReferencesByName.Add("System");
@@ -1755,6 +1788,28 @@ namespace Sharpmake
             conf.ReferencesByName.Add("System.Web.Services");
             conf.ReferencesByName.Add("System.Xml");
             conf.ReferencesByName.Add("System.Xml.Linq");
+        }
+    }
+
+    public class AspNetProject : CSharpProject, IAspNetProject
+    {
+        public AspNetProject()
+            : this(typeof(Target))
+        { }
+
+        public AspNetProject(Type targetType)
+            : base(targetType)
+        {
+            this.InitAspNetProject();
+        }
+
+        [Obsolete("Not needed anymore, InitAspNetProject() handle it")]
+        public void AddCommonWebExtensions()
+        {}
+
+        public void AddDefaultReferences(Configuration conf)
+        {
+            CSharpProjectExtensions.AddAspNetReferences(conf);
         }
 
         public bool? MvcBuildViews { get; set; }
@@ -1811,6 +1866,7 @@ namespace Sharpmake
             ".disco",
             ".manifest"
         );
+        public Strings ContentExtension = new Strings();
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
         public string ResourcesPath = null;
@@ -1950,14 +2006,18 @@ namespace Sharpmake
 
             var sourceFilesExcludeRegex = RegexCache.GetCachedRegexes(SourceFilesExcludeRegex);
             var sourceFiles = new Strings(GetDirectoryFiles(new DirectoryInfo(SourceRootPath)).Select(GetCapitalizedFile));
-            AddMatchExtensionFiles(sourceFiles, ref VsctCompileFiles, VsctExtension);
-            if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, VsctCompileFiles), VsctCompileFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                System.Diagnostics.Debugger.Break();
+
+            sourceFiles = FilterSourceFiles(sourceFiles);
 
             AddMatchExtensionFiles(sourceFiles, ref ResolvedNoneFullFileNames, NoneExtensions);
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, ResolvedNoneFullFileNames), ResolvedNoneFullFileNames, ref SourceFilesExclude, sourceFilesExcludeRegex))
                 System.Diagnostics.Debugger.Break();
-            if ((ResolvedResourcesFullFileNames.Count + ResolvedContentFullFileNames.Count + ResolvedNoneFullFileNames.Count + VsctCompileFiles.Count) == 0)
+            AddMatchExtensionFiles(sourceFiles, ref ResolvedContentFullFileNames, ContentExtension);
+            AddMatchExtensionFiles(sourceFiles, ref VsctCompileFiles, VsctExtension);
+            if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, VsctCompileFiles), VsctCompileFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
+                System.Diagnostics.Debugger.Break();
+
+            if ((ResolvedResourcesFullFileNames.Count + ResolvedContentFullFileNames.Count + ResolvedNoneFullFileNames.Count) == 0)
                 return;
 
             foreach (string excludeSourceFile in SourceFilesExclude)
@@ -1967,6 +2027,28 @@ namespace Sharpmake
                 ResolvedNoneFullFileNames.Remove(excludeSourceFile);
                 VsctCompileFiles.Remove(excludeSourceFile);
             }
+        }
+
+        private Strings FilterSourceFiles(Strings sourceFiles)
+        {
+            var sourceFilesExcludeRegex = RegexCache.GetCachedRegexes(SourceFilesExcludeRegex);
+            var filterSourceFiles = new Strings();
+            foreach (string sourceFile in sourceFiles)
+            {
+                bool exclude = false;
+                foreach (CachedRegex reg in sourceFilesExcludeRegex)
+                {
+                    if (reg.Match(sourceFile).Success)
+                    {
+                        exclude = true;
+                        break;
+                    }
+                }
+                if (!exclude)
+                    filterSourceFiles.Add(sourceFile);
+            }
+            sourceFiles = filterSourceFiles;
+            return sourceFiles;
         }
 
         protected override void ExcludeOutputFiles()
