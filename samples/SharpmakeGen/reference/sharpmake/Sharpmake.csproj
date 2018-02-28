@@ -72,6 +72,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FakeFileTree.cs" />
     <Compile Include="FastBuildSettings.cs" />
+    <Compile Include="FileSystemStringComparer.cs" />
     <Compile Include="GenerationOutput.cs" />
     <Compile Include="GeneratorManager.cs" />
     <Compile Include="GlobalSuppressions.cs" />
