@@ -130,18 +130,39 @@ namespace Sharpmake
 
         public void SetParameter(string name, object obj)
         {
-            if (IsCaseSensitive)
-                _parameters[name] = obj;
+            name = SetParameterImpl(name, obj, false);
+        }
+
+        private string SetParameterImpl(string name, object obj, bool scoped)
+        {
+            if (!IsCaseSensitive)
+                name = name.ToLowerInvariant();
+
+            RefCountedSymbol refCountedObject;
+            if (_parameters.TryGetValue(name, out refCountedObject))
+            {
+                if (scoped)
+                    refCountedObject.PushValue(obj);
+                else
+                    refCountedObject.Value = obj;
+            }
             else
-                _parameters[name.ToLower()] = obj;
+            {
+                _parameters.Add(name, new RefCountedSymbol(obj));
+            }
+
+            return name;
         }
 
         public void RemoveParameter(string name)
         {
-            if (IsCaseSensitive)
+            if (!IsCaseSensitive)
+                name = name.ToLowerInvariant();
+
+            RefCountedSymbol refCountedReference = _parameters[name];
+            refCountedReference.PopValue();
+            if (!refCountedReference.HasValue)
                 _parameters.Remove(name);
-            else
-                _parameters.Remove(name.ToLower());
         }
 
         public class ScopedParameter : IDisposable
@@ -152,7 +173,7 @@ namespace Sharpmake
             {
                 _resolver = resolver;
                 _name = name;
-                _resolver.SetParameter(_name, value);
+                _resolver.SetParameterImpl(_name, value, true);
             }
             public void Dispose()
             {
@@ -172,7 +193,7 @@ namespace Sharpmake
                 var names = new List<string>();
                 foreach(var assignment in assignments)
                 {
-                    _resolver.SetParameter(assignment.Identifier, assignment.Value);
+                    _resolver.SetParameterImpl(assignment.Identifier, assignment.Value, true);
                     names.Add(assignment.Identifier);
                 }
 
@@ -342,9 +363,43 @@ namespace Sharpmake
             Resolved
         };
 
+        private class RefCountedSymbol
+        {
+            private readonly Stack<object> _scopedReferences = new Stack<object>();
+
+            public object Value
+            {
+                get
+                {
+                    return _scopedReferences.Peek();
+                }
+                set
+                {
+                    _scopedReferences.Pop();
+                    _scopedReferences.Push(value);
+                }
+            }
+            public bool HasValue => _scopedReferences.Count > 0;
+
+            public RefCountedSymbol(object symbolValue)
+            {
+                _scopedReferences.Push(symbolValue);
+            }
+
+            public void PushValue(object value)
+            {
+                _scopedReferences.Push(value);
+            }
+
+            public void PopValue()
+            {
+                _scopedReferences.Pop();
+            }
+        }
+
         private Dictionary<string, ResolveStatus> _resolveStatusFields = new Dictionary<string, ResolveStatus>();
         private List<string> _resolvingObjectPath = new List<string>();
-        private Dictionary<string, object> _parameters = new Dictionary<string, object>();
+        private Dictionary<string, RefCountedSymbol> _parameters = new Dictionary<string, RefCountedSymbol>();
         private HashSet<object> _resolvedObject = new HashSet<object>();
 
         public char[] _pathEndCharacters = { ']' };
@@ -430,16 +485,17 @@ namespace Sharpmake
             }
 
             string parameterName = names[0];
-            object parameter = null;
             // get the paramters...
             if (!IsCaseSensitive)
-                parameterName = parameterName.ToLower();
-            if (!_parameters.TryGetValue(parameterName, out parameter))
+                parameterName = parameterName.ToLowerInvariant();
+            RefCountedSymbol refCountedReference;
+            if (!_parameters.TryGetValue(parameterName, out refCountedReference))
             {
                 if (throwIfNotFound)
                     throw new Exception("Cannot resolve parameter " + names[0]);
                 return null;
             }
+            object parameter = refCountedReference.Value;
 
             string name = "";
             for (int i = 1; i < names.Length && parameter != null; ++i)
