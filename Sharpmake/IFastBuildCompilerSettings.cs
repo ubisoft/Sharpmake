@@ -19,5 +19,7 @@ namespace Sharpmake
     {
         IDictionary<DevEnv, string> BinPath { get; set; }
         IDictionary<DevEnv, string> LinkerPath { get; set; }
+        IDictionary<DevEnv, string> LinkerExe { get; set; }
+        IDictionary<DevEnv, string> LibrarianExe { get; set; }
     }
 }
