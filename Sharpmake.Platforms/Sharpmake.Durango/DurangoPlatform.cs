@@ -55,6 +55,8 @@ namespace Sharpmake
             #region IPlatformFastBuildCompilerSettings implementation
             public IDictionary<DevEnv, string> BinPath { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
             #endregion
 
             #region IMicrosoftPlatformBff implementation
@@ -166,14 +168,22 @@ namespace Sharpmake
                     if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
                         linkerPath = binPath;
 
+                    string linkerExe;
+                    if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
+                        linkerExe = "link.exe";
+
+                    string librarianExe;
+                    if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
+                        librarianExe = "lib.exe";
+
                     configurations.Add(
                         configName,
                         new CompilerSettings.Configuration(
                             Platform.durango,
                             binPath: Sharpmake.Util.GetCapitalizedPath(Sharpmake.Util.PathGetAbsolute(projectRootPath, binPath)),
                             linkerPath: Sharpmake.Util.GetCapitalizedPath(Sharpmake.Util.PathGetAbsolute(projectRootPath, linkerPath)),
-                            librarian: @"$LinkerPath$\lib.exe",
-                            linker: @"$LinkerPath$\link.exe"
+                            librarian: Path.Combine(@"$LinkerPath$", librarianExe),
+                            linker: Path.Combine(@"$LinkerPath$", linkerExe)
                         )
                     );
 

@@ -200,6 +200,14 @@ namespace Sharpmake
                     if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
                         linkerPath = binPath;
 
+                    string linkerExe;
+                    if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
+                        linkerExe = "link.exe";
+
+                    string librarianExe;
+                    if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
+                        librarianExe = "lib.exe";
+
                     string resCompiler;
                     if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
                         resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
@@ -211,8 +219,8 @@ namespace Sharpmake
                             binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath)),
                             linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
                             resourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resCompiler)),
-                            librarian: @"$LinkerPath$\lib.exe",
-                            linker: @"$LinkerPath$\link.exe"
+                            librarian: Path.Combine(@"$LinkerPath$", librarianExe),
+                            linker: Path.Combine(@"$LinkerPath$", linkerExe)
                         )
                     );
 
