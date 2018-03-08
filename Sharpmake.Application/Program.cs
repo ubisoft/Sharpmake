@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Sharpmake.Generators;
 using Sharpmake.Generators.VisualStudio;
@@ -503,7 +504,7 @@ namespace Sharpmake.Application
             if (parameters.ProfileOutput)
                 builder.EventOutputProfile += LogWrite;
 
-            // generate debug solution
+            // Generate debug solution
             if (generateDebugSolution)
             {
                 DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments);
@@ -511,38 +512,34 @@ namespace Sharpmake.Application
                 return builder;
             }
 
-            switch (parameters.Input)
+            // Load user input (either files or pre-built assemblies)
+            try
             {
-                case Argument.InputType.File:
-                    {
-                        try
-                        {
-                            builder.LoadSharpmakeFiles(parameters.Sources);
-                        }
-                        catch (Exception)
-                        {
-                            builder.Dispose();
-                            throw;
-                        }
-                    }
-                    break;
-                case Argument.InputType.Assembly:
-                    {
-                        try
-                        {
-                            builder.LoadAssemblies(parameters.Assemblies);
-                        }
-                        catch (Exception)
-                        {
-                            builder.Dispose();
-                            throw;
-                        }
-                    }
-                    break;
-                default:
-                    builder.Dispose();
-                    throw new Error("sharpmake input missing, use /sources() or /assemblies()");
+                switch (parameters.Input)
+                {
+                    case Argument.InputType.File:
+                        builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadSharpmakeFiles(parameters.Sources));
+                        break;
+                    case Argument.InputType.Assembly:
+                        builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadAssemblies(parameters.Assemblies));
+                        break;
+                    default:
+                        throw new Error("Sharpmake input missing, use /sources() or /assemblies()");
+                }
             }
+            catch (Exception)
+            {
+                builder.Dispose();
+                throw;
+            }
+
+            if (builder.Arguments.TypesToGenerate.Count == 0)
+                throw new Error("Sharpmake has nothing to generate!" + Environment.NewLine
+                    + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
+            builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
+
+            // Call all configuration's methods and resolve project/solution member's values
+            builder.BuildProjectAndSolution();
 
             return builder;
         }
