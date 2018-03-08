@@ -16,7 +16,11 @@ using System;
 namespace Sharpmake
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public class Main : Attribute
+    public class EntryPoint : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    public class Main : EntryPoint
     { }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]

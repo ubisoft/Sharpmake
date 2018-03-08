@@ -114,7 +114,7 @@ namespace Sharpmake
         public bool BlobOnly = false;
         public bool Diagnostics = false;
         private ThreadPool _tasks;
-        private Assembly _projectAssembly;  // keep the instance of manually loaded assembly, it's may be need by other assembly on load ( command line )
+        private readonly List<Assembly> _builtAssemblies = new List<Assembly>(); // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private Dictionary<string, string> _referenceList; // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
 
         public BuildContext.BaseBuildContext Context { get; private set; }
@@ -148,6 +148,8 @@ namespace Sharpmake
             Instance = this;
             _builderExt = new BuilderExtension(this);
 
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+
             if (_multithreaded)
             {
                 _tasks = new ThreadPool();
@@ -175,48 +177,48 @@ namespace Sharpmake
             return _solutions.TryGetValue(type, out solution) ? solution : null;
         }
 
-        public void LoadAssemblies(params Assembly[] assemblies)
+        public void ExecuteEntryPointInAssemblies<TEntryPoint>(params Assembly[] assemblies)
+            where TEntryPoint : EntryPoint
         {
-            List<MethodInfo> mainMethods = new List<MethodInfo>();
+            MethodInfo entryPointMethodInfo = null;
 
             foreach (Assembly assembly in assemblies)
             {
                 foreach (Type type in assembly.GetTypes())
                 {
-                    MethodInfo mainMethodInfo = type.GetMethod("SharpmakeMain");
-                    if (mainMethodInfo != null && mainMethodInfo.IsDefined(typeof(Main), false))
+                    foreach (MethodInfo methodInfo in type.GetMethods())
                     {
-                        if (!mainMethodInfo.IsStatic)
-                            throw new Error("SharpmakeMain method should be static {0}", mainMethodInfo.ToString());
+                        if (!methodInfo.IsDefined(typeof(TEntryPoint), false))
+                            continue;
 
-                        if (mainMethodInfo.GetParameters().Length != 1 ||
-                            mainMethodInfo.GetParameters()[0].GetType() == typeof(Arguments))
-                            throw new Error("SharpmakeMain method should have one parameters of type Sharpmake.Builder: {0} in {1}", mainMethodInfo.ToString(), type.FullName);
+                        if (entryPointMethodInfo != null)
+                            throw new Error($"Multiple entry point found, only one entry point method with [{typeof(TEntryPoint).FullName}] is expected "
+                                            + $"({entryPointMethodInfo.DeclaringType?.FullName}.{entryPointMethodInfo.Name} vs. {type.FullName}.{methodInfo.Name})");
 
-                        mainMethods.Add(mainMethodInfo);
+                        if (!methodInfo.IsStatic)
+                            throw new Error($"Method {type.FullName}.{methodInfo} is defined as an entry point, but is not static");
+
+                        var parameters = methodInfo.GetParameters();
+                        if (parameters.Length != 1 || parameters[0].GetType() == typeof(Arguments))
+                            throw new Error($"Method {type.FullName}.{methodInfo} method must have one argument of type {typeof(Arguments).FullName}");
+
+                        entryPointMethodInfo = methodInfo;
                     }
                 }
             }
 
-            if (mainMethods.Count != 1)
-                throw new Error("sharpmake must contain one and only one static entry point method called Main(Sharpmake.Builder) with [Sharpmake.Main] attribute. Make sure it's public.");
+            if (entryPointMethodInfo == null)
+                return;
 
             try
             {
-                mainMethods[0].Invoke(null, new object[] { Arguments });
+                entryPointMethodInfo.Invoke(null, new object[] { Arguments });
             }
             catch (TargetInvocationException e)
             {
                 if (e.InnerException != null)
-                    throw (e.InnerException);
+                    throw e.InnerException;
             }
-
-            if (Arguments.TypesToGenerate.Count == 0)
-                throw new Error("sharpmake have nothing to generate! Make sure to add builder.Generate<[your_class]>(); in '{0}'.", mainMethods[0].ToString());
-
-            Context.ConfigureOrder = Arguments.ConfigureOrder;
-
-            BuildProjectAndSolution();
         }
 
         public void BuildProjectAndSolution()
@@ -305,7 +307,7 @@ namespace Sharpmake
             }
         }
 
-        public void LoadAssemblies(params string[] assembliesFiles)
+        public Assembly[] LoadAssemblies(params string[] assembliesFiles)
         {
             Strings assemblyFolders = new Strings();
             Strings references = new Strings();
@@ -347,33 +349,36 @@ namespace Sharpmake
                 }
             }
 
-            LoadAssemblies(assemblies);
+            return assemblies;
         }
+        
+        private readonly Lazy<Assembly> SharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
+        private readonly Lazy<Assembly> SharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
+        {
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
+            return Assembly.LoadFrom(generatorsAssembly);
+        });
 
-        // Expect a list of existing files with their full path
-        public void LoadSharpmakeFiles(params string[] sharpmakeFiles)
+        private Assembly BuildAndLoadAssembly(IList<string> sharpmakeFiles)
         {
             Assembler assembler = new Assembler();
 
             // Add sharpmake assembly
-            Assembly sharpmake = Assembly.GetAssembly(typeof(Builder));
-            assembler.Assemblies.Add(sharpmake);
+            assembler.Assemblies.Add(SharpmakeAssembly.Value);
 
-            // Add generators assembly to be able to reference them from .sharpmake files.
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
-            Assembly generators = Assembly.LoadFrom(generatorsAssembly);
-            assembler.Assemblies.Add(generators);
+            // Add generators assembly to be able to reference them from .sharpmake.cs files
+            assembler.Assemblies.Add(SharpmakeGeneratorAssembly.Value);
 
-            _projectAssembly = assembler.BuildAssembly(sharpmakeFiles);
+            Assembly newAssembly = assembler.BuildAssembly(sharpmakeFiles.ToArray());
 
-            if (_projectAssembly == null)
+            if (newAssembly == null)
                 throw new InternalError();
 
             // Keep track of assemblies explicitly referenced by compiled files
             _referenceList = assembler.References.Distinct().ToDictionary(fullpath => AssemblyName.GetAssemblyName(fullpath).FullName.ToString(), fullpath => fullpath);
 
-            // load platforms if they were passed as references
+            // Load platforms if they were passed as references
             using (var extensionLoader = new ExtensionLoader())
             {
                 foreach (var referencePath in assembler.References)
@@ -382,16 +387,22 @@ namespace Sharpmake
                 }
             }
 
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            _builtAssemblies.Add(newAssembly);
+            return newAssembly;
+        }
 
-            LoadAssemblies(_projectAssembly);
+        // Expect a list of existing files with their full path
+        public Assembly LoadSharpmakeFiles(params string[] sharpmakeFiles)
+        {
+            return BuildAndLoadAssembly(sharpmakeFiles);
         }
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            // Check if this is the built assembly version of .sharpmake files that is requested to be loaded
-            if (_projectAssembly != null && _projectAssembly.FullName == args.Name)
-                return _projectAssembly;
+            // Check if this is a built assembly of .sharpmake.cs files that is requested to be loaded
+            var builtAssembly = _builtAssemblies.FirstOrDefault(assembly => assembly.FullName == args.Name);
+            if (builtAssembly != null)
+                return builtAssembly;
 
             // Check if this is an assembly that if referenced by [module: Sharpmake.Reference("...")], is so, explicitly load it with its fullPath
             string explicitReferencesFullPath;
