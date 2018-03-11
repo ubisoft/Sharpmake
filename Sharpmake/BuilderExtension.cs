@@ -51,6 +51,9 @@ namespace Sharpmake
         /// <param name="extensionAssembly">The <see cref="Assembly"/> to scan.</param>
         private void RegisterExtensionAssembly(Assembly extensionAssembly)
         {
+            if (extensionAssembly.ReflectionOnly)
+                return;
+
             // Ignores if the assembly does not declare itself as a Sharpmake extension.
             if (extensionAssembly.GetCustomAttribute<SharpmakeExtensionAttribute>() != null)
             {
