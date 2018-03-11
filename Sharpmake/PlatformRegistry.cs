@@ -114,7 +114,7 @@ namespace Sharpmake
             if (extensionAssembly == null)
                 throw new ArgumentNullException(nameof(extensionAssembly));
             if (extensionAssembly.ReflectionOnly)
-                throw new InvalidOperationException("Cannot register extensions from an assembly that was loaded in reflection-only mode");
+                return;
 
             // Don't support loading dynamically compiled assemblies
             if (extensionAssembly.IsDynamic)
