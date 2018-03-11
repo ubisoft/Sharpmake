@@ -26,6 +26,7 @@ namespace Sharpmake
     <TargetPlatformIdentifier>[targetPlatformIdentifier]</TargetPlatformIdentifier>
     <TargetPlatformSdkPath>[targetPlatformSdkPath]</TargetPlatformSdkPath>
     <XdkEditionRootVS2015>[xdkEditionRootVS2015]</XdkEditionRootVS2015>
+    <XdkEditionRootVS2017>[xdkEditionRootVS2017]</XdkEditionRootVS2017>
     <GameOSFilePath>[gameOSFilePath]</GameOSFilePath>
     <SDKReferenceDirectoryRoot>[sdkReferenceDirectoryRoot]</SDKReferenceDirectoryRoot>
 ";

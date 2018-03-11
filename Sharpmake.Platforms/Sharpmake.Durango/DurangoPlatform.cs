@@ -385,6 +385,7 @@ namespace Sharpmake
                     string targetPlatformIdentifier = FileGeneratorUtilities.RemoveLineTag;
                     string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.durango);
                     string xdkEditionRootVS2015 = FileGeneratorUtilities.RemoveLineTag;
+                    string xdkEditionRootVS2017 = FileGeneratorUtilities.RemoveLineTag;
 
                     if (!Util.IsDurangoSideBySideXDK())
                     {
@@ -413,11 +414,23 @@ namespace Sharpmake
                     {
                         if (!string.IsNullOrEmpty(platformFolder))
                         {
-                            xdkEditionRootVS2015 = platformFolder;
-
                             using (generator.Declare("custompropertyname", "_PlatformFolder"))
                             using (generator.Declare("custompropertyvalue", platformFolder))
                                 generator.Write(Vcxproj.Template.Project.CustomProperty);
+                        }
+
+                        if (DevEnv.vs2015 >= context.DevelopmentEnvironmentsRange.MinDevEnv && DevEnv.vs2015 <= context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        {
+                            var vs2015PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango);
+                            if (!string.IsNullOrEmpty(vs2015PlatformFolder))
+                                xdkEditionRootVS2015 = vs2015PlatformFolder;
+                        }
+
+                        if (DevEnv.vs2017 >= context.DevelopmentEnvironmentsRange.MinDevEnv && DevEnv.vs2017 <= context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        {
+                            var vs2017PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2017, Platform.durango);
+                            if (!string.IsNullOrEmpty(vs2017PlatformFolder))
+                                xdkEditionRootVS2017 = vs2017PlatformFolder;
                         }
 
                         using (generator.Declare("durangoXdkInstallPath", GlobalSettings.DurangoXDK))
@@ -430,6 +443,7 @@ namespace Sharpmake
                         using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
                         using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
                         using (generator.Declare("xdkEditionRootVS2015", xdkEditionRootVS2015))
+                        using (generator.Declare("xdkEditionRootVS2017", xdkEditionRootVS2017))
                         {
                             generator.Write(_projectDescriptionPlatformSpecific);
                         }
