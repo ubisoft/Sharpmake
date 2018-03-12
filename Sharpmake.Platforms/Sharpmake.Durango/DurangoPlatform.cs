@@ -428,7 +428,7 @@ namespace Sharpmake
                         if (!string.IsNullOrEmpty(platformFolder))
                         {
                             using (generator.Declare("custompropertyname", "_PlatformFolder"))
-                            using (generator.Declare("custompropertyvalue", platformFolder))
+                            using (generator.Declare("custompropertyvalue", Sharpmake.Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
                                 generator.Write(Vcxproj.Template.Project.CustomProperty);
                         }
 
