@@ -115,7 +115,7 @@ namespace Sharpmake
         public bool Diagnostics = false;
         private ThreadPool _tasks;
         private readonly List<Assembly> _builtAssemblies = new List<Assembly>(); // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
-        private Dictionary<string, string> _referenceList; // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
+        private readonly Dictionary<string, string> _references = new Dictionary<string, string>(); // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
 
         public BuildContext.BaseBuildContext Context { get; private set; }
 
@@ -376,7 +376,16 @@ namespace Sharpmake
                 throw new InternalError();
 
             // Keep track of assemblies explicitly referenced by compiled files
-            _referenceList = assembler.References.Distinct().ToDictionary(fullpath => AssemblyName.GetAssemblyName(fullpath).FullName.ToString(), fullpath => fullpath);
+            foreach (var fullpath in assembler.References.Distinct())
+            {
+                var assemblyName = AssemblyName.GetAssemblyName(fullpath).FullName;
+                string assemblyPath;
+                if (_references.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase) )
+                {
+                    throw new Error($"Assembly {assemblyName} present in two different locations: {fullpath} and {assemblyPath}.");
+                }
+                _references[assemblyName] = fullpath;
+            }
 
             // Load platforms if they were passed as references
             using (var extensionLoader = new ExtensionLoader())
@@ -406,7 +415,7 @@ namespace Sharpmake
 
             // Check if this is an assembly that if referenced by [module: Sharpmake.Reference("...")], is so, explicitly load it with its fullPath
             string explicitReferencesFullPath;
-            if (_referenceList.TryGetValue(args.Name, out explicitReferencesFullPath))
+            if (_references.TryGetValue(args.Name, out explicitReferencesFullPath))
                 return Assembly.LoadFrom(explicitReferencesFullPath);
 
             return null;
