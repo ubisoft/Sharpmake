@@ -71,12 +71,26 @@ namespace Sharpmake
                     }
                     break;
                 case DevEnv.vs2015:
-                case DevEnv.vs2017:
                     {
-                        // Paths are the same regardless of what version of XDK you are using unlike VS2012
                         includePath.Add(@"{0}xdk\ucrt\inc;");
                         includePath.Add(@"{0}xdk\VS2015\vc\include;");
                         includePath.Add(@"{0}xdk\VS2015\vc\platform\amd64;");
+                    }
+                    break;
+                case DevEnv.vs2017:
+                    {
+                        includePath.Add(@"{0}xdk\ucrt\inc;");
+
+                        if (GlobalSettings.EnableLegacyXdkHeaders)
+                        {
+                            includePath.Add(@"{0}xdk\VS2015\vc\include;");
+                            includePath.Add(@"{0}xdk\VS2015\vc\platform\amd64;");
+                        }
+                        else
+                        {
+                            includePath.Add(@"{0}xdk\VS2017\vc\include;");
+                            includePath.Add(@"{0}xdk\VS2017\vc\platform\amd64;");
+                        }
                     }
                     break;
                 default:
@@ -106,9 +120,18 @@ namespace Sharpmake
                     }
                     break;
                 case DevEnv.vs2015:
-                case DevEnv.vs2017:
                     {
                         string trailingPath = @"xdk\VS2015\vc\platform\amd64";
+                        if (Durango.Util.IsDurangoSideBySideXDK())
+                            usingDirectories.Add(Path.Combine(durangoXDKPath, GlobalSettings.XdkEditionTarget, trailingPath));
+                        else
+                            usingDirectories.Add(Path.Combine(durangoXDKPath, trailingPath));
+                    }
+                    break;
+                case DevEnv.vs2017:
+                    {
+                        string trailingPath = (GlobalSettings.EnableLegacyXdkHeaders) ? @"xdk\VS2015\vc\platform\amd64" : @"xdk\VS2017\vc\platform\amd64";
+
                         if (Durango.Util.IsDurangoSideBySideXDK())
                             usingDirectories.Add(Path.Combine(durangoXDKPath, GlobalSettings.XdkEditionTarget, trailingPath));
                         else
@@ -158,9 +181,7 @@ namespace Sharpmake
                         }
                     }
                 case DevEnv.vs2015:
-                case DevEnv.vs2017:
                     {
-                        // Paths are the same regardless of what version of XDK you are using unlike VS2012
                         return string.Format(
                             string.Concat(
                                 @"{0}xdk\Lib\amd64;",
@@ -170,6 +191,33 @@ namespace Sharpmake
                             ),
                             durangoXDKPath
                         );
+                    }
+                case DevEnv.vs2017:
+                    {
+                        if (GlobalSettings.EnableLegacyXdkHeaders)
+                        {
+                            return string.Format(
+                                string.Concat(
+                                    @"{0}xdk\Lib\amd64;",
+                                    @"{0}xdk\ucrt\lib\amd64;",
+                                    @"{0}xdk\VS2015\vc\lib\amd64;",
+                                    @"{0}xdk\VS2015\vc\platform\amd64;"
+                                ),
+                                durangoXDKPath
+                            );
+                        }
+                        else
+                        {
+                            return string.Format(
+                                string.Concat(
+                                    @"{0}xdk\Lib\amd64;",
+                                    @"{0}xdk\ucrt\lib\amd64;",
+                                    @"{0}xdk\VS2017\vc\lib\amd64;",
+                                    @"{0}xdk\VS2017\vc\platform\amd64;"
+                                ),
+                                durangoXDKPath
+                            );
+                        }
                     }
                 default:
                     throw new NotImplementedException("No DurangoLibraryPath associated with " + visualVersion);

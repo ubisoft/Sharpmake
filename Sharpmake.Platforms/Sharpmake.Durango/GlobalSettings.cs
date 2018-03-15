@@ -115,6 +115,11 @@ namespace Sharpmake
                 }
             }
 
+            /// <summary>
+            /// EnableLegacyXdkHeaders to use VS2015 include and libraries on VS2017.
+            /// </summary>
+            public static bool EnableLegacyXdkHeaders = false;
+
             [Obsolete("Please use MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango) and MSBuildGlobalSettings.SetCppPlatformFolder(DevEnv.vs2015, Platform.durango, value) instead")]
             public static string XdkEditionRootVS2015
             {
