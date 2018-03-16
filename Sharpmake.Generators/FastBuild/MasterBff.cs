@@ -11,11 +11,11 @@ namespace Sharpmake.Generators.FastBuild
     public class MasterBff : ISolutionGenerator
     {
         private Builder _masterBffBuilder = null;
-        private static Strings s_masterBffFilenames = new Strings();
 
+        [Obsolete("This method is not supported anymore.")]
         public static bool IsMasterBffFilename(string filename)
         {
-            return s_masterBffFilenames.Contains(filename);
+            return false;
         }
 
         internal static string GetGlobalBffConfigFileName(string masterBffFileName)
@@ -272,7 +272,6 @@ namespace Sharpmake.Generators.FastBuild
             MemoryStream bffCleanMemoryStream = fileGenerator.ToMemoryStream();
 
             // Write master bff file
-            s_masterBffFilenames.Add(masterBffFileName);
             FileInfo bffFileInfo = new FileInfo(masterBffFullPath);
             updated = _masterBffBuilder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream);
 
