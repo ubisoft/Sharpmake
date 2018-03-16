@@ -150,6 +150,9 @@ namespace Sharpmake
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
+            if (Diagnostics)
+                EventPostGeneration += LogUnusedConfigs;
+
             if (_multithreaded)
             {
                 _tasks = new ThreadPool();
@@ -725,6 +728,36 @@ namespace Sharpmake
             internal void Generate(object parameter)
             {
                 _builder.Generate(_solution);
+            }
+        }
+
+        private void LogUnusedConfigs(List<Project> projects, List<Solution> solutions)
+        {
+            var usedConfigs = new List<Project.Configuration>();
+
+            foreach (Solution s in solutions)
+            {
+                foreach (var pair in s.SolutionFilesMapping)
+                {
+                    List<Solution.Configuration> configurations = pair.Value;
+                    foreach (var solutionConfig in configurations)
+                    {
+                        foreach (var includedProject in solutionConfig.IncludedProjectInfos)
+                            usedConfigs.Add(includedProject.Configuration);
+                    }
+                }
+            }
+
+            foreach (Project p in projects)
+            {
+                if (p.GetType().IsDefined(typeof(Export), false))
+                    continue;
+
+                foreach (var conf in p.Configurations)
+                {
+                    if (!usedConfigs.Contains(conf))
+                        LogWarningLine(conf.Project.SharpmakeCsFileName + ": Warning: Config not used during generation: " + conf);
+                }
             }
         }
 
