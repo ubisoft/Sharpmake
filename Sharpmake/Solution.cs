@@ -230,6 +230,7 @@ namespace Sharpmake
                 for (int i = 0; i < origCount; ++i)
                 {
                     Configuration.IncludedProjectInfo configurationProject = solutionConfiguration.IncludedProjectInfos[i];
+                    bool projectIsInactive = configurationProject.InactiveProject;
 
                     Project project = builder.GetProject(configurationProject.Type);
                     Project.Configuration projectConfiguration = project.GetConfiguration(configurationProject.Target);
@@ -289,9 +290,22 @@ namespace Sharpmake
                                 Project = dependencyProject,
                                 Configuration = dependencyConfiguration,
                                 Target = dependencyProjectTarget,
-                                InactiveProject = configurationProject.InactiveProject // inherit from the parent: no reason to mark dependencies for build if parent is inactive
+                                InactiveProject = projectIsInactive // inherit from the parent: no reason to mark dependencies for build if parent is inactive
                             };
                             solutionConfiguration.IncludedProjectInfos.Add(configurationProjectDependency);
+                        }
+                        else if (!projectIsInactive && configurationProjectDependency.InactiveProject)
+                        {
+                            // if the project we found in the solutionConfiguration is inactive, and the current is not, replace its settings
+                            configurationProjectDependency.Type = dependencyProjectType;
+                            configurationProjectDependency.Project = dependencyProject;
+                            configurationProjectDependency.Configuration = dependencyConfiguration;
+                            configurationProjectDependency.Target = dependencyProjectTarget;
+                            configurationProjectDependency.InactiveProject = false;
+                        }
+                        else if (projectIsInactive)
+                        {
+                            // if the current project is inactive, ignore
                         }
                         else
                         {
@@ -315,8 +329,7 @@ namespace Sharpmake
                                 throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
                         }
 
-                        bool depBuild = !dependencyConfiguration.IsExcludedFromBuild && !configurationProjectDependency.InactiveProject;
-
+                        bool depBuild = !projectIsInactive && !dependencyConfiguration.IsExcludedFromBuild && !configurationProjectDependency.InactiveProject;
                         if (depBuild && solutionConfiguration.IncludeOnlyFilterProject && (dependencyProject.SourceFilesFiltersCount == 0 || dependencyProject.SkipProjectWhenFiltersActive))
                             depBuild = false;
 
