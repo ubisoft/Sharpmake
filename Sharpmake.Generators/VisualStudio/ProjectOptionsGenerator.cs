@@ -1467,9 +1467,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["GenerateWindowsMetadata"] = "true";
                 string windowsMetadataFile = @"$(OutDir)\$(RootNamespace).winmd";
                 context.CommandLineOptions["GenerateWindowsMetadata"] = "/WINMD";
-
-                // TODO: fix this! the $ variables above will never be resolved by fastbuild
-                context.CommandLineOptions["WindowsMetadataFile"] = @"/WINMDFILE:""" + Bff.CurrentBffPathKeyCombine(windowsMetadataFile) + @"""";
+                context.CommandLineOptions["WindowsMetadataFile"] = @"/WINMDFILE:""" + windowsMetadataFile + @"""";
             }),
             Options.Option(Options.Vc.Linker.GenerateWindowsMetadata.Disable, () =>
             {
