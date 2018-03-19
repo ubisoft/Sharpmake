@@ -86,6 +86,7 @@ namespace Sharpmake
 
         #region Internal
 
+        [DebuggerDisplay("{ProjectName}")]
         public class ResolvedProject
         {
             // Associated project
@@ -350,7 +351,7 @@ namespace Sharpmake
             }
 
             if (hasFastBuildProjectConf)
-                    MakeFastBuildAllProjectIfNeeded(builder);
+                MakeFastBuildAllProjectIfNeeded(builder);
 
             _dependenciesResolved = true;
         }
