@@ -22,6 +22,7 @@ namespace Sharpmake
     public partial class Solution
     {
         [Resolver.Resolvable]
+        [DebuggerDisplay("{SolutionFileName}:{Name}:{PlatformName}")]
         public class Configuration : Sharpmake.Configuration
         {
             /// <summary>
@@ -123,7 +124,7 @@ namespace Sharpmake
                 AddProject(projectType, projectTarget, inactiveProject, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
             }
 
-            [DebuggerDisplay("{Project?.Name} {Configuration?.Name}")]
+            [DebuggerDisplay("{Project == null ? Type.Name : Project.Name} {Configuration == null ? Target.Name : Configuration.Name}")]
             public class IncludedProjectInfo
             {
                 // Type of the project, need this to resolve Project instance
