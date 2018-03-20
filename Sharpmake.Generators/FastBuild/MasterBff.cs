@@ -56,14 +56,13 @@ namespace Sharpmake.Generators.FastBuild
             string masterBffFileResult = GenerateMasterBffFile(solution, solutionConfigurations, masterBffPath, masterBffFileName, out updated);
             if (updated)
             {
-                Project.FastBuildGeneratedFileCount++;
-                Project.FastBuildMasterGeneratedFiles.Add(masterBffFileName);
+                Project.AddFastbuildMasterGeneratedFile(masterBffFileName);
                 generatedFiles.Add(masterBffFileResult);
             }
             else
             {
                 skipFiles.Add(masterBffFileResult);
-                Project.FastBuildUpToDateFileCount++;
+                Project.IncrementFastBuildUpToDateFileCount();
             }
 
             _masterBffBuilder = null;
@@ -348,12 +347,11 @@ namespace Sharpmake.Generators.FastBuild
             FileInfo bffFileInfo = new FileInfo(masterBffGlobalConfigFile);
             if (_masterBffBuilder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream))
             {
-                Project.FastBuildGeneratedFileCount++;
-                Project.FastBuildMasterGeneratedFiles.Add(masterBffGlobalConfigFile);
+                Project.AddFastbuildMasterGeneratedFile(masterBffGlobalConfigFile);
             }
             else
             {
-                Project.FastBuildUpToDateFileCount++;
+                Project.IncrementFastBuildUpToDateFileCount();
             }
         }
 

@@ -1102,12 +1102,12 @@ namespace Sharpmake.Generators.FastBuild
 
             if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffCleanMemoryStream))
             {
-                Project.FastBuildGeneratedFileCount++;
+                Project.IncrementFastBuildGeneratedFileCount();
                 generatedFiles.Add(bffFileInfo.FullName);
             }
             else
             {
-                Project.FastBuildUpToDateFileCount++;
+                Project.IncrementFastBuildUpToDateFileCount();
                 skipFiles.Add(bffFileInfo.FullName);
             }
         }
