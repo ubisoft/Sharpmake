@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Sharpmake
 {
@@ -250,11 +251,32 @@ namespace Sharpmake
 
         public static bool BlobPragmaMessageEnabled { get; set; } = true;
 
-        public static int FastBuildGeneratedFileCount { get; set; }
+        private static int s_FastBuildGeneratedFileCount = 0;
+        public static int FastBuildGeneratedFileCount { get { return s_FastBuildGeneratedFileCount; } }
 
-        public static int FastBuildUpToDateFileCount { get; set; }
+        public static void IncrementFastBuildGeneratedFileCount()
+        {
+            Interlocked.Increment(ref s_FastBuildGeneratedFileCount);
+        }
 
-        public static List<string> FastBuildMasterGeneratedFiles { get; set; } = new List<string>();
+        private static int s_FastBuildUpToDateFileCount = 0;
+        public static int FastBuildUpToDateFileCount { get { return s_FastBuildUpToDateFileCount; } }
+
+        public static void IncrementFastBuildUpToDateFileCount()
+        {
+            Interlocked.Increment(ref s_FastBuildUpToDateFileCount);
+        }
+
+        public static List<string> FastBuildMasterGeneratedFiles { get; } = new List<string>();
+
+        public static void AddFastbuildMasterGeneratedFile(string file)
+        {
+            lock (FastBuildMasterGeneratedFiles)
+            {
+                FastBuildMasterGeneratedFiles.Add(file);
+                IncrementFastBuildGeneratedFileCount();
+            }
+        }
 
         private bool _deployProject = false;
         public bool DeployProject
