@@ -95,8 +95,8 @@ namespace Sharpmake.Generators.Generic
             out bool updated)
         {
             FileInfo solutionFileInfo = new FileInfo(Util.GetCapitalizedPath(solutionPath + Path.DirectorySeparatorChar + solutionFile + MakeExtension));
-
-            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(configurations);
+            bool projectsWereFiltered = false;
+            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(configurations, out projectsWereFiltered);
             solutionProjects.Sort((a, b) => string.Compare(a.ProjectName, b.ProjectName)); // Ensure all projects are always in the same order to avoid random shuffles
 
             if (solutionProjects.Count == 0)

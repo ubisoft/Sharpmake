@@ -1069,7 +1069,8 @@ namespace Sharpmake
         {
             try
             {
-                File.Delete(filename);
+                if (File.Exists(filename))
+                    File.Delete(filename);
                 return true;
             }
             catch (Exception)

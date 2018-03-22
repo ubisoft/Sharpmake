@@ -54,15 +54,18 @@ namespace Sharpmake.Generators.FastBuild
 
             bool updated;
             string masterBffFileResult = GenerateMasterBffFile(solution, solutionConfigurations, masterBffPath, masterBffFileName, out updated);
-            if (updated)
+            if (masterBffFileResult != null)
             {
-                Project.AddFastbuildMasterGeneratedFile(masterBffFileName);
-                generatedFiles.Add(masterBffFileResult);
-            }
-            else
-            {
-                skipFiles.Add(masterBffFileResult);
-                Project.IncrementFastBuildUpToDateFileCount();
+                if (updated)
+                {
+                    Project.AddFastbuildMasterGeneratedFile(masterBffFileName);
+                    generatedFiles.Add(masterBffFileResult);
+                }
+                else
+                {
+                    skipFiles.Add(masterBffFileResult);
+                    Project.IncrementFastBuildUpToDateFileCount();
+                }
             }
 
             _masterBffBuilder = null;
@@ -82,8 +85,16 @@ namespace Sharpmake.Generators.FastBuild
             // Global configuration file is in the same directory as the master bff but filename suffix added to its filename.
             string globalConfigFullPath = GetGlobalBffConfigFileName(masterBffFullPath);
             string globalConfigFileName = Path.GetFileName(globalConfigFullPath);
-
-            var solutionProjects = solution.GetResolvedProjects(solutionConfigurations);
+            bool projectsWereFiltered;
+            var solutionProjects = solution.GetResolvedProjects(solutionConfigurations, out projectsWereFiltered);
+            if (solutionProjects.Count == 0 && projectsWereFiltered)
+            {
+                // We are running in filter mode for submit assistant and all projects were filtered out. 
+                // We need to skip generation and delete any existing master bff file.
+                Util.TryDeleteFile(masterBffFullPath);
+                updated = false;
+                return null;
+            }
 
             // Start writing Bff
             var fileGenerator = new FileGenerator();

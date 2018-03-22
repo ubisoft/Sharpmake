@@ -624,7 +624,8 @@ namespace Sharpmake.Generators.VisualStudio
 
         private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, List<Solution.Configuration> solutionConfigurations)
         {
-            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(solutionConfigurations);
+            bool projectsWereFiltered;
+            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(solutionConfigurations, out projectsWereFiltered);
 
             // Ensure all projects are always in the same order to avoid random shuffles
             solutionProjects.Sort((a, b) =>
