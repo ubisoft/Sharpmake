@@ -139,6 +139,8 @@ namespace Sharpmake
             projectsWereFiltered = false;
             List<ResolvedProject> result = new List<ResolvedProject>();
 
+            Dictionary<Project.Configuration, ResolvedProject> configurationsToProjects = new Dictionary<Project.Configuration, ResolvedProject>();
+
             foreach (Configuration solutionConfiguration in solutionConfigurations)
             {
                 foreach (Configuration.IncludedProjectInfo includedProjectInfo in solutionConfiguration.IncludedProjectInfos)
@@ -154,42 +156,41 @@ namespace Sharpmake
                     {
                         resolvedProject = new ResolvedProject
                         {
-                            Project             = includedProjectInfo.Project,
-                            TargetDefault       = includedProjectInfo.Target,
+                            Project = includedProjectInfo.Project,
+                            TargetDefault = includedProjectInfo.Target,
                             OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName,
-                            ProjectFile         = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
-                            ProjectName         = includedProjectInfo.Configuration.ProjectName
+                            ProjectFile = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
+                            ProjectName = includedProjectInfo.Configuration.ProjectName
                         };
                         result.Add(resolvedProject);
                     }
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
+
+                    if(!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
+                        configurationsToProjects[includedProjectInfo.Configuration] = resolvedProject;
                 }
             }
 
 
             foreach (ResolvedProject resolvedProject in result)
             {
-                // Folder must all be the same for all config, else will be emptied.
-                foreach (Project.Configuration projectConfiguration in resolvedProject.Configurations)
-                {
-                    if (resolvedProject.SolutionFolder == null)
-                        resolvedProject.SolutionFolder = projectConfiguration.SolutionFolder;
-                    else if (resolvedProject.SolutionFolder != projectConfiguration.SolutionFolder)
-                        resolvedProject.SolutionFolder = "";
-                }
-
                 foreach (Project.Configuration resolvedProjectConf in resolvedProject.Configurations)
                 {
+                    // Folder must all be the same for all config, else will be emptied.
+                    if (resolvedProject.SolutionFolder == null)
+                        resolvedProject.SolutionFolder = resolvedProjectConf.SolutionFolder;
+                    else if (resolvedProject.SolutionFolder != resolvedProjectConf.SolutionFolder)
+                        resolvedProject.SolutionFolder = "";
+
                     foreach (Project.Configuration dependencyConfiguration in resolvedProjectConf.ResolvedDependencies)
                     {
-                        foreach (ResolvedProject resolvedProjectToAdd in result)
+                        if (configurationsToProjects.ContainsKey(dependencyConfiguration))
                         {
-                            if (resolvedProjectToAdd.Configurations.Contains(dependencyConfiguration))
-                            {
-                                if (!resolvedProject.Dependencies.Contains(resolvedProjectToAdd))
-                                    resolvedProject.Dependencies.Add(resolvedProjectToAdd);
-                            }
+                            var resolvedProjectToAdd = configurationsToProjects[dependencyConfiguration];
+
+                            if (!resolvedProject.Dependencies.Contains(resolvedProjectToAdd))
+                                resolvedProject.Dependencies.Add(resolvedProjectToAdd);
                         }
                     }
                 }
