@@ -51,7 +51,8 @@ namespace Sharpmake.Generators.Apple
             string solutionFileContentsPath = solutionFolder + Path.DirectorySeparatorChar + SolutionContentsFileName;
             FileInfo solutionFileContentsInfo = new FileInfo(solutionFileContentsPath);
 
-            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(configurations);
+            bool projectsWereFiltered;
+            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(configurations, out projectsWereFiltered);
             solutionProjects.Sort((a, b) => string.Compare(a.ProjectName, b.ProjectName)); // Ensure all projects are always in the same order to avoid random shuffles
 
             // Move the first executable project on top.

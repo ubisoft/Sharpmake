@@ -131,11 +131,11 @@ namespace Sharpmake
             return solution;
         }
 
-        public List<ResolvedProject> GetResolvedProjects(List<Configuration> solutionConfigurations)
+        public List<ResolvedProject> GetResolvedProjects(List<Configuration> solutionConfigurations, out bool projectsWereFiltered)
         {
             if (!_dependenciesResolved)
                 throw new InternalError("Solution not resolved: {0}", GetType().FullName);
-
+            projectsWereFiltered = false;
             List<ResolvedProject> result = new List<ResolvedProject>();
 
             foreach (Configuration solutionConfiguration in solutionConfigurations)
@@ -143,7 +143,10 @@ namespace Sharpmake
                 foreach (Configuration.IncludedProjectInfo includedProjectInfo in solutionConfiguration.IncludedProjectInfos)
                 {
                     if (solutionConfiguration.IncludeOnlyFilterProject && !(includedProjectInfo.Project is FastBuildAllProject) && (includedProjectInfo.Project.SourceFilesFiltersCount == 0 || includedProjectInfo.Project.SkipProjectWhenFiltersActive))
+                    {
+                        projectsWereFiltered = true;
                         continue;
+                    }
 
                     ResolvedProject resolvedProject = result.Find(p => p.OriginalProjectFile == includedProjectInfo.Configuration.ProjectFullFileName);
                     if (resolvedProject == null)
