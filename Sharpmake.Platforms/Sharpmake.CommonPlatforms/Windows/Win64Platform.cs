@@ -166,7 +166,7 @@ namespace Sharpmake
 
                                 try
                                 {
-                                    foreach (string p in Directory.EnumerateFiles(systemDllPath, "api-ms-win-*.dll"))
+                                    foreach (string p in Util.DirectoryGetFiles(systemDllPath, "api-ms-win-*.dll"))
                                         extraFiles.Add(p);
                                 }
                                 catch { }
