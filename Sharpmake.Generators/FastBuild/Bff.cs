@@ -135,7 +135,7 @@ namespace Sharpmake.Generators.FastBuild
             string projectName = firstConf.ProjectName;
             string projectPath = new FileInfo(projectFile).Directory.FullName;
             var context = new BffGenerationContext(builder, project, projectPath);
-            string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName);
+            string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
             string fastBuildClrSupport = Util.IsDotNet(firstConf) ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
             var confSourceFiles = GetGeneratedFiles(context, configurations, out filesInNonDefaultSection);
