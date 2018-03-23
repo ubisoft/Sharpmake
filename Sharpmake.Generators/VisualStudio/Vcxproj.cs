@@ -1058,12 +1058,6 @@ namespace Sharpmake.Generators.VisualStudio
                 NatvisFiles.Add(natvisFile);
             }
 
-            foreach (string file in context.Project.PRIFiles)
-            {
-                ProjectFile priFile = new ProjectFile(context, file);
-                PRIFiles.Add(priFile);
-            }
-
             foreach (string file in projectFiles)
             {
                 ProjectFile projectFile = new ProjectFile(context, file);
@@ -1223,11 +1217,12 @@ namespace Sharpmake.Generators.VisualStudio
             if (context.Project.PRIFiles.Count > 0)
             {
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                foreach (string file in context.Project.PRIFiles)
+                foreach (string file in context.Project.PRIFiles.SortedValues)
                 {
-                    ProjectFile projectFile = new ProjectFile(context, file);
-                    writtenPRIFiles.Add(projectFile.FileNameProjectRelative);
-                    using (fileGenerator.Declare("file", projectFile))
+                    ProjectFile priFile = new ProjectFile(context, file);
+                    PRIFiles.Add(priFile);
+                    writtenPRIFiles.Add(priFile.FileNameProjectRelative);
+                    using (fileGenerator.Declare("file", priFile))
                         fileGenerator.Write(Template.Project.ProjectFilesPRIResources);
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
