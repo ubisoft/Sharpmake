@@ -20,8 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sharpmake.UnitTests")]
-
 namespace Sharpmake
 {
     public class Arguments

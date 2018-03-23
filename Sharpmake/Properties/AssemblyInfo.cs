@@ -52,3 +52,4 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Sharpmake.Application")]
 [assembly: InternalsVisibleTo("Sharpmake.Generators")]
+[assembly: InternalsVisibleTo("Sharpmake.UnitTests")]
