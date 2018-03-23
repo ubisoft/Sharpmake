@@ -203,7 +203,7 @@ ex: /remaproot(""C:\p4ws\projectRoot\"")")]
 
             [CommandLine.Option("fakesourcedirfile", @"path to a file containing the list of files in the source tree
 This list will be used instead of the real source path
-ex: /fakesourcedirfile( ""files.txt"", ")]
+ex: /fakesourcedirfile( ""files.txt"" ")]
             public void CommandLineFakeSourceDirFile(string fakeSourceDirFile)
             {
                 string fakeSourceDirFileFullPath = Path.GetFullPath(fakeSourceDirFile);
@@ -286,6 +286,22 @@ ex: /fakesourcedirfile( ""files.txt"", ")]
             public void CommandLineGenerateDebugSolution()
             {
                 GenerateDebugSolution = true;
+            }
+
+            [CommandLine.Option("forcecleanup", @"Path to an autocleanup db.
+If this is set, all the files listed in the DB will be removed, and sharpmake will exit.
+ex: /forcecleanup( ""tmp/sharpmakeautocleanupdb.bin"" ")]
+            public void CommandLineForceCleanup(string autocleanupDb)
+            {
+                if (!File.Exists(autocleanupDb))
+                    throw new FileNotFoundException(autocleanupDb);
+
+                Util.s_forceFilesCleanup = true;
+                Util.s_overrideFilesAutoCleanupDBPath = autocleanupDb;
+
+                Util.ExecuteFilesAutoCleanup();
+
+                Exit = true;
             }
 
             public void Validate()

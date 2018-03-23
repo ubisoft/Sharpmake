@@ -859,11 +859,13 @@ namespace Sharpmake
         public static List<string> FilesAlternatesAutoCleanupDBSuffixes = new List<string>(); // The alternates db suffixes using by other context
         public static string FilesAutoCleanupDBPath = string.Empty;
         public static string FilesAutoCleanupDBSuffix = string.Empty;   // Current auto-cleanup suffix for the database.
+        internal static bool s_forceFilesCleanup = false;
+        internal static string s_overrideFilesAutoCleanupDBPath;
         public static bool FilesAutoCleanupActive = false;
         public static TimeSpan FilesAutoCleanupDelay = TimeSpan.Zero;
         public static HashSet<string> FilesToBeExplicitlyRemovedFromDB = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         public static HashSet<string> FilesAutoCleanupIgnoredEndings = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-        private static readonly string s_filesAutoCleanupDBPrefix = "sharpmakeautocleanupdb";
+        private const string s_filesAutoCleanupDBPrefix = "sharpmakeautocleanupdb";
         private enum DBVersion { Version = 2 };
 
         private static Dictionary<string, DateTime> ReadCleanupDatabase(string databaseFilename)
@@ -908,7 +910,10 @@ namespace Sharpmake
 
         private static string GetDatabaseFilename(string dbSuffix)
         {
-            string databaseFilename = Path.Combine(FilesAutoCleanupDBPath, string.Format(@"{0}{1}{2}", s_filesAutoCleanupDBPrefix, dbSuffix, ".bin"));
+            if (!string.IsNullOrWhiteSpace(s_overrideFilesAutoCleanupDBPath))
+                return s_overrideFilesAutoCleanupDBPath;
+
+            string databaseFilename = Path.Combine(FilesAutoCleanupDBPath, $"{s_filesAutoCleanupDBPrefix}{dbSuffix}.bin");
             return databaseFilename;
         }
 
@@ -937,11 +942,11 @@ namespace Sharpmake
         /// </example>
         public static void ExecuteFilesAutoCleanup()
         {
-            if (!FilesAutoCleanupActive)
+            if (!FilesAutoCleanupActive && !s_forceFilesCleanup)
                 return; // Auto cleanup not active. Nothing to do.
 
-            if (!Directory.Exists(FilesAutoCleanupDBPath))
-                throw new Exception(string.Format("Unable to find directory {0} used to store auto-cleanup database. Is proper path set?", FilesAutoCleanupDBPath));
+            if (string.IsNullOrWhiteSpace(s_overrideFilesAutoCleanupDBPath) && !Directory.Exists(FilesAutoCleanupDBPath))
+                throw new Exception($"Unable to find directory {FilesAutoCleanupDBPath} used to store auto-cleanup database. Is proper path set?");
 
             string databaseFilename = GetDatabaseFilename(FilesAutoCleanupDBSuffix);
             Dictionary<string, DateTime> dbFiles = ReadCleanupDatabase(databaseFilename);
@@ -964,6 +969,20 @@ namespace Sharpmake
                 DateTime now = DateTime.Now;
                 foreach (KeyValuePair<string, DateTime> filenameDate in dbFiles)
                 {
+                    if (s_forceFilesCleanup)
+                    {
+                        if (!File.Exists(filenameDate.Key))
+                            continue;
+ 
+                        LogWrite(@"Force deleting '{0}'", filenameDate.Key);
+                        if (!TryDeleteFile(filenameDate.Key, removeIfReadOnly:true))
+                        {
+                            // Failed to delete the file... Keep it for now... Maybe later we will be able to delete it!
+                            LogWrite(@"Failed to delete '{0}'", filenameDate.Key);
+                        }
+                        continue;
+                    }
+
                     if (newDbFiles.ContainsKey(filenameDate.Key))
                         continue;
 
