@@ -239,7 +239,7 @@ ex: /fakesourcedirfile( ""files.txt"", ")]
                                     bool success = uint.TryParse(splitLine[4], out attributes);
                                     if (success && (attributes & 0x10) != 0x10) // 16 is directory
                                     {
-                                        string filePath = Util.PathMakeStandard(splitLine[0].Substring(folder.Length + 1).TrimEnd('"'));
+                                        string filePath = splitLine[0].Substring(folder.Length + 1).TrimEnd('"');
                                         int size;
                                         Util.AddNewFakeFile(filePath, int.TryParse(splitLine[1], out size) ? size : 0);
                                     }

@@ -43,7 +43,7 @@ namespace Sharpmake
         public static string FakePathPrefix
         {
             get { return s_fakePathPrefix; }
-            set { s_fakePathPrefix = SimplifyPath(PathMakeStandard(value)); }
+            set { s_fakePathPrefix = SimplifyPath(value); }
         }
 
         public static void AddNewFakeFile(string fileFullPath, int fileSize)
