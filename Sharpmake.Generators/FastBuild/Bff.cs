@@ -523,6 +523,8 @@ namespace Sharpmake.Generators.FastBuild
                         if (isCompileAsCFile)
                         {
                             fastBuildUsingPlatformConfig = platformBff.CConfigName;
+                            // Do not take cpp Language conformance into account while compiling in C
+                            confCmdLineOptions["CppLanguageStd"] = FileGeneratorUtilities.RemoveLineTag;
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
                         }
