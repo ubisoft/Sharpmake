@@ -240,7 +240,8 @@ ex: /fakesourcedirfile( ""files.txt"", ")]
                                     if (success && (attributes & 0x10) != 0x10) // 16 is directory
                                     {
                                         string filePath = Util.PathMakeStandard(splitLine[0].Substring(folder.Length + 1).TrimEnd('"'));
-                                        Util.AddNewFakeFile(filePath, 0);
+                                        int size;
+                                        Util.AddNewFakeFile(filePath, int.TryParse(splitLine[1], out size) ? size : 0);
                                     }
                                 }
                                 line = projectFileStream.ReadLine();
