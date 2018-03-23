@@ -85,7 +85,7 @@ namespace Sharpmake
                         foreach (var folder in xdkFolders.Select(x => Path.GetFileName(x)))
                         {
                             int current = 0;
-                            if (folder.Length >= 6 && int.TryParse(folder.Substring(0, 6), out current))
+                            if (TryParseXdkEditionTarget(folder, out current))
                             {
                                 if (current > latestValue)
                                 {
@@ -104,6 +104,19 @@ namespace Sharpmake
             public static bool IsDurangoSideBySideXDK()
             {
                 return !string.IsNullOrEmpty(GetLatestDurangoSideBySideXDK());
+            }
+
+            public static bool TryParseXdkEditionTarget(string xdkEditionTargetString, out int xdkEditionTarget)
+            {
+                xdkEditionTarget = 0;
+                if (string.IsNullOrWhiteSpace(xdkEditionTargetString))
+                    return false;
+
+                const int xdkEditionTargetExpectedLength = 6;
+                if (xdkEditionTargetString.Length != xdkEditionTargetExpectedLength)
+                    return false;
+
+                return int.TryParse(xdkEditionTargetString, out xdkEditionTarget);
             }
 
             private static string s_durangoExtensionXDK = null;
