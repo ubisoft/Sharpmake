@@ -64,7 +64,7 @@ namespace Sharpmake
                     currentDir = currentDir.Dirs.GetValueOrAdd(fileFullPathParts[i], new FakeDirEntry(path));
                 }
                 path = Path.Combine(path, fileFullPathParts[fileFullPathParts.Length - 1]);
-                currentDir.Files.Add(fileFullPathParts[fileFullPathParts.Length - 1], new FakeFileEntry { Path = path, SizeInBytes = 0 });
+                currentDir.Files.Add(fileFullPathParts[fileFullPathParts.Length - 1], new FakeFileEntry { Path = path, SizeInBytes = fileSize });
                 ++s_fakeFilesCount;
             }
         }
