@@ -359,7 +359,7 @@ namespace SharpmakeUnitTests
             IsFileNameToLower = false;
 
             SourceRootPath = Directory.GetCurrentDirectory() + "/[project.Name]";
-            AddTargets(new Target(Platform.anycpu, DevEnv.vs2015, Optimization.Debug));
+            AddTargets(new Target(Platform.anycpu, DevEnv.vs2017, Optimization.Debug));
         }
 
         [ConfigurePriority(-100)]
