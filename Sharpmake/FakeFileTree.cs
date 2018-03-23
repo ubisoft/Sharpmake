@@ -46,6 +46,36 @@ namespace Sharpmake
             set { s_fakePathPrefix = SimplifyPath(value); }
         }
 
+
+        public static int GetFakeFileLength(string fileFullPath)
+        {
+            if (CountFakeFiles() > 0)
+            {
+                string cleanPath = SimplifyPath(fileFullPath).Replace(WindowsSeparator, UnixSeparator);
+                string[] fileFullPathParts = cleanPath.Split(_pathSeparators, StringSplitOptions.RemoveEmptyEntries);
+                FakeDirEntry dir;
+                string root;
+                if (UsesUnixSeparator)
+                    root = UnixSeparator + fileFullPathParts[0];
+                else
+                    root = fileFullPathParts[0] + WindowsSeparator;
+                if (s_fakeTree.TryGetValue(root, out dir))
+                {
+                    for (int i = 1; i < fileFullPathParts.Length - 1; ++i)
+                    {
+                        if (!dir.Dirs.TryGetValue(fileFullPathParts[i], out dir))
+                            return 0;
+                    }
+
+                    FakeFileEntry file;
+                    if (dir.Files.TryGetValue(fileFullPathParts.Last(), out file))
+                        return file.SizeInBytes;
+                }
+            }
+
+            return 0;
+        }
+
         public static void AddNewFakeFile(string fileFullPath, int fileSize)
         {
             string cleanPath = FakePathPrefix + UnixSeparator + SimplifyPath(fileFullPath);

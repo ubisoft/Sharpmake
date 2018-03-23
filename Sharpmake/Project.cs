@@ -1158,18 +1158,26 @@ namespace Sharpmake
                     }
                 }
 
+                uint currentFileSize = 0;
                 if (Util.CountFakeFiles() > 0)
-                    continue;
+                {
+                    currentFileSize = (uint)Util.GetFakeFileLength(sourceFileInfo.FullName);
+                    if (currentFileSize == 0)
+                        continue;
+                }
+                else if (sourceFileInfo.Exists)
+                {
+                    currentFileSize = (uint)sourceFileInfo.Length;
+                }
 
-                if (sourceFileInfo.Exists)
-                    currentBlobSize += (uint)sourceFileInfo.Length;
+                currentBlobSize += currentFileSize;
 
                 bool isWorkBlobCandidate = (BlobWorkEnabled && !sourceFileInfo.IsReadOnly);
                 currentBlobSourceFiles.Add(new SourceFile(sourcefile, isWorkBlobCandidate));
                 if (isWorkBlobCandidate)
                 {
                     workBlobSourceFiles.Add(sourcefile);
-                    totalWorkBlobSize += (uint)sourceFileInfo.Length;
+                    totalWorkBlobSize += currentFileSize;
                 }
             }
 
