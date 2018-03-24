@@ -1580,7 +1580,6 @@ namespace Sharpmake
 
         public static string GetAppxManifestFileName(Project.Configuration conf)
         {
-            Debug.Assert(conf.NeedsAppxManifestFile);
             return Path.GetFullPath(PathMakeStandard(conf.AppxManifestFilePath));
         }
 
