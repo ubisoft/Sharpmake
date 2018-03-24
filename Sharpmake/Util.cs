@@ -1065,12 +1065,22 @@ namespace Sharpmake
             return null;
         }
 
-        public static bool TryDeleteFile(string filename)
+        public static bool TryDeleteFile(string filename, bool removeIfReadOnly = false)
         {
             try
             {
-                if (File.Exists(filename))
+                var fileInfo = new FileInfo(filename);
+                if (fileInfo.Exists)
+                {
+                    if (fileInfo.IsReadOnly)
+                    {
+                        if (!removeIfReadOnly)
+                            return false;
+                        fileInfo.IsReadOnly = false;
+                    }
                     File.Delete(filename);
+                }
+
                 return true;
             }
             catch (Exception)
