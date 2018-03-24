@@ -1009,18 +1009,25 @@ namespace Sharpmake
                 }
             }
 
-            // Write database.            
-            using (Stream writeStream = new FileStream(databaseFilename, FileMode.Create, FileAccess.Write, FileShare.None))
-            using (BinaryWriter binWriter = new BinaryWriter(writeStream))
+            // Write database if needed
+            if (newDbFiles.Count > 0)
             {
-                // Write version number
-                int version = (int)DBVersion.Version;
-                binWriter.Write(version);
-                binWriter.Flush();
+                using (Stream writeStream = new FileStream(databaseFilename, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (BinaryWriter binWriter = new BinaryWriter(writeStream))
+                {
+                    // Write version number
+                    int version = (int)DBVersion.Version;
+                    binWriter.Write(version);
+                    binWriter.Flush();
 
-                // Write the list of files.
-                IFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(writeStream, newDbFiles);
+                    // Write the list of files.
+                    IFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(writeStream, newDbFiles);
+                }
+            }
+            else
+            {
+                TryDeleteFile(databaseFilename);
             }
         }
 
