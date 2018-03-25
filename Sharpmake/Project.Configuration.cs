@@ -556,8 +556,6 @@ namespace Sharpmake
             // For projects merging multiple targets, sometimes what is wanted is to not generate
             // any FastBuild .bff files, but instead include the ones for all appropriate targets
             public bool DoNotGenerateFastBuild = false;
-            public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
-            public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
 
             // container for executable 
             [Resolver.Resolvable]
@@ -1779,6 +1777,11 @@ namespace Sharpmake
                 if (string.IsNullOrEmpty(OutputExtension))
                     OutputExtension = PlatformRegistry.Get<IConfigurationTasks>(Platform).GetDefaultOutputExtension(Output);
             }
+
+            #region Deprecated
+            [Obsolete("This delegate was used only by " + nameof(FastBuildFileIncludeCondition) + " which had no effect. It will be removed.")] public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
+            [Obsolete("This property could be set but was never used by Sharpmake. It will be removed.")] public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
+            #endregion
         }
     }
 }
