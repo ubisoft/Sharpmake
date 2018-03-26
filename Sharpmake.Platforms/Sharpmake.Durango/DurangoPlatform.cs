@@ -446,7 +446,7 @@ namespace Sharpmake
                                 xdkEditionRootVS2017 = vs2017PlatformFolder;
 
                             int xdkEdition;
-                            bool isMinFeb2018Xdk = Util.TryParseXdkEditionTarget(GlobalSettings.XdkEditionTarget, out xdkEdition) && xdkEdition > GlobalSettings._feb2018XdkEditionTarget;
+                            bool isMinFeb2018Xdk = Util.TryParseXdkEditionTarget(GlobalSettings.XdkEditionTarget, out xdkEdition) && xdkEdition >= GlobalSettings._feb2018XdkEditionTarget;
                             if (GlobalSettings.EnableLegacyXdkHeaders && isMinFeb2018Xdk)
                                 enableLegacyXdkHeaders = "true";
                         }
