@@ -59,6 +59,7 @@ namespace Sharpmake
             public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, Strings> ExtraFiles { get; set; } = new Dictionary<DevEnv, Strings>();
             #endregion
 
             #region IMicrosoftPlatformBff implementation
@@ -115,7 +116,10 @@ namespace Sharpmake
                 }
                 else
                 {
-                    Strings extraFiles = new Strings();
+                    var fastBuildCompilerSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.durango);
+                    Strings extraFiles;
+                    if (!fastBuildCompilerSettings.ExtraFiles.TryGetValue(devEnv, out extraFiles))
+                        extraFiles = new Strings();
                     string executable;
 
                     switch (devEnv)
@@ -138,8 +142,6 @@ namespace Sharpmake
                                     @"$RootPath$\vccorlib110.dll");
 
                                 executable = @"$RootPath$\cl.exe";
-                                var fastBuildCompilerSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.durango);
-
                                 fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out rootPath);
                             }
                             break;
