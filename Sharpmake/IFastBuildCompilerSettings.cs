@@ -21,5 +21,6 @@ namespace Sharpmake
         IDictionary<DevEnv, string> LinkerPath { get; set; }
         IDictionary<DevEnv, string> LinkerExe { get; set; }
         IDictionary<DevEnv, string> LibrarianExe { get; set; }
+        IDictionary<DevEnv, Strings> ExtraFiles { get; set; }
     }
 }
