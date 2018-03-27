@@ -122,7 +122,7 @@ namespace Sharpmake
                     if (s_enableLegacyXdkHeaders == null)
                     {
                         int xdkEdition;
-                        s_enableLegacyXdkHeaders = Util.TryParseXdkEditionTarget(XdkEditionTarget, out xdkEdition) && xdkEdition < _feb2018XdkEditionTarget;
+                        s_enableLegacyXdkHeaders = Util.IsDurangoSideBySideXDK() && Util.TryParseXdkEditionTarget(XdkEditionTarget, out xdkEdition) && xdkEdition < _feb2018XdkEditionTarget;
                     }
 
                     return s_enableLegacyXdkHeaders.Value;
