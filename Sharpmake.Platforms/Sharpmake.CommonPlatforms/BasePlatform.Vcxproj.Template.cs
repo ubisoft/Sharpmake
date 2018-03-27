@@ -169,8 +169,8 @@ namespace Sharpmake
             @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" Label=""Configuration"">
     <ConfigurationType>[options.ConfigurationType]</ConfigurationType>
     <UseDebugLibraries>[options.UseDebugLibraries]</UseDebugLibraries>
-    <_IsNativeEnvironment>[options.NativeEnvironmentVS2012]</_IsNativeEnvironment>
-    <UseNativeEnvironment>[options.NativeEnvironmentVS2013]</UseNativeEnvironment>
+    <PreferredToolArchitecture>[options.PreferredToolArchitecture]</PreferredToolArchitecture>
+    <_IsNativeEnvironment>[options._IsNativeEnvironment]</_IsNativeEnvironment>
     <CharacterSet>[options.CharacterSet]</CharacterSet>
     <UseOfMfc>[options.UseOfMfc]</UseOfMfc>
     <CLRSupport>[clrSupport]</CLRSupport>

@@ -144,12 +144,21 @@ namespace Sharpmake
                     UseMfcDynamic
                 }
 
+                [Obsolete("Please use " + nameof(PreferredToolArchitecture) + " instead", true)]
                 public enum NativeEnvironment
                 {
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     Enable,
                     [Default]
                     Disable
+                }
+
+                public enum PreferredToolArchitecture
+                {
+                    [Default]
+                    Default,
+                    x86,
+                    x64
                 }
 
                 public enum DisableFastUpToDateCheck

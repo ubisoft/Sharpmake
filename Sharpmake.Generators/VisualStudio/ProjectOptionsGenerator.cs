@@ -394,7 +394,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.TreatWarningsAsErrors.Enable, () => { context.Options["TreatWarningAsError"] = "true"; context.CommandLineOptions["TreatWarningAsError"] = "/WX"; })
             );
 
-            SelectNativeVsEvironmentOption(context);
+            SelectPreferredToolArchitecture(context);
 
             context.Options["TrackFileAccess"] = FileGeneratorUtilities.RemoveLineTag;
 
@@ -982,40 +982,34 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        private static void SelectNativeVsEvironmentOption(IGenerationContext context)
+        private static void SelectPreferredToolArchitecture(IGenerationContext context)
         {
             switch (context.DevelopmentEnvironment)
             {
                 case DevEnv.vs2010:
-                    {
-                        context.Options["NativeEnvironmentVS2012"] = FileGeneratorUtilities.RemoveLineTag;
-                        context.Options["NativeEnvironmentVS2013"] = FileGeneratorUtilities.RemoveLineTag;
-                    }
-                    break;
                 case DevEnv.vs2012:
                     {
-                        //Options.Vc.General.NativeEnvironment.
+                        // Falling back to <_IsNativeEnvironment> that has same effect
+                        context.Options["PreferredToolArchitecture"] = FileGeneratorUtilities.RemoveLineTag;
                         context.SelectOption
                         (
-                        Options.Option(Options.Vc.General.NativeEnvironment.Enable, () => { context.Options["NativeEnvironmentVS2012"] = "true"; }),
-                        Options.Option(Options.Vc.General.NativeEnvironment.Disable, () => { context.Options["NativeEnvironmentVS2012"] = FileGeneratorUtilities.RemoveLineTag; })
+                        Options.Option(Options.Vc.General.PreferredToolArchitecture.Default, () => { context.Options["_IsNativeEnvironment"] = FileGeneratorUtilities.RemoveLineTag; }),
+                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x86, () => { context.Options["_IsNativeEnvironment"] = "false"; }),
+                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x64, () => { context.Options["_IsNativeEnvironment"] = "true"; })
                         );
-
-                        context.Options["NativeEnvironmentVS2013"] = FileGeneratorUtilities.RemoveLineTag;
                     }
                     break;
                 case DevEnv.vs2013:
-                case DevEnv.vs2015: // For the moment and until proven otherwise, use the native env. flag of VS2013
+                case DevEnv.vs2015:
                 case DevEnv.vs2017:
                     {
-                        //Options.Vc.General.NativeEnvironment.
+                        context.Options["_IsNativeEnvironment"] = FileGeneratorUtilities.RemoveLineTag;
                         context.SelectOption
                         (
-                        Options.Option(Options.Vc.General.NativeEnvironment.Enable, () => { context.Options["NativeEnvironmentVS2013"] = "true"; }),
-                        Options.Option(Options.Vc.General.NativeEnvironment.Disable, () => { context.Options["NativeEnvironmentVS2013"] = FileGeneratorUtilities.RemoveLineTag; })
+                        Options.Option(Options.Vc.General.PreferredToolArchitecture.Default, () => { context.Options["PreferredToolArchitecture"] = FileGeneratorUtilities.RemoveLineTag; }),
+                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x86, () => { context.Options["PreferredToolArchitecture"] = "x86"; }),
+                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x64, () => { context.Options["PreferredToolArchitecture"] = "x64"; })
                         );
-
-                        context.Options["NativeEnvironmentVS2012"] = FileGeneratorUtilities.RemoveLineTag;
                     }
                     break;
             }
