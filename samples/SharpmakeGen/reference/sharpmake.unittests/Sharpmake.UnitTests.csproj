@@ -53,6 +53,7 @@
     <Compile Include="DotNetReferenceCollectionTest.cs" />
     <Compile Include="KitsRootPathsTests.cs" />
     <Compile Include="ResolverTest.cs" />
+    <Compile Include="SharpmakeFileParserTest.cs" />
     <Compile Include="UtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
