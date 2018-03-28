@@ -236,8 +236,8 @@ namespace Sharpmake
         private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
         public List<string> _references = new List<string>();
-        private static Regex s_includeRegex = new Regex(@"^\s*\[module:\s*Sharpmake.Include([^\""])*\""((?<INCLUDE>([^\""]*)+))", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
-        private static Regex s_referenceRegex = new Regex(@"^\s*\[module:\s*Sharpmake.Reference([^\""])*\""((?<REFERENCE>([^\""]*)+))", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+        private static readonly Regex s_includeRegex = new Regex(@"^\s*\[module:\s*Sharpmake.Include([^\""])*\""((?<INCLUDE>([^\""]*)+))", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+        private static readonly Regex s_referenceRegex = new Regex(@"^\s*\[module:\s*Sharpmake.Reference([^\""])*\""((?<REFERENCE>([^\""]*)+))", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
         private static bool IsDelegate(Type delegateType)
         {
@@ -367,6 +367,75 @@ namespace Sharpmake
             return sourceFiles;
         }
 
+        internal static void GetSharpmakeIncludesFromLine(
+            string line,
+            FileInfo sourceFilePath,
+            int lineNumber,
+            ref List<string> includes
+        )
+        {
+            Match match = s_includeRegex.Match(line);
+            for (; match.Success; match = match.NextMatch())
+            {
+                string includeFilename = match.Groups["INCLUDE"].ToString();
+                string resolvedIncludeFilename = "";
+
+                if (!Path.IsPathRooted(includeFilename))
+                    resolvedIncludeFilename = Util.PathGetAbsolute(sourceFilePath.DirectoryName, includeFilename);
+                else
+                    resolvedIncludeFilename = includeFilename;
+
+                if (!Util.FileExists(resolvedIncludeFilename))
+                    resolvedIncludeFilename = Util.GetCapitalizedPath(resolvedIncludeFilename);
+                if (!Util.FileExists(resolvedIncludeFilename))
+                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found {0}", includeFilename);
+
+                includes.Add(resolvedIncludeFilename);
+            }
+        }
+
+        internal static void GetSharpmakeReferencesFromLine(
+            string line,
+            FileInfo sourceFilePath,
+            int lineNumber,
+            ref List<string> references
+        )
+        {
+            Match match = s_referenceRegex.Match(line);
+            for (; match.Success; match = match.NextMatch())
+            {
+                string referenceRelativePath = match.Groups["REFERENCE"].ToString();
+                string referencePath = "";
+
+                // Try next to the source file that reference it (if relative path)
+                if (!Path.IsPathRooted(referenceRelativePath))
+                    referencePath = Util.PathGetAbsolute(sourceFilePath.DirectoryName, referenceRelativePath);
+
+                if (!Util.FileExists(referencePath))
+                {
+                    // Try next to the Sharpmake binary
+                    referencePath = Util.PathGetAbsolute(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), referenceRelativePath);
+
+                    if (!File.Exists(referencePath))
+                    {
+                        // Try in the current working directory
+                        referencePath = Util.PathGetAbsolute(Directory.GetCurrentDirectory(), referenceRelativePath);
+
+                        if (!File.Exists(referencePath))
+                        {
+                            // Try using .net framework locations
+                            referencePath = GetAssemblyDllPath(referenceRelativePath);
+
+                            if (referencePath == null)
+                                throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Reference file not found: {0}", referenceRelativePath);
+                        }
+                    }
+                }
+
+                references.Add(referencePath);
+            }
+        }
+
         private void AnalyseSourceFile(string sourceFile, List<string> includes)
         {
             using (StreamReader reader = new StreamReader(sourceFile))
@@ -379,58 +448,9 @@ namespace Sharpmake
                 {
                     ++lineNumber;
 
-                    Match match = s_includeRegex.Match(line);
-                    for (; match.Success; match = match.NextMatch())
-                    {
-                        string includeFilename = match.Groups["INCLUDE"].ToString();
-                        string resolvedIncludeFilename = "";
+                    GetSharpmakeIncludesFromLine(line, sourceFilePath, lineNumber, ref includes);
+                    GetSharpmakeReferencesFromLine(line, sourceFilePath, lineNumber, ref _references);
 
-                        if (!Path.IsPathRooted(includeFilename))
-                            resolvedIncludeFilename = Util.PathGetAbsolute(sourceFilePath.DirectoryName, includeFilename);
-                        else
-                            resolvedIncludeFilename = includeFilename;
-
-                        if (!File.Exists(resolvedIncludeFilename))
-                            resolvedIncludeFilename = Util.GetCapitalizedPath(resolvedIncludeFilename);
-                        if (!File.Exists(resolvedIncludeFilename))
-                            throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found {0}", includeFilename);
-
-                        includes.Add(resolvedIncludeFilename);
-                    }
-
-                    match = s_referenceRegex.Match(line);
-                    for (; match.Success; match = match.NextMatch())
-                    {
-                        string referenceRelativePath = match.Groups["REFERENCE"].ToString();
-                        string referencePath = "";
-
-                        // Try next to the source file that reference it (if relative path)
-                        if (!Path.IsPathRooted(referenceRelativePath))
-                            referencePath = Util.PathGetAbsolute(sourceFilePath.DirectoryName, referenceRelativePath);
-
-                        if (!File.Exists(referencePath))
-                        {
-                            // Try next to the Sharpmake binary
-                            referencePath = Util.PathGetAbsolute(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), referenceRelativePath);
-
-                            if (!File.Exists(referencePath))
-                            {
-                                // Try in the current working directory
-                                referencePath = Util.PathGetAbsolute(Directory.GetCurrentDirectory(), referenceRelativePath);
-
-                                if (!File.Exists(referencePath))
-                                {
-                                    // Try using .net framework locations
-                                    referencePath = GetAssemblyDllPath(referenceRelativePath);
-
-                                    if (referencePath == null)
-                                        throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Reference file not found: {0}", referenceRelativePath);
-                                }
-                            }
-                        }
-
-                        _references.Add(referencePath);
-                    }
                     line = reader.ReadLine();
                 }
             }
