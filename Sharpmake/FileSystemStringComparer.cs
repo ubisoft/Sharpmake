@@ -52,11 +52,7 @@ namespace Sharpmake
         /// <param name="caseSensitive">The case-sensitivity mode to use in file name comparisons.</param>
         public FileSystemStringComparer(bool caseSensitive)
         {
-            if (caseSensitive)
-                _comparer = StringComparer.OrdinalIgnoreCase;
-            else
-                _comparer = StringComparer.Ordinal;
-
+            _comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
         }
 
         public int Compare(string x, string y)
