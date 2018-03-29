@@ -1308,15 +1308,6 @@ namespace Sharpmake.Generators.VisualStudio
             //    Disable                                 GenerateManifest="false"
             SelectGenerateManifestOption(context, optionsContext);
 
-            //GenerateDebugInformation="false"
-            //    VS2012-VS2013
-            //    Enable                                  GenerateDebugInformation="true"           /DEBUG
-            //    Disable                                 GenerateDebugInformation="false"
-            //
-            //    VS2015
-            //    Enable                                  GenerateDebugInformation="Debug"          /DEBUG
-            //    EnableFastLink                          GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
-            //    Disable                                 GenerateDebugInformation="No"
             SelectGenerateDebugInformationOption(context, optionsContext);
 
             // GenerateMapFile
@@ -1924,25 +1915,57 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectGenerateDebugInformationOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
+            //GenerateDebugInformation="false"
+            //    VS2012-VS2013
+            //    GenerateDebugInformation.Enable         GenerateDebugInformation="true"           /DEBUG
+            //    GenerateDebugInformation.Disable        GenerateDebugInformation="false"
+            //    (GenerateFullProgramDatabaseFile is ignored, there can only be full pdb files)
+            //
+            //    VS2015
+            //    GenerateDebugInformation.Enable         GenerateDebugInformation="true"           /DEBUG
+            //    GenerateDebugInformation.EnableFastLink GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
+            //    Disable                                 GenerateDebugInformation="No"
+            //
+            //    VS2017
+            //    Enable                                  GenerateDebugInformation="true"           /DEBUG
+            //    EnableFastLink                          GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
+            //    Disable                                 GenerateDebugInformation="No"
+
             Action<bool> enableDebugInformation = (isFastLink) =>
             {
-                if (isFastLink && context.Configuration.IsFastBuild)
-                {
-                    var generateFullPDB = Options.GetObject<Options.Vc.Linker.GenerateFullProgramDatabaseFile>(context.Configuration);
-                    if (generateFullPDB == Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable)
-                    {
-                        isFastLink = false;
-                        context.Builder.LogWarningLine("FastBuild and generateFullPDB will disable FastLink");
-                    }
-                }
-
-                context.Options["GenerateDebugInformation"] = isFastLink ? "DebugFastLink" : "true";
-
+                bool forceFullPDB = false;
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable, () => { context.Options["FullProgramDatabaseFile"] = "true"; }),
-                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Disable, () => { context.Options["FullProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag; })
+                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable,  () => { context.Options["FullProgramDatabaseFile"] = "true"; forceFullPDB = true;}),
+                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Disable, () => { context.Options["FullProgramDatabaseFile"] = "false"; }),
+                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Default, () => { context.Options["FullProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag; })
                 );
+
+                if (isFastLink && forceFullPDB)
+                    throw new Error("Cannot set both EnableFastLink and GenerateFullProgramDatabaseFile.Enable in conf " + context.Configuration);
+
+                bool isMicrosoftPlatform = context.Configuration.Platform.IsMicrosoft();
+                if (isFastLink)
+                {
+                    if (!isMicrosoftPlatform)
+                        throw new Error("Cannot set EnableFastLink on non-microsoft platform " + context.Configuration.Platform);
+
+                    context.Options["GenerateDebugInformation"] = "DebugFastLink";
+                    context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG:FASTLINK";
+                }
+                else
+                {
+                    if (isMicrosoftPlatform && context.DevelopmentEnvironment == DevEnv.vs2017 && forceFullPDB)
+                    {
+                        context.Options["GenerateDebugInformation"] = "DebugFull";
+                        context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG:FULL";
+                    }
+                    else
+                    {
+                        context.Options["GenerateDebugInformation"] = "true";
+                        context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG";
+                    }
+                }
 
                 string optionsCompilerProgramDatabaseFile = context.Configuration.CompilerPdbFilePath;
                 string optionsLinkerProgramDatabaseFile = context.Configuration.LinkerPdbFilePath;
@@ -1963,7 +1986,6 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["LinkerProgramDatabaseFile"] = string.IsNullOrEmpty(optionsLinkerProgramDatabaseFile)
                     ? FileGeneratorUtilities.RemoveLineTag
                     : optionsLinkerProgramDatabaseFile;
-                context.CommandLineOptions["GenerateDebugInformation"] = isFastLink ? "/DEBUG:FASTLINK" : "/DEBUG";
 
                 // %2 is converted by FastBuild
                 // Output name of object being compiled, as specified by CompilerOutputPath and the name of discovered objects depending on the Compiler input options (extension is also replace with CompilerOutputExtension).
