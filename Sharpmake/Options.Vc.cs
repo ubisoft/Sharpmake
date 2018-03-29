@@ -586,6 +586,11 @@ namespace Sharpmake
                     Disable
                 }
 
+                /// <summary>
+                /// Enable will write /DEBUG, and let MS linker decide to use FastLink or Full PDBs
+                ///   If you want to force DEBUG:FULL, set both GenerateDebugInformation
+                ///   and GenerateFullProgramDatabaseFile to Enable
+                /// </summary>
                 public enum GenerateDebugInformation
                 {
                     [Default]
@@ -598,6 +603,7 @@ namespace Sharpmake
                 public enum GenerateFullProgramDatabaseFile
                 {
                     [Default]
+                    Default,
                     Disable,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Enable
