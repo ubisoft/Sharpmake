@@ -11,14 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using NUnit.Framework;
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using Sharpmake;
+using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {
@@ -37,7 +34,13 @@ namespace Sharpmake.UnitTests
             _fakeFileInfo = new FileInfo(Path.Combine(Util.FakePathPrefix, "SharpmakeFile.sharpmake.cs"));
         }
 
+        [SetUp]
+        public void ClearFakeTreeSetup()
+        {
+            Util.ClearFakeTree();
+        }
 
+        #region Include
         [Test]
         public void SimpleInclude()
         {
@@ -72,12 +75,72 @@ namespace Sharpmake.UnitTests
             StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
         }
 
+        [Test]
+        public void ConvolutedInclude()
+        {
+            const string sharpmakeIncludedFile = "some project with spaces.sharpmake.cs";
+            string sharpmakeIncludeFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeIncludedFile);
+
+            Util.AddNewFakeFile(sharpmakeIncludedFile, 0);
+
+            string line = $"   [  module\t : Sharpmake  .\t Include ( @\"{sharpmakeIncludedFile}\" \t) ]  \t";
+
+            var includes = new List<string>();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+
+            Assert.That(includes.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+        }
 
         [Test]
-        public void WeirdlyFormattedInclude()
+        public void ConvolutedIncludeWithComments()
+        {
+            const string sharpmakeIncludedFile = "some project with spaces.sharpmake.cs";
+            string sharpmakeIncludeFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeIncludedFile);
+
+            Util.AddNewFakeFile(sharpmakeIncludedFile, 0);
+
+            string line = $"   [  module\t :/**/Sharpmake  .\t Include (  /* comment with string inisde @\"{sharpmakeIncludedFile}\" */ @\"{sharpmakeIncludedFile}\" \t) ]  \t // This is comment";
+
+            var includes = new List<string>();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+
+            Assert.That(includes.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+        }
+
+        [Test]
+        public void WildcardIncludes()
+        {
+            string[] sharpmakeIncludedFiles = {
+                Path.Combine("folder", "sub1", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file2.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "anotherfiletonotinclude.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "anotherfiletonotinclude.sharpmake.cs")
+            };
+            string[] sharpmakeIncludesFullPath = sharpmakeIncludedFiles.Select(file => Path.Combine(_fakeFileInfo.DirectoryName, file)).ToArray();
+
+            foreach (string file in sharpmakeIncludedFiles)
+                Util.AddNewFakeFile(file, 0);
+
+            string line = @"[module: Sharpmake.Include(""folder/*/file*.cs"")]";
+
+            var includes = new List<string>();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+
+            Assert.That(includes.Count, Is.EqualTo(5));
+            CollectionAssert.IsSubsetOf(includes, sharpmakeIncludesFullPath);
+            foreach (string include in includes)
+                StringAssert.DoesNotContain(include, "anotherfiletonotinclude.sharpmake.cs");
+        }
+
+        [Test]
+        public void IncorrectFormattedInclude()
         {
             const string sharpmakeIncludedFile = "yetanotherproject.sharpmake.cs";
-            string sharpmakeIncludeFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeIncludedFile);
 
             Util.AddNewFakeFile(sharpmakeIncludedFile, 0);
 
@@ -86,17 +149,76 @@ namespace Sharpmake.UnitTests
             var includes = new List<string>();
             Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
 
-            Assert.That(includes.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
-
-            // now test the full path include
-            includes.Clear();
-            line = $@"[module: Sharpmake.Include(""{sharpmakeIncludeFullPath}"")]";
-
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
-
-            Assert.That(includes.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+            Assert.That(includes.Count, Is.EqualTo(0));
         }
+        #endregion
+
+        #region Reference
+        [Test]
+        public void SimpleReference()
+        {
+            const string sharpmakeReferencedFile = "someassembly.dll";
+            string sharpmakeReferenceFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeReferencedFile);
+
+            Util.AddNewFakeFile(sharpmakeReferencedFile, 0);
+
+            string line = $@"[module: Sharpmake.Reference(""{sharpmakeReferencedFile}"")]";
+
+            var references = new List<string>();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+
+            Assert.That(references.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, references.First());
+        }
+
+        [Test]
+        public void SimpleReferenceFullPath()
+        {
+            const string sharpmakeReferencedFile = "someotherassembly.dll";
+            string sharpmakeReferenceFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeReferencedFile);
+
+            Util.AddNewFakeFile(sharpmakeReferencedFile, 0);
+
+            string line = $@"[module: Sharpmake.Reference(""{sharpmakeReferenceFullPath}"")]";
+
+            var references = new List<string>();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+
+            Assert.That(references.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, references.First());
+        }
+
+        [Test]
+        public void ConvolutedReference()
+        {
+            const string sharpmakeReferencedFile = "some assembly with spaces.dll";
+            string sharpmakeReferenceFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeReferencedFile);
+
+            Util.AddNewFakeFile(sharpmakeReferencedFile, 0);
+
+            string line = $"   [  module\t : Sharpmake  .\t Reference ( @\"{sharpmakeReferencedFile}\" \t) ]  \t";
+
+            var references = new List<string>();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+
+            Assert.That(references.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, references.First());
+        }
+
+        [Test]
+        public void IncorrectFormattedReference()
+        {
+            const string sharpmakeReferencedFile = "yetanotherassembly.dll";
+
+            Util.AddNewFakeFile(sharpmakeReferencedFile, 0);
+
+            string line = $"\t   \t [module:\t \t SharpmakeAReference(\t stuffstuff \"{sharpmakeReferencedFile}\")]";
+
+            var references = new List<string>();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+
+            Assert.That(references.Count, Is.EqualTo(0));
+        }
+        #endregion
     }
 }

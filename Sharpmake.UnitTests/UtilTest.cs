@@ -175,7 +175,7 @@ namespace SharpmakeUnitTests
         [SetUp]
         public void Init()
         {
-            Util.FakePathPrefix = Directory.GetCurrentDirectory();
+            Util.FakePathPrefix = Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
 
             string[] files =
             {
@@ -239,8 +239,35 @@ namespace SharpmakeUnitTests
             };
 
             var result = Util.DirectoryGetDirectories(Path.Combine(Util.FakePathPrefix, "code"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
 
-            Assert.That(result.Intersect(expected).Count(), Is.EqualTo(expected.Count()));
+        [Test]
+        public void CanListDirectoriesWithFilter()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "data"),
+                Path.Combine(Util.FakePathPrefix, "code")
+            };
+
+            var result = Util.DirectoryGetDirectories(Path.Combine(Util.FakePathPrefix), "*d*");
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListDirectoriesWithFilterAndSearchOption()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "data"),
+                Path.Combine(Util.FakePathPrefix, "code"),
+                Path.Combine(Util.FakePathPrefix, "code", "main"),
+                Path.Combine(Util.FakePathPrefix, "code", "test")
+            };
+
+            var result = Util.DirectoryGetDirectories(Path.Combine(Util.FakePathPrefix), "????", SearchOption.AllDirectories);
+            Assert.That(result, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -255,8 +282,33 @@ namespace SharpmakeUnitTests
             };
 
             var result = Util.DirectoryGetFiles(Path.Combine(Util.FakePathPrefix, "code"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
 
-            Assert.That(result.Intersect(expected).Count(), Is.EqualTo(expected.Count()));
+        [Test]
+        public void CanListFilesWithFilter()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "test.cpp"),
+                Path.Combine(Util.FakePathPrefix, "code", "main", "main.cpp"),
+                Path.Combine(Util.FakePathPrefix, "code", "test", "stuff.cpp")
+            };
+
+            var result = Util.DirectoryGetFiles(Path.Combine(Util.FakePathPrefix, "code"), "*.cpp");
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFilesWithFilterAndSearchOption()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "test.cpp"),
+            };
+
+            var result = Util.DirectoryGetFiles(Path.Combine(Util.FakePathPrefix, "code"), "*.cpp", SearchOption.TopDirectoryOnly);
+            Assert.That(result, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -268,8 +320,116 @@ namespace SharpmakeUnitTests
             };
 
             var result = Util.DirectoryGetFiles(Path.Combine(Util.FakePathPrefix, "code", "main"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
 
-            Assert.That(result.Intersect(expected).Count(), Is.EqualTo(expected.Count()));
+        [Test]
+        public void TestPathWithWildcards()
+        {
+            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "*test", "test")));
+            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "*test**", "test")));
+            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "tes?t", "test")));
+            Assert.IsTrue(Util.IsPathWithWildcards(Path.Combine("test", "tes??t", "test")));
+
+            Assert.IsFalse(Util.IsPathWithWildcards(Path.Combine("test", "test", "test")));
+        }
+
+        [Test]
+        public void ErrorListFileWithWildcards()
+        {
+            Assert.Catch<ArgumentException>(() => Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "test")));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards_WithDotDot1()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "test.h"),
+                Path.Combine(Util.FakePathPrefix, "code", "test.cpp")
+            };
+
+            var result = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "inexistantFolder", "..", "test*"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards_WithDotDot2()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "test.cpp")
+            };
+
+            var result1 = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "????", "..", "*.cpp"));
+            Assert.That(result1, Is.EquivalentTo(expected));
+
+            var result2 = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "????", "..", "test.cpp"));
+            Assert.That(result2, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards1()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "test.h"),
+                Path.Combine(Util.FakePathPrefix, "code", "test.cpp")
+            };
+
+            var result = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "test*"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards2()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "main", "main.cpp"),
+                Path.Combine(Util.FakePathPrefix, "code", "test", "stuff.cpp")
+            };
+
+            var result = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "*", "*.cpp"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards3()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "main", "main.cpp"),
+                Path.Combine(Util.FakePathPrefix, "code", "test", "stuff.cpp")
+            };
+
+            var result = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "c*de", "????", "*.cpp"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards4()
+        {
+            string[] expected =
+            {
+                Path.Combine(Util.FakePathPrefix, "code", "main", "main.cpp")
+            };
+
+            var result = Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "*", "main.cpp"));
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void CanListFileWithWildcards_NoMatch()
+        {
+            // Last file doesn't exist in test folder
+            Assert.IsEmpty(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "c?de", "test", "main.cpp")));
+
+            // No folder with only one character exist
+            Assert.IsEmpty(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "?", "main.cpp")));
+
+            // No file with only one character exist
+            Assert.IsEmpty(Util.DirectoryGetFilesWithWildcards(Path.Combine(Util.FakePathPrefix, "code", "*", "?")));
         }
     }
 

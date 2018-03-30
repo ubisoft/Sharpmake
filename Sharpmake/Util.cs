@@ -154,6 +154,7 @@ namespace Sharpmake
         }
 
         public static readonly char[] _pathSeparators = { Util.WindowsSeparator, Util.UnixSeparator };
+        internal static readonly char[] WildcardCharacters = { '*', '?' };
 
         public static void PathSplitFileNameFromPath(string fileFullPath, out string fileName, out string pathName)
         {

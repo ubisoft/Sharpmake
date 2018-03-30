@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Sharpmake
 {
@@ -48,7 +49,7 @@ namespace Sharpmake
 
         public static FakeFileEntry GetFakeFile(string path)
         {
-            if (CountFakeFiles() > 0)
+            if (CountFakeFiles() > 0 && !string.IsNullOrEmpty(path))
             {
                 string cleanPath = SimplifyPath(path).Replace(WindowsSeparator, UnixSeparator);
                 string[] fileFullPathParts = cleanPath.Split(_pathSeparators, StringSplitOptions.RemoveEmptyEntries);
@@ -152,46 +153,58 @@ namespace Sharpmake
             return Directory.Exists(directoryPath);
         }
 
+        internal static string ConvertWildcardToRegEx(string wildcard)
+        {
+            return "^" + Regex.Escape(wildcard).Replace(@"\*", ".*").Replace(@"\?", ".") + "$";
+        }
+
         public static string[] DirectoryGetFiles(string path, string searchPattern = "*", SearchOption searchOption = SearchOption.AllDirectories)
         {
             if (CountFakeFiles() > 0)
             {
-                List<string> files = new List<string>();
-
                 string cleanPath = SimplifyPath(path).Replace(WindowsSeparator, UnixSeparator);
                 string[] fileFullPathParts = cleanPath.Split(_pathSeparators, StringSplitOptions.RemoveEmptyEntries);
                 FakeDirEntry dir;
-                string root;
-                if (UsesUnixSeparator)
-                    root = UnixSeparator + fileFullPathParts[0];
-                else
-                    root = fileFullPathParts[0] + WindowsSeparator;
-                if (s_fakeTree.TryGetValue(root, out dir))
+
+                // Determine if root directory exist in the fake tree
+                string root = UsesUnixSeparator ? UnixSeparator + fileFullPathParts[0] : fileFullPathParts[0] + WindowsSeparator;
+                if (!s_fakeTree.TryGetValue(root, out dir))
+                    return new string[] { };
+
+                // Iterate over the provided path and validate that each part exist in the fake tree
+                for (int i = 1; i < fileFullPathParts.Length; ++i)
                 {
-                    for (int i = 1; i < fileFullPathParts.Length; ++i)
-                    {
-                        if (!dir.Dirs.TryGetValue(fileFullPathParts[i], out dir))
-                            return new string[] { };
-                    }
-
-                    HashSet<FakeDirEntry> visited = new HashSet<FakeDirEntry>();
-                    Stack<FakeDirEntry> visiting = new Stack<FakeDirEntry>();
-                    visiting.Push(dir);
-                    while (visiting.Count > 0)
-                    {
-                        FakeDirEntry visitedDir = visiting.Pop();
-                        if (visited.Contains(visitedDir))
-                            continue;
-
-                        visited.Add(visitedDir);
-                        files.AddRange(visitedDir.Files.Values.Select(x => x.Path));
-
-                        foreach (var f in visitedDir.Dirs)
-                            visiting.Push(f.Value);
-                    }
-                    return files.ToArray();
+                    if (!dir.Dirs.TryGetValue(fileFullPathParts[i], out dir))
+                        return new string[] { };
                 }
-                return new string[] { };
+
+                // Setup filter if any
+                Regex regexFilter = null;
+                if (searchPattern != "*")
+                    regexFilter = new Regex(ConvertWildcardToRegEx(searchPattern), RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+                // Gather file items depending of filter and search option
+                // - TopDirectoryOnly (early exit)
+                if (searchOption == SearchOption.TopDirectoryOnly)
+                    return (regexFilter != null ? dir.Files.Where(e => regexFilter.IsMatch(e.Key)).Select(e => e.Value.Path) : dir.Files.Values.Select(x => x.Path)).ToArray();
+                // - AllDirectories
+                HashSet<FakeDirEntry> visited = new HashSet<FakeDirEntry>();
+                Stack<FakeDirEntry> visiting = new Stack<FakeDirEntry>();
+                List<string> files = new List<string>();
+                visiting.Push(dir);
+                while (visiting.Count > 0)
+                {
+                    FakeDirEntry visitedDir = visiting.Pop();
+                    if (visited.Contains(visitedDir))
+                        continue;
+                    visited.Add(visitedDir);
+
+                    files.AddRange(regexFilter != null ? visitedDir.Files.Where(e => regexFilter.IsMatch(e.Key)).Select(e => e.Value.Path) : visitedDir.Files.Values.Select(x => x.Path));
+
+                    foreach (var f in visitedDir.Dirs)
+                        visiting.Push(f.Value);
+                }
+                return files.ToArray();
             }
 
             if (Directory.Exists(path))
@@ -199,30 +212,112 @@ namespace Sharpmake
             return new string[] { };
         }
 
-        public static string[] DirectoryGetDirectories(string path)
+        public static string[] DirectoryGetDirectories(string path, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
             if (CountFakeFiles() > 0)
             {
                 string cleanPath = SimplifyPath(path).Replace(WindowsSeparator, UnixSeparator);
                 string[] fileFullPathParts = cleanPath.Split(_pathSeparators, StringSplitOptions.RemoveEmptyEntries);
                 FakeDirEntry dir;
-                string root;
-                if (UsesUnixSeparator)
-                    root = UnixSeparator + fileFullPathParts[0];
-                else
-                    root = fileFullPathParts[0] + WindowsSeparator;
-                if (s_fakeTree.TryGetValue(root, out dir))
+
+                // Determine if root directory exist in the fake tree
+                string root = UsesUnixSeparator ? UnixSeparator + fileFullPathParts[0] : fileFullPathParts[0] + WindowsSeparator;
+                if (!s_fakeTree.TryGetValue(root, out dir))
+                    return new string[] { };
+
+                // Iterate over the provided path and validate that each part exist in the fake tree
+                for (int i = 1; i < fileFullPathParts.Length; ++i)
                 {
-                    for (int i = 1; i < fileFullPathParts.Length; ++i)
-                    {
-                        if (!dir.Dirs.TryGetValue(fileFullPathParts[i], out dir))
-                            return new string[] { };
-                    }
-                    return dir.Dirs.Values.Select(x => x.Path).ToArray();
+                    if (!dir.Dirs.TryGetValue(fileFullPathParts[i], out dir))
+                        return new string[] { };
                 }
-                return new string[] { };
+
+                // Setup filter if any
+                Regex regexFilter = null;
+                if (searchPattern != "*")
+                    regexFilter = new Regex(ConvertWildcardToRegEx(searchPattern), RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+                // Gather file items depending of filter and search option
+                // - TopDirectoryOnly (early exit)
+                if (searchOption == SearchOption.TopDirectoryOnly)
+                  return (regexFilter != null ? dir.Dirs.Where(e => regexFilter.IsMatch(e.Key)).Select(e => e.Value.Path) : dir.Dirs.Values.Select(x => x.Path)).ToArray();
+                // - AllDirectories
+                HashSet<FakeDirEntry> visited = new HashSet<FakeDirEntry>();
+                Stack<FakeDirEntry> visiting = new Stack<FakeDirEntry>();
+                List<string> directories = new List<string>();
+                visiting.Push(dir);
+                while (visiting.Count > 0)
+                {
+                    FakeDirEntry visitedDir = visiting.Pop();
+                    if (visited.Contains(visitedDir))
+                        continue;
+                    visited.Add(visitedDir);
+
+                    directories.AddRange(regexFilter != null ? visitedDir.Dirs.Where(e => regexFilter.IsMatch(e.Key)).Select(e => e.Value.Path) : visitedDir.Dirs.Values.Select(x => x.Path));
+
+                    foreach (var f in visitedDir.Dirs)
+                        visiting.Push(f.Value);
+                }
+                return directories.ToArray();
             }
-            return Directory.GetDirectories(path);
+
+            if (Directory.Exists(path))
+                return Directory.GetDirectories(path, searchPattern, searchOption);
+            return new string[] { };
+        }
+
+        public static bool IsPathWithWildcards(string path)
+        {
+            return path.IndexOfAny(Util.WildcardCharacters) != -1;
+        }
+
+        internal static Strings ListFileSystemItemWithWildcardInFolderList(string currentWildcardPart, Strings currentFolderList, Func<string, string, SearchOption, string[]> getItemFunc, Func<string, bool> existItemFunc)
+        {
+            var result = new Strings();
+            if (IsPathWithWildcards(currentWildcardPart))
+            {
+                foreach (string currentPath in currentFolderList)
+                {
+                    result.AddRange(getItemFunc(currentPath, currentWildcardPart, SearchOption.TopDirectoryOnly));
+                }
+            }
+            else
+            {
+                foreach (string currentPath in currentFolderList)
+                {
+                    string filePath = Path.Combine(currentPath, currentWildcardPart);
+                    if (existItemFunc(filePath))
+                        result.Add(filePath);
+                }
+            }
+
+            return result;
+        }
+
+        public static string[] DirectoryGetFilesWithWildcards(string path)
+        {
+            if (!IsPathWithWildcards(path))
+                throw new ArgumentException("Path doesn't contains wildcard");
+
+            var currentFolderList = new Strings();
+            int firstWildcardIndex = path.IndexOfAny(Util.WildcardCharacters);
+            int firstSeparatorIndex = path.LastIndexOfAny(Util._pathSeparators, firstWildcardIndex);
+            string[] wildcardsPart = path.Substring(firstSeparatorIndex + 1).Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries);
+
+            currentFolderList.Add(firstSeparatorIndex == -1 ? "." : path.Substring(0, firstSeparatorIndex));
+
+            // Iterate over folders' part
+            for (int i = 0; i < wildcardsPart.Length - 1; ++i)
+                currentFolderList = ListFileSystemItemWithWildcardInFolderList(wildcardsPart[i], currentFolderList, DirectoryGetDirectories, DirectoryExists);
+
+            // Handle last item of the wildcard part, that is a file
+            var result = ListFileSystemItemWithWildcardInFolderList(wildcardsPart.Last(), currentFolderList, DirectoryGetFiles, FileExists);
+
+            // Cleanup path
+            var cleanResult = new Strings();
+            cleanResult.AddRange(result.Select(SimplifyPath));
+
+            return cleanResult.ToArray();
         }
     }
 }
