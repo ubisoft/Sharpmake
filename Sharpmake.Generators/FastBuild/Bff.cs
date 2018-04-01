@@ -1054,9 +1054,12 @@ namespace Sharpmake.Generators.FastBuild
                                             }
 
                                             // Write Target Alias
-                                            using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                            if (isLastSubConfig)
                                             {
-                                                bffGenerator.Write(Template.ConfigurationFile.TargetSection);
+                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                                {
+                                                    bffGenerator.Write(Template.ConfigurationFile.TargetSection);
+                                                }
                                             }
                                         }
                                     }
