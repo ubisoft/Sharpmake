@@ -230,6 +230,9 @@ namespace Sharpmake.Generators.FastBuild
                         Options.Vc.Compiler.Exceptions exceptionsSetting = tuple.Item7;
                         bool isCompileAsNonCLRFile = tuple.Rest.Item1;
 
+                        bool isFirstSubConfig = subConfigIndex == 0;
+                        bool isLastSubConfig = subConfigIndex == confSubConfigs.Keys.Count - 1;
+
                         // For now, this will do.
                         if (conf.FastBuildBlobbed && isDefaultTuple && !isUnity)
                         {
@@ -325,7 +328,7 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildObjectListDependencies = FileGeneratorUtilities.RemoveLineTag;
                         if (confSubConfigs.Keys.Count > 1)
                         {
-                            if (subConfigIndex != confSubConfigs.Keys.Count - 1)
+                            if (!isLastSubConfig)
                             {
                                 partialLibInfo = "[Partial Lib of " + fastBuildOutputFileShortName + "]";
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
@@ -386,30 +389,36 @@ namespace Sharpmake.Generators.FastBuild
 
                         var fastBuildTargetSubTargets = new List<string>();
                         {
-                            if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                            if (isLastSubConfig) // post-build steps on the last subconfig
                             {
-                                if(conf.CopyDependenciesBuildStep != null)
-                                    throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
-
-                                var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, projectPath);
-                                foreach (var copy in copies)
+                                if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
                                 {
-                                    var sourceFile = copy.Key;
-                                    var destinationFolder = copy.Value;
+                                    if (conf.CopyDependenciesBuildStep != null)
+                                        throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
 
-                                    // use the global root for alias computation, as the project has not idea in which master bff it has been included
-                                    var destinationRelativeToGlobal = Util.GetConvertedRelativePath(projectPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
-                                    string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(Path.GetFileName(sourceFile), destinationRelativeToGlobal);
-                                    fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
+                                    var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, projectPath);
+                                    foreach (var copy in copies)
+                                    {
+                                        var sourceFile = copy.Key;
+                                        var destinationFolder = copy.Value;
+
+                                        // use the global root for alias computation, as the project has not idea in which master bff it has been included
+                                        var destinationRelativeToGlobal = Util.GetConvertedRelativePath(projectPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
+                                        string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(Path.GetFileName(sourceFile), destinationRelativeToGlobal);
+                                        fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
+                                    }
                                 }
                             }
 
-                            // the pre-steps are written in the master bff, we only need to refer their aliases
-                            fastBuildTargetSubTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
-                            fastBuildTargetSubTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
+                            if (isFirstSubConfig) // pre-build steps on the first config
+                            {
+                                // the pre-steps are written in the master bff, we only need to refer their aliases
+                                fastBuildTargetSubTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
+                                fastBuildTargetSubTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
 
-                            fastBuildTargetSubTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
-                            fastBuildTargetSubTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
+                                fastBuildTargetSubTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
+                                fastBuildTargetSubTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
+                            }
 
                             fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
 
@@ -429,30 +438,33 @@ namespace Sharpmake.Generators.FastBuild
                                 fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_" + outputType);
                             }
 
-                            foreach (var eventPair in conf.EventPostBuildExecute)
+                            if (isLastSubConfig) // post-build steps on the last subconfig
                             {
-                                fastBuildTargetSubTargets.Add(eventPair.Key);
-                                postBuildEvents.Add(eventPair.Key, eventPair.Value);
-                            }
+                                foreach (var eventPair in conf.EventPostBuildExecute)
+                                {
+                                    fastBuildTargetSubTargets.Add(eventPair.Key);
+                                    postBuildEvents.Add(eventPair.Key, eventPair.Value);
+                                }
 
-                            foreach (var buildEvent in conf.ResolvedEventPostBuildExe)
-                            {
-                                string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild);
-                                fastBuildTargetSubTargets.Add(eventKey);
-                                postBuildEvents.Add(eventKey, buildEvent);
-                            }
+                                foreach (var buildEvent in conf.ResolvedEventPostBuildExe)
+                                {
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild);
+                                    fastBuildTargetSubTargets.Add(eventKey);
+                                    postBuildEvents.Add(eventKey, buildEvent);
+                                }
 
-                            foreach (var eventPair in conf.EventCustomPostBuildExecute)
-                            {
-                                fastBuildTargetSubTargets.Add(eventPair.Key);
-                                postBuildEvents.Add(eventPair.Key, eventPair.Value);
-                            }
+                                foreach (var eventPair in conf.EventCustomPostBuildExecute)
+                                {
+                                    fastBuildTargetSubTargets.Add(eventPair.Key);
+                                    postBuildEvents.Add(eventPair.Key, eventPair.Value);
+                                }
 
-                            foreach (var buildEvent in conf.ResolvedEventCustomPostBuildExe)
-                            {
-                                string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction);
-                                fastBuildTargetSubTargets.Add(eventKey);
-                                postBuildEvents.Add(eventKey, buildEvent);
+                                foreach (var buildEvent in conf.ResolvedEventCustomPostBuildExe)
+                                {
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction);
+                                    fastBuildTargetSubTargets.Add(eventKey);
+                                    postBuildEvents.Add(eventKey, buildEvent);
+                                }
                             }
 
                             if (conf.Output != Project.Configuration.OutputType.Dll)
@@ -792,7 +804,7 @@ namespace Sharpmake.Generators.FastBuild
 
                                         // Exe and DLL will always add an extra objectlist
                                         if ((conf.Output == Project.Configuration.OutputType.Exe ||
-                                                conf.Output == Project.Configuration.OutputType.Dll) && subConfigIndex == confSubConfigs.Keys.Count - 1 // only last subconfig will generate objectlist
+                                                conf.Output == Project.Configuration.OutputType.Dll) && isLastSubConfig // only last subconfig will generate objectlist
                                         )
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
@@ -839,7 +851,7 @@ namespace Sharpmake.Generators.FastBuild
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
 
-                                        if (conf.Output == Project.Configuration.OutputType.Dll && subConfigIndex != confSubConfigs.Keys.Count - 1)
+                                        if (conf.Output == Project.Configuration.OutputType.Dll && !isLastSubConfig)
                                         {
                                             using (bffGenerator.Declare("objectListName", fastBuildOutputFileShortName))
                                             {
@@ -897,7 +909,7 @@ namespace Sharpmake.Generators.FastBuild
                                             {
                                                 case Project.Configuration.OutputType.Exe:
                                                     {
-                                                        if (subConfigIndex == confSubConfigs.Keys.Count - 1)
+                                                        if (isLastSubConfig)
                                                         {
                                                             beginSectionType = Template.ConfigurationFile.ExeDllBeginSection;
                                                         }
