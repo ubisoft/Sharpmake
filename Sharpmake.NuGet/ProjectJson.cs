@@ -13,9 +13,9 @@
 // limitations under the License.
 using System.Collections.Generic;
 using System.IO;
-using SimpleNuGet.Impl;
+using Sharpmake.NuGet.Impl;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet
 {
     /// <summary>
     /// The project.json file allows to specify nuget references in a more convenient way.

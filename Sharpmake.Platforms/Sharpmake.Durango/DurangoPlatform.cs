@@ -25,12 +25,22 @@ namespace Sharpmake
     {
         [PlatformImplementation(Platform.durango,
             typeof(IPlatformDescriptor),
+            typeof(Project.Configuration.IConfigurationTasks),
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IMicrosoftPlatformBff),
             typeof(IPlatformVcxproj))]
         public sealed partial class DurangoPlatform : BaseMicrosoftPlatform, IFastBuildCompilerSettings
         {
+            public override IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            {
+                var dirs = new List<string>();
+                string platformDirsStr = configuration.Target.GetFragment<DevEnv>().GetDurangoLibraryPath();
+                dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
+
+                return dirs;
+            }
+
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Durango";
             public override bool IsPcPlatform => false;
@@ -66,13 +76,6 @@ namespace Sharpmake
                 string projectRootPath
             )
             {
-                var fastBuildCompilerSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.durango);
-                if (!fastBuildCompilerSettings.BinPath.ContainsKey(devEnv))
-                    fastBuildCompilerSettings.BinPath.Add(devEnv, devEnv.GetDurangoBinPath());
-
-                if (!fastBuildCompilerSettings.LinkerPath.ContainsKey(devEnv))
-                    fastBuildCompilerSettings.LinkerPath.Add(devEnv, fastBuildCompilerSettings.BinPath[devEnv]);
-
                 switch (devEnv)
                 {
                     case DevEnv.vs2012:
@@ -87,7 +90,7 @@ namespace Sharpmake
                         {
                             var win64PlatformSettings = PlatformRegistry.Get<IPlatformBff>(Platform.win64);
 
-                            string overrideName = devEnv == DevEnv.vs2015 ? "Compiler-x64-v140-vs2015" : "Compiler-x64-v141-vs2017";
+                            string overrideName = "Compiler-" + Sharpmake.Util.GetSimplePlatformString(Platform.win64) + "-" + devEnv;
                             CompilerSettings compilerSettings = win64PlatformSettings.GetMasterCompilerSettings(masterCompilerSettings, overrideName, rootPath, devEnv, projectRootPath, false);
                             compilerSettings.PlatformFlags |= Platform.durango;
                             SetConfiguration(compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
@@ -154,17 +157,33 @@ namespace Sharpmake
                 if (!configurations.ContainsKey(configName))
                 {
                     var fastBuildCompilerSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.durango);
+                    string binPath;
+                    if (!fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out binPath))
+                        binPath = devEnv.GetDurangoBinPath();
+
+                    string linkerPath;
+                    if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
+                        linkerPath = binPath;
+
                     configurations.Add(
                         configName,
                         new CompilerSettings.Configuration(
                             Platform.durango,
-                            binPath: Sharpmake.Util.GetCapitalizedPath(Sharpmake.Util.PathGetAbsolute(projectRootPath, fastBuildCompilerSettings.BinPath[devEnv])),
-                            linkerPath: Sharpmake.Util.GetCapitalizedPath(Sharpmake.Util.PathGetAbsolute(projectRootPath, fastBuildCompilerSettings.LinkerPath[devEnv])),
+                            binPath: Sharpmake.Util.GetCapitalizedPath(Sharpmake.Util.PathGetAbsolute(projectRootPath, binPath)),
+                            linkerPath: Sharpmake.Util.GetCapitalizedPath(Sharpmake.Util.PathGetAbsolute(projectRootPath, linkerPath)),
                             librarian: @"$LinkerPath$\lib.exe",
                             linker: @"$LinkerPath$\link.exe"
                         )
                     );
-                    configurations.Add(".durangoConfigMasm", new CompilerSettings.Configuration(Platform.durango, compiler: @"$BinPath$\ml64.exe", usingOtherConfiguration: @".durangoConfig"));
+
+                    configurations.Add(
+                        ".durangoConfigMasm",
+                        new CompilerSettings.Configuration(
+                            Platform.durango,
+                            compiler: @"$BinPath$\ml64.exe",
+                            usingOtherConfiguration: configName
+                        )
+                    );
                 }
             }
             #endregion
@@ -179,15 +198,6 @@ namespace Sharpmake
             public override IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)
             {
                 yield return "_DURANGO";
-            }
-
-            public override IEnumerable<string> GetPlatformLibraryPaths(IGenerationContext context)
-            {
-                var dirs = new List<string>(base.GetPlatformLibraryPaths(context));
-                string platformDirsStr = context.DevelopmentEnvironment.GetDurangoLibraryPath();
-                dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
-
-                return dirs;
             }
 
             public override IEnumerable<string> GetCxUsingPath(IGenerationContext context)

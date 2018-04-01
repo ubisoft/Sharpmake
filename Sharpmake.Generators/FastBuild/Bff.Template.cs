@@ -211,7 +211,8 @@ Compiler( '[fastbuildCompilerName]' )
                 public static string CompilerOptionsCommon = @"
     .CompilerInputUnity       = '[fastBuildUnityName]'
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputPath        = '[fastBuildInputPath]'
+    .CompilerInputPath        = [fastBuildInputPath]
+    .CompilerInputPattern     = [fastBuildCompilerInputPattern]
     .CompilerInputExcludedFiles = [fastBuildInputExcludedFiles]
     .CompilerInputFiles       = [fastBuildSourceFiles]
 
@@ -241,8 +242,7 @@ Compiler( '[fastbuildCompilerName]' )
 ";
 
                 public static string LibrarianAdditionalInputs = @"
-    .LibrarianAdditionalInputs = { [fastBuildLibrarianAdditionalInputs]
-                                 }
+    .LibrarianAdditionalInputs = [fastBuildLibrarianAdditionalInputs]
 ";
 
                 public static string LibrarianOptions = @"
@@ -393,8 +393,7 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 //=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]' )
 {
-    .Targets = { [fastBuildTargetSubTargets]
-               }
+    .Targets = [fastBuildTargetSubTargets]
 }
 
 ";
@@ -484,7 +483,7 @@ Exec( '[fastBuildPreBuildName]' )
                 public static string UnitySection = @"
 Unity( '[unityFile.UnityName]' )
 {
-    .UnityInputPath                     = '[unityFile.UnityInputPath]'
+    .UnityInputPath                     = [unityFile.UnityInputPath]
     .UnityInputExcludePath              = [unityFile.UnityInputExcludePath]
     .UnityInputExcludePattern           = '[unityFile.UnityInputExcludePattern]'
     .UnityInputPattern                  = '[unityFile.UnityInputPattern]'

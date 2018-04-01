@@ -108,7 +108,7 @@ namespace Sharpmake
         /// <param name="extensionAssembly">The <see cref="Assembly"/> to scan.</param>
         /// <exception cref="ArgumentNullException"><paramref name="extensionAssembly"/> is `null`.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="extensionAssembly"/> was loaded in reflection-only.</exception>
-        /// <exception cref="NotSupportedException"><paramref name="extensionAssembly"/> is a dynamically </exception>
+        /// <exception cref="NotSupportedException"><paramref name="extensionAssembly"/> is a dynamically compiled assembly.</exception>
         public static void RegisterExtensionAssembly(Assembly extensionAssembly)
         {
             if (extensionAssembly == null)

@@ -14,7 +14,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace SimpleNuGet.Impl
+namespace Sharpmake.NuGet.Impl
 {
     /// <summary>
     /// A string parser is an object that handles the parsing of ${xyz} tags.

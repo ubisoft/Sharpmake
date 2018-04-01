@@ -62,7 +62,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SimpleNuGet.Impl
+namespace Sharpmake.NuGet.Impl
 {
     // ReSharper disable LoopCanBeConvertedToQuery
     // ReSharper disable RedundantExplicitArrayCreation

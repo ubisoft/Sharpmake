@@ -15,7 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleNuGet.Impl
+namespace Sharpmake.NuGet.Impl
 {
     /// <summary>
     /// Provides a typed array interface around a json object where each key represent an item in the list.

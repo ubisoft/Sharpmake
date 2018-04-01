@@ -25,7 +25,7 @@ namespace Sharpmake.Generators.Generic
     /// <summary>
     ///
     /// </summary>
-    public partial class Makefile
+    public partial class Makefile : IProjectGenerator
     {
         private const string MakeExtension = ".make";
         private const string ObjectExtension = ".o";

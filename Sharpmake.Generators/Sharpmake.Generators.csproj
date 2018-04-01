@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -59,6 +61,7 @@
     <Compile Include="FastBuild\IClangPlatformBff.cs" />
     <Compile Include="FastBuild\IMicrosoftPlatformBff.cs" />
     <Compile Include="FastBuild\IPlatformBff.cs" />
+    <Compile Include="FastBuild\MasterBff.cs" />
     <Compile Include="FileGenerator.cs" />
     <Compile Include="FileGeneratorUtilities.cs" />
     <Compile Include="GeneratorManager.cs" />
@@ -75,6 +78,8 @@
     <Compile Include="VisualStudio\Csproj.cs" />
     <Compile Include="VisualStudio\IPlatformVcxproj.cs" />
     <Compile Include="VisualStudio\IVcxprojGenerationContext.cs" />
+    <Compile Include="VisualStudio\ProjectJson.Template.cs" />
+    <Compile Include="VisualStudio\ProjectJson.cs" />
     <Compile Include="VisualStudio\ProjectOptionsGenerator.cs" />
     <Compile Include="VisualStudio\Pyproj.Template.cs" />
     <Compile Include="VisualStudio\Pyproj.cs" />
@@ -88,10 +93,6 @@
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj">
       <Project>{15F793C7-9E88-64A9-591C-7244FCC6B771}</Project>
       <Name>Sharpmake</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleNuGet\SimpleNuGet.csproj">
-      <Project>{D163B9B5-0A3D-9F09-F47E-83EB1485E2C0}</Project>
-      <Name>SimpleNuGet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

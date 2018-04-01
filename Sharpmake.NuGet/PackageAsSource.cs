@@ -14,7 +14,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace SimpleNuGet
+namespace Sharpmake.NuGet
 {
     [DataContract]
     public class PackageAsSource

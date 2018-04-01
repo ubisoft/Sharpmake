@@ -152,6 +152,20 @@ namespace Sharpmake
             }
         }
 
+        public static string GetVSYear(this DevEnv visualVersion)
+        {
+            switch (visualVersion)
+            {
+                case DevEnv.vs2010: return "2010";
+                case DevEnv.vs2012: return "2012";
+                case DevEnv.vs2013: return "2013";
+                case DevEnv.vs2015: return "2015";
+                case DevEnv.vs2017: return "2017";
+                default:
+                    throw new Error("DevEnv " + visualVersion + " not recognized!");
+            }
+        }
+
         public static string GetVisualStudioDir(this DevEnv visualVersion)
         {
             string registryKeyString = string.Format(

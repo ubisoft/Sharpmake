@@ -99,6 +99,7 @@ namespace Sharpmake
             {
                 void SetupLibraryPaths(Configuration configuration, DependencySetting dependencySetting, Configuration dependency);
                 string GetDefaultOutputExtension(OutputType outputType);
+                IEnumerable<string> GetPlatformLibraryPaths(Configuration configuration);
             }
 
             private static int s_count = 0;
@@ -109,7 +110,6 @@ namespace Sharpmake
             public Configuration()
             {
                 PrecompSourceExcludeExtension.Add(".asm");
-                ReferencesByNuGetPackage = new PackageReferences(this);
             }
 
             public static OutputType SimpleOutputType(OutputType type)
@@ -593,8 +593,13 @@ namespace Sharpmake
 
             public class FileCustomBuild
             {
+                public FileCustomBuild(string description = "Copy files...")
+                {
+                    Description = description;
+                }
+
+                public string Description;
                 public Strings CommandLines = new Strings();
-                public string Description = "";
                 public Strings Inputs = new Strings();
                 public Strings Outputs = new Strings();
                 public bool LinkObjects = false;
@@ -639,9 +644,18 @@ namespace Sharpmake
                 }
             }
 
-            public abstract class BuildStepBase
+            public abstract class BuildStepBase : IComparable
             {
                 public bool IsNameSpecific { get; set; }
+
+                // Override this to control the order of BuildStep execution in Build Events
+                public virtual int CompareTo(object obj)
+                {
+                    if (obj == null)
+                        return 1;
+
+                    return 0;
+                }
             }
 
 
@@ -692,7 +706,7 @@ namespace Sharpmake
             public UniqueList<BuildStepBase> EventCustomPostBuildExe = new UniqueList<BuildStepBase>();
             public Dictionary<string, BuildStepBase> EventPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public Dictionary<string, BuildStepBase> EventCustomPostBuildExecute = new Dictionary<string, BuildStepBase>();
-            public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>();
+            public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>(); // <path to file, destination folder>
             public BuildStepExecutable PostBuildStampExe = null;
 
             public List<string> CustomBuildStep = new List<string>();
@@ -748,7 +762,10 @@ namespace Sharpmake
 
             // FastBuild configuration
             public bool IsFastBuild = false;
+
+            [Obsolete("Sharpmake will determine the projects to build.")]
             public bool IsMainProject = false;
+
             public bool FastBuildBlobbed = true;
             [Obsolete("Use FastBuildDistribution instead.")]
             public bool FastBuildDisableDistribution = false;
@@ -775,16 +792,16 @@ namespace Sharpmake
             public IEnumerable<string> ResolvedTargetDependsFiles => _resolvedTargetDependsFiles;
 
             private UniqueList<BuildStepBase> _resolvedEventPreBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventPreBuildExe => _resolvedEventPreBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventPreBuildExe => _resolvedEventPreBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventPostBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventPostBuildExe => _resolvedEventPostBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventPostBuildExe => _resolvedEventPostBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventCustomPreBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventCustomPreBuildExe => _resolvedEventCustomPreBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventCustomPreBuildExe => _resolvedEventCustomPreBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedEventCustomPostBuildExe = new UniqueList<BuildStepBase>();
-            public IEnumerable<BuildStepBase> ResolvedEventCustomPostBuildExe => _resolvedEventCustomPostBuildExe;
+            public IEnumerable<BuildStepBase> ResolvedEventCustomPostBuildExe => _resolvedEventCustomPostBuildExe.SortedValues;
 
             private UniqueList<BuildStepBase> _resolvedExecFiles = new UniqueList<BuildStepBase>();
             public IEnumerable<BuildStepBase> ResolvedExecFiles => _resolvedExecFiles;
@@ -1153,8 +1170,7 @@ namespace Sharpmake
             public Strings ForceUsingFiles = new Strings();
 
             // NuGet packages (only C# for now)
-            public PackageReferences ReferencesByNuGetPackage;
-            internal Strings NuGetPackageProjectReferencesByPath = new Strings();
+            public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
 
             public bool? ReferenceOutputAssembly = null;
 

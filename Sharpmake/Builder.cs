@@ -119,6 +119,8 @@ namespace Sharpmake
 
         public BuildContext.BaseBuildContext Context { get; private set; }
 
+        private readonly BuilderExtension _builderExt;
+
         private ConcurrentDictionary<Type, GenerationOutput> _generationReport = new ConcurrentDictionary<Type, GenerationOutput>();
         private HashSet<Type> _buildScheduledType = new HashSet<Type>();
 
@@ -144,6 +146,7 @@ namespace Sharpmake
             _getGeneratorsManagerCallBack().InitializeBuilder(this);
             Trace.Assert(Instance == null);
             Instance = this;
+            _builderExt = new BuilderExtension(this);
 
             if (_multithreaded)
             {
@@ -485,6 +488,12 @@ namespace Sharpmake
             }
         }
 
+        internal void RegisterGeneratedProject(Project project)
+        {
+            lock (_generatedProjects)
+                _generatedProjects.Add(project);
+        }
+
         private static void LogObject(TextWriter writer, string prefix, object obj)
         {
             Type type = obj.GetType();
@@ -727,6 +736,9 @@ namespace Sharpmake
                 var projects = new List<Project>(_projects.Values);
                 var solutions = new List<Solution>(_solutions.Values);
 
+                // Append generated projects, if any
+                projects.AddRange(_generatedProjects);
+
                 // Pre event
                 EventPreGeneration?.Invoke(projects, solutions);
 
@@ -831,12 +843,7 @@ namespace Sharpmake
 
                     if (project.SourceFilesFilters == null || (project.SourceFilesFiltersCount != 0 && !project.SkipProjectWhenFiltersActive))
                     {
-                        if (project is CSharpProject)
-                            _getGeneratorsManagerCallBack().Generate(this, (CSharpProject)project, configurations, projectFile, output.Generated, output.Skipped);
-                        else if (project is PythonProject)
-                            _getGeneratorsManagerCallBack().Generate(this, (PythonProject)project, configurations, projectFile, output.Generated, output.Skipped);
-                        else
-                            _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
+                        _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
                     }
                 }
                 catch (Exception ex)
@@ -900,6 +907,8 @@ namespace Sharpmake
 
         internal Dictionary<Type, Project> _projects = new Dictionary<Type, Project>();
         internal Dictionary<Type, Solution> _solutions = new Dictionary<Type, Solution>();
+
+        private List<Project> _generatedProjects = new List<Project>();
 
         private bool _linked = false;
         private readonly Func<IGeneratorManager> _getGeneratorsManagerCallBack;

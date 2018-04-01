@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 namespace Sharpmake.Generators.VisualStudio
 {
-    public partial class Pyproj
+    public partial class Pyproj : IProjectGenerator
     {
         internal class ItemGroups
         {
@@ -72,7 +72,7 @@ namespace Sharpmake.Generators.VisualStudio
             writer.Write(resolver.Resolve(value));
         }
 
-        public void Generate(Builder builder, PythonProject project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
+        public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
         {
             _builder = builder;
 
@@ -80,7 +80,11 @@ namespace Sharpmake.Generators.VisualStudio
             string projectPath = fileInfo.Directory.FullName;
             string projectFileName = fileInfo.Name;
             bool updated;
-            string projectFileResult = Generate(project, configurations, projectPath, projectFileName, out updated);
+
+            if (!(project is PythonProject))
+                throw new ArgumentException("Project is not a PythonProject");
+
+            string projectFileResult = Generate((PythonProject)project, configurations, projectPath, projectFileName, out updated);
             if (updated)
                 generatedFiles.Add(projectFileResult);
             else

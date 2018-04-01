@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Sharpmake.Generators.Apple
 {
-    public partial class XCodeProj
+    public partial class XCodeProj : IProjectGenerator
     {
         private Builder _builder;
         public const string ProjectExtension = ".xcodeproj";
