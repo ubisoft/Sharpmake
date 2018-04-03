@@ -236,7 +236,8 @@ namespace Sharpmake
         private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
         public List<string> _references = new List<string>();
-        private static readonly string s_moduleBaseRegex = @"^\s*\[\s*module\s*:\s*Sharpmake\s*\.\s*{0}\s*\(\s*@?\""(?<{0}>.*?)\""\s*\)\s*\]\s*$";
+        private const string _dp = @"(/\*.*?\*/|\s)*"; // Discardable Part, we use _dp to make it small in the following line
+        private static readonly string s_moduleBaseRegex = $@"^{_dp}\[{_dp}module{_dp}:{_dp}Sharpmake{_dp}\.{_dp}{{0}}{_dp}\({_dp}@?\""(?<{{0}}>.*?)\""{_dp}\){_dp}\]{_dp}(//.*)?$";
         private static readonly Regex s_includeRegex = new Regex(string.Format(s_moduleBaseRegex, "Include"), RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
         private static readonly Regex s_referenceRegex = new Regex(string.Format(s_moduleBaseRegex, "Reference"), RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
 

@@ -42,6 +42,15 @@ namespace Sharpmake.UnitTests
 
         #region Include
         [Test]
+        public void EmptyLine()
+        {
+            var includes = new List<string>();
+            Assembler.GetSharpmakeIncludesFromLine("", _fakeFileInfo, _fakeFileLine, ref includes);
+
+            Assert.That(includes.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public void SimpleInclude()
         {
             const string sharpmakeIncludedFile = "someproject.sharpmake.cs";
@@ -93,20 +102,83 @@ namespace Sharpmake.UnitTests
         }
 
         [Test]
-        public void ConvolutedIncludeWithComments()
+        public void ConvolutedIncludeWithComments1()
         {
-            const string sharpmakeIncludedFile = "some project with spaces.sharpmake.cs";
-            string sharpmakeIncludeFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeIncludedFile);
+            string[] sharpmakeIncludedFiles = {
+                Path.Combine("folder", "sub1", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file2.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "nottoinclude.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "nottoinclude.sharpmake.cs")
+            };
+            string[] sharpmakeIncludesFullPath = sharpmakeIncludedFiles.Select(file => Path.Combine(_fakeFileInfo.DirectoryName, file)).ToArray();
 
-            Util.AddNewFakeFile(sharpmakeIncludedFile, 0);
+            foreach (string file in sharpmakeIncludedFiles)
+                Util.AddNewFakeFile(file, 0);
 
-            string line = $"   [  module\t :/**/Sharpmake  .\t Include (  /* comment with string inisde @\"{sharpmakeIncludedFile}\" */ @\"{sharpmakeIncludedFile}\" \t) ]  \t // This is comment";
+            string line = @"[module/*:Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]/**/: Sharpmake/*.Reference*/.Include(/*asda(@"" /*dsa*/@""folder*/sub*/*file*.cs"")]// asdmvie  aas */ asd [module: Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]";
 
             var includes = new List<string>();
             Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
 
-            Assert.That(includes.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+            Assert.That(includes.Count, Is.EqualTo(5));
+            CollectionAssert.IsSubsetOf(includes, sharpmakeIncludesFullPath);
+            foreach (string include in includes)
+                StringAssert.DoesNotContain(include, "nottoinclude.sharpmake.cs");
+        }
+
+        [Test]
+        public void ConvolutedIncludeWithComments2()
+        {
+            string[] sharpmakeIncludedFiles = {
+                Path.Combine("folder", "sub1", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file2.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "nottoinclude.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "nottoinclude.sharpmake.cs")
+            };
+            string[] sharpmakeIncludesFullPath = sharpmakeIncludedFiles.Select(file => Path.Combine(_fakeFileInfo.DirectoryName, file)).ToArray();
+
+            foreach (string file in sharpmakeIncludedFiles)
+                Util.AddNewFakeFile(file, 0);
+
+            string line = @"/**/[module: Sharpmake.Include(@""folder*/sub*/*file*.cs"")] // asdmvie aas */ [module: Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]";
+
+            var includes = new List<string>();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+
+            Assert.That(includes.Count, Is.EqualTo(5));
+            CollectionAssert.IsSubsetOf(includes, sharpmakeIncludesFullPath);
+            foreach (string include in includes)
+                StringAssert.DoesNotContain(include, "nottoinclude.sharpmake.cs");
+        }
+
+        [Test]
+        public void ConvolutedIncludeWithComments_NoInclude()
+        {
+            string[] sharpmakeIncludedFiles = {
+                Path.Combine("folder", "sub1", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "file2.sharpmake.cs"),
+                Path.Combine("folder", "sub1", "nottoinclude.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file1.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "file3.sharpmake.cs"),
+                Path.Combine("folder", "sub2", "nottoinclude.sharpmake.cs")
+            };
+
+            foreach (string file in sharpmakeIncludedFiles)
+                Util.AddNewFakeFile(file, 0);
+
+            string line = @"//**/[module: Sharpmake.Include(@""folder*/sub*/*file*.cs"")] // asdmvie aas */ [module: Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]";
+
+            var includes = new List<string>();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+
+            Assert.That(includes.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -126,7 +198,7 @@ namespace Sharpmake.UnitTests
             foreach (string file in sharpmakeIncludedFiles)
                 Util.AddNewFakeFile(file, 0);
 
-            string line = @"[module: Sharpmake.Include(""folder/*/file*.cs"")]";
+            string line = @"[module: Sharpmake.Include(""folder/*sub*/file*.cs"")]";
 
             var includes = new List<string>();
             Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
