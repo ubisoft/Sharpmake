@@ -703,6 +703,20 @@ namespace Sharpmake.Generators.VisualStudio
             else if (hasFastBuildConfig)
                 GenerateBffFilesSection(context, fileGenerator);
 
+            // Generate and add reference to packages.config file for project
+            if (firstConf.ReferencesByNuGetPackage.Count > 0)
+            {
+                var packagesConfig = new PackagesConfig();
+                packagesConfig.Generate(context.Builder, firstConf, "native", context.ProjectDirectory, generatedFiles, skipFiles);
+                if (packagesConfig.IsGenerated)
+                {
+                    fileGenerator.Write(Template.Project.ProjectFilesBegin);
+                    using (fileGenerator.Declare("file", new ProjectFile(context, Util.SimplifyPath(packagesConfig.PackagesConfigPath))))
+                        fileGenerator.Write(Template.Project.ProjectFilesNone);
+                    fileGenerator.Write(Template.Project.ProjectFilesEnd);
+                }
+            }
+
             // Import platform makefiles.
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateMakefileConfigurationVcxproj(context, fileGenerator);
@@ -737,7 +751,38 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
             }
+            
+            // add imports to nuget packages
+            foreach (var package in firstConf.ReferencesByNuGetPackage)
+            {
+                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceImport));
+            }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
+
+            // add error checks for nuget package targets files
+            if (firstConf.ReferencesByNuGetPackage.Count > 0)
+            {
+                using (fileGenerator.Declare("targetName", "EnsureNuGetPackageBuildImports"))
+                using (fileGenerator.Declare("beforeTargets", "PrepareForBuild"))
+                {
+                    fileGenerator.Write(Template.Project.ProjectCustomTargetsBegin);
+                }
+
+                fileGenerator.Write(Template.Project.PropertyGroupStart);
+                using (fileGenerator.Declare("custompropertyname", "ErrorText"))
+                using (fileGenerator.Declare("custompropertyvalue", "This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}."))
+                {
+                    fileGenerator.Write(Template.Project.CustomProperty);
+                }
+                fileGenerator.Write(Template.Project.PropertyGroupEnd);
+
+                foreach (var package in firstConf.ReferencesByNuGetPackage)
+                {
+                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceError));
+                }
+
+                fileGenerator.Write(Template.Project.ProjectCustomTargetsEnd);
+            }
 
             // in case we are using fast build we do not want to write the dependencies
             // in the vcxproj because they are handled internally in the bff
