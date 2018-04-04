@@ -15,7 +15,7 @@
 using Sharpmake;
 using System;
 
-namespace CSharpPackageReference
+namespace PackageReference
 {
     [Generate]
     public class PackageReferences : CSharpProject
@@ -23,13 +23,13 @@ namespace CSharpPackageReference
         public PackageReferences()
         {
             AddTargets(new Target(
-            Platform.anycpu,
+            Platform.win64,
             DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.v4_5 | DotNetFramework.v4_6_2));
+            DotNetFramework.v4_5_2 | DotNetFramework.v4_6_2));
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
@@ -54,18 +54,50 @@ namespace CSharpPackageReference
     }
 
     [Generate]
-    public class PackageReferenceSolution : CSharpSolution
+    public class PackageReferencesCPP : Project
     {
-        public PackageReferenceSolution()
+        public PackageReferencesCPP()
         {
             AddTargets(new Target(
-            Platform.anycpu,
+            Platform.win64,
             DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.v4_5 | DotNetFramework.v4_6_2));
+            DotNetFramework.v4_5_2 | DotNetFramework.v4_6_2));
+
+            RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
+
+            // This Path will be used to get all SourceFiles in this Folder and all subFolders
+            SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
+        }
+
+        [Configure()]
+        public virtual void ConfigureAll(Configuration conf, Target target)
+        {
+            conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
+            conf.ProjectPath = @"[project.RootPath]";
+
+            conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
+
+            conf.ReferencesByNuGetPackage.Add("gtest-vc140-static-64", "1.1.0");
+        }
+    }
+
+    [Generate]
+    public class PackageReferenceSolution : CSharpSolution
+    {
+        public PackageReferenceSolution()
+        {
+            AddTargets(new Target(
+            Platform.win64,
+            DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
+            Optimization.Debug | Optimization.Release,
+            OutputType.Dll,
+            Blob.NoBlob,
+            BuildSystem.MSBuild,
+            DotNetFramework.v4_5_2 | DotNetFramework.v4_6_2));
         }
 
         [Configure()]
@@ -78,6 +110,7 @@ namespace CSharpPackageReference
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";
 
             conf.AddProject<PackageReferences>(target);
+            conf.AddProject<PackageReferencesCPP>(target);
         }
 
         [Main]
