@@ -67,6 +67,15 @@ namespace Sharpmake
                 }
             }
 
+            public string Resolve(Resolver resolver, string customTemplate)
+            {
+                using (resolver.NewScopedParameter("packageName", Name))
+                using (resolver.NewScopedParameter("packageVersion", Version))
+                {
+                    return resolver.Resolve(customTemplate);
+                }
+            }
+
             public int CompareTo(PackageReference other)
             {
                 if (ReferenceEquals(this, other))

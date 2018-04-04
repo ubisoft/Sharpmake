@@ -350,10 +350,14 @@ jobs:
         working-directory: 'samples/PackageReferences'
         run: |
           & $env:SHARPMAKE_WIN_EXE "/sources('PackageReferences.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-          projects\packagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe
-          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-          projects\packagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe
+          nuget restore projects\PackageReferenceSolution.vs2017.v4_7_2.sln
+          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "x64"
+          projects\csharppackagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe
+          projects\cpppackagereferences\output\vs2017\${{ matrix.configuration }}\cpppackagereferences.exe
+          nuget restore projects\PackageReferenceSolution.vs2019.v4_7_2.sln
+          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "x64"
+          projects\csharppackagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe
+          projects\cpppackagereferences\output\vs2019\${{ matrix.configuration }}\cpppackagereferences.exe
 
       - name: Install Qt
         if: runner.os == 'Windows'
