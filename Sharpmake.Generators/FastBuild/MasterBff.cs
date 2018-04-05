@@ -655,7 +655,7 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastBuildVS2012EnumBugWorkaround", fastBuildVS2012EnumBugWorkaround))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);
-                    foreach (var compilerConfiguration in compilerSettings.Configurations)
+                    foreach (var compilerConfiguration in compilerSettings.Configurations.OrderBy(x => x.Key))
                     {
                         var compConf = compilerConfiguration.Value;
 
