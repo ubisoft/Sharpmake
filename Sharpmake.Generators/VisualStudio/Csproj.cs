@@ -40,6 +40,8 @@ namespace Sharpmake.Generators.VisualStudio
             internal ItemGroup<Compile> Compiles = new ItemGroup<Compile>();
             internal ItemGroup<ProjectReference> ProjectReferences = new ItemGroup<ProjectReference>();
             internal ItemGroup<BootstrapperPackage> BootstrapperPackages = new ItemGroup<BootstrapperPackage>();
+            internal ItemGroup<FileAssociationItem> FileAssociationItems = new ItemGroup<FileAssociationItem>();
+            internal ItemGroup<PublishFile> PublishFiles = new ItemGroup<PublishFile>();
             internal ItemGroup<EmbeddedResource> EmbeddedResources = new ItemGroup<EmbeddedResource>();
             internal ItemGroup<Page> Pages = new ItemGroup<Page>();
             internal ItemGroup<Resource> Resources = new ItemGroup<Resource>();
@@ -72,6 +74,8 @@ namespace Sharpmake.Generators.VisualStudio
                 writer.Write(Resources.Resolve(resolver));
                 writer.Write(EmbeddedResources.Resolve(resolver));
                 writer.Write(BootstrapperPackages.Resolve(resolver));
+                writer.Write(FileAssociationItems.Resolve(resolver));
+                writer.Write(PublishFiles.Resolve(resolver));
                 writer.Write(ProjectReferences.Resolve(resolver));
                 writer.Write(WebReferences.Resolve(resolver));
                 writer.Write(WebReferenceUrls.Resolve(resolver));
@@ -612,6 +616,50 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            internal class FileAssociationItem : ItemGroupItem, IResolvable
+            {
+                public bool? Visible;
+                public string Description;
+                public string Progid;
+                public string DefaultIcon;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("visible", Visible))
+                    using (resolver.NewScopedParameter("description", Description))
+                    using (resolver.NewScopedParameter("progid", Progid))
+                    using (resolver.NewScopedParameter("defaultIcon", DefaultIcon))
+                    using (LinkParameter(resolver))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.FileAssociationItem);
+                    }
+                }
+            }
+
+            internal class PublishFile : ItemGroupItem, IResolvable
+            {
+                public bool? Visible;
+                public string Group;
+                public PublishState PublishState;
+                public bool IncludeHash;
+                public FileType FileType;
+
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("visible", Visible))
+                    using (resolver.NewScopedParameter("group", Group))
+                    using (resolver.NewScopedParameter("publishState", PublishState))
+                    using (resolver.NewScopedParameter("includeHash", IncludeHash))
+                    using (resolver.NewScopedParameter("fileType", FileType))
+                    using (LinkParameter(resolver))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.PublishFile);
+                    }
+                }
+            }
+
             internal class EmbeddedResource : ItemGroups.ItemGroupItem, IResolvable
             {
                 public string DependUpon = null;
@@ -619,6 +667,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Generator = null;
                 public string LastGenOutput = null;
                 public string SubType = "Designer";
+                public string CopyToOutputDirectory = null;
 
                 public string Resolve(Resolver resolver)
                 {
@@ -626,6 +675,7 @@ namespace Sharpmake.Generators.VisualStudio
                     using (resolver.NewScopedParameter("generator", Generator))
                     using (resolver.NewScopedParameter("lastGenOutput", LastGenOutput))
                     using (resolver.NewScopedParameter("subType", SubType))
+                    using (resolver.NewScopedParameter("copyToOutputDirectory", CopyToOutputDirectory))
                     using (resolver.NewScopedParameter("dependentUpon", DependUpon))
                     using (resolver.NewScopedParameter("mergeWithCto", MergeWithCto))
                     using (LinkParameter(resolver))
@@ -639,6 +689,8 @@ namespace Sharpmake.Generators.VisualStudio
                             writer.Write(Template.ItemGroups.LastGenOutput);
                         if (!string.IsNullOrWhiteSpace(SubType))
                             writer.Write(Template.ItemGroups.SubType);
+                        if (CopyToOutputDirectory != null)
+                            writer.Write(Template.ItemGroups.CopyToOutputDirectory);
                         if (!string.IsNullOrWhiteSpace(DependUpon))
                             writer.Write(Template.ItemGroups.DependentUpon);
                         if (!string.IsNullOrWhiteSpace(MergeWithCto))
@@ -1283,6 +1335,13 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
+        private enum CopyToOutputDirectory
+        {
+            Never,
+            Always,
+            PreserveNewest
+        }
+
         private void GenerateFiles(
             CSharpProject project,
             List<Project.Configuration> configurations,
@@ -1302,13 +1361,13 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var content in project.AdditionalContentAlwaysCopy)
             {
                 var includePath = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Contents.Add(new ItemGroups.Content { Include = includePath, CopyToOutputDirectory = "Always", LinkFolder = project.GetLinkFolder(includePath) });
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = includePath, CopyToOutputDirectory = CopyToOutputDirectory.Always.ToString(), LinkFolder = project.GetLinkFolder(includePath) });
             }
 
             foreach (var content in project.AdditionalContentCopyIfNewer)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, CopyToOutputDirectory = "PreserveNewest", LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest.ToString(), LinkFolder = project.GetLinkFolder(include) });
             }
 
             foreach (var content in project.AdditionalContent)
@@ -1326,13 +1385,13 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var content in project.AdditionalNoneAlwaysCopy)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = "Always", LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.Always.ToString(), LinkFolder = project.GetLinkFolder(include) });
             }
 
             foreach (var content in project.AdditionalNoneCopyIfNewer)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = "PreserveNewest", LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest.ToString(), LinkFolder = project.GetLinkFolder(include) });
             }
 
             if (!string.IsNullOrWhiteSpace(project.ApplicationSplashScreen))
@@ -1347,6 +1406,18 @@ namespace Sharpmake.Generators.VisualStudio
                 itemGroups.Analyzers.Add(new ItemGroups.Analyzer { Include = include });
             }
             #endregion
+
+            foreach (var embeddedResource in project.AdditionalEmbeddedResourceAlwaysCopy)
+            {
+                string file = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(embeddedResource));
+                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.Always.ToString(), LinkFolder = project.GetLinkFolder(file) });
+            }
+
+            foreach (var embeddedResource in project.AdditionalEmbeddedResourceCopyIfNewer)
+            {
+                string file = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(embeddedResource));
+                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest.ToString(), LinkFolder = project.GetLinkFolder(file) });
+            }
 
             if (configurations.SelectMany(config => config.AdditionalNone).Any(noneInclude => !configurations.First().AdditionalNone.Contains(noneInclude)))
             {
@@ -1987,6 +2058,31 @@ namespace Sharpmake.Generators.VisualStudio
                     Visible = b.Visible,
                 }
                 ));
+
+            itemGroups.FileAssociationItems.AddRange(project.FileAssociationItems.Select(
+                b =>
+                    new ItemGroups.FileAssociationItem()
+                    {
+                        Include = b.Include,
+                        Visible = b.Visible,
+                        Description = b.Description,
+                        Progid = b.Progid,
+                        DefaultIcon = b.DefaultIcon
+                    }
+            ));
+
+            itemGroups.PublishFiles.AddRange(project.PublishFiles.Select(
+                b =>
+                    new ItemGroups.PublishFile()
+                    {
+                        Include = b.Include,
+                        Visible = b.Visible,
+                        Group = b.Group,
+                        PublishState = b.PublishState,
+                        IncludeHash = b.IncludeHash,
+                        FileType = b.FileType
+                    }
+            ));
             #endregion
         }
 
@@ -2681,6 +2777,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectOption
             (
+            Options.Option(Options.CSharp.CopyVsixExtensionFiles.Enabled, () => { options["CopyVsixExtensionFiles"] = "true"; }),
+            Options.Option(Options.CSharp.CopyVsixExtensionFiles.Disabled, () => { options["CopyVsixExtensionFiles"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
             Options.Option(Options.CSharp.DeployExtension.Enabled, () => { options["DeployExtension"] = RemoveLineTag; }),
             Options.Option(Options.CSharp.DeployExtension.Disabled, () => { options["DeployExtension"] = "False"; })
             );
@@ -2762,8 +2864,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.UpdateEnabled.Disabled, () => { options["UpdateEnabled"] = RemoveLineTag; })
             );
             SelectOption(
-            Options.Option(Options.CSharp.UpdatePeriodically.Enabled, () => { options["UpdatePeriodically"] = "true"; }),
-            Options.Option(Options.CSharp.UpdatePeriodically.Disabled, () => { options["UpdatePeriodically"] = RemoveLineTag; })
+            Options.Option(Options.CSharp.UpdatePeriodically.Enabled, () => { options["UpdatePeriodically"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.UpdatePeriodically.Disabled, () => { options["UpdatePeriodically"] = "false"; })
             );
 
             SelectOption(
@@ -2792,8 +2894,13 @@ namespace Sharpmake.Generators.VisualStudio
             );
 
             SelectOption(
-            Options.Option(Options.CSharp.OpenBrowserOnPublish.Enabled, () => { options["OpenBrowserOnPublish"] = "true"; }),
-            Options.Option(Options.CSharp.OpenBrowserOnPublish.Disabled, () => { options["OpenBrowserOnPublish"] = RemoveLineTag; })
+            Options.Option(Options.CSharp.OpenBrowserOnPublish.Enabled, () => { options["OpenBrowserOnPublish"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.OpenBrowserOnPublish.Disabled, () => { options["OpenBrowserOnPublish"] = "false"; })
+            );
+
+            SelectOption(
+            Options.Option(Options.CSharp.CreateWebPageOnPublish.Enabled, () => { options["CreateWebPageOnPublish"] = "true"; }),
+            Options.Option(Options.CSharp.CreateWebPageOnPublish.Disabled, () => { options["CreateWebPageOnPublish"] = RemoveLineTag; })
             );
 
             SelectOption(
@@ -2935,6 +3042,7 @@ namespace Sharpmake.Generators.VisualStudio
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
             options["ManifestKeyFile"] = Options.StringOption.Get<Options.CSharp.ManifestKeyFile>(conf);
             options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
+            options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
 
             // concat defines, don't add options.Defines since they are automatically added by VS
             Strings defines = new Strings();

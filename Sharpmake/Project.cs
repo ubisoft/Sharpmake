@@ -1727,6 +1727,40 @@ namespace Sharpmake
         public bool Install;
     }
 
+    public class FileAssociationItem
+    {
+        public string Include;
+        public bool Visible;
+        public string Description;
+        public string Progid;
+        public string DefaultIcon;
+    }
+
+    public enum PublishState
+    {
+        Auto,
+        DataFile,
+        Exclude,
+        Include,
+        Prerequisite
+    }
+
+    public enum FileType
+    {
+        Assembly,
+        File
+    }
+
+    public class PublishFile
+    {
+        public string Include;
+        public bool Visible;
+        public string Group = string.Empty;
+        public PublishState PublishState = PublishState.Include;
+        public bool IncludeHash = true;
+        public FileType FileType = FileType.File;
+    }
+
     public enum CSharpProjectType
     {
         Test,
@@ -1931,6 +1965,8 @@ namespace Sharpmake
         public Strings ResolvedContentFullFileNames = new Strings();
         public Strings ResolvedNoneFullFileNames = new Strings();
         public Strings AdditionalEmbeddedResource = new Strings();
+        public Strings AdditionalEmbeddedResourceAlwaysCopy = new Strings();
+        public Strings AdditionalEmbeddedResourceCopyIfNewer = new Strings();
         public Strings AdditionalEmbeddedAssemblies = new Strings();
         public Strings AdditionalNone = new Strings();
         public Strings SourceNoneFilesExcludeRegex = new Strings();
@@ -1950,6 +1986,8 @@ namespace Sharpmake
         public Strings AnalyzerDllFilePaths = new Strings();
         public Strings AdditionalFolders = new Strings();
         public List<BootstrapperPackage> BootstrapperPackages = new List<BootstrapperPackage>();
+        public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
+        public List<PublishFile> PublishFiles = new List<PublishFile>();
 
         public bool IncludeResxAsResources = true;
         public string RootNamespace;

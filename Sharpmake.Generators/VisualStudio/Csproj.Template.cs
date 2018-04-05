@@ -61,7 +61,10 @@ namespace Sharpmake.Generators.VisualStudio
     <UseVSHostingProcess>[options.UseVSHostingProcess]</UseVSHostingProcess>
     <ProductName>[options.ProductName]</ProductName>
     <PublisherName>[options.PublisherName]</PublisherName>
+    <MinimumRequiredVersion>[options.MinimumRequiredVersion]</MinimumRequiredVersion>
     <WebPage>[options.WebPage]</WebPage>
+    <OpenBrowserOnPublish>[options.OpenBrowserOnPublish]</OpenBrowserOnPublish>
+    <CreateWebPageOnPublish>[options.CreateWebPageOnPublish]</CreateWebPageOnPublish>
     <BootstrapperComponentsUrl>[options.BootstrapperComponentsUrl]</BootstrapperComponentsUrl>
     <Install>[options.Install]</Install>
     <InstallFrom>[options.InstallFrom]</InstallFrom>
@@ -74,7 +77,10 @@ namespace Sharpmake.Generators.VisualStudio
     <CopyOutputSymbolsToOutputDirectory>[options.CopyOutputSymbolsToOutputDirectory]</CopyOutputSymbolsToOutputDirectory>
     <MapFileExtensions>[options.MapFileExtensions]</MapFileExtensions>
     <ApplicationRevision>[options.ApplicationRevision]</ApplicationRevision>
+    <ApplicationVersion>[options.ApplicationVersion]</ApplicationVersion>
     <UseApplicationTrust>[options.UseApplicationTrust]</UseApplicationTrust>
+    <CreateDesktopShortcut>[options.CreateDesktopShortcut]</CreateDesktopShortcut>
+    <PublishWizardCompleted>[options.PublishWizardCompleted]</PublishWizardCompleted>
     <BootstrapperEnabled>[options.BootstrapperEnabled]</BootstrapperEnabled>
     <MinimumVisualStudioVersion>[options.MinimumVisualStudioVersion]</MinimumVisualStudioVersion>
     <OldToolsVersion>[options.OldToolsVersion]</OldToolsVersion>
@@ -117,6 +123,8 @@ namespace Sharpmake.Generators.VisualStudio
     <StartWorkingDirectory>[options.StartWorkingDirectory]</StartWorkingDirectory>
     <CodeAnalysisRuleSet>[conf.CodeAnalysisRuleSetFilePath]</CodeAnalysisRuleSet>
     <LangVersion>[options.LanguageVersion]</LangVersion>
+    <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
+    <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
   </PropertyGroup>
 ";
 
@@ -417,6 +425,23 @@ namespace Sharpmake.Generators.VisualStudio
       <ProductName>[productName]</ProductName>
       <Install>[install]</Install>
     </BootstrapperPackage>
+";
+                public static string FileAssociationItem =
+                    @"    <FileAssociation Include=""[include]"">
+      <Visible>[visible]</Visible>
+      <Description>[description]</Description>
+      <Progid>[progid]</Progid>
+      <DefaultIcon>[defaultIcon]</DefaultIcon>
+    </FileAssociation>
+";
+                public static string PublishFile =
+                    @"    <PublishFile Include=""[include]"">
+      <Visible>[visible]</Visible>
+      <Group>[group]</Group>
+      <PublishState>[publishState]</PublishState>
+      <IncludeHash>[includeHash]</IncludeHash>
+      <FileType>[fileType]</FileType>
+    </PublishFile>
 ";
 
                 public static string ProjectReferenceBegin =

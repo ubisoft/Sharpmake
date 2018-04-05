@@ -62,6 +62,13 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum CopyVsixExtensionFiles
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             public enum GeneratePkgDefFile
             {
                 [Default]
@@ -141,8 +148,8 @@ namespace Sharpmake
 
             public enum UpdatePeriodically
             {
-                Enabled,
                 [Default]
+                Enabled,
                 Disabled
             }
 
@@ -296,6 +303,11 @@ namespace Sharpmake
                 public SuppressWarning(params string[] warnings) : base(string.Join(",", warnings)) { }
             }
 
+            public class CopyVsixExtensionLocation : StringOption
+            {
+                public CopyVsixExtensionLocation(string location) : base(location) { }
+            }
+
             public enum MapFileExtensions
             {
                 Enabled,
@@ -321,6 +333,13 @@ namespace Sharpmake
             {
                 [Default]
                 Enabled,
+                Disabled
+            }
+
+            public enum CreateWebPageOnPublish
+            {
+                Enabled,
+                [Default]
                 Disabled
             }
 
