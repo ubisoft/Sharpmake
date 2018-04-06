@@ -110,6 +110,14 @@ copy_list = [
     BinarySite("Sharpmake.Generators", "Sharpmake.Generators"),
 ]
 
+# Add the extension to the list of files to copy.
+if os.path.isdir("Sharpmake.Extensions"):
+    for extension_dir in os.listdir("Sharpmake.Extensions"):
+        name = extension_dir
+        path = os.path.join("Sharpmake.Extensions", extension_dir)
+        site = BinarySite(name, path)
+        copy_list.append(site)
+
 # Add the platforms to the list of files to copy.
 if os.path.isdir("Sharpmake.Platforms"):
     for platform_dir in os.listdir("Sharpmake.Platforms"):

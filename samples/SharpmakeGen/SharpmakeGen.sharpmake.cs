@@ -1,7 +1,11 @@
-﻿using Sharpmake;
+﻿using System;
+using System.Reflection;
+using Sharpmake;
+using System.Linq;
 
 [module: Sharpmake.Include("Platforms.sharpmake.cs")]
 [module: Sharpmake.Include("Samples.sharpmake.cs")]
+[module: Sharpmake.Include("Extensions.sharpmake.cs")]
 
 namespace SharpmakeGen
 {
@@ -136,7 +140,7 @@ namespace SharpmakeGen
             );
         }
 
-        [Configure()]
+        [Configure]
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.SolutionFileName = "[solution.Name]";
@@ -147,20 +151,12 @@ namespace SharpmakeGen
             conf.AddProject<SharpmakeGeneratorsProject>(target);
             conf.AddProject<SharpmakeUnitTestsProject>(target);
 
-            conf.AddProject<Platforms.CommonPlatformsProject>(target);
-            conf.AddProject<Platforms.DurangoProject>(target);
-            conf.AddProject<Platforms.NvShieldProject>(target);
-            conf.AddProject<Platforms.X360Project>(target);
-
-            conf.AddProject<Samples.ConfigureOrderProject>(target);
-            conf.AddProject<Samples.CPPCLIProject>(target);
-            conf.AddProject<Samples.CSharpHelloWorldProject>(target);
-            conf.AddProject<Samples.CSharpVsixProject>(target);
-            conf.AddProject<Samples.HelloWorldProject>(target);
-            conf.AddProject<Samples.QTFileCustomBuildProject>(target);
-            conf.AddProject<Samples.PackageReferencesProject>(target);
-            conf.AddProject<Samples.SharpmakeGenProject>(target);
-            conf.AddProject<Samples.SimpleExeLibDependencyProject>(target);
+            // Platforms, Extensions and Samples
+            foreach (Type projectType in Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(Platforms.PlatformProject)) || t.IsSubclassOf(typeof(Extensions.ExtensionProject)) || t.IsSubclassOf(typeof(Samples.SampleProject))))
+            {
+                conf.AddProject(projectType, target);
+            }
         }
 
         [Main]

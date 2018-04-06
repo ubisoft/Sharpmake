@@ -44,6 +44,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.sharpmake.cs" />
     <Compile Include="Platforms.sharpmake.cs" />
     <Compile Include="Samples.sharpmake.cs" />
     <Compile Include="SharpmakeGen.sharpmake.cs" />

@@ -70,8 +70,7 @@ tests = [
     Test("HelloWorld", "HelloWorld.sharpmake.cs"),
     Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
     Test("PackageReferences", "PackageReferences.sharpmake.cs"),
-    Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"),
-    Test("SharpmakeGen", "SharpmakeGen.sharpmake.cs", "..")
+    Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs")
 ]
 
 def find_target_path(directory, target):
