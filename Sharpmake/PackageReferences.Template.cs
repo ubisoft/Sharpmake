@@ -14,9 +14,13 @@
 
 namespace Sharpmake
 {
-    // Delegate template resolving to an external class (using an existing resolver)
-    public interface IResolverHelper
+    public partial class PackageReferences
     {
-        string Resolve(Resolver resolver);
+        /// <remarks>
+        /// See : https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets
+        /// </remarks>
+        private const string TemplateBeginPackageReference = "    <PackageReference Include=\"[packageName]\" Version=\"[packageVersion]\"";
+        private const string TemplatePackagePrivateAssets  = "        <PrivateAssets>[privateAssets]</PrivateAssets>\n";
+        private const string TemplateEndPackageReference   = "    </PackageReference>\n";
     }
 }

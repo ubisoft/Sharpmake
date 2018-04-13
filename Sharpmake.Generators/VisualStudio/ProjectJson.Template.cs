@@ -58,6 +58,22 @@ namespace Sharpmake.Generators.VisualStudio
             public static string DependenciesItem =
 @"
     ""[dependency.Name]"": ""[dependency.Version]""";
+
+            /// <remarks>
+            /// See : https://github.com/NuGet/Home/wiki/%5BSpec%5D-Managing-dependency-package-assets#suppress-parent
+            /// </remarks>
+            public static string BeginDependencyItem =
+@"
+    ""[dependency.Name]"": {
+        ""version"": ""[dependency.Version]""";
+
+            public static string DependencyPrivateAssets =
+@",
+        ""suppressParent"": ""[privateAssets]""";
+
+            public static string EndDependencyItem =
+@"
+    }";
         }
     }
 }

@@ -609,8 +609,6 @@ namespace Sharpmake.Generators.VisualStudio
   </ProjectExtensions>
 ";
 
-            public const string PackageReference = "    <PackageReference Include=\"[packageName]\" Version=\"[packageVersion]\" />\n";
-
             public const string CustomPropertiesStart =
 @"  <PropertyGroup>
 ";

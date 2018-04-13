@@ -10,6 +10,14 @@
     "win": { }
   },
   "dependencies": {
+    "Mono.Cecil": {
+        "version": "0.9.6.4",
+        "suppressParent": "all"
+    },
+    "MySql.Data": {
+        "version": "6.10.6",
+        "suppressParent": "compile,build"
+    },
     "Newtonsoft.Json": "9.0.1",
     "NUnit": "3.6.0"
   }

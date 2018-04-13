@@ -2037,7 +2037,7 @@ namespace Sharpmake.Generators.VisualStudio
                 var resolver = new Resolver();
                 foreach (var packageReference in configuration.ReferencesByNuGetPackage)
                 {
-                    itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver, Template.PackageReference)));
+                    itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
                 }
             }
             else if (devenv == DevEnv.vs2015)

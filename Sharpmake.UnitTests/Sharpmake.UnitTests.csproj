@@ -48,10 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSharpDependencyPropagationTest.cs" />
+    <Compile Include="CSharpTestProjectBuilder.cs" />
     <Compile Include="CommandLineTest.cs" />
     <Compile Include="DependencyPropagationTest.cs" />
     <Compile Include="DotNetReferenceCollectionTest.cs" />
     <Compile Include="KitsRootPathsTests.cs" />
+    <Compile Include="PackageReferencesTest.cs" />
     <Compile Include="ResolverTest.cs" />
     <Compile Include="SharpmakeFileParserTest.cs" />
     <Compile Include="UtilTest.cs" />

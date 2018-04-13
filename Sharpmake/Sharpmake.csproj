@@ -90,6 +90,7 @@
     <Compile Include="Options.Vc.cs" />
     <Compile Include="Options.XCode.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="PackageReferences.Template.cs" />
     <Compile Include="PackageReferences.cs" />
     <Compile Include="PlatformAttributes.cs" />
     <Compile Include="PlatformEventArgs.cs" />

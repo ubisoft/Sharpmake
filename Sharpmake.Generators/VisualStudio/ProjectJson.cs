@@ -121,8 +121,18 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         if (i != 0)
                             fileGenerator.Write(",");
-                        using (fileGenerator.Declare("dependency", conf.ReferencesByNuGetPackage.SortedValues[i]))
-                            fileGenerator.Write(Template.DependenciesItem);
+                        var packageReference = conf.ReferencesByNuGetPackage.SortedValues[i];
+                        if (packageReference.PrivateAssets == PackageReferences.DefaultPrivateAssets)
+                        {
+                            using (fileGenerator.Declare("dependency", packageReference))
+                                fileGenerator.Write(Template.DependenciesItem);
+                        }
+                        else
+                        {
+                            using (fileGenerator.Declare("dependency", packageReference))
+                            using (fileGenerator.Declare("privateAssets", string.Join(",", PackageReferences.PackageReference.GetFormatedAssetsDependency(packageReference.PrivateAssets))))
+                                fileGenerator.Write($"{Template.BeginDependencyItem}{Template.DependencyPrivateAssets}{Template.EndDependencyItem}");
+                        }
                     }
                     fileGenerator.Write(Template.DependenciesEnd);
 
