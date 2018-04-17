@@ -19,8 +19,10 @@ namespace SharpmakeGen.Samples
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
+			
             conf.SolutionFolder = "Samples";
-
+            conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]\Samples";
+			
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);

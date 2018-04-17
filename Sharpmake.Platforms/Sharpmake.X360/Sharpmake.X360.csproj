@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\debug</OutputPath>
+    <OutputPath>..\..\bin\debug</OutputPath>
     <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -30,7 +30,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\release</OutputPath>
+    <OutputPath>..\..\bin\release</OutputPath>
     <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>

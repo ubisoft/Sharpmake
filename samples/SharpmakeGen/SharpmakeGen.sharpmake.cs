@@ -32,7 +32,7 @@ namespace SharpmakeGen
             conf.ProjectFileName = "[project.Name]";
             conf.ProjectPath = @"[project.SourceRootPath]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
-            conf.TargetPath = @"[conf.ProjectPath]\bin\[target.Optimization]";
+            conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]";
 
             conf.ReferencesByName.Add("System");
 
@@ -90,6 +90,9 @@ namespace SharpmakeGen
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
+			
+            conf.TargetPath = @"[conf.ProjectPath]\bin\[target.Optimization]";
+			
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);

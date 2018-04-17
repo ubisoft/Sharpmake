@@ -76,7 +76,7 @@ tests = [
 def find_target_path(directory, target):
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join(directory, "bin", optim_token, target))
+        path = os.path.abspath(os.path.join("..", "bin", optim_token, "samples", target))
         if os.path.isfile(path):
             return path
 

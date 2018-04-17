@@ -4,7 +4,7 @@ setlocal
 :: set batch file directory as current
 cd /d %~dp0%
 
-set SHARPMAKE_EXECUTABLE=%~dp0%Sharpmake.Application\bin\debug\Sharpmake.Application.exe
+set SHARPMAKE_EXECUTABLE=%~dp0%bin\debug\Sharpmake.Application.exe
 set SHARPMAKEGEN_PATH=samples\SharpmakeGen
 
 if "%VS140COMNTOOLS%"=="" (
