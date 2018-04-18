@@ -97,6 +97,11 @@ def red_bg():
 def green_bg():
     if os.name == "nt":
         os.system("color 2F")
+        
+def black_bg():
+    if os.name == "nt":
+        os.system("color 0F")
+       
 
 def pause(timeout=None):
     if timeout is None:
@@ -157,5 +162,6 @@ def launch_tests():
     finally:
         os.chdir(entry_path)
 
+black_bg()
 exit_code = launch_tests()
 sys.exit(exit_code)
