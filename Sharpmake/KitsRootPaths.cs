@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Sharpmake
@@ -29,6 +30,8 @@ namespace Sharpmake
         private static ConcurrentDictionary<DotNetFramework, string> s_netFxKitsDir = new ConcurrentDictionary<DotNetFramework, string>();
 
         private static ConcurrentDictionary<DotNetFramework, string> s_netFxToolsDir = new ConcurrentDictionary<DotNetFramework, string>();
+
+        private static ConcurrentDictionary<Options.Vc.General.WindowsTargetPlatformVersion, bool> s_windowsTargetPlatformVersionInstalled = new ConcurrentDictionary<Options.Vc.General.WindowsTargetPlatformVersion, bool>();
 
         [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
         public static Options.Vc.General.WindowsTargetPlatformVersion WindowsTargetPlatformVersion { get; private set; } = Options.Vc.General.WindowsTargetPlatformVersion.v8_1;
@@ -212,6 +215,58 @@ namespace Sharpmake
 
             s_netFxToolsDir.TryAdd(dotNetFramework, netFxToolsDir);
             return netFxToolsDir;
+        }
+        
+        public static bool IsWindowsTargetPlatformVersionInstalled(Options.Vc.General.WindowsTargetPlatformVersion version)
+        {
+            bool isInstalled = false;
+            if (s_windowsTargetPlatformVersionInstalled.TryGetValue(version, out isInstalled))
+            {
+                return isInstalled;
+            }
+
+            // cache which version folders exist on the current system
+            string path;
+            if (version == Options.Vc.General.WindowsTargetPlatformVersion.v8_1)
+            {
+                path = s_defaultKitsRoots[KitsRootEnum.KitsRoot81];
+            }
+            else
+            {
+                path = Path.Combine(s_defaultKitsRoots[KitsRootEnum.KitsRoot10], "Include", version.ToVersionString());
+            }
+
+            isInstalled = Directory.Exists(path);
+            s_windowsTargetPlatformVersionInstalled.TryAdd(version, isInstalled);
+
+            return isInstalled;
+        }
+
+        public static void SetKitsRoot10ToHighestInstalledVersion(DevEnv? devEnv = null)
+        {
+            Options.Vc.General.WindowsTargetPlatformVersion? highestVersion = null;
+
+            var targetVersions = EnumUtils.EnumerateValues<Options.Vc.General.WindowsTargetPlatformVersion>().Reverse();
+            foreach (var version in targetVersions)
+            {
+                if (IsWindowsTargetPlatformVersionInstalled(version))
+                {
+                    highestVersion = version;
+                    break;
+                }
+            }
+
+            if (devEnv.HasValue)
+            {
+                SetUseKitsRootForDevEnv(devEnv.Value, KitsRootEnum.KitsRoot10, highestVersion);
+            }
+            else
+            {
+                foreach (var env in EnumUtils.EnumerateValues<DevEnv>())
+                {
+                    SetUseKitsRootForDevEnv(env, KitsRootEnum.KitsRoot10, highestVersion);
+                }
+            }
         }
     }
 }
