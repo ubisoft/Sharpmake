@@ -1,5 +1,8 @@
 @echo off
 
+:: Clear previous run status
+COLOR
+
 :: set batch file directory as current
 pushd "%~dp0"
 
