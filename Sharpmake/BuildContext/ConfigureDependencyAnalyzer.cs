@@ -603,7 +603,7 @@ namespace Sharpmake.BuildContext
         {
             foreach (var composite in tests)
             {
-                if (!analyzer.TargetTypes.Any(type => composite.TargetTypes.Contains(type)))
+                if (!analyzer.TargetTypes.Any(composite.TargetTypes.Contains))
                 {
                     composite.Add(analyzer);
                     return;

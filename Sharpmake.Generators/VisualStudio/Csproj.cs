@@ -839,7 +839,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                         // Fix indentation here...
                         List<string> itemGroupResult = itemGroupWriter.ToString().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(s => "    " + s).ToList();
-                        itemGroupResult.ForEach(s => writer.WriteLine(s));
+                        itemGroupResult.ForEach(writer.WriteLine);
 
                         writer.Write(Template.ItemGroups.ChooseConditionEnd);
                     }
