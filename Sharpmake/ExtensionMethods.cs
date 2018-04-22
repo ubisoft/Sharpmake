@@ -85,7 +85,7 @@ namespace Sharpmake
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
                 default:
-                    throw new ArgumentOutOfRangeException("framework");
+                    throw new ArgumentOutOfRangeException(nameof(framework));
             }
         }
 
@@ -132,7 +132,7 @@ namespace Sharpmake
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
                 default:
-                    throw new ArgumentOutOfRangeException("framework");
+                    throw new ArgumentOutOfRangeException(nameof(framework));
             }
         }
 
