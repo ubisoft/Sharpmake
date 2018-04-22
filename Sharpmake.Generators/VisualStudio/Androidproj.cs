@@ -237,7 +237,7 @@ namespace Sharpmake.Generators.VisualStudio
                 allFiles.Add(projectFile);
             }
 
-            allFiles.Sort((ProjectFile l, ProjectFile r) => { return l.FileNameProjectRelative.CompareTo(r.FileNameProjectRelative); });
+            allFiles.Sort((ProjectFile l, ProjectFile r) => { return string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.OrdinalIgnoreCase); });
 
             // type -> files
             var customSourceFiles = new Dictionary<string, List<ProjectFile>>();

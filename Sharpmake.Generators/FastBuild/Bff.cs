@@ -1964,7 +1964,7 @@ namespace Sharpmake.Generators.FastBuild
             foreach (string inputAbsPath in inputPaths)
             {
                 string sourceFileRelativeTmp = Util.PathGetRelative(inputAbsPath, path, true);
-                if (!sourceFileRelativeTmp.StartsWith(".."))
+                if (!sourceFileRelativeTmp.StartsWith("..", StringComparison.Ordinal))
                     return true;
             }
 

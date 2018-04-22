@@ -306,7 +306,7 @@ namespace Sharpmake
             var otherType = other.GetType();
             if (thisType != otherType)
             {
-                int cmp = thisType.FullName.CompareTo(otherType.FullName);
+                int cmp = string.Compare(thisType.FullName, otherType.FullName, StringComparison.Ordinal);
                 if (cmp == 0)
                     throw new Exception("Two different types cannot have same name: " + thisType.FullName);
                 return cmp;
@@ -318,7 +318,7 @@ namespace Sharpmake
             if (other._valueCache == null)
                 other._valueCache = other.GetTargetString();
 
-            return _valueCache.CompareTo(other._valueCache);
+            return string.Compare(_valueCache, other._valueCache, StringComparison.Ordinal);
         }
 
 
@@ -495,7 +495,7 @@ namespace Sharpmake
                         if (field.FieldType.IsDefined(typeof(Fragment), false))
                             results.Add(field);
                     }
-                    results.Sort((l, r) => l.FieldType.FullName.CompareTo(r.FieldType.FullName));
+                    results.Sort((l, r) => string.Compare(l.FieldType.FullName, r.FieldType.FullName, StringComparison.Ordinal));
 
                     return results.ToArray();
                 });

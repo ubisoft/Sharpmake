@@ -43,9 +43,9 @@ namespace Sharpmake
         public int CompareTo(TrackedConfiguration other)
         {
             if (_config?.Owner == null)
-                return GetDisplayedName(false).CompareTo(other.GetDisplayedName(false));
+                return string.Compare(GetDisplayedName(false), other.GetDisplayedName(false), StringComparison.Ordinal);
 
-            return _config.ToString().CompareTo(other._config.ToString());
+            return string.Compare(_config.ToString(), other._config.ToString(), StringComparison.Ordinal);
         }
 
         public void AddDependency(

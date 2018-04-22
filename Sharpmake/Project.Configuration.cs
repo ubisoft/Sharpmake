@@ -2589,9 +2589,8 @@ namespace Sharpmake
             {
                 if (l.Project.DependenciesOrder != r.Project.DependenciesOrder)
                     return l.Project.DependenciesOrder.CompareTo(r.Project.DependenciesOrder);
-                else
-                    return l.Project.FullClassName.CompareTo(r.Project.FullClassName);
-                //return l.Target.CompareTo(r.Target);
+
+                return string.Compare(l.Project.FullClassName, r.Project.FullClassName, StringComparison.Ordinal);
             }
 
             internal class DependencyNode

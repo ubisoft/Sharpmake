@@ -114,7 +114,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Include;
                 public string LinkFolder = string.Empty;
 
-                private bool IsLink { get { return Include.StartsWith(".."); } }
+                private bool IsLink { get { return Include.StartsWith("..", StringComparison.Ordinal); } }
 
                 private string Link
                 {
@@ -1938,7 +1938,7 @@ namespace Sharpmake.Generators.VisualStudio
             #region remaining files
 
             //tt files
-            List<string> ttFiles = remainingNoneFiles.Where(f => f.ToLower().EndsWith(TTExtension)).ToList();
+            List<string> ttFiles = remainingNoneFiles.Where(f => f.EndsWith(TTExtension, StringComparison.OrdinalIgnoreCase)).ToList();
             foreach (string ttFile in ttFiles)
             {
                 bool runtimeTemplate = project.AdditionalRuntimeTemplates.Contains(ttFile);
@@ -2490,7 +2490,7 @@ namespace Sharpmake.Generators.VisualStudio
         private static string GetProjectLinkedFolder(string sourceFile, string projectPath, string sourceRootPath)
         {
             // Exit out early if the file is not a relative path.
-            if (!sourceFile.StartsWith(".."))
+            if (!sourceFile.StartsWith("..", StringComparison.Ordinal))
                 return string.Empty;
 
             string absoluteFile = Util.PathGetAbsolute(projectPath, sourceFile);

@@ -607,7 +607,7 @@ namespace Sharpmake.Generators.Apple
             // Search in existing roots.
             foreach (ProjectFileSystemItem item in _projectItems.Where(item => item is ProjectFileSystemItem))
             {
-                if (fullPath.StartsWith(item.FullPath))
+                if (fullPath.StartsWith(item.FullPath, StringComparison.OrdinalIgnoreCase))
                 {
                     if (fullPath.Length > item.FullPath.Length)
                         return AddInFileSystem(item, fullPath.Substring(item.FullPath.Length + 1), applyWorkspaceOnlyToRoot ? null : workspacePath);
@@ -666,7 +666,7 @@ namespace Sharpmake.Generators.Apple
                     }
                 }
             }
-            parent.Children.Sort((f1, f2) => f1.Name.CompareTo(f2.Name));
+            parent.Children.Sort((f1, f2) => string.Compare(f1.Name, f2.Name, StringComparison.OrdinalIgnoreCase));
             return parent;
         }
 
@@ -1199,7 +1199,7 @@ namespace Sharpmake.Generators.Apple
 
             protected virtual int CompareToInternal(ProjectItem other)
             {
-                return Identifier.CompareTo(other.Identifier);
+                return string.Compare(Identifier, other.Identifier, StringComparison.Ordinal);
             }
 
             public static bool operator ==(ProjectItem left, ProjectItem right)

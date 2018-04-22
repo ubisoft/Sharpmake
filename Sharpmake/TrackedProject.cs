@@ -50,7 +50,7 @@ namespace Sharpmake
 
         public int CompareTo(TrackedProject other)
         {
-            return ProjectString.CompareTo(other.ProjectString);
+            return string.Compare(ProjectString, other.ProjectString, StringComparison.Ordinal);
         }
 
         public TrackedConfiguration FindConfiguration(Project.Configuration config)

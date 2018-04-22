@@ -609,7 +609,7 @@ namespace Sharpmake.Generators.Generic
                 allFiles.Add(projectFile);
             }
 
-            allFiles.Sort((l, r) => l.FileNameProjectRelative.CompareTo(r.FileNameProjectRelative));
+            allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, System.StringComparison.OrdinalIgnoreCase));
 
             // type -> files
             foreach (ProjectFile projectFile in allFiles)
