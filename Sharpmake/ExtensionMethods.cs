@@ -19,7 +19,7 @@ using System.Linq;
 
 namespace Sharpmake
 {
-    public static partial class ExtensionMethods
+    public static class ExtensionMethods
     {
         public static bool IsPC(this Platform platform)
         {

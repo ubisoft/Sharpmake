@@ -15,7 +15,7 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Vcxproj
     {
-        public static partial class Template
+        public static class Template
         {
             public static class Project
             {
