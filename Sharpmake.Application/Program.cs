@@ -590,6 +590,7 @@ namespace Sharpmake.Application
                     case Argument.InputType.Assembly:
                         builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadAssemblies(parameters.Assemblies));
                         break;
+                    case Argument.InputType.Undefined:
                     default:
                         throw new Error("Sharpmake input missing, use /sources() or /assemblies()");
                 }
