@@ -47,7 +47,7 @@ namespace Sharpmake.BuildContext
         {
             private IEnumerable<Type> _toGenerate;
 
-            public BaseTestCase(IEnumerable<Type> toGenerate)
+            protected BaseTestCase(IEnumerable<Type> toGenerate)
             {
                 _toGenerate = toGenerate;
             }

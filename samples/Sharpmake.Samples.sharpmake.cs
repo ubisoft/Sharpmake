@@ -7,7 +7,7 @@ namespace SharpmakeGen.Samples
 {
     public abstract class SampleProject : Common.SharpmakeBaseProject
     {
-        public SampleProject()
+        protected SampleProject()
             : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
         {
             // samples are special, all the classes are here instead of in the subfolders

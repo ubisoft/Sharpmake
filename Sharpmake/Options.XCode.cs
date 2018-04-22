@@ -164,7 +164,7 @@ namespace Sharpmake
 
                 public abstract class Frameworks : Strings
                 {
-                    public Frameworks(params string[] paths)
+                    protected Frameworks(params string[] paths)
                         : base(paths)
                     { }
                 }
