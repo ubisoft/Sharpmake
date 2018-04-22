@@ -232,7 +232,7 @@ namespace Sharpmake
                 typeof(DebugProject));
 
             // add attribute [Sharpmake.Generate]
-            Type[] generateAttrParams = new Type[] { };
+            Type[] generateAttrParams = { };
             ConstructorInfo generateAttrCtorInfo = typeof(Sharpmake.Generate).GetConstructor(generateAttrParams);
             CustomAttributeBuilder generateAttrBuilder = new CustomAttributeBuilder(generateAttrCtorInfo, new object[] { });
             typeBuilder.SetCustomAttribute(generateAttrBuilder);

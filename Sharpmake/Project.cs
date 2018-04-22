@@ -2023,8 +2023,7 @@ namespace Sharpmake
             aspNetProject.ProjectTypeGuids = CSharpProjectType.AspNetMvc5;
             aspNetProject.SourceFilesExtensions.Add(".asax");
 
-            string[] contentExtension = new[]
-            {
+            string[] contentExtension = {
                 ".cshtml", ".js", ".map",
                 ".css", ".scss",
                 ".eot", ".svg", ".ttf", ".woff", ".woff2",
