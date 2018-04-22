@@ -15,7 +15,7 @@ namespace Sharpmake.Generators.Generic
 {
     public partial class MakeProject
     {
-        private class Template
+        private static class Template
         {
             public static string GlobalTemplate =
 @"include $(CLEAR_VARS)

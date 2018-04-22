@@ -16,7 +16,7 @@ namespace Sharpmake.Generators.Apple
 {
     public partial class XCWorkspace
     {
-        private class Template
+        private static class Template
         {
             public static string Header =
 @"<?xml version=""1.0"" encoding=""UTF-8""?>

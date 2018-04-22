@@ -17,7 +17,7 @@ namespace Sharpmake.Generators.VisualStudio
     {
         private class Template
         {
-            public class Project
+            public static class Project
             {
                 public static string ProjectBegin =
                 @"<Project DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"" ToolsVersion=""4.0"">

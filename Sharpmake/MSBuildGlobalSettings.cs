@@ -20,7 +20,7 @@ namespace Sharpmake
     /// <summary>
     /// This class contains some global msbuild settings
     /// </summary>
-    public class MSBuildGlobalSettings
+    public static class MSBuildGlobalSettings
     {
         // cppPlatformFolders (pre-vs2019)
         private static readonly ConcurrentDictionary<Tuple<DevEnv, string>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, string>, string>();
@@ -58,7 +58,7 @@ namespace Sharpmake
         /// </summary>
         /// <param name="devEnv">Visual studio version</param>
         /// <param name="platform">Platform</param>
-        public void ResetCppPlatformFolder(DevEnv devEnv, string platform)
+        public static void ResetCppPlatformFolder(DevEnv devEnv, string platform)
         {
             var key = Tuple.Create(devEnv, platform);
             string value;
@@ -133,7 +133,7 @@ namespace Sharpmake
         /// </summary>
         /// <param name="devEnv">Visual studio version</param>
         /// <param name="platform">Platform</param>
-        public void ResetAdditionalVCTargetsPath(DevEnv devEnv, string platform)
+        public static void ResetAdditionalVCTargetsPath(DevEnv devEnv, string platform)
         {
             var key = Tuple.Create(devEnv, platform);
             string value;

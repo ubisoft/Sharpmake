@@ -27,7 +27,7 @@ namespace Sharpmake
     }
 
 
-    public class FastBuildSettings
+    public static class FastBuildSettings
     {
         public const string FastBuildConfigFileExtension = ".bff";
         public const string MasterBffFileName = "fbuild";

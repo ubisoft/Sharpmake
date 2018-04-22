@@ -18,7 +18,7 @@ namespace Sharpmake.Generators.Apple
 {
     public partial class XCodeProj
     {
-        private class Template
+        private static class Template
         {
             public static string GlobalHeader =
 @"// !$*UTF8*$!

@@ -1087,7 +1087,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private class XCodeProjIdGenerator
+        private static class XCodeProjIdGenerator
         {
             private static System.Security.Cryptography.SHA1CryptoServiceProvider s_cryptoProvider;
             private static Dictionary<ProjectItem, string> s_hashRepository;

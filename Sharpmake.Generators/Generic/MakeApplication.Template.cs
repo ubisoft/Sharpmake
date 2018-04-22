@@ -16,7 +16,7 @@ namespace Sharpmake.Generators.Generic
 {
     public partial class MakeApplication
     {
-        private class Template
+        private static class Template
         {
             public static string ApplicationContent =
 @"APP_PLATFORM := [item.AppPlatform]
