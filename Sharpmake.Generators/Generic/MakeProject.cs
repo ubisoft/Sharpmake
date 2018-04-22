@@ -96,7 +96,7 @@ namespace Sharpmake.Generators.Generic
             private string _prebuiltStaticLibraries;
             private string _prebuiltStaticLibrariesDebug;
             private string _prebuiltStaticLibrariesRelease;
-            private string _prebuiltStaticLibrariesFinal;
+            private readonly string _prebuiltStaticLibrariesFinal;
 
             public ProjectSettings(Project project, List<Project.Configuration> configurations, Resolver resolver)
             {
@@ -241,7 +241,7 @@ namespace Sharpmake.Generators.Generic
         {
             private Options.AndroidMakefile.PrebuiltStaticLibraries _option;
             private string _armMode;
-            private string _libraryPath;
+            private readonly string _libraryPath;
 
             public PrebuiltStaticLibrary(Project project, Options.AndroidMakefile.PrebuiltStaticLibraries option)
             {

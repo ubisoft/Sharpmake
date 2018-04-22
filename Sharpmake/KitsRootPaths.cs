@@ -26,9 +26,9 @@ namespace Sharpmake
         private static Dictionary<DevEnv, Tuple<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>> s_useKitsRootForDevEnv = new Dictionary<DevEnv, Tuple<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>>();
         private static Dictionary<KitsRootEnum, string> s_kitsRoots = new Dictionary<KitsRootEnum, string>();
 
-        private static ConcurrentDictionary<DotNetFramework, string> s_netFxKitsDir = new ConcurrentDictionary<DotNetFramework, string>();
+        private static readonly ConcurrentDictionary<DotNetFramework, string> s_netFxKitsDir = new ConcurrentDictionary<DotNetFramework, string>();
 
-        private static ConcurrentDictionary<DotNetFramework, string> s_netFxToolsDir = new ConcurrentDictionary<DotNetFramework, string>();
+        private static readonly ConcurrentDictionary<DotNetFramework, string> s_netFxToolsDir = new ConcurrentDictionary<DotNetFramework, string>();
 
         [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
         public static Options.Vc.General.WindowsTargetPlatformVersion WindowsTargetPlatformVersion { get; private set; } = Options.Vc.General.WindowsTargetPlatformVersion.v8_1;

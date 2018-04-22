@@ -81,10 +81,10 @@ namespace Sharpmake.BuildContext
         /// </summary>
         private class MethodTestCase : BaseTestCase
         {
-            private Type _type;
-            private ConfigurePriority _priority;
+            private readonly Type _type;
+            private readonly ConfigurePriority _priority;
             private IEnumerable<string> _methods;
-            private string _method;
+            private readonly string _method;
             private int _max;
             private int _testIndex = 0;
             private int _min;

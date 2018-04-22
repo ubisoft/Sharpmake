@@ -184,7 +184,7 @@ namespace Sharpmake
         public class ScopedParameterGroup : IDisposable
         {
             private readonly Resolver _resolver;
-            private string[] _names;
+            private readonly string[] _names;
 
             public ScopedParameterGroup(Resolver resolver, params VariableAssignment[] assignments)
             {
@@ -400,7 +400,7 @@ namespace Sharpmake
         private Dictionary<string, ResolveStatus> _resolveStatusFields = new Dictionary<string, ResolveStatus>();
         private List<string> _resolvingObjectPath = new List<string>();
         private Dictionary<string, RefCountedSymbol> _parameters = new Dictionary<string, RefCountedSymbol>();
-        private HashSet<object> _resolvedObject = new HashSet<object>();
+        private readonly HashSet<object> _resolvedObject = new HashSet<object>();
 
         public char[] _pathEndCharacters = { ']' };
 

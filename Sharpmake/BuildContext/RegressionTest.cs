@@ -81,7 +81,7 @@ namespace Sharpmake.BuildContext
         public readonly DirectoryInfo Reference;
         public readonly DirectoryInfo RemapRoot;
 
-        private ConcurrentDictionary<string, OutputInfo> _referenceDifferenceMap = new ConcurrentDictionary<string, OutputInfo>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, OutputInfo> _referenceDifferenceMap = new ConcurrentDictionary<string, OutputInfo>(StringComparer.OrdinalIgnoreCase);
 
         public RegressionTest(DirectoryInfo outputDirectory, DirectoryInfo referenceDirectory, DirectoryInfo remapRoot)
             : base(false, true)

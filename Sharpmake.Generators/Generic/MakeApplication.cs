@@ -102,7 +102,7 @@ namespace Sharpmake.Generators.Generic
             private string _stl;
             private string _cFlagsDebug;
             private string _cFlagsRelease;
-            private string _toolchainVersion;
+            private readonly string _toolchainVersion;
 
             public ApplicationSettings(List<Solution.Configuration> configurations)
             {
