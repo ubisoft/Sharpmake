@@ -217,13 +217,18 @@ namespace Sharpmake
         public virtual void GenerateProjectLinkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
             var simpleOutput = Project.Configuration.SimpleOutputType(context.Configuration.Output);
-
-            if (simpleOutput == Project.Configuration.OutputType.Lib)
-                generator.Write(GetProjectStaticLinkVcxprojTemplate());
-            else if (simpleOutput == Project.Configuration.OutputType.Dll)
-                generator.Write(GetProjectLinkSharedVcxprojTemplate());
-            else if (simpleOutput == Project.Configuration.OutputType.Exe)
-                generator.Write(GetProjectLinkExecutableVcxprojTemplate());
+            switch (simpleOutput)
+            {
+                case Project.Configuration.OutputType.Lib:
+                    generator.Write(GetProjectStaticLinkVcxprojTemplate());
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    generator.Write(GetProjectLinkSharedVcxprojTemplate());
+                    break;
+                case Project.Configuration.OutputType.Exe:
+                    generator.Write(GetProjectLinkExecutableVcxprojTemplate());
+                    break;
+            }
         }
 
         public virtual void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
