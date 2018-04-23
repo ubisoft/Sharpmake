@@ -717,7 +717,7 @@ namespace Sharpmake.Generators.Apple
             options["RemoveLibraryPaths"] = "";
             options["RemoveSpecificDeviceLibraryPaths"] = "";
             options["RemoveSpecificSimulatorLibraryPaths"] = "";
-            options["SDKRoot"] = "iphoneos";
+            options["SDKRoot"] = conf.Platform == Platform.ios ? "iphoneos" : RemoveLineTag;
             options["SpecificLibraryPaths"] = RemoveLineTag;
             options["TargetedDeviceFamily"] = "1,2";
             options["UsePrecompiledHeader"] = "NO";
