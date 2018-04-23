@@ -1002,6 +1002,7 @@ namespace Sharpmake.Generators.Apple
             }
 
             OrderableStrings includePaths = conf.IncludePaths;
+            includePaths.AddRange(conf.IncludePrivatePaths);
             includePaths.AddRange(conf.DependenciesIncludePaths);
             options["IncludePaths"] = includePaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
 
