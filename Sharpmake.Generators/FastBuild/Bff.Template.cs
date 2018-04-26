@@ -101,8 +101,9 @@ Compiler( '[fastbuildCompilerName]' )
     .Executable             = '[fastBuildExecutable]'
 ]
 ";
+
                 public static string LinkerOptions = @"
-    .LinkerOptions          = '/OUT:""%2"" ""%1""[dllOption]'
+    .LinkerOptions          = '/OUT:""%2""[dllOption]'
                             // General
                             // ---------------------------
                             + ' [cmdLineOptions.ShowProgress]'
@@ -116,6 +117,9 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.IgnoreAllDefaultLibraries]'
                             + ' [cmdLineOptions.IgnoreDefaultLibraryNames]'
                             + ' [cmdLineOptions.DelayLoadedDLLs]'
+                            // Input files
+                            // ---------------------------
+                            + ' ""%1""'
                             // Manifest
                             // ---------------------------
                             + ' [cmdLineOptions.GenerateManifest]'
