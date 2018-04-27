@@ -73,6 +73,7 @@ namespace Sharpmake
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>[options.DisableLanguageExtensions]</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>[options.TreatWChar_tAsBuiltInType]</TreatWChar_tAsBuiltInType>
+      <RemoveUnreferencedCodeData>[options.RemoveUnreferencedCodeData]</RemoveUnreferencedCodeData>
       <ForceConformanceInForLoopScope>[options.ForceConformanceInForLoopScope]</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
       <OpenMPSupport>[options.OpenMP]</OpenMPSupport>

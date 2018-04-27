@@ -311,6 +311,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.DisableLanguageExtensions]'
             + ' [cmdLineOptions.TreatWChar_tAsBuiltInType]'
             + ' [cmdLineOptions.ForceConformanceInForLoopScope]'
+            + ' [cmdLineOptions.RemoveUnreferencedCodeData]'
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.OpenMP]'
             + ' [cmdLineOptions.LanguageStandard]'

@@ -371,8 +371,8 @@ namespace Sharpmake
 
                 public enum RemovedUnreferencedCOMDAT
                 {
-                    [Default]
                     Disable,
+                    [Default]
                     Enable,
                 }
 
