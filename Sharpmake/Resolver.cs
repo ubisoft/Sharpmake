@@ -551,6 +551,9 @@ namespace Sharpmake
 
         private void ResolveMember(string objectPath, object obj, MemberInfo memberInfo, object fallbackValue)
         {
+            if (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property)
+                return;
+
             string memberPath;
             if (objectPath != null)
                 memberPath = objectPath + _pathSeparator + memberInfo.Name;
