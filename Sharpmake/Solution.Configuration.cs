@@ -221,7 +221,10 @@ namespace Sharpmake
                 Util.ResolvePath(Solution.SharpmakeCsPath, ref SolutionPath);
                 Util.ResolvePath(Solution.SharpmakeCsPath, ref MasterBffDirectory);
                 if (Solution.IsFileNameToLower)
+                {
                     SolutionFileName = SolutionFileName.ToLower();
+                    MasterBffFileName = MasterBffFileName.ToLower();
+                }
             }
         }
     }
