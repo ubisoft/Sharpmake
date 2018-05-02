@@ -767,7 +767,7 @@ namespace Sharpmake
                 WriteLogs();
 
             LogWriteLine("  generating projects and solutions...");
-            using (new Util.StopwatchProfiler(ms => { LogWriteLine("    generation done done in {0:0.0} sec", ms / 1000.0f); }))
+            using (new Util.StopwatchProfiler(ms => { LogWriteLine("    generation done in {0:0.0} sec", ms / 1000.0f); }))
             {
                 var projects = new List<Project>(_projects.Values);
                 var solutions = new List<Solution>(_solutions.Values);
