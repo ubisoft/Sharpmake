@@ -1492,7 +1492,11 @@ namespace Sharpmake
 
             Resolver resolver = new Resolver();
             resolver.SetParameter("project", this);
-            resolver.Resolve(this, skipInvalidPath);
+
+            if (skipInvalidPath)
+                resolver.Resolve(this, fallbackValue: false);
+            else
+                resolver.Resolve(this);
 
             // Resolve full paths
             _rootPath = Util.SimplifyPath(RootPath);
