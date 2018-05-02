@@ -123,7 +123,7 @@ namespace Sharpmake.Application
 
         private static int Main()
         {
-            if (CommandLine.ContainParameter("-breakintodebugger"))
+            if (CommandLine.ContainParameter("breakintodebugger"))
             {
                 System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
                 Debugger.Break();
