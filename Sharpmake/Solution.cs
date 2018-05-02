@@ -137,7 +137,7 @@ namespace Sharpmake
             if (!_dependenciesResolved)
                 throw new InternalError("Solution not resolved: {0}", GetType().FullName);
             projectsWereFiltered = false;
-            List<ResolvedProject> result = new List<ResolvedProject>();
+            var result = new Dictionary<string, ResolvedProject>();
 
             Dictionary<Project.Configuration, ResolvedProject> configurationsToProjects = new Dictionary<Project.Configuration, ResolvedProject>();
 
@@ -151,19 +151,17 @@ namespace Sharpmake
                         continue;
                     }
 
-                    ResolvedProject resolvedProject = result.Find(p => p.OriginalProjectFile == includedProjectInfo.Configuration.ProjectFullFileName);
-                    if (resolvedProject == null)
-                    {
-                        resolvedProject = new ResolvedProject
+                    ResolvedProject resolvedProject = result.GetValueOrAdd(
+                        includedProjectInfo.Configuration.ProjectFullFileName,
+                        new ResolvedProject
                         {
-                            Project = includedProjectInfo.Project,
-                            TargetDefault = includedProjectInfo.Target,
+                            Project             = includedProjectInfo.Project,
+                            TargetDefault       = includedProjectInfo.Target,
                             OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName,
-                            ProjectFile = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
-                            ProjectName = includedProjectInfo.Configuration.ProjectName
-                        };
-                        result.Add(resolvedProject);
-                    }
+                            ProjectFile         = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
+                            ProjectName         = includedProjectInfo.Configuration.ProjectName
+                        }
+                    );
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
 
@@ -173,7 +171,7 @@ namespace Sharpmake
             }
 
 
-            foreach (ResolvedProject resolvedProject in result)
+            foreach (ResolvedProject resolvedProject in result.Values)
             {
                 foreach (Project.Configuration resolvedProjectConf in resolvedProject.Configurations)
                 {
@@ -196,7 +194,7 @@ namespace Sharpmake
                 }
             }
 
-            return result;
+            return result.Values;
         }
 
         internal HashSet<Type> GetDependenciesProjectTypes()
