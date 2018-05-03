@@ -364,6 +364,14 @@ namespace Sharpmake
                     Enable,
                 }
 
+                public enum CreateHotPatchableCode
+                {
+                    [Default]
+                    Default,
+                    Disable,
+                    Enable,
+                }
+
                 public enum DisableLanguageExtensions
                 {
                     [Default]
@@ -763,6 +771,16 @@ namespace Sharpmake
                     Default,
                     Enable,
                     Disable
+                }
+
+                public enum CreateHotPatchableImage
+                {
+                    [Default]
+                    Disable,
+                    Enable,
+                    X86Image,
+                    X64Image,
+                    ItaniumImage
                 }
 
                 public enum ForceFileOutput
