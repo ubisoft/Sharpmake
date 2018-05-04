@@ -66,7 +66,7 @@ namespace Sharpmake.Application
             if (Debugger.IsAttached)
             {
                 message = message.Replace(prefix + Util.CallerInfoTag, String.Empty);
-                Debug.Write(message);
+                Trace.Write(message);
             }
         }
 
@@ -88,7 +88,7 @@ namespace Sharpmake.Application
 
                 Console.Write(message);
                 if (Debugger.IsAttached)
-                    Debug.Write(message);
+                    Trace.Write(message);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Sharpmake.Application
             Interlocked.Increment(ref s_warningCount);
             Console.Write(msg, args);
             if (Debugger.IsAttached)
-                Debug.Write(args.Length > 0 ? string.Format(msg, args) : msg);
+                Trace.Write(args.Length > 0 ? string.Format(msg, args) : msg);
         }
 
         public static void ErrorWrite(string msg, params object[] args)
@@ -111,7 +111,7 @@ namespace Sharpmake.Application
             Interlocked.Increment(ref s_errorCount);
             Console.Write(msg, args);
             if (Debugger.IsAttached)
-                Debug.Write(args.Length > 0 ? string.Format(msg, args) : msg);
+                Trace.Write(args.Length > 0 ? string.Format(msg, args) : msg);
         }
 
         public static void ErrorWriteLine(string msg, params object[] args)

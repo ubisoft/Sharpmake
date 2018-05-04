@@ -854,7 +854,7 @@ namespace Sharpmake
 
             Console.WriteLine(message);
             if (Debugger.IsAttached)
-                Debug.WriteLine(message);
+                Trace.WriteLine(message);
         }
 
         public static List<string> FilesAlternatesAutoCleanupDBSuffixes = new List<string>(); // The alternates db suffixes using by other context

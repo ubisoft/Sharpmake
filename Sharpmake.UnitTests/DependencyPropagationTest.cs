@@ -64,7 +64,7 @@ namespace SharpmakeUnitTests
             {
                 Console.Write(msg, args);
                 if (System.Diagnostics.Debugger.IsAttached)
-                    System.Diagnostics.Debug.Write(string.Format(msg, args));
+                    System.Diagnostics.Trace.Write(string.Format(msg, args));
             };
             _builder.EventOutputError += log;
             _builder.EventOutputWarning += log;
