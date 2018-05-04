@@ -465,7 +465,10 @@ namespace Sharpmake
                     GetSharpmakeIncludesFromLine(line, sourceFilePath, lineNumber, ref includes);
                     GetSharpmakeReferencesFromLine(line, sourceFilePath, lineNumber, ref _references);
 
-                    line = reader.ReadLine();
+                    line = reader.ReadLine()?.TrimStart();
+
+                    if (!string.IsNullOrEmpty(line) && line.StartsWith("namespace", StringComparison.Ordinal))
+                        break;
                 }
             }
         }
