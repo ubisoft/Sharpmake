@@ -251,6 +251,8 @@ namespace Sharpmake
 
             DebugProjectGenerator.AddSharpmakePackage(conf);
 
+            conf.Options.Add(Options.CSharp.LanguageVersion.CSharp5);
+
             conf.ReferencesByPath.AddRange(DebugProjectGenerator.DebugProjects[GetType()].References);
             foreach (var projectReference in DebugProjectGenerator.DebugProjects[GetType()].ProjectReferences)
             {
