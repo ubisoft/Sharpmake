@@ -42,6 +42,23 @@ namespace Sharpmake
             }
         }
 
+        public bool HasFragmentMask(params object[] fragmentMasks)
+        {
+            return FragmentMasks.Any(f =>
+            {
+                foreach (object fragmentMask in fragmentMasks)
+                {
+                    Type fragmentType = fragmentMask.GetType();
+                    ITarget.ValidFragmentType(fragmentType);
+                    if (f.GetType() == fragmentType)
+                    {
+                        return Enum.Equals(f, fragmentMask);
+                    }
+                }
+                return false;
+            });
+        }
+
         internal List<Type> TypesToGenerate = new List<Type>();
 
         public void Generate<T>()
