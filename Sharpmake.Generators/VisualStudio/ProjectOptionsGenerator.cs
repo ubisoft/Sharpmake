@@ -719,8 +719,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.BuiltInWChartType.Enable, () => { context.Options["TreatWChar_tAsBuiltInType"] = "true"; context.CommandLineOptions["TreatWChar_tAsBuiltInType"] = "/Zc:wchar_t"; })
             );
 
-            //    Disable                                 Removed_unreferenced_COMDAT="false"
-            //    Enable                                  Removed_unreferenced_COMDAT="true"                /Zc:inline
+            //    Disable                                 RemoveUnreferencedCodeData="false"
+            //    Enable                                  RemoveUnreferencedCodeData="true"                /Zc:inline
             if (!context.DevelopmentEnvironment.IsVisualStudio() || context.DevelopmentEnvironment < DevEnv.vs2013)
             {
                 context.Options["RemoveUnreferencedCodeData"] = FileGeneratorUtilities.RemoveLineTag;
@@ -730,12 +730,12 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.RemovedUnreferencedCOMDAT.Disable, () =>
+                Options.Option(Options.Vc.Compiler.RemoveUnreferencedCodeData.Disable, () =>
                 {
                     context.Options["RemoveUnreferencedCodeData"] = "false";
                     context.CommandLineOptions["RemoveUnreferencedCodeData"] = FileGeneratorUtilities.RemoveLineTag;
                 }),
-                Options.Option(Options.Vc.Compiler.RemovedUnreferencedCOMDAT.Enable, () =>
+                Options.Option(Options.Vc.Compiler.RemoveUnreferencedCodeData.Enable, () =>
                 {
                     context.Options["RemoveUnreferencedCodeData"] = FileGeneratorUtilities.RemoveLineTag;
                     context.CommandLineOptions["RemoveUnreferencedCodeData"] = "/Zc:inline";

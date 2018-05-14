@@ -378,7 +378,15 @@ namespace Sharpmake
                     Enable,
                 }
 
+                [Obsolete("Use option RemoveUnreferencedCodeData instead")]
                 public enum RemovedUnreferencedCOMDAT
+                {
+                    Disable,
+                    [Default]
+                    Enable,
+                }
+
+                public enum RemoveUnreferencedCodeData
                 {
                     Disable,
                     [Default]
