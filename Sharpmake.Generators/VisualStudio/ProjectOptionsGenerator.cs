@@ -310,6 +310,19 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.Options["ResourceAdditionalIncludeDirectories"] = new Strings(Util.PathGetRelative(context.ProjectDirectory, resourceIncludePath)).JoinStrings(";");
                 writeResourceCompileTag = true;
+
+                string cmdLineIncludePrefix = optionsContext.PlatformDescriptor.IsUsingClang ? "-I" : "/I";
+                string[] additionalResourceIncludes = resourceIncludePath.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, cmdLineIncludePrefix)).ToArray();
+
+                string separator = $"'{Environment.NewLine} + ' ";
+                if (context.CommandLineOptions["AdditionalResourceIncludeDirectories"] == FileGeneratorUtilities.RemoveLineTag)
+                {
+                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join(separator, additionalResourceIncludes);
+                }
+                else
+                {
+                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] += separator + string.Join(separator, additionalResourceIncludes);
+                }
             }
             else
             {
