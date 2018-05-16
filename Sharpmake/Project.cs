@@ -145,6 +145,9 @@ namespace Sharpmake
         public Strings PRIFiles = new Strings();
         public Strings PRIFilesExtensions = new Strings(".resw");
 
+        public Strings NoneFiles = new Strings();
+        public Strings NoneExtensions = new Strings();
+
         public Strings XResourcesResw = new Strings();
         public Strings XResourcesImg = new Strings();
 
@@ -695,7 +698,7 @@ namespace Sharpmake
             ResolvedSourceFilesBuildExclude.AddRange(SourceFilesBuildExclude);
 
             // Only scan directory for files if needed
-            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0)
+            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0 || NoneExtensions.Count != 0)
             {
                 string capitalizedSourceRootPath = Util.GetCapitalizedPath(SourceRootPath);
 
@@ -728,6 +731,7 @@ namespace Sharpmake
                     AddMatchExtensionFiles(additionalFiles, ref PRIFiles, PRIFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref ResourceFiles, ResourceFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref NatvisFiles, NatvisFilesExtensions);
+                    AddMatchExtensionFiles(additionalFiles, ref NoneFiles, NoneExtensions);
                 }
 
                 // Apply Filters 
@@ -755,6 +759,9 @@ namespace Sharpmake
 
                 AddMatchExtensionFiles(files, ref NatvisFiles, NatvisFilesExtensions);
                 Util.ResolvePath(SourceRootPath, ref NatvisFiles);
+
+                AddMatchExtensionFiles(files, ref NoneFiles, NoneExtensions);
+                Util.ResolvePath(SourceRootPath, ref NoneFiles);
             }
 
             if (SourceFilesFilters != null)
@@ -776,6 +783,7 @@ namespace Sharpmake
                 SourceFiles.AddRange(keepFiles);
                 ResourceFiles.IntersectWith(SourceFilesFilters);
                 NatvisFiles.IntersectWith(SourceFilesFilters);
+                NoneFiles.IntersectWith(SourceFilesFilters);
             }
 
             AdditionalFiltering(SourceFiles, ref SourceFilesExclude);
@@ -793,6 +801,8 @@ namespace Sharpmake
                 Debugger.Break();
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, NatvisFiles), NatvisFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
                 Debugger.Break();
+            if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, NoneFiles), NoneFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
+                Debugger.Break();
 
             // Remove exclude file
             foreach (string excludeSourceFile in SourceFilesExclude)
@@ -800,6 +810,7 @@ namespace Sharpmake
                 ResolvedSourceFiles.Remove(excludeSourceFile);
                 ResourceFiles.Remove(excludeSourceFile);
                 NatvisFiles.Remove(excludeSourceFile);
+                NoneFiles.Remove(excludeSourceFile);
             }
             var resolvedSourceFilesRelative = Util.PathGetRelative(RootPath, ResolvedSourceFiles);
 
@@ -1976,27 +1987,6 @@ namespace Sharpmake
 
     public class CSharpProject : Project
     {
-        public readonly Strings NoneExtensions = new Strings(
-            ".config",
-            ".settings",
-            ".map",
-            ".wsdl",
-            ".datasource",
-            ".cd",
-            ".doc",
-            ".docx",
-            ".xsd",
-            ".xss",
-            ".xsc",
-            ".txt",
-            ".bat",
-            ".xml",
-            ".tt",
-            ".svcmap",
-            ".svcinfo",
-            ".disco",
-            ".manifest"
-        );
         public Strings ContentExtension = new Strings();
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
@@ -2014,7 +2004,6 @@ namespace Sharpmake
         public Strings ApplicationDefinitionFilenames = new Strings();
         public Strings ResolvedResourcesFullFileNames = new Strings();
         public Strings ResolvedContentFullFileNames = new Strings();
-        public Strings ResolvedNoneFullFileNames = new Strings();
         public Strings AdditionalEmbeddedResource = new Strings();
         public Strings AdditionalEmbeddedResourceAlwaysCopy = new Strings();
         public Strings AdditionalEmbeddedResourceCopyIfNewer = new Strings();
@@ -2112,6 +2101,28 @@ namespace Sharpmake
 
             //Default Excludes
             SourceFilesExcludeRegex.Add(@"\b(bin|obj)\\");
+
+            NoneExtensions.Add(
+                ".config",
+                ".settings",
+                ".map",
+                ".wsdl",
+                ".datasource",
+                ".cd",
+                ".doc",
+                ".docx",
+                ".xsd",
+                ".xss",
+                ".xsc",
+                ".txt",
+                ".bat",
+                ".xml",
+                ".tt",
+                ".svcmap",
+                ".svcinfo",
+                ".disco",
+                ".manifest"
+            );
         }
 
         public CSharpProject()
@@ -2159,22 +2170,18 @@ namespace Sharpmake
 
             sourceFiles = FilterSourceFiles(sourceFiles);
 
-            AddMatchExtensionFiles(sourceFiles, ref ResolvedNoneFullFileNames, NoneExtensions);
-            if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, ResolvedNoneFullFileNames), ResolvedNoneFullFileNames, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                Debugger.Break();
             AddMatchExtensionFiles(sourceFiles, ref ResolvedContentFullFileNames, ContentExtension);
             AddMatchExtensionFiles(sourceFiles, ref VsctCompileFiles, VsctExtension);
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, VsctCompileFiles), VsctCompileFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
                 Debugger.Break();
 
-            if ((ResolvedResourcesFullFileNames.Count + ResolvedContentFullFileNames.Count + ResolvedNoneFullFileNames.Count) == 0)
+            if ((ResolvedResourcesFullFileNames.Count + ResolvedContentFullFileNames.Count) == 0)
                 return;
 
             foreach (string excludeSourceFile in SourceFilesExclude)
             {
                 ResolvedResourcesFullFileNames.Remove(excludeSourceFile);
                 ResolvedContentFullFileNames.Remove(excludeSourceFile);
-                ResolvedNoneFullFileNames.Remove(excludeSourceFile);
                 VsctCompileFiles.Remove(excludeSourceFile);
             }
         }

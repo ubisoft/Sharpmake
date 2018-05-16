@@ -237,6 +237,11 @@ namespace Sharpmake.Generators.VisualStudio
       <FileType>Document</FileType>
     </PRIResource>
 ";
+
+                public static string ProjectFilesNone =
+                @"    <None Include=""[file.FileNameProjectRelative]"" />
+";
+
                 public static string ProjectFilesCustomSourceBegin =
                 @"    <[type] Include=""[file.FileNameProjectRelative]""";
 

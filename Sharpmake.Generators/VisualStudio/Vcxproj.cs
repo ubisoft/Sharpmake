@@ -1331,6 +1331,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<ProjectFile> sourceFiles = new List<ProjectFile>();
             List<ProjectFile> NatvisFiles = new List<ProjectFile>();
             List<ProjectFile> PRIFiles = new List<ProjectFile>();
+            List<ProjectFile> NoneFiles = new List<ProjectFile>();
             List<ProjectFile> XResourcesReswFiles = new List<ProjectFile>();
             List<ProjectFile> XResourcesImgFiles = new List<ProjectFile>();
             List<ProjectFile> customBuildFiles = new List<ProjectFile>();
@@ -1339,6 +1340,12 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 ProjectFile natvisFile = new ProjectFile(context, file);
                 NatvisFiles.Add(natvisFile);
+            }
+
+            foreach (string file in context.Project.NoneFiles)
+            {
+                ProjectFile priFile = new ProjectFile(context, file);
+                NoneFiles.Add(priFile);
             }
 
             foreach (string file in projectFiles)
@@ -1507,6 +1514,19 @@ namespace Sharpmake.Generators.VisualStudio
                     writtenPRIFiles.Add(priFile.FileNameProjectRelative);
                     using (fileGenerator.Declare("file", priFile))
                         fileGenerator.Write(Template.Project.ProjectFilesPRIResources);
+                }
+                fileGenerator.Write(Template.Project.ProjectFilesEnd);
+            }
+
+            // Write None files
+            if (context.Project.NoneFiles.Count > 0)
+            {
+                fileGenerator.Write(Template.Project.ProjectFilesBegin);
+                foreach (string file in context.Project.NoneFiles)
+                {
+                    ProjectFile projectFile = new ProjectFile(context, file);
+                    using (fileGenerator.Declare("file", projectFile))
+                        fileGenerator.Write(Template.Project.ProjectFilesNone);
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
@@ -1911,6 +1931,8 @@ namespace Sharpmake.Generators.VisualStudio
                 allFileLists.Add(new Tuple<string, List<ProjectFile>>("Natvis", NatvisFiles));
             if (PRIFiles.Count > 0)
                 allFileLists.Add(new Tuple<string, List<ProjectFile>>("PRIResource", PRIFiles));
+            if (NoneFiles.Count > 0)
+                allFileLists.Add(new Tuple<string, List<ProjectFile>>("None", NoneFiles));
             foreach (var entry in customSourceFiles)
             {
                 allFileLists.Add(new Tuple<string, List<ProjectFile>>(entry.Key, entry.Value));

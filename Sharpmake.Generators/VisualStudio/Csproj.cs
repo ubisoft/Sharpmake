@@ -1039,7 +1039,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!string.IsNullOrEmpty(appManifest))
             {
-                appManifest = project.ResolvedNoneFullFileNames.FirstOrDefault(s => s.Contains(appManifest));
+                appManifest = project.NoneFiles.FirstOrDefault(s => s.Contains(appManifest));
                 if (appManifest != null)
                 {
                     appManifest = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(appManifest));
@@ -1449,7 +1449,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<string> resolvedResources = project.ResourceFiles.Concat(project.ResolvedResourcesFullFileNames).Select(resource => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(resource))).Distinct().ToList();
             List<string> resolvedEmbeddedResource = project.ResourceFiles.Concat(project.AdditionalEmbeddedResource).Concat(project.AdditionalEmbeddedAssemblies).Select(f => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(f))).Distinct().ToList();
             List<string> resolvedNoneFiles =
-                (project.ResolvedNoneFullFileNames.Select(file => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(file))))
+                (project.NoneFiles.Select(file => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(file))))
                 .Concat(project.AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))))
                 .Where(f => !allContents.Contains(f) && !resolvedResources.Contains(f) && !resolvedEmbeddedResource.Contains(f)).Distinct().ToList();
 
