@@ -676,6 +676,43 @@ namespace Sharpmake.Generators.VisualStudio
             return solutionFileInfo.FullName;
         }
 
+        private Solution.Configuration.IncludedProjectInfo ResolveStartupProject(Solution solution, List<Solution.Configuration> solutionConfigurations)
+        {
+            // Set the default startup project.
+            var configuration = solutionConfigurations.FirstOrDefault();
+            if (configuration == null)
+                return null;
+
+            // Find all executable projects
+            var executableProjects = solutionConfigurations
+                .SelectMany(e => e.IncludedProjectInfos)
+                .Where(e =>
+                    e.Configuration.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
+                    e.Configuration.Output == Project.Configuration.OutputType.DotNetWindowsApp ||
+                    e.Configuration.Output == Project.Configuration.OutputType.Exe)
+                .GroupBy(e => e.Configuration.ProjectFullFileName).ToList();
+
+            // If there is more than one, set the one with the same name as the solution
+            if (executableProjects.Count > 1)
+            {
+                var sameName = executableProjects.FirstOrDefault(e => solution.Name.Equals(e.First().Configuration.ProjectName, StringComparison.OrdinalIgnoreCase));
+                if (sameName != null)
+                {
+                    return sameName.First();
+                }
+
+                // If none, try to find a project that the name is at the beginning of the solution name
+                // (It can happen that a project "Application" is in a solution named "ApplicationSolution")
+                sameName = executableProjects.FirstOrDefault(e => solution.Name.StartsWith(e.First().Configuration.ProjectName, StringComparison.OrdinalIgnoreCase));
+                if (sameName != null)
+                {
+                    return sameName.First();
+                }
+            }
+
+            return executableProjects.FirstOrDefault()?.First();
+        }
+
         private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, List<Solution.Configuration> solutionConfigurations)
         {
             bool projectsWereFiltered;
@@ -700,6 +737,9 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             Solution.Configuration.IncludedProjectInfo startupProject = startupProjectGroups.Select(group => group.First().StartupProject).FirstOrDefault();
+            if (startupProject == null)
+                startupProject = ResolveStartupProject(solution, solutionConfigurations);
+
             if (startupProject != null)
             {
                 //put the startup project at the top of the project list. Visual Studio will put it as the default startup project.

@@ -126,6 +126,24 @@ namespace Sharpmake
                 AddProjectInternal(projectType, projectTarget, inactiveProject, solutionFolder, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
             }
 
+            public void SetStartupProject<TPROJECTTYPE>(
+                [CallerFilePath] string sourceFilePath = "",
+                [CallerLineNumber] int sourceLineNumber = 0)
+            {
+                IncludedProjectInfo includedProjectInfo = GetProject(typeof(TPROJECTTYPE));
+
+                if (includedProjectInfo == null)
+                {
+                    throw new Error(string.Format("{0} error : Can't set project {1} as startup project of solution {2} and target {3} since it is not included in the configuration.",
+                        Util.FormatCallerInfo(sourceFilePath, sourceLineNumber),
+                        typeof(TPROJECTTYPE).Name,
+                        Solution.Name,
+                        Target));
+                }
+
+                StartupProject = includedProjectInfo;
+            }
+
             [DebuggerDisplay("{Project == null ? Type.Name : Project.Name} {Configuration == null ? Target.Name : Configuration.Name}")]
             public class IncludedProjectInfo
             {
