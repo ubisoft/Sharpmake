@@ -752,6 +752,8 @@ namespace Sharpmake
                 NatvisFiles.IntersectWith(SourceFilesFilters);
             }
 
+            AdditionalFiltering(SourceFiles, ref SourceFilesExclude);
+
             // Add source files
             ResolvedSourceFiles.AddRange(SourceFiles);
 
@@ -1011,6 +1013,11 @@ namespace Sharpmake
                 else
                     conf.ResolvedSourceFilesBuildExclude.AddRange(blobContent.ResolvedBlobSourceFiles);
             }
+        }
+
+        public virtual void AdditionalFiltering(Strings sourceFiles, ref Strings sourceFilesExclude)
+        {
+
         }
 
         public virtual bool ResolveFilterPath(string relativePath, out string filterPath)
