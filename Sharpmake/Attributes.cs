@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using JetBrains.Annotations;
 
 namespace Sharpmake
 {
@@ -37,6 +38,7 @@ namespace Sharpmake
     public class Export : Attribute
     { }
 
+    [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class Configure : Attribute
     {
