@@ -588,6 +588,34 @@ namespace Sharpmake
                 public bool FastBuildUseStdOutAsOutput = false;
             }
 
+            [Resolver.Resolvable]
+            public class BuildStepTest : BuildStepBase
+            {
+                public BuildStepTest(
+                    string executableFile,
+                    string executableArguments,
+                    string outputFile,
+                    string executableWorkingDirectory = "",
+                    int timeOutInSecond = 0,
+                    bool alwaysShowOutput = true)
+
+                {
+                    TestExecutable = executableFile;
+                    TestArguments = executableArguments;
+                    TestOutput = outputFile;
+                    TestWorkingDir = executableWorkingDirectory;
+                    TestTimeOutInSecond = timeOutInSecond;
+                    TestAlwaysShowOutput = alwaysShowOutput;
+                }
+
+                public string TestExecutable = "";
+                public string TestOutput = "";
+                public string TestArguments = "";
+                public string TestWorkingDir = "";
+                public int TestTimeOutInSecond = 0;
+                public bool TestAlwaysShowOutput = false;
+            }
+
             public class FileCustomBuild
             {
                 public FileCustomBuild(string description = "Copy files...")
@@ -758,6 +786,7 @@ namespace Sharpmake
             public Dictionary<string, BuildStepBase> EventCustomPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>(); // <path to file, destination folder>
             public BuildStepExecutable PostBuildStampExe = null;
+            public BuildStepTest PostBuildStepTest = null;
 
             public List<string> CustomBuildStep = new List<string>();
             public string CustomBuildStepDescription = "";
@@ -1110,6 +1139,9 @@ namespace Sharpmake
 
                 if(PostBuildStampExe != null)
                     PostBuildStampExe.Resolve(resolver);
+
+                if (PostBuildStepTest != null)
+                    PostBuildStepTest.Resolve(resolver);
 
                 string dependencyExtension = Util.GetProjectFileExtension(this);
                 ProjectFullFileNameWithExtension = ProjectFullFileName + dependencyExtension;

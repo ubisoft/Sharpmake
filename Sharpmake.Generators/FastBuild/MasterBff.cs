@@ -505,6 +505,11 @@ namespace Sharpmake.Generators.FastBuild
                         }
                     }
                 }
+                else
+                {
+                    throw new Error("error, BuildStep not supported: {0}", buildEvent.GetType().FullName);
+                }
+
             }
         }
 

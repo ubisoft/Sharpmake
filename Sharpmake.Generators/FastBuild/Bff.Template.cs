@@ -482,6 +482,22 @@ Exec( '[fastBuildPreBuildName]' )
 
 ";
 
+                public static string TestSection = @"
+//=================================================================================================================
+// Test [fastBuildTest]
+//=================================================================================================================
+Test( '[fastBuildTest]' )
+{
+  .TestExecutable        = '[fastBuildTestExecutable]'
+  .TestOutput            = '[fastBuildTestOutput]'
+  .TestArguments         = '[fastBuildTestArguments]'
+  .TestWorkingDir        = '[fastBuildTestWorkingDir]'
+  .TestTimeOut           =  [fastBuildTestTimeOut]
+  .TestAlwaysShowOutput  =  [fastBuildTestAlwaysShowOutput]
+}
+
+";
+
                 public static string UnityBeginSection = @"
 //=================================================================================================================
 // Master .bff Unity/Blob files (shared across configs)

@@ -292,8 +292,11 @@ namespace Sharpmake.Generators.FastBuild
                         List<string> fastBuildProjectDependencyList = new List<string>();
                         List<string> fastBuildProjectExeUtilityDependencyList = new List<string>();
 
-                        if (conf.Output == Project.Configuration.OutputType.Exe ||
-                            conf.Output == Project.Configuration.OutputType.Dll)
+                        bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
+                        bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
+                        bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+
+                        if (isOutputTypeExeOrDll)
                         {
                             StringBuilder result = new StringBuilder();
                             result.Append("\n");
@@ -391,7 +394,7 @@ namespace Sharpmake.Generators.FastBuild
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
                             {
-                                if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                                if (isOutputTypeExe || conf.ExecuteTargetCopy)
                                 {
                                     if (conf.CopyDependenciesBuildStep != null)
                                         throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
@@ -464,6 +467,13 @@ namespace Sharpmake.Generators.FastBuild
                                     string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, buildEvent);
+                                }
+
+                                if(conf.PostBuildStepTest != null)
+                                {
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, conf.PostBuildStepTest, Vcxproj.BuildStep.PostBuildCustomAction);
+                                    fastBuildTargetSubTargets.Add(eventKey);
+                                    postBuildEvents.Add(eventKey, conf.PostBuildStepTest);
                                 }
                             }
 
@@ -625,7 +635,7 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildCompilerForceUsing = builderForceUsingFiles.ToString();
                         }
 
-                        if ((conf.Output == Project.Configuration.OutputType.Exe || conf.Output == Project.Configuration.OutputType.Dll) && conf.PostBuildStampExe != null)
+                        if (isOutputTypeExeOrDll && conf.PostBuildStampExe != null)
                         {
                             fastBuildStampExecutable = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStampExe.ExecutableFile, true));
                             fastBuildStampArguments = String.Format("{0} {1} {2}",
@@ -635,7 +645,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         bool linkObjects = false;
-                        if (conf.Output == Project.Configuration.OutputType.Exe || conf.Output == Project.Configuration.OutputType.Dll)
+                        if (isOutputTypeExeOrDll)
                         {
                             linkObjects = (confOptions["UseLibraryDependencyInputs"] == "true");
                         }
@@ -803,8 +813,7 @@ namespace Sharpmake.Generators.FastBuild
                                         }
 
                                         // Exe and DLL will always add an extra objectlist
-                                        if ((conf.Output == Project.Configuration.OutputType.Exe ||
-                                                conf.Output == Project.Configuration.OutputType.Dll) && isLastSubConfig // only last subconfig will generate objectlist
+                                        if (isOutputTypeExeOrDll && isLastSubConfig // only last subconfig will generate objectlist
                                         )
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
@@ -851,7 +860,7 @@ namespace Sharpmake.Generators.FastBuild
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
 
-                                        if (conf.Output == Project.Configuration.OutputType.Dll && !isLastSubConfig)
+                                        if (isOutputTypeDll && !isLastSubConfig)
                                         {
                                             using (bffGenerator.Declare("objectListName", fastBuildOutputFileShortName))
                                             {
@@ -1050,6 +1059,28 @@ namespace Sharpmake.Generators.FastBuild
                                                     {
                                                         bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
                                                     }
+                                                }
+                                                else if(postBuildEvent.Value is Project.Configuration.BuildStepTest)
+                                                {
+                                                    var testCommand = postBuildEvent.Value as Project.Configuration.BuildStepTest;
+
+                                                    string fastBuildTestExecutable = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStepTest.TestExecutable, true));
+                                                    string fastBuildTestOutput = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStepTest.TestOutput, true));
+
+                                                    using (bffGenerator.Declare("fastBuildTest", postBuildEvent.Key))
+                                                    using (bffGenerator.Declare("fastBuildTestExecutable", fastBuildTestExecutable))
+                                                    using (bffGenerator.Declare("fastBuildTestWorkingDir", conf.PostBuildStepTest.TestWorkingDir == string.Empty ? FileGeneratorUtilities.RemoveLineTag : CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.PostBuildStepTest.TestWorkingDir))))
+                                                    using (bffGenerator.Declare("fastBuildTestOutput", fastBuildTestOutput))
+                                                    using (bffGenerator.Declare("fastBuildTestArguments", conf.PostBuildStepTest.TestArguments))
+                                                    using (bffGenerator.Declare("fastBuildTestTimeOut", conf.PostBuildStepTest.TestTimeOutInSecond.ToString()))
+                                                    using (bffGenerator.Declare("fastBuildTestAlwaysShowOutput", conf.PostBuildStepTest.TestAlwaysShowOutput ? "true" : "false"))
+                                                    {
+                                                        bffGenerator.Write(Template.ConfigurationFile.TestSection);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    throw new Error("error, BuildStep not supported: {0}", postBuildEvent.GetType().FullName);
                                                 }
                                             }
 

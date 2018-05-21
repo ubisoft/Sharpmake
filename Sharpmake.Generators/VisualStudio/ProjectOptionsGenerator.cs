@@ -1692,8 +1692,20 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.Output == Project.Configuration.OutputType.Dll)
                 {
+                    if (context.Configuration.PostBuildStepTest != null)
+                    {
+                        // First, execute tests
+                        context.Configuration.EventPostBuild.Insert(0,
+                            string.Format(
+                                "{0} {1}",
+                                Util.SimplifyPath(Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PostBuildStepTest.TestExecutable)),
+                                context.Configuration.PostBuildStepTest.TestArguments
+                            )
+                        );
+                    }
                     if (context.Configuration.PostBuildStampExe != null)
                     {
+                        // NO, first, execute stamp !
                         context.Configuration.EventPostBuild.Insert(0,
                             string.Format(
                                 "{0} {1} {2} {3}",
@@ -1733,34 +1745,33 @@ namespace Sharpmake.Generators.VisualStudio
             if (!eventBuildStep.IsResolved)
                 throw new Error("Event hasn't been resolved!");
 
+            Func<string, string> extractName = (name) => name.Substring(name.LastIndexOf(@"\", StringComparison.Ordinal) + 1).Replace('.', '_');
+
+            bool isPostBuildCustomActionWithSpecificName = buildStep == Vcxproj.BuildStep.PostBuild || buildStep == Vcxproj.BuildStep.PostBuildCustomAction || eventBuildStep.IsNameSpecific;
+
             if (eventBuildStep is Project.Configuration.BuildStepExecutable)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepExecutable;
                 string execName;
 
-                if (buildStep == Vcxproj.BuildStep.PostBuild || buildStep == Vcxproj.BuildStep.PostBuildCustomAction || cEvent.IsNameSpecific)
+                if (isPostBuildCustomActionWithSpecificName)
                 {
-                    execName = @"Exec_"
-                               + cEvent.ExecutableFile.Substring(cEvent.ExecutableFile.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
-                    execName += "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
+                    execName  = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
                 }
                 else
                 {
-                    execName = @"Exec_"
-                           + cEvent.ExecutableFile.Substring(cEvent.ExecutableFile.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
+                    execName  = @"Exec_" + extractName(cEvent.ExecutableFile);
                     execName += "_" + (execName).GetHashCode().ToString("X8");
                 }
-                execName = execName.Replace('.', '_');
 
                 return execName;
             }
-
-            if (eventBuildStep is Project.Configuration.BuildStepCopy)
+            else if (eventBuildStep is Project.Configuration.BuildStepCopy)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepCopy;
                 string copyName;
 
-                if (buildStep == Vcxproj.BuildStep.PostBuild || buildStep == Vcxproj.BuildStep.PostBuildCustomAction || cEvent.IsNameSpecific)
+                if (isPostBuildCustomActionWithSpecificName)
                 {
                     copyName = "Copy_" + (conf.TargetFileFullName + cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
                 }
@@ -1771,8 +1782,27 @@ namespace Sharpmake.Generators.VisualStudio
 
                 return copyName;
             }
+            else if(eventBuildStep is Project.Configuration.BuildStepTest)
+            {
+                var tEvent = eventBuildStep as Project.Configuration.BuildStepTest;
+                string testName;
 
-            return null;
+                if (isPostBuildCustomActionWithSpecificName)
+                {
+                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
+                }
+                else
+                {
+                    testName = "Test_" + extractName(tEvent.TestExecutable);
+                    testName += "_" + (testName).GetHashCode().ToString("X8");
+                }
+
+                return testName;
+            }
+            else
+            {
+                throw new Error("error, BuildStep not supported: {0}", eventBuildStep.GetType().FullName);
+            }
         }
 
         private static void SelectAdditionalLibraryDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
