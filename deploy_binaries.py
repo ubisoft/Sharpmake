@@ -66,7 +66,7 @@ if not os.path.isfile(os.path.join(root_dir, "bin/{}/Sharpmake.dll".format(confi
 
 # If the directory exists, make sure that it is empty.
 if not os.path.isdir(target_dir):
-    os.mkdir(target_dir)
+    os.makedirs(target_dir)
 
 # Simple wrapper class that represents an output folder,
 # ie: bin/Release or bin/Debug
@@ -82,16 +82,18 @@ class BinarySite:
     def copy(self):
         # Copy the DLL.
         dll_path = os.path.join(root_dir, "bin", config, self.name + ".dll")
-        if os.path.isfile(dll_path):
-            self.copy_file(dll_path)
+        self.copy_file(dll_path)
+        self.copy_file(dll_path + ".config")
 
         # Copy the executable.
         exe_path = os.path.join(root_dir, "bin", config, self.name + ".exe")
-        if os.path.isfile(exe_path):
-            self.copy_file(exe_path)
+        self.copy_file(exe_path)
+        self.copy_file(exe_path + ".config")
 
-        # Copy the program debug database if it exists.
+        # Copy the program debug database and mdb files.
         if deploy_pdb:
+            self.copy_file(dll_path + ".mdb")
+            self.copy_file(exe_path + ".mdb")
             self.copy_file(os.path.join(root_dir, "bin", config, self.name + ".pdb"))
 
         # Copy the XML API doc if it exists.
