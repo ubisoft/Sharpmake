@@ -307,12 +307,23 @@ namespace Sharpmake
                     return Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81), "bin", targetPlatform, "rc.exe");
                 case KitsRootEnum.KitsRoot10:
                     {
-                        string kitsRootPath;
-                        if (KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion) <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
-                            kitsRootPath = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81);
-                        else
-                            kitsRootPath = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
-                        return Path.Combine(kitsRootPath, "bin", targetPlatform, "rc.exe");
+                        Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
+                        if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                        {
+                            string kitsRoot81Path = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81);
+                            return Path.Combine(kitsRoot81Path, "bin", targetPlatform, "rc.exe");
+                        }
+
+                        string kitsRoot10Path = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
+                        string platformVersion = windowsTargetPlatformVersion.ToVersionString();
+
+                        // First, try WindowsSdkVerBinPath
+                        string candidateWindowsSdkVerBinPath = Path.Combine(kitsRoot10Path, "bin", platformVersion, targetPlatform, "rc.exe");
+                        if (File.Exists(candidateWindowsSdkVerBinPath))
+                            return candidateWindowsSdkVerBinPath;
+
+                        // If it didn't contain rc.exe, fallback to WindowsSdkBinPath
+                        return Path.Combine(kitsRoot10Path, "bin", targetPlatform, "rc.exe");
                     }
                 default:
                     throw new NotImplementedException("No WindowsResourceCompiler associated with " + kitsRoot);
