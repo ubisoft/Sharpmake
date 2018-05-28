@@ -508,12 +508,12 @@ Unity( '[unityFile.UnityName]' )
 {
     .UnityInputPath                     = [unityFile.UnityInputPath]
     .UnityInputExcludePath              = [unityFile.UnityInputExcludePath]
-    .UnityInputExcludePattern           = '[unityFile.UnityInputExcludePattern]'
-    .UnityInputPattern                  = '[unityFile.UnityInputPattern]'
+    .UnityInputExcludePattern           = [unityFile.UnityInputExcludePattern]
+    .UnityInputPattern                  = [unityFile.UnityInputPattern]
     .UnityInputPathRecurse              = '[unityFile.UnityInputPathRecurse]'
     .UnityInputFiles                    = [unityFile.UnityInputFiles]
     .UnityInputExcludedFiles            = [unityFile.UnityInputExcludedFiles]
-    .UnityInputObjectLists              = '[unityFile.UnityInputObjectLists]'
+    .UnityInputObjectLists              = [unityFile.UnityInputObjectLists]
     .UnityInputIsolateWritableFiles     =  [unityFile.UnityInputIsolateWritableFiles]
     .UnityInputIsolateWritableFilesLimit = [unityFile.UnityInputIsolateWritableFilesLimit]
     .UnityOutputPath                    = '[unityFile.UnityOutputPath]'

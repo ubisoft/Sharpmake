@@ -27,8 +27,8 @@ namespace Sharpmake.Generators.FastBuild
         {
             public string UnityName                           = string.Empty; // Name of unity
             public string UnityOutputPath                     = string.Empty; // Path to output generated Unity files
-            public string UnityInputPath                      = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) to find files 
-            public string UnityInputExcludePath               = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) in which to ignore files 
+            public string UnityInputPath                      = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) to find files
+            public string UnityInputExcludePath               = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) in which to ignore files
             public string UnityInputExcludePattern            = FileGeneratorUtilities.RemoveLineTag; // (optional) Wildcard pattern(s) of files/folders to exclude
             public string UnityInputPattern                   = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern(s) of files to find (default *cpp)
             public string UnityInputPathRecurse               = FileGeneratorUtilities.RemoveLineTag; // (optional) Recurse when searching for files (default true)
@@ -40,6 +40,8 @@ namespace Sharpmake.Generators.FastBuild
             public string UnityOutputPattern                  = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern of output Unity file names (default Unity*cpp)
             public string UnityNumFiles                       = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
             public string UnityPCH                            = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
+
+            public const string DefaultUnityInputPatternExtension = ".cpp";
 
             public override int GetHashCode()
             {

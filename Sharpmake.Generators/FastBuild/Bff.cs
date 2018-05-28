@@ -1202,6 +1202,7 @@ namespace Sharpmake.Generators.FastBuild
             string fastBuildUnityInputFiles = FileGeneratorUtilities.RemoveLineTag;
             string fastBuildUnityInputExcludedfiles = FileGeneratorUtilities.RemoveLineTag;
             string fastBuildUnityPaths = FileGeneratorUtilities.RemoveLineTag;
+            string fastBuildUnityInputPattern = FileGeneratorUtilities.RemoveLineTag;
 
             string fastBuildUnityInputExcludePath = FileGeneratorUtilities.RemoveLineTag;
             string fastBuildUnityCount = FileGeneratorUtilities.RemoveLineTag;
@@ -1282,6 +1283,14 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildUnityInputExcludePath = UtilityMethods.FBuildCollectionFormat(unityInputExcludePathRelative, spaceLength);
             }
 
+            // only write UnityInputPattern if it's not FastBuild's default value of .cpp
+            if (project.SourceFilesBlobExtensions.Count != 1 || !project.SourceFilesBlobExtensions.Contains(Unity.DefaultUnityInputPatternExtension))
+            {
+                var inputPatterns = new Strings(project.SourceFilesBlobExtensions);
+                inputPatterns.InsertPrefix("*");
+                fastBuildUnityInputPattern = UtilityMethods.FBuildCollectionFormat(inputPatterns, spaceLength);
+            }
+
             Unity unityFile = new Unity
             {
                 // Note that the UnityName and UnityOutputPattern are intentionally left empty: they will be set in the Resolve
@@ -1293,7 +1302,8 @@ namespace Sharpmake.Generators.FastBuild
                 UnityNumFiles = fastBuildUnityCount,
                 UnityInputPath = fastBuildUnityPaths,
                 UnityInputFiles = fastBuildUnityInputFiles,
-                UnityInputExcludedFiles = fastBuildUnityInputExcludedfiles
+                UnityInputExcludedFiles = fastBuildUnityInputExcludedfiles,
+                UnityInputPattern = fastBuildUnityInputPattern
             };
 
             // _unities being a dictionary, a new entry will be created only
