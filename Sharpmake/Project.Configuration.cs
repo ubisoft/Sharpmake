@@ -515,6 +515,12 @@ namespace Sharpmake
                 set { _blobPath = value; }
             }
 
+            /// <summary>
+            // How many static blob files would this configuration generate
+            /// </summary>
+            ///
+            internal int GeneratableBlobCount = 0;
+
             string _fastBuildUnityPath = null;
             public string FastBuildUnityPath
             {

@@ -1224,7 +1224,15 @@ namespace Sharpmake
             }
 
             // index of nb of blob created
-            BlobCount = allBlobsFiles.Count;
+            int nbBlobCreated = allBlobsFiles.Count;
+            BlobCount = nbBlobCreated;
+
+            // make the number of blobs a conf generates available to generators
+            if (nbBlobCreated > 0)
+            {
+                foreach (Configuration conf in configurations)
+                    conf.GeneratableBlobCount = nbBlobCreated;
+            }
 
             // Capping the number of blob work to the number of blobs. It makes no sense to have more work blobs than blobs.
             if (BlobWorkFileCount > BlobCount)
@@ -1235,7 +1243,7 @@ namespace Sharpmake
             {
                 for (int i = 0; i < allBlobsFiles.Count; ++i)
                 {
-                    string blobFileName = String.Format(@"{0}_{1:000}", Name.ToLower(), i);
+                    string blobFileName = string.Format(@"{0}_{1:000}", Name.ToLower(), i);
                     var blobbedFiles = (isBlobWorkEnabled) ?
                         from j in allBlobsFiles[i] where !j.IsWorkBlobCandidate select j.Path :
                         from j in allBlobsFiles[i] select j.Path;
@@ -1245,10 +1253,10 @@ namespace Sharpmake
                 // write work blob size
                 if (BlobWorkEnabled)
                 {
-                    List<List<String>> workBlobFiles = new List<List<String>>(BlobWorkFileCount);
+                    var workBlobFiles = new List<List<string>>(BlobWorkFileCount);
 
                     for (int i = 0; i < BlobWorkFileCount; ++i)
-                        workBlobFiles.Add(new List<String>());
+                        workBlobFiles.Add(new List<string>());
 
                     foreach (string workkBlobSourceFile in workBlobSourceFiles)
                     {
@@ -1259,7 +1267,7 @@ namespace Sharpmake
 
                     for (int i = 0; i < workBlobFiles.Count; ++i)
                     {
-                        string blobFileName = String.Format(@"{0}_work_{1:000}", Name.ToLower(), i);
+                        string blobFileName = string.Format(@"{0}_work_{1:000}", Name.ToLower(), i);
                         blobFiles.Add(BlobGenerateFile(blobPath, workBlobFiles[i], blobFileName, configurations, WorkBlobFileHeader, WorkBlobFileFooter));
                     }
                 }

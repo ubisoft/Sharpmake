@@ -1207,7 +1207,7 @@ namespace Sharpmake.Generators.FastBuild
             string fastBuildUnityInputExcludePath = FileGeneratorUtilities.RemoveLineTag;
             string fastBuildUnityCount = FileGeneratorUtilities.RemoveLineTag;
 
-            int unityCount = conf.FastBuildUnityCount > 0 ? conf.FastBuildUnityCount : project.BlobCount;
+            int unityCount = conf.FastBuildUnityCount > 0 ? conf.FastBuildUnityCount : conf.GeneratableBlobCount;
             if(unityCount > 0)
                 fastBuildUnityCount = unityCount.ToString(CultureInfo.InvariantCulture);
 
