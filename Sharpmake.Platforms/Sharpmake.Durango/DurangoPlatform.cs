@@ -371,12 +371,20 @@ namespace Sharpmake
 
                 // WARNING: THIS IS A PATCH TO ADD THE XMANIFEST FILE IN THE FILE LIST
                 //          This is not a clean way to do but it is the only way we found so far
-                if (context.ProjectConfigurations.First().NeedsAppxManifestFile)
+                var manifestFiles = context.ProjectConfigurations
+                    .Where(x => x.Platform == Platform.durango && x.NeedsAppxManifestFile)
+                    .Select(Sharpmake.Util.GetAppxManifestFileName)
+                    .Distinct()
+                    .ToList();
+                if (manifestFiles.Count > 1)
+                {
+                    throw new Error("conf.AppxManifestFilePath must be identical for all Durango configurations.");
+                }
+                else if (manifestFiles.Count == 1)
                 {
                     fileGenerator.Write(_projectFilesBegin);
                     {
-                        string file = Sharpmake.Util.GetAppxManifestFileName(context.ProjectConfigurations.First());
-                        var projectFile = new Vcxproj.ProjectFile(context, file);
+                        var projectFile = new Vcxproj.ProjectFile(context, manifestFiles[0]);
                         using (fileGenerator.Declare("file", projectFile))
                         {
                             fileGenerator.Write(_projectFilesXManifest);
