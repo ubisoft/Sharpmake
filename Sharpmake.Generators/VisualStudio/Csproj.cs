@@ -1039,7 +1039,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!string.IsNullOrEmpty(appManifest))
             {
-                appManifest = project.NoneFiles.FirstOrDefault(s => s.Contains(appManifest));
+                appManifest = project.NoneFiles.FirstOrDefault(s => s.EndsWith(appManifest, StringComparison.OrdinalIgnoreCase));
                 if (appManifest != null)
                 {
                     appManifest = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(appManifest));
