@@ -51,9 +51,13 @@ namespace Sharpmake.Application
         private static int s_errorCount = 0;
         private static int s_warningCount = 0;
 
-        public static void LogWrite(string msg, params object[] args)
+        public static void LogWrite(string format, params object[] args)
         {
-            string message = string.Format(msg, args);
+            LogWrite(string.Format(format, args));
+        }
+
+        public static void LogWrite(string message)
+        {
             string prefix = String.Empty;
 
             if (DebugEnable)
@@ -71,17 +75,25 @@ namespace Sharpmake.Application
             }
         }
 
-        public static void LogWriteLine(string msg, params object[] args)
+        public static void LogWriteLine(string format, params object[] args)
         {
-            LogWrite(msg + Environment.NewLine, args);
+            LogWriteLine(string.Format(format, args));
         }
 
+        public static void LogWriteLine(string msg)
+        {
+            LogWrite(msg + Environment.NewLine);
+        }
 
-        public static void DebugWrite(string msg, params object[] args)
+        public static void DebugWrite(string format, params object[] args)
+        {
+            DebugWrite(string.Format(format, args));
+        }
+
+        public static void DebugWrite(string message)
         {
             if (DebugEnable)
             {
-                string message = args.Length > 0 ? string.Format(msg, args) : msg;
                 TimeSpan span = DateTime.Now - s_startTime;
 
                 string prefix = String.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
@@ -93,37 +105,51 @@ namespace Sharpmake.Application
             }
         }
 
-        public static void DebugWriteLine(string msg, params object[] args)
+        public static void DebugWriteLine(string format, params object[] args)
+        {
+            DebugWriteLine(string.Format(format, args));
+        }
+
+        public static void DebugWriteLine(string msg)
         {
             if (DebugEnable)
-                DebugWrite(msg + Environment.NewLine, args);
+                DebugWrite(msg + Environment.NewLine);
         }
 
-        public static void WarningWrite(string msg, params object[] args)
+        public static void WarningWrite(string format, params object[] args)
+        {
+            WarningWrite(string.Format(format, args));
+        }
+
+        public static void WarningWrite(string msg)
         {
             Interlocked.Increment(ref s_warningCount);
-            string formattedMsg = args.Length > 0 ? string.Format(msg, args) : msg;
-
-            Console.Write(formattedMsg);
-
+            Console.Write(msg);
             if (Debugger.IsAttached)
-                Trace.Write(formattedMsg);
+                Trace.Write(msg);
         }
 
-        public static void ErrorWrite(string msg, params object[] args)
+        public static void ErrorWrite(string format, params object[] args)
+        {
+            ErrorWrite(string.Format(format, args));
+        }
+
+        public static void ErrorWrite(string msg)
         {
             Interlocked.Increment(ref s_errorCount);
-            string formattedMsg = args.Length > 0 ? string.Format(msg, args) : msg;
-
-            Console.Write(formattedMsg);
-
+            Console.Write(msg);
             if (Debugger.IsAttached)
-                Trace.Write(formattedMsg);
+                Trace.Write(msg);
         }
 
-        public static void ErrorWriteLine(string msg, params object[] args)
+        public static void ErrorWriteLine(string format, params object[] args)
         {
-            ErrorWrite(msg + Environment.NewLine, args);
+            ErrorWrite(string.Format(format, args));
+        }
+
+        public static void ErrorWriteLine(string msg)
+        {
+            ErrorWrite(msg + Environment.NewLine);
         }
 
         #endregion
@@ -203,7 +229,7 @@ namespace Sharpmake.Application
                             oneInstanceMutex.WaitOne();
                         }
                     }
-                    catch (System.Threading.AbandonedMutexException)
+                    catch (AbandonedMutexException)
                     {
                         // This occurs if another sharpmake is killed in the debugger
                     }
