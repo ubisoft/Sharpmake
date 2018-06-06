@@ -568,22 +568,22 @@ namespace Sharpmake.Application
                     default:
                         throw new Error("Sharpmake input missing, use /sources() or /assemblies()");
                 }
+
+                if (builder.Arguments.TypesToGenerate.Count == 0)
+                    throw new Error("Sharpmake has nothing to generate!" + Environment.NewLine
+                        + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
+                builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
+
+                // Call all configuration's methods and resolve project/solution member's values
+                builder.BuildProjectAndSolution();
+
+                return builder;
             }
-            catch (Exception)
+            catch
             {
                 builder.Dispose();
                 throw;
             }
-
-            if (builder.Arguments.TypesToGenerate.Count == 0)
-                throw new Error("Sharpmake has nothing to generate!" + Environment.NewLine
-                    + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
-            builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
-
-            // Call all configuration's methods and resolve project/solution member's values
-            builder.BuildProjectAndSolution();
-
-            return builder;
         }
 
         private static void RecursivePrintMethodInfo(Analyzer.ConfigureMethodInfo method, ISet<string> set, int nested = 0)
