@@ -61,6 +61,16 @@ namespace Sharpmake
             Assembler assembler = new Assembler();
             List<string> allsources = assembler.GetSourceFiles(MainSources);
 
+            ProjectContent project = new ProjectContent { ProjectFolder = RootPath };
+            DebugProjects.Add(CreateProject("sharpmake_debug"), project);
+
+            // Add sources
+            foreach (var source in allsources)
+            {
+                project.ProjectFiles.Add(source);
+            }
+
+            // Add references
             var references = new HashSet<string>();
             if (assembler.UseDefaultReferences)
             {
@@ -71,29 +81,8 @@ namespace Sharpmake
             foreach (var assemblerRef in assembler.References)
                 references.Add(assemblerRef);
 
-            // find all folders and create associated projects types
-            foreach (var source in allsources)
-            {
-                string dir = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(dir))
-                    dir = Util.PathMakeStandard(dir);
+            project.References.AddRange(references);
 
-                var existing = DebugProjects.FirstOrDefault(dp => dir.Contains(dp.Value.ProjectFolder));
-                if (existing.Equals(default(KeyValuePair<Type, ProjectContent>)))
-                {
-                    string projectName = Path.GetFileName(dir) + "_sharpmake";
-                    Type myProjectType = CreateProject(projectName);
-
-                    ProjectContent project = new ProjectContent { ProjectFolder = dir };
-                    project.References.AddRange(references);
-                    foreach (var p in DebugProjects)
-                        p.Value.ProjectReferences.Add(myProjectType);
-                    DebugProjects.Add(myProjectType, project);
-                    existing = DebugProjects.Last();
-                }
-
-                existing.Value.ProjectFiles.Add(source);
-            }
         }
 
         private static Type CreateProject(string typeSignature)
