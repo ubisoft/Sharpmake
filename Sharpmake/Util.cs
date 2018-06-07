@@ -1054,7 +1054,7 @@ namespace Sharpmake
         public static string WinFormSubTypesDbPath = string.Empty;
         private static readonly string s_winFormSubTypesDbPrefix = "winformssubtypesdb";
 
-        private static string GetWinFormSubTypeDbPath()
+        public static string GetWinFormSubTypeDbPath()
         {
             return Path.Combine(WinFormSubTypesDbPath, string.Format(@"{0}{1}", s_winFormSubTypesDbPrefix, ".bin"));
         }
