@@ -274,7 +274,7 @@ namespace Sharpmake
             }
         }
 
-        public static Strings GetStrings<T>(Configuration conf)
+        public static Strings GetStrings<T>(Configuration conf) where T : Strings
         {
             List<object> options = conf.Options;
             Strings values = new Strings();
@@ -289,7 +289,7 @@ namespace Sharpmake
             return values;
         }
 
-        public static string GetString<T>(Configuration conf)
+        public static string GetString<T>(Configuration conf) where T : StringOption
         {
             List<object> options = conf.Options;
 
