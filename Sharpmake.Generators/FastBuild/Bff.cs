@@ -560,7 +560,6 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
                         string clangFileLanguage = String.Empty;
-                        string clangStd = "-std=gnu++14";
 
                         if (isCompileAsCFile)
                         {
@@ -816,7 +815,6 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
                                     using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName ?? FileGeneratorUtilities.RemoveLineTag))
                                     using (bffGenerator.Declare("fastBuildClangFileLanguage", clangFileLanguage))
-                                    using (bffGenerator.Declare("fastBuildClangStd", clangStd))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFilesWithToken", fastBuildDeoptimizationWritableFilesWithToken))
                                     using (bffGenerator.Declare("fastBuildCompilerForceUsing", fastBuildCompilerForceUsing))
@@ -890,6 +888,7 @@ namespace Sharpmake.Generators.FastBuild
                                                 {
                                                     bffGenerator.Write(fastBuildCompilerExtraOptions);
                                                     bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
+
                                                     if (isUsePrecomp)
                                                         bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
                                                     bffGenerator.Write(compilerOptions);
