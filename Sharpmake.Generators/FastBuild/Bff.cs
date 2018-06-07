@@ -505,38 +505,48 @@ namespace Sharpmake.Generators.FastBuild
 
                         // Remove from cmdLineOptions["AdditionalDependencies"] dependencies that are already listed in fastBuildProjectDependencyList
                         {
+                            var basePlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
+                            string libExt = ".lib";
+                            string outExt = ".a";
+                            string prefixExt = "-l";
+                            basePlatform.SetupPlatformLibraryOptions(ref libExt, ref outExt, ref prefixExt);
                             var finalDependencies = new Strings();
                             foreach (var additionalDependency in additionalDependencies)
                             {
-                                // Properly compute dependency identifier
+                                // compute dependency identifier by removing platform lib prefix and extension (if necessary)
                                 int subStringStartIndex = 0;
                                 int subStringLength = additionalDependency.Length;
-                                if (additionalDependency.EndsWith(".lib", StringComparison.OrdinalIgnoreCase))
-                                    subStringLength -= 4;
+                                if (additionalDependency.EndsWith(libExt, StringComparison.OrdinalIgnoreCase))
+                                    subStringLength -= libExt.Length;
 
-                                if (additionalDependency.StartsWith("-l", StringComparison.Ordinal))
+                                if (additionalDependency.StartsWith(prefixExt, StringComparison.Ordinal))
                                 {
-                                    subStringStartIndex = 2;
-                                    subStringLength -= 2;
+                                    subStringStartIndex = prefixExt.Length;
+                                    subStringLength -= prefixExt.Length;
                                 }
                                 string testedDep = additionalDependency.Substring(subStringStartIndex, subStringLength);
 
+                                // add this link dependency if it's not a project dependency nor a project object file
                                 if (!fastBuildProjectDependencyList.Contains(testedDep) && !IsObjectList(fastBuildProjectDependencyList, testedDep))
                                 {
                                     if (clangPlatformBff == null)
                                     {
+                                        // just add the original dependency
                                         finalDependencies.Add(@"""" + additionalDependency + @"""");
                                     }
                                     else
                                     {
-                                        string recomposedName = additionalDependency;
-                                        if (additionalDependency.StartsWith("-l", StringComparison.Ordinal))
-                                            recomposedName = "lib" + recomposedName.Substring(2);
-
-                                        if (Path.GetExtension(recomposedName) == string.Empty)
-                                            recomposedName = recomposedName + ".a";
-
-                                        finalDependencies.Add(@"""" + recomposedName + @"""");
+                                        if (!additionalDependency.Contains('/') && !additionalDependency.Contains('\\'))
+                                        {
+                                            // the dependency is a "global" lib (ie it doesn't contain a file path)
+                                            // use the -l switch to link it.
+                                            finalDependencies.Add(@"""-l" + testedDep + @"""");
+                                        }
+                                        else
+                                        {
+                                            // the dependency is a "local" lib use the file path to link it
+                                            finalDependencies.Add(@"""" + additionalDependency + @"""");
+                                        }
                                     }
                                 }
                             }
