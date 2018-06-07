@@ -1782,7 +1782,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    execName  = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
+                    execName  = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
                 }
                 else
                 {
