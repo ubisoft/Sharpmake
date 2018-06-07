@@ -1051,11 +1051,11 @@ namespace Sharpmake.Generators.FastBuild
                                                     var execCommand = postBuildEvent.Value as Project.Configuration.BuildStepExecutable;
 
                                                     using (bffGenerator.Declare("fastBuildPreBuildName", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildPrebuildExeFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableFile))))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildInputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableInputFileArgumentOption))))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildOutputFile", CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableOutputFileArgumentOption))))
+                                                    using (bffGenerator.Declare("fastBuildPrebuildExeFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableFile)))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildInputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableInputFileArgumentOption)))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildOutputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableOutputFileArgumentOption)))
                                                     using (bffGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
-                                                    using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, execCommand.ExecutableWorkingDirectory))))
+                                                    using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableWorkingDirectory)))
                                                     using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                                                     {
                                                         bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
@@ -1065,8 +1065,8 @@ namespace Sharpmake.Generators.FastBuild
                                                 {
                                                     var copyCommand = postBuildEvent.Value as Project.Configuration.BuildStepCopy;
 
-                                                    string sourcePath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.SourcePath));
-                                                    string destinationPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, copyCommand.DestinationPath));
+                                                    string sourcePath = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, copyCommand.SourcePath);
+                                                    string destinationPath = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, copyCommand.DestinationPath);
 
                                                     using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
                                                     using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
@@ -1084,12 +1084,13 @@ namespace Sharpmake.Generators.FastBuild
                                                 {
                                                     var testCommand = postBuildEvent.Value as Project.Configuration.BuildStepTest;
 
-                                                    string fastBuildTestExecutable = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStepTest.TestExecutable, true));
-                                                    string fastBuildTestOutput = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStepTest.TestOutput, true));
+                                                    string fastBuildTestExecutable = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, conf.PostBuildStepTest.TestExecutable);
+                                                    string fastBuildTestOutput = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, conf.PostBuildStepTest.TestOutput);
+                                                    string fastBuildTestWorkingDir = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, conf.PostBuildStepTest.TestWorkingDir);
 
                                                     using (bffGenerator.Declare("fastBuildTest", postBuildEvent.Key))
                                                     using (bffGenerator.Declare("fastBuildTestExecutable", fastBuildTestExecutable))
-                                                    using (bffGenerator.Declare("fastBuildTestWorkingDir", conf.PostBuildStepTest.TestWorkingDir == string.Empty ? FileGeneratorUtilities.RemoveLineTag : CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.PostBuildStepTest.TestWorkingDir))))
+                                                    using (bffGenerator.Declare("fastBuildTestWorkingDir", fastBuildTestWorkingDir))
                                                     using (bffGenerator.Declare("fastBuildTestOutput", fastBuildTestOutput))
                                                     using (bffGenerator.Declare("fastBuildTestArguments", conf.PostBuildStepTest.TestArguments))
                                                     using (bffGenerator.Declare("fastBuildTestTimeOut", conf.PostBuildStepTest.TestTimeOutInSecond.ToString()))

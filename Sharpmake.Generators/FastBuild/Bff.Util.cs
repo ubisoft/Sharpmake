@@ -408,5 +408,22 @@ namespace Sharpmake.Generators.FastBuild
             );
             return hasFastBuildConfig;
         }
+
+        public static string GetNormalizedPathForPostBuildEvent(string projectRootPath, string projectFolderPath, string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return FileGeneratorUtilities.RemoveLineTag;
+            }
+            else if (path.StartsWith(projectRootPath, StringComparison.OrdinalIgnoreCase))
+            {
+                // keep the full path for the source if outside of the global root
+                return Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(projectFolderPath, path));
+            }
+            else
+            {
+                return path;
+            }
+        }
     }
 }
