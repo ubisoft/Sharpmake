@@ -91,9 +91,9 @@ namespace Sharpmake
             return false;
         }
 
-        public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
+        public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
         {
-            using (fileGenerator.Resolver.NewScopedParameter("dllOption", outputType == Project.Configuration.OutputType.Dll ? " /DLL" : ""))
+            using (fileGenerator.Resolver.NewScopedParameter("dllOption", configuration.Output == Project.Configuration.OutputType.Dll ? " /DLL" : ""))
             {
                 fileGenerator.Write(Bff.Template.ConfigurationFile.LinkerOptions);
             }

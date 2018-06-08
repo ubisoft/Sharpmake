@@ -1019,7 +1019,7 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                             else
                                             {
-                                                platformBff.SetupExtraLinkerSettings(bffGenerator, conf.Output, fastBuildOutputFile);
+                                                platformBff.SetupExtraLinkerSettings(bffGenerator, conf, fastBuildOutputFile);
                                             }
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);

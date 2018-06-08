@@ -63,9 +63,9 @@ namespace Sharpmake.Generators.FastBuild
         /// Setups extra linker settings for linking with that platform.
         /// </summary>
         /// <param name="fileGenerator">A <see cref="IFileGenerator"/> for writing the file.</param>
-        /// <param name="outputType">The build output.</param>
+        /// <param name="configuration">The project configuration</param>
         /// <param name="fastBuildOutputFile">The file name of the build output.</param>
-        void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile);
+        void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile);
 
         CompilerSettings GetMasterCompilerSettings(
                IDictionary<string, CompilerSettings> masterCompilerSettings,
