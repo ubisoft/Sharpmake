@@ -80,7 +80,7 @@ namespace Sharpmake
                     if (pathToCompiler.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
                     {
                         string rootRelative = pathToCompiler.Substring(rootPath.Length).TrimStart(Util._pathSeparators);
-                        pathToCompiler = Path.Combine("$RootPath$", rootRelative);
+                        pathToCompiler = Path.Combine("$ExecutableRootPath$", rootRelative);
                     }
 
                     Strings extraFiles = new Strings();
@@ -104,9 +104,9 @@ namespace Sharpmake
                                     Path.Combine(pathToCompiler, "mspft110.dll"),
                                     Path.Combine(pathToCompiler, "msobj110.dll"),
                                     Path.Combine(pathToCompiler, "mspdb110.dll"),
-                                    @"$RootPath$\redist\x64\Microsoft.VC110.CRT\msvcp110.dll",
-                                    @"$RootPath$\redist\x64\Microsoft.VC110.CRT\msvcr110.dll",
-                                    @"$RootPath$\redist\x64\Microsoft.VC110.CRT\vccorlib110.dll"
+                                    @"$ExecutableRootPath$\redist\x64\Microsoft.VC110.CRT\msvcp110.dll",
+                                    @"$ExecutableRootPath$\redist\x64\Microsoft.VC110.CRT\msvcr110.dll",
+                                    @"$ExecutableRootPath$\redist\x64\Microsoft.VC110.CRT\vccorlib110.dll"
                                 );
                             }
                             break;
@@ -118,9 +118,9 @@ namespace Sharpmake
                                     Path.Combine(pathToCompiler, "mspft120.dll"),
                                     Path.Combine(pathToCompiler, "msobj120.dll"),
                                     Path.Combine(pathToCompiler, "mspdb120.dll"),
-                                    @"$RootPath$\redist\x64\Microsoft.VC120.CRT\msvcp120.dll",
-                                    @"$RootPath$\redist\x64\Microsoft.VC120.CRT\msvcr120.dll",
-                                    @"$RootPath$\redist\x64\Microsoft.VC120.CRT\vccorlib120.dll"
+                                    @"$ExecutableRootPath$\redist\x64\Microsoft.VC120.CRT\msvcp120.dll",
+                                    @"$ExecutableRootPath$\redist\x64\Microsoft.VC120.CRT\msvcr120.dll",
+                                    @"$ExecutableRootPath$\redist\x64\Microsoft.VC120.CRT\vccorlib120.dll"
                                 );
                             }
                             break;
@@ -145,10 +145,10 @@ namespace Sharpmake
                                     extraFiles.Add(
 
                                         Path.Combine(pathToCompiler, "vcvars64.bat"),
-                                        @"$RootPath$\redist\x64\Microsoft.VC140.CRT\concrt140.dll",
-                                        @"$RootPath$\redist\x64\Microsoft.VC140.CRT\msvcp140.dll",
-                                        @"$RootPath$\redist\x64\Microsoft.VC140.CRT\vccorlib140.dll",
-                                        @"$RootPath$\redist\x64\Microsoft.VC140.CRT\vcruntime140.dll",
+                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\concrt140.dll",
+                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\msvcp140.dll",
+                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\vccorlib140.dll",
+                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\vcruntime140.dll",
                                         Path.Combine(systemDllPath, "ucrtbase.dll")
                                     );
                                 }
@@ -160,7 +160,7 @@ namespace Sharpmake
                                         Path.Combine(pathToCompiler, "msvcp140.dll"),
                                         Path.Combine(pathToCompiler, "pgodb140.dll"),
                                         Path.Combine(pathToCompiler, "vcruntime140.dll"),
-                                        @"$RootPath$\Auxiliary\Build\vcvars64.bat"
+                                        @"$ExecutableRootPath$\Auxiliary\Build\vcvars64.bat"
                                     );
                                 }
 

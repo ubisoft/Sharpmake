@@ -80,9 +80,9 @@ Settings
 //=================================================================================================================
 Compiler( '[fastbuildCompilerName]' )
 {
-    .RootPath     = '[fastBuildVisualStudioEnvironment]'
-    .Executable   = '[fastBuildCompilerExecutable]'
-    .ExtraFiles   = [fastBuildExtraFiles]
+    .ExecutableRootPath     = '[fastBuildCompilerRootPath]'
+    .Executable             = '[fastBuildCompilerExecutable]'
+    .ExtraFiles             = [fastBuildExtraFiles]
     [fastBuildVS2012EnumBugWorkaround]
 }
 ";

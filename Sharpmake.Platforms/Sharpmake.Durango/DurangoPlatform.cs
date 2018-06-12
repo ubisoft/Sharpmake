@@ -127,21 +127,21 @@ namespace Sharpmake
                         case DevEnv.vs2012:
                             {
                                 extraFiles.Add(
-                                    @"$RootPath$\c1.dll",
-                                    @"$RootPath$\c1xx.dll",
-                                    @"$RootPath$\c1xxast.dll",
-                                    @"$RootPath$\c2.dll",
-                                    @"$RootPath$\msobj110.dll",
-                                    @"$RootPath$\mspdb110.dll",
-                                    @"$RootPath$\mspdbcore.dll",
-                                    @"$RootPath$\mspdbsrv.exe",
-                                    @"$RootPath$\mspft110.dll",
-                                    @"$RootPath$\1033\clui.dll",
-                                    @"$RootPath$\msvcp110.dll",
-                                    @"$RootPath$\msvcr110.dll",
-                                    @"$RootPath$\vccorlib110.dll");
+                                    @"$ExecutableRootPath$\c1.dll",
+                                    @"$ExecutableRootPath$\c1xx.dll",
+                                    @"$ExecutableRootPath$\c1xxast.dll",
+                                    @"$ExecutableRootPath$\c2.dll",
+                                    @"$ExecutableRootPath$\msobj110.dll",
+                                    @"$ExecutableRootPath$\mspdb110.dll",
+                                    @"$ExecutableRootPath$\mspdbcore.dll",
+                                    @"$ExecutableRootPath$\mspdbsrv.exe",
+                                    @"$ExecutableRootPath$\mspft110.dll",
+                                    @"$ExecutableRootPath$\1033\clui.dll",
+                                    @"$ExecutableRootPath$\msvcp110.dll",
+                                    @"$ExecutableRootPath$\msvcr110.dll",
+                                    @"$ExecutableRootPath$\vccorlib110.dll");
 
-                                executable = @"$RootPath$\cl.exe";
+                                executable = @"$ExecutableRootPath$\cl.exe";
                                 fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out rootPath);
                             }
                             break;
