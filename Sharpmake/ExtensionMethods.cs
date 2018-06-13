@@ -269,7 +269,7 @@ namespace Sharpmake
 
             string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
 
-            var paths = new List<string>();
+            var paths = new Strings();
             paths.Add(visualVersion.GetVisualStudioBinPath(platform));
 
             switch (kitsRoot)
@@ -281,9 +281,22 @@ namespace Sharpmake
                     paths.Add(Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81), "bin", targetPlatform));
                     break;
                 case KitsRootEnum.KitsRoot10:
-                    paths.Add(Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10), "bin", targetPlatform));
-                    if(KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion) <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
-                        paths.Add(Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81), "bin", targetPlatform));
+                    {
+                        Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
+
+                        string kitsRoot10Path = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
+                        string platformVersion = windowsTargetPlatformVersion.ToVersionString();
+
+                        // Use WindowsSdkVerBinPath (the version specific folder), if it exists
+                        string candidateWindowsSdkVerBinPath = Path.Combine(kitsRoot10Path, "bin", platformVersion, targetPlatform);
+                        if (Util.DirectoryExists(candidateWindowsSdkVerBinPath))
+                            paths.Add(candidateWindowsSdkVerBinPath);
+                        else
+                            paths.Add(Path.Combine(kitsRoot10Path, "bin", targetPlatform));
+
+                        if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                            paths.Add(Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81), "bin", targetPlatform));
+                    }
                     break;
                 default:
                     throw new NotImplementedException("No GetWindowsExecutablePath associated with " + kitsRoot);
