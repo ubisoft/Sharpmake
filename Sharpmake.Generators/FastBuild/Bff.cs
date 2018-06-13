@@ -287,6 +287,7 @@ namespace Sharpmake.Generators.FastBuild
                         bool useObjectLists = Sharpmake.Options.GetObject<Options.Vc.Linker.UseLibraryDependencyInputs>(conf) == Sharpmake.Options.Vc.Linker.UseLibraryDependencyInputs.Enable;
                         string outputFile = confOptions["OutputFile"];
                         string fastBuildOutputFile = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, outputFile, true));
+                        fastBuildOutputFile = platformBff.GetOutputFilename(conf.Output, fastBuildOutputFile);
                         string fastBuildOutputFileShortName = GetShortProjectName(project, conf);
                         string fastBuildProjectDependencies = "''";
                         List<string> fastBuildProjectDependencyList = new List<string>();
@@ -458,8 +459,9 @@ namespace Sharpmake.Generators.FastBuild
                                     fastBuildTargetSubTargets.Add(eventPair.Key);
                                     postBuildEvents.Add(eventPair.Key, eventPair.Value);
                                 }
-
-                                foreach (var buildEvent in conf.ResolvedEventPostBuildExe)
+                                
+                                var extraPlatformEvents = platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; });
+                                foreach (var buildEvent in extraPlatformEvents.Concat(conf.ResolvedEventPostBuildExe))
                                 {
                                     string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild);
                                     fastBuildTargetSubTargets.Add(eventKey);

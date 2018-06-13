@@ -67,6 +67,22 @@ namespace Sharpmake.Generators.FastBuild
         /// <param name="fastBuildOutputFile">The file name of the build output.</param>
         void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile);
 
+        /// <summary>
+        /// Get the extra list of build steps to execute for this platform.
+        /// </summary>
+        /// <param name="configuration">The project configuration</param>
+        /// <param name="fastBuildOutputFile">The file name of the build output.</param>
+        /// <returns>The list of post build step to execute.</returns>
+        IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile);
+
+        /// <summary>
+        /// Get the linker output name for this platform.
+        /// </summary>
+        /// <param name="outputType">The project output type</param>
+        /// <param name="fastBuildOutputFile">The original file name of the build output.</param>
+        /// <returns>The final file name of the build output.</returns>
+        string GetOutputFilename(Project.Configuration.OutputType outputType, string fastBuildOutputFile);
+
         CompilerSettings GetMasterCompilerSettings(
                IDictionary<string, CompilerSettings> masterCompilerSettings,
                string compilerName,
