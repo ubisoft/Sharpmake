@@ -1056,11 +1056,14 @@ namespace Sharpmake
 
         public static string GetWinFormSubTypeDbPath()
         {
-            return Path.Combine(WinFormSubTypesDbPath, string.Format(@"{0}{1}", s_winFormSubTypesDbPrefix, ".bin"));
+            return Path.Combine(WinFormSubTypesDbPath, $@"{s_winFormSubTypesDbPrefix}{".bin"}");
         }
 
         public static void SerializeAllCsprojSubTypes(object allCsProjSubTypes)
         {
+            if (!Directory.Exists(WinFormSubTypesDbPath))
+                Directory.CreateDirectory(WinFormSubTypesDbPath);
+
             string winFormSubTypesDbFullPath = GetWinFormSubTypeDbPath();
 
             using (Stream writeStream = new FileStream(winFormSubTypesDbFullPath, FileMode.Create, FileAccess.Write, FileShare.None))
