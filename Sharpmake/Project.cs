@@ -1850,6 +1850,13 @@ namespace Sharpmake
         public FileType FileType = FileType.File;
     }
 
+    public enum CopyToOutputDirectory
+    {
+        Never,
+        Always,
+        PreserveNewest
+    }
+
     public enum CSharpProjectType
     {
         Test,
@@ -2019,6 +2026,7 @@ namespace Sharpmake
     public class CSharpProject : Project
     {
         public Strings ContentExtension = new Strings();
+        public CopyToOutputDirectory? DefaultContentCopyOperation = null;
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
         public string ResourcesPath = null;
