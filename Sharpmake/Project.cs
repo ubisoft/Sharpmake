@@ -1725,6 +1725,14 @@ namespace Sharpmake
         public bool Install;
     }
 
+    public enum ItemCopyType
+    {
+        None,
+        Always,
+        PreserveNewest
+    }
+
+
     public enum CSharpProjectType
     {
         Test,
@@ -1915,6 +1923,7 @@ namespace Sharpmake
             ".manifest"
         );
         public Strings ContentExtension = new Strings();
+        public ItemCopyType DefaultContentCopyOperation = ItemCopyType.None;
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
         public string ResourcesPath = null;
