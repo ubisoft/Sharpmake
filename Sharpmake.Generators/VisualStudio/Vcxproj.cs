@@ -581,6 +581,15 @@ namespace Sharpmake.Generators.VisualStudio
             }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
 
+            foreach (var element in context.Project.CustomTargets)
+            {
+                using (fileGenerator.Declare("project", context.Project))
+                using (fileGenerator.Declare("targetElement", element))
+                {
+                    fileGenerator.Write(Template.TargetElement.CustomTarget);
+                }
+            }
+
             // in case we are using fast build we do not want to write the dependencies
             // in the vcxproj because they are handled internally in the bff
             if (hasNonFastBuildConfig)
