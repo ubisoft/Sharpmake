@@ -1549,13 +1549,6 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        internal enum CopyToOutputDirectory
-        {
-            Never,
-            Always,
-            PreserveNewest
-        }
-
         private void GenerateFiles(
             CSharpProject project,
             List<Project.Configuration> configurations,
@@ -1568,7 +1561,7 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var file in project.ResolvedContentFullFileNames)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, file);
-                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, CopyToOutputDirectory = project.DefaultContentCopyOperation, LinkFolder = project.GetLinkFolder(include) });
             }
 
 
