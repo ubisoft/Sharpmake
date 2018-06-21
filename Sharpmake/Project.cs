@@ -147,6 +147,9 @@ namespace Sharpmake
         public Strings ResourceFiles = new Strings();
         public Strings ResourceFilesExtensions = new Strings();
 
+        public Strings NonEmbeddedResourceFiles = new Strings();
+        public Strings NonEmbeddedResourceFilesExtensions = new Strings();
+
         public Strings NatvisFiles = new Strings();
         public Strings NatvisFilesExtensions = new Strings(".natvis");
 
@@ -678,7 +681,7 @@ namespace Sharpmake
             ResolvedSourceFilesBuildExclude.AddRange(SourceFilesBuildExclude);
 
             // Only scan directory for files if needed
-            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0)
+            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || NonEmbeddedResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0)
             {
                 string capitalizedSourceRootPath = Util.GetCapitalizedPath(SourceRootPath);
 
@@ -710,6 +713,7 @@ namespace Sharpmake
 
                     AddMatchExtensionFiles(additionalFiles, ref PRIFiles, PRIFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref ResourceFiles, ResourceFilesExtensions);
+                    AddMatchExtensionFiles(additionalFiles, ref NonEmbeddedResourceFiles, NonEmbeddedResourceFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref NatvisFiles, NatvisFilesExtensions);
                 }
 
@@ -735,6 +739,9 @@ namespace Sharpmake
 
                 AddMatchExtensionFiles(files, ref ResourceFiles, ResourceFilesExtensions);
                 Util.ResolvePath(SourceRootPath, ref ResourceFiles);
+
+                AddMatchExtensionFiles(files, ref NonEmbeddedResourceFiles, NonEmbeddedResourceFilesExtensions);
+                Util.ResolvePath(SourceRootPath, ref NonEmbeddedResourceFiles);
 
                 AddMatchExtensionFiles(files, ref NatvisFiles, NatvisFilesExtensions);
                 Util.ResolvePath(SourceRootPath, ref NatvisFiles);
@@ -1656,6 +1663,7 @@ namespace Sharpmake
             // disable automatic source files discovery
             SourceFilesExtensions.Clear();
             ResourceFilesExtensions.Clear();
+            NonEmbeddedResourceFilesExtensions.Clear();
             PRIFilesExtensions.Clear();
         }
     }
@@ -1789,6 +1797,7 @@ namespace Sharpmake
             aspNetProject.ContentExtension.Add(contentExtension);
 
             aspNetProject.ResourceFilesExtensions.Remove(contentExtension);
+            aspNetProject.NonEmbeddedResourceFilesExtensions.Remove(contentExtension);
             aspNetProject.EmbeddedResourceExtensions.Remove(contentExtension);
 
             aspNetProject.NoneExtensions.Add(".pubxml");
