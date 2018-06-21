@@ -2060,6 +2060,13 @@ namespace Sharpmake
         Assembly,
         File
     }
+    
+    public enum CopyToOutputDirectory
+    {
+        Never,
+        Always,
+        PreserveNewest
+    }
 
     public class PublishFile
     {
@@ -2258,6 +2265,7 @@ namespace Sharpmake
     public class CSharpProject : Project
     {
         public Strings ContentExtension = new Strings();
+        public CopyToOutputDirectory? DefaultContentCopyOperation = null;
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
         public CSharpProjectSchema ProjectSchema = CSharpProjectSchema.Default;
