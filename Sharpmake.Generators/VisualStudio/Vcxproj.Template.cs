@@ -452,6 +452,15 @@ namespace Sharpmake.Generators.VisualStudio
 ";
                 }
             }
+
+            public static class TargetElement
+            {
+                public static string CustomTarget =
+@"  <Target Name=""[targetElement.Name]"" [targetElement.TargetParameters]>
+    [targetElement.CustomTasks]
+  </Target>
+";
+            }
         }
     }
 }
