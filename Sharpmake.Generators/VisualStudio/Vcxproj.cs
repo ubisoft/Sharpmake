@@ -353,7 +353,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (fileGenerator.Declare("projectKeyword", projectKeyword))
             using (fileGenerator.Declare("vc11TargetsPath", vc11TargetsPath))
             {
-                fileGenerator.Write(Template.Project.ProjectDescription, FileGeneratorUtilities.RemoveLineTag);
+                fileGenerator.Write(Template.Project.ProjectDescription);
             }
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
 
@@ -363,7 +363,7 @@ namespace Sharpmake.Generators.VisualStudio
                     platform.Value.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
             }
 
-            fileGenerator.Write(Template.Project.ImportCppDefaultProps, FileGeneratorUtilities.RemoveLineTag);
+            fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
