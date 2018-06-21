@@ -2226,6 +2226,19 @@ namespace Sharpmake.Generators.VisualStudio
                     };
                     itemGroups.AddReference(dotNetFramework, referencesByPath);
                 }
+                
+                foreach (var str in conf.InteropReferencesByPath.Select(Util.GetCapitalizedPath))
+                {
+                    var referencesByPath = new ItemGroups.Reference
+                    {
+                        Include = Path.GetFileNameWithoutExtension(str),
+                        SpecificVersion = false,
+                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                        EmbedInteropTypes = true,
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByPath);
+                }
 
                 foreach (var str in project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath))
                 {
