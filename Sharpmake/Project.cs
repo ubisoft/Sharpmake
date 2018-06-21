@@ -22,6 +22,14 @@ using System.Threading;
 namespace Sharpmake
 {
     [Resolver.Resolvable]
+    public class CustomTargetElement
+    {
+        public string Name = "";
+        public string TargetParameters = "";
+        public string CustomTasks = "";
+    }
+
+    [Resolver.Resolvable]
     public partial class Project : Configurable<Project.Configuration>
     {
         private string _name = "[project.ClassName]";                                     // Project Name
@@ -156,6 +164,7 @@ namespace Sharpmake
 
         public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
         public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
+        public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
 
         public Strings LibraryPathsExcludeFromWarningRegex = new Strings();                 // Library paths where we want to ignore the path doesn't exist warning
         public Strings IncludePathsExcludeFromWarningRegex = new Strings();                 // Include paths where we want to ignore the path doesn't exist warning
@@ -1909,7 +1918,7 @@ namespace Sharpmake
 
             aspNetProject.NoneExtensions.Add(".pubxml");
 
-            aspNetProject.CustomTargets.Add(new CSharpProject.CustomTargetElement()
+            aspNetProject.CustomTargets.Add(new CustomTargetElement()
             {
                 Name = "MvcBuildViews",
                 TargetParameters = @"AfterTargets=""AfterBuild"" Condition=""'$(MvcBuildViews)' == 'true'""",
@@ -2049,7 +2058,6 @@ namespace Sharpmake
         public List<WebReferenceUrl> WebReferenceUrls = new List<WebReferenceUrl>();
         public List<ComReference> ComReferences = new List<ComReference>();
         public UniqueList<ImportProject> ImportProjects = new UniqueList<ImportProject>();
-        public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
         public List<UsingTask> UsingTasks = new List<UsingTask>();
 
         public bool? WcfAutoStart; // Wcf Auto-Start service when debugging
@@ -2064,24 +2072,6 @@ namespace Sharpmake
         public Options.CSharp.RunPostBuildEvent RunPostBuildEvent = Options.CSharp.RunPostBuildEvent.OnBuildSuccess;
 
         public string CodeAnalysisRuleSetFileName;
-
-        [Resolver.Resolvable]
-        public class CustomTargetElement
-        {
-            public string Name;
-            public string TargetParameters;
-            public string CustomTasks;
-
-            public CustomTargetElement()
-            { }
-
-            public CustomTargetElement(string name, string targetParameters, string customTasks)
-            {
-                Name = name;
-                TargetParameters = targetParameters;
-                CustomTasks = customTasks;
-            }
-        }
 
         [Resolver.Resolvable]
         public class UsingTask
