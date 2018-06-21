@@ -1342,6 +1342,7 @@ namespace Sharpmake
             public DotNetReferenceCollection DotNetReferences = new DotNetReferenceCollection();
 
             public Strings ProjectReferencesByPath = new Strings();
+            public Strings InteropReferencesByPath = new Strings();
             public Strings ReferencesByName = new Strings();
             public Strings ReferencesByNameExternal = new Strings();
             public Strings ReferencesByPath = new Strings();
