@@ -81,6 +81,21 @@ namespace Sharpmake
             return PathMakeStandard(path, !Util.IsRunningInMono());
         }
 
+        private static string GetTextTemplateDirectiveParam(string[] templateText, string directive, string paramName)
+        {
+            Regex regex = new Regex(@"<#@\s*?" + directive + @"\s+?.*?" + paramName + @"=""(?<paramValue>.*?)"".*?#>");
+
+            foreach (var line in templateText)
+            {
+                Match m = regex.Match(line);
+                Group g = m.Groups["paramValue"];
+                if (g != null && g.Success)
+                    return g.Value;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Finds the first occurrence of directive and returns the 
         /// requested param value. Ex:
@@ -91,9 +106,28 @@ namespace Sharpmake
         /// </summary>
         public static string GetTextTemplateDirectiveParam(string filePath, string directive, string paramName)
         {
+            return GetTextTemplateDirectiveParam(File.ReadAllLines(filePath), directive, paramName);
+        }
+
+        /// <summary>
+        /// Finds the output type of a template, looking for both the directive form and the Host.SetFileExtension form
+        /// will match:
+        ///  <#@ output extension=".txt" #>
+        /// or
+        ///  Host.SetFileExtension(".txt")
+        /// and return ".txt"
+        /// </summary>
+		public static string GetTextTemplateOutputExtension(string filePath)
+        {
             string[] templateText = File.ReadAllLines(filePath);
 
-            Regex regex = new Regex(@"<#@\s*?" + directive + @"\s+?.*?" + paramName + @"=""(?<paramValue>.*?)"".*?#>");
+            var output = Util.GetTextTemplateDirectiveParam(templateText, "output", "extension");
+            if (output != null)
+                return output;
+
+            // alternatively look for host.SetFileExtension
+
+            Regex regex = new Regex(@"Host.SetFileExtension\(""(?<paramValue>.*?)""\)");
 
             foreach (var line in templateText)
             {

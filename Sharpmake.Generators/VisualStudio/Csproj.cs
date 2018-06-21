@@ -2079,7 +2079,7 @@ namespace Sharpmake.Generators.VisualStudio
                 bool runtimeTemplate = project.AdditionalRuntimeTemplates.Contains(ttFile);
                 string expectedExtension =
                     runtimeTemplate ? ".cs" :
-                    Util.GetTextTemplateDirectiveParam(Path.Combine(_projectPath, ttFile), "output", "extension") ?? ".cs";
+                    Util.GetTextTemplateOutputExtension(Path.Combine(_projectPath, ttFile)) ?? ".cs";
                 if (!expectedExtension.StartsWith(".", StringComparison.Ordinal))
                     expectedExtension = "." + expectedExtension;
                 string fileNameWithoutExtension = ttFile.Substring(0, ttFile.Length - TTExtension.Length);
