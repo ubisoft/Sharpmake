@@ -2013,6 +2013,17 @@ namespace Sharpmake.Generators.VisualStudio
                     }));
 
                 referencesByPath.AddRange(
+                    conf.InteropReferencesByPath.Select(Util.GetCapitalizedPath)
+                    .Select(str => new ItemGroups.Reference
+                    {
+                        Include = Path.GetFileNameWithoutExtension(str),
+                        SpecificVersion = false,
+                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                        EmbedInteropTypes = true,
+                    }));
+
+                referencesByPath.AddRange(
                     project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath)
                     .Select(str => new ItemGroups.Reference
                     {
