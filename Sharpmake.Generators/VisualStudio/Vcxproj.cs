@@ -774,6 +774,15 @@ namespace Sharpmake.Generators.VisualStudio
             }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
 
+            foreach (var element in context.Project.CustomTargets)
+            {
+                using (fileGenerator.Declare("project", context.Project))
+                using (fileGenerator.Declare("targetElement", element))
+                {
+                    fileGenerator.Write(Template.TargetElement.CustomTarget);
+                }
+            }
+
             // add error checks for nuget package targets files
             if (firstConf.ReferencesByNuGetPackage.Count > 0)
             {
