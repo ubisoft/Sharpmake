@@ -278,6 +278,7 @@ namespace Sharpmake
             // ensure that no file will be automagically added
             SourceFilesExtensions.Clear();
             ResourceFilesExtensions.Clear();
+            NonEmbeddedResourceFilesExtensions.Clear();
             PRIFilesExtensions.Clear();
             ResourceFiles.Clear();
             NoneExtensions.Clear();
