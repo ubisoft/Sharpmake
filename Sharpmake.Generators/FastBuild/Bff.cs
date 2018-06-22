@@ -727,7 +727,7 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                                 else if (String.Compare(sourceFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0)
                                 {
-                                    if (microsoftPlatformBff.SupportsResourceFiles)
+                                    if (microsoftPlatformBff != null && microsoftPlatformBff.SupportsResourceFiles)
                                     {
                                         fastbuildResourceFilesList.Add(sourceFileName);
                                         projectHasResourceFiles = true;
