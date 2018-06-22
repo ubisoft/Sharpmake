@@ -1064,7 +1064,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Write(Template.MSBuild14PropertyGroup, writer, resolver);
             }
 
-            WriteCustomProperties(project, writer, resolver);
+            WriteCustomProperties(project.CustomProperties, writer, resolver);
 
             if (project.ProjectTypeGuids == CSharpProjectType.Wcf)
             {
@@ -1273,6 +1273,8 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            WriteCustomProperties(project.CustomPropertiesPostImport, writer, resolver);
+
             foreach (var element in project.UsingTasks)
             {
                 using (resolver.NewScopedParameter("project", project))
@@ -1328,15 +1330,15 @@ namespace Sharpmake.Generators.VisualStudio
             writer.Close();
         }
 
-        private static void WriteCustomProperties(Project project, StreamWriter writer, Resolver resolver)
+        private static void WriteCustomProperties(Dictionary<string, string> properties, StreamWriter writer, Resolver resolver)
         {
-            if (project.CustomProperties.Any())
+            if (properties.Any())
             {
                 Write(Template.CustomPropertiesStart, writer, resolver);
-                foreach (var key in project.CustomProperties.Keys)
+                foreach (var key in properties.Keys)
                 {
                     resolver.SetParameter("custompropertyname", key);
-                    resolver.SetParameter("custompropertyvalue", project.CustomProperties[key]);
+                    resolver.SetParameter("custompropertyvalue", properties[key]);
                     Write(Template.CustomProperty, writer, resolver);
                 }
                 Write(Template.CustomPropertiesEnd, writer, resolver);
