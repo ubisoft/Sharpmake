@@ -39,9 +39,6 @@ namespace Sharpmake.Generators.VisualStudio
     </ProjectConfiguration>
 ";
 
-                public static string ProjectDescriptionVC11TargetsPath =
-                    @"<VCTargetsPath Condition=""'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''"">$(VCTargetsPath11)</VCTargetsPath>";
-
                 public static string ProjectDescription =
 @"  <PropertyGroup Label=""Globals"">
     <ProjectGuid>{[guid]}</ProjectGuid>
@@ -54,9 +51,18 @@ namespace Sharpmake.Generators.VisualStudio
     <SccProvider>[sccProvider]</SccProvider>
     <ProjectName>[projectName]</ProjectName>
     <ApplicationEnvironment>title</ApplicationEnvironment>
-    <WindowsSdkDir_10>[windowsSdkDir10]</WindowsSdkDir_10>
+";
+
+                public static string WindowsSDKOverrides =
+@"    <UCRTContentRoot>[UCRTContentRoot]</UCRTContentRoot>
+    <UniversalCRTSdkDir_10>[UniversalCRTSdkDir_10]</UniversalCRTSdkDir_10>
+    <[windowsSdkDirKey]>[windowsSdkDirValue]</[windowsSdkDirKey]>
+    <WindowsSdkDir>$([windowsSdkDirKey])</WindowsSdkDir>
     <WindowsTargetPlatformVersion>[targetPlatformVersion]</WindowsTargetPlatformVersion>
-    [vc11TargetsPath]
+";
+
+                public const string DisableRegistryUse =
+@"    <DisableRegistryUse>true</DisableRegistryUse>
 ";
 
                 public static string ProjectDescriptionStartPlatformConditional =

@@ -77,16 +77,17 @@ namespace Sharpmake
 
             public override void SetupSdkOptions(IGenerationContext context)
             {
-                var options = context.Options;
                 var conf = context.Configuration;
                 var devEnv = context.DevelopmentEnvironment;
 
-                bool clrSupport = Util.IsDotNet(conf);
-                if (devEnv >= DevEnv.vs2012 && devEnv.OverridenWindowsPath())
+                // vs2012 and vs2013 do not support overriding windows kits using the underlying variables
+                // so we need to change the VC++ directories path
+                if ((devEnv == DevEnv.vs2012 || devEnv == DevEnv.vs2013) && !KitsRootPaths.UsesDefaultKitRoot(devEnv))
                 {
+                    var options = context.Options;
                     options["ExecutablePath"] = devEnv.GetWindowsExecutablePath(conf.Platform);
                     options["IncludePath"] = devEnv.GetWindowsIncludePath();
-                    options["LibraryPath"] = devEnv.GetWindowsLibraryPath(conf.Platform, clrSupport ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
+                    options["LibraryPath"] = devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
                     options["ExcludePath"] = devEnv.GetWindowsIncludePath();
                 }
             }

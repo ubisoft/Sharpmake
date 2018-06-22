@@ -12,7 +12,6 @@
     <RootNamespace>HelloWorld</RootNamespace>
     <ProjectName>HelloWorld</ProjectName>
     <ApplicationEnvironment>title</ApplicationEnvironment>
-    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

@@ -183,6 +183,11 @@ namespace Sharpmake
                 throw new Error("Can't override a specific Visual Studio version directory more than once. Version: " + visualVersion);
         }
 
+        public static bool OverridenVisualStudioDir(this DevEnv visualVersion)
+        {
+            return s_visualStudioDirOverrides.ContainsKey(visualVersion);
+        }
+
         public static string GetVisualStudioDir(this DevEnv visualVersion)
         {
             // First check if the visual studio path is overriden from default value.

@@ -48,6 +48,7 @@ namespace Sharpmake
                 s_netFxKitsDir[dotNet] = Util.GetRegistryLocalMachineSubKeyValue(netFXSdkRegistryKeyString + @"\" + dotNet.ToVersionString(), "KitsInstallationFolder", $@"C:\Program Files (x86)\Windows Kits\NETFXSDK\{dotNet.ToVersionString()}\");
             }
 
+            s_defaultKitsRootForDevEnv[DevEnv.vs2010] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot,   null);
             s_defaultKitsRootForDevEnv[DevEnv.vs2012] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot,   null);
             s_defaultKitsRootForDevEnv[DevEnv.vs2013] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot81, Options.Vc.General.WindowsTargetPlatformVersion.v8_1);
             s_defaultKitsRootForDevEnv[DevEnv.vs2015] = Tuple.Create<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>(KitsRootEnum.KitsRoot81, Options.Vc.General.WindowsTargetPlatformVersion.v8_1);
@@ -90,6 +91,12 @@ namespace Sharpmake
                 return s_defaultKitsRootForDevEnv[devEnv].Item1;
 
             throw new NotImplementedException("No KitsRoot to use with " + devEnv);
+        }
+
+        public static bool UsesDefaultKitRoot(DevEnv devEnv)
+        {
+            KitsRootEnum kitsRoot = GetUseKitsRootForDevEnv(devEnv);
+            return kitsRoot == s_defaultKitsRootForDevEnv[devEnv].Item1;
         }
 
         public static bool IsDefaultKitRootPath(DevEnv devEnv)

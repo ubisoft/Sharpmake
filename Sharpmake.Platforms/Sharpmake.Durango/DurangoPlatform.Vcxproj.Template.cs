@@ -25,6 +25,7 @@ namespace Sharpmake
     <DurangoXdkTasks>[durangoXdkTasks]</DurangoXdkTasks>
     <TargetPlatformIdentifier>[targetPlatformIdentifier]</TargetPlatformIdentifier>
     <TargetPlatformSdkPath>[targetPlatformSdkPath]</TargetPlatformSdkPath>
+    <XdkEditionRootVS2012>[xdkEditionRootVS2012]</XdkEditionRootVS2012>
     <XdkEditionRootVS2015>[xdkEditionRootVS2015]</XdkEditionRootVS2015>
     <XdkEditionRootVS2017>[xdkEditionRootVS2017]</XdkEditionRootVS2017>
     <EnableLegacyXdkHeaders>[enableLegacyXdkHeaders]</EnableLegacyXdkHeaders>

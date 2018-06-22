@@ -850,6 +850,12 @@ namespace Sharpmake
             MinDevEnv = minDevEnv;
             MaxDevEnv = maxDevEnv;
         }
+
+        public bool Contains(DevEnv devEnv)
+        {
+            return (MinDevEnv <= devEnv) && (devEnv <= MaxDevEnv);
+        }
+
         public DevEnv MinDevEnv;
         public DevEnv MaxDevEnv;
     }

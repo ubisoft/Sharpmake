@@ -406,6 +406,7 @@ namespace Sharpmake
                     string durangoXdkTasks = FileGeneratorUtilities.RemoveLineTag;
                     string targetPlatformIdentifier = FileGeneratorUtilities.RemoveLineTag;
                     string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.durango);
+                    string xdkEditionRootVS2012 = FileGeneratorUtilities.RemoveLineTag;
                     string xdkEditionRootVS2015 = FileGeneratorUtilities.RemoveLineTag;
                     string xdkEditionRootVS2017 = FileGeneratorUtilities.RemoveLineTag;
                     string enableLegacyXdkHeaders = FileGeneratorUtilities.RemoveLineTag;
@@ -442,14 +443,21 @@ namespace Sharpmake
                                 generator.Write(Vcxproj.Template.Project.CustomProperty);
                         }
 
-                        if (DevEnv.vs2015 >= context.DevelopmentEnvironmentsRange.MinDevEnv && DevEnv.vs2015 <= context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2012))
+                        {
+                            var vs2012PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2012, Platform.durango);
+                            if (!string.IsNullOrEmpty(vs2012PlatformFolder))
+                                xdkEditionRootVS2012 = vs2012PlatformFolder;
+                        }
+
+                        if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2015))
                         {
                             var vs2015PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango);
                             if (!string.IsNullOrEmpty(vs2015PlatformFolder))
                                 xdkEditionRootVS2015 = vs2015PlatformFolder;
                         }
 
-                        if (DevEnv.vs2017 >= context.DevelopmentEnvironmentsRange.MinDevEnv && DevEnv.vs2017 <= context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2017))
                         {
                             var vs2017PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2017, Platform.durango);
                             if (!string.IsNullOrEmpty(vs2017PlatformFolder))
@@ -470,6 +478,7 @@ namespace Sharpmake
                         using (generator.Declare("gameOSFilePath", gameOSFilePath))
                         using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
                         using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
+                        using (generator.Declare("xdkEditionRootVS2012", xdkEditionRootVS2012))
                         using (generator.Declare("xdkEditionRootVS2015", xdkEditionRootVS2015))
                         using (generator.Declare("xdkEditionRootVS2017", xdkEditionRootVS2017))
                         using (generator.Declare("enableLegacyXdkHeaders", enableLegacyXdkHeaders))
