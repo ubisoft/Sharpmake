@@ -525,7 +525,8 @@ namespace Sharpmake.Generators.VisualStudio
             public static class UsingTaskElement
             {
                 public static string UsingTask =
-@"  <UsingTask AssemblyFile=""[usingTaskElement.AssemblyFile]"" TaskName=""[usingTaskElement.TaskName]"" />";
+@"  <UsingTask AssemblyFile=""[usingTaskElement.AssemblyFile]"" TaskName=""[usingTaskElement.TaskName]"" />
+";
             }
 
             public static class TargetElement
