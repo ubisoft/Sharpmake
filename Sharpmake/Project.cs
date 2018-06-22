@@ -233,6 +233,7 @@ namespace Sharpmake
 
         public Dictionary<string, string> PreImportCustomProperties = new Dictionary<string, string>();      // pre import properties are added before any imports to the project xml as <Key>Value</Key>
         public Dictionary<string, string> CustomProperties = new Dictionary<string, string>();      // custom properties are added to the project xml as <Key>Value</Key>
+        public Dictionary<string, string> PostImportCustomProperties = new Dictionary<string, string>();  // additional custom properties that are added after imports
 
         public Dictionary<string, string> CustomFilterMapping = new Dictionary<string, string>();  /// maps relative source directory to a custom filter path for vcxproj.filter files
 

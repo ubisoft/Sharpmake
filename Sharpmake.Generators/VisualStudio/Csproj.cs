@@ -1179,7 +1179,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             var preImportCustomProperties = new Dictionary<string, string>(project.PreImportCustomProperties);
             AddPreImportCustomProperties(preImportCustomProperties, project, projectPath);
-            WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
+            WriteCustomProperties(preImportCustomProperties, writer, resolver);
 
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
             WriteImportProjects(preImportProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
@@ -1281,7 +1281,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Write(Template.MSBuild14PropertyGroup, writer, resolver);
             }
 
-            WriteCustomProperties(project.CustomProperties, project, writer, resolver);
+            WriteCustomProperties(project.CustomProperties, writer, resolver);
 
             if (project.ProjectTypeGuids == CSharpProjectType.Wcf)
             {
@@ -1501,6 +1501,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             WriteImportProjects(importProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
+            WriteCustomProperties(project.PostImportCustomProperties, writer, resolver);
 
             foreach (var element in project.UsingTasks)
             {
@@ -1614,7 +1615,7 @@ namespace Sharpmake.Generators.VisualStudio
         }
 
         // TODO: remove this and use Sharpmake.Generators.VisualStudio.VsProjCommon.WriteCustomProperties instead
-        private static void WriteCustomProperties(Dictionary<string, string> customProperties, Project project, StreamWriter writer, Resolver resolver)
+        private static void WriteCustomProperties(Dictionary<string, string> customProperties, StreamWriter writer, Resolver resolver)
         {
             if (customProperties.Any())
             {
