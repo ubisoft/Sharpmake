@@ -30,6 +30,7 @@ namespace Sharpmake
         IncludePaths = 1 << 3,
         Defines = 1 << 4,
         AdditionalUsingDirectories = 1 << 5,
+        BuildPrerequisite = 1 << 6,
 
         // Useful masks
         Default = LibraryFiles
@@ -399,6 +400,11 @@ namespace Sharpmake
             /// Request sharpmake to dump the dependency graph of this configuration
             /// </summary>
             public bool DumpDependencyGraph = false;
+
+            /// <summary>
+            /// List of GUIDs of the projects that this project depends on to be properly built
+            /// </summary>
+            public Strings ProjectGuidDependencies = new Strings();
 
             public void AddSourceFileWithExceptionSetting(string filename, Options.Vc.Compiler.Exceptions exceptionSetting)
             {
@@ -1600,6 +1606,11 @@ namespace Sharpmake
                         _resolvedTargetDependsFiles.AddRange(dependency.TargetDependsFiles);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
+                    }
+
+                    if (dependencySetting.HasFlag(DependencySetting.BuildPrerequisite))
+                    {
+                        ProjectGuidDependencies.Add(dependency.ProjectGuid);
                     }
 
                     bool isExport = dependency.Project.GetType().IsDefined(typeof(Export), false);

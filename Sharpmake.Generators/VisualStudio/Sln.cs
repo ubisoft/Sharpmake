@@ -364,6 +364,25 @@ namespace Sharpmake.Generators.VisualStudio
                                 fileGenerator.Write(Template.Solution.ProjectSectionEnd);
                             }
                         }
+                        else
+                        {
+                            bool writeProjectDependencies = resolvedProject.Configurations.Any(conf => conf.ProjectGuidDependencies.Count > 0);
+                            if (writeProjectDependencies)
+                            {
+                                fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
+
+                                foreach (Project.Configuration configuration in resolvedProject.Configurations)
+                                {
+                                    foreach (string projectGuid in configuration.ProjectGuidDependencies)
+                                    {
+                                        using (fileGenerator.Declare("projectDependencyGuid", projectGuid))
+                                            fileGenerator.Write(Template.Solution.ProjectDependency);
+                                    }
+                                }
+
+                                fileGenerator.Write(Template.Solution.ProjectSectionEnd);
+                            }
+                        }
 
                         fileGenerator.Write(Template.Solution.ProjectEnd);
                     }
