@@ -341,7 +341,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 public string Generator;
                 public string LastGenOutput;
-                public string CopyToOutputDirectory;
+                public CopyToOutputDirectory? CopyToOutputDirectory;
                 public string IncludeInVsix;
 
                 public string Resolve(Resolver resolver)
@@ -432,7 +432,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Generator;
                 public string LastGenOutput;
                 public string DependentUpon = null;
-                public string CopyToOutputDirectory = null;
+                public CopyToOutputDirectory? CopyToOutputDirectory;
 
                 public string Resolve(Resolver resolver)
                 {
@@ -667,7 +667,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Generator = null;
                 public string LastGenOutput = null;
                 public string SubType = "Designer";
-                public string CopyToOutputDirectory = null;
+                public CopyToOutputDirectory? CopyToOutputDirectory = null;
 
                 public string Resolve(Resolver resolver)
                 {
@@ -1335,7 +1335,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        private enum CopyToOutputDirectory
+        internal enum CopyToOutputDirectory
         {
             Never,
             Always,
@@ -1361,13 +1361,13 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var content in project.AdditionalContentAlwaysCopy)
             {
                 var includePath = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Contents.Add(new ItemGroups.Content { Include = includePath, CopyToOutputDirectory = CopyToOutputDirectory.Always.ToString(), LinkFolder = project.GetLinkFolder(includePath) });
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = includePath, CopyToOutputDirectory = CopyToOutputDirectory.Always, LinkFolder = project.GetLinkFolder(includePath) });
             }
 
             foreach (var content in project.AdditionalContentCopyIfNewer)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest.ToString(), LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Contents.Add(new ItemGroups.Content { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest, LinkFolder = project.GetLinkFolder(include) });
             }
 
             foreach (var content in project.AdditionalContent)
@@ -1385,13 +1385,13 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var content in project.AdditionalNoneAlwaysCopy)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.Always.ToString(), LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.Always, LinkFolder = project.GetLinkFolder(include) });
             }
 
             foreach (var content in project.AdditionalNoneCopyIfNewer)
             {
                 string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(content));
-                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest.ToString(), LinkFolder = project.GetLinkFolder(include) });
+                itemGroups.Nones.Add(new ItemGroups.None { Include = include, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest, LinkFolder = project.GetLinkFolder(include) });
             }
 
             if (!string.IsNullOrWhiteSpace(project.ApplicationSplashScreen))
@@ -1410,13 +1410,13 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var embeddedResource in project.AdditionalEmbeddedResourceAlwaysCopy)
             {
                 string file = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(embeddedResource));
-                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.Always.ToString(), LinkFolder = project.GetLinkFolder(file) });
+                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.Always, LinkFolder = project.GetLinkFolder(file) });
             }
 
             foreach (var embeddedResource in project.AdditionalEmbeddedResourceCopyIfNewer)
             {
                 string file = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(embeddedResource));
-                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest.ToString(), LinkFolder = project.GetLinkFolder(file) });
+                itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest, LinkFolder = project.GetLinkFolder(file) });
             }
 
             if (configurations.SelectMany(config => config.AdditionalNone).Any(noneInclude => !configurations.First().AdditionalNone.Contains(noneInclude)))
