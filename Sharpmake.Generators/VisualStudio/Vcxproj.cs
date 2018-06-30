@@ -463,7 +463,9 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(Template.Project.ProjectDescription);
             }
 
-            WriteWindowsKitsOverrides(context, ref fileGenerator);
+            if (hasNonFastBuildConfig)
+                WriteWindowsKitsOverrides(context, ref fileGenerator);
+
             WriteVcOverrides(context, ref fileGenerator);
 
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
