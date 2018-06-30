@@ -242,7 +242,9 @@ namespace Sharpmake.Generators.VisualStudio
             KitsRootEnum? kitsRootWritten = null;
             for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; ++devEnv)
             {
-                if (!devEnv.OverridenWindowsPath())
+                // there's no need to write the properties with older versions of vs, as we override
+                // completely the VC++ directories entries in the vcxproj
+                if (devEnv < DevEnv.vs2015)
                     continue;
 
                 KitsRootEnum kitsRootVersion = KitsRootPaths.GetUseKitsRootForDevEnv(devEnv);
@@ -254,38 +256,39 @@ namespace Sharpmake.Generators.VisualStudio
                     continue;
 
                 string windowsSdkDirKey = FileGeneratorUtilities.RemoveLineTag;
-                string windowsSdkDirValue = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(kitsRootVersion));
+                string windowsSdkDirValue = FileGeneratorUtilities.RemoveLineTag;
 
                 string UniversalCRTSdkDir_10 = FileGeneratorUtilities.RemoveLineTag;
                 string UCRTContentRoot = FileGeneratorUtilities.RemoveLineTag;
+
                 string targetPlatformVersionString = FileGeneratorUtilities.RemoveLineTag;
-                switch (kitsRootVersion)
+                if (kitsRootVersion != KitsRootEnum.KitsRoot81) // 8.1 is the default value for vs2015 and vs2017, so only specify a different platformVersion if we need to
+                    targetPlatformVersionString = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(devEnv).ToVersionString();
+
+                if (devEnv.OverridenWindowsPath())
                 {
-                    case KitsRootEnum.KitsRoot:
-                        windowsSdkDirKey = "WindowsSdkDir_80";
-                        break;
-                    case KitsRootEnum.KitsRoot81:
-                        windowsSdkDirKey = "WindowsSdkDir_81";
-                        break;
-                    case KitsRootEnum.KitsRoot10:
-                        {
-                            // there's no need to write the properties with older versions of vs, as we override
-                            // completely the VC++ directories entries in the vcxproj
-                            if (context.DevelopmentEnvironmentsRange.MinDevEnv < DevEnv.vs2015)
-                                break;
+                    windowsSdkDirValue = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(kitsRootVersion));
+                    switch (kitsRootVersion)
+                    {
+                        case KitsRootEnum.KitsRoot:
+                            windowsSdkDirKey = "WindowsSdkDir_80";
+                            break;
+                        case KitsRootEnum.KitsRoot81:
+                            windowsSdkDirKey = "WindowsSdkDir_81";
+                            break;
+                        case KitsRootEnum.KitsRoot10:
+                            {
+                                windowsSdkDirKey = "WindowsSdkDir_10";
+                                UniversalCRTSdkDir_10 = windowsSdkDirValue;
 
-                            windowsSdkDirKey = "WindowsSdkDir_10";
-                            UniversalCRTSdkDir_10 = windowsSdkDirValue;
-
-                            // this variable is found in Windows Kits\10\DesignTime\CommonConfiguration\Neutral\uCRT.props
-                            // it is always read from the registry unless overriden, so we need to explicitely set it
-                            UCRTContentRoot = windowsSdkDirValue;
-
-                            targetPlatformVersionString = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(devEnv).ToVersionString();
-                        }
-                        break;
-                    default:
-                        throw new NotImplementedException($"Unsupported kitsRoot '{kitsRootVersion}'");
+                                // this variable is found in Windows Kits\10\DesignTime\CommonConfiguration\Neutral\uCRT.props
+                                // it is always read from the registry unless overriden, so we need to explicitely set it
+                                UCRTContentRoot = windowsSdkDirValue;
+                            }
+                            break;
+                        default:
+                            throw new NotImplementedException($"Unsupported kitsRoot '{kitsRootVersion}'");
+                    }
                 }
 
                 using (fileGenerator.Declare("windowsSdkDirKey", windowsSdkDirKey))
