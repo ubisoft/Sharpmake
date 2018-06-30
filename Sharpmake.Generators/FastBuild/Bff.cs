@@ -329,13 +329,40 @@ namespace Sharpmake.Generators.FastBuild
                         string partialLibs = FileGeneratorUtilities.RemoveLineTag;
                         string librarianAdditionalInputs = FileGeneratorUtilities.RemoveLineTag; // TODO: implement
                         string fastBuildObjectListDependencies = FileGeneratorUtilities.RemoveLineTag;
+
+                        string outputType;
+                        switch (conf.Output)
+                        {
+                            case Project.Configuration.OutputType.Lib:
+                                outputType = "Library";
+                                break;
+                            case Project.Configuration.OutputType.Exe:
+                                outputType = "Executable";
+                                break;
+                            case Project.Configuration.OutputType.Dll:
+                                outputType = "DLL";
+                                break;
+                            default:
+                                outputType = "Unknown";
+                                break;
+                        }
+
                         if (confSubConfigs.Keys.Count > 1)
                         {
                             if (!isLastSubConfig)
                             {
                                 partialLibInfo = "[Partial Lib of " + fastBuildOutputFileShortName + "]";
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
-                                fastBuildOutputFile = fastBuildOutputFile.Insert(fastBuildOutputFile.Length - 4, "_" + subConfigIndex.ToString());
+
+                                var staticLibExtension = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform).StaticLibraryFileExtension;
+
+                                fastBuildOutputFile = Path.ChangeExtension(fastBuildOutputFile, null); // removes the extension
+                                fastBuildOutputFile += "_" + subConfigIndex.ToString();
+
+                                if (!staticLibExtension.StartsWith(".", StringComparison.Ordinal))
+                                    fastBuildOutputFile += '.';
+                                fastBuildOutputFile += staticLibExtension;
+
                                 subConfigLibs.Add(fastBuildOutputFile);
                                 subConfigObjectList.Add(fastBuildOutputFileShortName);
                             }
@@ -355,7 +382,7 @@ namespace Sharpmake.Generators.FastBuild
                                 foreach (string subConfigObject in subConfigObjectList)
                                 {
                                     if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll)
-                                        result.Append((i++ != 0 ? "                                '" : "'") + subConfigObject + "',\n");
+                                        result.Append((i++ != 0 ? "                                '" : "'") + subConfigObject + "_" + outputType + "',\n");
                                     else
                                         result.Append((i++ != 0 ? "                                '" : "'") + subConfigObject + "_objects',\n");
                                 }
@@ -363,23 +390,6 @@ namespace Sharpmake.Generators.FastBuild
                                     result.Remove(result.Length - 1, 1);
                                 fastBuildObjectListDependencies = result.ToString();
                             }
-                        }
-
-                        string outputType;
-                        switch (conf.Output)
-                        {
-                            case Project.Configuration.OutputType.Lib:
-                                outputType = "Library";
-                                break;
-                            case Project.Configuration.OutputType.Exe:
-                                outputType = "Executable";
-                                break;
-                            case Project.Configuration.OutputType.Dll:
-                                outputType = "DLL";
-                                break;
-                            default:
-                                outputType = "Unknown";
-                                break;
                         }
 
                         string fastBuildCompilerPCHOptions = isUsePrecomp ? Template.ConfigurationFile.UsePrecomp : FileGeneratorUtilities.RemoveLineTag;
@@ -477,7 +487,7 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            if (conf.Output != Project.Configuration.OutputType.Dll)
+                            if (conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe)
                             {
                                 foreach (var subConfig in subConfigObjectList)
                                 {
