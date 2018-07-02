@@ -1632,7 +1632,7 @@ namespace Sharpmake.Generators.VisualStudio
                             remainingNoneFiles.Remove(file);
 
                             string wcfStorage = Path.GetDirectoryName(file);
-                            Trace.Assert(wcfStorage.StartsWith("Service References\\", StringComparison.OrdinalIgnoreCase));
+                            Trace.Assert(wcfStorage.IndexOf("Service References\\", StringComparison.OrdinalIgnoreCase)>=0);
 
                             itemGroups.WCFMetadataStorages.Add(new ItemGroups.WCFMetadataStorage { Include = wcfStorage });
                             break;
