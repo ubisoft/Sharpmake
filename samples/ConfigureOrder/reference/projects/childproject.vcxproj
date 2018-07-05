@@ -11,7 +11,6 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>ChildProject</RootNamespace>
     <ProjectName>ChildProject</ProjectName>
-    <ApplicationEnvironment>title</ApplicationEnvironment>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

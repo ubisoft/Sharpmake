@@ -17,7 +17,6 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>CLRCPPProj</RootNamespace>
     <ProjectName>CLRCPPProj</ProjectName>
-    <ApplicationEnvironment>title</ApplicationEnvironment>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

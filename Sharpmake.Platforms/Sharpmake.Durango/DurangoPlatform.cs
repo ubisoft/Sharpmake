@@ -396,6 +396,14 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
+                bool isApplication = context.ProjectConfigurations.Any(conf => conf.Output == Project.Configuration.OutputType.Exe);
+                bool hasPlatformSpecificGlobals = GlobalSettings.OverridenDurangoXDK || isApplication;
+
+                if (hasPlatformSpecificGlobals)
+                {
+                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                }
+
                 if (GlobalSettings.OverridenDurangoXDK)
                 {
                     string durangoXdkKitPath = FileGeneratorUtilities.RemoveLineTag;
@@ -433,59 +441,65 @@ namespace Sharpmake
                         xdkEditionTarget = GlobalSettings.XdkEditionTarget;
                         targetPlatformSdkPath = Util.GetDurangoExtensionXDK();
                     }
-
-                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                    
+                    if (!string.IsNullOrEmpty(platformFolder))
                     {
-                        if (!string.IsNullOrEmpty(platformFolder))
-                        {
-                            using (generator.Declare("custompropertyname", "_PlatformFolder"))
-                            using (generator.Declare("custompropertyvalue", Sharpmake.Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
-                                generator.Write(Vcxproj.Template.Project.CustomProperty);
-                        }
-
-                        if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2012))
-                        {
-                            var vs2012PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2012, Platform.durango);
-                            if (!string.IsNullOrEmpty(vs2012PlatformFolder))
-                                xdkEditionRootVS2012 = vs2012PlatformFolder;
-                        }
-
-                        if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2015))
-                        {
-                            var vs2015PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango);
-                            if (!string.IsNullOrEmpty(vs2015PlatformFolder))
-                                xdkEditionRootVS2015 = vs2015PlatformFolder;
-                        }
-
-                        if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2017))
-                        {
-                            var vs2017PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2017, Platform.durango);
-                            if (!string.IsNullOrEmpty(vs2017PlatformFolder))
-                                xdkEditionRootVS2017 = vs2017PlatformFolder;
-
-                            int xdkEdition;
-                            bool isMinFeb2018Xdk = Util.TryParseXdkEditionTarget(GlobalSettings.XdkEditionTarget, out xdkEdition) && xdkEdition >= GlobalSettings._feb2018XdkEditionTarget;
-                            if (GlobalSettings.EnableLegacyXdkHeaders && isMinFeb2018Xdk)
-                                enableLegacyXdkHeaders = "true";
-                        }
-
-                        using (generator.Declare("durangoXdkInstallPath", GlobalSettings.DurangoXDK))
-                        using (generator.Declare("sdkReferenceDirectoryRoot", GlobalSettings.XboxOneExtensionSDK))
-                        using (generator.Declare("durangoXdkKitPath", durangoXdkKitPath))
-                        using (generator.Declare("xdkEditionTarget", xdkEditionTarget))
-                        using (generator.Declare("targetPlatformSdkPath", targetPlatformSdkPath))
-                        using (generator.Declare("durangoXdkCompilers", durangoXdkCompilers))
-                        using (generator.Declare("gameOSFilePath", gameOSFilePath))
-                        using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
-                        using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
-                        using (generator.Declare("xdkEditionRootVS2012", xdkEditionRootVS2012))
-                        using (generator.Declare("xdkEditionRootVS2015", xdkEditionRootVS2015))
-                        using (generator.Declare("xdkEditionRootVS2017", xdkEditionRootVS2017))
-                        using (generator.Declare("enableLegacyXdkHeaders", enableLegacyXdkHeaders))
-                        {
-                            generator.Write(_projectDescriptionPlatformSpecific);
-                        }
+                        using (generator.Declare("custompropertyname", "_PlatformFolder"))
+                        using (generator.Declare("custompropertyvalue", Sharpmake.Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
+                            generator.Write(Vcxproj.Template.Project.CustomProperty);
                     }
+
+                    if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2012))
+                    {
+                        var vs2012PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2012, Platform.durango);
+                        if (!string.IsNullOrEmpty(vs2012PlatformFolder))
+                            xdkEditionRootVS2012 = vs2012PlatformFolder;
+                    }
+
+                    if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2015))
+                    {
+                        var vs2015PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2015, Platform.durango);
+                        if (!string.IsNullOrEmpty(vs2015PlatformFolder))
+                            xdkEditionRootVS2015 = vs2015PlatformFolder;
+                    }
+
+                    if (context.DevelopmentEnvironmentsRange.Contains(DevEnv.vs2017))
+                    {
+                        var vs2017PlatformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(DevEnv.vs2017, Platform.durango);
+                        if (!string.IsNullOrEmpty(vs2017PlatformFolder))
+                            xdkEditionRootVS2017 = vs2017PlatformFolder;
+
+                        int xdkEdition;
+                        bool isMinFeb2018Xdk = Util.TryParseXdkEditionTarget(GlobalSettings.XdkEditionTarget, out xdkEdition) && xdkEdition >= GlobalSettings._feb2018XdkEditionTarget;
+                        if (GlobalSettings.EnableLegacyXdkHeaders && isMinFeb2018Xdk)
+                            enableLegacyXdkHeaders = "true";
+                    }
+
+                    using (generator.Declare("durangoXdkInstallPath", GlobalSettings.DurangoXDK))
+                    using (generator.Declare("sdkReferenceDirectoryRoot", GlobalSettings.XboxOneExtensionSDK))
+                    using (generator.Declare("durangoXdkKitPath", durangoXdkKitPath))
+                    using (generator.Declare("xdkEditionTarget", xdkEditionTarget))
+                    using (generator.Declare("targetPlatformSdkPath", targetPlatformSdkPath))
+                    using (generator.Declare("durangoXdkCompilers", durangoXdkCompilers))
+                    using (generator.Declare("gameOSFilePath", gameOSFilePath))
+                    using (generator.Declare("durangoXdkTasks", durangoXdkTasks))
+                    using (generator.Declare("targetPlatformIdentifier", targetPlatformIdentifier))
+                    using (generator.Declare("xdkEditionRootVS2012", xdkEditionRootVS2012))
+                    using (generator.Declare("xdkEditionRootVS2015", xdkEditionRootVS2015))
+                    using (generator.Declare("xdkEditionRootVS2017", xdkEditionRootVS2017))
+                    using (generator.Declare("enableLegacyXdkHeaders", enableLegacyXdkHeaders))
+                    {
+                        generator.Write(_projectDescriptionPlatformSpecific);
+                    }
+                }
+
+                if (isApplication)
+                {
+                    generator.Write(_applicationEnvironment);
+                }
+
+                if (hasPlatformSpecificGlobals)
+                {
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
             }

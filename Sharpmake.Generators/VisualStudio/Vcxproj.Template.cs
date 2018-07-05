@@ -50,7 +50,6 @@ namespace Sharpmake.Generators.VisualStudio
     <SccLocalPath>[sccLocalPath]</SccLocalPath>
     <SccProvider>[sccProvider]</SccProvider>
     <ProjectName>[projectName]</ProjectName>
-    <ApplicationEnvironment>title</ApplicationEnvironment>
 ";
 
                 public static string WindowsSDKOverrides =

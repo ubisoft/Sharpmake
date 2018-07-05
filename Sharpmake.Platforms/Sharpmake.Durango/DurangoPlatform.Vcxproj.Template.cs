@@ -33,6 +33,10 @@ namespace Sharpmake
     <SDKReferenceDirectoryRoot>[sdkReferenceDirectoryRoot]</SDKReferenceDirectoryRoot>
 ";
 
+            private const string _applicationEnvironment =
+@"    <ApplicationEnvironment>title</ApplicationEnvironment>
+";
+
             private const string _projectConfigurationsCompileTemplate =
                 @"    <ClCompile>
       <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
