@@ -300,6 +300,14 @@ namespace Sharpmake
             set { SetProperty(ref _runFromPcDeploymentRegisterCommand, value); }
         }
 
+        // If true, remove the source files from a FastBuild project's associated vcxproj file.
+        private bool _stripFastBuildSourceFiles = true;
+        public bool StripFastBuildSourceFiles
+        {
+            get { return _stripFastBuildSourceFiles; }
+            set { SetProperty(ref _stripFastBuildSourceFiles, value); }
+        }
+
         private IEnumerable<Strings> GetStringFields()
         {
             yield return AdditionalSourceRootPaths;
