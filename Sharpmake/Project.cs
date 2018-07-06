@@ -2003,6 +2003,8 @@ namespace Sharpmake
         public string StartupObject = string.Empty;
         public bool NoWin32Manifest = false;
         public bool UseMSBuild14IfAvailable = false;
+        // If true, recreate the relative folder hierarchy for content files instead of grouping them up.
+        public bool PreserveLinkFolderPaths = false;
         public Strings ApplicationDefinitionFilenames = new Strings();
         public Strings ResolvedResourcesFullFileNames = new Strings();
         public Strings ResolvedContentFullFileNames = new Strings();
@@ -2197,6 +2199,26 @@ namespace Sharpmake
         private List<String> _filteredEmbeddedAssemblies = null;
         public virtual string GetLinkFolder(string file)
         {
+            if(PreserveLinkFolderPaths)
+            {
+                string relativePath = Util.PathGetRelative(SourceRootPath, Path.GetDirectoryName(file));
+
+                // Remove the root, if it exists.
+                // This will only happen if file is rooted *and* doesn't share the same root as SourceRootPath.
+                if(Path.IsPathRooted(relativePath))
+                {
+                    relativePath = relativePath.Substring(Path.GetPathRoot(relativePath).Length);
+                }
+
+                // If the relative path is elsewhere, we leave the file in the root.
+                if(relativePath.Contains(".."))
+                {
+                    return string.Empty;
+                }
+
+                return relativePath;
+            }
+
             if (_filteredEmbeddedAssemblies == null)
             {
                 _filteredEmbeddedAssemblies = new List<string>();
