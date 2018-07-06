@@ -94,6 +94,7 @@ Compiler( '[fastbuildCompilerName]' )
     .BinPath                = '[fastBuildBinPath]'
     .LinkerPath             = '[fastBuildLinkerPath]'
     .ResourceCompiler       = '[fastBuildResourceCompiler]'
+    .EmbeddedResourceCompiler = '[fastBuildEmbeddedResourceCompiler]'
     .Compiler               = '[fastBuildCompilerName]'
     .Librarian              = '[fastBuildLibrarian]'
     .Linker                 = '[fastBuildLinker]'
@@ -117,6 +118,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.IgnoreAllDefaultLibraries]'
                             + ' [cmdLineOptions.IgnoreDefaultLibraryNames]'
                             + ' [cmdLineOptions.DelayLoadedDLLs]'
+                            + ' [cmdLineOptions.EmbedResources]'
                             // Input files
                             // ---------------------------
                             + ' ""%1""'
@@ -211,6 +213,18 @@ Compiler( '[fastbuildCompilerName]' )
                 public static string ResourceCompilerExtraOptions = @"
     .ResourceCompilerExtraOptions   = ' /l 0x0409 /nologo'
                                     + ' [cmdLineOptions.AdditionalResourceIncludeDirectories]'
+";
+
+                public static string EmbeddedResourceCompilerOptions = @"
+    // Resource Compiler options
+    // -------------------------
+    .Compiler               = .EmbeddedResourceCompiler
+    .CompilerOutputPrefix   = '[fastBuildEmbeddedOutputPrefix]'
+    .CompilerOutputExtension= '.resources'
+    .CompilerOptions        = '/useSourcePath ""%1"" ""%2""'
+    .CompilerOutputPath     = '$Intermediate$'
+    .CompilerInputFiles     = [fastBuildEmbeddedResources]
+
 ";
 
                 public static string CompilerOptionsCommon = @"
@@ -429,6 +443,7 @@ Copy( '[fastBuildCopyAlias]' )
                                 [fastBuildObjectListDependencies]
                                 '[fastBuildOutputFileShortName]_objects'
                               }
+    .LinkerAssemblyResources = { [fastBuildObjectListEmbeddedResources] }
     .LinkerOutput           = '[fastBuildLinkerOutputFile]'
     .LinkerLinkObjects      = [fastBuildLinkerLinkObjects]
     .LinkerStampExe         = '[fastBuildStampExecutable]'
@@ -440,6 +455,16 @@ Copy( '[fastBuildCopyAlias]' )
 // ObjectList [fastBuildOutputFileShortName]_resources
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_resources' )
+{
+     [fastBuildUsingPlatformConfig]
+    .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
+";
+
+                public static string EmbeddedResourcesBeginSection = @"
+//=================================================================================================================
+// ObjectList [fastBuildOutputFileShortName]_embedded
+//=================================================================================================================
+ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 {
      [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'

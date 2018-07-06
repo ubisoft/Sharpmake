@@ -49,6 +49,7 @@ namespace Sharpmake.Generators
             public string BinPath { get; set; }
             public string LinkerPath { get; set; }
             public string ResourceCompiler { get; set; }
+            public string EmbeddedResourceCompiler { get; set; }
             public string Compiler { get; set; }
             public string Librarian { get; set; }
             public string Linker { get; set; }
@@ -63,6 +64,7 @@ namespace Sharpmake.Generators
                 string binPath = FileGeneratorUtilities.RemoveLineTag,
                 string linkerPath = FileGeneratorUtilities.RemoveLineTag,
                 string resourceCompiler = FileGeneratorUtilities.RemoveLineTag,
+                string embeddedResourceCompiler = FileGeneratorUtilities.RemoveLineTag,
                 string compiler = FileGeneratorUtilities.RemoveLineTag,
                 string librarian = FileGeneratorUtilities.RemoveLineTag,
                 string linker = FileGeneratorUtilities.RemoveLineTag,
@@ -73,6 +75,7 @@ namespace Sharpmake.Generators
                 BinPath = binPath;
                 LinkerPath = linkerPath;
                 ResourceCompiler = resourceCompiler;
+                EmbeddedResourceCompiler = embeddedResourceCompiler;
                 Compiler = compiler;
                 Librarian = librarian;
                 Linker = linker;

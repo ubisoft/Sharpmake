@@ -268,6 +268,11 @@ namespace Sharpmake
             public string ManifestFileSuffix = ".intermediate.manifest";
 
             /// <summary>
+            /// Prefix for compiled embedded resource files
+            /// </summary>
+            public string EmbeddedResourceOutputPrefix = string.Empty;
+
+            /// <summary>
             /// Intermediate devEnv directory 
             /// </summary>
             public string IntermediatePath = "[conf.ProjectPath]" + Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar + "[target.Platform]" + Path.DirectorySeparatorChar + "[target.Name]";

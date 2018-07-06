@@ -218,6 +218,7 @@ namespace Sharpmake.Generators.FastBuild
                             bffGenerator.Write(Template.ConfigurationFile.PlatformBeginSection);
                     }
                     List<string> resourceFilesSections = new List<string>();
+                    List<string> embeddedResourceFilesSections = new List<string>();
 
                     var additionalDependencies = new Strings();
                     {
@@ -762,12 +763,16 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         bool projectHasResourceFiles = false;
+                        bool projectHasEmbeddedResources = false;
                         string fastBuildSourceFiles = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildResourceFiles = FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildEmbeddedResources = FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildEmbeddedOutputPrefix = conf.EmbeddedResourceOutputPrefix;
 
                         {
                             List<string> fastbuildSourceFilesList = new List<string>();
                             List<string> fastbuildResourceFilesList = new List<string>();
+                            List<string> fastbuildEmbeddedResourceFilesList = new List<string>();
 
                             var sourceFiles = confSubConfigs[tuple];
                             foreach (Vcxproj.ProjectFile sourceFile in sourceFiles)
@@ -786,6 +791,14 @@ namespace Sharpmake.Generators.FastBuild
                                         projectHasResourceFiles = true;
                                     }
                                 }
+                                else if (String.Compare(sourceFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0)
+                                {
+                                    if (microsoftPlatformBff.SupportsResourceFiles)
+                                    {
+                                        fastbuildEmbeddedResourceFilesList.Add(sourceFileName);
+                                        projectHasEmbeddedResources = true;
+                                    }
+                                }
                                 else
                                 {
                                     bool isSourceFileExtension = project.SourceFilesCompileExtensions.Contains(sourceFile.FileExtension);
@@ -801,16 +814,27 @@ namespace Sharpmake.Generators.FastBuild
                             }
                             fastBuildSourceFiles = UtilityMethods.FBuildFormatList(fastbuildSourceFilesList, 32);
                             fastBuildResourceFiles = UtilityMethods.FBuildFormatList(fastbuildResourceFilesList, 30);
+                            fastBuildEmbeddedResources = UtilityMethods.FBuildFormatList(fastbuildEmbeddedResourceFilesList, 30);
                         }
 
                         if (projectHasResourceFiles)
                             resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
+                        if (projectHasEmbeddedResources)
+                        {
+                            embeddedResourceFilesSections.Add(fastBuildOutputFileShortName + "_embedded");
+                            confCmdLineOptions["EmbedResources"] = "/ASSEMBLYRESOURCE:\"%3\"";
+                        }
+                        else
+                        {
+                            confCmdLineOptions["EmbedResources"] = FileGeneratorUtilities.RemoveLineTag;
+                        }
 
                         // It is useless to have an input pattern defined if there is no input path
                         if (fastBuildInputPath == FileGeneratorUtilities.RemoveLineTag)
                             fastBuildCompilerInputPattern = FileGeneratorUtilities.RemoveLineTag;
 
                         string fastBuildObjectListResourceDependencies = FormatListPartForTag(resourceFilesSections, 32, true);
+                        string fastBuildObjectListEmbeddedResources = FormatListPartForTag(embeddedResourceFilesSections, 32, true);
 
                         using (bffGenerator.Declare("conf", conf))
                         using (bffGenerator.Declare("project", project))
@@ -837,9 +861,11 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildInputExcludedFiles", fastBuildInputExcludedFiles))
                                     using (bffGenerator.Declare("fastBuildSourceFiles", fastBuildSourceFiles))
                                     using (bffGenerator.Declare("fastBuildResourceFiles", fastBuildResourceFiles))
+                                    using (bffGenerator.Declare("fastBuildEmbeddedResources", fastBuildEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
                                     using (bffGenerator.Declare("fastBuildProjectDependencies", fastBuildProjectDependencies))
                                     using (bffGenerator.Declare("fastBuildObjectListResourceDependencies", fastBuildObjectListResourceDependencies))
+                                    using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildObjectListDependencies", fastBuildObjectListDependencies))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
@@ -856,12 +882,20 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildAdditionalCompilerOptionsFromCode", fastBuildAdditionalCompilerOptionsFromCode))
                                     using (bffGenerator.Declare("fastBuildStampExecutable", fastBuildStampExecutable))
                                     using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))
+                                    using (bffGenerator.Declare("fastBuildEmbeddedOutputPrefix", fastBuildEmbeddedOutputPrefix))
                                     {
                                         if (projectHasResourceFiles)
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ResourcesBeginSection);
                                             bffGenerator.Write(Template.ConfigurationFile.ResourceCompilerExtraOptions);
                                             bffGenerator.Write(Template.ConfigurationFile.ResourceCompilerOptions);
+                                            bffGenerator.Write(Template.ConfigurationFile.EndSection);
+                                        }
+
+                                        if (projectHasEmbeddedResources)
+                                        {
+                                            bffGenerator.Write(Template.ConfigurationFile.EmbeddedResourcesBeginSection);
+                                            bffGenerator.Write(Template.ConfigurationFile.EmbeddedResourceCompilerOptions);
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
 
@@ -1463,7 +1497,8 @@ namespace Sharpmake.Generators.FastBuild
             foreach (Vcxproj.ProjectFile projectFile in allFiles)
             {
                 if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                    (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                    (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
+                    (String.Compare(projectFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0))
                     sourceFiles.Add(projectFile);
             }
 

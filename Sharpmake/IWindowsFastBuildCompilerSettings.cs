@@ -19,5 +19,6 @@ namespace Sharpmake
     {
         // TODO: It looks like this belongs to Sharpmake.Generators.
         IDictionary<DevEnv, string> ResCompiler { get; set; }
+        IDictionary<DevEnv, string> ResxCompiler { get; set; }
     }
 }
