@@ -110,6 +110,7 @@ namespace Sharpmake.Generators.VisualStudio
     <BaseAddress>[options.BaseAddress]</BaseAddress>
     <OutputPath>[options.OutputDirectory]</OutputPath>
     <IntermediateOutputPath>[options.IntermediateDirectory]</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>[options.BaseIntermediateOutputPath]</BaseIntermediateOutputPath>
     <DefineConstants>[options.PreprocessorDefinitions]</DefineConstants>
     <ErrorReport>[options.ErrorReport]</ErrorReport>
     <WarningLevel>[options.WarningLevel]</WarningLevel>

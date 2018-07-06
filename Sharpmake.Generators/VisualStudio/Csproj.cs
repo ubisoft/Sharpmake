@@ -2755,6 +2755,9 @@ namespace Sharpmake.Generators.VisualStudio
             string intermediateDirectory = Util.PathGetRelative(_projectPath, conf.IntermediatePath);
             options["IntermediateDirectory"] = intermediateDirectory;
 
+            //BaseIntermediateOutputPath
+            options["BaseIntermediateOutputPath"] = string.IsNullOrEmpty(conf.BaseIntermediateOutputPath) ? RemoveLineTag : Util.PathGetRelative(_projectPath, conf.BaseIntermediateOutputPath);
+
             options["StartWorkingDirectory"] = string.IsNullOrEmpty(conf.StartWorkingDirectory) ? RemoveLineTag : conf.StartWorkingDirectory;
 
             ProcessDependencyCopy(project, conf);

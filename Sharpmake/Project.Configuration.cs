@@ -278,6 +278,11 @@ namespace Sharpmake
             public string IntermediatePath = "[conf.ProjectPath]" + Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar + "[target.Platform]" + Path.DirectorySeparatorChar + "[target.Name]";
 
             /// <summary>
+            /// Base Intermediate devEnv directory. Only used in csproj
+            /// </summary>
+            public string BaseIntermediateOutputPath = string.Empty;
+
+            /// <summary>
             /// Compiler defines, the generator may add some if needed for platform/target
             /// </summary>
             public Strings Defines = new Strings();
