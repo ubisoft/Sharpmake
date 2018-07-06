@@ -2123,7 +2123,7 @@ namespace Sharpmake.Generators.VisualStudio
         }
 
         private void GeneratePackageReferences(
-            Project project,
+            CSharpProject project,
             List<Project.Configuration> configurations,
             ItemGroups itemGroups,
             List<string> generatedFiles,
@@ -2132,28 +2132,37 @@ namespace Sharpmake.Generators.VisualStudio
         {
             Project.Configuration configuration = configurations[0];
             var devenv = configuration.Target.GetFragment<DevEnv>();
-            if (devenv >= DevEnv.vs2017)
+            if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageReference
+                || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv >= DevEnv.vs2017))
             {
+                if (devenv < DevEnv.vs2017)
+                    throw new Error("Package references are not supported on Visual Studio versions below vs2017");
+
                 var resolver = new Resolver();
                 foreach (var packageReference in configuration.ReferencesByNuGetPackage)
                 {
                     itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
                 }
             }
-            else if (devenv == DevEnv.vs2015)
+            else if (project.NuGetReferenceType == Project.NuGetPackageMode.ProjectJson
+                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv == DevEnv.vs2015))
             {
+                if (devenv < DevEnv.vs2015)
+                    throw new Error("Project.json files are not supported on Visual Studio versions below vs2015");
+
                 var projectJson = new ProjectJson();
-                projectJson.Generate(_builder, (CSharpProject)project, configurations, _projectPath, generatedFiles, skipFiles);
+                projectJson.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
                 if (projectJson.IsGenerated)
                 {
                     string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(projectJson.ProjectJsonPath));
                     itemGroups.Nones.Add(new ItemGroups.None { Include = include });
                 }
             }
-            else if (devenv == DevEnv.vs2012)
+            else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
+                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv == DevEnv.vs2012))
             {
                 var packagesConfig = new PackagesConfig();
-                packagesConfig.Generate(_builder, (CSharpProject)project, configurations, _projectPath, generatedFiles, skipFiles);
+                packagesConfig.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
                 if (packagesConfig.IsGenerated)
                 {
                     string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(packagesConfig.PackagesConfigPath));
