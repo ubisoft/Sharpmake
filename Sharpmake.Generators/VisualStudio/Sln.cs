@@ -548,7 +548,7 @@ namespace Sharpmake.Generators.VisualStudio
                     string category;
                     if (solution.MergePlatformConfiguration)
                     {
-                        configurationName = solutionConfiguration.PlatformName + " " + solutionConfiguration.Name;
+                        configurationName = solutionConfiguration.PlatformName + "-" + solutionConfiguration.Name;
                         category = "All Platforms";
                     }
                     else

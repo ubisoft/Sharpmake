@@ -60,7 +60,6 @@ namespace Sharpmake
             set { SetProperty(ref _perforceRootPath, value); }
         }
 
-        // TODO: currently broken
         private bool _mergePlatformConfiguration = false;
         public bool MergePlatformConfiguration
         {
