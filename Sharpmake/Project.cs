@@ -351,6 +351,18 @@ namespace Sharpmake
             Initialize(targetType, configurationType);
         }
 
+        /// <summary>
+        /// Special constructor for utility projects generated internally,
+        /// since these projects must handle paths differently
+        /// </summary>
+        /// <param name="targetType"></param>
+        /// <param name="configurationType"></param>
+        /// <param name="isInternal">Indicates if the class is defined within Sharpmake</param>
+        internal Project(Type targetType, Type configurationType, bool isInternal)
+        {
+            Initialize(targetType, configurationType, isInternal);
+        }
+
         protected override void PreInvokeConfiguration()
         {
             GetStringFields().Where(strings => strings != null).ForEach(elt => elt.SetReadOnly(true));
@@ -1353,7 +1365,7 @@ namespace Sharpmake
             return null;
         }
 
-        internal void Initialize(Type targetType, Type configurationType)
+        internal void Initialize(Type targetType, Type configurationType, bool isInternal = false)
         {
             var expectedType = typeof(Project.Configuration);
             if (configurationType == null || (configurationType != expectedType && !configurationType.IsSubclassOf(expectedType)))
@@ -1367,7 +1379,11 @@ namespace Sharpmake
             Targets.Initialize(targetType);
 
             string file;
-            if (Util.GetStackSourceFileTopMostTypeOf(GetType(), out file))
+            if(isInternal)
+            {
+                SharpmakeCsPath = Util.PathMakeStandard(AppDomain.CurrentDomain.BaseDirectory);
+            }
+            else if (Util.GetStackSourceFileTopMostTypeOf(GetType(), out file))
             {
                 FileInfo fileInfo = new FileInfo(file);
                 SharpmakeCsFileName = Util.PathMakeStandard(fileInfo.FullName);
@@ -1680,9 +1696,9 @@ namespace Sharpmake
     internal class FastBuildAllProject : Project
     {
         public FastBuildAllProject(Type targetType)
-            : base(targetType)
+            : base(targetType, typeof(Project.Configuration), true)
         {
-            // disable automatic source files discovery
+            // Disable automatic source files discovery
             SourceFilesExtensions.Clear();
             ResourceFilesExtensions.Clear();
             PRIFilesExtensions.Clear();
