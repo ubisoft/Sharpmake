@@ -157,6 +157,7 @@ namespace Sharpmake.Generators.VisualStudio
         private static void SelectConfigurationTypeOption(IGenerationContext context)
         {
             context.CommandLineOptions["ConfigurationType"] = FileGeneratorUtilities.RemoveLineTag;
+            context.Options["ConfigurationType"] = FileGeneratorUtilities.RemoveLineTag;
             switch (context.Configuration.Output)
             {
                 case Project.Configuration.OutputType.Exe:
@@ -184,7 +185,7 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Options["ConfigurationType"] = "Utility";
                     break;
                 case Project.Configuration.OutputType.None:
-                    context.Options["ConfigurationType"] = context.Configuration.IsFastBuild ? "Makefile" : FileGeneratorUtilities.RemoveLineTag;
+                    context.Options["ConfigurationType"] = context.Configuration.IsFastBuild || context.Configuration.CustomBuildSettings != null ? "Makefile" : FileGeneratorUtilities.RemoveLineTag;
                     break;
             }
         }

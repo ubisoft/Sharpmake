@@ -742,6 +742,34 @@ namespace Sharpmake
                 }
             }
 
+            /// <summary>
+            /// Settings for NMake projects with custom execution
+            /// </summary>
+            public class NMakeBuildSettings
+            {
+
+                public string BuildCommand = RemoveLineTag;
+                public string RebuildCommand = RemoveLineTag;
+                public string CleanCommand = RemoveLineTag;
+                public string OutputFile = RemoveLineTag;
+
+                public bool IsResolved { get; private set; } = false;
+
+                internal void Resolve(Resolver resolver)
+                {
+                    if (IsResolved)
+                        return;
+
+                    BuildCommand = resolver.Resolve(BuildCommand);
+                    RebuildCommand = resolver.Resolve(RebuildCommand);
+                    CleanCommand = resolver.Resolve(CleanCommand);
+                    OutputFile = resolver.Resolve(OutputFile);
+
+                    IsResolved = true;
+                }
+            }
+            public NMakeBuildSettings CustomBuildSettings = null;
+
 
             /// <summary>
             /// If specified, every obj will be outputed in intermediate directories corresponding to sources hierarchy
@@ -1130,6 +1158,12 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Executable);
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Output);
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.AdditionalInputs);
+                }
+
+                if(CustomBuildSettings != null)
+                {
+                    CustomBuildSettings.Resolve(resolver);
+                    Util.ResolvePath(Project.SourceRootPath, ref CustomBuildSettings.OutputFile);
                 }
 
                 foreach (var eventDictionary in new[]{

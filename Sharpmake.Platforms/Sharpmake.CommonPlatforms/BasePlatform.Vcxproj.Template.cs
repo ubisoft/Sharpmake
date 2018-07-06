@@ -242,5 +242,18 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMak
     <TargetFileName>[options.OutputFileName].exe</TargetFileName>
   </PropertyGroup>
 ";
+
+        private const string _projectConfigurationsCustomMakefile =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <OutDir>[options.OutputDirectory]\</OutDir>
+    <IntDir>[options.IntermediateDirectory]\</IntDir>
+    <NMakeBuildCommandLine>[conf.CustomBuildSettings.BuildCommand]</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>[conf.CustomBuildSettings.RebuildCommand]</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>[conf.CustomBuildSettings.CleanCommand]</NMakeCleanCommandLine>
+    <NMakeOutput>[conf.CustomBuildSettings.OutputFile]</NMakeOutput>
+    <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
+  </PropertyGroup>
+";
     }
 }

@@ -67,6 +67,7 @@ namespace Sharpmake.Generators.VisualStudio
         void GenerateProjectConfigurationGeneral(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator); // TODO: Merge with the above function and edit the reference projects.
         void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator);
+        void GenerateProjectConfigurationCustomMakeFile(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectPlatformImportSheet(IVcxprojGenerationContext context, IFileGenerator generator);
         void GeneratePlatformResourceFileList(IVcxprojGenerationContext context, IFileGenerator generator, Strings alreadyWrittenPriFiles, IList<Vcxproj.ProjectFile> resourceFiles, IList<Vcxproj.ProjectFile> imageResourceFiles);
         void GeneratePlatformReferences(IVcxprojGenerationContext context, IFileGenerator generator);

@@ -614,6 +614,10 @@ namespace Sharpmake.Generators.VisualStudio
                             platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                         }
                     }
+                    else if(conf.CustomBuildSettings != null)
+                    {
+                        platformVcxproj.GenerateProjectConfigurationCustomMakeFile(context, fileGenerator);
+                    }
                     else
                     {
                         platformVcxproj.GenerateProjectConfigurationGeneral2(context, fileGenerator);

@@ -232,6 +232,10 @@ namespace Sharpmake
         {
             generator.Write(_projectConfigurationsFastBuildMakefile);
         }
+        public virtual void GenerateProjectConfigurationCustomMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+            generator.Write(_projectConfigurationsCustomMakefile);
+        }
 
         public virtual void GenerateProjectPlatformImportSheet(IVcxprojGenerationContext context, IFileGenerator generator)
         {
