@@ -50,6 +50,9 @@ namespace Sharpmake
         // Experimental! Create solution dependencies from the FastBuild projects outputting Exe to the FastBuildAll project, to fix "F5" behavior in visual studio http://www.fastbuild.org/docs/functions/vssolution.html
         public bool FastBuildAllSlnDependencyFromExe = false;
 
+        // For adding additional files/folders to the solution
+        public Dictionary<string, Strings> ExtraItems = new Dictionary<string, Strings>();
+
         private string _perforceRootPath = null;
         public string PerforceRootPath
         {
