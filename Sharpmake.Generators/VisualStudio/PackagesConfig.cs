@@ -18,20 +18,20 @@ using System.Linq;
 
 namespace Sharpmake.Generators.VisualStudio
 {
-    // The project.json file maintains a list of packages used in a project, known as a package reference format.
-    // It supersedes packages.config but is in turn superseded by PackageReference with NuGet 4.0+.
+    // The packages.config file maintains a list of packages used in a project.
+    // It is superseded by project.json with NuGet 3.0+, but the latter discards certain functionality.
+    // This code should be used primarily for getting old projects to work.
     // https://docs.microsoft.com/en-us/nuget/schema/project-json
     internal partial class PackagesConfig
     {
         private Builder _builder;
         private string _projectPath;
 
-        private static readonly HashSet<string> s_projectConfigGenerated = new HashSet<string>();
-        private static readonly object s_projectConfigLock = new object();
+        private static readonly HashSet<string> s_packagesConfigGenerated = new HashSet<string>();
+        private static readonly object s_packagesConfigLock = new object();
 
         public bool IsGenerated { get; internal set; } = false;
         public string PackagesConfigPath => Path.Combine(_projectPath, "packages.config");
-
         public void Generate(Builder builder, CSharpProject project, List<Project.Configuration> configurations, string projectPath, List<string> generatedFiles, List<string> skipFiles)
         {
             _builder = builder;
@@ -44,11 +44,11 @@ namespace Sharpmake.Generators.VisualStudio
             _builder = null;
         }
 
-        private static bool IsGenerateNeeded(string projectConfigPath)
+        private static bool IsGenerateNeeded(string packagesConfigPath)
         {
-            if (!s_projectConfigGenerated.Contains(projectConfigPath))
+            if (!s_packagesConfigGenerated.Contains(packagesConfigPath))
             {
-                s_projectConfigGenerated.Add(projectConfigPath);
+                s_packagesConfigGenerated.Add(packagesConfigPath);
                 return true;
             }
 
@@ -57,28 +57,26 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GeneratePackagesConfig(Project.Configuration conf, DotNetFramework frameworks, List<string> generatedFiles, List<string> skipFiles)
         {
-            var projectConfigPath = PackagesConfigPath;
+            var packagesConfigPath = PackagesConfigPath;
 
-            // No NuGet references and no trace of a previous project.json
+            // No NuGet references and no trace of a previous packages.config
             if (conf.ReferencesByNuGetPackage.Count == 0)
             {
-                if (!File.Exists(projectConfigPath))
+                if (!File.Exists(packagesConfigPath))
                     return;
             }
 
-            lock (s_projectConfigLock)
+            lock (s_packagesConfigLock)
             {
                 if (conf.ReferencesByNuGetPackage.Count == 0)
                 {
-                    var fi = new FileInfo(projectConfigPath);
-                    if (!fi.IsReadOnly) // Do not delete project.json submitted in P4
-                    {
-                        Util.TryDeleteFile(projectConfigPath);
-                    }
+                    var fi = new FileInfo(packagesConfigPath);
+                    if (!fi.IsReadOnly) // Do not delete packages.config submitted in P4
+                        Util.TryDeleteFile(packagesConfigPath);
                     return;
                 }
 
-                if (IsGenerateNeeded(projectConfigPath))
+                if (IsGenerateNeeded(packagesConfigPath))
                 {
                     FileGenerator fileGenerator = new FileGenerator();
 
@@ -95,11 +93,11 @@ namespace Sharpmake.Generators.VisualStudio
 
                     fileGenerator.Write(Template.End);
 
-                    bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(projectConfigPath), fileGenerator.ToMemoryStream());
+                    bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(packagesConfigPath), fileGenerator.ToMemoryStream());
                     if (written)
-                        generatedFiles.Add(projectConfigPath);
+                        generatedFiles.Add(packagesConfigPath);
                     else
-                        skipFiles.Add(projectConfigPath);
+                        skipFiles.Add(packagesConfigPath);
                 }
             }
 
