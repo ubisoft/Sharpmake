@@ -786,8 +786,9 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                                 else
                                 {
-                                    // TODO: use SourceFileExtension array instead of ".cpp"
-                                    if ((String.Compare(sourceFile.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) != 0) ||
+                                    bool isSourceFileExtension = project.SourceFilesCompileExtensions.Contains(sourceFile.FileExtension);
+                                    bool isBlobbed = project.SourceFilesBlobExtensions.Contains(sourceFile.FileExtension);
+                                    if ((isSourceFileExtension && !isBlobbed) ||
                                         conf.ResolvedSourceFilesBlobExclude.Contains(sourceFile.FileName) ||
                                         (!isUnity && !isNoBlobImplicitConfig))
                                     {
