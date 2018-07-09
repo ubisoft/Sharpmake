@@ -1244,6 +1244,13 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.DisableFastUpToDateCheck.Disable, () => { context.Options["DisableFastUpToDateCheck"] = FileGeneratorUtilities.RemoveLineTag; })
             );
 
+            //EnableManagedIncrementalBuild
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.EnableManagedIncrementalBuild.Enable, () => { context.Options["EnableManagedIncrementalBuild"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.General.EnableManagedIncrementalBuild.Disable, () => { context.Options["EnableManagedIncrementalBuild"] = "false"; })
+            );
+
             //RandomizedBaseAddress
             context.SelectOption
             (
