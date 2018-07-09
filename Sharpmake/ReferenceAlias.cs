@@ -36,7 +36,7 @@ namespace Sharpmake
         public bool PublicReference { get; private set; }
         public Tuple<string, string> Nuget { get; private set; }
         public IReadOnlyList<string> Paths { get; private set; }
-        public Action<T, Project.Configuration, Target, Project> CustomAction { get; private set; }
+        public Action<T, Project.Configuration, ITarget, Project> CustomAction { get; private set; }
 
         internal static ReferenceAlias<T> FromType(Type type, bool publicRef)
         {
@@ -58,7 +58,7 @@ namespace Sharpmake
             return new ReferenceAlias<T> { Paths = paths };
         }
 
-        internal static ReferenceAlias<T> FromCustomAction(Action<T, Project.Configuration, Target, Project> customAction)
+        internal static ReferenceAlias<T> FromCustomAction(Action<T, Project.Configuration, ITarget, Project> customAction)
         {
             return new ReferenceAlias<T> { CustomAction = customAction };
         }
@@ -192,7 +192,7 @@ namespace Sharpmake
         private readonly Dictionary<T, ReferenceAlias<T>> _referenceAliases = new Dictionary<T, ReferenceAlias<T>>();
 
         public string BaseFilePath { get; set; }
-        public Action<T, Project.Configuration, Target, Project> FallbackAction { get; set; }
+        public Action<T, Project.Configuration, ITarget, Project> FallbackAction { get; set; }
 
         public ReferenceAliasManager()
         {
@@ -233,7 +233,7 @@ namespace Sharpmake
             _referenceAliases.Add(aliasValue, ReferenceAlias<T>.FromPaths( paths ));
         }
 
-        public void Set(T aliasValue, Action<T, Project.Configuration, Target, Project> customAction)
+        public void Set(T aliasValue, Action<T, Project.Configuration, ITarget, Project> customAction)
         {
             _referenceAliases.Add(aliasValue, ReferenceAlias<T>.FromCustomAction(customAction));
         }
@@ -246,7 +246,7 @@ namespace Sharpmake
         /// <param name="conf"></param>
         /// <param name="target"></param>
         /// <param name="project"></param>
-        public virtual void AddReference(T aliasValue, Project.Configuration conf, Target target, Project project)
+        public virtual void AddReference(T aliasValue, Project.Configuration conf, ITarget target, Project project)
         {
             if (!_referenceAliases.ContainsKey(aliasValue))
             {
@@ -307,7 +307,7 @@ namespace Sharpmake
             Instance = new ReferenceAliasForwardManager<T, TDest>();
         }
 
-        public override void AddReference(T aliasValue, Project.Configuration conf, Target target, Project project)
+        public override void AddReference(T aliasValue, Project.Configuration conf, ITarget target, Project project)
         {
             if (ReferenceAliasManager<TDest>.Instance == null)
                 throw new InvalidOperationException(string.Format("{0} does not have any instance created", typeof(ReferenceAliasManager<TDest>)));
@@ -326,7 +326,7 @@ namespace Sharpmake
     /// </summary>
     public static class ReferenceAliasExtensions
     {
-        public static void AddReference<T>(this Project.Configuration conf, T name, Target target = null, Project project = null) where T : struct, IConvertible
+        public static void AddReference<T>(this Project.Configuration conf, T name, ITarget target = null, Project project = null) where T : struct, IConvertible
         {
             if (ReferenceAliasManager<T>.Instance == null)
                 throw new InvalidOperationException(string.Format("{0} does not have any instance created", typeof(ReferenceAliasManager<T>)));
