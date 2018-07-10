@@ -184,7 +184,9 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             int configIndex = 0;
-            foreach (Project.Configuration conf in configurations)
+
+            var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
+            foreach (Project.Configuration conf in configurationsToBuild)
             {
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
@@ -193,7 +195,7 @@ namespace Sharpmake.Generators.FastBuild
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
 
-                if (conf.Platform.IsSupportedFastBuildPlatform() && confSourceFiles.ContainsKey(conf))
+                if (conf.Platform.IsSupportedFastBuildPlatform())
                 {
                     if (conf.IsBlobbed && conf.FastBuildBlobbed)
                     {
@@ -210,7 +212,7 @@ namespace Sharpmake.Generators.FastBuild
                     Strings subConfigObjectList = new Strings();
                     bool isUnity = false;
 
-                    if (configIndex == 0 || configurations[configIndex - 1].Platform != conf.Platform)
+                    if (configIndex == 0 || configurationsToBuild[configIndex - 1].Platform != conf.Platform)
                     {
                         using (bffGenerator.Declare("fastBuildDefine", GetPlatformSpecificDefine(conf.Platform)))
                             bffGenerator.Write(Template.ConfigurationFile.PlatformBeginSection);
@@ -466,7 +468,7 @@ namespace Sharpmake.Generators.FastBuild
                                     fastBuildTargetSubTargets.Add(eventPair.Key);
                                     postBuildEvents.Add(eventPair.Key, eventPair.Value);
                                 }
-                                
+
                                 var extraPlatformEvents = platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; });
                                 foreach (var buildEvent in extraPlatformEvents.Concat(conf.ResolvedEventPostBuildExe))
                                 {
@@ -540,7 +542,7 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     string prefix = prefixTuple.Item1;
                                     if (additionalDependency.StartsWith(prefix, prefixTuple.Item2))
-                                    {
+                                {
                                         subStringStartIndex = prefix.Length;
                                         subStringLength -= prefix.Length;
 
@@ -1177,15 +1179,11 @@ namespace Sharpmake.Generators.FastBuild
                         subConfigIndex++;
                     }
 
-                    if (configIndex == (configurations.Count - 1) || configurations[configIndex + 1].Platform != conf.Platform)
+                    if (configIndex == (configurationsToBuild.Count - 1) || configurationsToBuild[configIndex + 1].Platform != conf.Platform)
                     {
                         using (bffGenerator.Declare("fastBuildDefine", GetPlatformSpecificDefine(conf.Platform)))
                             bffGenerator.Write(Template.ConfigurationFile.PlatformEndSection);
                     }
-                }
-                else if (!confSourceFiles.ContainsKey(conf))
-                {
-                    Console.WriteLine("[Bff.cs] Unable to find {0} in source files dictionary.", conf.Name);
                 }
 
                 ++configIndex;
@@ -1441,14 +1439,14 @@ namespace Sharpmake.Generators.FastBuild
             writer.Flush();
         }
 
-        private static Dictionary<Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>
+        private static Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>
         GetGeneratedFiles(
             IGenerationContext context,
             List<Project.Configuration> configurations,
             out List<Vcxproj.ProjectFile> filesInNonDefaultSections
         )
         {
-            var confSubConfigs = new Dictionary<Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>();
+            var confSubConfigs = new Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>();
             filesInNonDefaultSections = new List<Vcxproj.ProjectFile>();
 
             // Add source files
@@ -1535,7 +1533,7 @@ namespace Sharpmake.Generators.FastBuild
             // Check if we need to add a compatible config for unity build - For now this is limited to C++ files compiled with no special options.... 
             foreach (Project.Configuration conf in configurations)
             {
-                if (conf.FastBuildBlobbed)
+                if (conf.FastBuildBlobbed && (sourceFiles.Count > 0 || conf.Project is FastBuildAllProject))
                 {
                     // For now, this will do.
                     var tuple = GetDefaultTupleConfig();
