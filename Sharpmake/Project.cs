@@ -1292,10 +1292,10 @@ namespace Sharpmake
 
         public enum NuGetPackageMode
         {
+            VersionDefault,
             PackageConfig,
             ProjectJson,
             PackageReference,
-            VersionDefault,
         }
 
         #region Internal

@@ -2132,6 +2132,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             Project.Configuration configuration = configurations[0];
             var devenv = configuration.Target.GetFragment<DevEnv>();
+            // package reference: Default in vs2017+
             if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageReference
                 || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv >= DevEnv.vs2017))
             {
@@ -2144,6 +2145,7 @@ namespace Sharpmake.Generators.VisualStudio
                     itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
                 }
             }
+            // project.json: Default in vs2015
             else if (project.NuGetReferenceType == Project.NuGetPackageMode.ProjectJson
                     || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv == DevEnv.vs2015))
             {
@@ -2158,8 +2160,9 @@ namespace Sharpmake.Generators.VisualStudio
                     itemGroups.Nones.Add(new ItemGroups.None { Include = include });
                 }
             }
+            // packages.config: Default in vs2013, vs2012, and vs2010
             else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
-                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv == DevEnv.vs2012))
+                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv <= DevEnv.vs2013))
             {
                 var packagesConfig = new PackagesConfig();
                 packagesConfig.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
