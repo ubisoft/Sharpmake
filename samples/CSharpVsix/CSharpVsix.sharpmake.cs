@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace CSharpHelloWorld
+namespace CSharpVsix
 {
     [Sharpmake.Generate]
     public class CSharpVsixProject : CSharpProject
