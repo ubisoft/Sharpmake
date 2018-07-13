@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpmakeGen", "samples\Sha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleExeLibDependency", "samples\SimpleExeLibDependency\SimpleExeLibDependency.csproj", "{128E20D6-0408-DD6C-4BA5-0B7A051E6734}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCF", "samples\CSharpWCF\CSharpWCF.csproj", "{8AF1D3AA-EB3A-4C2A-913B-B00684A888BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +114,10 @@ Global
 		{128E20D6-0408-DD6C-4BA5-0B7A051E6734}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{128E20D6-0408-DD6C-4BA5-0B7A051E6734}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{128E20D6-0408-DD6C-4BA5-0B7A051E6734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AF1D3AA-EB3A-4C2A-913B-B00684A888BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AF1D3AA-EB3A-4C2A-913B-B00684A888BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AF1D3AA-EB3A-4C2A-913B-B00684A888BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AF1D3AA-EB3A-4C2A-913B-B00684A888BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -130,5 +136,6 @@ Global
 		{1C5B0DF8-41C5-9E90-7A8C-622CDAA188ED} = {6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}
 		{C2F8D8B8-29F8-4117-62B6-F6E3E63C225B} = {33508DDB-C422-746D-6776-CCB54DBB91EB}
 		{128E20D6-0408-DD6C-4BA5-0B7A051E6734} = {33508DDB-C422-746D-6776-CCB54DBB91EB}
+		{8AF1D3AA-EB3A-4C2A-913B-B00684A888BA} = {33508DDB-C422-746D-6776-CCB54DBB91EB}
 	EndGlobalSection
 EndGlobal
