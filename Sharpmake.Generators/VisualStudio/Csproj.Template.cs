@@ -381,7 +381,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string WCFMetadata =
-@"    <WCFMetadata Include=""Service References\"" />
+@"    <WCFMetadata Include=""[baseStorage]"" />
 ";
 
                 public static string WCFMetadataStorage =

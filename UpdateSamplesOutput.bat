@@ -13,6 +13,8 @@ call :UpdateRef samples HelloWorld        HelloWorld.sharpmake.cs        referen
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpVsix        CSharpVsix.sharpmake.cs        reference CSharpVsix
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples CSharpWCF         CSharpWCF.sharpmake.cs         reference CSharpWCF\codebase
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences PackageReferences.sharpmake.cs reference PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples QTFileCustomBuild QTFileCustomBuild.sharpmake.cs reference QTFileCustomBuild

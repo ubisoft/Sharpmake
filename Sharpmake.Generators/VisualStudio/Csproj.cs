@@ -86,15 +86,7 @@ namespace Sharpmake.Generators.VisualStudio
                 writer.Write(Analyzers.Resolve(resolver));
                 writer.Write(VSIXSourceItems.Resolve(resolver));
                 writer.Write(FolderIncludes.Resolve(resolver));
-
-                if (WCFMetadataStorages.Count > 0)
-                {
-                    writer.Write(Template.ItemGroups.ItemGroupBegin);
-                    writer.Write(Template.ItemGroups.WCFMetadata);
-                    writer.Write(Template.ItemGroups.ItemGroupEnd);
-
-                    writer.Write(WCFMetadataStorages.Resolve(resolver));
-                }
+                writer.Write(WCFMetadataStorages.Resolve(resolver));
 
                 return writer.ToString();
             }
@@ -1223,6 +1215,17 @@ namespace Sharpmake.Generators.VisualStudio
             }
             #endregion
 
+            #region WCF support
+            // We need to know if there is any WCFMetadataStorage detected before generating <WCFMetadata>
+            if (itemGroups.WCFMetadataStorages.Count > 0)
+            {
+                writer.Write(Template.ItemGroups.ItemGroupBegin);
+                using (resolver.NewScopedParameter("baseStorage", project.WcfBaseStorage))
+                    Write(Template.ItemGroups.WCFMetadata, writer, resolver);
+                writer.Write(Template.ItemGroups.ItemGroupEnd);
+            }
+            #endregion
+
             writer.Write(itemGroups.Resolve(resolver));
 
             // TODO tjn move this outside ! we are generating .csproj, we shouldn't fill Import here
@@ -1632,6 +1635,8 @@ namespace Sharpmake.Generators.VisualStudio
                             remainingNoneFiles.Remove(file);
 
                             string wcfStorage = Path.GetDirectoryName(file);
+                            if (wcfStorage.IndexOf(project.WcfBaseStorage, StringComparison.OrdinalIgnoreCase)<0)
+                                throw new Error($"WCF file storage \"{wcfStorage}\" does not match project.{nameof(project.WcfBaseStorage)}:\"{project.WcfBaseStorage}\"");
 
                             itemGroups.WCFMetadataStorages.Add(new ItemGroups.WCFMetadataStorage { Include = wcfStorage });
                             break;
