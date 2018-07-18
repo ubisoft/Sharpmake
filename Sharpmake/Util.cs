@@ -1056,11 +1056,15 @@ namespace Sharpmake
 
         public static string GetWinFormSubTypeDbPath()
         {
-            return Path.Combine(WinFormSubTypesDbPath, $@"{s_winFormSubTypesDbPrefix}{".bin"}");
+            return Path.Combine(WinFormSubTypesDbPath, $@"{s_winFormSubTypesDbPrefix}.bin");
         }
 
         public static void SerializeAllCsprojSubTypes(object allCsProjSubTypes)
         {
+            // If DbPath is not specify, do not save C# subtypes information
+            if (string.IsNullOrEmpty(WinFormSubTypesDbPath))
+                return;
+
             if (!Directory.Exists(WinFormSubTypesDbPath))
                 Directory.CreateDirectory(WinFormSubTypesDbPath);
 
