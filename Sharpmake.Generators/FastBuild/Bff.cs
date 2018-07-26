@@ -48,6 +48,8 @@ namespace Sharpmake.Generators.FastBuild
 
             public string ProjectSourceCapitalized { get; }
 
+            public bool PlainOutput { get { return false; } }
+
             public Resolver EnvironmentVariableResolver
             {
                 get

@@ -72,6 +72,7 @@
     <Compile Include="FileGenerator.cs" />
     <Compile Include="FileGeneratorUtilities.cs" />
     <Compile Include="GeneratorManager.cs" />
+    <Compile Include="Generic\JsonCompilationDatabase.cs" />
     <Compile Include="Generic\MakeApplication.Template.cs" />
     <Compile Include="Generic\MakeApplication.cs" />
     <Compile Include="Generic\MakeProject.Template.cs" />

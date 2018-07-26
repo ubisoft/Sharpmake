@@ -20,6 +20,16 @@ using Sharpmake.Generators.FastBuild;
 
 namespace Sharpmake.Generators.VisualStudio
 {
+    internal enum ProjectOptionGenerationLevel
+    {
+        General,
+        Compiler,
+        Linker,
+        Manifest,
+        PostBuild,
+        All,
+    }
+
     public class ProjectOptionsGenerator
     {
         private class ProjectOptionsGenerationContext
@@ -71,7 +81,7 @@ namespace Sharpmake.Generators.VisualStudio
             return @"\&quot;";
         }
 
-        internal void GenerateOptions(IGenerationContext context)
+        internal void GenerateOptions(IGenerationContext context, ProjectOptionGenerationLevel level = ProjectOptionGenerationLevel.All)
         {
             var optionsContext = new ProjectOptionsGenerationContext(context.Configuration,
                 new VariableAssignment("project", context.Project),
@@ -79,11 +89,20 @@ namespace Sharpmake.Generators.VisualStudio
                 new VariableAssignment("conf", context.Configuration));
 
             GenerateGeneralOptions(context, optionsContext);
-            GenerateCompilerOptions(context, optionsContext);
-            GenerateLinkerOptions(context, optionsContext);
-            GenerateManifestToolOptions(context, optionsContext);
+
+            if (level >= ProjectOptionGenerationLevel.Compiler)
+                GenerateCompilerOptions(context, optionsContext);
+
+            if (level >= ProjectOptionGenerationLevel.Linker)
+                GenerateLinkerOptions(context, optionsContext);
+
+            if (level >= ProjectOptionGenerationLevel.Manifest)
+                GenerateManifestToolOptions(context, optionsContext);
+
             GenerateLLVMOptions(context, optionsContext);
-            GeneratePostBuildOptions(context, optionsContext);
+
+            if (level >= ProjectOptionGenerationLevel.PostBuild)
+                GeneratePostBuildOptions(context, optionsContext);
         }
 
         private void GenerateGeneralOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
@@ -131,7 +150,7 @@ namespace Sharpmake.Generators.VisualStudio
             //IntermediateDirectory
             optionsContext.IntermediateDirectoryRelative = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.IntermediatePath);
             context.Options["IntermediateDirectory"] = context.Configuration.Output != Project.Configuration.OutputType.None ? optionsContext.IntermediateDirectoryRelative : FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["IntermediateDirectory"] = Bff.CurrentBffPathKeyCombine(optionsContext.IntermediateDirectoryRelative);
+            context.CommandLineOptions["IntermediateDirectory"] = FormatCommandLineOptionPath(context, optionsContext.IntermediateDirectoryRelative);
 
             optionsContext.TargetName = context.Configuration.TargetFileFullName;
             context.Options["LayoutDir"] = !string.IsNullOrEmpty(context.Configuration.LayoutDir) ? context.Configuration.LayoutDir : FileGeneratorUtilities.RemoveLineTag;
@@ -150,7 +169,7 @@ namespace Sharpmake.Generators.VisualStudio
             context.SelectOptionWithFallback(
                 () => { context.Options["WindowsTargetPlatformVersion"] = FileGeneratorUtilities.RemoveLineTag; },
                 winTargetPlatformVersionOptionActions.ToArray()
-            );
+                );
         }
 
         private static void SelectConfigurationTypeOption(IGenerationContext context)
@@ -1077,7 +1096,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["PrecompiledHeaderFile"] = pchOutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.Project.Name + ".pch";
                 context.Options["PrecompiledHeaderOutputFileDirectory"] = pchOutputDirectoryRelative;
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = context.Options["PrecompiledHeaderThrough"];
-                context.CommandLineOptions["PrecompiledHeaderFile"] = Bff.CurrentBffPathKeyCombine(context.Options["PrecompiledHeaderFile"]);
+                context.CommandLineOptions["PrecompiledHeaderFile"] = FormatCommandLineOptionPath(context, context.Options["PrecompiledHeaderFile"]);
                 context.CommandLineOptions["PrecompiledHeaderOutputFileDirectory"] = Bff.CurrentBffPathKeyCombine(pchOutputDirectoryRelative);
 
                 if (!optionsContext.PlatformDescriptor.HasPrecompiledHeaderSupport)
@@ -1112,7 +1131,7 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         string importLibRelative = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".lib";
                         context.Options["ImportLibrary"] = importLibRelative;
-                        context.CommandLineOptions["ImportLibrary"] = "/IMPLIB:" + Bff.CurrentBffPathKeyCombine(importLibRelative);
+                        context.CommandLineOptions["ImportLibrary"] = "/IMPLIB:" + FormatCommandLineOptionPath(context, importLibRelative);
                     }
                     break;
                 case Project.Configuration.OutputType.Lib:
@@ -1288,7 +1307,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 var filePath = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.ModuleDefinitionFile);
                 context.Options["ModuleDefinitionFile"] = filePath;
-                context.CommandLineOptions["ModuleDefinitionFile"] = "/DEF:" + Bff.CurrentBffPathKeyCombine(filePath);
+                context.CommandLineOptions["ModuleDefinitionFile"] = "/DEF:" + FormatCommandLineOptionPath(context, filePath);
             }
             else
             {
@@ -1566,7 +1585,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 if (linkerAdditionalOptions.Length > 0)
                     linkerAdditionalOptions += " ";
-                linkerAdditionalOptions += "/ignore:" + disableLinkerWarnings.JoinStrings(",");
+                linkerAdditionalOptions += " /ignore:" + disableLinkerWarnings.JoinStrings(",");
             }
 
             context.Options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
@@ -1919,7 +1938,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     string manifestFile = optionsContext.IntermediateDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + context.Configuration.ManifestFileSuffix;
                     context.Options["ManifestFile"] = manifestFile;
-                    context.CommandLineOptions["ManifestFile"] = @"/ManifestFile:""" + Bff.CurrentBffPathKeyCombine(manifestFile) + @"""";
+                    context.CommandLineOptions["ManifestFile"] = @"/ManifestFile:""" + FormatCommandLineOptionPath(context, manifestFile) + @"""";
                 }
                 else
                 {
@@ -2002,8 +2021,8 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     optionsCompilerProgramDatabaseFile = Util.PathGetRelative(context.ProjectDirectory, optionsCompilerProgramDatabaseFile, true);
                     optionsLinkerProgramDatabaseFile = Util.PathGetRelative(context.ProjectDirectory, optionsLinkerProgramDatabaseFile, true);
-                    cmdLineOptionsCompilerProgramDatabaseFile = Bff.CurrentBffPathKeyCombine(optionsCompilerProgramDatabaseFile);
-                    cmdLineOptionsLinkerProgramDatabaseFile = Bff.CurrentBffPathKeyCombine(optionsLinkerProgramDatabaseFile);
+                    cmdLineOptionsCompilerProgramDatabaseFile = FormatCommandLineOptionPath(context, optionsCompilerProgramDatabaseFile);
+                    cmdLineOptionsLinkerProgramDatabaseFile = FormatCommandLineOptionPath(context, optionsLinkerProgramDatabaseFile);
                 }
 
                 context.Options["CompilerProgramDatabaseFile"] = string.IsNullOrEmpty(optionsCompilerProgramDatabaseFile)
@@ -2060,7 +2079,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string mapFile = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + targetNamePrefix + optionsContext.TargetName + ".map";
                 context.Options["MapFileName"] = mapFile;
 
-                string mapFileBffRelative = Bff.CurrentBffPathKeyCombine(mapFile);
+                string mapFileBffRelative = FormatCommandLineOptionPath(context, mapFile);
                 if (PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
                 {
                     context.CommandLineOptions["GenerateMapFile"] = @"-Wl,-Map=""" + mapFileBffRelative + @"""";
@@ -2082,6 +2101,11 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Linker.GenerateMapFile.Normal, enableMapOption),
             Options.Option(Options.Vc.Linker.GenerateMapFile.Full, enableMapOption)
             );
+        }
+
+        private static string FormatCommandLineOptionPath(IGenerationContext context, string path)
+        {
+            return !context.PlainOutput ? Bff.CurrentBffPathKeyCombine(path) : path;
         }
     }
 }

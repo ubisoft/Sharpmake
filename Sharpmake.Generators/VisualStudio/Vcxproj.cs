@@ -51,6 +51,7 @@ namespace Sharpmake.Generators.VisualStudio
             public string ProjectFileName { get; }
             public string ProjectDirectoryCapitalized { get; }
             public string ProjectSourceCapitalized { get; }
+            public bool PlainOutput { get { return true; } }
             public Project Project { get; }
             public Project.Configuration Configuration
             {

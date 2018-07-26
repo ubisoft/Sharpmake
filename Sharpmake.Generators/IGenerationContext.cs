@@ -31,6 +31,9 @@ namespace Sharpmake.Generators
         string ProjectDirectoryCapitalized { get; }
         string ProjectSourceCapitalized { get; }
 
+        // If the output should not contain any variables (they should be resolved)
+        bool PlainOutput { get; }
+
         void SelectOption(params Options.OptionAction[] options);
         void SelectOptionWithFallback(Action fallbackAction, params Options.OptionAction[] options);
     }
