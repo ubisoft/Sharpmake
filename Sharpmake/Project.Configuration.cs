@@ -1902,13 +1902,17 @@ namespace Sharpmake
 
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy) && dependency.TargetPath != TargetPath)
                                 {
-                                    _resolvedTargetCopyFiles.Add(Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + ".dll"));
-                                    if (!isExport) // Add PDBs only if the dependency is not an [export] project
+                                    // If using OnlyBuildOrder, ExecuteTargetCopy must be set to enable the copy.
+                                    if (dependencySetting != DependencySetting.OnlyBuildOrder || ExecuteTargetCopy)
                                     {
-                                        _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
+                                        _resolvedTargetCopyFiles.Add(Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + ".dll"));
+                                        if (!isExport) // Add PDBs only if the dependency is not an [export] project
+                                        {
+                                            _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
 
-                                        if (dependency.CopyCompilerPdbToDependentTargets)
-                                            _resolvedTargetCopyFiles.Add(dependency.CompilerPdbFilePath);
+                                            if (dependency.CopyCompilerPdbToDependentTargets)
+                                                _resolvedTargetCopyFiles.Add(dependency.CompilerPdbFilePath);
+                                        }
                                     }
                                     _resolvedEventPreBuildExe.AddRange(dependency.EventPreBuildExe);
                                     _resolvedEventPostBuildExe.AddRange(dependency.EventPostBuildExe);
