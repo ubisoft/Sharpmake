@@ -66,6 +66,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class CSharpWcfProject : SampleProject
+    {
+        public CSharpWcfProject()
+        {
+            Name = "CSharpWCF";
+        }
+    }
+
+    [Generate]
     public class HelloWorldProject : SampleProject
     {
         public HelloWorldProject()
