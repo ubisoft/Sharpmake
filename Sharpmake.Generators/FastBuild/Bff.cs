@@ -186,6 +186,9 @@ namespace Sharpmake.Generators.FastBuild
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
 
+                // TODO: really not ideal, refactor and move the properties we need from it someplace else
+                var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
+
                 if (conf.Platform.IsSupportedFastBuildPlatform() && confSourceFiles.ContainsKey(conf))
                 {
                     if (conf.IsBlobbed && conf.FastBuildBlobbed)
@@ -355,7 +358,7 @@ namespace Sharpmake.Generators.FastBuild
                                 partialLibInfo = "[Partial Lib of " + fastBuildOutputFileShortName + "]";
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
 
-                                var staticLibExtension = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform).StaticLibraryFileExtension;
+                                var staticLibExtension = vcxprojPlatform.StaticLibraryFileExtension;
 
                                 fastBuildOutputFile = Path.ChangeExtension(fastBuildOutputFile, null); // removes the extension
                                 fastBuildOutputFile += "_" + subConfigIndex.ToString();
@@ -507,11 +510,18 @@ namespace Sharpmake.Generators.FastBuild
 
                         // Remove from cmdLineOptions["AdditionalDependencies"] dependencies that are already listed in fastBuildProjectDependencyList
                         {
-                            var basePlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
                             string libExt = ".lib";
                             string outExt = ".a";
                             string prefixExt = "-l";
-                            basePlatform.SetupPlatformLibraryOptions(ref libExt, ref outExt, ref prefixExt);
+                            vcxprojPlatform.SetupPlatformLibraryOptions(ref libExt, ref outExt, ref prefixExt);
+
+                            // test prefixes, usually it is either -l or lib, to know if we can shorten it
+                            // Note that the output filename prefix is not case sensitive (ideally it should depend on the OS)
+                            Tuple<string, StringComparison>[] prefixesToTest = {
+                                Tuple.Create(prefixExt, StringComparison.Ordinal),
+                                Tuple.Create(vcxprojPlatform.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib), StringComparison.OrdinalIgnoreCase)
+                            };
+
                             var finalDependencies = new Strings();
                             foreach (var additionalDependency in additionalDependencies)
                             {
@@ -521,11 +531,18 @@ namespace Sharpmake.Generators.FastBuild
                                 if (additionalDependency.EndsWith(libExt, StringComparison.OrdinalIgnoreCase))
                                     subStringLength -= libExt.Length;
 
-                                if (additionalDependency.StartsWith(prefixExt, StringComparison.Ordinal))
+                                foreach (var prefixTuple in prefixesToTest)
                                 {
-                                    subStringStartIndex = prefixExt.Length;
-                                    subStringLength -= prefixExt.Length;
+                                    string prefix = prefixTuple.Item1;
+                                    if (additionalDependency.StartsWith(prefix, prefixTuple.Item2))
+                                    {
+                                        subStringStartIndex = prefix.Length;
+                                        subStringLength -= prefix.Length;
+
+                                        break;
+                                    }
                                 }
+
                                 string testedDep = additionalDependency.Substring(subStringStartIndex, subStringLength);
 
                                 // add this link dependency if it's not a project dependency nor a project object file
@@ -538,7 +555,7 @@ namespace Sharpmake.Generators.FastBuild
                                     }
                                     else
                                     {
-                                        if (!additionalDependency.Contains('/') && !additionalDependency.Contains('\\'))
+                                        if (subStringStartIndex != 0 && !additionalDependency.Contains(Util.UnixSeparator) && !additionalDependency.Contains(Util.WindowsSeparator))
                                         {
                                             // the dependency is a "global" lib (ie it doesn't contain a file path)
                                             // use the -l switch to link it.
