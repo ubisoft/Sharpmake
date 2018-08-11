@@ -79,12 +79,17 @@ namespace Sharpmake
 
         public Solution()
         {
-            Initialize(typeof(Target));
+            Initialize(typeof(Target), typeof(Solution.Configuration));
         }
 
         public Solution(Type targetType)
         {
-            Initialize(targetType);
+            Initialize(targetType, typeof(Solution.Configuration));
+        }
+
+        public Solution(Type targetType, Type configurationType)
+        {
+            Initialize(targetType, configurationType);
         }
 
         #region Internal
@@ -393,8 +398,14 @@ namespace Sharpmake
         private bool _resolved = false;
         private bool _dependenciesResolved = false;
 
-        private void Initialize(Type targetType)
+        private void Initialize(Type targetType, Type configurationType)
         {
+            var expectedType = typeof(Solution.Configuration);
+            if (configurationType == null || (configurationType != expectedType && !configurationType.IsSubclassOf(expectedType)))
+                throw new InternalError("configuration type {0} must be a subclass of {1}", targetType.FullName, expectedType.FullName);
+
+            ConfigurationType = configurationType;
+
             ClassName = GetType().Name;
             Targets.Initialize(targetType);
 

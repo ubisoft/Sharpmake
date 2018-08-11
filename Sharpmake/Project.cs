@@ -338,12 +338,17 @@ namespace Sharpmake
 
         public Project()
         {
-            Initialize(typeof(Target));
+            Initialize(typeof(Target), typeof(Project.Configuration));
         }
 
         public Project(Type targetType)
         {
-            Initialize(targetType);
+            Initialize(targetType, typeof(Project.Configuration));
+        }
+
+        public Project(Type targetType, Type configurationType)
+        {
+            Initialize(targetType, configurationType);
         }
 
         protected override void PreInvokeConfiguration()
@@ -1340,8 +1345,14 @@ namespace Sharpmake
             return null;
         }
 
-        internal void Initialize(Type targetType)
+        internal void Initialize(Type targetType, Type configurationType)
         {
+            var expectedType = typeof(Project.Configuration);
+            if (configurationType == null || (configurationType != expectedType && !configurationType.IsSubclassOf(expectedType)))
+                throw new InternalError("configuration type {0} must be a subclass of {1}", targetType.FullName, expectedType.FullName);
+
+            ConfigurationType = configurationType;
+
             ExtensionBuildTools[".asm"] = "MASM";
             ClassName = GetType().Name;
             FullClassName = GetType().FullName;

@@ -58,6 +58,9 @@ namespace Sharpmake
 
         private readonly List<TConfiguration> _configurations = new List<TConfiguration>();
 
+        // Type of Configuration object, must derive from TConfiguration
+        public Type ConfigurationType { get; internal protected set; }
+
         public void AddTargets(params ITarget[] targetsMask)
         {
             Targets.AddTargets("", targetsMask);
@@ -214,7 +217,7 @@ namespace Sharpmake
                 }
                 usedTargetNames.Add(targetString, target);
 
-                TConfiguration conf = new TConfiguration();
+                TConfiguration conf = Activator.CreateInstance(ConfigurationType) as TConfiguration;
                 conf.Construct(this, target);
                 _configurations.Add(conf);
                 var param = new object[] { conf, target };
