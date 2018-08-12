@@ -1825,16 +1825,25 @@ namespace Sharpmake
         {
             private readonly Stopwatch _stopWatch;
             private readonly Action<long> _disposeAction;
+            private readonly long _minThresholdMs;
 
             public StopwatchProfiler(Action<long> disposeAction)
+                : this(disposeAction, 0)
+            {
+            }
+
+            public StopwatchProfiler(Action<long> disposeAction, long minThresholdMs)
             {
                 _disposeAction = disposeAction;
                 _stopWatch = Stopwatch.StartNew();
+                _minThresholdMs = minThresholdMs;
             }
 
             public void Dispose()
             {
-                _disposeAction(_stopWatch.ElapsedMilliseconds);
+                long elapsed = _stopWatch.ElapsedMilliseconds;
+                if (elapsed > _minThresholdMs)
+                    _disposeAction(elapsed);
             }
         }
 
