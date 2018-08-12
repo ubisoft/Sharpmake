@@ -776,7 +776,11 @@ namespace Sharpmake
                 projects.AddRange(_generatedProjects);
 
                 // Pre event
-                EventPreGeneration?.Invoke(projects, solutions);
+                if (EventPreGeneration != null)
+                {
+                    using (new Util.StopwatchProfiler(ms => { LogWriteLine("    pre-generation steps took {0:0.0} sec", ms / 1000.0f); }, minThresholdMs: 100))
+                        EventPreGeneration.Invoke(projects, solutions);
+                }
 
                 // start with huge solutions to balance task with small one at the end.
                 solutions.Sort((s0, s1) => s1.Configurations.Count.CompareTo(s0.Configurations.Count));
@@ -792,8 +796,14 @@ namespace Sharpmake
                     _tasks.Wait();
 
                 // Post events
-                EventPostGeneration?.Invoke(projects, solutions);
-                EventPostGenerationReport?.Invoke(projects, solutions, _generationReport);
+                if (EventPostGeneration != null || EventPostGenerationReport != null)
+                {
+                    using (new Util.StopwatchProfiler(ms => { LogWriteLine("    post-generation steps took {0:0.0} sec", ms / 1000.0f); }, minThresholdMs: 100))
+                    {
+                        EventPostGeneration?.Invoke(projects, solutions);
+                        EventPostGenerationReport?.Invoke(projects, solutions, _generationReport);
+                    }
+                }
 
                 return _generationReport;
             }
