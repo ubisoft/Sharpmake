@@ -138,7 +138,10 @@ namespace Sharpmake.Application
             try
             {
                 DebugEnable = CommandLine.ContainParameter("verbose") || CommandLine.ContainParameter("debug") || CommandLine.ContainParameter("diagnostics");
-                LogWriteLine("sharpmake");
+
+                Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                string versionString = string.Join(".", version.Major, version.Minor, version.Build);
+                LogWriteLine($"sharpmake {versionString}");
                 LogWriteLine("  arguments : {0}", CommandLine.GetProgramCommandLine());
                 LogWriteLine("  directory : {0}", Directory.GetCurrentDirectory());
                 LogWriteLine(string.Empty);
@@ -323,7 +326,11 @@ namespace Sharpmake.Application
 
         private static void LogPlatformImplementationExtensionRegistered(object sender, PlatformImplementationExtensionRegisteredEventArgs e)
         {
-            LogWriteLine("Loaded platform extension {0} (Found {1} implementation class{2})", e.ExtensionAssembly.Location, e.Interfaces.Count, e.Interfaces.Count > 1 ? "es" : string.Empty);
+            System.Reflection.AssemblyName extensionName = e.ExtensionAssembly.GetName();
+            Version version = extensionName.Version;
+            string versionString = string.Join(".", version.Major, version.Minor, version.Build);
+
+            LogWriteLine("    loaded platform {0} {1} from '{2}'", extensionName.Name, versionString, e.ExtensionAssembly.Location);
         }
 
         private static void GenerateAll(BuildContext.BaseBuildContext buildContext, Argument parameters)
