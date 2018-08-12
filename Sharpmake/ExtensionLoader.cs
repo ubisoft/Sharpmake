@@ -33,7 +33,7 @@ namespace Sharpmake
         private AppDomain _remoteDomain;
         private ExtensionChecker _validator;
 
-        class ExtensionChecker : MarshalByRefObject
+        public class ExtensionChecker : MarshalByRefObject
         {
             private readonly Dictionary<string, bool> _loadedAssemblies = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -73,7 +73,7 @@ namespace Sharpmake
                 }
             }
 
-            public bool IsSharpmakeExtension(Assembly assembly)
+            public static bool IsSharpmakeExtension(Assembly assembly)
             {
                 if (assembly == null)
                     throw new ArgumentNullException(nameof(assembly));
@@ -143,8 +143,7 @@ namespace Sharpmake
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
             if (!fastLoad)
             {
-                var validator = new ExtensionChecker();
-                if (!validator.IsSharpmakeExtension(assembly))
+                if (!ExtensionChecker.IsSharpmakeExtension(assembly))
                     return null;
             }
 

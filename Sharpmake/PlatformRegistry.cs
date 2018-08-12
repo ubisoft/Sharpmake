@@ -113,11 +113,16 @@ namespace Sharpmake
         {
             if (extensionAssembly == null)
                 throw new ArgumentNullException(nameof(extensionAssembly));
+
             if (extensionAssembly.ReflectionOnly)
                 return;
 
             // Don't support loading dynamically compiled assemblies
             if (extensionAssembly.IsDynamic)
+                return;
+
+            // Ignores if the assembly does not declare itself as a Sharpmake extension.
+            if (!ExtensionLoader.ExtensionChecker.IsSharpmakeExtension(extensionAssembly))
                 return;
 
             // Don't support loading dynamically compiled assemblies because we need the location
@@ -129,65 +134,60 @@ namespace Sharpmake
             if (_platformAssemblies.Any(assembly => assembly.Location == extensionAssembly.Location))
                 return;
 
-            // Ignores if the assembly does not declare itself as a Sharpmake extension.
-            if (extensionAssembly.GetCustomAttribute<SharpmakeExtensionAttribute>() != null)
+            // Go through all the types declared in the Sharpmake extension assembly and look
+            // up for platform implementations.
+            var typeInfos = from type in extensionAssembly.GetTypes()
+                            let attributes = type.GetCustomAttributes<PlatformImplementationAttribute>()
+                            where attributes.Any()
+                            from attribute in attributes
+                            from platform in EnumeratePlatformBits(attribute.Platforms)
+                            from ifaceType in attribute.InterfaceTypes
+                            select new PlatformImplementationDescriptor(new PlatformImplementation(platform, ifaceType), type);
+
+            var registeredTypes = new List<Type>();
+
+            lock (_implementations)
             {
-                // Go through all the types declared in the Sharpmake extension assembly and look
-                // up for platform implementations.
-                var typeInfos = from type in extensionAssembly.GetTypes()
-                                let attributes = type.GetCustomAttributes<PlatformImplementationAttribute>()
-                                where attributes.Any()
-                                from attribute in attributes
-                                from platform in EnumeratePlatformBits(attribute.Platforms)
-                                from ifaceType in attribute.InterfaceTypes
-                                select new PlatformImplementationDescriptor(new PlatformImplementation(platform, ifaceType), type);
+                // Make sure that our platform implementations are unique.
+                EnsureUniquePlatformImplementations(typeInfos);
 
-                var registeredTypes = new List<Type>();
-
-                lock (_implementations)
+                foreach (var type in typeInfos)
                 {
-                    // Make sure that our platform implementations are unique.
-                    EnsureUniquePlatformImplementations(typeInfos);
-
-                    foreach (var type in typeInfos)
-                    {
-                        Type ifaceType = type.Implementation.InterfaceType;
-                        registeredTypes.Add(ifaceType);
-                        RegisterImplementationImplNoLock(type.Implementation.Platform, ifaceType, GetImplementationInstance(type.ConcreteType));
-                    }
+                    Type ifaceType = type.Implementation.InterfaceType;
+                    registeredTypes.Add(ifaceType);
+                    RegisterImplementationImplNoLock(type.Implementation.Platform, ifaceType, GetImplementationInstance(type.ConcreteType));
                 }
-
-                // Go through all types again and this time get the default implementations.
-                var defaultTypes = from type in extensionAssembly.GetTypes()
-                                   let attributes = type.GetCustomAttributes<DefaultPlatformImplementationAttribute>()
-                                   where attributes.Any()
-                                   from attribute in attributes
-                                   from ifaceType in attribute.InterfaceTypes
-                                   select new
-                                   {
-                                       ImplementationType = type,
-                                       InterfaceType = ifaceType
-                                   };
-                lock (_defaultImplementations)
-                {
-                    foreach (var type in defaultTypes)
-                    {
-                        // TODO: Check if the attribute is given to different types and throw an
-                        //       error if it does, just like for the platform implementations do
-                        //       by calling EnsureUniquePlatformImplementations(typeInfo). That's
-                        //       assuming that we don't scrap the concept of a default
-                        //       implementation though.
-
-                        registeredTypes.Add(type.InterfaceType);
-                        if (!_defaultImplementations.ContainsKey(type.InterfaceType))
-                            _defaultImplementations.Add(type.InterfaceType, GetImplementationInstance(type.ImplementationType));
-                    }
-                }
-
-                _platformAssemblies.Add(extensionAssembly);
-                PlatformImplementationExtensionRegistered?.Invoke(null, new PlatformImplementationExtensionRegisteredEventArgs(extensionAssembly, registeredTypes));
-
             }
+
+            // Go through all types again and this time get the default implementations.
+            var defaultTypes = from type in extensionAssembly.GetTypes()
+                               let attributes = type.GetCustomAttributes<DefaultPlatformImplementationAttribute>()
+                               where attributes.Any()
+                               from attribute in attributes
+                               from ifaceType in attribute.InterfaceTypes
+                               select new
+                               {
+                                   ImplementationType = type,
+                                   InterfaceType = ifaceType
+                               };
+            lock (_defaultImplementations)
+            {
+                foreach (var type in defaultTypes)
+                {
+                    // TODO: Check if the attribute is given to different types and throw an
+                    //       error if it does, just like for the platform implementations do
+                    //       by calling EnsureUniquePlatformImplementations(typeInfo). That's
+                    //       assuming that we don't scrap the concept of a default
+                    //       implementation though.
+
+                    registeredTypes.Add(type.InterfaceType);
+                    if (!_defaultImplementations.ContainsKey(type.InterfaceType))
+                        _defaultImplementations.Add(type.InterfaceType, GetImplementationInstance(type.ImplementationType));
+                }
+            }
+
+            _platformAssemblies.Add(extensionAssembly);
+            PlatformImplementationExtensionRegistered?.Invoke(null, new PlatformImplementationExtensionRegisteredEventArgs(extensionAssembly, registeredTypes));
         }
 
         /// <summary>

@@ -55,25 +55,22 @@ namespace Sharpmake
                 return;
 
             // Ignores if the assembly does not declare itself as a Sharpmake extension.
-            if (extensionAssembly.GetCustomAttribute<SharpmakeExtensionAttribute>() != null)
+            if (!ExtensionLoader.ExtensionChecker.IsSharpmakeExtension(extensionAssembly))
+                return;
+
+            foreach (Type classType in extensionAssembly.GetTypes())
             {
-                if (extensionAssembly.ReflectionOnly)
-                    throw new InvalidOperationException("Cannot register extensions from an assembly that was loaded in reflection-only mode");
-
-                foreach (Type classType in extensionAssembly.GetTypes())
+                foreach (MethodInfo methodInfo in classType.GetMethods().Where(m => m.GetCustomAttributes<BuilderEventAttribute>().Any()))
                 {
-                    foreach (MethodInfo methodInfo in classType.GetMethods().Where(m => m.GetCustomAttributes<BuilderEventAttribute>().Any()))
-                    {
-                        if (!methodInfo.IsStatic)
-                            throw new Exception($"Method {methodInfo.Name} from assembly {extensionAssembly.FullName} must be static");
+                    if (!methodInfo.IsStatic)
+                        throw new Exception($"Method {methodInfo.Name} from assembly {extensionAssembly.FullName} must be static");
 
-                        EventInfo ev = _builder.GetType().GetEvents().FirstOrDefault(e => e.Name == methodInfo.Name);
-                        if (ev == null)
-                            throw new Exception($"Can't find {methodInfo.Name} event in Builder class");
+                    EventInfo ev = _builder.GetType().GetEvents().FirstOrDefault(e => e.Name == methodInfo.Name);
+                    if (ev == null)
+                        throw new Exception($"Can't find {methodInfo.Name} event in Builder class");
 
-                        Delegate handler = Delegate.CreateDelegate(ev.EventHandlerType, null, methodInfo);
-                        ev.AddEventHandler(_builder, handler);
-                    }
+                    Delegate handler = Delegate.CreateDelegate(ev.EventHandlerType, null, methodInfo);
+                    ev.AddEventHandler(_builder, handler);
                 }
             }
         }
