@@ -77,7 +77,7 @@ namespace Sharpmake
         private static readonly IDictionary<PlatformImplementation, object> _implementations = new Dictionary<PlatformImplementation, object>(new PlatformImplementationComparer());
         private static readonly IDictionary<Type, object> _defaultImplementations = new Dictionary<Type, object>();
         private static readonly ISet<object> _implementationInstances = new HashSet<object>();
-        private static readonly ISet<Assembly> _platformAssemblies = new HashSet<Assembly>();
+        private static readonly ISet<Assembly> _parsedAssemblies = new HashSet<Assembly>();
 
         static PlatformRegistry()
         {
@@ -131,7 +131,7 @@ namespace Sharpmake
                 throw new NotSupportedException("Assembly does not have any location : not supported.");
 
             // Has that assembly already been checked for platform stuff?
-            if (_platformAssemblies.Any(assembly => assembly.Location == extensionAssembly.Location))
+            if (_parsedAssemblies.Any(assembly => assembly.Location == extensionAssembly.Location))
                 return;
 
             // Go through all the types declared in the Sharpmake extension assembly and look
@@ -146,16 +146,19 @@ namespace Sharpmake
 
             var registeredTypes = new List<Type>();
 
-            lock (_implementations)
+            if (typeInfos.Any())
             {
-                // Make sure that our platform implementations are unique.
-                EnsureUniquePlatformImplementations(typeInfos);
-
-                foreach (var type in typeInfos)
+                lock (_implementations)
                 {
-                    Type ifaceType = type.Implementation.InterfaceType;
-                    registeredTypes.Add(ifaceType);
-                    RegisterImplementationImplNoLock(type.Implementation.Platform, ifaceType, GetImplementationInstance(type.ConcreteType));
+                    // Make sure that our platform implementations are unique.
+                    EnsureUniquePlatformImplementations(typeInfos);
+
+                    foreach (var type in typeInfos)
+                    {
+                        Type ifaceType = type.Implementation.InterfaceType;
+                        registeredTypes.Add(ifaceType);
+                        RegisterImplementationImplNoLock(type.Implementation.Platform, ifaceType, GetImplementationInstance(type.ConcreteType));
+                    }
                 }
             }
 
@@ -170,24 +173,30 @@ namespace Sharpmake
                                    ImplementationType = type,
                                    InterfaceType = ifaceType
                                };
-            lock (_defaultImplementations)
-            {
-                foreach (var type in defaultTypes)
-                {
-                    // TODO: Check if the attribute is given to different types and throw an
-                    //       error if it does, just like for the platform implementations do
-                    //       by calling EnsureUniquePlatformImplementations(typeInfo). That's
-                    //       assuming that we don't scrap the concept of a default
-                    //       implementation though.
 
-                    registeredTypes.Add(type.InterfaceType);
-                    if (!_defaultImplementations.ContainsKey(type.InterfaceType))
-                        _defaultImplementations.Add(type.InterfaceType, GetImplementationInstance(type.ImplementationType));
+            if (defaultTypes.Any())
+            {
+                lock (_defaultImplementations)
+                {
+                    foreach (var type in defaultTypes)
+                    {
+                        // TODO: Check if the attribute is given to different types and throw an
+                        //       error if it does, just like for the platform implementations do
+                        //       by calling EnsureUniquePlatformImplementations(typeInfo). That's
+                        //       assuming that we don't scrap the concept of a default
+                        //       implementation though.
+
+                        registeredTypes.Add(type.InterfaceType);
+                        if (!_defaultImplementations.ContainsKey(type.InterfaceType))
+                            _defaultImplementations.Add(type.InterfaceType, GetImplementationInstance(type.ImplementationType));
+                    }
                 }
             }
 
-            _platformAssemblies.Add(extensionAssembly);
-            PlatformImplementationExtensionRegistered?.Invoke(null, new PlatformImplementationExtensionRegisteredEventArgs(extensionAssembly, registeredTypes));
+            _parsedAssemblies.Add(extensionAssembly);
+
+            if (typeInfos.Any() || defaultTypes.Any())
+                PlatformImplementationExtensionRegistered?.Invoke(null, new PlatformImplementationExtensionRegisteredEventArgs(extensionAssembly, registeredTypes));
         }
 
         /// <summary>
