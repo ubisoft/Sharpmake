@@ -656,8 +656,16 @@ namespace Sharpmake.Application
                     foreach (var file in diff.Value)
                         DebugWriteLine($"      {++j}/{diff.Value.Count}  {file}");
 
-                    foreach (var diffLine in diff.Key.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
-                        DebugWriteLine($"    {diffLine}");
+                    var diffLines = diff.Key.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (diffLines.Length == 0)
+                    {
+                        DebugWriteLine($"        // only whitespace or casing changes");
+                    }
+                    else
+                    {
+                        foreach (var diffLine in diffLines)
+                            DebugWriteLine($"    {diffLine}");
+                    }
                 }
             }
         }
