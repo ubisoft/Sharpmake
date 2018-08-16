@@ -288,7 +288,7 @@ namespace Sharpmake
             // Generate an library
             cp.GenerateExecutable = false;
 
-            // Set the level at which the compiler  
+            // Set the level at which the compiler
             // should start displaying warnings.
             cp.WarningLevel = 4;
 
@@ -342,7 +342,9 @@ namespace Sharpmake
 
         internal List<string> GetSourceFiles(string[] sources)
         {
-            List<string> sourceFiles = new List<string>(sources);
+            var visiting = new Strings(new FileSystemStringComparer(), sources);
+
+            var sourceFiles = new List<string>(visiting);
 
             // Get all using namespace from sourceFiles
             for (int i = 0; i < sourceFiles.Count; ++i)
@@ -356,8 +358,11 @@ namespace Sharpmake
 
                     foreach (string include in includes)
                     {
-                        if (!sourceFiles.Contains(include))
+                        if (!visiting.Contains(include))
+                        {
+                            visiting.Add(include);
                             sourceFiles.Add(include);
+                        }
                     }
                 }
                 else
