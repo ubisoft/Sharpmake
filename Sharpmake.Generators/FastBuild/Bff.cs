@@ -580,6 +580,10 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
                         string clangFileLanguage = String.Empty;
 
+                        string previousCppLanguageStdSetting;
+                        if (!confCmdLineOptions.TryGetValue("CppLanguageStd", out previousCppLanguageStdSetting))
+                            previousCppLanguageStdSetting = null;
+
                         if (isCompileAsCFile)
                         {
                             fastBuildUsingPlatformConfig = platformBff.CConfigName;
@@ -1148,6 +1152,11 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         confCmdLineOptions["ExceptionHandling"] = previousExceptionSettings;
+
+                        if (previousCppLanguageStdSetting == null)
+                            confCmdLineOptions.Remove("CppLanguageStd");
+                        else
+                            confCmdLineOptions["CppLanguageStd"] = previousCppLanguageStdSetting;
 
                         string outputDirectory = Path.GetDirectoryName(fastBuildOutputFile);
 
