@@ -93,7 +93,11 @@ namespace Sharpmake.Generators.FastBuild
 
         public static string GetShortProjectName(Project project, Configuration conf)
         {
-            return (project.Name + "_" + conf.Target.Name + "_" + conf.Target.GetPlatform()).Replace(' ', '_');
+            string platformString = conf.Platform.ToString();
+            if (conf.Platform >= Platform._reserved9)
+                platformString = Util.GetSimplePlatformString(conf.Platform).ToLower();
+
+            return (project.Name + "_" + conf.Target.Name + "_" + platformString).Replace(' ', '_');
         }
 
         public static string GetPlatformSpecificDefine(Platform platform)
