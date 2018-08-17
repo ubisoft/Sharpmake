@@ -1,12 +1,14 @@
 using System;
 using Sharpmake;
-using SharpmakeGen.Platforms;
+
+[module: Sharpmake.Include("*/Sharpmake.*.sharpmake.cs")]
 
 namespace SharpmakeGen.Samples
 {
-    public abstract class SampleProject : SharpmakeBaseProject
+    public abstract class SampleProject : Common.SharpmakeBaseProject
     {
         public SampleProject()
+            : base(excludeSharpmakeFiles: false)
         {
             SourceRootPath = @"[project.RootPath]\samples\[project.Name]";
             SourceFilesExcludeRegex.Add(
@@ -19,10 +21,10 @@ namespace SharpmakeGen.Samples
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
-			
+
             conf.SolutionFolder = "Samples";
             conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]\Samples";
-			
+
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
@@ -98,15 +100,6 @@ namespace SharpmakeGen.Samples
         public PackageReferencesProject()
         {
             Name = "PackageReferences";
-        }
-    }
-
-    [Generate]
-    public class SharpmakeGenProject : SampleProject
-    {
-        public SharpmakeGenProject()
-        {
-            Name = "SharpmakeGen";
         }
     }
 

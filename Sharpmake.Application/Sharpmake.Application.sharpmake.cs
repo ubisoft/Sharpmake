@@ -1,0 +1,31 @@
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Sharpmake;
+
+namespace SharpmakeGen
+{
+    [Generate]
+    public class SharpmakeApplicationProject : Common.SharpmakeBaseProject
+    {
+        public SharpmakeApplicationProject()
+        {
+            Name = "Sharpmake.Application";
+            ApplicationManifest = "app.manifest";
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.Output = Configuration.OutputType.DotNetConsoleApp;
+
+            conf.ReferencesByName.Add("System.Windows.Forms");
+
+            conf.AddPrivateDependency<SharpmakeProject>(target);
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+            conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
+        }
+    }
+}

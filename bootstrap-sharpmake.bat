@@ -5,7 +5,6 @@ setlocal
 cd /d %~dp0%
 
 set SHARPMAKE_EXECUTABLE=%~dp0%bin\debug\Sharpmake.Application.exe
-set SHARPMAKEGEN_PATH=samples\SharpmakeGen
 
 if "%VS140COMNTOOLS%"=="" (
     echo ERROR: Cannot determine the location of the VS Common Tools folder.
@@ -20,10 +19,9 @@ if "%VS140COMNTOOLS%"=="" (
 @call :BuildCsproj Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj Debug AnyCPU
 @call :BuildCsproj Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
 
-echo  cd /d %SHARPMAKEGEN_PATH%
-cd /d %SHARPMAKEGEN_PATH%
-echo @call %SHARPMAKE_EXECUTABLE% "/sources(\"SharpmakeGen.sharpmake.cs\")" /verbose
-@call %SHARPMAKE_EXECUTABLE% /sources("SharpmakeGen.sharpmake.cs") /verbose
+set SM_CMD=%SHARPMAKE_EXECUTABLE% /sources("Sharpmake.Main.sharpmake.cs") /verbose
+echo %SM_CMD%
+@call %SM_CMD%
 popd
 
 echo Sharpmake solution generated.
@@ -32,7 +30,7 @@ goto end
 @REM -----------------------------------------------------------------------
 :BuildCsproj
 echo Compiling %~1 in "%~2|%~3"...
-msbuild /nologo /verbosity:minimal /p:Configuration="%~2" /p:Platform="%~3" "%~1"
+msbuild /nologo /verbosity:quiet /p:Configuration="%~2" /p:Platform="%~3" "%~1"
 if errorlevel 1 (
     echo ERROR: Failed to compile %~1 in "%~2|%~3".
     goto:error

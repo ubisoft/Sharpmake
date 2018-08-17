@@ -1,18 +1,17 @@
 using System;
 using Sharpmake;
 
-[module: Sharpmake.Include("../../Sharpmake.Extensions/*/Sharpmake.*.sharpmake.cs")]
+[module: Sharpmake.Include("*/Sharpmake.*.sharpmake.cs")]
 
 namespace SharpmakeGen.Extensions
 {
-    public abstract class ExtensionProject : SharpmakeBaseProject
+    public abstract class ExtensionProject : Common.SharpmakeBaseProject
     {
         public ExtensionProject()
         {
             SourceRootPath = @"[project.RootPath]\Sharpmake.Extensions\[project.Name]";
             AssemblyName = "[project.Name]";
             RootNamespace = "Sharpmake";
-            SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");
         }
 
         public override void ConfigureAll(Configuration conf, Target target)

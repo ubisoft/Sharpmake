@@ -1,5 +1,15 @@
 .p4ignore
 
+### Sharpmake specifics
+# by default, ignore all solution and projects
+*.sln
+*.csproj
+# but negate for the following, mandatorily versionned
+!Sharpmake/Sharpmake.csproj
+!Sharpmake.Application/Sharpmake.Application.csproj
+!Sharpmake.Generators/Sharpmake.Generators.csproj
+!Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj
+
 # Samples generated projects
 /samples/*/projects/*
 samples/winformssubtypesdb.bin
@@ -46,5 +56,6 @@ _ReSharper*/
 # Other
 *.orig
 .project
+project.json
 project.lock.json
 Sharpmake.VC.db
