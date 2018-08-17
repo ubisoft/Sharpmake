@@ -106,6 +106,7 @@
     <Compile Include="SharpmakeExtension.cs" />
     <Compile Include="Solution.Configuration.cs" />
     <Compile Include="Solution.cs" />
+    <Compile Include="SourceAttributeParser.cs" />
     <Compile Include="Strings.cs" />
     <Compile Include="Target.cs" />
     <Compile Include="ThreadPool.cs" />

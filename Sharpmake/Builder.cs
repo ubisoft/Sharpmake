@@ -122,6 +122,8 @@ namespace Sharpmake
         private ConcurrentDictionary<Type, GenerationOutput> _generationReport = new ConcurrentDictionary<Type, GenerationOutput>();
         private HashSet<Type> _buildScheduledType = new HashSet<Type>();
 
+        private readonly List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
+
         public Builder(
             BuildContext.BaseBuildContext context,
             bool multithreaded,
@@ -370,6 +372,10 @@ namespace Sharpmake
 
             // Add generators assembly to be able to reference them from .sharpmake.cs files
             assembler.Assemblies.Add(SharpmakeGeneratorAssembly.Value);
+
+            // Add attribute parsers
+            foreach (var parser in _attributeParsers)
+                assembler.AttributeParsers.Add(parser);
 
             Assembly newAssembly = assembler.BuildAssembly(sharpmakeFiles.ToArray());
 
@@ -918,6 +924,11 @@ namespace Sharpmake
                 else
                     GenerateProjectFile(pair);
             }
+        }
+
+        public void AddAttributeParser(ISourceAttributeParser parser)
+        {
+            _attributeParsers.Add(parser);
         }
 
         #region Log

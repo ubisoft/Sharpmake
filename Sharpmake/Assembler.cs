@@ -39,6 +39,13 @@ namespace Sharpmake
         /// </summary>
         public List<string> References { get { return _references; } }
 
+        /// <summary>
+        /// Source attribute parser to use to add configuration based on source code
+        /// </summary>
+        public List<ISourceAttributeParser> AttributeParsers { get { return _attributeParsers; } }
+
+        public bool UseDefaultParsers = true;
+
         public bool UseDefaultReferences = true;
 
         public static readonly string[] DefaultReferences = { "System.dll", "System.Core.dll" };
@@ -236,6 +243,7 @@ namespace Sharpmake
         private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
         public List<string> _references = new List<string>();
+        private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
         private const string _dp = @"(/\*.*?\*/|\s)*"; // Discardable Part, we use _dp to make it small in the following line
         private static readonly string s_moduleBaseRegex = $@"^{_dp}\[{_dp}module{_dp}:{_dp}Sharpmake{_dp}\.{_dp}{{0}}{_dp}\({_dp}@?\""(?<{{0}}>.*?)\""{_dp}\){_dp}\]{_dp}(//.*)?$";
         private static readonly Regex s_includeRegex = new Regex(string.Format(s_moduleBaseRegex, "Include"), RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
@@ -369,9 +377,28 @@ namespace Sharpmake
             return cr.CompiledAssembly;
         }
 
+        private List<ISourceAttributeParser> ComputeParsers()
+        {
+            var parsers = AttributeParsers.ToList();
+            if (UseDefaultParsers)
+                AddDefaultParsers(parsers);
+            return parsers;
+        }
+
         internal List<string> GetSourceFiles(string[] sources)
         {
             var context = new AssemblerContext(this, sources);
+            AnalyseSourceFiles(context, ComputeParsers(), sources);
+            return context.SourceFiles;
+        }
+
+        private void AddDefaultParsers(ICollection<ISourceAttributeParser> parsers)
+        {
+
+        }
+
+        private void AnalyseSourceFiles(AssemblerContext context, IEnumerable<ISourceAttributeParser> parsers, string[] sources)
+        {
 
             // Get all using namespace from sourceFiles
             for (int i = 0; i < context.SourceFiles.Count; ++i)
@@ -379,15 +406,37 @@ namespace Sharpmake
                 string sourceFile = context.SourceFiles[i];
                 if (File.Exists(sourceFile))
                 {
-                    AnalyseSourceFile(sourceFile, context);
+                    AnalyseSourceFile(sourceFile, parsers, context);
                 }
                 else
                 {
                     throw new Error("source file not found: " + sourceFile);
                 }
             }
+        }
 
-            return context.SourceFiles;
+        internal void ParseSourceAttributesFromLine(
+            string line,
+            FileInfo sourceFilePath,
+            int lineNumber,
+            IAssemblerContext context
+        )
+        {
+            ParseSourceAttributesFromLine(line, sourceFilePath, lineNumber, ComputeParsers(), context);
+        }
+
+        internal void ParseSourceAttributesFromLine(
+            string line,
+            FileInfo sourceFilePath,
+            int lineNumber,
+            IEnumerable<ISourceAttributeParser> parsers,
+            IAssemblerContext context
+        )
+        {
+            foreach (var parser in parsers)
+            {
+                parser.ParseLine(line, sourceFilePath, lineNumber, context);
+            }
         }
 
         internal static void GetSharpmakeIncludesFromLine(
@@ -471,7 +520,7 @@ namespace Sharpmake
             }
         }
 
-        private void AnalyseSourceFile(string sourceFile, IAssemblerContext context)
+        private void AnalyseSourceFile(string sourceFile, IEnumerable<ISourceAttributeParser> parsers, IAssemblerContext context)
         {
             using (StreamReader reader = new StreamReader(sourceFile))
             {
@@ -485,6 +534,7 @@ namespace Sharpmake
 
                     GetSharpmakeIncludesFromLine(line, sourceFilePath, lineNumber, context);
                     GetSharpmakeReferencesFromLine(line, sourceFilePath, lineNumber, context);
+                    ParseSourceAttributesFromLine(line, sourceFilePath, lineNumber, parsers, context);
 
                     line = reader.ReadLine()?.TrimStart();
 
