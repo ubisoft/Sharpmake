@@ -256,6 +256,35 @@ namespace Sharpmake
             return delegateType.GetMethod("Invoke");
         }
 
+        private class AssemblerContext : IAssemblerContext
+        {
+            private readonly Assembler _assembler;
+            public List<string> SourceFiles;
+            private Strings _visiting;
+
+            public AssemblerContext(Assembler assembler, string[] sources)
+            {
+                _assembler = assembler;
+                _visiting = new Strings(new FileSystemStringComparer(), sources);
+                SourceFiles = new List<string>(_visiting);
+            }
+
+            public void AddSourceFile(string file)
+            {
+                if (!_visiting.Contains(file))
+                {
+                    SourceFiles.Add(file);
+                    _visiting.Add(file);
+                }
+            }
+
+            public void AddReference(string file)
+            {
+                if (!_assembler._references.Contains(file))
+                    _assembler._references.Add(file);
+            }
+        }
+
         private Assembly Build(string libraryFile, params string[] sources)
         {
             List<string> sourceFiles = GetSourceFiles(sources);
@@ -342,28 +371,15 @@ namespace Sharpmake
 
         internal List<string> GetSourceFiles(string[] sources)
         {
-            var visiting = new Strings(new FileSystemStringComparer(), sources);
-
-            var sourceFiles = new List<string>(visiting);
+            var context = new AssemblerContext(this, sources);
 
             // Get all using namespace from sourceFiles
-            for (int i = 0; i < sourceFiles.Count; ++i)
+            for (int i = 0; i < context.SourceFiles.Count; ++i)
             {
-                string sourceFile = sourceFiles[i];
+                string sourceFile = context.SourceFiles[i];
                 if (File.Exists(sourceFile))
                 {
-                    List<string> includes = new List<string>();
-
-                    AnalyseSourceFile(sourceFile, includes);
-
-                    foreach (string include in includes)
-                    {
-                        if (!visiting.Contains(include))
-                        {
-                            visiting.Add(include);
-                            sourceFiles.Add(include);
-                        }
-                    }
+                    AnalyseSourceFile(sourceFile, context);
                 }
                 else
                 {
@@ -371,14 +387,14 @@ namespace Sharpmake
                 }
             }
 
-            return sourceFiles;
+            return context.SourceFiles;
         }
 
         internal static void GetSharpmakeIncludesFromLine(
             string line,
             FileInfo sourceFilePath,
             int lineNumber,
-            ref List<string> includes
+            IAssemblerContext context
         )
         {
             Match match = s_includeRegex.Match(line);
@@ -391,7 +407,7 @@ namespace Sharpmake
             if (Util.IsPathWithWildcards(includeFilename))
             {
                 includeAbsolutePath = includeAbsolutePath ?? Path.Combine(sourceFilePath.DirectoryName, includeFilename);
-                includes.AddRange(Util.DirectoryGetFilesWithWildcards(includeAbsolutePath));
+                context.AddSourceFiles(Util.DirectoryGetFilesWithWildcards(includeAbsolutePath));
             }
             else
             {
@@ -402,7 +418,7 @@ namespace Sharpmake
                 if (!Util.FileExists(includeAbsolutePath))
                     throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found {0}", includeFilename);
 
-                includes.Add(includeAbsolutePath);
+                context.AddSourceFile(includeAbsolutePath);
             }
         }
 
@@ -410,7 +426,7 @@ namespace Sharpmake
             string line,
             FileInfo sourceFilePath,
             int lineNumber,
-            ref List<string> references
+            IAssemblerContext context
         )
         {
             Match match = s_referenceRegex.Match(line);
@@ -423,7 +439,7 @@ namespace Sharpmake
             if (Util.IsPathWithWildcards(referenceFilename))
             {
                 referenceAbsolutePath = referenceAbsolutePath ?? Path.Combine(sourceFilePath.DirectoryName, referenceFilename);
-                references.AddRange(Util.DirectoryGetFilesWithWildcards(referenceAbsolutePath));
+                context.AddReferences(Util.DirectoryGetFilesWithWildcards(referenceAbsolutePath));
             }
             else
             {
@@ -451,11 +467,11 @@ namespace Sharpmake
                     }
                 }
 
-                references.Add(referenceAbsolutePath);
+                context.AddReference(referenceAbsolutePath);
             }
         }
 
-        private void AnalyseSourceFile(string sourceFile, List<string> includes)
+        private void AnalyseSourceFile(string sourceFile, IAssemblerContext context)
         {
             using (StreamReader reader = new StreamReader(sourceFile))
             {
@@ -467,8 +483,8 @@ namespace Sharpmake
                 {
                     ++lineNumber;
 
-                    GetSharpmakeIncludesFromLine(line, sourceFilePath, lineNumber, ref includes);
-                    GetSharpmakeReferencesFromLine(line, sourceFilePath, lineNumber, ref _references);
+                    GetSharpmakeIncludesFromLine(line, sourceFilePath, lineNumber, context);
+                    GetSharpmakeReferencesFromLine(line, sourceFilePath, lineNumber, context);
 
                     line = reader.ReadLine()?.TrimStart();
 

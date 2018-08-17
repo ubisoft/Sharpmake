@@ -76,6 +76,7 @@
     <Compile Include="GenerationOutput.cs" />
     <Compile Include="GeneratorManager.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IAssemblerContext.cs" />
     <Compile Include="ICommandLineInterface.cs" />
     <Compile Include="IFastBuildCompilerSettings.cs" />
     <Compile Include="IPlatformDescriptor.cs" />

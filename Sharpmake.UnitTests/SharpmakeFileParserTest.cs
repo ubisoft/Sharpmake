@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -41,13 +42,30 @@ namespace Sharpmake.UnitTests
         }
 
         #region Include
+
+        private class AssemblerContext : IAssemblerContext
+        {
+            public List<string> References = new List<string>();
+            public List<string> Sources = new List<string>();
+
+            public void AddReference(string file)
+            {
+                References.Add(file);
+            }
+
+            public void AddSourceFile(string file)
+            {
+                Sources.Add(file);
+            }
+        }
+
         [Test]
         public void EmptyLine()
         {
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine("", _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine("", _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(0));
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -60,11 +78,11 @@ namespace Sharpmake.UnitTests
 
             string line = $@"[module: Sharpmake.Include(""{sharpmakeIncludedFile}"")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
         }
 
         [Test]
@@ -77,11 +95,11 @@ namespace Sharpmake.UnitTests
 
             string line = $@"[module: Sharpmake.Include(""{sharpmakeIncludeFullPath}"")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
         }
 
         [Test]
@@ -94,11 +112,11 @@ namespace Sharpmake.UnitTests
 
             string line = $"   [  module\t : Sharpmake  .\t Include ( @\"{sharpmakeIncludedFile}\" \t) ]  \t";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, includes.First());
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
         }
 
         [Test]
@@ -120,12 +138,12 @@ namespace Sharpmake.UnitTests
 
             string line = @"[module/*:Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]/**/: Sharpmake/*.Reference*/.Include(/*asda(@"" /*dsa*/@""folder*/sub*/*file*.cs"")]// asdmvie  aas */ asd [module: Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(5));
-            CollectionAssert.IsSubsetOf(includes, sharpmakeIncludesFullPath);
-            foreach (string include in includes)
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(5));
+            CollectionAssert.IsSubsetOf(assemblerContext.Sources, sharpmakeIncludesFullPath);
+            foreach (string include in assemblerContext.Sources)
                 StringAssert.DoesNotContain(include, "nottoinclude.sharpmake.cs");
         }
 
@@ -148,12 +166,12 @@ namespace Sharpmake.UnitTests
 
             string line = @"/**/[module: Sharpmake.Include(@""folder*/sub*/*file*.cs"")] // asdmvie aas */ [module: Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(5));
-            CollectionAssert.IsSubsetOf(includes, sharpmakeIncludesFullPath);
-            foreach (string include in includes)
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(5));
+            CollectionAssert.IsSubsetOf(assemblerContext.Sources, sharpmakeIncludesFullPath);
+            foreach (string include in assemblerContext.Sources)
                 StringAssert.DoesNotContain(include, "nottoinclude.sharpmake.cs");
         }
 
@@ -175,10 +193,10 @@ namespace Sharpmake.UnitTests
 
             string line = @"//**/[module: Sharpmake.Include(@""folder*/sub*/*file*.cs"")] // asdmvie aas */ [module: Sharpmake.Include(@""folder/sub1/nottoinclude.sharpmake.cs"")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(0));
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -200,12 +218,12 @@ namespace Sharpmake.UnitTests
 
             string line = @"[module: Sharpmake.Include(""folder/*sub*/file*.cs"")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(5));
-            CollectionAssert.IsSubsetOf(includes, sharpmakeIncludesFullPath);
-            foreach (string include in includes)
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(5));
+            CollectionAssert.IsSubsetOf(assemblerContext.Sources, sharpmakeIncludesFullPath);
+            foreach (string include in assemblerContext.Sources)
                 StringAssert.DoesNotContain(include, "anotherfiletonotinclude.sharpmake.cs");
         }
 
@@ -218,10 +236,10 @@ namespace Sharpmake.UnitTests
 
             string line = $"\t   \t [module:\t \t SharpmakeAInclude(\t stuffstuff \"{sharpmakeIncludedFile}\")]";
 
-            var includes = new List<string>();
-            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, ref includes);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeIncludesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(includes.Count, Is.EqualTo(0));
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(0));
         }
         #endregion
 
@@ -236,11 +254,11 @@ namespace Sharpmake.UnitTests
 
             string line = $@"[module: Sharpmake.Reference(""{sharpmakeReferencedFile}"")]";
 
-            var references = new List<string>();
-            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(references.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, references.First());
+            Assert.That(assemblerContext.References.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.References.First());
         }
 
         [Test]
@@ -253,11 +271,11 @@ namespace Sharpmake.UnitTests
 
             string line = $@"[module: Sharpmake.Reference(""{sharpmakeReferenceFullPath}"")]";
 
-            var references = new List<string>();
-            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(references.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, references.First());
+            Assert.That(assemblerContext.References.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.References.First());
         }
 
         [Test]
@@ -270,11 +288,11 @@ namespace Sharpmake.UnitTests
 
             string line = $"   [  module\t : Sharpmake  .\t Reference ( @\"{sharpmakeReferencedFile}\" \t) ]  \t";
 
-            var references = new List<string>();
-            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(references.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, references.First());
+            Assert.That(assemblerContext.References.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.References.First());
         }
 
         [Test]
@@ -286,10 +304,10 @@ namespace Sharpmake.UnitTests
 
             string line = $"\t   \t [module:\t \t SharpmakeAReference(\t stuffstuff \"{sharpmakeReferencedFile}\")]";
 
-            var references = new List<string>();
-            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, ref references);
+            var assemblerContext = new AssemblerContext();
+            Assembler.GetSharpmakeReferencesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(references.Count, Is.EqualTo(0));
+            Assert.That(assemblerContext.References.Count, Is.EqualTo(0));
         }
         #endregion
     }
