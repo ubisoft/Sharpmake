@@ -227,6 +227,7 @@ namespace Sharpmake
             PRIFilesExtensions.Clear();
             ResourceFiles.Clear();
             NoneExtensions.Clear();
+            VsctExtension.Clear();
 
             AddTargets(DebugProjectGenerator.GetTargets());
         }
