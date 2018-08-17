@@ -59,3 +59,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\14.0\Default Editors\sharpmake]
 "Custom"="{8B382828-6202-11D1-8870-0000F87579D2}"
 "Type"=dword:00000001
+
+; VISUAL STUDIO 2017
+[HKEY_USERS\VS2017\Software\Microsoft\VisualStudio\15.0_VS_INSTANCEID\FileExtensionMapping\sharpmake]
+@="{8B382828-6202-11D1-8870-0000F87579D2}"
+"LogViewID"="{694DD9B6-B865-4C5B-AD85-86356E9C88DC}"
+
+[HKEY_USERS\VS2017\Software\Microsoft\VisualStudio\15.0_VS_INSTANCEID\Default Editors\sharpmake]
+"Custom"="{8B382828-6202-11D1-8870-0000F87579D2}"
+"Type"=dword:00000001
