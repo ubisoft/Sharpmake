@@ -521,9 +521,10 @@ namespace Sharpmake.Generators.FastBuild
 
                             // test prefixes, usually it is either -l or lib, to know if we can shorten it
                             // Note that the output filename prefix is not case sensitive (ideally it should depend on the OS)
+                            string libPrefix = vcxprojPlatform.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
                             Tuple<string, StringComparison>[] prefixesToTest = {
                                 Tuple.Create(prefixExt, StringComparison.Ordinal),
-                                Tuple.Create(vcxprojPlatform.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib), StringComparison.OrdinalIgnoreCase)
+                                Tuple.Create(libPrefix, StringComparison.OrdinalIgnoreCase)
                             };
 
                             var finalDependencies = new Strings();
@@ -559,7 +560,8 @@ namespace Sharpmake.Generators.FastBuild
                                     }
                                     else
                                     {
-                                        if (subStringStartIndex != 0 && !additionalDependency.Contains(Util.UnixSeparator) && !additionalDependency.Contains(Util.WindowsSeparator))
+                                        bool prefixed = subStringStartIndex != 0;
+                                        if (prefixed)
                                         {
                                             // the dependency is a "global" lib (ie it doesn't contain a file path)
                                             // use the -l switch to link it.
@@ -567,6 +569,9 @@ namespace Sharpmake.Generators.FastBuild
                                         }
                                         else
                                         {
+                                            if (additionalDependency[0] != '$') // quick test that the path begins with $CurrentBffPath$
+                                                builder.LogWarningLine($"{additionalDependency} doesn't follow naming convention {libPrefix}NAME.ext. Add it to LibraryFiles with its full path or the link may fail.");
+
                                             // the dependency is a "local" lib use the file path to link it
                                             finalDependencies.Add(@"""" + additionalDependency + @"""");
                                         }
