@@ -2260,13 +2260,15 @@ namespace Sharpmake
         public string Path;
         public Guid Guid;
         public bool IsDefault;
+        public Guid BaseInterpreterGuid;
 
-        public PythonVirtualEnvironment(string name, string path, bool isDefault)
+        public PythonVirtualEnvironment(string name, string path, bool isDefault, Guid baseInterpreterGuid = default(Guid))
         {
             Name = name;
             Path = path;
             Guid = Util.BuildGuid(path);
             IsDefault = isDefault;
+            BaseInterpreterGuid = baseInterpreterGuid;
         }
     }
 

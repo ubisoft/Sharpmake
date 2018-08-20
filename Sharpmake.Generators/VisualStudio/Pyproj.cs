@@ -142,6 +142,21 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
+                foreach (PythonVirtualEnvironment virtualEnvironment in _project.VirtualEnvironments)
+                {
+                    if (virtualEnvironment.IsDefault)
+                    {
+                        string baseInterpreterRegisterKeyName = string.Format(@"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\{0}\PythonTools\Interpreters\{{{1}}}",
+                            devEnvRange.MinDevEnv.GetVisualVersionString(), virtualEnvironment.BaseInterpreterGuid.ToString());
+                        string baseInterpreterDescription = (string)Registry.GetValue(baseInterpreterRegisterKeyName, "Description", "");
+                        if (baseInterpreterDescription != string.Empty)
+                        {
+                            currentInterpreterId = string.Format("{{{0}}}", virtualEnvironment.Guid.ToString());
+                            currentInterpreterVersion = (string)Registry.GetValue(baseInterpreterRegisterKeyName, "Version", currentInterpreterVersion);
+                        }
+                    }
+                }
+
                 using (resolver.NewScopedParameter("interpreterId", currentInterpreterId))
                 using (resolver.NewScopedParameter("interpreterVersion", currentInterpreterVersion))
                 {
@@ -154,9 +169,9 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     Write(Template.Project.ProjectItemGroupBegin, writer, resolver);
                     using (resolver.NewScopedParameter("name", virtualEnvironment.Name))
-                    using (resolver.NewScopedParameter("version", defaultInterpreterVersion))
+                    using (resolver.NewScopedParameter("version", currentInterpreterVersion))
                     using (resolver.NewScopedParameter("basePath", virtualEnvironment.Path))
-                    using (resolver.NewScopedParameter("baseGuid", defaultInterpreter))
+                    using (resolver.NewScopedParameter("baseGuid", virtualEnvironment.BaseInterpreterGuid))
                     using (resolver.NewScopedParameter("guid", virtualEnvironment.Guid))
                     {
                         Write(Template.Project.VirtualEnvironmentInterpreter, writer, resolver);
@@ -184,7 +199,7 @@ namespace Sharpmake.Generators.VisualStudio
                         }
                     }
                 }
-                else // Set the default interpreter
+                else if (_project.VirtualEnvironments.Count == 0) // Set the default interpreter
                 {
                     using (resolver.NewScopedParameter("guid", currentInterpreterId))
                     using (resolver.NewScopedParameter("version", currentInterpreterVersion))
