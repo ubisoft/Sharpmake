@@ -134,7 +134,7 @@ namespace Sharpmake.Generators.Generic
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
                 using (fileGenerator.Declare("projectName", resolvedProject.ProjectName))
-                using (fileGenerator.Declare("projectFileDirectory", Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName)))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.ProjectRuleBegin);
@@ -154,7 +154,7 @@ namespace Sharpmake.Generators.Generic
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
-                using (fileGenerator.Declare("projectFileDirectory", Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName)))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.CleanRuleProject);
