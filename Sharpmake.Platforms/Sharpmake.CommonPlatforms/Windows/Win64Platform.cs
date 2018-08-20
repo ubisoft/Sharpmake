@@ -46,9 +46,6 @@ namespace Sharpmake
             public override string CConfigName => ".win64Config";
             public override bool SupportsResourceFiles => true;
 
-            public static string SDKBinPath { get { return s_SDKBinPath; } set { s_SDKBinPath = value; } }
-            private static string s_SDKBinPath = "";
-
             public override void AddCompilerSettings(
                 IDictionary<string, CompilerSettings> masterCompilerSettings,
                 string compilerName,
@@ -215,10 +212,6 @@ namespace Sharpmake
                     if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
                         resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
 
-                    string resxCompiler;
-                    if (!fastBuildCompilerSettings.ResxCompiler.TryGetValue(devEnv, out resxCompiler))
-                        resxCompiler = SDKBinPath + @"NETFX 4.0 Tools\resgen.exe";
-
                     configurations.Add(
                         configName,
                         new CompilerSettings.Configuration(
@@ -226,7 +219,6 @@ namespace Sharpmake
                             binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath)),
                             linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
                             resourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resCompiler)),
-                            embeddedResourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resxCompiler)),
                             librarian: Path.Combine(@"$LinkerPath$", librarianExe),
                             linker: Path.Combine(@"$LinkerPath$", linkerExe)
                         )

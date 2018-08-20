@@ -94,7 +94,6 @@ Compiler( '[fastbuildCompilerName]' )
     .BinPath                = '[fastBuildBinPath]'
     .LinkerPath             = '[fastBuildLinkerPath]'
     .ResourceCompiler       = '[fastBuildResourceCompiler]'
-    .EmbeddedResourceCompiler = '[fastBuildEmbeddedResourceCompiler]'
     .Compiler               = '[fastBuildCompilerName]'
     .Librarian              = '[fastBuildLibrarian]'
     .Linker                 = '[fastBuildLinker]'
@@ -218,7 +217,7 @@ Compiler( '[fastbuildCompilerName]' )
                 public static string EmbeddedResourceCompilerOptions = @"
     // Resource Compiler options
     // -------------------------
-    .Compiler               = .EmbeddedResourceCompiler
+    .Compiler               = '[fastBuildEmbeddedResourceCompiler]'
     .CompilerOutputPrefix   = '[fastBuildEmbeddedOutputPrefix]'
     .CompilerOutputExtension= '.resources'
     .CompilerOptions        = '/useSourcePath ""%1"" ""%2""'

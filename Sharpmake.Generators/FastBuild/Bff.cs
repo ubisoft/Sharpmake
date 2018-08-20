@@ -894,9 +894,13 @@ namespace Sharpmake.Generators.FastBuild
 
                                         if (projectHasEmbeddedResources)
                                         {
-                                            bffGenerator.Write(Template.ConfigurationFile.EmbeddedResourcesBeginSection);
-                                            bffGenerator.Write(Template.ConfigurationFile.EmbeddedResourceCompilerOptions);
-                                            bffGenerator.Write(Template.ConfigurationFile.EndSection);
+                                            // Only declare the compiler here to avoid potential exceptions caused by GetFragment in targets without a .Net framework
+                                            using (bffGenerator.Declare("fastBuildEmbeddedResourceCompiler", KitsRootPaths.GetNETFXToolsDir(conf.Target.GetFragment<DotNetFramework>()) + "resgen.exe"))
+                                            {
+                                                bffGenerator.Write(Template.ConfigurationFile.EmbeddedResourcesBeginSection);
+                                                bffGenerator.Write(Template.ConfigurationFile.EmbeddedResourceCompilerOptions);
+                                                bffGenerator.Write(Template.ConfigurationFile.EndSection);
+                                            }
                                         }
 
                                         // Exe and DLL will always add an extra objectlist

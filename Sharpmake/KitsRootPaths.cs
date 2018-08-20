@@ -28,6 +28,8 @@ namespace Sharpmake
 
         private static ConcurrentDictionary<DotNetFramework, string> s_netFxKitsDir = new ConcurrentDictionary<DotNetFramework, string>();
 
+        private static ConcurrentDictionary<DotNetFramework, string> s_netFxToolsDir = new ConcurrentDictionary<DotNetFramework, string>();
+
         [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
         public static Options.Vc.General.WindowsTargetPlatformVersion WindowsTargetPlatformVersion { get; private set; } = Options.Vc.General.WindowsTargetPlatformVersion.v8_1;
 
@@ -164,6 +166,52 @@ namespace Sharpmake
             }
 
             throw new NotImplementedException("No NETFXKitsDir associated with " + dotNetFramework);
+        }
+
+        public static string GetNETFXToolsDir(DotNetFramework dotNetFramework)
+        {
+            string netFxToolsDir;
+            if (s_netFxKitsDir.TryGetValue(dotNetFramework, out netFxToolsDir))
+                return netFxToolsDir;
+
+            var microsoftSdksRegistryKeyString = string.Format(@"SOFTWARE{0}\Microsoft\Microsoft SDKs",
+                Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty);
+
+            if(dotNetFramework >= DotNetFramework.v4_6)
+            {
+                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
+                    $@"{microsoftSdksRegistryKeyString}\NETFXSDK\{dotNetFramework.ToVersionString()}\WinSDK-NetFx40Tools-x86",
+                    "InstallationFolder",
+                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX {dotNetFramework.ToVersionString()} Tools\");
+            }
+            else if(dotNetFramework >= DotNetFramework.v4_5_1) // Note: .Net 4.5.2 lacks a NETFX tools release, so we use the previous version
+            {
+                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
+                    $@"{microsoftSdksRegistryKeyString}\Windows\v8.1A\WinSDK-NetFx40Tools-x86",
+                    "InstallationFolder",
+                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\");
+            }
+            else if(dotNetFramework >= DotNetFramework.v4_0)
+            {
+                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
+                    $@"{microsoftSdksRegistryKeyString}\Windows\v8.0A\WinSDK-NetFx40Tools-x86",
+                    "InstallationFolder",
+                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\bin\NETFX 4.0 Tools\");
+            }
+            else if(dotNetFramework >= DotNetFramework.v3_5)
+            {
+                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
+                    $@"{microsoftSdksRegistryKeyString}\Windows\v8.0A\WinSDK-NetFx35Tools-x86",
+                    "InstallationFolder",
+                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\");
+            }
+            else
+            {
+                throw new NotImplementedException("No NETFXToolsDir associated with " + dotNetFramework);
+            }
+
+            s_netFxToolsDir.TryAdd(dotNetFramework, netFxToolsDir);
+            return netFxToolsDir;
         }
     }
 }
