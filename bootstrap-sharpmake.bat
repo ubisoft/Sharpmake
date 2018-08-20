@@ -14,9 +14,6 @@ if "%VS140COMNTOOLS%"=="" (
 
 @call "%VS140COMNTOOLS%VsMSBuildCmd.bat"
 
-@call :BuildCsproj Sharpmake/Sharpmake.csproj Debug AnyCPU
-@call :BuildCsproj Sharpmake.Generators/Sharpmake.Generators.csproj Debug AnyCPU
-@call :BuildCsproj Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj Debug AnyCPU
 @call :BuildCsproj Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
 
 set SM_CMD=%SHARPMAKE_EXECUTABLE% /sources("Sharpmake.Main.sharpmake.cs") /verbose
