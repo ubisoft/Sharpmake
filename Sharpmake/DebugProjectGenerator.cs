@@ -61,16 +61,17 @@ namespace Sharpmake
             RootPath = Path.GetDirectoryName(sourcesArguments[0]);
 
             Assembler assembler = new Assembler();
+            assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
             IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 
             GenerateDebugProject(assemblyInfo, true, new Dictionary<string, Type>());
         }
-
-
-
+        
         private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, IDictionary<string, Type> visited)
         {
-            string displayName = isSetupProject ? "sharpmake_debug" : $"sharpmake_package_{assemblyInfo.Id.GetHashCode():X8}";
+            string displayName = assemblyInfo.DebugProjectName;
+            if (string.IsNullOrEmpty(displayName))
+                displayName = isSetupProject ? "sharpmake_debug" : $"sharpmake_package_{assemblyInfo.Id.GetHashCode():X8}";
 
             Type generatedProject;
             if (visited.TryGetValue(assemblyInfo.Id, out generatedProject))

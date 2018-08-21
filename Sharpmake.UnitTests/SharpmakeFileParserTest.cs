@@ -72,6 +72,11 @@ namespace Sharpmake.UnitTests
             {
                 throw new NotImplementedException();
             }
+
+            public void SetDebugProjectName(string name)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [Test]

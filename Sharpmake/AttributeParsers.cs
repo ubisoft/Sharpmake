@@ -83,4 +83,18 @@ namespace Sharpmake
             }
         }
     }
+
+    public class DebugProjectNameAttributeParser : SimpleSourceAttributeParser
+    {
+        private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
+
+        public DebugProjectNameAttributeParser() : base("DebugProjectName", 1, "Sharpmake")
+        {
+        }
+
+        public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
+        {
+            context.SetDebugProjectName(parameters[0]);
+        }
+    }
 }

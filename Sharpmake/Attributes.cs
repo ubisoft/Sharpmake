@@ -137,4 +137,14 @@ namespace Sharpmake
             FileName = fileName;
         }
     }
+
+    [System.AttributeUsage(AttributeTargets.Module, AllowMultiple = false)]
+    public class DebugProjectName : Attribute
+    {
+        public string Name { get; }
+        public DebugProjectName(string name)
+        {
+            Name = name;
+        }
+    }
 }

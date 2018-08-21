@@ -32,11 +32,13 @@ namespace Sharpmake
         void AddReference(IAssemblyInfo info);
         void AddSourceAttributeParser(ISourceAttributeParser parser);
         IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files);
+        void SetDebugProjectName(string name);
     }
 
     public interface IAssemblyInfo
     {
         string Id { get; }
+        string DebugProjectName { get; }
         Assembly Assembly { get; }
         IReadOnlyCollection<string> SourceFiles { get; }
         IReadOnlyCollection<string> References { get; }

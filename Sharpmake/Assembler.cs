@@ -53,6 +53,7 @@ namespace Sharpmake
         private class AssemblyInfo : IAssemblyInfo
         {
             public string Id { get; set; }
+            public string DebugProjectName { get; set; }
             public Assembly Assembly { get; set; }
             public IReadOnlyCollection<string> SourceFiles => _sourceFiles;
             public IReadOnlyCollection<string> References => _references;
@@ -289,6 +290,7 @@ namespace Sharpmake
             public List<ISourceAttributeParser> AllParsers = new List<ISourceAttributeParser>();
             public List<ISourceAttributeParser> ImportedParsers = new List<ISourceAttributeParser>();
             private readonly IBuilderContext _builderContext;
+            public string DebugProjectName;
 
             public AssemblerContext(Assembler assembler, IBuilderContext builderContext, string[] sources)
             {
@@ -341,6 +343,11 @@ namespace Sharpmake
                 var loadInfo = _builderContext.BuildAndLoadSharpmakeFiles(AllParsers, files);
                 this.AddSourceAttributeParsers(loadInfo.Parsers);
                 return loadInfo.AssemblyInfo;
+            }
+
+            public void SetDebugProjectName(string name)
+            {
+                DebugProjectName = name;
             }
 
             public BuilderCompileErrorBehavior CompileErrorBehavior => _builderContext?.CompileErrorBehavior ?? BuilderCompileErrorBehavior.ThrowException;
@@ -452,6 +459,7 @@ namespace Sharpmake
             return new AssemblyInfo()
             {
                 Id = string.Join(";", context.SourceFiles),
+                DebugProjectName = context.DebugProjectName,
                 UseDefaultReferences = UseDefaultReferences,
                 _sourceFiles = context.SourceFiles.ToList(),
                 _references = _references.ToList(),
