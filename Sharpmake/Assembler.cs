@@ -287,6 +287,7 @@ namespace Sharpmake
             public List<string> SourceFiles;
             private Strings _visiting;
             public List<ISourceAttributeParser> AllParsers = new List<ISourceAttributeParser>();
+            public List<ISourceAttributeParser> ImportedParsers = new List<ISourceAttributeParser>();
             private readonly IBuilderContext _builderContext;
 
             public AssemblerContext(Assembler assembler, IBuilderContext builderContext, string[] sources)
@@ -326,12 +327,19 @@ namespace Sharpmake
                 }
             }
 
+            public void AddSourceAttributeParser(ISourceAttributeParser parser)
+            {
+                AllParsers.Add(parser);
+                ImportedParsers.Add(parser);
+            }
+
             public IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files)
             {
                 if (_builderContext == null)
                     throw new NotSupportedException("BuildAndLoadSharpmakeFiles is not supported on builds without a IBuilderContext");
 
                 var loadInfo = _builderContext.BuildAndLoadSharpmakeFiles(AllParsers, files);
+                this.AddSourceAttributeParsers(loadInfo.Parsers);
                 return loadInfo.AssemblyInfo;
             }
 
@@ -466,20 +474,33 @@ namespace Sharpmake
 
         private void AnalyseSourceFiles(AssemblerContext context)
         {
+            var newParsers = Enumerable.Empty<ISourceAttributeParser>();
+            var allParsers = context.AllParsers.ToList(); // Copy, as it may be modified when parsing other files
+            int partiallyParsedCount = 0;
 
-            // Get all using namespace from sourceFiles
-            for (int i = 0; i < context.SourceFiles.Count; ++i)
+            do
             {
-                string sourceFile = context.SourceFiles[i];
-                if (File.Exists(sourceFile))
+                // Get all using namespace from sourceFiles
+                for (int i = 0; i < context.SourceFiles.Count; ++i)
                 {
-                    AnalyseSourceFile(sourceFile, context.AllParsers, context);
+                    string sourceFile = context.SourceFiles[i];
+                    if (File.Exists(sourceFile))
+                    {
+                        AnalyseSourceFile(sourceFile, (i < partiallyParsedCount) ? newParsers : allParsers, context);
+                    }
+                    else
+                    {
+                        throw new Error("source file not found: " + sourceFile);
+                    }
                 }
-                else
-                {
-                    throw new Error("source file not found: " + sourceFile);
-                }
-            }
+                // Get parsers discovered while parsing these files
+                // We need to reparse all files currently in the list (partiallyParsedCount) again with the new parsers only,
+                // and all files discovered after this with all the parsers.
+                newParsers = context.ImportedParsers;
+                context.ImportedParsers = new List<ISourceAttributeParser>();
+                allParsers.AddRange(newParsers);
+                partiallyParsedCount = context.SourceFiles.Count;
+            } while (newParsers.Any());
         }
 
         internal void ParseSourceAttributesFromLine(

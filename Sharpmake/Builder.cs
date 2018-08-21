@@ -954,13 +954,20 @@ namespace Sharpmake
         private class LoadInfo : ILoadInfo
         {
             public IAssemblyInfo AssemblyInfo { get; }
+            public IEnumerable<ISourceAttributeParser> Parsers { get; }
 
             public LoadInfo(IAssemblyInfo assemblyInfo)
             {
                 AssemblyInfo = assemblyInfo;
+                Parsers = Enumerable.Empty<ISourceAttributeParser>();
+            }
+
+            public LoadInfo(IAssemblyInfo assemblyInfo, IEnumerable<ISourceAttributeParser> parsers)
+            {
+                AssemblyInfo = assemblyInfo;
+                Parsers = parsers.ToArray();
             }
         }
-
 
         private class BuilderContext : IBuilderContext
         {
@@ -976,11 +983,12 @@ namespace Sharpmake
 
             public ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, params string[] files)
             {
+                var parserCount = _builder._attributeParsers.Count;
                 var assemblyInfo = _builder.BuildAndLoadAssembly(files, this, parsers);
                 if (assemblyInfo.Assembly != null)
                     _builder.ExecuteEntryPointInAssemblies<EntryPoint>(assemblyInfo.Assembly);
 
-                return new LoadInfo(assemblyInfo);
+                return new LoadInfo(assemblyInfo, _builder._attributeParsers.Skip(parserCount));
             }
         }
 

@@ -67,6 +67,11 @@ namespace Sharpmake.UnitTests
             {
                 throw new NotImplementedException();
             }
+
+            public void AddSourceAttributeParser(ISourceAttributeParser parser)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [Test]

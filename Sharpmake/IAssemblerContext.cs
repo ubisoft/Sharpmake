@@ -16,6 +16,7 @@ namespace Sharpmake
     public interface ILoadInfo
     {
         IAssemblyInfo AssemblyInfo { get; }
+        IEnumerable<ISourceAttributeParser> Parsers { get; }
     }
 
     public interface IBuilderContext
@@ -29,6 +30,7 @@ namespace Sharpmake
         void AddSourceFile(string file);
         void AddReference(string file);
         void AddReference(IAssemblyInfo info);
+        void AddSourceAttributeParser(ISourceAttributeParser parser);
         IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files);
     }
 
@@ -62,7 +64,13 @@ namespace Sharpmake
             foreach (var info in infos)
                 context.AddReference(info);
         }
-        
+
+        public static void AddSourceAttributeParsers(this IAssemblerContext context, IEnumerable<ISourceAttributeParser> parsers)
+        {
+            foreach (var parser in parsers)
+                context.AddSourceAttributeParser(parser);
+        }
+
         public static IAssemblyInfo BuildLoadAndAddReferenceToSharpmakeFilesAssembly(this IAssemblerContext context, params string[] files)
         {
             var assemblyInfo = context.BuildAndLoadSharpmakeFiles(files);
