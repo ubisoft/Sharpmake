@@ -84,6 +84,61 @@ namespace Sharpmake
         }
     }
 
+    public class PackageAttributeParser : SimpleSourceAttributeParser
+    {
+        private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
+
+        public PackageAttributeParser() : base("Package", 1, "Sharpmake")
+        {
+        }
+
+        public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
+        {
+            string includeFilename = parameters[0];
+            string includeAbsolutePath;
+            if (Path.IsPathRooted(includeFilename))
+            {
+                includeAbsolutePath = includeFilename;
+            }
+            else if (Util.IsPathWithWildcards(includeFilename))
+            {
+                includeAbsolutePath = Path.Combine(sourceFilePath.DirectoryName, includeFilename);
+            }
+            else
+            {
+                includeAbsolutePath = Util.PathGetAbsolute(sourceFilePath.DirectoryName, includeFilename);
+            }
+
+            IAssemblyInfo assemblyInfo;
+            if (_assemblies.TryGetValue(includeAbsolutePath, out assemblyInfo))
+            {
+                if (assemblyInfo == null)
+                    throw new Error($"Circual Sharpmake.Package dependency on {includeFilename}");
+                context.AddReference(assemblyInfo);
+                return;
+            }
+            _assemblies[includeAbsolutePath] = null;
+
+            string[] files;
+            if (Util.IsPathWithWildcards(includeFilename))
+            {
+                files = Util.DirectoryGetFilesWithWildcards(includeAbsolutePath);
+            }
+            else
+            {
+                if (!Util.FileExists(includeAbsolutePath))
+                    includeAbsolutePath = Util.GetCapitalizedPath(includeAbsolutePath);
+                if (!Util.FileExists(includeAbsolutePath))
+                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found {0}", includeFilename);
+
+                files = new string[] { includeAbsolutePath };
+            }
+
+            assemblyInfo = context.BuildLoadAndAddReferenceToSharpmakeFilesAssembly(files);
+            _assemblies[includeAbsolutePath] = assemblyInfo;
+        }
+    }
+
     public class DebugProjectNameAttributeParser : SimpleSourceAttributeParser
     {
         private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);

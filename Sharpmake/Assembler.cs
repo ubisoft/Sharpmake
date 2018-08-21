@@ -483,6 +483,7 @@ namespace Sharpmake
         {
             parsers.Add(new IncludeAttributeParser());
             parsers.Add(new ReferenceAttributeParser());
+            parsers.Add(new PackageAttributeParser());
         }
 
         private void AnalyseSourceFiles(AssemblerContext context)
