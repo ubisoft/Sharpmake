@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Analyzer\Analyzer.cs" />
     <Compile Include="Assembler.cs" />
+    <Compile Include="AttributeParsers.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="BuildContext\BaseBuildContext.cs" />
     <Compile Include="BuildContext\ConfigureDependencyAnalyzer.cs" />
