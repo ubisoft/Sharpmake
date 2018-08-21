@@ -931,6 +931,14 @@ namespace Sharpmake
             _attributeParsers.Add(parser);
         }
 
+        private class BuilderContext : IBuilderContext
+        { }
+
+        public IBuilderContext CreateContext()
+        {
+            return new BuilderContext();
+        }
+
         #region Log
 
         public void LogWriteLine(string message, params object[] args)

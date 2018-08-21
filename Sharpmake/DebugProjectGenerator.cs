@@ -59,7 +59,7 @@ namespace Sharpmake
             RootPath = Path.GetDirectoryName(sourcesArguments[0]);
 
             Assembler assembler = new Assembler();
-            List<string> allsources = assembler.GetSourceFiles(MainSources);
+            List<string> allsources = assembler.GetSourceFiles(Builder.Instance.CreateContext(), MainSources);
 
             ProjectContent project = new ProjectContent { ProjectFolder = RootPath };
             DebugProjects.Add(CreateProject("sharpmake_debug"), project);

@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Sharpmake
 {
+    public interface IBuilderContext
+    {
+    }
+
     public interface IAssemblerContext
     {
         void AddSourceFile(string file);

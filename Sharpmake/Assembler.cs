@@ -54,7 +54,7 @@ namespace Sharpmake
         {
             // Alway compile to a physic dll to be able to debug
             string tmpFile = GetTmpAssemblyFile();
-            return Build(tmpFile, sourceFiles);
+            return Build(null, tmpFile, sourceFiles);
         }
 
         public static TDelegate BuildDelegate<TDelegate>(string sourceFilePath, string fullFunctionName, Assembly[] assemblies)
@@ -269,9 +269,11 @@ namespace Sharpmake
             private readonly Assembler _assembler;
             public List<string> SourceFiles;
             private Strings _visiting;
+            private readonly IBuilderContext _builderContext;
 
-            public AssemblerContext(Assembler assembler, string[] sources)
+            public AssemblerContext(Assembler assembler, IBuilderContext builderContext, string[] sources)
             {
+                _builderContext = builderContext;
                 _assembler = assembler;
                 _visiting = new Strings(new FileSystemStringComparer(), sources);
                 SourceFiles = new List<string>(_visiting);
@@ -293,9 +295,9 @@ namespace Sharpmake
             }
         }
 
-        private Assembly Build(string libraryFile, params string[] sources)
+        private Assembly Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
         {
-            List<string> sourceFiles = GetSourceFiles(sources);
+            List<string> sourceFiles = GetSourceFiles(builderContext, sources);
 
             HashSet<string> references = new HashSet<string>();
 
@@ -385,9 +387,9 @@ namespace Sharpmake
             return parsers;
         }
 
-        internal List<string> GetSourceFiles(string[] sources)
+        internal List<string> GetSourceFiles(IBuilderContext builderContext, string[] sources)
         {
-            var context = new AssemblerContext(this, sources);
+            var context = new AssemblerContext(this, builderContext, sources);
             AnalyseSourceFiles(context, ComputeParsers(), sources);
             return context.SourceFiles;
         }
