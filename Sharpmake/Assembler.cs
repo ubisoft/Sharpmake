@@ -459,6 +459,11 @@ namespace Sharpmake
             };
         }
 
+        internal IAssemblyInfo LoadUncompiledAssemblyInfo(IBuilderContext context, string[] sources)
+        {
+            return LoadAssemblyInfo(context, sources);
+        }
+
         internal List<string> GetSourceFiles(IBuilderContext builderContext, string[] sources)
         {
             var context = new AssemblerContext(this, builderContext, sources);

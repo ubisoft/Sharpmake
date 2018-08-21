@@ -50,6 +50,8 @@ namespace Sharpmake
 
             public readonly List<string> References = new List<string>();
             public readonly List<Type> ProjectReferences = new List<Type>();
+
+            public bool IsSetupProject;
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
@@ -59,30 +61,63 @@ namespace Sharpmake
             RootPath = Path.GetDirectoryName(sourcesArguments[0]);
 
             Assembler assembler = new Assembler();
-            List<string> allsources = assembler.GetSourceFiles(Builder.Instance.CreateContext(), MainSources);
+            IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 
-            ProjectContent project = new ProjectContent { ProjectFolder = RootPath };
-            DebugProjects.Add(CreateProject("sharpmake_debug"), project);
+            GenerateDebugProject(assemblyInfo, true, new Dictionary<string, Type>());
+        }
 
+
+
+        private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, IDictionary<string, Type> visited)
+        {
+            string displayName = isSetupProject ? "sharpmake_debug" : $"sharpmake_package_{assemblyInfo.Id.GetHashCode():X8}";
+
+            Type generatedProject;
+            if (visited.TryGetValue(assemblyInfo.Id, out generatedProject))
+            {
+                if (generatedProject == null)
+                    throw new Error($"Circular sharpmake package dependency on {displayName}");
+                return generatedProject;
+            }
+
+            visited[assemblyInfo.Id] = null;
+
+            ProjectContent project = new ProjectContent { ProjectFolder = RootPath, IsSetupProject = isSetupProject };
+            generatedProject = CreateProject(displayName);
+            DebugProjects.Add(generatedProject, project);
+            
             // Add sources
-            foreach (var source in allsources)
+            foreach (var source in assemblyInfo.SourceFiles)
             {
                 project.ProjectFiles.Add(source);
             }
 
             // Add references
             var references = new HashSet<string>();
-            if (assembler.UseDefaultReferences)
+            if (assemblyInfo.UseDefaultReferences)
             {
                 foreach (string defaultReference in Assembler.DefaultReferences)
                     references.Add(Assembler.GetAssemblyDllPath(defaultReference));
             }
 
-            foreach (var assemblerRef in assembler.References)
-                references.Add(assemblerRef);
+            foreach (var assemblerRef in assemblyInfo.References)
+            {
+                if (!assemblyInfo.SourceReferences.ContainsKey(assemblerRef))
+                {
+                    references.Add(assemblerRef);
+                }
+            }
 
             project.References.AddRange(references);
+            
+            foreach (var refInfo in assemblyInfo.SourceReferences.Values)
+            {
+                project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, visited));
+            }
+            
+            visited[assemblyInfo.Id] = generatedProject;
 
+            return generatedProject;
         }
 
         private static Type CreateProject(string typeSignature)
@@ -250,8 +285,11 @@ namespace Sharpmake
             }
 
             // set up custom configuration only to setup project
-            if (string.CompareOrdinal(conf.ProjectPath.ToLower(), RootPath.ToLower()) == 0)
+            if (string.CompareOrdinal(conf.ProjectPath.ToLower(), RootPath.ToLower()) == 0
+                && DebugProjectGenerator.DebugProjects[GetType()].IsSetupProject)
+            {
                 conf.SetupProjectOptions();
+            }
         }
     }
 
