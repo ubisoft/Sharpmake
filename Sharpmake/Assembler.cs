@@ -49,12 +49,32 @@ namespace Sharpmake
         public bool UseDefaultReferences = true;
 
         public static readonly string[] DefaultReferences = { "System.dll", "System.Core.dll" };
+        
+        private class AssemblyInfo : IAssemblyInfo
+        {
+            public string Id { get; set; }
+            public Assembly Assembly { get; set; }
+            public IReadOnlyCollection<string> SourceFiles => _sourceFiles;
+            public IReadOnlyCollection<string> References => _references;
+            public IReadOnlyDictionary<string, IAssemblyInfo> SourceReferences => _sourceReferences;
+            public bool UseDefaultReferences { get; set; }
+
+            public List<string> _sourceFiles = new List<string>();
+            public List<string> _references = new List<string>();
+            public Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
+        }
+
 
         public Assembly BuildAssembly(params string[] sourceFiles)
         {
+            return BuildAssembly(null, sourceFiles).Assembly;
+        }
+
+        public IAssemblyInfo BuildAssembly(IBuilderContext context, params string[] sourceFiles)
+        {
             // Alway compile to a physic dll to be able to debug
             string tmpFile = GetTmpAssemblyFile();
-            return Build(null, tmpFile, sourceFiles);
+            return Build(context, tmpFile, sourceFiles);
         }
 
         public static TDelegate BuildDelegate<TDelegate>(string sourceFilePath, string fullFunctionName, Assembly[] assemblies)
@@ -197,7 +217,7 @@ namespace Sharpmake
             }
 
             // build in memory
-            Assembly assembly = assembler.Build(null, sourceTmpFile);
+            Assembly assembly = assembler.Build(null, null, sourceTmpFile).Assembly;
             InternalError.Valid(assembly != null);
 
             // Try to delete tmp file to prevent polution, but usefull while debugging
@@ -243,6 +263,7 @@ namespace Sharpmake
         private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
         public List<string> _references = new List<string>();
+        private Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
 
         private static bool IsDelegate(Type delegateType)
@@ -265,12 +286,14 @@ namespace Sharpmake
             private readonly Assembler _assembler;
             public List<string> SourceFiles;
             private Strings _visiting;
+            public List<ISourceAttributeParser> AllParsers = new List<ISourceAttributeParser>();
             private readonly IBuilderContext _builderContext;
 
             public AssemblerContext(Assembler assembler, IBuilderContext builderContext, string[] sources)
             {
                 _builderContext = builderContext;
                 _assembler = assembler;
+                AllParsers = assembler.ComputeParsers();
                 _visiting = new Strings(new FileSystemStringComparer(), sources);
                 SourceFiles = new List<string>(_visiting);
             }
@@ -289,11 +312,35 @@ namespace Sharpmake
                 if (!_assembler._references.Contains(file))
                     _assembler._references.Add(file);
             }
+
+            public void AddReference(IAssemblyInfo info)
+            {
+                if (info.Assembly == null)
+                {
+                    _assembler._sourceReferences.Add(info.Id, info);
+                }
+                else if (!_assembler._references.Contains(info.Id))
+                {
+                    _assembler._references.Add(info.Assembly.Location);
+                    _assembler._sourceReferences.Add(info.Id, info);
+                }
+            }
+
+            public IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files)
+            {
+                if (_builderContext == null)
+                    throw new NotSupportedException("BuildAndLoadSharpmakeFiles is not supported on builds without a IBuilderContext");
+
+                var loadInfo = _builderContext.BuildAndLoadSharpmakeFiles(AllParsers, files);
+                return loadInfo.AssemblyInfo;
+            }
+
+            public BuilderCompileErrorBehavior CompileErrorBehavior => _builderContext?.CompileErrorBehavior ?? BuilderCompileErrorBehavior.ThrowException;
         }
 
-        private Assembly Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
+        private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
         {
-            List<string> sourceFiles = GetSourceFiles(builderContext, sources);
+            var assemblyInfo = LoadAssemblyInfo(builderContext, sources);
 
             HashSet<string> references = new HashSet<string>();
 
@@ -353,7 +400,7 @@ namespace Sharpmake
             Environment.SetEnvironmentVariable("LIB", null);
 
             // Invoke compilation of the source file.
-            CompilerResults cr = provider.CompileAssemblyFromFile(cp, sourceFiles.ToArray());
+            CompilerResults cr = provider.CompileAssemblyFromFile(cp, assemblyInfo.SourceFiles.ToArray());
 
             if (cr.Errors.HasErrors || cr.Errors.HasWarnings)
             {
@@ -368,11 +415,17 @@ namespace Sharpmake
                     errorMessage += ce + Environment.NewLine;
                 }
 
-                if(cr.Errors.HasErrors)
-                    throw new Error(errorMessage);
+                if (cr.Errors.HasErrors)
+                {
+                    if (builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
+                        throw new Error(errorMessage);
+                    return assemblyInfo;
+                }
             }
 
-            return cr.CompiledAssembly;
+            assemblyInfo.Assembly = cr.CompiledAssembly;
+            assemblyInfo.Id = assemblyInfo.Assembly.Location;
+            return assemblyInfo;
         }
 
         private List<ISourceAttributeParser> ComputeParsers()
@@ -383,10 +436,25 @@ namespace Sharpmake
             return parsers;
         }
 
+        private AssemblyInfo LoadAssemblyInfo(IBuilderContext builderContext, string[] sources)
+        {
+            var context = new AssemblerContext(this, builderContext, sources);
+            AnalyseSourceFiles(context);
+
+            return new AssemblyInfo()
+            {
+                Id = string.Join(";", context.SourceFiles),
+                UseDefaultReferences = UseDefaultReferences,
+                _sourceFiles = context.SourceFiles.ToList(),
+                _references = _references.ToList(),
+                _sourceReferences = new Dictionary<string, IAssemblyInfo>(_sourceReferences),
+            };
+        }
+
         internal List<string> GetSourceFiles(IBuilderContext builderContext, string[] sources)
         {
             var context = new AssemblerContext(this, builderContext, sources);
-            AnalyseSourceFiles(context, ComputeParsers(), sources);
+            AnalyseSourceFiles(context);
             return context.SourceFiles;
         }
 
@@ -396,7 +464,7 @@ namespace Sharpmake
             parsers.Add(new ReferenceAttributeParser());
         }
 
-        private void AnalyseSourceFiles(AssemblerContext context, IEnumerable<ISourceAttributeParser> parsers, string[] sources)
+        private void AnalyseSourceFiles(AssemblerContext context)
         {
 
             // Get all using namespace from sourceFiles
@@ -405,7 +473,7 @@ namespace Sharpmake
                 string sourceFile = context.SourceFiles[i];
                 if (File.Exists(sourceFile))
                 {
-                    AnalyseSourceFile(sourceFile, parsers, context);
+                    AnalyseSourceFile(sourceFile, context.AllParsers, context);
                 }
                 else
                 {

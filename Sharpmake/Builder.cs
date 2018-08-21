@@ -363,7 +363,12 @@ namespace Sharpmake
             return Assembly.LoadFrom(generatorsAssembly);
         });
 
-        private Assembly BuildAndLoadAssembly(IList<string> sharpmakeFiles)
+        private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, BuilderCompileErrorBehavior compileErrorBehavior)
+        {
+            return BuildAndLoadAssembly(sharpmakeFiles, new BuilderContext(this, compileErrorBehavior));
+        }
+
+        private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, IBuilderContext context, IEnumerable<ISourceAttributeParser> parsers = null)
         {
             Assembler assembler = new Assembler();
 
@@ -374,12 +379,20 @@ namespace Sharpmake
             assembler.Assemblies.Add(SharpmakeGeneratorAssembly.Value);
 
             // Add attribute parsers
-            foreach (var parser in _attributeParsers)
-                assembler.AttributeParsers.Add(parser);
+            if (parsers != null)
+            {
+                assembler.UseDefaultParsers = false;
+                assembler.AttributeParsers.AddRange(parsers);
+            }
+            else
+            {
+                foreach (var parser in _attributeParsers)
+                    assembler.AttributeParsers.Add(parser);
+            }
 
-            Assembly newAssembly = assembler.BuildAssembly(sharpmakeFiles.ToArray());
+            var newAssemblyInfo = assembler.BuildAssembly(context, sharpmakeFiles.ToArray());
 
-            if (newAssembly == null)
+            if (newAssemblyInfo.Assembly == null && context.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
                 throw new InternalError();
 
             // Keep track of assemblies explicitly referenced by compiled files
@@ -403,14 +416,20 @@ namespace Sharpmake
                 }
             }
 
-            _builtAssemblies.Add(newAssembly);
-            return newAssembly;
+            if (newAssemblyInfo.Assembly != null)
+                _builtAssemblies.Add(newAssemblyInfo.Assembly);
+            return newAssemblyInfo;
         }
 
         // Expect a list of existing files with their full path
         public Assembly LoadSharpmakeFiles(params string[] sharpmakeFiles)
         {
-            return BuildAndLoadAssembly(sharpmakeFiles);
+            return LoadSharpmakeFiles(BuilderCompileErrorBehavior.ThrowException, sharpmakeFiles).Assembly;
+        }
+
+        public IAssemblyInfo LoadSharpmakeFiles(BuilderCompileErrorBehavior compileErrorBehavior, params string[] sharpmakeFiles)
+        {
+            return BuildAndLoadAssembly(sharpmakeFiles, compileErrorBehavior);
         }
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
@@ -931,13 +950,45 @@ namespace Sharpmake
             _attributeParsers.Add(parser);
         }
 
-        private class BuilderContext : IBuilderContext
-        { }
-
-        public IBuilderContext CreateContext()
+        #region IBuilderContext
+        private class LoadInfo : ILoadInfo
         {
-            return new BuilderContext();
+            public IAssemblyInfo AssemblyInfo { get; }
+
+            public LoadInfo(IAssemblyInfo assemblyInfo)
+            {
+                AssemblyInfo = assemblyInfo;
+            }
         }
+
+
+        private class BuilderContext : IBuilderContext
+        {
+            private readonly Builder _builder;
+
+            public BuilderCompileErrorBehavior CompileErrorBehavior { get; }
+
+            public BuilderContext(Builder builder, BuilderCompileErrorBehavior compileErrorBehavior)
+            {
+                _builder = builder;
+                CompileErrorBehavior = compileErrorBehavior;
+            }
+
+            public ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, params string[] files)
+            {
+                var assemblyInfo = _builder.BuildAndLoadAssembly(files, this, parsers);
+                if (assemblyInfo.Assembly != null)
+                    _builder.ExecuteEntryPointInAssemblies<EntryPoint>(assemblyInfo.Assembly);
+
+                return new LoadInfo(assemblyInfo);
+            }
+        }
+
+        public IBuilderContext CreateContext(BuilderCompileErrorBehavior compileErrorBehavior = BuilderCompileErrorBehavior.ThrowException)
+        {
+            return new BuilderContext(this, compileErrorBehavior);
+        }
+        #endregion
 
         #region Log
 

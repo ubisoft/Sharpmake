@@ -57,6 +57,16 @@ namespace Sharpmake.UnitTests
             {
                 Sources.Add(file);
             }
+
+            public void AddReference(IAssemblyInfo info)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [Test]
