@@ -36,7 +36,7 @@ namespace Sharpmake
         public static void SetCppPlatformFolder(DevEnv devEnv, Platform platform, string value)
         {
             Tuple<DevEnv, Platform> key = Tuple.Create(devEnv, platform);
-            if (!s_cppPlatformFolders.TryAdd(key, value))
+            if (!string.Equals(s_cppPlatformFolders.GetOrAdd(key, value), value))
                 throw new Error("You can't register more than once a platform folder for a specific combinaison. Key already registered: " + key);
         }
 
