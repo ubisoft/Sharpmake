@@ -45,6 +45,8 @@ namespace Sharpmake
 
         internal class ProjectContent
         {
+            public string DisplayName;
+
             public string ProjectFolder;
             public readonly HashSet<string> ProjectFiles = new HashSet<string>();
 
@@ -83,7 +85,7 @@ namespace Sharpmake
 
             visited[assemblyInfo.Id] = null;
 
-            ProjectContent project = new ProjectContent { ProjectFolder = RootPath, IsSetupProject = isSetupProject };
+            ProjectContent project = new ProjectContent { ProjectFolder = RootPath, IsSetupProject = isSetupProject, DisplayName = displayName };
             generatedProject = CreateProject(displayName);
             DebugProjects.Add(generatedProject, project);
             
@@ -264,6 +266,8 @@ namespace Sharpmake
             ResourceFiles.Clear();
             NoneExtensions.Clear();
             VsctExtension.Clear();
+
+            Name = DebugProjectGenerator.DebugProjects[GetType()].DisplayName;
 
             AddTargets(DebugProjectGenerator.GetTargets());
         }
