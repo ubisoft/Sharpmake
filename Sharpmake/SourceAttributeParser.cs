@@ -21,9 +21,9 @@ namespace Sharpmake
             string regex = $@"^{dp}\[{dp}module{dp}:{dp}";
             foreach (var ns in namespaces)
             {
-                regex += $@"{ns}{dp}\.{dp}";
+                regex += $@"{Regex.Escape(ns)}{dp}\.{dp}";
             }
-            regex += $@"{attributeName}{dp}";
+            regex += $@"{Regex.Escape(attributeName)}{dp}";
             if (parameterCount == 0)
             {
                 regex += $@"(?:\({dp}\))";
