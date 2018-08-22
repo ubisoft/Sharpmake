@@ -58,6 +58,8 @@ namespace Sharpmake
             if (!ExtensionLoader.ExtensionChecker.IsSharpmakeExtension(extensionAssembly))
                 return;
 
+            _builder.ExecuteEntryPointInAssemblies<EntryPoint>(extensionAssembly);
+
             foreach (Type classType in extensionAssembly.GetTypes())
             {
                 foreach (MethodInfo methodInfo in classType.GetMethods().Where(m => m.GetCustomAttributes<BuilderEventAttribute>().Any()))

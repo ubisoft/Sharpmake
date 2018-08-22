@@ -407,15 +407,6 @@ namespace Sharpmake
                 _references[assemblyName] = fullpath;
             }
 
-            // Load platforms if they were passed as references
-            using (var extensionLoader = new ExtensionLoader())
-            {
-                foreach (var referencePath in assembler.References)
-                {
-                    extensionLoader.LoadExtension(referencePath, false);
-                }
-            }
-
             if (newAssemblyInfo.Assembly != null)
                 _builtAssemblies.Add(newAssemblyInfo.Assembly);
             return newAssemblyInfo;
@@ -954,18 +945,27 @@ namespace Sharpmake
         private class LoadInfo : ILoadInfo
         {
             public IAssemblyInfo AssemblyInfo { get; }
+            public Assembly Assembly { get; }
             public IEnumerable<ISourceAttributeParser> Parsers { get; }
 
             public LoadInfo(IAssemblyInfo assemblyInfo)
-            {
-                AssemblyInfo = assemblyInfo;
-                Parsers = Enumerable.Empty<ISourceAttributeParser>();
-            }
-
+                : this(assemblyInfo, assemblyInfo.Assembly, null)
+            { }
             public LoadInfo(IAssemblyInfo assemblyInfo, IEnumerable<ISourceAttributeParser> parsers)
+                : this(assemblyInfo, assemblyInfo.Assembly, parsers)
+            { }
+            public LoadInfo(Assembly assembly)
+                : this(null, assembly, null)
+            { }
+            public LoadInfo(Assembly assembly, IEnumerable<ISourceAttributeParser> parsers)
+                : this(null, assembly, parsers)
+            { }
+
+            private LoadInfo(IAssemblyInfo assemblyInfo, Assembly assembly, IEnumerable<ISourceAttributeParser> parsers)
             {
                 AssemblyInfo = assemblyInfo;
-                Parsers = parsers.ToArray();
+                Assembly = assembly;
+                Parsers = parsers?.ToArray() ?? Enumerable.Empty<ISourceAttributeParser>();
             }
         }
 
@@ -989,6 +989,19 @@ namespace Sharpmake
                     _builder.ExecuteEntryPointInAssemblies<EntryPoint>(assemblyInfo.Assembly);
 
                 return new LoadInfo(assemblyInfo, _builder._attributeParsers.Skip(parserCount));
+            }
+
+            public ILoadInfo LoadExtension(string file)
+            {   
+                // Load extensions if they were passed as references (platforms,
+                // entry point execution to add new ISourceAttributeParser...)
+                using (var extensionLoader = new ExtensionLoader())
+                {
+                    var parserCount = _builder._attributeParsers.Count;
+                    var assembly = extensionLoader.LoadExtension(file, false);
+                    return new LoadInfo(assembly, _builder._attributeParsers.Skip(parserCount));
+                }
+                
             }
         }
 

@@ -15,6 +15,7 @@ namespace Sharpmake
 
     public interface ILoadInfo
     {
+        Assembly Assembly { get; }
         IAssemblyInfo AssemblyInfo { get; }
         IEnumerable<ISourceAttributeParser> Parsers { get; }
     }
@@ -22,6 +23,7 @@ namespace Sharpmake
     public interface IBuilderContext
     {
         ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, params string[] files);
+        ILoadInfo LoadExtension(string file);
         BuilderCompileErrorBehavior CompileErrorBehavior { get; }
     }
 

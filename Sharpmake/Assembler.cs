@@ -313,7 +313,11 @@ namespace Sharpmake
             public void AddReference(string file)
             {
                 if (!_assembler._references.Contains(file))
+                {
                     _assembler._references.Add(file);
+                    var loadInfo = _builderContext.LoadExtension(file);
+                    this.AddSourceAttributeParsers(loadInfo.Parsers);
+                }
             }
 
             public void AddReference(IAssemblyInfo info)
