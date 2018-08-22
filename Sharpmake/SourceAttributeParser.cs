@@ -17,11 +17,20 @@ namespace Sharpmake
     {
         public static Regex CreateAttributeRegex(string attributeName, uint parameterCount, params string[] namespaces)
         {
-            const string dp = @"(?:/\*.*?\*/|\s)*"; // Discardable Part, we use _dp to make it small in the following line
+            const string dp = @"(?:/\*.*?\*/|\s)*"; // Discardable Part, we use dp to make it small in the following lines
             string regex = $@"^{dp}\[{dp}module{dp}:{dp}";
+            // Handle namespaces being optional
+            // First we open groups for every namespace
             foreach (var ns in namespaces)
             {
-                regex += $@"{Regex.Escape(ns)}{dp}\.{dp}";
+                regex += "(?:";
+            }
+            // Then we write a namespace, close the group, mark it as optional
+            // For {"Sharpmake", "MyNs"}, the result, ignoring spaces, will be (?:(?:Sharpmake\.)?MyNs\.)?
+            // This means we accept either no prefix, MyNs. prefix, or Sharpmake.MyNs. prefix, but not the Sharpmake. prefix.
+            foreach (var ns in namespaces)
+            {
+                regex += $@"{Regex.Escape(ns)}{dp}\.{dp})?";
             }
             regex += $@"{Regex.Escape(attributeName)}{dp}";
             if (parameterCount == 0)
