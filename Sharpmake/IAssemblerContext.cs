@@ -79,5 +79,29 @@ namespace Sharpmake
             context.AddReference(assemblyInfo);
             return assemblyInfo;
         }
+
+        public static IAssemblyInfo CreateAssemblyInfoWithDebugProjectName(this IAssemblyInfo info, string debugProjectName)
+        {
+            return new DebugProjectNameAssemblyInfo(info, debugProjectName);
+        }
+
+        private class DebugProjectNameAssemblyInfo : IAssemblyInfo
+        {
+            private readonly IAssemblyInfo _info;
+            public string DebugProjectName { get; }
+
+            public DebugProjectNameAssemblyInfo(IAssemblyInfo info, string debugProjectName)
+            {
+                _info = info;
+                DebugProjectName = debugProjectName;
+            }
+
+            public Assembly Assembly => _info.Assembly;
+            public string Id => _info.Id;
+            public IReadOnlyCollection<string> References => _info.References;
+            public IReadOnlyCollection<string> SourceFiles => _info.SourceFiles;
+            public IReadOnlyDictionary<string, IAssemblyInfo> SourceReferences => _info.SourceReferences;
+            public bool UseDefaultReferences => _info.UseDefaultReferences;
+        }
     }
 }
