@@ -281,14 +281,18 @@ namespace Sharpmake.Application
                 // Then log details
                 LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
                 exitCode = ExitCode.Error;
-                Environment.Exit((int)exitCode);
+
+                if (!Debugger.IsAttached)
+                    Environment.Exit((int)exitCode);
             }
             catch (InternalError e)
             {
                 ErrorWriteLine(Environment.NewLine + "Internal Error:");
                 LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
                 exitCode = ExitCode.InternalError;
-                Environment.Exit((int)exitCode);
+
+                if (!Debugger.IsAttached)
+                    Environment.Exit((int)exitCode);
             }
 #if !DEBUG // Use this to catch right away if an exception throw
             catch (Exception e)
