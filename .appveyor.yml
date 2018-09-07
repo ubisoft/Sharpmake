@@ -10,6 +10,7 @@ configuration:
 - Release
 
 before_build:
+- cmd: bootstrap-sharpmake.bat
 - cmd: dotnet restore
 
 build:
