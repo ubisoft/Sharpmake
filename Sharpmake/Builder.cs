@@ -754,7 +754,7 @@ namespace Sharpmake
                 foreach (var conf in p.Configurations)
                 {
                     if (!usedConfigs.Contains(conf))
-                        LogWarningLine(conf.Project.SharpmakeCsFileName + ": Warning: Config not used during generation: " + conf);
+                        LogWarningLine(conf.Project.SharpmakeCsFileName + ": Warning: Config not used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);
                 }
             }
         }
