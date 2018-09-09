@@ -37,8 +37,12 @@ namespace Sharpmake
                     Cpp11,
                     Cpp14,
                     Cpp17,
+                    Cpp2a,
                     GnuCpp98,
-                    GnuCpp11
+                    GnuCpp11,
+                    GnuCpp14,
+                    GnuCpp17,
+                    GnuCpp2a,
                 }
 
                 public enum Exceptions
