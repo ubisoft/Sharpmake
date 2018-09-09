@@ -464,15 +464,19 @@ namespace Sharpmake.Generators.Generic
 
                 // CppLanguageStandard
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17, () => { cxxflags.Append("-std=c++17 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14, () => { cxxflags.Append("-std=c++14 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11, () => { cxxflags.Append("-std=c++11 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp98, () => { cxxflags.Append("-std=c++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11, () => { cxxflags.Append("-std=gnu++11 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp98, () => { cxxflags.Append("-std=gnu++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default, () => { cxxflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default,   () => { cxxflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp98,     () => { cxxflags.Append("-std=c++98 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11,     () => { cxxflags.Append("-std=c++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14,     () => { cxxflags.Append("-std=c++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17,     () => { cxxflags.Append("-std=c++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp2a,     () => { cxxflags.Append("-std=c++2a "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp98,  () => { cxxflags.Append("-std=gnu++98 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11,  () => { cxxflags.Append("-std=gnu++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp14,  () => { cxxflags.Append("-std=gnu++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp17,  () => { cxxflags.Append("-std=gnu++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp2a,  () => { cxxflags.Append("-std=gnu++2a "); })
                     );
-
+                    
                 // Exceptions
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.Exceptions.Enable, () => { cxxflags.Append("-fexceptions "); }),
