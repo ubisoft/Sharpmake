@@ -1426,6 +1426,9 @@ namespace Sharpmake
             public Strings ConditionalReferencesByPath = new Strings();
             public Strings ForceUsingFiles = new Strings();
 
+            public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
+            public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
+
             // NuGet packages (only C# for now)
             public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
 

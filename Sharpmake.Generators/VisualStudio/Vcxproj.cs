@@ -532,6 +532,26 @@ namespace Sharpmake.Generators.VisualStudio
                     fileGenerator.Write(Template.Project.ProjectImportedProps);
                 }
             }
+
+            // configuration .props files
+            foreach (Project.Configuration conf in context.ProjectConfigurations)
+            {
+                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (fileGenerator.Declare("conf", conf))
+                {
+                    foreach (string propsFile in conf.CustomPropsFiles)
+                    {
+                        string capitalizedFile = Project.GetCapitalizedFile(propsFile) ?? propsFile;
+
+                        string relativeFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, capitalizedFile);
+                        using (fileGenerator.Declare("importedPropsFile", relativeFile))
+                        {
+                            fileGenerator.Write(Template.Project.ProjectConfigurationImportedProps);
+                        }
+                    }
+                }
+            }
+
             fileGenerator.Write(Template.Project.ProjectImportedPropsEnd);
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneralImportPropertySheets);
             foreach (var platform in context.PresentPlatforms.Values)
@@ -695,6 +715,25 @@ namespace Sharpmake.Generators.VisualStudio
                 using (fileGenerator.Declare("importedTargetsFile", relativeFile))
                 {
                     fileGenerator.Write(Template.Project.ProjectTargetsItem);
+                }
+            }
+
+            // configuration .targets files
+            foreach (Project.Configuration conf in context.ProjectConfigurations)
+            {
+                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (fileGenerator.Declare("conf", conf))
+                {
+                    foreach (string targetsFile in conf.CustomTargetsFiles)
+                    {
+                        string capitalizedFile = Project.GetCapitalizedFile(targetsFile) ?? targetsFile;
+
+                        string relativeFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, capitalizedFile);
+                        using (fileGenerator.Declare("importedTargetsFile", relativeFile))
+                        {
+                            fileGenerator.Write(Template.Project.ProjectConfigurationImportedTargets);
+                        }
+                    }
                 }
             }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
