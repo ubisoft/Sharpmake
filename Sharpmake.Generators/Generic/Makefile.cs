@@ -389,10 +389,15 @@ namespace Sharpmake.Generators.Generic
             string outputDirectory = PathMakeUnix(GetOutputDirectory(conf, projectFileInfo));
             options["OutputDirectory"] = outputDirectory;
 
-            #region Compiler
+			#region Compiler
 
-            // Defines
-            Strings defines = new Strings();
+			// Defines
+			if (conf.DefaultOption == Options.DefaultTarget.Debug)
+				conf.Defines.Add("_DEBUG");
+			else // Release
+				conf.Defines.Add("NDEBUG");
+
+			Strings defines = new Strings();
             defines.AddRange(conf.Defines);
             defines.InsertPrefix("-D");
             options["Defines"] = defines.JoinStrings(" ");
