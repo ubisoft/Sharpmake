@@ -54,7 +54,8 @@ namespace Sharpmake
                     v10_0_10586_0,
                     v10_0_14393_0,
                     v10_0_15063_0,
-                    v10_0_16299_0
+                    v10_0_16299_0,
+                    v10_0_17134_0
                 }
 
                 public enum CharacterSet
