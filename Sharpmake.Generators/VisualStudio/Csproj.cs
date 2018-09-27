@@ -3082,17 +3082,22 @@ namespace Sharpmake.Generators.VisualStudio
 
             protected override void GenerateConfigurationContent(IFileGenerator fileGenerator, Project.Configuration conf)
             {
-                switch (conf.CsprojUserFile.StartAction)
+                using (fileGenerator.Declare("unmanagedDebugEnabled", conf.CsprojUserFile.EnableUnmanagedDebug ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 {
-                    case StartActionSetting.Program:
-                        fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithProgram);
-                        break;
-                    case StartActionSetting.URL:
-                        fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithUrl);
-                        break;
-                    default:
-                        fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithProject);
-                        break;
+                    switch (conf.CsprojUserFile.StartAction)
+                    {
+                        case StartActionSetting.Program:
+                            fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithProgram);
+                            break;
+                        case StartActionSetting.URL:
+                            fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithUrl);
+                            break;
+                        default:
+                            fileGenerator.WriteLine(CSproj.Template.UserFile.StartWithProject);
+                            break;
+                    }
+
+                    fileGenerator.WriteLine(CSproj.Template.UserFile.DebugUnmanaged);
                 }
             }
 

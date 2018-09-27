@@ -664,6 +664,9 @@ namespace Sharpmake.Generators.VisualStudio
     <StartURL>[conf.CsprojUserFile.StartURL]</StartURL>
     <StartArguments>[conf.CsprojUserFile.StartArguments]</StartArguments>
     <StartWorkingDirectory>[conf.CsprojUserFile.WorkingDirectory]</StartWorkingDirectory>";
+
+                public static readonly string DebugUnmanaged =
+@"    <EnableUnmanagedDebugging>[unmanagedDebugEnabled]</EnableUnmanagedDebugging>";
             }
         }
     }

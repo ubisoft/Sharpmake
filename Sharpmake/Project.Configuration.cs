@@ -1496,6 +1496,7 @@ namespace Sharpmake
                 public string StartArguments = RemoveLineTag;
                 public string WorkingDirectory = RemoveLineTag;
                 public bool OverwriteExistingFile = true;
+                public bool EnableUnmanagedDebug = false;
             }
             public CsprojUserFileSettings CsprojUserFile = null;
 
