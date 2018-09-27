@@ -1291,9 +1291,29 @@ namespace Sharpmake
                     string executableInputFileArgumentOption,
                     string executableOutputFileArgumentOption,
                     string executableOtherArguments,
+                    string executableWorkingDirectory,
+                    bool isNameSpecific,
+                    bool useStdOutAsOutput)
+                    : this(executableFile,
+                          executableInputFileArgumentOption,
+                          executableOutputFileArgumentOption,
+                          executableOtherArguments,
+                          executableWorkingDirectory,
+                          isNameSpecific,
+                          useStdOutAsOutput,
+                          false)
+                {
+                }
+
+                public BuildStepExecutable(
+                    string executableFile,
+                    string executableInputFileArgumentOption,
+                    string executableOutputFileArgumentOption,
+                    string executableOtherArguments,
                     string executableWorkingDirectory = "",
                     bool isNameSpecific = false,
-                    bool useStdOutAsOutput = false)
+                    bool useStdOutAsOutput = false,
+                    bool alwaysShowOutput = false)
 
                 {
                     ExecutableFile = executableFile;
@@ -1303,6 +1323,7 @@ namespace Sharpmake
                     ExecutableWorkingDirectory = executableWorkingDirectory;
                     IsNameSpecific = isNameSpecific;
                     FastBuildUseStdOutAsOutput = useStdOutAsOutput;
+                    FastBuildAlwaysShowOutput = alwaysShowOutput;
                 }
 
                 /// <summary>
@@ -1334,6 +1355,8 @@ namespace Sharpmake
                 /// Gets or sets whether the output is to *stdout*.
                 /// </summary>
                 public bool FastBuildUseStdOutAsOutput = false;
+
+                public bool FastBuildAlwaysShowOutput = false;
             }
 
             [Resolver.Resolvable]

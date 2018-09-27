@@ -505,6 +505,7 @@ Exec( '[fastBuildPreBuildName]' )
   .ExecArguments        = '[fastBuildPreBuildArguments]'
   .ExecWorkingDir       = '[fastBuildPrebuildWorkingPath]'
   .ExecUseStdOutAsOutput = [fastBuildPrebuildUseStdOutAsOutput]
+  .ExecAlwaysShowOutput =  [fastBuildPrebuildAlwaysShowOutput]
 }
 
 ";

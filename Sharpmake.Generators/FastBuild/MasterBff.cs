@@ -458,6 +458,7 @@ namespace Sharpmake.Generators.FastBuild
                     using (fileGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(execCommand.ExecutableOtherArguments) ? FileGeneratorUtilities.RemoveLineTag : execCommand.ExecutableOtherArguments))
                     using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : Util.PathGetRelative(relativeTo, execCommand.ExecutableWorkingDirectory)))
                     using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                    using (fileGenerator.Declare("fastBuildPrebuildAlwaysShowOutput", execCommand.FastBuildAlwaysShowOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                     {
                         string eventKey = fileGenerator.Resolver.Resolve(buildEvent.Key);
                         if (!bffSection.ContainsKey(eventKey))

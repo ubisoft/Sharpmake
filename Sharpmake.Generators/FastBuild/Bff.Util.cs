@@ -392,6 +392,7 @@ namespace Sharpmake.Generators.FastBuild
             // This is normally the project directory.
             using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", FileGeneratorUtilities.RemoveLineTag))
             using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", FileGeneratorUtilities.RemoveLineTag))
+            using (bffGenerator.Declare("fastBuildPrebuildAlwaysShowOutput", FileGeneratorUtilities.RemoveLineTag))
             {
                 functor(relativeBuildStep.Description);
             }
