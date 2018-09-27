@@ -30,7 +30,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2015,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.v4_5
+                    framework: DotNetFramework.v4_6_1
                 )
             );
             return result.ToArray();
