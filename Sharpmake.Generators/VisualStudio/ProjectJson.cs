@@ -33,6 +33,8 @@ namespace Sharpmake.Generators.VisualStudio
         public string ProjectJsonPath => Path.Combine(_projectPath, "project.json");
         public string ProjectJsonLockPath => Path.Combine(_projectPath, "project.lock.json");
 
+        public const string RemoveLineTag = "REMOVE_LINE_TAG";
+
         public void Generate(Builder builder, CSharpProject project, List<Project.Configuration> configurations, string projectPath, List<string> generatedFiles, List<string> skipFiles)
         {
             _builder = builder;
@@ -122,7 +124,25 @@ namespace Sharpmake.Generators.VisualStudio
                         if (i != 0)
                             fileGenerator.Write(",");
                         var packageReference = conf.ReferencesByNuGetPackage.SortedValues[i];
-                        if (packageReference.PrivateAssets == PackageReferences.DefaultPrivateAssets)
+                        bool hasOptions = false;
+
+                        // Check for private assets
+                        string privateAssets = null;
+                        if (packageReference.PrivateAssets != PackageReferences.DefaultPrivateAssets)
+                        {
+                            privateAssets = string.Join(",", PackageReferences.PackageReference.GetFormatedAssetsDependency(packageReference.PrivateAssets));
+                            hasOptions = true;
+                        }
+
+                        // Check for a custom type
+                        string referenceType = null;
+                        if (!string.IsNullOrEmpty(packageReference.ReferenceType))
+                        {
+                            referenceType = packageReference.ReferenceType;
+                            hasOptions = true;
+                        }
+
+                        if (!hasOptions)
                         {
                             using (fileGenerator.Declare("dependency", packageReference))
                                 fileGenerator.Write(Template.DependenciesItem);
@@ -130,13 +150,28 @@ namespace Sharpmake.Generators.VisualStudio
                         else
                         {
                             using (fileGenerator.Declare("dependency", packageReference))
-                            using (fileGenerator.Declare("privateAssets", string.Join(",", PackageReferences.PackageReference.GetFormatedAssetsDependency(packageReference.PrivateAssets))))
-                                fileGenerator.Write($"{Template.BeginDependencyItem}{Template.DependencyPrivateAssets}{Template.EndDependencyItem}");
+                            {
+                                fileGenerator.Write($"{Template.BeginDependencyItem}");
+
+                                if (!string.IsNullOrEmpty(privateAssets))
+                                {
+                                    using (fileGenerator.Declare("privateAssets", privateAssets))
+                                        fileGenerator.Write($"{Template.DependencyPrivateAssets}");
+                                }
+                                if (!string.IsNullOrEmpty(referenceType))
+                                {
+                                    using (fileGenerator.Declare("referenceType", referenceType))
+                                        fileGenerator.Write($"{Template.DependencyReferenceType}");
+                                }
+
+                                fileGenerator.Write($"{Template.EndDependencyItem}");
+                            }
                         }
                     }
                     fileGenerator.Write(Template.DependenciesEnd);
 
                     fileGenerator.Write(Template.End);
+                    fileGenerator.RemoveTaggedLines();
 
                     bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(projectJsonPath), fileGenerator.ToMemoryStream());
                     if (written)

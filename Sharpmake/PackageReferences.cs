@@ -29,17 +29,24 @@ namespace Sharpmake
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType)
             {
                 Name = name;
                 Version = version;
                 DotNetHint = dotNetHint;
                 PrivateAssets = privateAssets;
+                ReferenceType = referenceType;
+            }
+
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets)
+                : this(name, version, dotNetHint, privateAssets, null)
+            {
             }
 
             public string Name { get; internal set; }
             public string Version { get; internal set; }
             public string DotNetHint { get; internal set; }
+            public string ReferenceType { get; internal set; }
 
             public AssetsDependency PrivateAssets { get; internal set; }
 
@@ -68,6 +75,8 @@ namespace Sharpmake
                 if (nameComparison != 0) return nameComparison;
                 var versionComparison = string.Compare(Version, other.Version, StringComparison.OrdinalIgnoreCase);
                 if (versionComparison != 0) return versionComparison;
+                var referenceTypeComparison = string.Compare(ReferenceType, other.ReferenceType, StringComparison.OrdinalIgnoreCase);
+                if (referenceTypeComparison != 0) return referenceTypeComparison;
                 return string.Compare(string.Join(",", GetFormatedAssetsDependency(PrivateAssets)), string.Join(",", GetFormatedAssetsDependency(other.PrivateAssets)), StringComparison.OrdinalIgnoreCase);
             }
 
@@ -101,13 +110,13 @@ namespace Sharpmake
 
         private readonly UniqueList<PackageReference> _packageReferences = new UniqueList<PackageReference>();
 
-        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets)
+        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null)
         {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
             if (existingPackage == null)
             {
-                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets));
+                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, referenceType));
                 return;
             }
 
@@ -122,6 +131,11 @@ namespace Sharpmake
                 existingPackage.PrivateAssets &= privateAssets;
                 Builder.Instance.LogWarningLine($"Package {packageName} was added twice with different private assets. Kept assets are {string.Join(",", PackageReference.GetFormatedAssetsDependency(existingPackage.PrivateAssets))}.");
             }
+        }
+
+        public void Add(string packageName, string version, string dotNetHint, AssetsDependency privateAssets)
+        {
+            Add(packageName, version, dotNetHint, privateAssets, null);
         }
 
         public int Count => _packageReferences.Count;

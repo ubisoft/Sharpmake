@@ -71,6 +71,10 @@ namespace Sharpmake.Generators.VisualStudio
 @",
         ""suppressParent"": ""[privateAssets]""";
 
+            public static string DependencyReferenceType =
+@",
+        ""type"": ""[referenceType]""";
+
             public static string EndDependencyItem =
 @"
     }";
