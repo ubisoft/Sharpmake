@@ -79,3 +79,4 @@ the platform is open and that you are not breaking your NDA. Ubisoft has not
 published platform support for most video game consoles for that exact reason.
 We will not accept merge requests for new platforms that are not completely
 open for development.
+
