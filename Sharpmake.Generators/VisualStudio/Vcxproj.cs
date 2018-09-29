@@ -1245,6 +1245,21 @@ namespace Sharpmake.Generators.VisualStudio
             var customSourceFiles = new Dictionary<string, List<ProjectFile>>();
             foreach (ProjectFile projectFile in allFiles)
             {
+                //First check if this projectFile is present in any of the configuration, if excluded from all, don't add it
+                bool addFile = false;
+                foreach (Project.Configuration conf in context.ProjectConfigurations)
+                {
+                    if (conf.ResolvedSourceFilesBuildExclude.Contains(projectFile.FileName) == false)
+                    {
+                        addFile = true;
+                        break;
+                    }
+                }
+                if (addFile == false)
+                {
+                    continue;
+                }
+
                 string type = null;
                 if (context.Project.ExtensionBuildTools.TryGetValue(projectFile.FileExtension, out type))
                 {
