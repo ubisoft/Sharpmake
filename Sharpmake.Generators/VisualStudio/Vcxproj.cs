@@ -1312,8 +1312,38 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 foreach (ProjectFile file in includeFiles)
                 {
+                    bool writeEnd = false;
                     using (fileGenerator.Declare("file", file))
-                        fileGenerator.Write(Template.Project.ProjectFilesHeader);
+                    {
+                        foreach (Project.Configuration conf in context.ProjectConfigurations)
+                        {
+                            using (fileGenerator.Declare("conf", conf))
+                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                            {
+                                bool isExcludeFromBuild = conf.ResolvedSourceFilesBuildExclude.Contains(file.FileName);
+                                if (isExcludeFromBuild)
+                                {
+                                    if (writeEnd == false)
+                                    {
+                                        fileGenerator.Write(Template.Project.ProjectFilesHeaderBegin);
+                                        writeEnd = true;
+                                    }
+                                    fileGenerator.Write(Template.Project.ProjectFilesSourceExcludeFromBuild);
+                                }
+
+                            }
+                        }
+
+                        if (writeEnd)
+                        {
+                            fileGenerator.Write(Template.Project.ProjectFilesHeaderEnd);
+                        }
+                        else
+                        {
+                            fileGenerator.Write(Template.Project.ProjectFilesHeader);
+                        }
+                    }
+
                 }
             }
             fileGenerator.Write(Template.Project.ProjectFilesEnd);

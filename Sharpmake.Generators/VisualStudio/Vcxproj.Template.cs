@@ -222,6 +222,14 @@ namespace Sharpmake.Generators.VisualStudio
                 @"    <ClInclude Include=""[file.FileNameProjectRelative]"" />
 ";
 
+                public static string ProjectFilesHeaderBegin =
+                @"    <ClInclude Include=""[file.FileNameProjectRelative]"" >
+";
+
+                public static string ProjectFilesHeaderEnd =
+                @"    </ClInclude>
+";
+
                 public static string ProjectFilesNatvis =
                 @"    <Natvis Include=""[file.FileNameProjectRelative]"" />
 ";
