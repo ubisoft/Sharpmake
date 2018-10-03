@@ -814,7 +814,22 @@ namespace Sharpmake
                 if (conf.IsFastBuild && conf.FastBuildBlobbed)
                     fastBuildBlobs = true;
 
+                var confSourceFilesExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesExcludeRegex);
+
+                // Remove file that match conf.SourceFilesExcludeRegex
+                if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, SourceFiles), SourceFiles, ref conf.SourceFilesExclude, confSourceFilesExcludeRegex))
+                    System.Diagnostics.Debugger.Break();
+                if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, ResourceFiles), ResourceFiles, ref conf.SourceFilesExclude, confSourceFilesExcludeRegex))
+                    System.Diagnostics.Debugger.Break();
+                if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, NatvisFiles), NatvisFiles, ref conf.SourceFilesExclude, confSourceFilesExcludeRegex))
+                    System.Diagnostics.Debugger.Break();
+
                 conf.ResolvedSourceFilesBuildExclude.AddRange(SourceFilesExclude);
+
+                //Add SourceFilesExclude also to ResolvedSourceFilesBuildExclude in case we end up needing file for
+                //another configuration that way it gets added but excluded from build in this config
+                conf.ResolvedSourceFilesBuildExclude.AddRange(conf.SourceFilesExclude);
+                conf.ResolvedSourceFilesExclude.AddRange(conf.SourceFilesExclude);
 
                 // add SourceFilesBuildExclude from the project
                 if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, ResolvedSourceFilesBuildExclude))
@@ -939,6 +954,7 @@ namespace Sharpmake
                             conf.ResolvedSourceFilesBuildExclude.Add(sourceFile);
                     }
                     Util.ResolvePath(SourceRootPath, ref conf.ResolvedSourceFilesBuildExclude);
+                    Util.ResolvePath(SourceRootPath, ref conf.ResolvedSourceFilesExclude);
                 }
             }
 

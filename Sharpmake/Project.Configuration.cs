@@ -304,6 +304,14 @@ namespace Sharpmake
             public Strings SourceFilesFiltersRegex = new Strings();
 
             /// <summary>
+            /// Excluded file from project for this configuration
+            /// </summary>
+            public Strings SourceFilesExclude = new Strings();
+
+            public Strings SourceFilesExcludeRegex = new Strings();
+            
+
+            /// <summary>
             /// Sources file that match this regex will be compiled as C Files
             /// </summary>
             public Strings SourceFilesCompileAsCRegex = new Strings();
@@ -1044,6 +1052,8 @@ namespace Sharpmake
             }
 
             public Strings ResolvedSourceFilesBuildExclude = new Strings();
+
+            public Strings ResolvedSourceFilesExclude = new Strings();
 
             public Strings ResolvedSourceFilesBlobExclude = new Strings();
 

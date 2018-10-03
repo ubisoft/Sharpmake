@@ -1249,7 +1249,7 @@ namespace Sharpmake.Generators.VisualStudio
                 bool addFile = false;
                 foreach (Project.Configuration conf in context.ProjectConfigurations)
                 {
-                    if (conf.ResolvedSourceFilesBuildExclude.Contains(projectFile.FileName) == false)
+                    if (conf.ResolvedSourceFilesExclude.Contains(projectFile.FileName) == false)
                     {
                         addFile = true;
                         break;

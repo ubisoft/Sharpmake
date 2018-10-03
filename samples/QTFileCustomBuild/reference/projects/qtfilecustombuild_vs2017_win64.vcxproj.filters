@@ -11,10 +11,28 @@
     <ClCompile Include="obj\win64\qt\debug\moc_floatanglespinbox.cpp">
       <Filter>projects\obj\win64\qt\debug</Filter>
     </ClCompile>
+    <ClCompile Include="obj\win64\qt\debug\moc_floatcosanglespinbox.cpp">
+      <Filter>projects\obj\win64\qt\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\debug\moc_privatewidget.cpp">
+      <Filter>projects\obj\win64\qt\debug</Filter>
+    </ClCompile>
     <ClCompile Include="obj\win64\qt\release\moc_floatanglespinbox.cpp">
       <Filter>projects\obj\win64\qt\release</Filter>
     </ClCompile>
+    <ClCompile Include="obj\win64\qt\release\moc_floatcosanglespinbox.cpp">
+      <Filter>projects\obj\win64\qt\release</Filter>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\release\moc_privatewidget.cpp">
+      <Filter>projects\obj\win64\qt\release</Filter>
+    </ClCompile>
     <ClCompile Include="obj\win64\qt\retail\moc_floatanglespinbox.cpp">
+      <Filter>projects\obj\win64\qt\retail</Filter>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\retail\moc_floatcosanglespinbox.cpp">
+      <Filter>projects\obj\win64\qt\retail</Filter>
+    </ClCompile>
+    <ClCompile Include="obj\win64\qt\retail\moc_privatewidget.cpp">
       <Filter>projects\obj\win64\qt\retail</Filter>
     </ClCompile>
   </ItemGroup>
