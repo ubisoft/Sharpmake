@@ -1837,7 +1837,7 @@ namespace Sharpmake
                         }
                     } while (fetched > 0);
                 }
-                catch (COMException)
+                catch (System.Runtime.InteropServices.COMException)
                 {
                     // Ignore
                 }
@@ -1851,10 +1851,10 @@ namespace Sharpmake
         /// The supported visual studio products, in order by priority in which Sharpmake will choose them.
         /// We want to block products like the standalone Team Explorer, which is in the Visual Studio
         /// family yet isn't a variant of Visual Studio proper.
-        /// 
+        ///
         /// The list of Product IDs can be found here: https://docs.microsoft.com/en-us/visualstudio/install/workload-and-component-ids
         /// </summary>
-        public static readonly string[] s_supportedVisualStudioProducts = new[]
+        private static readonly string[] s_supportedVisualStudioProducts = new[]
         {
             "Microsoft.VisualStudio.Product.Enterprise",
             "Microsoft.VisualStudio.Product.Professional",
@@ -1879,8 +1879,12 @@ namespace Sharpmake
             }
         }
 
-        public static List<VsInstallation> GetVisualStudioInstallationsFromQuery(DevEnv visualVersion, bool allowPrereleaseVersions = false,
-            string[] requiredComponents = null, string[] requiredWorkloads = null)
+        public static List<VsInstallation> GetVisualStudioInstallationsFromQuery(
+            DevEnv visualVersion,
+            bool allowPrereleaseVersions = false,
+            string[] requiredComponents = null,
+            string[] requiredWorkloads = null
+        )
         {
             // Fetch all installed products
             var installedVersions = GetVisualStudioInstalledVersions();
@@ -1899,9 +1903,16 @@ namespace Sharpmake
             return candidates;
         }
 
-        public static string GetVisualStudioInstallPathFromQuery(DevEnv visualVersion, bool allowPrereleaseVersions = false,
-            string[] requiredComponents = null, string[] requiredWorkloads = null)
+        public static string GetVisualStudioInstallPathFromQuery(
+            DevEnv visualVersion,
+            bool allowPrereleaseVersions = false,
+            string[] requiredComponents = null,
+            string[] requiredWorkloads = null
+        )
         {
+            if (IsRunningInMono())
+                return null;
+
             var vsInstallations = GetVisualStudioInstallationsFromQuery(visualVersion, allowPrereleaseVersions, requiredComponents, requiredWorkloads);
             VsInstallation priorityInstallation = vsInstallations.FirstOrDefault();
             return priorityInstallation != null ? SimplifyPath(priorityInstallation.InstallationPath) : null;
