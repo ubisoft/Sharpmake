@@ -10,6 +10,7 @@ namespace SharpmakeGen
     public class SharpmakeUnitTestsProject : Common.SharpmakeBaseProject
     {
         public SharpmakeUnitTestsProject()
+            : base(generateXmlDoc: false)
         {
             Name = "Sharpmake.UnitTests";
 

@@ -19,11 +19,13 @@
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
     <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <DocumentationFile>..\bin\Debug\Sharpmake.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
     <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -33,11 +35,13 @@
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
     <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <DocumentationFile>..\bin\Release\Sharpmake.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
     <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>

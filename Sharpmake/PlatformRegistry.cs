@@ -283,7 +283,7 @@ namespace Sharpmake
         /// <param name="ifaceType">The interface to register to.</param>
         /// <param name="implementation">An <see cref="Object"/> that implements <paramref name="ifaceType"/>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="ifaceType"/> or <paramref name="implementation"/> are `null`.</exception>
-        /// <exception cref="ArgumentException"><paramref name="implType"/> does not implement <paramref name="ifaceType"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="implementation"/> does not implement <paramref name="ifaceType"/>.</exception>
         /// <remarks>
         /// This method ignores the attributes on <paramref name="implementation"/>'s
         /// <see cref="Type"/> and registers it for <paramref name="platform"/> and
@@ -309,7 +309,7 @@ namespace Sharpmake
         /// <typeparam name="TImplementation">The type of the implementation class.</typeparam>
         /// <remarks>
         /// This method will search through the <see cref="PlatformImplementationAttribute"/> on
-        /// <paramref name="implType"/> to find what platform/interface pairs to register.
+        /// <typeparamref name="TImplementation"/> to find what platform/interface pairs to register.
         /// </remarks>
         public static void RegisterImplementation<TImplementation>()
             where TImplementation : class, new()

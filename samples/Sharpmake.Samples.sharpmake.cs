@@ -8,7 +8,7 @@ namespace SharpmakeGen.Samples
     public abstract class SampleProject : Common.SharpmakeBaseProject
     {
         public SampleProject()
-            : base(excludeSharpmakeFiles: false)
+            : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
         {
             SourceRootPath = @"[project.RootPath]\samples\[project.Name]";
             SourceFilesExcludeRegex.Add(

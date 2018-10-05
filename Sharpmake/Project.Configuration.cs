@@ -526,9 +526,8 @@ namespace Sharpmake
             }
 
             /// <summary>
-            // How many static blob files would this configuration generate
+            /// How many static blob files would this configuration generate
             /// </summary>
-            ///
             internal int GeneratableBlobCount = 0;
 
             string _fastBuildUnityPath = null;

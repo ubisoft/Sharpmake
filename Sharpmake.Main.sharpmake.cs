@@ -38,9 +38,16 @@ namespace SharpmakeGen
 
         public abstract class SharpmakeBaseProject : CSharpProject
         {
-            protected SharpmakeBaseProject(bool excludeSharpmakeFiles = true)
+            private readonly bool _generateXmlDoc;
+
+            protected SharpmakeBaseProject(
+                bool excludeSharpmakeFiles = true,
+                bool generateXmlDoc = true
+            )
             {
                 AddTargets(GetDefaultTargets());
+
+                _generateXmlDoc = generateXmlDoc;
 
                 RootPath = Globals.AbsoluteRootPath;
                 SourceRootPath = @"[project.RootPath]\[project.Name]";
@@ -61,6 +68,17 @@ namespace SharpmakeGen
 
                 conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
                 conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
+
+                if (_generateXmlDoc)
+                {
+                    conf.XmlDocumentationFile = @"[conf.TargetPath]\[project.AssemblyName].xml";
+                    conf.Options.Add(
+                        new Options.CSharp.SuppressWarning(
+                            1570, // W1: CS1570: XML comment on 'construct' has badly formed XML — 'reason
+                            1591  // W4: CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member'
+                        )
+                    );
+                }
             }
         }
     }

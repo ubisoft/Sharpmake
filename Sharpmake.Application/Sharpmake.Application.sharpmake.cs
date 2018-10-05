@@ -10,6 +10,7 @@ namespace SharpmakeGen
     public class SharpmakeApplicationProject : Common.SharpmakeBaseProject
     {
         public SharpmakeApplicationProject()
+            : base(generateXmlDoc: false)
         {
             Name = "Sharpmake.Application";
             ApplicationManifest = "app.manifest";
