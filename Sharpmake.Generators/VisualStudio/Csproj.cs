@@ -1118,7 +1118,10 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
                 using (resolver.NewScopedParameter("conf", conf))
+                using (resolver.NewScopedParameter("project", project))
+                using (resolver.NewScopedParameter("target", conf.Target))
                 using (resolver.NewScopedParameter("options", options[conf]))
+                using (resolver.NewScopedParameter("documentationFileRelPath", Util.PathGetRelative(_projectPath, resolver.Resolve(options[conf]["DocumentationFile"])))) // Needed to make sure the documentation file is in relative mode!
                 {
                     Write(Template.Project.ProjectConfigurationsGeneral, writer, resolver);
                 }
@@ -3064,6 +3067,7 @@ namespace Sharpmake.Generators.VisualStudio
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
             options["ManifestKeyFile"] = Options.StringOption.Get<Options.CSharp.ManifestKeyFile>(conf);
             options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
+            options["DocumentationFile"] = Options.StringOption.Get<Options.CSharp.DocumentationFile>(conf);
             options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
 
             // concat defines, don't add options.Defines since they are automatically added by VS
