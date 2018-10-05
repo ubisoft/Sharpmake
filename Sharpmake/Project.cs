@@ -2113,7 +2113,10 @@ namespace Sharpmake
             : this(typeof(Target))
         { }
         public CSharpProject(Type targetType)
-            : base(targetType)
+            : this(targetType, typeof(Project.Configuration))
+        { }
+        public CSharpProject(Type targetType, Type configurationType)
+            : base(targetType, configurationType)
         {
             InitCSharpSpecifics();
         }
