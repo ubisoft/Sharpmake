@@ -343,6 +343,10 @@ namespace Sharpmake.Generators.VisualStudio
                 @"      <PreprocessorDefinitions Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[ProjectFilesSourceDefine];%(PreprocessorDefinitions)</PreprocessorDefinitions>
 ";
 
+                public static string ProjectFilesSourceExcludeGenerateXmlDocumentation =
+                @"      <GenerateXMLDocumentationFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">false</GenerateXMLDocumentationFiles>
+";
+
                 public static string SingleReferenceByName =
                     @"    <Reference Include=""[include]"" />
 ";

@@ -1063,6 +1063,8 @@ namespace Sharpmake
 
             public Strings ResolvedSourceFilesBlobExclude = new Strings();
 
+            public Strings ResolvedSourceFilesGenerateXmlDocumentationExclude = new Strings();
+
             public Strings ResolvedSourceFilesWithCompileAsCOption = new Strings();
             public Strings ResolvedSourceFilesWithCompileAsCPPOption = new Strings();
             public Strings ResolvedSourceFilesWithCompileAsCLROption = new Strings();

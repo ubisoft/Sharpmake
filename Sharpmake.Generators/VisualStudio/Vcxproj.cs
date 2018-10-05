@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -567,6 +567,7 @@ namespace Sharpmake.Generators.VisualStudio
                 using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
                 using (fileGenerator.Declare("conf", conf))
                 using (fileGenerator.Declare("options", options[conf]))
+                using (fileGenerator.Declare("target", conf.Target))
                 {
                     var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
 
@@ -1467,6 +1468,7 @@ namespace Sharpmake.Generators.VisualStudio
                             bool isCompileAsCLRFile = conf.ResolvedSourceFilesWithCompileAsCLROption.Contains(file.FileName);
                             bool isCompileAsNonCLRFile = conf.ResolvedSourceFilesWithCompileAsNonCLROption.Contains(file.FileName);
                             bool objsInSubdirectories = conf.ObjectFileName != null && !isResource;
+                            bool isExcludeFromGenerateXmlDocumentation = conf.ResolvedSourceFilesGenerateXmlDocumentationExclude.Contains(file.FileName);
 
                             var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
                             if (isPrecompSource && platformVcxproj.ExcludesPrecompiledHeadersFromBuild)
@@ -1588,6 +1590,11 @@ namespace Sharpmake.Generators.VisualStudio
                                             {
                                                 fileGenerator.Write(Template.Project.ProjectFilesSourceObjectFileName);
                                             }
+                                        }
+
+                                        if (isExcludeFromGenerateXmlDocumentation)
+                                        {
+                                            fileGenerator.Write(Template.Project.ProjectFilesSourceExcludeGenerateXmlDocumentation);
                                         }
                                     }
                                 }
