@@ -939,6 +939,23 @@ namespace Sharpmake
             // Only used by csproj
             public string StartWorkingDirectory = string.Empty;
 
+            /// <summary>
+            /// Defines where the compiler will generate an XML documentation file at compile time.
+            /// </summary>
+            ///
+            /// The compiler generated XML file can be distributed alongside your .NET assembly so that
+            /// Visual Studio and other IDEs can use IntelliSense to show quick information about types
+            /// or members.
+            /// Additionally, the XML file can be run through tools like DocFX and Sandcastle
+            /// to generate API reference websites
+            ///
+            /// The following will output an XML file in the target directory with the same root filename as the assembly
+            ///
+            ///     conf.XmlDocumentationFile = @"[conf.TargetPath]\[project.AssemblyName].xml";
+            ///
+            /// <remarks>C# only</remarks>
+            public string XmlDocumentationFile = "";
+
             public FileCustomBuild CustomBuildForAllSources = null;
             public FileCustomBuild CustomBuildForAllIncludes = null;
 

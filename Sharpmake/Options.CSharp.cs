@@ -245,11 +245,6 @@ namespace Sharpmake
                 public ManifestCertificateThumbprint(string url) : base(url) { }
             }
 
-            public class DocumentationFile : StringOption
-            {
-                public DocumentationFile(string name) : base(name) { }
-            }
-
             public class InstallURL : StringOption
             {
                 public InstallURL(string url) : base(url) { }

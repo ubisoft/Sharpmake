@@ -3067,7 +3067,7 @@ namespace Sharpmake.Generators.VisualStudio
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
             options["ManifestKeyFile"] = Options.StringOption.Get<Options.CSharp.ManifestKeyFile>(conf);
             options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
-            options["DocumentationFile"] = Options.StringOption.Get<Options.CSharp.DocumentationFile>(conf);
+            options["DocumentationFile"] = string.IsNullOrEmpty(conf.XmlDocumentationFile) ? FileGeneratorUtilities.RemoveLineTag : conf.XmlDocumentationFile;
             options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
 
             // concat defines, don't add options.Defines since they are automatically added by VS
