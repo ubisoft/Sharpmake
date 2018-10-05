@@ -2003,6 +2003,7 @@ namespace Sharpmake
         public string StartupObject = string.Empty;
         public bool NoWin32Manifest = false;
         public bool UseMSBuild14IfAvailable = false;
+        public Strings PublicResourceFiles = new Strings();
         // If true, recreate the relative folder hierarchy for content files instead of grouping them up.
         public bool PreserveLinkFolderPaths = false;
         public Strings ApplicationDefinitionFilenames = new Strings();
@@ -2127,6 +2128,8 @@ namespace Sharpmake
 
         internal override void ResolveSourceFiles(Builder builder)
         {
+            ResourceFiles.AddRange(PublicResourceFiles);
+
             base.ResolveSourceFiles(builder);
 
             //Getting CorrectCaseVersion

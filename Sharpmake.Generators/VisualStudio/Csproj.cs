@@ -1443,7 +1443,6 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             HashSet<string> allContents = new HashSet<string>(itemGroups.Contents.Select(c => c.Include));
-
             List<string> resolvedSources = project.ResolvedSourceFiles.Select(source => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(source))).ToList();
             List<string> resolvedResources = project.ResourceFiles.Concat(project.ResolvedResourcesFullFileNames).Select(resource => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(resource))).Distinct().ToList();
             List<string> resolvedEmbeddedResource = project.ResourceFiles.Concat(project.AdditionalEmbeddedResource).Concat(project.AdditionalEmbeddedAssemblies).Select(f => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(f))).Distinct().ToList();
@@ -1451,6 +1450,8 @@ namespace Sharpmake.Generators.VisualStudio
                 (project.ResolvedNoneFullFileNames.Select(file => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(file))))
                 .Concat(project.AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))))
                 .Where(f => !allContents.Contains(f) && !resolvedResources.Contains(f) && !resolvedEmbeddedResource.Contains(f)).Distinct().ToList();
+
+            List<string> publicResources = project.PublicResourceFiles.Select(source => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(source))).ToList();
 
             //Add the None files from the configuration
             resolvedNoneFiles = resolvedNoneFiles.Concat(
@@ -1596,17 +1597,19 @@ namespace Sharpmake.Generators.VisualStudio
                         {
                             string designerFile = fileAssociation.GetFilenameWithExtension(".designer.cs");
                             string resXFile = fileAssociation.GetFilenameWithExtension(".resx");
+                            bool publicAccessModifiers = publicResources.Any(f => f.Equals(resXFile, StringComparison.InvariantCultureIgnoreCase));
                             itemGroups.Compiles.Add(new ItemGroups.Compile
                             {
                                 Include = designerFile,
                                 DependentUpon = Path.GetFileName(resXFile),
                                 LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project.SourceRootPath),
-                                AutoGen = true
+                                AutoGen = true,
+                                DesignTime = publicAccessModifiers ? (bool?)true : null
                             });
                             itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
                             {
                                 Include = resXFile,
-                                Generator = "ResXFileCodeGenerator",
+                                Generator = publicAccessModifiers ? "PublicResXFileCodeGenerator" : "ResXFileCodeGenerator",
                                 MergeWithCto = resXFile.EndsWith("VSPackage.resx", StringComparison.InvariantCultureIgnoreCase) ? "true" : null,
                                 LastGenOutput = Path.GetFileName(designerFile),
                                 LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath),
