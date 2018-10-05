@@ -31,6 +31,8 @@ class Test:
             # Detects the path of the Sharpmake executable
             sharpmake_path = find_target_path(self.directory, "Sharpmake.Application.exe")
 
+            write_line("Using sharpmake " + sharpmake_path)
+
             # Builds the command line argument list.
             sources = "/sources(@\"{}\")".format(os.path.join(self.directory, self.script_name))
             assemblies = "/assemblies(@\"{}\")".format(find_target_path(self.directory, self.assembly))
