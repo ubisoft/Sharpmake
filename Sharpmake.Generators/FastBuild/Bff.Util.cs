@@ -199,7 +199,18 @@ namespace Sharpmake.Generators.FastBuild
                         // Fragments are enums by contract, so Enum.ToObject works
                         var typedFragment = Enum.ToObject(fragmentsInfos[i].FieldType, fragments[i]);
 
-                        fragmentString += "_" + typedFragment.ToString().Replace(",", "").Replace(" ", "");
+                        if (typedFragment is Platform)
+                        {
+                            Platform platformFragment = (Platform)typedFragment;
+                            string platformString = platformFragment.ToString();
+                            if (platformFragment >= Platform._reserved9)
+                                platformString = Util.GetSimplePlatformString(platformFragment);
+                            fragmentString += "_" + platformString.ToLower();
+                        }
+                        else
+                        {
+                            fragmentString += "_" + typedFragment.ToString().Replace(",", "").Replace(" ", "");
+                        }
                     }
                     unity.UnityName = project.Name + fragmentString + "_unity";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
