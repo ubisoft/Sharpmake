@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
 using System.Collections.Generic;
 
 namespace Sharpmake.Generators.FastBuild
@@ -66,6 +67,9 @@ namespace Sharpmake.Generators.FastBuild
         /// <param name="configuration">The project configuration</param>
         /// <param name="fastBuildOutputFile">The file name of the build output.</param>
         void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile);
+
+        [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf")]
+        void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile);
 
         /// <summary>
         /// Get the extra list of build steps to execute for this platform.
