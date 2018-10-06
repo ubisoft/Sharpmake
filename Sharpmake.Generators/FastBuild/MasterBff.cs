@@ -470,7 +470,7 @@ namespace Sharpmake.Generators.FastBuild
                     using (fileGenerator.Declare("fastBuildPrebuildExeFile", Util.PathGetRelative(relativeTo, execCommand.ExecutableFile)))
                     using (fileGenerator.Declare("fastBuildPreBuildInputFile", Util.PathGetRelative(relativeTo, execCommand.ExecutableInputFileArgumentOption)))
                     using (fileGenerator.Declare("fastBuildPreBuildOutputFile", Util.PathGetRelative(relativeTo, execCommand.ExecutableOutputFileArgumentOption)))
-                    using (fileGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
+                    using (fileGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(execCommand.ExecutableOtherArguments) ? FileGeneratorUtilities.RemoveLineTag : execCommand.ExecutableOtherArguments))
                     using (fileGenerator.Declare("fastBuildPrebuildWorkingPath", execCommand.ExecutableWorkingDirectory == string.Empty ? FileGeneratorUtilities.RemoveLineTag : Util.PathGetRelative(relativeTo, execCommand.ExecutableWorkingDirectory)))
                     using (fileGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                     {

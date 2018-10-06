@@ -375,7 +375,7 @@ namespace Sharpmake.Generators.FastBuild
             using (bffGenerator.Declare("fastBuildPrebuildExeFile", relativeBuildStep.Executable))
             using (bffGenerator.Declare("fastBuildPreBuildInputFile", relativeBuildStep.KeyInput))
             using (bffGenerator.Declare("fastBuildPreBuildOutputFile", relativeBuildStep.Output))
-            using (bffGenerator.Declare("fastBuildPreBuildArguments", relativeBuildStep.ExecutableArguments))
+            using (bffGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(relativeBuildStep.ExecutableArguments) ? FileGeneratorUtilities.RemoveLineTag : relativeBuildStep.ExecutableArguments))
             // This is normally the project directory.
             using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", FileGeneratorUtilities.RemoveLineTag))
             using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", FileGeneratorUtilities.RemoveLineTag))

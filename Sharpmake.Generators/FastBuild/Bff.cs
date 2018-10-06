@@ -1126,7 +1126,7 @@ namespace Sharpmake.Generators.FastBuild
                                                     using (bffGenerator.Declare("fastBuildPrebuildExeFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableFile)))
                                                     using (bffGenerator.Declare("fastBuildPreBuildInputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableInputFileArgumentOption)))
                                                     using (bffGenerator.Declare("fastBuildPreBuildOutputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableOutputFileArgumentOption)))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildArguments", execCommand.ExecutableOtherArguments))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(execCommand.ExecutableOtherArguments) ? FileGeneratorUtilities.RemoveLineTag : execCommand.ExecutableOtherArguments))
                                                     using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableWorkingDirectory)))
                                                     using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                                                     {
@@ -1164,8 +1164,8 @@ namespace Sharpmake.Generators.FastBuild
                                                     using (bffGenerator.Declare("fastBuildTestExecutable", fastBuildTestExecutable))
                                                     using (bffGenerator.Declare("fastBuildTestWorkingDir", fastBuildTestWorkingDir))
                                                     using (bffGenerator.Declare("fastBuildTestOutput", fastBuildTestOutput))
-                                                    using (bffGenerator.Declare("fastBuildTestArguments", conf.PostBuildStepTest.TestArguments))
-                                                    using (bffGenerator.Declare("fastBuildTestTimeOut", conf.PostBuildStepTest.TestTimeOutInSecond.ToString()))
+                                                    using (bffGenerator.Declare("fastBuildTestArguments", string.IsNullOrWhiteSpace(conf.PostBuildStepTest.TestArguments) ? FileGeneratorUtilities.RemoveLineTag : conf.PostBuildStepTest.TestArguments))
+                                                    using (bffGenerator.Declare("fastBuildTestTimeOut", conf.PostBuildStepTest.TestTimeOutInSecond == 0 ? FileGeneratorUtilities.RemoveLineTag : conf.PostBuildStepTest.TestTimeOutInSecond.ToString()))
                                                     using (bffGenerator.Declare("fastBuildTestAlwaysShowOutput", conf.PostBuildStepTest.TestAlwaysShowOutput ? "true" : "false"))
                                                     {
                                                         bffGenerator.Write(Template.ConfigurationFile.TestSection);
