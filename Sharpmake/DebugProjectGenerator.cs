@@ -146,8 +146,15 @@ namespace Sharpmake
 
         internal static Target GetTargets()
         {
-            return new Target(Platform.anycpu, DevEnv.vs2015 | DevEnv.vs2017, Optimization.Debug,
-                OutputType.Dll, Blob.NoBlob, BuildSystem.MSBuild, DotNetFramework.v4_5);
+            return new Target(
+                Platform.anycpu,
+                DevEnv.vs2015 | DevEnv.vs2017,
+                Optimization.Debug,
+                OutputType.Dll,
+                Blob.NoBlob,
+                BuildSystem.MSBuild,
+                DotNetFramework.v4_6_1
+            );
         }
 
         private static string s_sharpmakePackageName;
