@@ -363,6 +363,13 @@ namespace Sharpmake
                     Enable,
                 }
 
+                public enum ConformanceMode
+                {
+                    Disable,
+                    [Default]
+                    Enable
+                }
+
                 public enum CharUnsigned
                 {
                     [Default]

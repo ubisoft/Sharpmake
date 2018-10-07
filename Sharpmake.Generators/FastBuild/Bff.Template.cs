@@ -309,6 +309,7 @@ Compiler( '[fastbuildCompilerName]' )
             // Language options
             // ---------------------------
             + ' [cmdLineOptions.DisableLanguageExtensions]'
+            + ' [cmdLineOptions.ConformanceMode]'
             + ' [cmdLineOptions.TreatWChar_tAsBuiltInType]'
             + ' [cmdLineOptions.ForceConformanceInForLoopScope]'
             + ' [cmdLineOptions.RuntimeTypeInfo]'

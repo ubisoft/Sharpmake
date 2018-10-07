@@ -711,6 +711,15 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.DisableLanguageExtensions.Enable, () => { context.Options["DisableLanguageExtensions"] = "true"; context.CommandLineOptions["DisableLanguageExtensions"] = "/Za"; })
             );
 
+            // Options.Vc.Compiler.ConformanceMode
+            //    Disable                                 ConformanceMode="false"
+            //    Enable                                  ConformanceMode="true"                          /permissive-
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.ConformanceMode.Disable, () => { context.Options["ConformanceMode"] = "false"; context.CommandLineOptions["ConformanceMode"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Compiler.ConformanceMode.Enable, () => { context.Options["ConformanceMode"] = "true"; context.CommandLineOptions["ConformanceMode"] = "/permissive-"; })
+            );
+
             //Options.Vc.Compiler.BuiltInWChartType.
             //    Disable                                 TreatWChar_tAsBuiltInType="false"               /Zc:wchar_t-
             //    Enable                                  TreatWChar_tAsBuiltInType="true"                /Zc:wchar_t
