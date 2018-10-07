@@ -257,7 +257,7 @@ namespace Sharpmake
     public class DebugProject : CSharpProject
     {
         public DebugProject()
-            : base(typeof(Target))
+            : base(typeof(Target), typeof(Configuration), isInternal: true)
         {
             // set paths
             RootPath = DebugProjectGenerator.DebugProjects[GetType()].ProjectFolder;

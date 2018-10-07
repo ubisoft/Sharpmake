@@ -2116,7 +2116,10 @@ namespace Sharpmake
             : this(targetType, typeof(Project.Configuration))
         { }
         public CSharpProject(Type targetType, Type configurationType)
-            : base(targetType, configurationType)
+            : this(targetType, configurationType, isInternal: false)
+        { }
+        internal CSharpProject(Type targetType, Type configurationType, bool isInternal)
+            : base(targetType, configurationType, isInternal)
         {
             InitCSharpSpecifics();
         }
