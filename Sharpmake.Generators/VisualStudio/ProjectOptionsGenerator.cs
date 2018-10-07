@@ -150,7 +150,8 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.10586.0"; }),
                 Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.14393.0"; }),
                 Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.15063.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.16299.0"; })
+                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.16299.0"; }),
+                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.17134.0"; })
                 );
         }
 
@@ -709,6 +710,22 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.DisableLanguageExtensions.Disable, () => { context.Options["DisableLanguageExtensions"] = "false"; context.CommandLineOptions["DisableLanguageExtensions"] = FileGeneratorUtilities.RemoveLineTag; }),
             Options.Option(Options.Vc.Compiler.DisableLanguageExtensions.Enable, () => { context.Options["DisableLanguageExtensions"] = "true"; context.CommandLineOptions["DisableLanguageExtensions"] = "/Za"; })
             );
+
+            if (context.DevelopmentEnvironment == DevEnv.vs2017)
+            {
+                // Options.Vc.Compiler.ConformanceMode
+                //    Disable                                 ConformanceMode="false"
+                //    Enable                                  ConformanceMode="true"                          /permissive-
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.Compiler.ConformanceMode.Disable, () => { context.Options["ConformanceMode"] = "false"; context.CommandLineOptions["ConformanceMode"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.ConformanceMode.Enable, () => { context.Options["ConformanceMode"] = "true"; context.CommandLineOptions["ConformanceMode"] = "/permissive-"; })
+                );
+            }
+            else
+            {
+               context.CommandLineOptions["ConformanceMode"] = FileGeneratorUtilities.RemoveLineTag;
+            }
 
             //Options.Vc.Compiler.BuiltInWChartType.
             //    Disable                                 TreatWChar_tAsBuiltInType="false"               /Zc:wchar_t-
