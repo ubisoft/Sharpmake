@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2017 Ubisoft Entertainment
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,7 +68,7 @@ namespace Sharpmake
 
             GenerateDebugProject(assemblyInfo, true, new Dictionary<string, Type>());
         }
-        
+
         private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, IDictionary<string, Type> visited)
         {
             string displayName = assemblyInfo.DebugProjectName;
@@ -85,10 +85,14 @@ namespace Sharpmake
 
             visited[assemblyInfo.Id] = null;
 
-            ProjectContent project = new ProjectContent { ProjectFolder = RootPath, IsSetupProject = isSetupProject, DisplayName = displayName };
+            ProjectContent project = new ProjectContent {
+                ProjectFolder = RootPath,
+                IsSetupProject = isSetupProject,
+                DisplayName = displayName
+            };
             generatedProject = CreateProject(displayName);
             DebugProjects.Add(generatedProject, project);
-            
+
             // Add sources
             foreach (var source in assemblyInfo.SourceFiles)
             {
@@ -112,12 +116,12 @@ namespace Sharpmake
             }
 
             project.References.AddRange(references);
-            
+
             foreach (var refInfo in assemblyInfo.SourceReferences.Values)
             {
                 project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, visited));
             }
-            
+
             visited[assemblyInfo.Id] = generatedProject;
 
             return generatedProject;
@@ -256,15 +260,19 @@ namespace Sharpmake
     [Sharpmake.Generate]
     public class DebugProject : CSharpProject
     {
+        private readonly DebugProjectGenerator.ProjectContent _projectInfo;
+
         public DebugProject()
             : base(typeof(Target), typeof(Configuration), isInternal: true)
         {
+            _projectInfo = DebugProjectGenerator.DebugProjects[GetType()];
+
             // set paths
-            RootPath = DebugProjectGenerator.DebugProjects[GetType()].ProjectFolder;
+            RootPath = _projectInfo.ProjectFolder;
             SourceRootPath = RootPath;
 
             // add selected source files
-            SourceFiles.AddRange(DebugProjectGenerator.DebugProjects[GetType()].ProjectFiles);
+            SourceFiles.AddRange(_projectInfo.ProjectFiles);
 
             // ensure that no file will be automagically added
             SourceFilesExtensions.Clear();
@@ -274,7 +282,7 @@ namespace Sharpmake
             NoneExtensions.Clear();
             VsctExtension.Clear();
 
-            Name = DebugProjectGenerator.DebugProjects[GetType()].DisplayName;
+            Name = _projectInfo.DisplayName;
 
             AddTargets(DebugProjectGenerator.GetTargets());
         }
@@ -290,15 +298,15 @@ namespace Sharpmake
 
             conf.Options.Add(Options.CSharp.LanguageVersion.CSharp5);
 
-            conf.ReferencesByPath.AddRange(DebugProjectGenerator.DebugProjects[GetType()].References);
-            foreach (var projectReference in DebugProjectGenerator.DebugProjects[GetType()].ProjectReferences)
+            conf.ReferencesByPath.AddRange(_projectInfo.References);
+            foreach (var projectReference in _projectInfo.ProjectReferences)
             {
                 conf.AddPrivateDependency(target, projectReference);
             }
 
             // set up custom configuration only to setup project
             if (string.CompareOrdinal(conf.ProjectPath.ToLower(), RootPath.ToLower()) == 0
-                && DebugProjectGenerator.DebugProjects[GetType()].IsSetupProject)
+                && _projectInfo.IsSetupProject)
             {
                 conf.SetupProjectOptions();
             }
