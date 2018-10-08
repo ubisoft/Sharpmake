@@ -1452,6 +1452,7 @@ namespace Sharpmake.Generators.VisualStudio
                             Project.Configuration conf = context.ProjectConfigurations[i];
                             List<ProjectFile> compiledFiles = configurationCompiledFiles[i];
 
+                            bool hasPrecomp = !string.IsNullOrEmpty(conf.PrecompSource) && !string.IsNullOrEmpty(conf.PrecompHeader);
                             bool isPrecompSource = !string.IsNullOrEmpty(conf.PrecompSource) && file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase);
                             bool isDontUsePrecomp = conf.PrecompSourceExclude.Contains(file.FileName) ||
                                                     conf.PrecompSourceExcludeFolders.Any(folder => file.FileName.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) ||
@@ -1500,7 +1501,7 @@ namespace Sharpmake.Generators.VisualStudio
                             haveFileOptions = haveFileOptions ||
                                               isExcludeFromBuild ||
                                               isPrecompSource ||
-                                              isDontUsePrecomp ||
+                                              (isDontUsePrecomp && hasPrecomp) ||
                                               isBlobFileDefine ||
                                               isResourceFileDefine ||
                                               isCompileAsCFile ||
@@ -1561,7 +1562,7 @@ namespace Sharpmake.Generators.VisualStudio
                                         {
                                             fileGenerator.Write(Template.Project.ProjectFilesSourcePrecompCreate);
                                         }
-                                        else if (isDontUsePrecomp)
+                                        else if (isDontUsePrecomp && hasPrecomp)
                                         {
                                             fileGenerator.Write(Template.Project.ProjectFilesSourcePrecompNotUsing);
                                         }
