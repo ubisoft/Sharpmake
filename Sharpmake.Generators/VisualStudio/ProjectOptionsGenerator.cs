@@ -1087,12 +1087,15 @@ namespace Sharpmake.Generators.VisualStudio
         private void GenerateLinkerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             string outputExtension = context.Configuration.OutputExtension;
-            string outputFileName = $"{optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output)}{optionsContext.TargetName}";
+            if (outputExtension.Length > 0 && !outputExtension.StartsWith(".", StringComparison.Ordinal))
+                outputExtension = outputExtension.Insert(0, ".");
+
+            string outputFileName = optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output) + optionsContext.TargetName;
 
             context.Options["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["OutputFileName"] = outputFileName;
-            context.Options["OutputFileExtension"] = "." + outputExtension;
+            context.Options["OutputFileExtension"] = outputExtension;
 
             context.Options["AdditionalDeploymentFolders"] = "";
 
@@ -1103,7 +1106,7 @@ namespace Sharpmake.Generators.VisualStudio
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                    context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + outputFileName + "." + outputExtension;
+                    context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + outputFileName + outputExtension;
                     if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
                     {
                         string importLibRelative = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".lib";
@@ -1112,7 +1115,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                     break;
                 case Project.Configuration.OutputType.Lib:
-                    context.Options["OutputFile"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + outputFileName + "." + outputExtension;
+                    context.Options["OutputFile"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + outputFileName + outputExtension;
                     break;
                 case Project.Configuration.OutputType.Utility:
                 case Project.Configuration.OutputType.None:
