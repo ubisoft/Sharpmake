@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Sharpmake</id>
@@ -7,5 +7,6 @@
     <file src="bin\release\**" target="tools" />
     <file src="bin\release\*.dll" target="lib/net45" />
     <file src="bin\release\*.pdb" target="lib/net45" />
+    <file src="bin\release\*.xml" target="lib/net45" />
   </files>
 </package>
