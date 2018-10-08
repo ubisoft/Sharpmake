@@ -35,6 +35,8 @@ namespace Sharpmake
                     Default,
                     Cpp98,
                     Cpp11,
+                    Cpp14,
+                    Cpp17,
                     GnuCpp98,
                     GnuCpp11
                 }
