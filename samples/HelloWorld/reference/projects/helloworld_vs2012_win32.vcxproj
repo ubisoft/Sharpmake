@@ -33,9 +33,6 @@
     <IntDir>obj\win32\debug\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win32\debug\helloworld.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>

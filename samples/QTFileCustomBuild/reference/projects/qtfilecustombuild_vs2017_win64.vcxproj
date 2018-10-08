@@ -56,9 +56,6 @@
     <IntDir>obj\win64\debug\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win64\debug\qtfilecustombuild.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -69,9 +66,6 @@
     <IntDir>obj\win64\release\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win64\release\qtfilecustombuild.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -82,9 +76,6 @@
     <IntDir>obj\win64\retail\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win64\retail\qtfilecustombuild.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>

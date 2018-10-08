@@ -48,9 +48,6 @@
     <IntDir>temp\vs2012\win32\noblob_msbuild_vs2012_v4_5_debug_dll_win32\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win32\debug\clrcppproj.dll</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -61,9 +58,6 @@
     <IntDir>temp\vs2012\win32\noblob_msbuild_vs2012_v4_5_release_dll_win32\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win32\release\clrcppproj.dll</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>

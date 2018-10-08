@@ -1652,17 +1652,44 @@ namespace Sharpmake.Generators.VisualStudio
         {
             string eventSeparator = Vcxproj.EventSeparator;
 
-            context.Options["PreBuildEvent"] = context.Configuration.EventPreBuild.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.EventPreBuild.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
-            context.Options["PreBuildEventDescription"] = context.Configuration.EventPreBuildDescription != String.Empty ? context.Configuration.EventPreBuildDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["PreBuildEventEnable"] = context.Configuration.EventPreBuildExcludedFromBuild ? "false" : "true";
+            if (context.Configuration.EventPreBuild.Count == 0)
+            {
+                context.Options["PreBuildEvent"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreBuildEventDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreBuildEventEnable"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["PreBuildEvent"] = (context.Configuration.EventPreBuild.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
+                context.Options["PreBuildEventDescription"] = context.Configuration.EventPreBuildDescription != string.Empty ? context.Configuration.EventPreBuildDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreBuildEventEnable"] = context.Configuration.EventPreBuildExcludedFromBuild ? "false" : "true";
+            }
 
-            context.Options["PreLinkEvent"] = context.Configuration.EventPreLink.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.EventPreLink.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
-            context.Options["PreLinkEventDescription"] = context.Configuration.EventPreLinkDescription != String.Empty ? context.Configuration.EventPreLinkDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["PreLinkEventEnable"] = context.Configuration.EventPreLinkExcludedFromBuild ? "false" : "true";
+            if (context.Configuration.EventPreLink.Count == 0)
+            {
+                context.Options["PreLinkEvent"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreLinkEventDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreLinkEventEnable"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["PreLinkEvent"] = (context.Configuration.EventPreLink.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
+                context.Options["PreLinkEventDescription"] = context.Configuration.EventPreLinkDescription != string.Empty ? context.Configuration.EventPreLinkDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreLinkEventEnable"] = context.Configuration.EventPreLinkExcludedFromBuild ? "false" : "true";
+            }
 
-            context.Options["PrePostLinkEvent"] = context.Configuration.EventPrePostLink.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.EventPrePostLink.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
-            context.Options["PrePostLinkEventDescription"] = context.Configuration.EventPrePostLinkDescription != String.Empty ? context.Configuration.EventPrePostLinkDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["PrePostLinkEventEnable"] = context.Configuration.EventPrePostLinkExcludedFromBuild ? "false" : "true";
+            if (context.Configuration.EventPrePostLink.Count == 0)
+            {
+                context.Options["PrePostLinkEvent"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PrePostLinkEventDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PrePostLinkEventEnable"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["PrePostLinkEvent"] = (context.Configuration.EventPrePostLink.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
+                context.Options["PrePostLinkEventDescription"] = context.Configuration.EventPrePostLinkDescription != string.Empty ? context.Configuration.EventPrePostLinkDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PrePostLinkEventEnable"] = context.Configuration.EventPrePostLinkExcludedFromBuild ? "false" : "true";
+            }
 
             if (!context.Configuration.IsFastBuild)
             {
@@ -1754,25 +1781,65 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            context.Options["PreBuildEvent"] = context.Configuration.EventPreBuild.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.EventPreBuild.JoinStrings(eventSeparator, escapeXml: true) + eventSeparator);
-            context.Options["PreBuildEventDescription"] = context.Configuration.EventPreBuildDescription != String.Empty ? context.Configuration.EventPreBuildDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["PreBuildEventEnable"] = context.Configuration.EventPreBuildExcludedFromBuild ? "false" : "true";
+            if (context.Configuration.EventPreBuild.Count == 0)
+            {
+                context.Options["PreBuildEvent"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreBuildEventDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreBuildEventEnable"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["PreBuildEvent"] = context.Configuration.EventPreBuild.JoinStrings(eventSeparator, escapeXml: true) + eventSeparator;
+                context.Options["PreBuildEventDescription"] = context.Configuration.EventPreBuildDescription != string.Empty ? context.Configuration.EventPreBuildDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PreBuildEventEnable"] = context.Configuration.EventPreBuildExcludedFromBuild ? "false" : "true";
+            }
 
-            context.Options["PostBuildEvent"] = context.Configuration.EventPostBuild.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (Util.JoinStrings(context.Configuration.EventPostBuild, eventSeparator, escapeXml: true) + eventSeparator);
-            context.Options["PostBuildEventDescription"] = context.Configuration.EventPostBuildDescription != String.Empty ? context.Configuration.EventPostBuildDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["PostBuildEventEnable"] = context.Configuration.EventPostBuildExcludedFromBuild ? "false" : "true";
+            if (context.Configuration.EventPostBuild.Count == 0)
+            {
+                context.Options["PostBuildEvent"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PostBuildEventDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PostBuildEventEnable"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["PostBuildEvent"] = Util.JoinStrings(context.Configuration.EventPostBuild, eventSeparator, escapeXml: true) + eventSeparator;
+                context.Options["PostBuildEventDescription"] = context.Configuration.EventPostBuildDescription != string.Empty ? context.Configuration.EventPostBuildDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PostBuildEventEnable"] = context.Configuration.EventPostBuildExcludedFromBuild ? "false" : "true";
+            }
 
-            context.Options["CustomBuildEvent"] = context.Configuration.EventCustomBuild.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.EventCustomBuild.JoinStrings(eventSeparator, escapeXml: true) + eventSeparator);
-            context.Options["CustomBuildEventDescription"] = context.Configuration.EventCustomBuildDescription != String.Empty ? context.Configuration.EventCustomBuildDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["CustomBuildEventOutputs"] = context.Configuration.EventCustomBuildOutputs != String.Empty ? context.Configuration.EventCustomBuildOutputs : FileGeneratorUtilities.RemoveLineTag;
+            if (context.Configuration.EventCustomBuild.Count == 0)
+            {
+                context.Options["CustomBuildEvent"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildEventDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildEventOutputs"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["CustomBuildEvent"] = (context.Configuration.EventCustomBuild.JoinStrings(eventSeparator, escapeXml: true) + eventSeparator);
+                context.Options["CustomBuildEventDescription"] = context.Configuration.EventCustomBuildDescription != string.Empty ? context.Configuration.EventCustomBuildDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildEventOutputs"] = context.Configuration.EventCustomBuildOutputs != string.Empty ? context.Configuration.EventCustomBuildOutputs : FileGeneratorUtilities.RemoveLineTag;
+            }
 
-            context.Options["CustomBuildStep"] = context.Configuration.CustomBuildStep.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (Util.JoinStrings(context.Configuration.CustomBuildStep, eventSeparator, escapeXml: true) + eventSeparator);
-            context.Options["CustomBuildStepDescription"] = context.Configuration.CustomBuildStepDescription != String.Empty ? context.Configuration.CustomBuildStepDescription : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["CustomBuildStepOutputs"] = context.Configuration.CustomBuildStepOutputs.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.CustomBuildStepOutputs.JoinStrings(";", escapeXml: true));
-            context.Options["CustomBuildStepInputs"] = context.Configuration.CustomBuildStepInputs.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.CustomBuildStepInputs.JoinStrings(";", escapeXml: true));
-            context.Options["CustomBuildStepBeforeTargets"] = context.Configuration.CustomBuildStepBeforeTargets != String.Empty ? context.Configuration.CustomBuildStepBeforeTargets : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["CustomBuildStepAfterTargets"] = context.Configuration.CustomBuildStepAfterTargets != String.Empty ? context.Configuration.CustomBuildStepAfterTargets : FileGeneratorUtilities.RemoveLineTag;
-            context.Options["CustomBuildStepTreatOutputAsContent"] = context.Configuration.CustomBuildStepTreatOutputAsContent != String.Empty ? context.Configuration.CustomBuildStepTreatOutputAsContent : FileGeneratorUtilities.RemoveLineTag;
+            if (context.Configuration.CustomBuildStep.Count == 0)
+            {
+                context.Options["CustomBuildStep"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepDescription"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepOutputs"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepInputs"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepBeforeTargets"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepAfterTargets"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepTreatOutputAsContent"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                context.Options["CustomBuildStep"] = (Util.JoinStrings(context.Configuration.CustomBuildStep, eventSeparator, escapeXml: true) + eventSeparator);
+                context.Options["CustomBuildStepDescription"] = context.Configuration.CustomBuildStepDescription != string.Empty ? context.Configuration.CustomBuildStepDescription : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepOutputs"] = context.Configuration.CustomBuildStepOutputs.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.CustomBuildStepOutputs.JoinStrings(";", escapeXml: true));
+                context.Options["CustomBuildStepInputs"] = context.Configuration.CustomBuildStepInputs.Count == 0 ? FileGeneratorUtilities.RemoveLineTag : (context.Configuration.CustomBuildStepInputs.JoinStrings(";", escapeXml: true));
+                context.Options["CustomBuildStepBeforeTargets"] = context.Configuration.CustomBuildStepBeforeTargets != string.Empty ? context.Configuration.CustomBuildStepBeforeTargets : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepAfterTargets"] = context.Configuration.CustomBuildStepAfterTargets != string.Empty ? context.Configuration.CustomBuildStepAfterTargets : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CustomBuildStepTreatOutputAsContent"] = context.Configuration.CustomBuildStepTreatOutputAsContent != string.Empty ? context.Configuration.CustomBuildStepTreatOutputAsContent : FileGeneratorUtilities.RemoveLineTag;
+            }
         }
 
         public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)

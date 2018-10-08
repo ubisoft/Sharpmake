@@ -44,9 +44,6 @@
     <IntDir>temp\vs2010\win32\noblob_msbuild_vs2010_v4_0_debug_dll_win32\</IntDir>
     <TargetExt>.lib</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win32\debug\theemptycppproject.lib</OutputFile>
   </PropertyGroup>
@@ -56,9 +53,6 @@
     <IntDir>temp\vs2010\win32\noblob_msbuild_vs2010_v4_0_release_dll_win32\</IntDir>
     <TargetExt>.lib</TargetExt>
     <GenerateManifest>true</GenerateManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win32\release\theemptycppproject.lib</OutputFile>
   </PropertyGroup>

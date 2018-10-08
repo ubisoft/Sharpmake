@@ -2768,13 +2768,32 @@ namespace Sharpmake.Generators.VisualStudio
 
             ProcessDependencyCopy(project, conf);
 
-            options["PreBuildEvent"] = conf.EventPreBuild.Count == 0 ? RemoveLineTag : conf.EventPreBuild.JoinStrings(Environment.NewLine, escapeXml: true);
-            options["PreBuildEventDescription"] = conf.EventPreBuildDescription != string.Empty ? conf.EventPreBuildDescription : RemoveLineTag;
-            options["PreBuildEventEnable"] = conf.EventPreBuildExcludedFromBuild ? "false" : "true";
+            if (conf.EventPreBuild.Count == 0)
+            {
+                options["PreBuildEvent"] = RemoveLineTag;
+                options["PreBuildEventDescription"] = RemoveLineTag;
+                options["PreBuildEventEnable"] = RemoveLineTag;
+            }
+            else
+            {
+                options["PreBuildEvent"] = conf.EventPreBuild.JoinStrings(Environment.NewLine, escapeXml: true);
+                options["PreBuildEventDescription"] = conf.EventPreBuildDescription != string.Empty ? conf.EventPreBuildDescription : RemoveLineTag;
+                options["PreBuildEventEnable"] = conf.EventPreBuildExcludedFromBuild ? "false" : "true";
+            }
 
-            options["PostBuildEvent"] = conf.EventPostBuild.Count == 0 ? RemoveLineTag : Util.JoinStrings(conf.EventPostBuild, Environment.NewLine, escapeXml: true);
-            options["PostBuildEventDescription"] = conf.EventPostBuildDescription != string.Empty ? conf.EventPostBuildDescription : RemoveLineTag;
-            options["PostBuildEventEnable"] = conf.EventPostBuildExcludedFromBuild ? "false" : "true";
+            if (conf.EventPostBuild.Count == 0)
+            {
+                options["PostBuildEvent"] = RemoveLineTag;
+                options["PostBuildEventDescription"] = RemoveLineTag;
+                options["PostBuildEventEnable"] = RemoveLineTag;
+            }
+            else
+            {
+                options["PostBuildEvent"] = Util.JoinStrings(conf.EventPostBuild, Environment.NewLine, escapeXml: true);
+                options["PostBuildEventDescription"] = conf.EventPostBuildDescription != string.Empty ? conf.EventPostBuildDescription : RemoveLineTag;
+                options["PostBuildEventEnable"] = conf.EventPostBuildExcludedFromBuild ? "false" : "true";
+            }
+
 
             #endregion
 
