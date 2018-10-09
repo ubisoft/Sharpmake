@@ -187,10 +187,18 @@ endif
 
 ";
 
-                public static string ObjectRule =
+                public static readonly string ObjectRuleCxx =
 @"$(OBJDIR)/[objectFile]: [sourceFile] | $(OBJDIR)
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o ""$@"" -c ""$<""
+	$(SILENT) $(POSTFILECMDS)
+
+";
+
+                public static readonly string ObjectRuleC =
+@"$(OBJDIR)/[objectFile]: [sourceFile] | $(OBJDIR)
+	@echo $(notdir $<)
+	$(SILENT) $(CXX)  $(CFLAGS) -x c -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 
 ";
