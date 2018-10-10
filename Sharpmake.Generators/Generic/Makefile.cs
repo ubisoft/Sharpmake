@@ -514,6 +514,9 @@ namespace Sharpmake.Generators.Generic
                 options["LinkCommand"] = Template.Project.LinkCommandExe;
             }
 
+            string linkerAdditionalOptions = conf.AdditionalLinkerOptions.JoinStrings(" ");
+            options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
+
             #endregion
 
             return options;
