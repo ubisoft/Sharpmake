@@ -123,23 +123,28 @@ namespace Sharpmake
             }
         }
 
-        public static string GetVisualVersionString(this DevEnv visualVersion)
+        public static int GetVisualMajorVersion(this DevEnv visualVersion)
         {
             switch (visualVersion)
             {
                 case DevEnv.vs2010:
-                    return "10.0";
+                    return 10;
                 case DevEnv.vs2012:
-                    return "11.0";
+                    return 11;
                 case DevEnv.vs2013:
-                    return "12.0";
+                    return 12;
                 case DevEnv.vs2015:
-                    return "14.0";
+                    return 14;
                 case DevEnv.vs2017:
-                    return "15.0";
+                    return 15;
                 default:
                     throw new NotImplementedException("DevEnv " + visualVersion + " not recognized!");
             }
+        }
+
+        public static string GetVisualVersionString(this DevEnv visualVersion)
+        {
+            return string.Format("{0}.0", visualVersion.GetVisualMajorVersion());
         }
 
         public static string GetDefaultPlatformToolset(this DevEnv visualVersion)
@@ -188,22 +193,28 @@ namespace Sharpmake
             return s_visualStudioDirOverrides.ContainsKey(visualVersion);
         }
 
+        private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioDirectories = new ConcurrentDictionary<DevEnv, string>();
         public static string GetVisualStudioDir(this DevEnv visualVersion)
         {
-            // First check if the visual studio path is overriden from default value.
-            string pathOverride;
-            if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
-                return pathOverride;
+            string visualStudioDirectory = s_visualStudioDirectories.GetOrAdd(visualVersion, devEnv =>
+            {
+                // First check if the visual studio path is overriden from default value.
+                string pathOverride;
+                if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
+                    return pathOverride;
 
-            string registryKeyString = string.Format(
-                            @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
-                            Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty);
+                string installDir = Util.GetVisualStudioInstallPathFromQuery(visualVersion);
+                if (string.IsNullOrEmpty(installDir))
+                {
+                    installDir = visualVersion == DevEnv.vs2017
+                        ? @"Microsoft Visual Studio\2017\Professional"
+                        : string.Format(@"Microsoft Visual Studio {0}", visualVersion.GetVisualVersionString());
+                    installDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), installDir);
+                }
+                return Util.SimplifyPath(installDir);
+            });
 
-            string fallback = visualVersion == DevEnv.vs2017 ? @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional"
-                                                             : @"C:\Program Files (x86)\Microsoft Visual Studio " + visualVersion.GetVisualVersionString();
-
-            string installDir = Util.GetRegistryLocalMachineSubKeyValue(registryKeyString, visualVersion.GetVisualVersionString(), fallback);
-            return Util.SimplifyPath(installDir);
+            return visualStudioDirectory;
         }
 
         private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioVCRootPathCache = new ConcurrentDictionary<DevEnv, string>();
@@ -581,6 +592,19 @@ namespace Sharpmake
                 return true;
 
             return false;
+        }
+
+        public static int IndexOf<T>(this T[] source, T value)
+        {
+            return IndexOf<T>(source, value, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public static int IndexOf<T>(this T[] source, T value, StringComparison stringComparison)
+        {
+            if (typeof(T) == typeof(string))
+                return Array.FindIndex(source, m => m.ToString().Equals(value.ToString(), stringComparison));
+            else
+                return Array.IndexOf(source, value);
         }
     }
 }

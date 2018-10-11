@@ -20,6 +20,7 @@ namespace SharpmakeGen
             conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.v4.0");
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
+            conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "1.16.30");
         }
     }
 }
