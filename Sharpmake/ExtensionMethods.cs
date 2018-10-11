@@ -68,6 +68,8 @@ namespace Sharpmake
                     return "4.7";
                 case DotNetFramework.v4_7_1:
                     return "4.7.1";
+                case DotNetFramework.v4_7_2:
+                    return "4.7.2";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }
@@ -99,6 +101,8 @@ namespace Sharpmake
                     return "net47";
                 case DotNetFramework.v4_7_1:
                     return "net471";
+                case DotNetFramework.v4_7_2:
+                    return "net472";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }

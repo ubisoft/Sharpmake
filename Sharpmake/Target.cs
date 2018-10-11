@@ -148,6 +148,7 @@ namespace Sharpmake
         v4_6_2 = 1 << 11,
         v4_7 = 1 << 12,
         v4_7_1 = 1 << 13,
+        v4_7_2 = 1 << 14,
     }
 
     // Optional
