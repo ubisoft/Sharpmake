@@ -76,19 +76,9 @@ namespace Sharpmake
             set { SetProperty(ref _postGenerationCallback, value); }
         }
 
-        public Solution()
+        public Solution(Type targetType = null, Type configurationType = null)
         {
-            Initialize(typeof(Target), typeof(Solution.Configuration));
-        }
-
-        public Solution(Type targetType)
-        {
-            Initialize(targetType, typeof(Solution.Configuration));
-        }
-
-        public Solution(Type targetType, Type configurationType)
-        {
-            Initialize(targetType, configurationType);
+            Initialize(targetType ?? typeof(Target), configurationType ?? typeof(Solution.Configuration));
         }
 
         #region Internal

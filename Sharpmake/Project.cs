@@ -344,19 +344,9 @@ namespace Sharpmake
             yield return IncludePathsExcludeFromWarningRegex;
         }
 
-        public Project()
+        public Project(Type targetType = null, Type configurationType = null)
         {
-            Initialize(typeof(Target), typeof(Project.Configuration));
-        }
-
-        public Project(Type targetType)
-        {
-            Initialize(targetType, typeof(Project.Configuration));
-        }
-
-        public Project(Type targetType, Type configurationType)
-        {
-            Initialize(targetType, configurationType);
+            Initialize(targetType ?? typeof(Target), configurationType ?? typeof(Project.Configuration));
         }
 
         /// <summary>
@@ -1387,7 +1377,7 @@ namespace Sharpmake
             Targets.Initialize(targetType);
 
             string file;
-            if(isInternal)
+            if (isInternal)
             {
                 SharpmakeCsPath = Util.PathMakeStandard(AppDomain.CurrentDomain.BaseDirectory);
             }
