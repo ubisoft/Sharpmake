@@ -398,9 +398,9 @@ namespace Sharpmake.Generators.Generic
 
             // Includes
             OrderableStrings includePaths = new OrderableStrings();
-            includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.IncludePrivatePaths));
-            includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.IncludePaths));
-            includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesIncludePaths));
+            includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.IncludePrivatePaths)));
+            includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.IncludePaths)));
+            includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.DependenciesIncludePaths)));
             PathMakeUnix(includePaths);
             includePaths.InsertPrefix("-I");
             options["Includes"] = includePaths.JoinStrings(" ");

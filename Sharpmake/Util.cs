@@ -696,6 +696,18 @@ namespace Sharpmake
                     pathBuilder.Append(childInfo.Name);
             }
         }
+
+        public static OrderableStrings PathGetCapitalized(OrderableStrings fullPaths)
+        {
+            OrderableStrings result = new OrderableStrings(fullPaths);
+
+            for (int i = 0; i < result.Count; ++i)
+            {
+                result[i] = GetCapitalizedPath(result[i]);
+            }
+            return result;
+        }
+
         public static string GetCapitalizedPath(string path)
         {
             if (CountFakeFiles() > 0)
