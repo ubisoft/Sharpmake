@@ -533,6 +533,18 @@ namespace Sharpmake
             }
         }
 
+        public static bool IsLLVMToolchain(this Options.Vc.General.PlatformToolset platformToolset)
+        {
+            switch (platformToolset)
+            {
+                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
+                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
+                case Options.Vc.General.PlatformToolset.LLVM:
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Gets whether a <see cref="DevEnv"/> is a Visual Studio version.
         /// </summary>
