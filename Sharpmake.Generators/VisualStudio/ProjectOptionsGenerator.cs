@@ -892,31 +892,6 @@ namespace Sharpmake.Generators.VisualStudio
             // Default defines...
             optionsContext.PlatformVcxproj.SelectCompilerOptions(context);
 
-            if (context.Configuration.Target.GetFragment<DevEnv>() == DevEnv.vs2012 && context.Configuration.Target.GetPlatform().IsPC())
-            {
-                // Disable all the unsupported features of LLVM-clang on MSVC2012
-                if (context.Options["PlatformToolset"] == "LLVM-vs2012")
-                {
-                    // Full list is in this file:
-                    // http://llvm.org/viewvc/llvm-project/cfe/trunk/include/clang/Driver/CLCompatOptions.td?view=markup
-                    context.Options["NativeEnvironmentVS2012"] = FileGeneratorUtilities.RemoveLineTag; // Native environment makes the compiler fallback to MSVC
-
-                    // reset the overriden path
-                    context.Options["ExecutablePath"] = FileGeneratorUtilities.RemoveLineTag;
-                    context.Options["IncludePath"] = FileGeneratorUtilities.RemoveLineTag;
-                    context.Options["LibraryPath"] = FileGeneratorUtilities.RemoveLineTag;
-                    context.Options["ExcludePath"] = FileGeneratorUtilities.RemoveLineTag;
-
-                    // Uncomment those when LLVM 3.9 is released
-                    // The new version will add support from PCH, but requires them to be set as ForceIncludes
-                    // List<string> forceIncludes = new List<string>();
-                    // forceIncludes.AddRange(options["ForcedIncludeFiles"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-                    // forceIncludes.Add(conf.PrecompHeader);
-                    // forceIncludes.Remove(RemoveLineTag);
-                    // options["ForcedIncludeFiles"] = Util.JoinStrings(forceIncludes, ";");
-                }
-            }
-
             // Options.Vc.Compiler.AdditionalOptions
             context.Configuration.AdditionalCompilerOptions.Sort();
             string additionalCompilerOptions = context.Configuration.AdditionalCompilerOptions.JoinStrings(" ");
