@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Sharpmake.Generators;
@@ -153,8 +154,7 @@ namespace Sharpmake.Application
                     return (int)ExitCode.Success;
                 }
 
-                if (DebugEnable)
-                    PlatformRegistry.PlatformImplementationExtensionRegistered += LogPlatformImplementationExtensionRegistered;
+                AppDomain.CurrentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
 
                 // Log warnings and errors from builder
                 Assembler.EventOutputError += ErrorWrite;
@@ -322,13 +322,24 @@ namespace Sharpmake.Application
             return (int)exitCode;
         }
 
-        private static void LogPlatformImplementationExtensionRegistered(object sender, PlatformImplementationExtensionRegisteredEventArgs e)
+        private static void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
-            System.Reflection.AssemblyName extensionName = e.ExtensionAssembly.GetName();
+            LogSharpmakeExtensionLoaded(args.LoadedAssembly);
+        }
+
+        private static void LogSharpmakeExtensionLoaded(Assembly assembly)
+        {
+            if (assembly == null)
+                return;
+
+            if (!ExtensionLoader.ExtensionChecker.IsSharpmakeExtension(assembly))
+                return;
+
+            AssemblyName extensionName = assembly.GetName();
             Version version = extensionName.Version;
             string versionString = string.Join(".", version.Major, version.Minor, version.Build);
 
-            LogWriteLine("    loaded platform {0} {1} from '{2}'", extensionName.Name, versionString, e.ExtensionAssembly.Location);
+            LogWriteLine("    {0} {1} loaded from '{2}'", extensionName.Name, versionString, assembly.Location);
         }
 
         private static void GenerateAll(BuildContext.BaseBuildContext buildContext, Argument parameters)
