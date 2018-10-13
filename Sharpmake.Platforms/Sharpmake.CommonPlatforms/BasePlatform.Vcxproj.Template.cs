@@ -27,6 +27,7 @@ namespace Sharpmake
       <CompileAsManaged>[clrSupport]</CompileAsManaged>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
+      <DiagnosticsFormat>[options.DiagnosticsFormat]</DiagnosticsFormat>
       <MultiProcessorCompilation>[options.MultiProcessorCompilation]</MultiProcessorCompilation>
       <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
       <InlineFunctionExpansion>[options.InlineFunctionExpansion]</InlineFunctionExpansion>

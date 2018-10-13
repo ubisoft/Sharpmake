@@ -406,6 +406,13 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.TreatWarningsAsErrors.Enable, () => { context.Options["TreatWarningAsError"] = "true"; context.CommandLineOptions["TreatWarningAsError"] = "/WX"; })
             );
 
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.DiagnosticsFormat.Classic, () => { context.Options["DiagnosticsFormat"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["DiagnosticsFormat"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.General.DiagnosticsFormat.Caret, () => { context.Options["DiagnosticsFormat"] = "Caret"; context.CommandLineOptions["DiagnosticsFormat"] = "/diagnostics:caret"; }),
+            Options.Option(Options.Vc.General.DiagnosticsFormat.ColumnInfo, () => { context.Options["DiagnosticsFormat"] = "Column"; context.CommandLineOptions["DiagnosticsFormat"] = "/diagnostics:column"; })
+            );
+
             SelectPreferredToolArchitecture(context);
 
             context.Options["TrackFileAccess"] = FileGeneratorUtilities.RemoveLineTag;

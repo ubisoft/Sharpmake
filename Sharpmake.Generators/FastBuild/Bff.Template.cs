@@ -296,6 +296,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.SuppressStartupBanner]'
             + ' [cmdLineOptions.WarningLevel]'
             + ' [cmdLineOptions.TreatWarningAsError]'
+            + ' [cmdLineOptions.DiagnosticsFormat]'
             + ' [fastBuildCompileAsC]'
             // Multi-threaded build is already handled by FASTBuild
             // + ' [cmdLineOptions.MultiProcessorCompilation]'

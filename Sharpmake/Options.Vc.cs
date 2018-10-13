@@ -121,6 +121,16 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum DiagnosticsFormat
+                {
+                    [Default]
+                    Classic, // default, only show the line number
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    ColumnInfo, // line + column
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    Caret // context + caret
+                }
+
                 public enum EnableManagedIncrementalBuild
                 {
                     [Default]
