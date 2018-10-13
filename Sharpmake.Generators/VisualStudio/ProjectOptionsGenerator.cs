@@ -143,16 +143,13 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["LayoutExtensionFilter"] = context.Configuration.IsFastBuild ? "*.pdb;*.ilk;*.exp;*.lib;*.winmd;*.appxrecipe;*.map;*.pl;*.bat;*.txt;*.log;*.pel2;*.zip;*.etl;*.vspx" : FileGeneratorUtilities.RemoveLineTag;
 
             // This should normally be set with the KitsRootPaths class, but this allows the coder to force a platform version.
+            var winTargetPlatformVersionOptionActions = new List<Options.OptionAction>();
+            foreach (Options.Vc.General.WindowsTargetPlatformVersion winVersion in Enum.GetValues(typeof(Options.Vc.General.WindowsTargetPlatformVersion)))
+                winTargetPlatformVersionOptionActions.Add(Options.Option(winVersion, () => { context.Options["WindowsTargetPlatformVersion"] = winVersion.ToVersionString(); }));
             context.SelectOptionWithFallback(
                 () => { context.Options["WindowsTargetPlatformVersion"] = FileGeneratorUtilities.RemoveLineTag; },
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v8_1, () => { context.Options["WindowsTargetPlatformVersion"] = "8.1"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.10240.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.10586.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.14393.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.15063.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.16299.0"; }),
-                Options.Option(Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0, () => { context.Options["WindowsTargetPlatformVersion"] = "10.0.17134.0"; })
-                );
+                winTargetPlatformVersionOptionActions.ToArray()
+            );
         }
 
         private static void SelectConfigurationTypeOption(IGenerationContext context)

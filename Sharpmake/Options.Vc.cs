@@ -50,12 +50,13 @@ namespace Sharpmake
                 public enum WindowsTargetPlatformVersion
                 {
                     v8_1,
-                    v10_0_10240_0,
-                    v10_0_10586_0,
-                    v10_0_14393_0,
-                    v10_0_15063_0,
-                    v10_0_16299_0,
-                    v10_0_17134_0
+                    v10_0_10240_0, // RTM (even if never named like that officially)
+                    v10_0_10586_0, // November 2015 Update
+                    v10_0_14393_0, // 2016 Anniversary Update
+                    v10_0_15063_0, // 2017 Creators Update
+                    v10_0_16299_0, // 2017 Fall Creators Update
+                    v10_0_17134_0, // April 2018 Update
+                    v10_0_17763_0, // October 2018 Update
                 }
 
                 public enum CharacterSet
