@@ -44,7 +44,11 @@ namespace Sharpmake
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     v141_xp, // Visual Studio 2017 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
-                    LLVM_vs2012 // LLVM from Visual Studio 2012
+                    LLVM_vs2012, // LLVM from Visual Studio 2012
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    LLVM_vs2014, // LLVM from Visual Studio 2015
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    LLVM, // LLVM from Visual Studio 2017
                 }
 
                 public enum WindowsTargetPlatformVersion
