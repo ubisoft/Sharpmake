@@ -190,11 +190,22 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateCompilerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            if (context.Configuration.ForcedIncludes.Count > 0)
+            var forcedIncludes = new Strings();
+
+            if (!context.Configuration.IsFastBuild)
             {
-                context.Options["ForcedIncludeFiles"] = context.Configuration.ForcedIncludes.JoinStrings(";");
+                // support of PCH requires them to be set as ForceIncludes with ClangCl
+                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
+                    forcedIncludes.Add(context.Configuration.PrecompHeader);
+            }
+
+            forcedIncludes.AddRange(context.Configuration.ForcedIncludes);
+
+            if (forcedIncludes.Count > 0)
+            {
+                context.Options["ForcedIncludeFiles"] = forcedIncludes.JoinStrings(";");
                 StringBuilder result = new StringBuilder();
-                foreach (var forcedInclude in context.Configuration.ForcedIncludes)
+                foreach (var forcedInclude in forcedIncludes)
                     result.Append(@"/FI""" + forcedInclude + @""" ");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["ForcedIncludeFiles"] = result.ToString();
