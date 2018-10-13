@@ -505,6 +505,34 @@ namespace Sharpmake
             }
         }
 
+        public static bool IsDefaultToolsetForDevEnv(this Options.Vc.General.PlatformToolset platformToolset, DevEnv visualVersion)
+        {
+            switch (platformToolset)
+            {
+                case Options.Vc.General.PlatformToolset.v100:
+                    return visualVersion == DevEnv.vs2010;
+                case Options.Vc.General.PlatformToolset.v110:
+                    return visualVersion == DevEnv.vs2012;
+                case Options.Vc.General.PlatformToolset.v120:
+                    return visualVersion == DevEnv.vs2013;
+                case Options.Vc.General.PlatformToolset.v140:
+                    return visualVersion == DevEnv.vs2015;
+                case Options.Vc.General.PlatformToolset.v141:
+                    return visualVersion == DevEnv.vs2017;
+                case Options.Vc.General.PlatformToolset.v110_xp:
+                case Options.Vc.General.PlatformToolset.v120_xp:
+                case Options.Vc.General.PlatformToolset.v140_xp:
+                case Options.Vc.General.PlatformToolset.v141_xp:
+                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
+                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
+                case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.Default:
+                    return false;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(platformToolset), platformToolset, null);
+            }
+        }
+
         /// <summary>
         /// Gets whether a <see cref="DevEnv"/> is a Visual Studio version.
         /// </summary>
