@@ -56,7 +56,6 @@ namespace Sharpmake
 
         public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
         {
-
             switch (outputType)
             {
                 case Project.Configuration.OutputType.Exe:

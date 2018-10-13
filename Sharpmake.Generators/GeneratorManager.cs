@@ -29,32 +29,32 @@ namespace Sharpmake.Generators
 
         private MasterBff _masterBffGenerator = null;
         public MasterBff MasterBffGenerator => _masterBffGenerator ?? (_masterBffGenerator = new MasterBff());
-        
+
         private XCWorkspace _xcodeWorkspaceGenerator = null;
         public XCWorkspace XCWorkspaceGenerator => _xcodeWorkspaceGenerator ?? (_xcodeWorkspaceGenerator = new XCWorkspace());
-        
+
         private MakeApplication _makeApplicationGenerator = null;
         public MakeApplication MakeApplicationGenerator => _makeApplicationGenerator ?? (_makeApplicationGenerator = new MakeApplication());
 
         // Project generators
         private CSproj _csprojGenerator = null;
         public CSproj CsprojGenerator => _csprojGenerator ?? (_csprojGenerator = new CSproj());
-        
+
         private Pyproj _pyprojGenerator = null;
         public Pyproj PyprojGenerator => _pyprojGenerator ?? (_pyprojGenerator = new Pyproj());
-        
+
         private Vcxproj _vcxprojGenerator = null;
         public Vcxproj VcxprojGenerator => _vcxprojGenerator ?? (_vcxprojGenerator = new Vcxproj());
 
         private Bff _bffGenerator = null;
         public Bff BffGenerator => _bffGenerator ?? (_bffGenerator = new Bff());
-        
+
         private XCodeProj _xcodeProjectGenerator = null;
         public XCodeProj XCodeProjectGenerator => _xcodeProjectGenerator ?? (_xcodeProjectGenerator = new XCodeProj());
-        
+
         private MakeProject _makeProjectGenerator = null;
         public MakeProject MakeProjectGenerator => _makeProjectGenerator ?? (_makeProjectGenerator = new MakeProject());
-        
+
         private Makefile _makefileGenerator = null;
         public Makefile MakefileGenerator => _makefileGenerator ?? (_makefileGenerator = new Makefile());
         #endregion

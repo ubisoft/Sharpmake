@@ -1252,7 +1252,7 @@ namespace Sharpmake.Generators.VisualStudio
                 newImportProjects.AddRange(importProjects);
                 importProjects = newImportProjects;
                 importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", Condition = "'$(VSToolsPath)' != ''" });
-                importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition="false"});
+                importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
             }
 
             if (importProjects.Count == 0)
@@ -1640,7 +1640,7 @@ namespace Sharpmake.Generators.VisualStudio
                             remainingNoneFiles.Remove(file);
 
                             string wcfStorage = Path.GetDirectoryName(file);
-                            if (wcfStorage.IndexOf(project.WcfBaseStorage, StringComparison.OrdinalIgnoreCase)<0)
+                            if (wcfStorage.IndexOf(project.WcfBaseStorage, StringComparison.OrdinalIgnoreCase) < 0)
                                 throw new Error($"WCF file storage \"{wcfStorage}\" does not match project.{nameof(project.WcfBaseStorage)}:\"{project.WcfBaseStorage}\"");
 
                             itemGroups.WCFMetadataStorages.Add(new ItemGroups.WCFMetadataStorage { Include = wcfStorage });

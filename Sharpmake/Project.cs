@@ -189,7 +189,7 @@ namespace Sharpmake
             set { SetProperty(ref _blobPath, value); }
         }
 
-        string _fastBuildUnityPath = null;
+        private string _fastBuildUnityPath = null;
         public string FastBuildUnityPath
         {
             get { return _fastBuildUnityPath ?? _blobPath; }
@@ -1032,7 +1032,6 @@ namespace Sharpmake
 
         public virtual void AdditionalFiltering(Strings sourceFiles, ref Strings sourceFilesExclude)
         {
-
         }
 
         public virtual bool ResolveFilterPath(string relativePath, out string filterPath)
@@ -1682,11 +1681,16 @@ namespace Sharpmake
         #endregion
 
         #region Deprecated
-        [Obsolete("Use " + nameof(SourceFilesBlobExtensions) + ".")] public Strings SourceFilesBlobExtension => SourceFilesBlobExtensions;
-        [Obsolete("Use " + nameof(ResourceFilesExtensions) + ".")] public Strings ResourceFilesExtension => ResourceFilesExtensions;
-        [Obsolete("Use " + nameof(NatvisFilesExtensions) + ".")] public Strings NatvisFilesExtension => NatvisFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesExtensions) + ".")] protected Strings SourceFilesExtension => SourceFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesCompileExtensions) + ".")] protected Strings SourceFilesCompileExtension => SourceFilesCompileExtensions;
+        [Obsolete("Use " + nameof(SourceFilesBlobExtensions) + ".")]
+        public Strings SourceFilesBlobExtension => SourceFilesBlobExtensions;
+        [Obsolete("Use " + nameof(ResourceFilesExtensions) + ".")]
+        public Strings ResourceFilesExtension => ResourceFilesExtensions;
+        [Obsolete("Use " + nameof(NatvisFilesExtensions) + ".")]
+        public Strings NatvisFilesExtension => NatvisFilesExtensions;
+        [Obsolete("Use " + nameof(SourceFilesExtensions) + ".")]
+        protected Strings SourceFilesExtension => SourceFilesExtensions;
+        [Obsolete("Use " + nameof(SourceFilesCompileExtensions) + ".")]
+        protected Strings SourceFilesCompileExtension => SourceFilesCompileExtensions;
         #endregion
     }
 
@@ -1921,7 +1925,7 @@ namespace Sharpmake
 
         [Obsolete("Not needed anymore, InitAspNetProject() handle it")]
         public void AddCommonWebExtensions()
-        {}
+        { }
 
         public void AddDefaultReferences(Configuration conf)
         {
@@ -2198,19 +2202,19 @@ namespace Sharpmake
         private List<String> _filteredEmbeddedAssemblies = null;
         public virtual string GetLinkFolder(string file)
         {
-            if(PreserveLinkFolderPaths)
+            if (PreserveLinkFolderPaths)
             {
                 string relativePath = Util.PathGetRelative(SourceRootPath, Path.GetDirectoryName(file));
 
                 // Remove the root, if it exists.
                 // This will only happen if file is rooted *and* doesn't share the same root as SourceRootPath.
-                if(Path.IsPathRooted(relativePath))
+                if (Path.IsPathRooted(relativePath))
                 {
                     relativePath = relativePath.Substring(Path.GetPathRoot(relativePath).Length);
                 }
 
                 // If the relative path is elsewhere, we leave the file in the root.
-                if(relativePath.Contains(".."))
+                if (relativePath.Contains(".."))
                 {
                     return string.Empty;
                 }
@@ -2245,8 +2249,10 @@ namespace Sharpmake
         }
 
         #region Deprecated
-        [Obsolete("Use " + nameof(NoneExtensions) + ".")] public Strings NoneExtension => NoneExtensions;
-        [Obsolete("Use " + nameof(EmbeddedResourceExtensions) + ".")] public Strings EmbeddedResourceExtension => EmbeddedResourceExtensions;
+        [Obsolete("Use " + nameof(NoneExtensions) + ".")]
+        public Strings NoneExtension => NoneExtensions;
+        [Obsolete("Use " + nameof(EmbeddedResourceExtensions) + ".")]
+        public Strings EmbeddedResourceExtension => EmbeddedResourceExtensions;
         #endregion
     }
 
@@ -2339,5 +2345,4 @@ namespace Sharpmake
         {
         }
     }
-
 }

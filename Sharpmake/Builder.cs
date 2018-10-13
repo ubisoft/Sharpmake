@@ -354,9 +354,9 @@ namespace Sharpmake
 
             return assemblies;
         }
-        
-        private readonly Lazy<Assembly> SharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
-        private readonly Lazy<Assembly> SharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
+
+        private readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
+        private readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
         {
             DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
             string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
@@ -373,10 +373,10 @@ namespace Sharpmake
             Assembler assembler = new Assembler();
 
             // Add sharpmake assembly
-            assembler.Assemblies.Add(SharpmakeAssembly.Value);
+            assembler.Assemblies.Add(_sharpmakeAssembly.Value);
 
             // Add generators assembly to be able to reference them from .sharpmake.cs files
-            assembler.Assemblies.Add(SharpmakeGeneratorAssembly.Value);
+            assembler.Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
 
             // Add attribute parsers
             if (parsers != null)
@@ -400,7 +400,7 @@ namespace Sharpmake
             {
                 var assemblyName = AssemblyName.GetAssemblyName(fullpath).FullName;
                 string assemblyPath;
-                if (_references.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase) )
+                if (_references.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new Error($"Assembly {assemblyName} present in two different locations: {fullpath} and {assemblyPath}.");
                 }
@@ -992,7 +992,7 @@ namespace Sharpmake
             }
 
             public ILoadInfo LoadExtension(string file)
-            {   
+            {
                 // Load extensions if they were passed as references (platforms,
                 // entry point execution to add new ISourceAttributeParser...)
                 using (var extensionLoader = new ExtensionLoader())
@@ -1001,7 +1001,6 @@ namespace Sharpmake
                     var assembly = extensionLoader.LoadExtension(file, false);
                     return new LoadInfo(assembly, _builder._attributeParsers.Skip(parserCount));
                 }
-                
             }
         }
 

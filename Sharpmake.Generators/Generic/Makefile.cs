@@ -371,8 +371,8 @@ namespace Sharpmake.Generators.Generic
 
             // CompilerToUse
             SelectOption(conf,
-                Options.Option(Options.Makefile.General.PlatformToolset.Gcc,      () => { options["CompilerToUse"] = "g++"; }),
-                Options.Option(Options.Makefile.General.PlatformToolset.Clang,    () => { options["CompilerToUse"] = "clang++"; })
+                Options.Option(Options.Makefile.General.PlatformToolset.Gcc, () => { options["CompilerToUse"] = "g++"; }),
+                Options.Option(Options.Makefile.General.PlatformToolset.Clang, () => { options["CompilerToUse"] = "clang++"; })
                 );
 
             // IntermediateDirectory
@@ -404,36 +404,36 @@ namespace Sharpmake.Generators.Generic
 
                 // ExtraWarnings
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Enable,  () => { cflags.Append("-Wextra "); }),
+                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Enable, () => { cflags.Append("-Wextra "); }),
                     Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => { cflags.Append(""); })
                     );
 
                 // GenerateDebugInformation
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Enable,   () => { cflags.Append("-g "); }),
-                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable,  () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Enable, () => { cflags.Append("-g "); }),
+                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => { cflags.Append(""); })
                     );
 
                 // OptimizationLevel
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable,             () => { cflags.Append(""); }),
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Standard,            () => { cflags.Append("-O1 "); }),
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Full,                () => { cflags.Append("-O2 "); }),
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.FullWithInlining,    () => { cflags.Append("-O3 "); }),
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.ForSize,             () => { cflags.Append("-Os "); })
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => { cflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Standard, () => { cflags.Append("-O1 "); }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Full, () => { cflags.Append("-O2 "); }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.FullWithInlining, () => { cflags.Append("-O3 "); }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.ForSize, () => { cflags.Append("-Os "); })
                     );
 
                 // Warnings
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings,   () => { cflags.Append(""); }),
-                    Options.Option(Options.Makefile.Compiler.Warnings.MoreWarnings,     () => { cflags.Append("-Wall "); }),
-                    Options.Option(Options.Makefile.Compiler.Warnings.Disable,          () => { cflags.Append("-w "); })
+                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => { cflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.Warnings.MoreWarnings, () => { cflags.Append("-Wall "); }),
+                    Options.Option(Options.Makefile.Compiler.Warnings.Disable, () => { cflags.Append("-w "); })
                     );
 
                 // WarningsAsErrors
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Enable,   () => { cflags.Append("-Werror "); }),
-                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable,  () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Enable, () => { cflags.Append("-Werror "); }),
+                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => { cflags.Append(""); })
                     );
 
                 // AdditionalCompilerOptions
@@ -465,8 +465,8 @@ namespace Sharpmake.Generators.Generic
 
                 // RTTI
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.Rtti.Enable,     () => { cxxflags.Append("-frtti "); }),
-                    Options.Option(Options.Makefile.Compiler.Rtti.Disable,    () => { cxxflags.Append("-fno-rtti "); })
+                    Options.Option(Options.Makefile.Compiler.Rtti.Enable, () => { cxxflags.Append("-frtti "); }),
+                    Options.Option(Options.Makefile.Compiler.Rtti.Disable, () => { cxxflags.Append("-fno-rtti "); })
                     );
 
                 options["CXXFLAGS"] = cxxflags.ToString();

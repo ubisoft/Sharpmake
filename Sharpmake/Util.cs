@@ -974,9 +974,9 @@ namespace Sharpmake
                     {
                         if (!File.Exists(filenameDate.Key))
                             continue;
- 
+
                         LogWrite(@"Force deleting '{0}'", filenameDate.Key);
-                        if (!TryDeleteFile(filenameDate.Key, removeIfReadOnly:true))
+                        if (!TryDeleteFile(filenameDate.Key, removeIfReadOnly: true))
                         {
                             // Failed to delete the file... Keep it for now... Maybe later we will be able to delete it!
                             LogWrite(@"Failed to delete '{0}'", filenameDate.Key);

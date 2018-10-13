@@ -49,7 +49,7 @@ namespace Sharpmake
         public bool UseDefaultReferences = true;
 
         public static readonly string[] DefaultReferences = { "System.dll", "System.Core.dll" };
-        
+
         private class AssemblyInfo : IAssemblyInfo
         {
             public string Id { get; set; }
@@ -426,7 +426,7 @@ namespace Sharpmake
                 string errorMessage = "";
                 foreach (CompilerError ce in cr.Errors)
                 {
-                    if(ce.IsWarning)
+                    if (ce.IsWarning)
                         EventOutputWarning?.Invoke(ce + Environment.NewLine);
                     else
                         EventOutputError?.Invoke(ce + Environment.NewLine);
@@ -556,7 +556,7 @@ namespace Sharpmake
                 while (line != null)
                 {
                     ++lineNumber;
-                    
+
                     ParseSourceAttributesFromLine(line, sourceFilePath, lineNumber, parsers, context);
 
                     line = reader.ReadLine()?.TrimStart();

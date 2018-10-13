@@ -167,13 +167,13 @@ namespace QTFileCustomBuild
             }
         }
 
-        bool FileIsPrecompiledHeader(string file, ProjConfiguration conf)
+        private bool FileIsPrecompiledHeader(string file, ProjConfiguration conf)
         {
             return (conf.PrecompHeader != null && file.EndsWith(conf.PrecompHeader, StringComparison.InvariantCultureIgnoreCase))
                      || (conf.PrecompSource != null && file.EndsWith(conf.PrecompSource, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        static int GetIndexMatchedAtEnd(string fileBuffer, string stringToFind)
+        private static int GetIndexMatchedAtEnd(string fileBuffer, string stringToFind)
         {
             int len = stringToFind.Length;
             int indexOfMatch = len > 0 ? len - 1 : 0;
@@ -185,7 +185,7 @@ namespace QTFileCustomBuild
             return 0;
         }
 
-        async Task<bool> FileContainsQObject(string file)
+        private async Task<bool> FileContainsQObject(string file)
         {
             try
             {
@@ -293,7 +293,7 @@ namespace QTFileCustomBuild
                     {
                         conf.SourceFilesBuildExcludeRegex.Add(Path.GetFileName(target.Output));
                     }
-                    if(target.IsCPPFile)
+                    if (target.IsCPPFile)
                     {
                         mocTargets.Add(new MocVcxprojBuildStep(target));
                     }
@@ -427,7 +427,7 @@ namespace QTFileCustomBuild
             {
                 target.CombinedDefines = combinedDefines;
                 target.IncludePaths.AddRange(confIncludes);
-                if(!target.IsCPPFile)
+                if (!target.IsCPPFile)
                     target.ForceIncludes.AddRange(precompiledHeader);
             }
         }

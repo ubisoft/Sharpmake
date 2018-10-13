@@ -163,10 +163,10 @@ namespace Sharpmake.Generators.VisualStudio
             string fileExt = Path.GetExtension(filenameLC);
             switch (fileExt)
             {
-                case Vcxproj.ProjectExtension:      guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper();  break;
-                case CSproj.ProjectExtension:       guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper();     break;
-                case Pyproj.ProjectExtension:       guid = ProjectTypeGuids.Python.ToString().ToUpper();            break;
-                case Androidproj.ProjectExtension:  guid = ProjectTypeGuids.Android.ToString().ToUpper();           break;
+                case Vcxproj.ProjectExtension: guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper(); break;
+                case CSproj.ProjectExtension: guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper(); break;
+                case Pyproj.ProjectExtension: guid = ProjectTypeGuids.Python.ToString().ToUpper(); break;
+                case Androidproj.ProjectExtension: guid = ProjectTypeGuids.Android.ToString().ToUpper(); break;
                 default:
                     throw new Error("Unknown file extension {0} : unable to detect file type GUID [{1}]", fileExt, projectFile);
             }
@@ -330,7 +330,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             Solution.ResolvedProject fastBuildAllProjectForSolutionDependency = null;
-            if(solution.FastBuildAllSlnDependencyFromExe)
+            if (solution.FastBuildAllSlnDependencyFromExe)
             {
                 var fastBuildAllProjects = solutionProjects.Where(p => p.Project is FastBuildAllProject).ToArray();
                 if (fastBuildAllProjects.Length > 1)
@@ -539,7 +539,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                     Project.Configuration projectConf = solutionProject.Project.GetConfiguration(projectTarget);
 
-                    if(includedProject != null && includedProject.Configuration.IsFastBuild)
+                    if (includedProject != null && includedProject.Configuration.IsFastBuild)
                         solutionConfigurationFastBuildBuilt.GetValueOrAdd(solutionConfiguration, new List<string>());
 
                     Platform projectPlatform = projectTarget.GetPlatform();

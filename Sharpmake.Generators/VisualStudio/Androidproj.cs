@@ -360,7 +360,7 @@ namespace Sharpmake.Generators.VisualStudio
             SelectOption
             (
             Options.Option(Options.Vc.General.UseDebugLibraries.Disabled, () => { options["UseDebugLibraries"] = "false"; }),
-            Options.Option(Options.Vc.General.UseDebugLibraries.Enabled,  () => { options["UseDebugLibraries"] = "true";  })
+            Options.Option(Options.Vc.General.UseDebugLibraries.Enabled, () => { options["UseDebugLibraries"] = "true"; })
             );
 
             SelectOption

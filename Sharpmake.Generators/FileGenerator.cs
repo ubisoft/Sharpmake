@@ -17,7 +17,7 @@ using System.Text;
 
 namespace Sharpmake.Generators
 {
-    class FileGenerator : IFileGenerator
+    internal class FileGenerator : IFileGenerator
     {
         // TODO: Remove usage of MemoryStream in APIs and refactor this to use StreamBuilder
         //       instead.

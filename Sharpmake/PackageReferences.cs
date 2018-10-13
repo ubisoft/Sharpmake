@@ -84,7 +84,7 @@ namespace Sharpmake
                     yield return "all";
                     yield break;
                 }
-                
+
                 foreach (var value in (AssetsDependency[])Enum.GetValues(typeof(AssetsDependency)))
                 {
                     if (!dependency.HasFlag(value) || value == AssetsDependency.All || value == AssetsDependency.None)

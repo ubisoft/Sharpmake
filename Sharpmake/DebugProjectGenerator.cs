@@ -85,7 +85,8 @@ namespace Sharpmake
 
             visited[assemblyInfo.Id] = null;
 
-            ProjectContent project = new ProjectContent {
+            ProjectContent project = new ProjectContent
+            {
                 ProjectFolder = RootPath,
                 IsSetupProject = isSetupProject,
                 DisplayName = displayName
@@ -320,6 +321,7 @@ namespace Sharpmake
         public AssemblyVersionException(string msg) : base(msg) { }
 
         protected AssemblyVersionException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
+            : base(info, context)
+        { }
     }
 }

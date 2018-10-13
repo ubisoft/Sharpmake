@@ -206,7 +206,7 @@ namespace Sharpmake
             return Util.SimplifyPath(installDir);
         }
 
-        private static readonly ConcurrentDictionary<DevEnv,string> s_visualStudioVCRootPathCache = new ConcurrentDictionary<DevEnv, string>();
+        private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioVCRootPathCache = new ConcurrentDictionary<DevEnv, string>();
         public static string GetVisualStudioVCRootPath(this DevEnv visualVersion)
         {
             string visualStudioVCRootPath = s_visualStudioVCRootPathCache.GetOrAdd(visualVersion, devEnv =>
@@ -404,7 +404,6 @@ namespace Sharpmake
                             }
 
                             return string.Join(";", paths);
-
                         }
                     default:
                         throw new NotImplementedException("No WindowsResourceCompiler associated with " + visualVersion);

@@ -191,7 +191,7 @@ namespace Sharpmake
                 _resolver = resolver;
 
                 var names = new List<string>();
-                foreach(var assignment in assignments)
+                foreach (var assignment in assignments)
                 {
                     _resolver.SetParameterImpl(assignment.Identifier, assignment.Value, true);
                     names.Add(assignment.Identifier);

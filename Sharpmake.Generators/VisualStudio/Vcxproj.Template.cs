@@ -72,7 +72,7 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </PropertyGroup>
 ";
 
-                public static string ImportCppDefaultProps = 
+                public static string ImportCppDefaultProps =
 @"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
 ";
 
@@ -231,7 +231,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectFilesResourceBegin =
                 @"    <ResourceCompile Include=""[file.FileNameProjectRelative]""";
-                
+
                 public static string ProjectFilesPRIResources =
                 @"    <PRIResource Include=""[file.FileNameProjectRelative]"">
       <FileType>Document</FileType>

@@ -240,7 +240,7 @@ namespace Sharpmake
                 // Gather file items depending of filter and search option
                 // - TopDirectoryOnly (early exit)
                 if (searchOption == SearchOption.TopDirectoryOnly)
-                  return (regexFilter != null ? dir.Dirs.Where(e => regexFilter.IsMatch(e.Key)).Select(e => e.Value.Path) : dir.Dirs.Values.Select(x => x.Path)).ToArray();
+                    return (regexFilter != null ? dir.Dirs.Where(e => regexFilter.IsMatch(e.Key)).Select(e => e.Value.Path) : dir.Dirs.Values.Select(x => x.Path)).ToArray();
                 // - AllDirectories
                 HashSet<FakeDirEntry> visited = new HashSet<FakeDirEntry>();
                 Stack<FakeDirEntry> visiting = new Stack<FakeDirEntry>();

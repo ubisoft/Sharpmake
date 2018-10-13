@@ -26,7 +26,7 @@ namespace Sharpmake.Generators.FastBuild
 {
     public partial class Bff : IProjectGenerator
     {
-        class BffGenerationContext : IGenerationContext
+        private class BffGenerationContext : IGenerationContext
         {
             public Builder Builder { get; }
 
@@ -53,7 +53,6 @@ namespace Sharpmake.Generators.FastBuild
                 ProjectDirectory = projectDir;
                 ProjectDirectoryCapitalized = Util.GetCapitalizedPath(projectDir);
                 ProjectSourceCapitalized = Util.GetCapitalizedPath(project.SourceRootPath);
-
             }
 
             public void SelectOption(params Options.OptionAction[] options)
@@ -491,7 +490,7 @@ namespace Sharpmake.Generators.FastBuild
                                     postBuildEvents.Add(eventKey, buildEvent);
                                 }
 
-                                if(conf.PostBuildStepTest != null)
+                                if (conf.PostBuildStepTest != null)
                                 {
                                     string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, conf.PostBuildStepTest, Vcxproj.BuildStep.PostBuildCustomAction);
                                     fastBuildTargetSubTargets.Add(eventKey);
@@ -543,7 +542,7 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     string prefix = prefixTuple.Item1;
                                     if (additionalDependency.StartsWith(prefix, prefixTuple.Item2))
-                                {
+                                    {
                                         subStringStartIndex = prefix.Length;
                                         subStringLength -= prefix.Length;
 
@@ -582,7 +581,7 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            if(finalDependencies.Any())
+                            if (finalDependencies.Any())
                                 confCmdLineOptions["AdditionalDependencies"] = string.Join($"'{Environment.NewLine}                            + ' ", finalDependencies);
                             else
                                 confCmdLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
@@ -996,7 +995,6 @@ namespace Sharpmake.Generators.FastBuild
                                                     }
 
                                                     // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
-
                                                 }
 
                                                 bffGenerator.Write(Template.ConfigurationFile.EndSection);
@@ -1152,7 +1150,7 @@ namespace Sharpmake.Generators.FastBuild
                                                         bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
                                                     }
                                                 }
-                                                else if(postBuildEvent.Value is Project.Configuration.BuildStepTest)
+                                                else if (postBuildEvent.Value is Project.Configuration.BuildStepTest)
                                                 {
                                                     var testCommand = postBuildEvent.Value as Project.Configuration.BuildStepTest;
 
@@ -1269,9 +1267,9 @@ namespace Sharpmake.Generators.FastBuild
             return dependencies.Any(dependency => dependency.Contains(dep) && dependency.Contains("objects"));
         }
 
-        Dictionary<Unity, List<Project.Configuration>> _unities = new Dictionary<Unity, List<Project.Configuration>>();
+        private Dictionary<Unity, List<Project.Configuration>> _unities = new Dictionary<Unity, List<Project.Configuration>>();
 
-        string GetUnityName(Project.Configuration conf)
+        private string GetUnityName(Project.Configuration conf)
         {
             if (_unities.Count > 0)
             {
@@ -1282,7 +1280,7 @@ namespace Sharpmake.Generators.FastBuild
             return null;
         }
 
-        void ConfigureUnities(IGenerationContext context, List<Vcxproj.ProjectFile> sourceFiles)
+        private void ConfigureUnities(IGenerationContext context, List<Vcxproj.ProjectFile> sourceFiles)
         {
             var conf = context.Configuration;
             var project = context.Project;
@@ -1302,7 +1300,7 @@ namespace Sharpmake.Generators.FastBuild
             string fastBuildUnityCount = FileGeneratorUtilities.RemoveLineTag;
 
             int unityCount = conf.FastBuildUnityCount > 0 ? conf.FastBuildUnityCount : conf.GeneratableBlobCount;
-            if(unityCount > 0)
+            if (unityCount > 0)
                 fastBuildUnityCount = unityCount.ToString(CultureInfo.InvariantCulture);
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude);
@@ -1312,10 +1310,10 @@ namespace Sharpmake.Generators.FastBuild
             {
                 List<string> items = new List<string>();
 
-                foreach(var file in sourceFiles)
+                foreach (var file in sourceFiles)
                 {
                     // TODO: use SourceFileExtension array instead of ".cpp"
-                    if((string.Compare(file.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) == 0) &&
+                    if ((string.Compare(file.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) == 0) &&
                        (conf.PrecompSource == null || !file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase)) &&
                        !conf.ResolvedSourceFilesBlobExclude.Contains(file.FileName))
                     {
@@ -1365,7 +1363,7 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             if (fastBuildUnityInputFiles == FileGeneratorUtilities.RemoveLineTag &&
-                fastBuildUnityPaths      == FileGeneratorUtilities.RemoveLineTag)
+                fastBuildUnityPaths == FileGeneratorUtilities.RemoveLineTag)
             {
                 // no input path nor files => no unity
                 return;
@@ -1408,7 +1406,7 @@ namespace Sharpmake.Generators.FastBuild
             confListForUnity.Add(conf);
         }
 
-        void ResolveUnities(Project project)
+        private void ResolveUnities(Project project)
         {
             if (_unities.Count == 0)
                 return;

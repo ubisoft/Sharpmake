@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("HelloWorld.Properties")]
-[assembly: AssemblyCopyright("Copyright © Ubisoft 2013")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

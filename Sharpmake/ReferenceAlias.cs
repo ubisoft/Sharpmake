@@ -150,13 +150,13 @@ namespace Sharpmake
         public void Invoke(Type enumType, object parameter)
         {
             MethodInfo method = _initContainerType.GetMethods()
-                .FirstOrDefault(m => m.GetCustomAttributes().Any(a => a is ReferenceAliasInitMethodAttribute && 
-                                                                ((ReferenceAliasInitMethodAttribute) a).EnumType == enumType));
+                .FirstOrDefault(m => m.GetCustomAttributes().Any(a => a is ReferenceAliasInitMethodAttribute &&
+                                                                ((ReferenceAliasInitMethodAttribute)a).EnumType == enumType));
 
             if (method == null)
                 throw new InvalidOperationException(string.Format("Unable to find ReferenceAliasInitMethod on type {0} for enum {1}", _initContainerType.FullName, enumType.FullName));
 
-            method.Invoke(this, new[] {parameter});
+            method.Invoke(this, new[] { parameter });
         }
     }
 
@@ -230,7 +230,7 @@ namespace Sharpmake
 
         public void Set(T aliasValue, params string[] paths)
         {
-            _referenceAliases.Add(aliasValue, ReferenceAlias<T>.FromPaths( paths ));
+            _referenceAliases.Add(aliasValue, ReferenceAlias<T>.FromPaths(paths));
         }
 
         public void Set(T aliasValue, Action<T, Project.Configuration, ITarget, Project> customAction)
@@ -299,7 +299,7 @@ namespace Sharpmake
     /// </summary>
     /// <typeparam name="T">Source enum type</typeparam>
     /// <typeparam name="TDest">Destionation enum type</typeparam>
-    public class ReferenceAliasForwardManager<T, TDest> : ReferenceAliasManager<T> where T : struct, IConvertible 
+    public class ReferenceAliasForwardManager<T, TDest> : ReferenceAliasManager<T> where T : struct, IConvertible
                                                                                    where TDest : struct, IConvertible
     {
         public new static void CreateInstance()

@@ -186,7 +186,8 @@ namespace Sharpmake
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)
-                    : base(interval) { }
+                    : base(interval)
+                { }
             }
 
             public class ApplicationRevision : StringOption
@@ -443,7 +444,6 @@ namespace Sharpmake
 
             public enum GenerateManifests
             {
-
                 Enabled,
                 [Default]
                 Disabled

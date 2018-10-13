@@ -530,7 +530,7 @@ namespace Sharpmake
             /// </summary>
             internal int GeneratableBlobCount = 0;
 
-            string _fastBuildUnityPath = null;
+            private string _fastBuildUnityPath = null;
             public string FastBuildUnityPath
             {
                 get { return _fastBuildUnityPath ?? _blobPath ?? Project.FastBuildUnityPath; }
@@ -756,7 +756,6 @@ namespace Sharpmake
             /// </summary>
             public class NMakeBuildSettings
             {
-
                 public string BuildCommand = RemoveLineTag;
                 public string RebuildCommand = RemoveLineTag;
                 public string CleanCommand = RemoveLineTag;
@@ -879,7 +878,6 @@ namespace Sharpmake
                 public Strings AdditionalInputs = new Strings();
                 // Filters if this step should run on 
                 public ProjectFilter Filter = ProjectFilter.AllProjects;
-
             }
 
             public class CustomFileBuildStep : CustomFileBuildStepData
@@ -891,7 +889,7 @@ namespace Sharpmake
                     Executable = resolver.Resolve(Executable);
                     Description = resolver.Resolve(Description);
                     Output = resolver.Resolve(Output);
-                    foreach(var input in AdditionalInputs.Values)
+                    foreach (var input in AdditionalInputs.Values)
                     {
                         AdditionalInputs.UpdateValue(input, resolver.Resolve(input));
                     }
@@ -1188,7 +1186,7 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.AdditionalInputs);
                 }
 
-                if(CustomBuildSettings != null)
+                if (CustomBuildSettings != null)
                 {
                     CustomBuildSettings.Resolve(resolver);
                     Util.ResolvePath(Project.SourceRootPath, ref CustomBuildSettings.OutputFile);
@@ -1205,7 +1203,7 @@ namespace Sharpmake
                         eventPair.Value.Resolve(resolver);
                 }
 
-                if(PostBuildStampExe != null)
+                if (PostBuildStampExe != null)
                     PostBuildStampExe.Resolve(resolver);
 
                 if (PostBuildStepTest != null)
@@ -1883,8 +1881,10 @@ namespace Sharpmake
             }
 
             #region Deprecated
-            [Obsolete("This delegate was used only by " + nameof(FastBuildFileIncludeCondition) + " which had no effect. It will be removed.")] public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
-            [Obsolete("This property could be set but was never used by Sharpmake. It will be removed.")] public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
+            [Obsolete("This delegate was used only by " + nameof(FastBuildFileIncludeCondition) + " which had no effect. It will be removed.")]
+            public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
+            [Obsolete("This property could be set but was never used by Sharpmake. It will be removed.")]
+            public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
             #endregion
         }
     }

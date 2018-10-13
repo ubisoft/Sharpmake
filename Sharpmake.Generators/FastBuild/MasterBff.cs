@@ -182,7 +182,8 @@ namespace Sharpmake.Generators.FastBuild
                     {
                         if (!s_postGenerationHandlerInitialized)
                         {
-                            builder.EventPostGeneration += (projects, solutions) => {
+                            builder.EventPostGeneration += (projects, solutions) =>
+                            {
                                 GenerateMasterBffFiles(builder, s_confsPerSolutions.Values);
                             };
                             s_postGenerationHandlerInitialized = true;
@@ -405,7 +406,6 @@ namespace Sharpmake.Generators.FastBuild
             {
                 string compilerName = "Compiler-" + Util.GetSimplePlatformString(platform) + "-" + masterBffInfo.DevEnv.Value;
                 PlatformRegistry.Query<IPlatformBff>(platform)?.AddCompilerSettings(masterCompilerSettings, compilerName, platformToolSetPath, masterBffInfo.DevEnv.Value, projectRootPath);
-
             }
 
             GenerateMasterBffGlobalSettingsFile(builder, globalConfigFullPath, masterBffInfo, masterCompilerSettings);
@@ -509,7 +509,6 @@ namespace Sharpmake.Generators.FastBuild
                 {
                     throw new Error("error, BuildStep not supported: {0}", buildEvent.GetType().FullName);
                 }
-
             }
         }
 

@@ -20,7 +20,7 @@ using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {
-    class DotNetReferenceTest
+    internal class DotNetReferenceTest
     {
         private List<DotNetReference> _testReferences;
 
@@ -174,7 +174,7 @@ namespace Sharpmake.UnitTests
         }
     }
 
-    class DotNetReferenceCollectionTest
+    internal class DotNetReferenceCollectionTest
     {
         private readonly DotNetReference[] _testReferences = {
             new DotNetReference("MyLib1", DotNetReference.ReferenceType.DotNet),

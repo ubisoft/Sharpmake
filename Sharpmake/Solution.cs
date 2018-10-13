@@ -152,17 +152,17 @@ namespace Sharpmake
                         includedProjectInfo.Configuration.ProjectFullFileName,
                         new ResolvedProject
                         {
-                            Project             = includedProjectInfo.Project,
-                            TargetDefault       = includedProjectInfo.Target,
+                            Project = includedProjectInfo.Project,
+                            TargetDefault = includedProjectInfo.Target,
                             OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName,
-                            ProjectFile         = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
-                            ProjectName         = includedProjectInfo.Configuration.ProjectName
+                            ProjectFile = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
+                            ProjectName = includedProjectInfo.Configuration.ProjectName
                         }
                     );
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
 
-                    if(!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
+                    if (!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
                         configurationsToProjects[includedProjectInfo.Configuration] = resolvedProject;
                 }
             }
@@ -240,14 +240,14 @@ namespace Sharpmake
                         );
                     }
 
-                    if(configurationProject.Project == null)
+                    if (configurationProject.Project == null)
                         configurationProject.Project = project;
-                    else if(configurationProject.Project != project)
+                    else if (configurationProject.Project != project)
                         throw new Error("Tried to match more than one project to Project type.");
 
-                    if(configurationProject.Configuration == null)
+                    if (configurationProject.Configuration == null)
                         configurationProject.Configuration = projectConfiguration;
-                    else if(configurationProject.Configuration != projectConfiguration)
+                    else if (configurationProject.Configuration != projectConfiguration)
                         throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
 
                     hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
@@ -260,7 +260,7 @@ namespace Sharpmake
                     {
                         if (build)
                             configurationProject.ToBuild = Configuration.IncludedProjectInfo.Build.Yes;
-                        else if(configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
+                        else if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
                             configurationProject.ToBuild = Configuration.IncludedProjectInfo.Build.No;
                     }
 
@@ -430,7 +430,7 @@ namespace Sharpmake
                         )
                     ).ToList();
 
-                    if(fastBuildProjectConfsToBuild.Count == 0)
+                    if (fastBuildProjectConfsToBuild.Count == 0)
                         continue;
 
                     // if there's only one project to build, no need for the FastBuildAll

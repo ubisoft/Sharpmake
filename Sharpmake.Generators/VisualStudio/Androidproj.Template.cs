@@ -13,9 +13,9 @@
 // limitations under the License.
 namespace Sharpmake.Generators.VisualStudio
 {
-    partial class Androidproj
+    public partial class Androidproj
     {
-        static class Template
+        private static class Template
         {
             public static class Project
             {

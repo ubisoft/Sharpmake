@@ -136,7 +136,7 @@ namespace Sharpmake
                 set
                 {
                     int xdkEdition;
-                    if(!Util.TryParseXdkEditionTarget(XdkEditionTarget, out xdkEdition) || xdkEdition < _feb2018XdkEditionTarget)
+                    if (!Util.TryParseXdkEditionTarget(XdkEditionTarget, out xdkEdition) || xdkEdition < _feb2018XdkEditionTarget)
                         throw new NotSupportedException(nameof(EnableLegacyXdkHeaders) + $" is not yet supported with '{xdkEdition}'");
 
                     s_enableLegacyXdkHeaders = value;

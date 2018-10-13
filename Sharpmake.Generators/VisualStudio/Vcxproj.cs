@@ -38,7 +38,7 @@ namespace Sharpmake.Generators.VisualStudio
             PostBuildCustomAction = 0x04,
         }
 
-        class GenerationContext : IVcxprojGenerationContext
+        private class GenerationContext : IVcxprojGenerationContext
         {
             private Options.ExplicitOptions _options;
             private IDictionary<string, string> _cmdLineOptions;
@@ -343,9 +343,9 @@ namespace Sharpmake.Generators.VisualStudio
                 string vcRootPathKey;
                 switch (devEnv)
                 {
-                    case DevEnv.vs2012: vcRootPathKey = "VCInstallDir_110";      break;
-                    case DevEnv.vs2013: vcRootPathKey = "VCInstallDir_120";      break;
-                    case DevEnv.vs2015: vcRootPathKey = "VCInstallDir_140";      break;
+                    case DevEnv.vs2012: vcRootPathKey = "VCInstallDir_110"; break;
+                    case DevEnv.vs2013: vcRootPathKey = "VCInstallDir_120"; break;
+                    case DevEnv.vs2015: vcRootPathKey = "VCInstallDir_140"; break;
                     case DevEnv.vs2017: vcRootPathKey = "VCToolsInstallDir_150"; break;
                     default:
                         throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
@@ -635,7 +635,7 @@ namespace Sharpmake.Generators.VisualStudio
                             platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                         }
                     }
-                    else if(conf.CustomBuildSettings != null)
+                    else if (conf.CustomBuildSettings != null)
                     {
                         platformVcxproj.GenerateProjectConfigurationCustomMakeFile(context, fileGenerator);
                     }
@@ -700,7 +700,7 @@ namespace Sharpmake.Generators.VisualStudio
             // TODO: make a better check
             if (hasNonFastBuildConfig || !context.Project.StripFastBuildSourceFiles)
                 GenerateFilesSection(context, fileGenerator, generatedFiles, skipFiles);
-            else if(hasFastBuildConfig)
+            else if (hasFastBuildConfig)
                 GenerateBffFilesSection(context, fileGenerator);
 
             // Import platform makefiles.
@@ -1759,7 +1759,7 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
 
             // for the configuration that are fastbuild but external and requires to add the bff files
-            if(context.ProjectConfigurations.Any(x => x.IsFastBuild))
+            if (context.ProjectConfigurations.Any(x => x.IsFastBuild))
                 GenerateBffFilesSection(context, fileGenerator);
 
             var allFileLists = new List<Tuple<string, List<ProjectFile>>>();

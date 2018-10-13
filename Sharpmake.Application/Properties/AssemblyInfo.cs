@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("Sharpmake.Application")]
-[assembly: AssemblyCopyright("Copyright © Ubisoft 2017")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -22,7 +22,7 @@ namespace Sharpmake
     // multiple times.
     internal class CachedRegex
     {
-        private readonly  Regex _regex;
+        private readonly Regex _regex;
         public CachedRegex(Regex regex) { _regex = regex; }
 
         public Match Match(string toEvaluate)

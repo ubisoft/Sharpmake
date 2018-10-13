@@ -20,7 +20,7 @@ namespace Sharpmake
         /// See : https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets
         /// </remarks>
         private const string TemplateBeginPackageReference = "    <PackageReference Include=\"[packageName]\" Version=\"[packageVersion]\"";
-        private const string TemplatePackagePrivateAssets  = "        <PrivateAssets>[privateAssets]</PrivateAssets>\n";
-        private const string TemplateEndPackageReference   = "    </PackageReference>\n";
+        private const string TemplatePackagePrivateAssets = "        <PrivateAssets>[privateAssets]</PrivateAssets>\n";
+        private const string TemplateEndPackageReference = "    </PackageReference>\n";
     }
 }

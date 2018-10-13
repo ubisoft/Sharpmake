@@ -24,6 +24,5 @@ namespace Sharpmake.Generators.VisualStudio
         IReadOnlyDictionary<Platform, IPlatformVcxproj> PresentPlatforms { get; }
 
         Resolver EnvironmentVariableResolver { get; }
-
     }
 }

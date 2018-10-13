@@ -137,7 +137,7 @@ namespace Sharpmake
             FileName = fileName;
         }
     }
-    
+
     [System.AttributeUsage(AttributeTargets.Module, AllowMultiple = true)]
     public class Package : Attribute
     {
@@ -147,7 +147,7 @@ namespace Sharpmake
             FileName = fileName;
         }
     }
-    
+
     [System.AttributeUsage(AttributeTargets.Module, AllowMultiple = false)]
     public class DebugProjectName : Attribute
     {

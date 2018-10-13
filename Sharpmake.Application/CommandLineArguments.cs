@@ -29,7 +29,8 @@ namespace Sharpmake.Application
                 { }
 
                 protected Error(SerializationInfo info, StreamingContext context)
-                    : base(info, context) { }
+                    : base(info, context)
+                { }
             }
 
             public enum InputType

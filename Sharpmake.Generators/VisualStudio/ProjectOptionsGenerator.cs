@@ -22,7 +22,7 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public class ProjectOptionsGenerator
     {
-        class ProjectOptionsGenerationContext
+        private class ProjectOptionsGenerationContext
         {
             private readonly Project.Configuration _projectConfiguration;
 
@@ -1858,11 +1858,11 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    execName  = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
+                    execName = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
                 }
                 else
                 {
-                    execName  = @"Exec_" + extractName(cEvent.ExecutableFile);
+                    execName = @"Exec_" + extractName(cEvent.ExecutableFile);
                     execName += "_" + (execName).GetHashCode().ToString("X8");
                 }
 
@@ -1884,7 +1884,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 return copyName;
             }
-            else if(eventBuildStep is Project.Configuration.BuildStepTest)
+            else if (eventBuildStep is Project.Configuration.BuildStepTest)
             {
                 var tEvent = eventBuildStep as Project.Configuration.BuildStepTest;
                 string testName;
@@ -1991,7 +1991,7 @@ namespace Sharpmake.Generators.VisualStudio
                 // semicolon -separated list of dependencies.
                 string[] resolvedAdditionalDependencies = optionsContext.Resolver.Resolve(
                         string.Join(";", additionalDependencies.Concat(platformAdditionalDependencies))
-                    ).Split(new [] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    ).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (resolvedAdditionalDependencies.Any())
                 {
@@ -2091,7 +2091,7 @@ namespace Sharpmake.Generators.VisualStudio
                 bool forceFullPDB = false;
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable,  () => { context.Options["FullProgramDatabaseFile"] = "true"; forceFullPDB = true;}),
+                Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable, () => { context.Options["FullProgramDatabaseFile"] = "true"; forceFullPDB = true; }),
                 Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Disable, () => { context.Options["FullProgramDatabaseFile"] = "false"; }),
                 Options.Option(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Default, () => { context.Options["FullProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag; })
                 );

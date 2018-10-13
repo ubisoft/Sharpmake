@@ -16,7 +16,7 @@ using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {
-    class KitsRootPathsTests
+    internal class KitsRootPathsTests
     {
         [Test]
         public void Test_NETFXKitsDir_throws_for_old_frameworks()

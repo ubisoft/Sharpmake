@@ -154,7 +154,6 @@ namespace Sharpmake
                 }
 
                 return compilerSettings;
-
             }
 
             public override void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
@@ -441,7 +440,7 @@ namespace Sharpmake
                         xdkEditionTarget = GlobalSettings.XdkEditionTarget;
                         targetPlatformSdkPath = Util.GetDurangoExtensionXDK();
                     }
-                    
+
                     if (!string.IsNullOrEmpty(platformFolder))
                     {
                         using (generator.Declare("custompropertyname", "_PlatformFolder"))

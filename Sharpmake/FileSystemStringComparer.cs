@@ -29,12 +29,12 @@ namespace Sharpmake
     /// </remarks>
     public class FileSystemStringComparer : IComparer<string>, IEqualityComparer<string>
     {
-        private static readonly bool _hostOsIsCaseSensitive;
+        private static readonly bool s_hostOsIsCaseSensitive;
 
         static FileSystemStringComparer()
         {
             var operatingSystemFamily = Environment.OSVersion.Platform;
-            _hostOsIsCaseSensitive = (operatingSystemFamily == PlatformID.MacOSX || operatingSystemFamily == PlatformID.Unix);
+            s_hostOsIsCaseSensitive = (operatingSystemFamily == PlatformID.MacOSX || operatingSystemFamily == PlatformID.Unix);
         }
 
         private readonly object _comparer;         // Using System::Object as the type because this can be both IComparer or IEqualityComparer.
@@ -44,7 +44,8 @@ namespace Sharpmake
         /// the same as the case sensitivity of the the host operating system's file system.
         /// </summary>
         public FileSystemStringComparer()
-            : this(_hostOsIsCaseSensitive) { }
+            : this(s_hostOsIsCaseSensitive)
+        { }
 
         /// <summary>
         /// Creates a new <see cref="FileSystemStringComparer"/>.

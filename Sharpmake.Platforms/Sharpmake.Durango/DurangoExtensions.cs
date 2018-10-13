@@ -223,6 +223,5 @@ namespace Sharpmake
                     throw new NotImplementedException("No DurangoLibraryPath associated with " + visualVersion);
             }
         }
-
     }
 }
