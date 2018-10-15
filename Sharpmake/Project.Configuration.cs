@@ -1376,7 +1376,7 @@ namespace Sharpmake
                     throw new Error("resolving dependencies for {0}: cannot find project dependency of type {1} induced by {2}",
                         Owner.GetType().ToNiceTypeName(), pair.Key.ToNiceTypeName(), visitedConfiguration.ToString());
 
-                Project.Configuration dependencyConf = dependencyProject.GetConfiguration(pair.Value);
+                Configuration dependencyConf = dependencyProject.GetConfiguration(pair.Value);
                 if (dependencyConf == null)
                 {
                     string message =
@@ -1395,8 +1395,14 @@ namespace Sharpmake
                             ".  Are you passing the appropriate target type in AddDependency<{0}>(...)?  It should be type {1}.",
                             dependencyProject.GetType().ToNiceTypeName(), dependencyProject.Targets.TargetType.ToNiceTypeName());
                     }
-                    System.Diagnostics.Trace.WriteLine(message);
-                    System.Diagnostics.Debugger.Break();
+
+                    Trace.WriteLine(message);
+                    Trace.WriteLine("Project configurations are:");
+                    int i = 0;
+                    foreach (var conf in dependencyProject.Configurations)
+                        Trace.WriteLine(++i + "/" + dependencyProject.Configurations.Count + " " + conf.ToString());
+
+                    Debugger.Break();
 
                     throw new Error(message);
                 }
