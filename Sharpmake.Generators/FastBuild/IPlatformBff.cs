@@ -44,13 +44,13 @@ namespace Sharpmake.Generators.FastBuild
         /// Gets a configuration name for that platform in the .bff file for the code files that
         /// are written in native C code.
         /// </summary>
-        string CConfigName { get; }
+        string CConfigName(Configuration conf);
 
         /// <summary>
         /// Gets a configuration name for that platform in the .bff file for the code files that
         /// are written in native C++ code.
         /// </summary>
-        string CppConfigName { get; }
+        string CppConfigName(Configuration conf);
 
         /// <summary>
         /// Gets whether a library prefix (usually `lib`) is required on that platform when
@@ -87,26 +87,8 @@ namespace Sharpmake.Generators.FastBuild
         /// <returns>The final file name of the build output.</returns>
         string GetOutputFilename(Project.Configuration.OutputType outputType, string fastBuildOutputFile);
 
-        CompilerSettings GetMasterCompilerSettings(
-               IDictionary<string, CompilerSettings> masterCompilerSettings,
-               string compilerName,
-               string rootPath,
-               DevEnv devEnv,
-               string projectRootPath,
-               bool useCCompiler);
-
         void AddCompilerSettings(
             IDictionary<string, CompilerSettings> masterCompilerSettings,
-            string compilerName,
-            string rootPath,
-            DevEnv devEnv,
-            string projectRootPath);
-
-        void SetConfiguration(
-            IDictionary<string, CompilerSettings.Configuration> configurations,
-            string compilerName,
-            string projectRootPath,
-            DevEnv devEnv,
-            bool useCCompiler);
+            Project.Configuration conf);
     }
 }

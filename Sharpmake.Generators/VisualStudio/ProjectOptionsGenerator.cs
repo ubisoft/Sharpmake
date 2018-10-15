@@ -305,9 +305,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             optionsContext.PlatformVcxproj.SetupSdkOptions(context);
 
-            // AdditionalIncludeDirectories
-            SelectAdditionalIncludeDirectoriesOption(context, optionsContext);
-
             // Options.Vc.Compiler.AdditionalUsingDirectories
             Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
             additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
@@ -948,31 +945,6 @@ namespace Sharpmake.Generators.VisualStudio
             return relativePostBuildCopies;
         }
 
-        private static void SelectAdditionalIncludeDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
-        {
-            var includePaths = new OrderableStrings(optionsContext.PlatformVcxproj.GetIncludePaths(context));
-            context.Options["AdditionalIncludeDirectories"] = includePaths.Count > 0 ? Util.PathGetRelative(context.ProjectDirectory, includePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-
-            if (optionsContext.Resolver != null)
-            {
-                string cmdLineIncludePrefix = optionsContext.PlatformDescriptor.IsUsingClang ? "-I" : "/I";
-
-                var platformIncludePaths = optionsContext.PlatformVcxproj.GetPlatformIncludePaths(context).Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, cmdLineIncludePrefix)).ToArray();
-
-                var dirs = new List<string>();
-                dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, cmdLineIncludePrefix)));
-                dirs.AddRange(platformIncludePaths);
-
-                if (dirs.Any())
-                    context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
-
-                if (platformIncludePaths.Any())
-                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", platformIncludePaths);
-            }
-        }
-
         private static void SelectDebugInformationOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             // win64 don't support /ZI which is the default one, forward it to /Zi
@@ -1045,7 +1017,9 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.PlatformToolset.v140_xp, () => { context.Options["PlatformToolset"] = "v140_xp"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141, () => { context.Options["PlatformToolset"] = "v141"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141_xp, () => { context.Options["PlatformToolset"] = "v141_xp"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012, () => { context.Options["PlatformToolset"] = "LLVM-vs2012"; context.Options["TrackFileAccess"] = "false"; })
+                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012, () => { context.Options["PlatformToolset"] = "LLVM-vs2012"; context.Options["TrackFileAccess"] = "false"; }),
+                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2014, () => { context.Options["PlatformToolset"] = "LLVM-vs2014"; }),
+                Options.Option(Options.Vc.General.PlatformToolset.LLVM, () => { context.Options["PlatformToolset"] = "llvm"; })
             );
             optionsContext.PlatformVcxproj.SetupPlatformToolsetOptions(context);
         }

@@ -82,8 +82,16 @@ namespace Sharpmake
 
         #region IPlatformBff implementation
         public override string BffPlatformDefine => null;
-        public override string CConfigName => string.Empty;
-        public override string CppConfigName => CConfigName;
+
+        public override string CConfigName(Configuration conf)
+        {
+            return string.Empty;
+        }
+
+        public override string CppConfigName(Configuration conf)
+        {
+            return string.Empty;
+        }
 
         public override bool AddLibPrefix(Configuration conf)
         {
@@ -96,16 +104,7 @@ namespace Sharpmake
             base.SetupExtraLinkerSettings(fileGenerator, outputType, fastBuildOutputFile);
         }
 
-        public override void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, string rootPath, DevEnv devEnv, string projectRootPath)
-        {
-        }
-
-        public override CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, string rootPath, DevEnv devEnv, string projectRootPath, bool useCCompiler)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+        public override void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
         {
         }
         #endregion

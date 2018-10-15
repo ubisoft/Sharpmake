@@ -49,8 +49,16 @@ namespace Sharpmake
         protected const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
         public virtual string BffPlatformDefine => null;
-        public virtual string CConfigName => string.Empty;
-        public virtual string CppConfigName => CConfigName;
+
+        public virtual string CConfigName(Configuration conf)
+        {
+            return string.Empty;
+        }
+
+        public virtual string CppConfigName(Configuration conf)
+        {
+            return string.Empty;
+        }
 
         public virtual bool AddLibPrefix(Configuration conf)
         {
@@ -87,12 +95,7 @@ namespace Sharpmake
         {
         }
 
-        public virtual CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, string rootPath, DevEnv devEnv, string projectRootPath, bool useCCompiler)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+        public virtual void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
         {
         }
         #endregion
@@ -139,7 +142,12 @@ namespace Sharpmake
 
         public IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context)
         {
-            return GetPlatformIncludePathsImpl(context);
+            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path);
+        }
+
+        public IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context)
+        {
+            return GetPlatformIncludePathsWithPrefixImpl(context);
         }
 
         public virtual IEnumerable<string> GetCxUsingPath(IGenerationContext context)
@@ -303,6 +311,12 @@ namespace Sharpmake
             return includePaths;
         }
 
+        protected virtual IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
+        {
+            yield break;
+        }
+
+        [Obsolete("Implement GetPlatformIncludePathsWithPrefixImpl instead")]
         protected virtual IEnumerable<string> GetPlatformIncludePathsImpl(IGenerationContext context)
         {
             yield break;

@@ -96,6 +96,10 @@ namespace Sharpmake.Generators.FastBuild
             if (conf.Platform >= Platform._reserved9)
                 platformString = Util.GetSimplePlatformString(conf.Platform).ToLower();
 
+            var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+            if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(conf.Target.GetFragment<DevEnv>()))
+                platformString += "_" + platformToolset;
+
             return (project.Name + "_" + conf.Target.Name + "_" + platformString).Replace(' ', '_');
         }
 
@@ -153,6 +157,8 @@ namespace Sharpmake.Generators.FastBuild
                 context.Options = new Options.ExplicitOptions();
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
                 projectOptionsGen.GenerateOptions(context);
+                FillIncludeDirectoriesOptions(context);
+
                 options.Add(conf, context.Options);
                 cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
 
@@ -241,6 +247,13 @@ namespace Sharpmake.Generators.FastBuild
 
                         bool isFirstSubConfig = subConfigIndex == 0;
                         bool isLastSubConfig = subConfigIndex == confSubConfigs.Keys.Count - 1;
+
+                        if (isConsumeWinRTExtensions)
+                        {
+                            if (isCompileAsCFile)
+                                throw new Error("A C file cannot be marked to consume WinRT.");
+                            isCompileAsCFile = false;
+                        }
 
                         // For now, this will do.
                         if (conf.FastBuildBlobbed && isDefaultTuple && !isUnity)
@@ -402,6 +415,7 @@ namespace Sharpmake.Generators.FastBuild
                             }
                         }
 
+                        string fastBuildPCHForceInclude = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptions = isUsePrecomp ? Template.ConfigurationFile.UsePrecomp : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptionsClang = isUsePrecomp ? Template.ConfigurationFile.UsePrecompClang : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildLinkerOutputFile = fastBuildOutputFile;
@@ -597,7 +611,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         if (isCompileAsCFile)
                         {
-                            fastBuildUsingPlatformConfig = platformBff.CConfigName;
+                            fastBuildUsingPlatformConfig = platformBff.CConfigName(conf);
                             // Do not take cpp Language conformance into account while compiling in C
                             confCmdLineOptions["CppLanguageStd"] = FileGeneratorUtilities.RemoveLineTag;
                             if (clangPlatformBff != null)
@@ -605,7 +619,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
                         else
                         {
-                            fastBuildUsingPlatformConfig = platformBff.CppConfigName;
+                            fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
                         }
 
                         if (isASMFileSection)
@@ -669,6 +683,41 @@ namespace Sharpmake.Generators.FastBuild
                             //compilerOptions += Template.ConfigurationFile.CompilerForceUsing;
 
                         }
+
+                        string llvmClangCompilerOptions = null;
+                        var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                        if (!isConsumeWinRTExtensions)
+                        {
+                            switch (platformToolset)
+                            {
+                                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
+                                    // <!-- Set the value of _MSC_VER to claim for compatibility -->
+                                    llvmClangCompilerOptions = "-m64 -fmsc-version=1700";
+                                    fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+                                    break;
+                                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
+                                    // <!-- Set the value of _MSC_VER to claim for compatibility -->
+                                    llvmClangCompilerOptions = "-m64 -fmsc-version=1900";
+                                    fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+                                    break;
+                                case Options.Vc.General.PlatformToolset.LLVM:
+                                    // <!-- Set the value of _MSC_VER to claim for compatibility -->
+                                    // TODO: figure out what version number to put there
+                                    // maybe use the DevEnv value
+                                    llvmClangCompilerOptions = "-m64 -fmsc-version=1910"; // -m$(PlatformArchitecture)
+                                    fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+                                    break;
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(llvmClangCompilerOptions))
+                        {
+                            if (fastBuildAdditionalCompilerOptionsFromCode == FileGeneratorUtilities.RemoveLineTag)
+                                fastBuildAdditionalCompilerOptionsFromCode = llvmClangCompilerOptions;
+                            else
+                                fastBuildAdditionalCompilerOptionsFromCode += llvmClangCompilerOptions;
+                        }
+
                         if (conf.ReferencesByName.Count > 0)
                         {
                             throw new Exception("Use ReferencesByPath instead of ReferencesByName for FastBuild support; ");
@@ -736,14 +785,14 @@ namespace Sharpmake.Generators.FastBuild
                             excludedSourceFiles.AddRange(conf.PrecompSourceExclude);
 
                             // Converting the excluded filenames to relative path to the input path so that this
-                            // can work properly with subst usage when running with fastbuild caching active. 
+                            // can work properly with subst usage when running with fastbuild caching active.
                             //
                             // Also exclusion checks in fastbuild assume that the exclusion filenames are
                             // relative to the .UnityInputPath and checks that paths are ending with the specified
                             // path which means that any filename starting with a .. will never be excluded by fastbuild.
                             //
                             // Note: Ideally fastbuild should expect relative paths to the bff file path instead of the .UnityInputPath but
-                            // well I guess we are stuck with this.                                                    
+                            // well I guess we are stuck with this.
                             var excludedSourceFilesRelative = new Strings();
                             foreach (string file in excludedSourceFiles.SortedValues)
                             {
@@ -868,6 +917,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildObjectListDependencies", fastBuildObjectListDependencies))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
+                                    using (bffGenerator.Declare("fastBuildPCHForceInclude", isUsePrecomp ? fastBuildPCHForceInclude : FileGeneratorUtilities.RemoveLineTag))
                                     using (bffGenerator.Declare("fastBuildConsumeWinRTExtension", fastBuildConsumeWinRTExtension))
                                     using (bffGenerator.Declare("fastBuildPartialLibs", partialLibs))
                                     using (bffGenerator.Declare("fastBuildOutputType", outputType))
@@ -952,53 +1002,50 @@ namespace Sharpmake.Generators.FastBuild
 
                                         if (isOutputTypeDll && !isLastSubConfig)
                                         {
-                                            using (bffGenerator.Declare("objectListName", fastBuildOutputFileShortName))
+                                            bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
+
+                                            if (conf.Platform.IsMicrosoft())
                                             {
-                                                bffGenerator.Write(Template.ConfigurationFile.GenericObjectListBeginSection);
+                                                bffGenerator.Write(fastBuildCompilerExtraOptions);
+                                                bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
 
-                                                if (conf.Platform.IsMicrosoft())
+                                                if (isUsePrecomp)
+                                                    bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
+                                                bffGenerator.Write(compilerOptions);
+                                                if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                 {
-                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
-                                                    bffGenerator.Write(Template.ConfigurationFile.CPPCompilerOptimizationOptions);
-
                                                     if (isUsePrecomp)
-                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptions);
-                                                    bffGenerator.Write(compilerOptions);
+                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
+                                                    bffGenerator.Write(fastBuildCompilerOptionsDeoptimize);
+                                                    bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // CLANG Specific
+
+                                                // TODO: This checks twice if the platform supports Clang -- fix?
+                                                clangPlatformBff?.SetupClangOptions(bffGenerator);
+
+                                                if (conf.Platform.IsUsingClang())
+                                                {
+                                                    if (isUsePrecomp)
+                                                        bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
+                                                    bffGenerator.Write(compilerOptionsClang);
+
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(fastBuildCompilerOptionsDeoptimize);
+                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
-                                                else
-                                                {
-                                                    // CLANG Specific
 
-                                                    // TODO: This checks twice if the platform supports Clang -- fix?
-                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);
-
-                                                    if (conf.Platform.IsUsingClang())
-                                                    {
-                                                        if (isUsePrecomp)
-                                                            bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
-                                                        bffGenerator.Write(compilerOptionsClang);
-
-                                                        if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                                                        {
-                                                            if (isUsePrecomp)
-                                                                bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                            bffGenerator.Write(compilerOptionsClangDeoptimized);
-                                                            bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
-                                                        }
-                                                    }
-
-                                                    // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
-                                                }
-
-                                                bffGenerator.Write(Template.ConfigurationFile.EndSection);
+                                                // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
                                             }
+
+                                            bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
                                         else
                                         {
@@ -1251,6 +1298,62 @@ namespace Sharpmake.Generators.FastBuild
             {
                 Project.IncrementFastBuildUpToDateFileCount();
                 skipFiles.Add(bffFileInfo.FullName);
+            }
+        }
+
+        private static string CmdLineConvertIncludePathsFunc(IGenerationContext context, Resolver resolver, string include, string prefix)
+        {
+            // if the include is below the global root, we compute the relative path,
+            // otherwise it's probably a system include for which we keep the full path
+            string resolvedInclude = resolver.Resolve(include);
+            if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
+            return $@"{prefix}""{resolvedInclude}""";
+        }
+
+        private static void FillIncludeDirectoriesOptions(BffGenerationContext context)
+        {
+            // TODO: really not ideal, refactor and move the properties we need from it someplace else
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+
+            var includePaths = new OrderableStrings(platformVcxproj.GetIncludePaths(context));
+            context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+            var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
+            var resolver = platformDescriptor.GetPlatformEnvironmentResolver(
+                new VariableAssignment("project", context.Project),
+                new VariableAssignment("target", context.Configuration),
+                new VariableAssignment("conf", context.Configuration)
+            );
+
+            if (resolver != null)
+            {
+                string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I" : "/I";
+
+                var dirs = new List<string>();
+                dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p, defaultCmdLineIncludePrefix)));
+
+                var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
+                var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p.Path, p.CmdLinePrefix)).ToList();
+                dirs.AddRange(platformIncludePathsPrefixed);
+                if (dirs.Any())
+                    context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
+
+                if (platformIncludePaths.Any())
+                {
+                    if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
+                    {
+                        // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
+                        // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
+                        var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p.Path, defaultCmdLineIncludePrefix)).ToList();
+                        context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", platformIncludePathsDefaultPrefix);
+                    }
+                    else
+                    {
+                        context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", platformIncludePathsPrefixed);
+                    }
+                }
             }
         }
 

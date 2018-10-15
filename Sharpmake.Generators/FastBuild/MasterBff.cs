@@ -38,9 +38,8 @@ namespace Sharpmake.Generators.FastBuild
         {
             // Dependency dictionary based on the include string (many projects might be in one .bff or a single project might generate many
             public Dictionary<string, Strings> BffIncludeToDependencyIncludes = new Dictionary<string, Strings>();
-            public DevEnv? DevEnv;
-            public UniqueList<Platform> Platforms = new UniqueList<Platform>();
-            public List<string> AllConfigsSections = new List<string>(); // All Configs section when running with a source file filter
+            public readonly Dictionary<string, CompilerSettings> CompilerSettings = new Dictionary<string, CompilerSettings>();
+            public readonly List<string> AllConfigsSections = new List<string>(); // All Configs section when running with a source file filter
         }
 
         private class ConfigurationsPerBff : IEnumerable<Solution.Configuration>
@@ -268,8 +267,9 @@ namespace Sharpmake.Generators.FastBuild
             var masterBffCopySections = new List<string>();
             var masterBffCustomSections = new UniqueList<string>(); // section that is not ordered
 
-            string projectRootPath = null;
             bool mustGenerateFastbuild = false;
+
+            var platformBffCache = new Dictionary<Platform, IPlatformBff>();
 
             foreach (Solution.Configuration solutionConfiguration in configurationsPerBff)
             {
@@ -296,14 +296,9 @@ namespace Sharpmake.Generators.FastBuild
 
                     mustGenerateFastbuild = true;
 
-                    projectRootPath = project.RootPath;
+                    IPlatformBff platformBff = platformBffCache.GetValueOrAdd(conf.Platform, PlatformRegistry.Query<IPlatformBff>(conf.Platform));
 
-                    masterBffInfo.Platforms.Add(conf.Platform);
-                    var devEnv = conf.Target.GetFragment<DevEnv>();
-                    if (masterBffInfo.DevEnv == null)
-                        masterBffInfo.DevEnv = devEnv;
-                    else if (devEnv != masterBffInfo.DevEnv)
-                        throw new Error($"Master bff {masterBffFileName} cannot contain varying devEnvs: {masterBffInfo.DevEnv} {devEnv}!");
+                    platformBff.AddCompilerSettings(masterBffInfo.CompilerSettings, conf);
 
                     if (FastBuildSettings.WriteAllConfigsSection && includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes)
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
@@ -398,23 +393,13 @@ namespace Sharpmake.Generators.FastBuild
 
             string fastBuildMasterBffDependencies = result.Length == 0 ? FileGeneratorUtilities.RemoveLineTag : result.ToString();
 
-            var masterCompilerSettings = new Dictionary<string, CompilerSettings>();
-
-            // TODO: test what happens when using multiple devenv, one per platform, in the same master bff: should it even be allowed?
-            string platformToolSetPath = Path.Combine(masterBffInfo.DevEnv.Value.GetVisualStudioDir(), "VC");
-            foreach (var platform in masterBffInfo.Platforms)
-            {
-                string compilerName = "Compiler-" + Util.GetSimplePlatformString(platform) + "-" + masterBffInfo.DevEnv.Value;
-                PlatformRegistry.Query<IPlatformBff>(platform)?.AddCompilerSettings(masterCompilerSettings, compilerName, platformToolSetPath, masterBffInfo.DevEnv.Value, projectRootPath);
-            }
-
-            GenerateMasterBffGlobalSettingsFile(builder, globalConfigFullPath, masterBffInfo, masterCompilerSettings);
+            GenerateMasterBffGlobalSettingsFile(builder, globalConfigFullPath, masterBffInfo);
 
             using (fileGenerator.Declare("fastBuildProjectName", masterBffFileName))
             using (fileGenerator.Declare("fastBuildGlobalConfigurationInclude", $"#include \"{globalConfigFileName}\""))
             {
                 fileGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
-                foreach (Platform platform in masterBffInfo.Platforms)
+                foreach (Platform platform in platformBffCache.Keys) // kind of cheating to use that cache instead of the masterBffInfo.CompilerSettings, but it works :)
                 {
                     using (fileGenerator.Declare("fastBuildDefine", Bff.GetPlatformSpecificDefine(platform)))
                         fileGenerator.Write(Bff.Template.ConfigurationFile.Define);
@@ -515,14 +500,13 @@ namespace Sharpmake.Generators.FastBuild
         private static void GenerateMasterBffGlobalSettingsFile(
             Builder builder,
             string masterBffGlobalConfigFile,
-            MasterBffInfo masterBffInfo,
-            Dictionary<string, CompilerSettings> masterCompilerSettings
+            MasterBffInfo masterBffInfo
         )
         {
             var fileGenerator = new FileGenerator();
 
-            WriteMasterSettingsSection(fileGenerator, masterBffInfo, masterCompilerSettings);
-            WriteMasterCompilerSection(fileGenerator, masterBffInfo, masterCompilerSettings);
+            WriteMasterSettingsSection(fileGenerator, masterBffInfo);
+            WriteMasterCompilerSection(fileGenerator, masterBffInfo);
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
@@ -540,10 +524,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private static void WriteMasterSettingsSection(
-            FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo,
-            Dictionary<string, CompilerSettings> masterCompilerSettings
-        )
+        private static void WriteMasterSettingsSection(FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo)
         {
             string tempFolder = Path.GetTempPath();
 
@@ -558,7 +539,7 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             string fastBuildPATH = FileGeneratorUtilities.RemoveLineTag;
-            if (FastBuildSettings.SetPathToResourceCompilerInEnvironment && masterBffInfo.Platforms.Any(p => PlatformRegistry.Has<IMicrosoftPlatformBff>(p)))
+            if (FastBuildSettings.SetPathToResourceCompilerInEnvironment)
             {
                 // !FIX FOR LINK : fatal error LNK1158: cannot run rc.exe!
                 //
@@ -566,7 +547,7 @@ namespace Sharpmake.Generators.FastBuild
                 // if it doesn't find it, link errors can occur
                 //
                 // link.exe will first search rc.exe next to it, and if it fails
-                // it will look for it in the folers listed by the PATH
+                // it will look for it in the folders listed by the PATH
                 // environment variable, so we'll try to replicate that process
                 // in sharpmake:
                 //
@@ -575,19 +556,14 @@ namespace Sharpmake.Generators.FastBuild
                 //       3) If found, exit
                 //       4) If not, add a PATH environment variable pointing to the rc.exe folder
 
-                Platform platform = masterBffInfo.Platforms.First();
-
-                var platformSettings =
-                    masterCompilerSettings
-                        .Where(x => x.Value.DevEnv == masterBffInfo.DevEnv)
-                        .Where(x => x.Value.PlatformFlags.HasFlag(platform))
-                        .Select(x => x.Value);
-
-                string defaultResourceCompilerPath = Path.GetDirectoryName(masterBffInfo.DevEnv.Value.GetWindowsResourceCompiler(Platform.win64));
-
-                Strings resourceCompilerPaths = new Strings();
-                foreach (var setting in platformSettings)
+                List<Platform> microsoftPlatforms = PlatformRegistry.GetAvailablePlatforms<IMicrosoftPlatformBff>().ToList();
+                var resourceCompilerPaths = new Strings();
+                foreach (CompilerSettings setting in masterBffInfo.CompilerSettings.Values)
                 {
+                    if (!microsoftPlatforms.Any(x => setting.PlatformFlags.HasFlag(x)))
+                        continue;
+
+                    string defaultResourceCompilerPath = Path.GetDirectoryName(setting.DevEnv.GetWindowsResourceCompiler(Platform.win64));
                     foreach (var configurationPair in setting.Configurations)
                     {
                         var configuration = configurationPair.Value;
@@ -628,17 +604,9 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private static void WriteMasterCompilerSection(
-            FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo,
-            Dictionary<string, CompilerSettings> masterCompilerSettings
-        )
+        private static void WriteMasterCompilerSection(FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo)
         {
-            var sortedMasterCompileSettings =
-                masterCompilerSettings
-                    .Where(x => x.Value.DevEnv == masterBffInfo.DevEnv)
-                    .Where(x => masterBffInfo.Platforms.TestPlatformFlags(x.Value.PlatformFlags))
-                    .OrderBy(x => x.Value.CompilerName);
-
+            var sortedMasterCompileSettings = masterBffInfo.CompilerSettings.OrderBy(x => x.Value.CompilerName);
             foreach (var compiler in sortedMasterCompileSettings)
             {
                 var compilerSettings = compiler.Value;
@@ -655,16 +623,13 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastbuildCompilerName", compiler.Key))
                 using (masterBffGenerator.Declare("fastBuildCompilerRootPath", compilerSettings.RootPath))
                 using (masterBffGenerator.Declare("fastBuildCompilerExecutable", string.IsNullOrEmpty(compilerSettings.Executable) ? FileGeneratorUtilities.RemoveLineTag : compilerSettings.Executable))
-                using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 20) : FileGeneratorUtilities.RemoveLineTag))
+                using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28) : FileGeneratorUtilities.RemoveLineTag))
                 using (masterBffGenerator.Declare("fastBuildVS2012EnumBugWorkaround", fastBuildVS2012EnumBugWorkaround))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);
                     foreach (var compilerConfiguration in compilerSettings.Configurations.OrderBy(x => x.Key))
                     {
                         var compConf = compilerConfiguration.Value;
-
-                        if (!masterBffInfo.Platforms.Contains(compConf.Platform))
-                            continue;
 
                         using (masterBffGenerator.Declare("fastBuildConfigurationName", compilerConfiguration.Key))
                         using (masterBffGenerator.Declare("fastBuildBinPath", compConf.BinPath))

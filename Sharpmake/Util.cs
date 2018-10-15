@@ -1478,6 +1478,44 @@ namespace Sharpmake
             return !string.IsNullOrEmpty(key);
         }
 
+        public static string GetDefaultLLVMInstallDir()
+        {
+            string registryKeyString = string.Format(
+                @"SOFTWARE{0}\LLVM\LLVM",
+                Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty
+            );
+
+            string key = string.Empty;
+            try
+            {
+                using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registryKeyString))
+                    key = (string)localMachineKey?.GetValue(null); // null to get default
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            return key;
+        }
+
+        public static string GetClangVersionFromLLVMInstallDir(string llvmInstallDir)
+        {
+            if (!DirectoryExists(llvmInstallDir))
+                throw new Error($"Couldn't find {llvmInstallDir} to lookup version");
+
+            string libDir = Path.Combine(llvmInstallDir, "lib", "clang");
+
+            var versionFolder = DirectoryGetDirectories(libDir);
+            if (versionFolder.Length == 0)
+                throw new Error($"Couldn't find a version number folder for clang in {llvmInstallDir}");
+
+            if (versionFolder.Length != 1)
+                throw new NotImplementedException($"More than one version folder found in {llvmInstallDir}, the code doesn't handle that (yet).");
+
+            return Path.GetFileName(versionFolder[0]);
+        }
+
         /// <summary>
         /// Generate a pseudo Guid base on relative path from the Project GuidReference path to the generated files
         /// Need to do it that way because many vcproj may be generated from the same Project.

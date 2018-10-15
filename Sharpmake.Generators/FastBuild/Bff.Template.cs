@@ -177,6 +177,7 @@ Compiler( '[fastbuildCompilerName]' )
     .PCHOutputFile          = '[cmdLineOptions.PrecompiledHeaderFile]'
     .PCHOptions             = '""%1"" /Fp""%2"" /Fo""%3"" /c'
                             + ' /Yc""[cmdLineOptions.PrecompiledHeaderThrough]""'
+                            + ' [fastBuildPCHForceInclude]'
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
@@ -196,7 +197,8 @@ Compiler( '[fastbuildCompilerName]' )
 ";
 
                 public static string UsePrecompClang = @"-include-pch $PCHOutputFile$";
-                public static string UsePrecomp = @"/Yu""[cmdLineOptions.PrecompiledHeaderThrough]"" /Fp""$PCHOutputFile$""";
+                public static string UsePrecomp = @"/Yu""[cmdLineOptions.PrecompiledHeaderThrough]"" /Fp""$PCHOutputFile$""'
+                            + ' [fastBuildPCHForceInclude]";
 
                 public static string ResourceCompilerOptions = @"
     // Resource Compiler options
@@ -368,6 +370,7 @@ Compiler( '[fastbuildCompilerName]' )
                 public static string CPPCompilerOptionsDeoptimize = @"
     .CompilerOptionsDeoptimized = '""%1"" /Fo""%2"" /c'
                             + ' [fastBuildCompilerPCHOptions]'
+                            + ' [fastBuildPCHForceInclude]'
                             + ' $CompilerExtraOptions$'
                             + ' /Od'
 ";
@@ -479,17 +482,6 @@ ObjectList( '[fastBuildOutputFileShortName]_objects' )
      [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
-
-                public static string GenericObjectListBeginSection = @"
-//=================================================================================================================
-// ObjectList [objectListName]_objects
-//=================================================================================================================
-ObjectList( '[objectListName]_objects' )
-{
-     [fastBuildUsingPlatformConfig]
-    .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
-";
-
 
                 public static string GenericExcutableSection = @"
 //=================================================================================================================

@@ -59,6 +59,7 @@
     <Compile Include="Linux\LinuxPlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Windows\BaseWindowsPlatform.cs" />
+    <Compile Include="Windows\ClangForWindowsSettings.cs" />
     <Compile Include="Windows\Win32Platform.cs" />
     <Compile Include="Windows\Win64EnvironmentVariableResolver.cs" />
     <Compile Include="Windows\Win64Platform.cs" />

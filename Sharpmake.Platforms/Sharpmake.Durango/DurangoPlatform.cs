@@ -64,7 +64,17 @@ namespace Sharpmake
 
             #region IMicrosoftPlatformBff implementation
             public override string BffPlatformDefine => "_DURANGO";
-            public override string CConfigName => ".durangoConfig";
+
+            public override string CConfigName(Configuration conf)
+            {
+                return ".durangoConfig";
+            }
+
+            public override string CppConfigName(Configuration conf)
+            {
+                return ".durangoConfig";
+            }
+
             public override bool SupportsResourceFiles => false;
             public override bool HasUserAccountControlSupport => false;
 
@@ -75,17 +85,20 @@ namespace Sharpmake
 
             public override void AddCompilerSettings(
                 IDictionary<string, CompilerSettings> masterCompilerSettings,
-                string compilerName,
-                string rootPath,
-                DevEnv devEnv,
-                string projectRootPath
+                Project.Configuration conf
             )
             {
+                var projectRootPath = conf.Project.RootPath;
+                var devEnv = conf.Target.GetFragment<DevEnv>();
+                var platform = Platform.durango; // could also been retrieved from conf.Target.GetPlatform(), if we want
+                string platformToolSetPath = Path.Combine(devEnv.GetVisualStudioDir(), "VC");
+                string compilerName = "Compiler-" + Sharpmake.Util.GetSimplePlatformString(platform) + "-" + devEnv;
+
                 switch (devEnv)
                 {
                     case DevEnv.vs2012:
                         {
-                            CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, rootPath, devEnv, projectRootPath, false);
+                            CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, platformToolSetPath, devEnv, projectRootPath, false);
                             compilerSettings.PlatformFlags |= Platform.durango;
                             SetConfiguration(compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
                         }
@@ -93,10 +106,10 @@ namespace Sharpmake
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                         {
-                            var win64PlatformSettings = PlatformRegistry.Get<IPlatformBff>(Platform.win64);
+                            var win64PlatformSettings = PlatformRegistry.Get<IPlatformBff>(Platform.win64) as Windows.Win64Platform; // TODO: make cleaner
 
                             string overrideName = "Compiler-" + Sharpmake.Util.GetSimplePlatformString(Platform.win64) + "-" + devEnv;
-                            CompilerSettings compilerSettings = win64PlatformSettings.GetMasterCompilerSettings(masterCompilerSettings, overrideName, rootPath, devEnv, projectRootPath, false);
+                            CompilerSettings compilerSettings = win64PlatformSettings.GetMasterCompilerSettings(masterCompilerSettings, overrideName, devEnv, projectRootPath, Sharpmake.Options.Vc.General.PlatformToolset.Default, false);
                             compilerSettings.PlatformFlags |= Platform.durango;
                             SetConfiguration(compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
                         }
@@ -106,7 +119,7 @@ namespace Sharpmake
                 }
             }
 
-            public override CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, string rootPath, DevEnv devEnv, string projectRootPath, bool useCCompiler)
+            private CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, string rootPath, DevEnv devEnv, string projectRootPath, bool useCCompiler)
             {
                 CompilerSettings compilerSettings;
 
@@ -156,7 +169,7 @@ namespace Sharpmake
                 return compilerSettings;
             }
 
-            public override void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+            private void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
             {
                 string configName = ".durangoConfig";
 
@@ -230,6 +243,7 @@ namespace Sharpmake
                 var options = context.Options;
                 var devEnv = context.DevelopmentEnvironment;
 
+                // TODO: check if we need to override the paths in case of FastBuild?
                 if (GlobalSettings.OverridenDurangoXDK && !Util.IsDurangoSideBySideXDK() && Util.IsDurangoSideBySideXDKInstalled())
                 {
                     // only use the full path to includes and libs if we have a
@@ -508,9 +522,11 @@ namespace Sharpmake
                 return _projectConfigurationsLinkTemplate;
             }
 
-            protected override IEnumerable<string> GetPlatformIncludePathsImpl(IGenerationContext context)
+            protected override IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
             {
-                return EnumerateSemiColonSeparatedString(context.DevelopmentEnvironment.GetDurangoIncludePath());
+                const string cmdLineIncludePrefix = "/I";
+                var durangoIncludePaths = EnumerateSemiColonSeparatedString(context.DevelopmentEnvironment.GetDurangoIncludePath());
+                return durangoIncludePaths.Select(includePath => new IncludeWithPrefix(cmdLineIncludePrefix, includePath));
             }
 
             #endregion

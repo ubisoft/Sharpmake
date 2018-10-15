@@ -495,6 +495,8 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options = confOptions;
                 context.CommandLineOptions = confCmdLineOptions;
                 projectOptionsGen.GenerateOptions(context);
+                FillIncludeDirectoriesOptions(context);
+
                 context.Reset(); // just a safety, not necessary to clean up
 
                 options.Add(conf, confOptions);
@@ -776,6 +778,14 @@ namespace Sharpmake.Generators.VisualStudio
                 generatedFiles.Add(projectFileInfo.FullName);
             else
                 skipFiles.Add(projectFileInfo.FullName);
+        }
+
+        private static void FillIncludeDirectoriesOptions(GenerationContext context)
+        {
+            IPlatformVcxproj platformVcxproj = context.PresentPlatforms[context.Configuration.Platform];
+
+            var includePaths = platformVcxproj.GetIncludePaths(context);
+            context.Options["AdditionalIncludeDirectories"] = includePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, includePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
         }
 
         private void WriteCustomProperties(IVcxprojGenerationContext context, IFileGenerator fileGenerator)

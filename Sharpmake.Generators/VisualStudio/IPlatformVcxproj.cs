@@ -15,6 +15,18 @@ using System.Collections.Generic;
 
 namespace Sharpmake.Generators.VisualStudio
 {
+    public class IncludeWithPrefix
+    {
+        public string CmdLinePrefix;
+        public string Path;
+
+        public IncludeWithPrefix(string cmdLinePrefix, string includePath)
+        {
+            CmdLinePrefix = cmdLinePrefix;
+            Path = includePath;
+        }
+    }
+
     public interface IPlatformVcxproj
     {
         string ExecutableFileExtension { get; }
@@ -38,6 +50,7 @@ namespace Sharpmake.Generators.VisualStudio
         // are the platform's include paths.
         IEnumerable<string> GetIncludePaths(IGenerationContext context);
         IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context);
+        IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context);
 
         IEnumerable<string> GetCxUsingPath(IGenerationContext context);
 
