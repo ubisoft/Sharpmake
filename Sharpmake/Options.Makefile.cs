@@ -95,6 +95,16 @@ namespace Sharpmake
                     Disable
                 }
             }
+
+            public static class Linker
+            {
+                public enum LibGroup
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+            }
         }
     }
 }
