@@ -386,7 +386,8 @@ namespace Sharpmake.Generators.Generic
             options["IntermediateDirectory"] = PathMakeUnix(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.IntermediatePath));
 
             // OutputDirectory
-            options["OutputDirectory"] = PathMakeUnix(GetOutputDirectory(conf, projectFileInfo));
+            string outputDirectory = PathMakeUnix(GetOutputDirectory(conf, projectFileInfo));
+            options["OutputDirectory"] = outputDirectory;
 
             #region Compiler
 
@@ -404,6 +405,14 @@ namespace Sharpmake.Generators.Generic
             PathMakeUnix(includePaths);
             includePaths.InsertPrefix("-I");
             options["Includes"] = includePaths.JoinStrings(" ");
+
+            if (conf.ForcedIncludes.Count > 0)
+            {
+                OrderableStrings relativeForceIncludes = new OrderableStrings(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.ForcedIncludes));
+                PathMakeUnix(relativeForceIncludes);
+                relativeForceIncludes.InsertPrefix("-include ");
+                options["Includes"] += " " + relativeForceIncludes.JoinStrings(" ");
+            }
 
             // CFLAGS
             {
@@ -487,22 +496,42 @@ namespace Sharpmake.Generators.Generic
             options["OutputFile"] = FormatOutputFileName(conf);
 
             // DependenciesLibraryFiles
-            OrderableStrings dependenciesLibraryFiles = GetDependenciesOutputFilesProjectRelative(conf, projectFileInfo);
+            OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
             PathMakeUnix(dependenciesLibraryFiles);
+            dependenciesLibraryFiles.InsertPrefix("-l");
             options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
 
             // LibraryFiles
-            OrderableStrings libraryFiles = new OrderableStrings();
-            libraryFiles.AddRange(conf.LibraryFiles);
+            OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
             libraryFiles.InsertPrefix("-l");
             options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
 
             // LibraryPaths
             OrderableStrings libraryPaths = new OrderableStrings();
             libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.LibraryPaths));
+            libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesLibraryPaths));
             PathMakeUnix(libraryPaths);
             libraryPaths.InsertPrefix("-L");
             options["LibraryPaths"] = libraryPaths.JoinStrings(" ");
+
+            // Dependencies
+            var deps = new Strings();
+            foreach (Project.Configuration depConf in conf.ResolvedDependencies)
+            {
+                switch (depConf.Output)
+                {
+                    case Project.Configuration.OutputType.None: continue;
+                    case Project.Configuration.OutputType.Lib:
+                    case Project.Configuration.OutputType.Dll:
+                    case Project.Configuration.OutputType.DotNetClassLibrary:
+                        deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)));
+                        break;
+                    default:
+                        deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)));
+                        break;
+                }
+            }
+            options["LDDEPS"] = deps.JoinStrings(" ");
 
             // LinkCommand
             if (conf.Output == Project.Configuration.OutputType.Lib)
@@ -556,20 +585,6 @@ namespace Sharpmake.Generators.Generic
             }
 
             return sourceFiles;
-        }
-
-        private OrderableStrings GetDependenciesOutputFilesProjectRelative(Project.Configuration conf, FileInfo projectFileInfo)
-        {
-            // Build list of dependencies output files relative to project file.
-            OrderableStrings dependencyFiles = new OrderableStrings();
-            foreach (Project.Configuration dependencyConf in conf.ResolvedDependencies)
-            {
-                var outputFileProjectRelative = Path.Combine(GetOutputDirectory(dependencyConf, projectFileInfo), FormatOutputFileName(dependencyConf));
-                dependencyFiles.Add(outputFileProjectRelative, dependencyConf.TargetFileOrderNumber);
-            }
-            dependencyFiles.Sort();
-
-            return dependencyFiles;
         }
 
         private string GetOutputDirectory(Project.Configuration conf, FileInfo projectFileInfo)

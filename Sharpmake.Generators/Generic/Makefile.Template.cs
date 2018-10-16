@@ -101,7 +101,7 @@ endif
   LDFLAGS   += [options.LibraryPaths] [options.AdditionalLinkerOptions]
   LIBS      += [options.DependenciesLibraryFiles] [options.LibraryFiles]
   RESFLAGS  += $(DEFINES) $(INCLUDES)
-  LDDEPS    += [options.DependenciesLibraryFiles]
+  LDDEPS    += [options.LDDEPS]
   LINKCMD    = [options.LinkCommand]
   define PREBUILDCMDS
   endef
