@@ -508,6 +508,7 @@ namespace Sharpmake
             public OrderableStrings DependenciesForceUsingFiles = new OrderableStrings();
             public UniqueList<Configuration> ConfigurationDependencies = new UniqueList<Configuration>();
             public UniqueList<Configuration> ForceUsingDependencies = new UniqueList<Configuration>();
+            public UniqueList<Configuration> GenericBuildDependencies = new UniqueList<Configuration>();
 
             public List<DotNetDependency> DotNetPublicDependencies = new List<DotNetDependency>();
             public List<DotNetDependency> DotNetPrivateDependencies = new List<DotNetDependency>();
@@ -1787,6 +1788,10 @@ namespace Sharpmake
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
                                 }
+
+                                // If our no-output project is just a build-order dependency, update the build order accordingly
+                                if (!dependencyOutputLib && isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder)
+                                    GenericBuildDependencies.Add(dependency);
                             }
                             break;
                         case OutputType.Dll:

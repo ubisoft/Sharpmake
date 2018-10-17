@@ -112,6 +112,19 @@ namespace Sharpmake
 
         public Dictionary<string, List<Solution.Configuration>> SolutionFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
 
+        internal class ResolvedProjectGuidComparer : IEqualityComparer<ResolvedProject>
+        {
+            public bool Equals(ResolvedProject p, ResolvedProject q)
+            {
+                return p.UserData["Guid"] == q.UserData["Guid"];
+            }
+
+            public int GetHashCode(ResolvedProject obj)
+            {
+                return obj.ProjectFile.GetHashCode();
+            }
+        }
+
         internal static Solution CreateProject(Type solutionType, List<Object> fragmentMasks)
         {
             Solution solution;
@@ -212,6 +225,7 @@ namespace Sharpmake
                 return;
 
             bool hasFastBuildProjectConf = false;
+            var unlinkedConfigurations = new Dictionary<Solution.Configuration, List<Project.Configuration>>(); // This will hold MSBuild -> Fastbuild refs
             foreach (Solution.Configuration solutionConfiguration in Configurations)
             {
                 // Build SolutionFilesMapping
@@ -219,6 +233,8 @@ namespace Sharpmake
 
                 var fileConfigurationList = SolutionFilesMapping.GetValueOrAdd(configurationFile, new List<Solution.Configuration>());
                 fileConfigurationList.Add(solutionConfiguration);
+
+                var unlinkedList = unlinkedConfigurations.GetValueOrAdd(solutionConfiguration, new List<Project.Configuration>());
 
                 // solutionConfiguration.IncludedProjectInfos will be appended
                 // while iterating, but with projects that we already have resolved,
@@ -265,6 +281,10 @@ namespace Sharpmake
                     }
 
                     var dependenciesConfiguration = configurationProject.Configuration.GetRecursiveDependencies();
+                    // TODO: Slow LINQ? May be better to create this list as part of GetRecursiveDependencies
+                    if (!configurationProject.Configuration.IsFastBuild && configurationProject.Configuration.ResolvedDependencies.Any(d => d.IsFastBuild))
+                        unlinkedList.Add(configurationProject.Configuration);
+                    unlinkedList.AddRange(dependenciesConfiguration.Where(c => !c.IsFastBuild && c.ResolvedDependencies.Any(d => d.IsFastBuild)));
                     foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
                     {
                         Project dependencyProject = dependencyConfiguration.Project;
@@ -326,8 +346,13 @@ namespace Sharpmake
                                 throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
                         }
 
-                        bool depBuild = !projectIsInactive && !dependencyConfiguration.IsExcludedFromBuild && !configurationProjectDependency.InactiveProject;
-                        if (depBuild && solutionConfiguration.IncludeOnlyFilterProject && (dependencyProject.SourceFilesFiltersCount == 0 || dependencyProject.SkipProjectWhenFiltersActive))
+                        // If we're finding a fastbuild dependency of an MSBuild project, we know that it'll need re-linking
+                        bool depBuild = !dependencyConfiguration.IsExcludedFromBuild
+                            && !projectIsInactive
+                            && !configurationProjectDependency.InactiveProject
+                            && !(dependencyConfiguration.IsFastBuild && !configurationProject.Configuration.IsFastBuild);
+
+                        if (solutionConfiguration.IncludeOnlyFilterProject && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive))
                             depBuild = false;
 
                         if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
@@ -347,7 +372,7 @@ namespace Sharpmake
             }
 
             if (hasFastBuildProjectConf)
-                MakeFastBuildAllProjectIfNeeded(builder);
+                MakeFastBuildAllProjectIfNeeded(builder, unlinkedConfigurations);
 
             _dependenciesResolved = true;
         }
@@ -411,7 +436,7 @@ namespace Sharpmake
             }
         }
 
-        private void MakeFastBuildAllProjectIfNeeded(Builder builder)
+        private void MakeFastBuildAllProjectIfNeeded(Builder builder, Dictionary<Solution.Configuration, List<Project.Configuration>> unlinkedConfigurations)
         {
             foreach (var solutionFile in SolutionFilesMapping)
             {
@@ -447,7 +472,7 @@ namespace Sharpmake
                 var firstSolutionConf = projectsToBuildPerSolutionConfig.First().Item1;
 
                 Project fastBuildAllProject = null;
-                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig)
+                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig.Where(p => p.Item2.Count > 1))
                 {
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
@@ -468,7 +493,7 @@ namespace Sharpmake
                     }
                     else
                     {
-                        // validate the asumption made above
+                        // validate the assumption made above
                         if (fastBuildAllProject.Targets.TargetType != firstSolutionConf.Target.GetType())
                             throw new Error("Target type must match between all solution configurations");
                     }
@@ -479,7 +504,7 @@ namespace Sharpmake
                 fastBuildAllProject.Targets.BuildTargets();
                 fastBuildAllProject.InvokeConfiguration(builder.Context);
 
-                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig)
+                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig.Where(p => p.Item2.Count > 1))
                 {
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
@@ -487,12 +512,23 @@ namespace Sharpmake
                     var solutionTarget = solutionConf.Target;
                     var projectConf = fastBuildAllProject.GetConfiguration(solutionTarget);
 
+                    // Re-link projects to the new All project
+                    // TODO: We should do something to detect and avoid any circular references that this project can now theoretically create.
+                    List<Project.Configuration> projectConfigsToRelink;
+                    if (unlinkedConfigurations.TryGetValue(solutionConf, out projectConfigsToRelink))
+                    {
+                        foreach (Project.Configuration config in projectConfigsToRelink.Distinct())
+                        {
+                            config.GenericBuildDependencies.Add(projectConf);
+                        }
+                    }
+
                     projectConf.IsFastBuild = true;
 
                     // output the project in the same folder as the solution, and the same name
                     projectConf.ProjectPath = solutionConf.SolutionPath;
                     if (string.IsNullOrWhiteSpace(FastBuildAllProjectFileSuffix))
-                        throw new Error("FastBuildAllProjectFileSuffix cannot be left emtpy in solution " + solutionFile);
+                        throw new Error("FastBuildAllProjectFileSuffix cannot be left empty in solution " + solutionFile);
                     projectConf.ProjectFileName = solutionFile.Key + FastBuildAllProjectFileSuffix;
                     projectConf.SolutionFolder = FastBuildAllSolutionFolder;
 
@@ -510,6 +546,11 @@ namespace Sharpmake
                     {
                         // update the ToBuild, as now it is built through the "FastBuildAll" dependency
                         projectConfigToBuild.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
+
+                        // Relink any build-order dependencies
+                        projectConf.GenericBuildDependencies.AddRange(projectConfigToBuild.Configuration.GenericBuildDependencies);
+                        projectConf.GenericBuildDependencies.AddRange(projectConfigToBuild.Configuration.DotNetPublicDependencies.Select(d => d.Configuration).Where(c => !c.IsFastBuild));
+                        projectConf.GenericBuildDependencies.AddRange(projectConfigToBuild.Configuration.DotNetPrivateDependencies.Select(d => d.Configuration).Where(c => !c.IsFastBuild));
 
                         projectConf.AddPrivateDependency(projectConfigToBuild.Target, projectConfigToBuild.Project.GetType(), DependencySetting.OnlyBuildOrder);
                     }
