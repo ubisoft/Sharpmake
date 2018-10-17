@@ -23,10 +23,10 @@ echo %SM_CMD%
 echo Sharpmake solution generated.
 goto end
 
-:: NUGET RESTORE
+@REM -----------------------------------------------------------------------
 :NugetRestore
 echo Restoring nuget packages for %~1
-nuget restore "%~1"
+dotnet restore "%~1"
 if errorlevel 1 (
     echo ERROR: Failed to restore nuget package for %~1
     goto error
