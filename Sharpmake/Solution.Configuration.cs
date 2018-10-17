@@ -108,20 +108,22 @@ namespace Sharpmake
             public void AddProject<TPROJECTTYPE>(
                 ITarget projectTarget,
                 bool inactiveProject = false,
+                string solutionFolder = "",
                 [CallerFilePath] string sourceFilePath = "",
                 [CallerLineNumber] int sourceLineNumber = 0)
             {
-                AddProject(typeof(TPROJECTTYPE), projectTarget, inactiveProject, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
+                AddProjectInternal(typeof(TPROJECTTYPE), projectTarget, inactiveProject, solutionFolder, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
             }
 
             public void AddProject(
                 Type projectType,
                 ITarget projectTarget,
                 bool inactiveProject = false,
+                string solutionFolder = "",
                 [CallerFilePath] string sourceFilePath = "",
                 [CallerLineNumber] int sourceLineNumber = 0)
             {
-                AddProject(projectType, projectTarget, inactiveProject, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
+                AddProjectInternal(projectType, projectTarget, inactiveProject, solutionFolder, Util.FormatCallerInfo(sourceFilePath, sourceLineNumber));
             }
 
             [DebuggerDisplay("{Project == null ? Type.Name : Project.Name} {Configuration == null ? Target.Name : Configuration.Name}")]
@@ -138,6 +140,11 @@ namespace Sharpmake
 
                 // Target of the project, need to resolve the Configuration
                 public ITarget Target;
+
+                /// <summary>
+                /// The solution folder to use for the project in this solution. It overrides <see cref="Sharpmake.Project.Configuration.SolutionFolder"/>
+                /// </summary>
+                public string SolutionFolder;
 
                 public override string ToString()
                 {
@@ -181,7 +188,7 @@ namespace Sharpmake
                 return null;
             }
 
-            private void AddProject(Type projectType, ITarget projectTarget, bool inactiveProject, string callerInfo)
+            private void AddProjectInternal(Type projectType, ITarget projectTarget, bool inactiveProject, string solutionFolder, string callerInfo)
             {
                 IncludedProjectInfo includedProjectInfo = GetProject(projectType);
 
@@ -192,7 +199,8 @@ namespace Sharpmake
                         {
                             Type = projectType,
                             Target = projectTarget,
-                            InactiveProject = inactiveProject
+                            InactiveProject = inactiveProject,
+                            SolutionFolder = solutionFolder
                         }
                     );
                 }

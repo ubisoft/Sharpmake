@@ -169,9 +169,9 @@ namespace Sharpmake
                             TargetDefault = includedProjectInfo.Target,
                             OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName,
                             ProjectFile = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
-                            ProjectName = includedProjectInfo.Configuration.ProjectName
-                        }
-                    );
+                            ProjectName = includedProjectInfo.Configuration.ProjectName,
+                            SolutionFolder = includedProjectInfo.SolutionFolder
+                        });
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
 
@@ -186,8 +186,11 @@ namespace Sharpmake
                 foreach (Project.Configuration resolvedProjectConf in resolvedProject.Configurations)
                 {
                     // Folder must all be the same for all config, else will be emptied.
-                    if (resolvedProject.SolutionFolder == null)
+                    if (string.IsNullOrEmpty(resolvedProject.SolutionFolder) &&
+                        !string.IsNullOrEmpty(resolvedProjectConf.SolutionFolder))
+                    {
                         resolvedProject.SolutionFolder = resolvedProjectConf.SolutionFolder;
+                    }
                     else if (resolvedProject.SolutionFolder != resolvedProjectConf.SolutionFolder)
                         resolvedProject.SolutionFolder = "";
 
