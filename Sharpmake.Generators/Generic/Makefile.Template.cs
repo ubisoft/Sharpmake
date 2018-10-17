@@ -122,7 +122,7 @@ endif
 
                 public static string ObjectsVariableElement = "  [excludeChar]OBJECTS += $(OBJDIR)/[objectFile]\n";
 
-                public static string ObjectsVariableEnd = "\nendif\n\n";
+                public static string ObjectsVariableEnd = "endif\n\n";
 
                 public static string ProjectRulesGeneral =
 @"RESOURCES := \
