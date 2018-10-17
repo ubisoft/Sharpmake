@@ -531,7 +531,9 @@ namespace Sharpmake.Generators.Generic
                         break;
                 }
             }
-            options["LDDEPS"] = deps.JoinStrings(" ");
+            var depsRelative = Util.PathGetRelative(projectFileInfo.DirectoryName, deps);
+            PathMakeUnix(depsRelative);
+            options["LDDEPS"] = string.Join(" ", depsRelative);
 
             // LinkCommand
             if (conf.Output == Project.Configuration.OutputType.Lib)
