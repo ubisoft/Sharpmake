@@ -78,6 +78,7 @@ namespace Sharpmake
       <RuntimeLibrary>[options.RuntimeLibrary]</RuntimeLibrary>
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
+      <ForcedUsingFiles>[options.ForcedUsingFiles]</ForcedUsingFiles>
     </ClCompile>
 ";
 

@@ -554,9 +554,20 @@ namespace Sharpmake.Generators.VisualStudio
             );
 
             context.Options["ForcedUsingFiles"] = FileGeneratorUtilities.RemoveLineTag;
-            if (context.Configuration.ForceUsingFiles.Any())
+            if (context.Configuration.ForceUsingFiles.Any() || context.Configuration.DependenciesForceUsingFiles.Any() || context.Configuration.ForceUsingDependencies.Any())
             {
-                context.Options["ForcedUsingFiles"] = context.Configuration.ForceUsingFiles.JoinStrings(";", true);
+                StringBuilder builder = new StringBuilder(context.Configuration.ForceUsingFiles.JoinStrings(";", true));
+                if (context.Configuration.ForceUsingFiles.Any())
+                    builder.Append(";");
+
+                builder.Append(context.Configuration.DependenciesForceUsingFiles.JoinStrings(";"));
+                if (context.Configuration.DependenciesForceUsingFiles.Any())
+                    builder.Append(";");
+
+                foreach (var dep in context.Configuration.ForceUsingDependencies)
+                    builder.AppendFormat(@"{0}.dll;", dep.Project is CSharpProject ? dep.TargetFileName : dep.TargetFileFullName);
+                string ForceUsingFiles = builder.ToString();
+                context.Options["ForcedUsingFiles"] = ForceUsingFiles.Remove(ForceUsingFiles.Length - 1, 1);
             }
 
             //Options.Vc.Compiler.CompileAsWinRT.     

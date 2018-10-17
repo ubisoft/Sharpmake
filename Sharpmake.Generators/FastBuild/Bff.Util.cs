@@ -264,19 +264,19 @@ namespace Sharpmake.Generators.FastBuild
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
         }
 
-        public static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true)
+        public static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
         {
             var dependencies = new UniqueList<Project.Configuration>();
-            GetOrderedFlattenedProjectDependenciesInternal(conf, dependencies, allDependencies);
+            GetOrderedFlattenedProjectDependenciesInternal(conf, dependencies, allDependencies, fuDependencies);
             return dependencies;
         }
 
-        private static void GetOrderedFlattenedProjectDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies, bool allDependencies)
+        private static void GetOrderedFlattenedProjectDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies, bool allDependencies, bool fuDependencies)
         {
             if (!conf.IsFastBuild)
                 return;
 
-            var confDependencies = allDependencies ? conf.ResolvedDependencies.ToList() : conf.ConfigurationDependencies.ToList();
+            var confDependencies = allDependencies ? conf.ResolvedDependencies : fuDependencies ? conf.ForceUsingDependencies : conf.ConfigurationDependencies;
 
             if (confDependencies.Contains(conf))
                 throw new Error("Cyclic dependency detected in project " + conf);
@@ -286,7 +286,7 @@ namespace Sharpmake.Generators.FastBuild
                 var tmpDeps = new UniqueList<Project.Configuration>();
                 foreach (Project.Configuration dep in confDependencies)
                 {
-                    GetOrderedFlattenedProjectDependenciesInternal(dep, tmpDeps, true);
+                    GetOrderedFlattenedProjectDependenciesInternal(dep, tmpDeps, true, fuDependencies);
                     tmpDeps.Add(dep);
                 }
                 foreach (Project.Configuration dep in tmpDeps)
@@ -302,7 +302,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (dependencies.Contains(dep))
                         continue;
 
-                    GetOrderedFlattenedProjectDependenciesInternal(dep, dependencies, true);
+                    GetOrderedFlattenedProjectDependenciesInternal(dep, dependencies, true, fuDependencies);
                     if (dep.IsFastBuild)
                         dependencies.Add(dep);
                 }

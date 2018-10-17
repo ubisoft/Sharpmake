@@ -385,6 +385,10 @@ Compiler( '[fastbuildCompilerName]' )
     .DeoptimizeWritableFiles = [fastBuildDeoptimizationWritableFiles]
     .DeoptimizeWritableFilesWithToken = [fastBuildDeoptimizationWritableFilesWithToken]
 ";
+                public static string PreBuildDependencies = @"
+    .PreBuildDependencies = { [fastBuildPreBuildTargets]
+                            }
+";
 
                 public static string PlatformBeginSection = @"
 ////////////////////////////////////////////////////////////////////////////////

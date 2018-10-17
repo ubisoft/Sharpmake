@@ -30,6 +30,7 @@ namespace Sharpmake
         IncludePaths = 1 << 3,
         Defines = 1 << 4,
         AdditionalUsingDirectories = 1 << 5,
+        ForceUsingAssembly = 1 << 6,
 
         // Useful masks
         Default = LibraryFiles
@@ -38,6 +39,10 @@ namespace Sharpmake
                               | Defines,
 
         DefaultWithoutLinking = IncludePaths
+                              | Defines,
+
+        DefaultForceUsing = ForceUsingAssembly
+                              | IncludePaths
                               | Defines,
 
 
@@ -480,7 +485,9 @@ namespace Sharpmake
 
             public OrderableStrings AdditionalUsingDirectories = new OrderableStrings();
             public OrderableStrings DependenciesLibraryFiles = new OrderableStrings();
+            public OrderableStrings DependenciesForceUsingFiles = new OrderableStrings();
             public UniqueList<Configuration> ConfigurationDependencies = new UniqueList<Configuration>();
+            public UniqueList<Configuration> ForceUsingDependencies = new UniqueList<Configuration>();
 
             public List<DotNetDependency> DotNetPublicDependencies = new List<DotNetDependency>();
             public List<DotNetDependency> DotNetPrivateDependencies = new List<DotNetDependency>();
@@ -1753,6 +1760,9 @@ namespace Sharpmake
 
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         DependenciesLibraryFiles.AddRange(dependency.LibraryFiles);
+
+                                    if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
+                                        DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
                                 }
                             }
                             break;
@@ -1764,6 +1774,8 @@ namespace Sharpmake
                                         PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupDynamicLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
+                                    if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
+                                        ForceUsingDependencies.Add(dependency);
 
                                     // check if that case is valid: dll with additional libs
                                     if (isExport && !goesThroughDLL)
@@ -1829,6 +1841,8 @@ namespace Sharpmake
                                 bool? referenceOutputAssembly = ReferenceOutputAssembly;
                                 if (dependencySetting == DependencySetting.OnlyBuildOrder)
                                     referenceOutputAssembly = false;
+                                if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
+                                    ForceUsingDependencies.Add(dependency);
 
                                 var dotNetDependency = new DotNetDependency(dependency)
                                 {

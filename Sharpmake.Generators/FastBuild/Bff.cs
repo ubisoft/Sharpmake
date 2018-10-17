@@ -680,8 +680,6 @@ namespace Sharpmake.Generators.FastBuild
 
                                 fastBuildAdditionalCompilerOptionsFromCode += "/FU\"" + refByPathCopy + "\" ";
                             }
-                            //compilerOptions += Template.ConfigurationFile.CompilerForceUsing;
-
                         }
 
                         string llvmClangCompilerOptions = null;
@@ -723,10 +721,14 @@ namespace Sharpmake.Generators.FastBuild
                             throw new Exception("Use ReferencesByPath instead of ReferencesByName for FastBuild support; ");
                         }
 
-                        if (conf.ForceUsingFiles.Count() != 0)
+                        if (conf.ForceUsingDependencies.Any() || conf.DependenciesForceUsingFiles.Any() || conf.ForceUsingFiles.Any())
                         {
                             StringBuilder builderForceUsingFiles = new StringBuilder();
-                            foreach (var f in conf.ForceUsingFiles)
+                            foreach (var fuConfig in conf.ForceUsingDependencies)
+                            {
+                                builderForceUsingFiles.AppendFormat(@" /FU""{0}.dll""", GetOutputFileName(fuConfig));
+                            }
+                            foreach (var f in conf.ForceUsingFiles.Union(conf.DependenciesForceUsingFiles))
                             {
                                 string file = f;
                                 if (f.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
@@ -865,6 +867,20 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildEmbeddedResources = UtilityMethods.FBuildFormatList(fastbuildEmbeddedResourceFilesList, 30);
                         }
 
+                        UniqueList<Project.Configuration> orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
+                        string fastBuildPreBuildDependencies = "";
+                        if (orderedForceUsingDeps.Count != 0)
+                        {
+                            StringBuilder builderPreBuild = new StringBuilder();
+                            foreach (var dep in orderedForceUsingDeps)
+                            {
+                                builderPreBuild.AppendFormat(@"'{0}',", GetShortProjectName(dep.Project, dep));
+                            }
+
+                            fastBuildPreBuildDependencies = builderPreBuild.ToString();
+                            if (fastBuildPreBuildDependencies.Length > 0)
+                                fastBuildPreBuildDependencies = fastBuildPreBuildDependencies.Remove(fastBuildPreBuildDependencies.Length - 1, 1);
+                        }
                         if (projectHasResourceFiles)
                             resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
                         if (projectHasEmbeddedResources)
@@ -912,6 +928,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildEmbeddedResources", fastBuildEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
                                     using (bffGenerator.Declare("fastBuildProjectDependencies", fastBuildProjectDependencies))
+                                    using (bffGenerator.Declare("fastBuildPreBuildTargets", fastBuildPreBuildDependencies))
                                     using (bffGenerator.Declare("fastBuildObjectListResourceDependencies", fastBuildObjectListResourceDependencies))
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildObjectListDependencies", fastBuildObjectListDependencies))
@@ -997,6 +1014,11 @@ namespace Sharpmake.Generators.FastBuild
                                                 }
                                             }
 
+                                            if (orderedForceUsingDeps.Count != 0)
+                                            {
+                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
+                                            }
+
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
 
@@ -1043,6 +1065,11 @@ namespace Sharpmake.Generators.FastBuild
                                                 }
 
                                                 // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
+                                            }
+
+                                            if (orderedForceUsingDeps.Count != 0)
+                                            {
+                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
                                             }
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
@@ -1565,7 +1592,7 @@ namespace Sharpmake.Generators.FastBuild
                 if (addLibPrefix)
                     targetNamePrefix = "lib";
             }
-            string targetName = conf.TargetFileFullName;
+            string targetName = conf.Project is CSharpProject ? conf.TargetFileName : conf.TargetFileFullName;
             return targetNamePrefix + targetName;
         }
 
