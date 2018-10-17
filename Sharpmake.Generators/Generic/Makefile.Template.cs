@@ -99,7 +99,7 @@ endif
   CFLAGS    += $(CPPFLAGS) [options.CFLAGS]
   CXXFLAGS  += $(CFLAGS) [options.CXXFLAGS]
   LDFLAGS   += [options.LibraryPaths] [options.AdditionalLinkerOptions]
-  LIBS      += [options.LibsStartGroup][options.DependenciesLibraryFiles] [options.LibraryFiles][options.LibsEndGroup]
+  LDLIBS    += [options.LibsStartGroup][options.DependenciesLibraryFiles] [options.LibraryFiles][options.LibsEndGroup]
   RESFLAGS  += $(DEFINES) $(INCLUDES)
   LDDEPS    += [options.LDDEPS]
   LINKCMD    = [options.LinkCommand]
@@ -116,7 +116,7 @@ endif
 ";
                 public static string LinkCommandLib = "$(AR) -rcs $(TARGET) $(OBJECTS)";
 
-                public static string LinkCommandExe = "$(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LIBS)";
+                public static string LinkCommandExe = "$(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)";
 
                 public static string ObjectsVariableBegin = "ifeq ($(config),[name])\n";
 
