@@ -245,6 +245,17 @@ namespace Sharpmake
             set { SetProperty(ref _blobWorkFileFooter, value); }
         }
 
+        /// <summary>
+        /// This property controls the casing of includes within the generated blob files.
+        /// If true, the case will be fixed. Default is false.
+        /// </summary>
+        public bool BlobFixCasing
+        {
+            get { return _blobFixCasing; }
+            set { SetProperty(ref _blobFixCasing, value); }
+        }
+        private bool _blobFixCasing = false;
+
         public static int BlobGenerated { get; private set; }
 
         public static int BlobUpdateToDate { get; private set; }
@@ -1073,8 +1084,9 @@ namespace Sharpmake
             if (header != null)
                 writer.WriteLine(header + Environment.NewLine);
 
-            foreach (string sourceFile in sourceFiles)
+            foreach (string sourceFileFullPath in sourceFiles)
             {
+                string sourceFile = BlobFixCasing ? Util.GetCapitalizedPath(sourceFileFullPath) : sourceFileFullPath;
                 string sourceFileRelative = Util.PathGetRelative(blobFileInfo.Directory.FullName, sourceFile).Replace(Util.WindowsSeparator, Util.UnixSeparator);
 
                 // Visual Studio will append the relative include path to the blob file path and will not resolve it before it is searching
