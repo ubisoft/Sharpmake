@@ -1545,11 +1545,11 @@ namespace Sharpmake
                 {
                     ProductID = setupInstance.GetProduct().GetId();
                     Components = (from package in setupInstance.GetPackages()
-                        where string.Equals(package.GetType(), "Component", StringComparison.OrdinalIgnoreCase)
-                        select package.GetId()).ToArray();
+                                  where string.Equals(package.GetType(), "Component", StringComparison.OrdinalIgnoreCase)
+                                  select package.GetId()).ToArray();
                     Workloads = (from package in setupInstance.GetPackages()
-                        where string.Equals(package.GetType(), "Workload", StringComparison.OrdinalIgnoreCase)
-                        select package.GetId()).ToArray();
+                                 where string.Equals(package.GetType(), "Workload", StringComparison.OrdinalIgnoreCase)
+                                 select package.GetId()).ToArray();
                 }
             }
 
