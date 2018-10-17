@@ -882,6 +882,7 @@ namespace Sharpmake
                     { }
                 }
 
+                [Obsolete("Please use " + nameof(Project.Configuration.ResourceIncludePaths) + " instead", true)]
                 public class AdditionalIncludeDirectories : Strings
                 {
                     public AdditionalIncludeDirectories(params string[] dirs)

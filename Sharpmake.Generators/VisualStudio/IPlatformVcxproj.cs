@@ -51,6 +51,7 @@ namespace Sharpmake.Generators.VisualStudio
         IEnumerable<string> GetIncludePaths(IGenerationContext context);
         IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context);
         IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context);
+        IEnumerable<string> GetResourceIncludePaths(IGenerationContext context);
 
         IEnumerable<string> GetCxUsingPath(IGenerationContext context);
 

@@ -150,6 +150,11 @@ namespace Sharpmake
             return GetPlatformIncludePathsWithPrefixImpl(context);
         }
 
+        public IEnumerable<string> GetResourceIncludePaths(IGenerationContext context)
+        {
+            return GetResourceIncludePathsImpl(context);
+        }
+
         public virtual IEnumerable<string> GetCxUsingPath(IGenerationContext context)
         {
             yield break;
@@ -320,6 +325,16 @@ namespace Sharpmake
         protected virtual IEnumerable<string> GetPlatformIncludePathsImpl(IGenerationContext context)
         {
             yield break;
+        }
+
+        protected virtual IEnumerable<string> GetResourceIncludePathsImpl(IGenerationContext context)
+        {
+            var resourceIncludePaths = new OrderableStrings();
+            resourceIncludePaths.AddRange(context.Configuration.ResourceIncludePrivatePaths);
+            resourceIncludePaths.AddRange(context.Configuration.ResourceIncludePaths);
+            resourceIncludePaths.AddRange(context.Configuration.DependenciesResourceIncludePaths);
+
+            return resourceIncludePaths;
         }
 
         #endregion

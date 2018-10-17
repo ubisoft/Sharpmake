@@ -345,6 +345,26 @@ namespace Sharpmake
 
             public OrderableStrings IncludePrivatePaths = new OrderableStrings();
 
+            #region Resource Includes
+            /// <summary>
+            /// Include paths for resource compilation.
+            /// These paths will propagate via the IncludePaths DependencySetting, use ResourceIncludePrivatePaths if you want to avoid this
+            /// </summary>
+            public OrderableStrings ResourceIncludePaths = new OrderableStrings();
+
+            /// <summary>
+            /// Include paths for resource compilation.
+            /// These paths are received from dependencies via the IncludePaths DependencySetting.
+            /// </summary>
+            public IEnumerable<string> DependenciesResourceIncludePaths => _dependenciesResourceIncludePaths;
+            protected OrderableStrings _dependenciesResourceIncludePaths = new OrderableStrings();
+
+            /// <summary>
+            /// Include paths for resource compilation.
+            /// These paths will never propagate.
+            /// </summary>
+            public OrderableStrings ResourceIncludePrivatePaths = new OrderableStrings();
+            #endregion
 
             public OrderableStrings AdditionalCompilerOptions = new OrderableStrings();
 
@@ -1141,6 +1161,8 @@ namespace Sharpmake
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExcludeFolders);
                 Util.ResolvePath(Project.SourceRootPath, ref ConsumeWinRTExtensions);
                 Util.ResolvePath(Project.SourceRootPath, ref ExcludeWinRTExtensions);
+                Util.ResolvePath(Project.SourceRootPath, ref ResourceIncludePaths);
+                Util.ResolvePath(Project.SourceRootPath, ref ResourceIncludePrivatePaths);
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesExceptionsEnabled);
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesExceptionsEnabledWithExternC);
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesExceptionsEnabledWithSEH);
@@ -1727,6 +1749,7 @@ namespace Sharpmake
                         if (wantIncludePaths && dependencySetting.HasFlag(DependencySetting.IncludePaths))
                         {
                             DependenciesIncludePaths.AddRange(dependency.IncludePaths);
+                            _dependenciesResourceIncludePaths.AddRange(dependency.ResourceIncludePaths);
 
                             // Is there a case where we want the defines but *not* the include paths?
                             if (dependencySetting.HasFlag(DependencySetting.Defines))
