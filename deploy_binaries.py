@@ -68,37 +68,38 @@ if not os.path.isfile(os.path.join(root_dir, "bin/{}/Sharpmake.dll".format(confi
 if not os.path.isdir(target_dir):
     os.makedirs(target_dir)
 
+################################################################################
+def copy_file(src):
+    if os.path.isfile(src) and os.path.normpath(os.path.dirname(src)) != os.path.normpath(target_dir):
+        print("Copying {} to {}".format(os.path.join(root_dir, src), target_dir))
+        shutil.copy2(src, target_dir)
+
 # Simple wrapper class that represents an output folder,
 # ie: bin/Release or bin/Debug
 class BinarySite:
     def __init__(self, name):
         self.name = name
 
-    def copy_file(self, src):
-        if os.path.isfile(src) and os.path.normpath(os.path.dirname(src)) != os.path.normpath(target_dir):
-            print("Copying {} to {}".format(os.path.join(root_dir, src), target_dir))
-            shutil.copy2(src, target_dir)
-
     def copy(self):
         # Copy the DLL.
         dll_path = os.path.join(root_dir, "bin", config, self.name + ".dll")
-        self.copy_file(dll_path)
-        self.copy_file(dll_path + ".config")
+        copy_file(dll_path)
+        copy_file(dll_path + ".config")
 
         # Copy the executable.
         exe_path = os.path.join(root_dir, "bin", config, self.name + ".exe")
-        self.copy_file(exe_path)
-        self.copy_file(exe_path + ".config")
+        copy_file(exe_path)
+        copy_file(exe_path + ".config")
 
         # Copy the program debug database and mdb files.
         if deploy_pdb:
-            self.copy_file(dll_path + ".mdb")
-            self.copy_file(exe_path + ".mdb")
-            self.copy_file(os.path.join(root_dir, "bin", config, self.name + ".pdb"))
+            copy_file(dll_path + ".mdb")
+            copy_file(exe_path + ".mdb")
+            copy_file(os.path.join(root_dir, "bin", config, self.name + ".pdb"))
 
         # Copy the XML API doc if it exists.
         if deploy_xmldoc:
-            self.copy_file(os.path.join(root_dir, "bin", config, self.name + ".xml"))
+            copy_file(os.path.join(root_dir, "bin", config, self.name + ".xml"))
 
     def __str__(self):
         return self.name
@@ -126,3 +127,9 @@ if os.path.isdir("Sharpmake.Platforms"):
 # Finally, do the copying.
 for site in copy_list:
     site.copy()
+
+# Also copy the interop allowing the detection of visual studio
+vs_interop = os.path.join(root_dir, "bin", config, "Microsoft.VisualStudio.Setup.Configuration.Interop.dll")
+if os.path.isfile(vs_interop):
+    copy_file(vs_interop)
+
