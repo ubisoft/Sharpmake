@@ -37,31 +37,41 @@ namespace Sharpmake
         {
             public static bool OverridenLLVMInstallDir { get; private set; }
 
-            private static string s_LLVMInstallDir;
+            private static string s_llvmInstallDir;
             public static string LLVMInstallDir
             {
                 get
                 {
-                    return s_LLVMInstallDir ?? (s_LLVMInstallDir = Util.GetDefaultLLVMInstallDir());
+                    return s_llvmInstallDir ?? (s_llvmInstallDir = Util.GetDefaultLLVMInstallDir());
                 }
 
                 set
                 {
-                    s_LLVMInstallDir = value;
+                    s_llvmInstallDir = value;
                     OverridenLLVMInstallDir = true;
                 }
             }
 
-            private static string s_ClangVersion;
+            private static string s_clangVersion;
             public static string ClangVersion
             {
-                get { return s_ClangVersion ?? (s_ClangVersion = Util.GetClangVersionFromLLVMInstallDir(LLVMInstallDir)); }
+                get
+                {
+                    if (s_clangVersion == null)
+                    {
+                        if (Util.DirectoryExists(LLVMInstallDir))
+                            s_clangVersion = Util.GetClangVersionFromLLVMInstallDir(LLVMInstallDir);
+                        else
+                            s_clangVersion = "7.0.0"; // arbitrary
+                    }
+                    return s_clangVersion;
+                }
 
                 set
                 {
-                    s_ClangVersion = value;
-                    if (!Util.DirectoryExists(Path.Combine(LLVMInstallDir, "lib", "clang", s_ClangVersion)))
-                        throw new Error($"Cannot find required files for Clang {s_ClangVersion} in {LLVMInstallDir}");
+                    s_clangVersion = value;
+                    if (!Util.DirectoryExists(Path.Combine(LLVMInstallDir, "lib", "clang", s_clangVersion)))
+                        throw new Error($"Cannot find required files for Clang {s_clangVersion} in {LLVMInstallDir}");
                 }
             }
         }
