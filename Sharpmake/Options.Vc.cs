@@ -890,6 +890,29 @@ namespace Sharpmake
                     { }
                 }
             }
+
+            public static class LLVM
+            {
+                /// <summary>
+                /// Use clang-cl for compiling.  If this option is disabled, the Microsoft compiler (cl.exe) will be used instead.
+                /// </summary>
+                public enum UseClangCl
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                /// <summary>
+                /// Use lld-link for linking.  If this option is disabled, the Microsoft linker (link.exe) will be used instead.
+                /// </summary>
+                public enum UseLldLink
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+            }
         }
     }
 }

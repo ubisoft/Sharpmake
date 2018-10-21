@@ -82,6 +82,7 @@ namespace Sharpmake.Generators.VisualStudio
             GenerateCompilerOptions(context, optionsContext);
             GenerateLinkerOptions(context, optionsContext);
             GenerateManifestToolOptions(context, optionsContext);
+            GenerateLLVMOptions(context, optionsContext);
             GeneratePostBuildOptions(context, optionsContext);
         }
 
@@ -1824,6 +1825,21 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["CustomBuildStepAfterTargets"] = context.Configuration.CustomBuildStepAfterTargets != string.Empty ? context.Configuration.CustomBuildStepAfterTargets : FileGeneratorUtilities.RemoveLineTag;
                 context.Options["CustomBuildStepTreatOutputAsContent"] = context.Configuration.CustomBuildStepTreatOutputAsContent != string.Empty ? context.Configuration.CustomBuildStepTreatOutputAsContent : FileGeneratorUtilities.RemoveLineTag;
             }
+        }
+
+        private void GenerateLLVMOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
+        {
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.LLVM.UseClangCl.Enable, () => { context.Options["UseClangCl"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.LLVM.UseClangCl.Disable, () => { context.Options["UseClangCl"] = "false"; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.LLVM.UseLldLink.Enable, () => { context.Options["UseLldLink"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.LLVM.UseLldLink.Disable, () => { context.Options["UseLldLink"] = "false"; })
+            );
         }
 
         public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)

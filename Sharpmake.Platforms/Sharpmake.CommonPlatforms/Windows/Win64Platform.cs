@@ -50,11 +50,17 @@ namespace Sharpmake
             public override string CConfigName(Configuration conf)
             {
                 var devEnv = conf.Target.GetFragment<DevEnv>();
+                string platformToolsetString = string.Empty;
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
                 if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
-                    return ".win64" + platformToolset + "Config";
+                    platformToolsetString = $"_{platformToolset}";
 
-                return ".win64Config";
+                string lldString = string.Empty;
+                var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
+                if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable)
+                    lldString = "_LLD";
+
+                return $".win64{platformToolsetString}{lldString}Config";
             }
 
             public override string CppConfigName(Configuration conf)
@@ -73,7 +79,25 @@ namespace Sharpmake
 
                 string compilerName = "Compiler-" + Util.GetSimplePlatformString(platform);
 
+                string linkerPathOverride = null;
+                string linkerExeOverride = null;
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                if (platformToolset == Options.Vc.General.PlatformToolset.LLVM)
+                {
+                    var useClangCl = Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf);
+
+                    // Use default platformToolset to get MS compiler instead of Clang, when ClanCl is disabled
+                    if (useClangCl == Options.Vc.LLVM.UseClangCl.Disable)
+                        platformToolset = Options.Vc.General.PlatformToolset.Default;
+
+                    var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
+                    if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable)
+                    {
+                        linkerPathOverride = Path.Combine(ClangForWindows.Settings.LLVMInstallDir, "bin");
+                        linkerExeOverride = "lld-link.exe";
+                    }
+                }
+
                 if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
                     compilerName += "-" + platformToolset;
                 else
@@ -81,7 +105,7 @@ namespace Sharpmake
 
                 CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, devEnv, projectRootPath, platformToolset, false);
                 compilerSettings.PlatformFlags |= Platform.win64;
-                SetConfiguration(compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false);
+                SetConfiguration(compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false, linkerPathOverride, linkerExeOverride);
             }
 
             public CompilerSettings GetMasterCompilerSettings(
@@ -134,7 +158,7 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                         case Options.Vc.General.PlatformToolset.LLVM:
 
-                            platformToolSetPath = Util.GetDefaultLLVMInstallDir();
+                            platformToolSetPath = ClangForWindows.Settings.LLVMInstallDir;
                             pathToCompiler = Path.Combine(platformToolSetPath, "bin");
                             compilerExeName = "clang-cl.exe";
 
@@ -260,7 +284,15 @@ namespace Sharpmake
                 return compilerSettings;
             }
 
-            private void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string configName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+            private void SetConfiguration(
+                IDictionary<string, CompilerSettings.Configuration> configurations,
+                string configName,
+                string projectRootPath,
+                DevEnv devEnv,
+                bool useCCompiler,
+                string linkerPathOverride,
+                string linkerExeOverride
+            )
             {
                 if (!configurations.ContainsKey(configName))
                 {
@@ -270,11 +302,15 @@ namespace Sharpmake
                         binPath = devEnv.GetVisualStudioBinPath(Platform.win64);
 
                     string linkerPath;
-                    if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
+                    if (!string.IsNullOrEmpty(linkerPathOverride))
+                        linkerPath = linkerPathOverride;
+                    else if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
                         linkerPath = binPath;
 
                     string linkerExe;
-                    if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
+                    if (!string.IsNullOrEmpty(linkerExeOverride))
+                        linkerExe = linkerExeOverride;
+                    else if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                         linkerExe = "link.exe";
 
                     string librarianExe;
@@ -346,6 +382,31 @@ namespace Sharpmake
                 }
 
                 return msvcIncludePaths.Select(includePath => new IncludeWithPrefix(cmdLineIncludePrefix, includePath));
+            }
+
+            public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
+            {
+                string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
+                if (string.IsNullOrEmpty(platformFolder) || !ClangForWindows.Settings.OverridenLLVMInstallDir)
+                    return;
+
+                generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                {
+                    if (!string.IsNullOrEmpty(platformFolder))
+                    {
+                        using (generator.Declare("custompropertyname", "_PlatformFolder"))
+                        using (generator.Declare("custompropertyvalue", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
+                            generator.Write(Vcxproj.Template.Project.CustomProperty);
+                    }
+
+                    if (ClangForWindows.Settings.OverridenLLVMInstallDir)
+                    {
+                        using (generator.Declare("custompropertyname", "LLVMInstallDir"))
+                        using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                            generator.Write(Vcxproj.Template.Project.CustomProperty);
+                    }
+                }
+                generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
             }
             #endregion
         }

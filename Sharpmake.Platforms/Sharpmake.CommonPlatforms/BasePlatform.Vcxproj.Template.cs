@@ -207,6 +207,8 @@ namespace Sharpmake
     <ExcludePath>[options.ExcludePath]</ExcludePath>
     <DisableFastUpToDateCheck>[options.DisableFastUpToDateCheck]</DisableFastUpToDateCheck>
     <EnableManagedIncrementalBuild>[options.EnableManagedIncrementalBuild]</EnableManagedIncrementalBuild>
+    <UseClangCl>[options.UseClangCl]</UseClangCl>
+    <UseLldLink>[options.UseLldLink]</UseLldLink>
   </PropertyGroup>
 ";
 
