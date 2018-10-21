@@ -56,9 +56,12 @@ namespace Sharpmake
                     platformToolsetString = $"_{platformToolset}";
 
                 string lldString = string.Empty;
-                var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
-                if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable)
-                    lldString = "_LLD";
+                if (platformToolset == Options.Vc.General.PlatformToolset.LLVM)
+                {
+                    var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
+                    if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable)
+                        lldString = "_LLD";
+                }
 
                 return $".win64{platformToolsetString}{lldString}Config";
             }
