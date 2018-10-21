@@ -20,12 +20,7 @@ namespace Sharpmake
     {
         public static class GlobalSettings
         {
-            private static bool s_overridenDurangoXDK = false;
-            public static bool OverridenDurangoXDK
-            {
-                get { return s_overridenDurangoXDK; }
-                set { s_overridenDurangoXDK = value; }
-            }
+            public static bool OverridenDurangoXDK { get; set; } = false;
 
             private static string s_durangoXDK = null;
             public static string DurangoXDK
@@ -47,7 +42,7 @@ namespace Sharpmake
                 set
                 {
                     s_durangoXDK = value;
-                    s_overridenDurangoXDK = true;
+                    OverridenDurangoXDK = true;
                 }
             }
 
