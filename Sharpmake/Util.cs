@@ -2022,15 +2022,21 @@ namespace Sharpmake
             try
             {
                 using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
-                    key = (localMachineKey != null) ? (string)localMachineKey.GetValue(value) : null;
+                {
+                    if (localMachineKey != null)
+                    {
+                        key = (string)localMachineKey.GetValue(value);
+                        if (string.IsNullOrEmpty(key))
+                            LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                    }
+                    else
+                        LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
+                }
             }
             catch { }
 
             if (string.IsNullOrEmpty(key))
-            {
-                LogWrite("Registry subKey (" + registrySubKey + ") or value under it (" + value + ") is not set, fallback to default: " + fallbackValue);
                 key = fallbackValue;
-            }
 
             s_registryCache.TryAdd(subKeyValueTuple, key);
 
