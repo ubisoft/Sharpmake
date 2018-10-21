@@ -39,7 +39,7 @@ namespace Sharpmake
         /// <summary>
         /// Extra user assembly file name to use while compiling
         /// </summary>
-        public List<string> References { get { return _references; } }
+        public IReadOnlyList<string> References { get { return _references; } }
 
         /// <summary>
         /// Source attribute parser to use to add configuration based on source code
@@ -265,8 +265,7 @@ namespace Sharpmake
 
         private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
-        public List<string> _references = new List<string>();
-        private Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
+        private List<string> _references = new List<string>();
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
 
         private static bool IsDelegate(Type delegateType)
@@ -286,37 +285,36 @@ namespace Sharpmake
 
         private class AssemblerContext : IAssemblerContext
         {
-            private readonly Assembler _assembler;
-            public List<string> SourceFiles;
+            private readonly AssemblyInfo _assemblyInfo;
+            public IReadOnlyList<string> SourceFiles => _assemblyInfo.SourceFiles.ToList();
             private Strings _visiting;
             public List<ISourceAttributeParser> AllParsers = new List<ISourceAttributeParser>();
             public List<ISourceAttributeParser> ImportedParsers = new List<ISourceAttributeParser>();
             private readonly IBuilderContext _builderContext;
-            public string DebugProjectName;
 
-            public AssemblerContext(Assembler assembler, IBuilderContext builderContext, string[] sources)
+            public AssemblerContext(AssemblyInfo assemblyInfo, IBuilderContext builderContext, string[] sources, IList<ISourceAttributeParser> allParsers)
             {
+                _assemblyInfo = assemblyInfo;
                 _builderContext = builderContext;
-                _assembler = assembler;
-                AllParsers = assembler.ComputeParsers();
+                AllParsers.AddRange(allParsers);
+                _assemblyInfo._sourceFiles.AddRange(sources);
                 _visiting = new Strings(new FileSystemStringComparer(), sources);
-                SourceFiles = new List<string>(_visiting);
             }
 
             public void AddSourceFile(string file)
             {
                 if (!_visiting.Contains(file))
                 {
-                    SourceFiles.Add(file);
+                    _assemblyInfo._sourceFiles.Add(file);
                     _visiting.Add(file);
                 }
             }
 
             public void AddReference(string file)
             {
-                if (!_assembler._references.Contains(file))
+                if (!_assemblyInfo._references.Contains(file))
                 {
-                    _assembler._references.Add(file);
+                    _assemblyInfo._references.Add(file);
                     var loadInfo = _builderContext.LoadExtension(file);
                     this.AddSourceAttributeParsers(loadInfo.Parsers);
                 }
@@ -326,12 +324,12 @@ namespace Sharpmake
             {
                 if (info.Assembly == null)
                 {
-                    _assembler._sourceReferences.Add(info.Id, info);
+                    _assemblyInfo._sourceReferences.Add(info.Id, info);
                 }
-                else if (!_assembler._references.Contains(info.Id))
+                else if (!_assemblyInfo._references.Contains(info.Id))
                 {
-                    _assembler._references.Add(info.Assembly.Location);
-                    _assembler._sourceReferences.Add(info.Id, info);
+                    _assemblyInfo._references.Add(info.Assembly.Location);
+                    _assemblyInfo._sourceReferences.Add(info.Id, info);
                 }
             }
 
@@ -353,7 +351,7 @@ namespace Sharpmake
 
             public void SetDebugProjectName(string name)
             {
-                DebugProjectName = name;
+                _assemblyInfo.DebugProjectName = name;
             }
 
             public BuilderCompileErrorBehavior CompileErrorBehavior => _builderContext?.CompileErrorBehavior ?? BuilderCompileErrorBehavior.ThrowException;
@@ -459,18 +457,18 @@ namespace Sharpmake
 
         private AssemblyInfo LoadAssemblyInfo(IBuilderContext builderContext, string[] sources)
         {
-            var context = new AssemblerContext(this, builderContext, sources);
+            var assemblyInfo = new AssemblyInfo()
+            {
+                Id = string.Join(";", sources),
+                UseDefaultReferences = UseDefaultReferences
+            };
+
+            var context = new AssemblerContext(assemblyInfo, builderContext, sources, ComputeParsers());
             AnalyseSourceFiles(context);
 
-            return new AssemblyInfo()
-            {
-                Id = string.Join(";", context.SourceFiles),
-                DebugProjectName = context.DebugProjectName,
-                UseDefaultReferences = UseDefaultReferences,
-                _sourceFiles = context.SourceFiles.ToList(),
-                _references = _references.ToList(),
-                _sourceReferences = new Dictionary<string, IAssemblyInfo>(_sourceReferences),
-            };
+            _references.AddRange(assemblyInfo.References);
+
+            return assemblyInfo;
         }
 
         internal IAssemblyInfo LoadUncompiledAssemblyInfo(IBuilderContext context, string[] sources)
@@ -480,9 +478,15 @@ namespace Sharpmake
 
         internal List<string> GetSourceFiles(IBuilderContext builderContext, string[] sources)
         {
-            var context = new AssemblerContext(this, builderContext, sources);
+            var assemblyInfo = new AssemblyInfo()
+            {
+                Id = string.Join(";", sources),
+                UseDefaultReferences = UseDefaultReferences
+            };
+
+            var context = new AssemblerContext(assemblyInfo, builderContext, sources, ComputeParsers());
             AnalyseSourceFiles(context);
-            return context.SourceFiles;
+            return assemblyInfo.SourceFiles.ToList();
         }
 
         private void AddDefaultParsers(ICollection<ISourceAttributeParser> parsers)
