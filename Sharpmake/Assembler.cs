@@ -27,6 +27,7 @@ namespace Sharpmake
         /// <summary>
         /// Extra user directory to load assembly from using statement detection
         /// </summary>
+        [Obsolete("AssemblyDirectory is not used anymore")]
         public List<string> AssemblyDirectory { get { return _assemblyDirectory; } }
 
         /// <summary>
