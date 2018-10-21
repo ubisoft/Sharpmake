@@ -204,6 +204,11 @@ namespace Sharpmake.Generators.VisualStudio
             if (forcedIncludes.Count > 0)
             {
                 context.Options["ForcedIncludeFiles"] = forcedIncludes.JoinStrings(";");
+
+                // save the vanilla value without the LLVM workaround for reuse later
+                if (forcedIncludes.Count != context.Configuration.ForcedIncludes.Count)
+                    context.Options["ForcedIncludeFilesVanilla"] = context.Configuration.ForcedIncludes.JoinStrings(";");
+
                 StringBuilder result = new StringBuilder();
                 foreach (var forcedInclude in forcedIncludes)
                     result.Append(@"/FI""" + forcedInclude + @""" ");

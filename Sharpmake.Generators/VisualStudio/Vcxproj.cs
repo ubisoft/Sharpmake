@@ -701,7 +701,7 @@ namespace Sharpmake.Generators.VisualStudio
             // source file requires to be remove from the projects, so that not 2 same cpp file be in 2 different project.
             // TODO: make a better check
             if (hasNonFastBuildConfig || !context.Project.StripFastBuildSourceFiles)
-                GenerateFilesSection(context, fileGenerator, generatedFiles, skipFiles);
+                GenerateFilesSection(context, options, fileGenerator, generatedFiles, skipFiles);
             else if (hasFastBuildConfig)
                 GenerateBffFilesSection(context, fileGenerator);
 
@@ -1202,7 +1202,13 @@ namespace Sharpmake.Generators.VisualStudio
                 skipFiles.Add(projectFiltersFileInfo.FullName);
         }
 
-        private void GenerateFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator, IList<string> generatedFiles, IList<string> skipFiles)
+        private void GenerateFilesSection(
+            IVcxprojGenerationContext context,
+            Dictionary<Project.Configuration, Options.ExplicitOptions> options,
+            IFileGenerator fileGenerator,
+            IList<string> generatedFiles,
+            IList<string> skipFiles
+        )
         {
             string filtersFileName = context.ProjectPath + ProjectExtension + ProjectFilterExtension;
             string copyDependenciesFileName = context.ProjectPath + CopyDependenciesExtension;
@@ -1575,6 +1581,20 @@ namespace Sharpmake.Generators.VisualStudio
                                         else if (isDontUsePrecomp && hasPrecomp)
                                         {
                                             fileGenerator.Write(Template.Project.ProjectFilesSourcePrecompNotUsing);
+
+                                            // in case we are using the LLVM toolchain, the PCH was added
+                                            // as force include globally for the conf, so we need
+                                            // to use the forced include vanilla list that we prepared
+                                            var optionsForConf = options[conf];
+                                            if (optionsForConf.ContainsKey("ForcedIncludeFilesVanilla"))
+                                            {
+                                                // Note: faster to test that the options array has the
+                                                // vanilla list, as we only add it in case we use LLVM,
+                                                // but we could also have tested
+                                                // Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain()
+                                                using (fileGenerator.Declare("options", optionsForConf))
+                                                    fileGenerator.Write(Template.Project.ProjectFilesForcedIncludeVanilla);
+                                            }
                                         }
 
                                         if (consumeWinRTExtensions)
