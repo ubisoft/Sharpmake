@@ -285,18 +285,20 @@ namespace Sharpmake
 
         private class AssemblerContext : IAssemblerContext
         {
+            private readonly Assembler _assembler;
             private readonly AssemblyInfo _assemblyInfo;
             public IReadOnlyList<string> SourceFiles => _assemblyInfo.SourceFiles.ToList();
             private Strings _visiting;
-            public List<ISourceAttributeParser> AllParsers = new List<ISourceAttributeParser>();
+            public readonly List<ISourceAttributeParser> AllParsers;
             public List<ISourceAttributeParser> ImportedParsers = new List<ISourceAttributeParser>();
             private readonly IBuilderContext _builderContext;
 
-            public AssemblerContext(AssemblyInfo assemblyInfo, IBuilderContext builderContext, string[] sources, IList<ISourceAttributeParser> allParsers)
+            public AssemblerContext(Assembler assembler, AssemblyInfo assemblyInfo, IBuilderContext builderContext, string[] sources)
             {
+                _assembler = assembler;
                 _assemblyInfo = assemblyInfo;
                 _builderContext = builderContext;
-                AllParsers.AddRange(allParsers);
+                AllParsers = assembler.ComputeParsers();
                 _assemblyInfo._sourceFiles.AddRange(sources);
                 _visiting = new Strings(new FileSystemStringComparer(), sources);
             }
@@ -353,8 +355,6 @@ namespace Sharpmake
             {
                 _assemblyInfo.DebugProjectName = name;
             }
-
-            public BuilderCompileErrorBehavior CompileErrorBehavior => _builderContext?.CompileErrorBehavior ?? BuilderCompileErrorBehavior.ThrowException;
         }
 
         private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
@@ -463,7 +463,7 @@ namespace Sharpmake
                 UseDefaultReferences = UseDefaultReferences
             };
 
-            var context = new AssemblerContext(assemblyInfo, builderContext, sources, ComputeParsers());
+            var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
             AnalyseSourceFiles(context);
 
             _references.AddRange(assemblyInfo.References);
@@ -484,7 +484,7 @@ namespace Sharpmake
                 UseDefaultReferences = UseDefaultReferences
             };
 
-            var context = new AssemblerContext(assemblyInfo, builderContext, sources, ComputeParsers());
+            var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
             AnalyseSourceFiles(context);
             return assemblyInfo.SourceFiles.ToList();
         }
