@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ namespace Sharpmake
             if (_assemblies.TryGetValue(includeAbsolutePath, out assemblyInfo))
             {
                 if (assemblyInfo == null)
-                    throw new Error($"Circual Sharpmake.Package dependency on {includeFilename}");
+                    throw new Error($"Circular Sharpmake.Package dependency on {includeFilename}");
                 context.AddReference(assemblyInfo);
                 return;
             }
@@ -143,7 +143,7 @@ namespace Sharpmake
                 if (!Util.FileExists(includeAbsolutePath))
                     includeAbsolutePath = Util.GetCapitalizedPath(includeAbsolutePath);
                 if (!Util.FileExists(includeAbsolutePath))
-                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found {0}", includeFilename);
+                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Package file not found {0}", includeFilename);
 
                 files = new string[] { includeAbsolutePath };
             }
@@ -155,8 +155,6 @@ namespace Sharpmake
 
     public class DebugProjectNameAttributeParser : SimpleSourceAttributeParser
     {
-        private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
-
         public DebugProjectNameAttributeParser() : base("DebugProjectName", 1, "Sharpmake")
         {
         }
