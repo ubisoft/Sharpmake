@@ -1589,7 +1589,11 @@ namespace Sharpmake.Generators.VisualStudio
             // it does not have a specific line in the vcxproj
             Strings disableLinkerWarnings = Options.GetStrings<Options.Vc.Linker.DisableSpecificWarnings>(context.Configuration);
             if (disableLinkerWarnings.Count > 0)
-                linkerAdditionalOptions += " /ignore:" + disableLinkerWarnings.JoinStrings(",");
+            {
+                if (linkerAdditionalOptions.Length > 0)
+                    linkerAdditionalOptions += " ";
+                linkerAdditionalOptions += "/ignore:" + disableLinkerWarnings.JoinStrings(",");
+            }
 
             context.Options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
         }
