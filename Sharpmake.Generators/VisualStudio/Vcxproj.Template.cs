@@ -151,7 +151,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectConfigurationsResourceCompile =
                 @"    <ResourceCompile>[options.ResourceCompileTag]
       <PreprocessorDefinitions>[options.ResourcePreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>[options.ResourceAdditionalIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>[options.AdditionalResourceIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowProgress>[options.ResourceCompilerShowProgress]</ShowProgress>
     </ResourceCompile>[options.ResourceCompileTag]
 ";

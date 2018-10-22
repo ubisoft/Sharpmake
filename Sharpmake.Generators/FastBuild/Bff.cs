@@ -1344,6 +1344,7 @@ namespace Sharpmake.Generators.FastBuild
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
 
             var includePaths = new OrderableStrings(platformVcxproj.GetIncludePaths(context));
+            var resourceIncludePaths = new OrderableStrings(platformVcxproj.GetResourceIncludePaths(context));
             context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
 
@@ -1358,6 +1359,7 @@ namespace Sharpmake.Generators.FastBuild
             {
                 string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I" : "/I";
 
+                // Fill include dirs
                 var dirs = new List<string>();
                 dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p, defaultCmdLineIncludePrefix)));
 
@@ -1367,20 +1369,24 @@ namespace Sharpmake.Generators.FastBuild
                 if (dirs.Any())
                     context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
 
-                if (platformIncludePaths.Any())
+                // Fill resource include dirs
+                var resourceDirs = new List<string>();
+                resourceDirs.AddRange(resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p, defaultCmdLineIncludePrefix)));
+
+                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
                 {
-                    if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
-                    {
-                        // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
-                        // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
-                        var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p.Path, defaultCmdLineIncludePrefix)).ToList();
-                        context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", platformIncludePathsDefaultPrefix);
-                    }
-                    else
-                    {
-                        context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", platformIncludePathsPrefixed);
-                    }
+                    // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
+                    // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
+                    var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p.Path, defaultCmdLineIncludePrefix));
+                    resourceDirs.AddRange(platformIncludePathsDefaultPrefix);
                 }
+                else
+                {
+                    resourceDirs.AddRange(platformIncludePathsPrefixed);
+                }
+
+                if (resourceDirs.Any())
+                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", resourceDirs);
             }
         }
 

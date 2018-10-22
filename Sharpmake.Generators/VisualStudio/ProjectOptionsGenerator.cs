@@ -316,32 +316,7 @@ namespace Sharpmake.Generators.VisualStudio
             additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
 
 
-            bool writeResourceCompileTag = false;
-            // Options.Vc.ResourceCompiler.AdditionalIncludeDirectories
-            var resourceIncludePaths = new OrderableStrings(optionsContext.PlatformVcxproj.GetResourceIncludePaths(context));
-            resourceIncludePaths.AddRange(context.Configuration.DependenciesResourceIncludePaths);
-            if (resourceIncludePaths.Any())
-            {
-                context.Options["ResourceAdditionalIncludeDirectories"] = new Strings(Util.PathGetRelative(context.ProjectDirectory, resourceIncludePaths)).JoinStrings(";");
-                writeResourceCompileTag = true;
-
-                string cmdLineIncludePrefix = optionsContext.PlatformDescriptor.IsUsingClang ? "-I" : "/I";
-                string[] additionalResourceIncludes = resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, cmdLineIncludePrefix)).ToArray();
-
-                string separator = $"'{Environment.NewLine} + ' ";
-                if (context.CommandLineOptions["AdditionalResourceIncludeDirectories"] == FileGeneratorUtilities.RemoveLineTag)
-                {
-                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join(separator, additionalResourceIncludes);
-                }
-                else
-                {
-                    context.CommandLineOptions["AdditionalResourceIncludeDirectories"] += separator + string.Join(separator, additionalResourceIncludes);
-                }
-            }
-            else
-            {
-                context.Options["ResourceAdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            }
+            bool writeResourceCompileTag = optionsContext.PlatformVcxproj.GetResourceIncludePaths(context).Any();
 
             //Resource Compiler ShowProgress
             //    No                                      ShowProgress="false"

@@ -784,8 +784,13 @@ namespace Sharpmake.Generators.VisualStudio
         {
             IPlatformVcxproj platformVcxproj = context.PresentPlatforms[context.Configuration.Platform];
 
+            // Fill include dirs
             var includePaths = platformVcxproj.GetIncludePaths(context);
             context.Options["AdditionalIncludeDirectories"] = includePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, includePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+
+            // Fill resource include dirs
+            var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);
+            context.Options["AdditionalResourceIncludeDirectories"] = resourceIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, resourceIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
         }
 
         private void WriteCustomProperties(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
