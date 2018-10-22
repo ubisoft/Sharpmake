@@ -181,6 +181,7 @@ namespace Sharpmake
         public DevEnv DevEnv;
         public OutputType OutputType;
         public DotNetFramework Framework;
+        public string FrameworkFolder { get { return Framework.ToFolderName(); } }
         public Blob Blob;
 
         public override string Name
