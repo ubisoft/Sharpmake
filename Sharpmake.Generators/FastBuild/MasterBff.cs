@@ -52,7 +52,7 @@ namespace Sharpmake.Generators.FastBuild
 
                 foreach (var conf in confsPerBffs)
                 {
-                    if (conf.IsFastBuildEnabled() && !conf.ProjectsWereFiltered)
+                    if (conf.IsFastBuildEnabled() && !(conf.ProjectsWereFiltered && conf.ResolvedProjects.Count == 0))
                         yield return conf;
                 }
             }
