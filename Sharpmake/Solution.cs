@@ -355,7 +355,7 @@ namespace Sharpmake
                             && !configurationProjectDependency.InactiveProject
                             && !(dependencyConfiguration.IsFastBuild && !configurationProject.Configuration.IsFastBuild);
 
-                        if (solutionConfiguration.IncludeOnlyFilterProject && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive))
+                        if (depBuild && solutionConfiguration.IncludeOnlyFilterProject && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive))
                             depBuild = false;
 
                         if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
@@ -414,6 +414,7 @@ namespace Sharpmake
 
         private bool _resolved = false;
         private bool _dependenciesResolved = false;
+        private bool _generateFastBuildAllOnlyForConfThatNeedIt = true;
 
         private void Initialize(Type targetType, Type configurationType)
         {
@@ -475,10 +476,13 @@ namespace Sharpmake
                 var firstSolutionConf = projectsToBuildPerSolutionConfig.First().Item1;
 
                 Project fastBuildAllProject = null;
-                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig.Where(p => p.Item2.Count > 1))
+                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig)
                 {
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
+
+                    if (_generateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                        continue;
 
                     var solutionTarget = solutionConf.Target;
                     if (fastBuildAllProject == null)
@@ -507,10 +511,14 @@ namespace Sharpmake
                 fastBuildAllProject.Targets.BuildTargets();
                 fastBuildAllProject.InvokeConfiguration(builder.Context);
 
-                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig.Where(p => p.Item2.Count > 1))
+                // we need to iterate again after invoking the configure of all the projects so we can tweak their conf
+                foreach (var projectsToBuildInSolutionConfig in projectsToBuildPerSolutionConfig)
                 {
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
+
+                    if (_generateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                        continue;
 
                     var solutionTarget = solutionConf.Target;
                     var projectConf = fastBuildAllProject.GetConfiguration(solutionTarget);
