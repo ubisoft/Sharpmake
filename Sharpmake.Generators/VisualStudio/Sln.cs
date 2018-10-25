@@ -352,11 +352,23 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("projectTypeGuid", resolvedProject.UserData["TypeGuid"]))
                     {
                         fileGenerator.Write(Template.Solution.ProjectBegin);
-                        IEnumerable<string> buildDeps = resolvedProject.Configurations.SelectMany(c => c.GenericBuildDependencies.Select(p => p.ProjectGuid ?? ReadGuidFromProjectFile(p.ProjectFullFileNameWithExtension))).Distinct();
-                        if (buildDeps.Any())
+                        Strings buildDepsGuids = new Strings(resolvedProject.Configurations.SelectMany(
+                            c => c.GenericBuildDependencies.Select(
+                                p => p.ProjectGuid ?? ReadGuidFromProjectFile(p.ProjectFullFileNameWithExtension)
+                            )
+                        ));
+
+                        if (fastBuildAllProjectForSolutionDependency != null)
+                        {
+                            bool writeDependencyToFastBuildAll = resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe);
+                            if (writeDependencyToFastBuildAll)
+                                buildDepsGuids.Add(fastBuildAllProjectForSolutionDependency.UserData["Guid"] as string);
+                        }
+
+                        if (buildDepsGuids.Any())
                         {
                             fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
-                            foreach (string guid in buildDeps)
+                            foreach (string guid in buildDepsGuids)
                             {
                                 using (fileGenerator.Declare("projectDependencyGuid", guid))
                                     fileGenerator.Write(Template.Solution.ProjectDependency);
