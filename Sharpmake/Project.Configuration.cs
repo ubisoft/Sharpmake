@@ -1409,32 +1409,48 @@ namespace Sharpmake
                 Configuration dependencyConf = dependencyProject.GetConfiguration(pair.Value);
                 if (dependencyConf == null)
                 {
-                    string message =
-                        string.Format(
+                    var messageBuilder = new System.Text.StringBuilder();
+
+                    messageBuilder.AppendFormat(
                             "resolving dependencies for {0}: cannot find dependency project configuration {1} in project {2} induced by {3}",
-                            Owner.GetType().ToNiceTypeName(), pair.Value, pair.Key.ToNiceTypeName(), visitedConfiguration.ToString());
+                            Owner.GetType().ToNiceTypeName(),
+                            pair.Value,
+                            pair.Key.ToNiceTypeName(),
+                            visitedConfiguration.ToString()
+                    );
                     if (pair.Value.GetType() == dependencyProject.Targets.TargetType)
                     {
-                        message += string.Format(
+                        messageBuilder.AppendFormat(
                             ".  The target type is correct.  The error can be caused by missing calls to AddTargets or unwanted calls to AddFragmentMask in the constructor of {0}.",
-                            dependencyProject.GetType().ToNiceTypeName());
+                            dependencyProject.GetType().ToNiceTypeName()
+                        );
                     }
                     else
                     {
-                        message += string.Format(
+                        messageBuilder.AppendFormat(
                             ".  Are you passing the appropriate target type in AddDependency<{0}>(...)?  It should be type {1}.",
-                            dependencyProject.GetType().ToNiceTypeName(), dependencyProject.Targets.TargetType.ToNiceTypeName());
+                            dependencyProject.GetType().ToNiceTypeName(),
+                            dependencyProject.Targets.TargetType.ToNiceTypeName()
+                        );
+                    }
+                    messageBuilder.AppendLine();
+
+                    if (dependencyProject.Configurations.Any())
+                    {
+                        messageBuilder.AppendLine("Project configurations are:");
+                        int i = 0;
+                        foreach (var conf in dependencyProject.Configurations)
+                            messageBuilder.AppendLine(++i + "/" + dependencyProject.Configurations.Count + " " + conf.ToString());
+                    }
+                    else
+                    {
+                        messageBuilder.AppendLine("The project does not contain any configurations!");
                     }
 
-                    Trace.WriteLine(message);
-                    Trace.WriteLine("Project configurations are:");
-                    int i = 0;
-                    foreach (var conf in dependencyProject.Configurations)
-                        Trace.WriteLine(++i + "/" + dependencyProject.Configurations.Count + " " + conf.ToString());
-
+                    Trace.WriteLine(messageBuilder.ToString());
                     Debugger.Break();
 
-                    throw new Error(message);
+                    throw new Error(messageBuilder.ToString());
                 }
 
                 if (!dependencyConf.Target.IsEqualTo(pair.Value))
