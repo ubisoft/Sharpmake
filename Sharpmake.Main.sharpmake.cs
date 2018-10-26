@@ -64,6 +64,9 @@ namespace SharpmakeGen
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
                 conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]";
 
+                conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Optimization]\[project.Name]";
+                conf.BaseIntermediateOutputPath = conf.IntermediatePath;
+
                 conf.ReferencesByName.Add("System");
 
                 conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
