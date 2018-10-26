@@ -1475,7 +1475,15 @@ namespace Sharpmake.Generators.FastBuild
 
                 // Remove any excluded paths(exclusion has priority)
                 unityInputPaths.RemoveRange(fastbuildUnityInputExcludePathList);
-                var unityInputRelativePaths = new Strings(unityInputPaths.Select(p => CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, p, true))));
+                var unityInputRelativePaths = new Strings(unityInputPaths.Select(
+                    p =>
+                    {
+                        if (p.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                            return CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, p, true));
+                        return p;
+                    }
+                ));
+
                 fastBuildUnityPaths = UtilityMethods.FBuildCollectionFormat(unityInputRelativePaths, spaceLength);
 
                 var excludedSourceFiles = new Strings(conf.ResolvedSourceFilesBlobExclude);
