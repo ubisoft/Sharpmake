@@ -100,8 +100,11 @@ namespace Sharpmake
                 if (Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain())
                 {
                     context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + devEnv.GetWindowsExecutablePath(conf.Platform);
-                    context.Options["IncludePath"] = ClangForWindows.GetWindowsClangIncludePath() + ";" + devEnv.GetWindowsIncludePath();
-                    context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
+                    if (Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable)
+                    {
+                        context.Options["IncludePath"] = ClangForWindows.GetWindowsClangIncludePath() + ";" + devEnv.GetWindowsIncludePath();
+                        context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
+                    }
                 }
             }
             #endregion

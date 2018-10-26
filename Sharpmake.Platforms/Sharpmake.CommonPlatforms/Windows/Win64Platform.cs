@@ -370,7 +370,7 @@ namespace Sharpmake
                 const string cmdLineIncludePrefix = "/I";
                 IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(context.DevelopmentEnvironment.GetWindowsIncludePath());
 
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
+                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
                     var includes = new List<IncludeWithPrefix>();
 

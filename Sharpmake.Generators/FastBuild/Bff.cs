@@ -683,28 +683,31 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         string llvmClangCompilerOptions = null;
-                        var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
                         if (!isConsumeWinRTExtensions)
                         {
-                            switch (platformToolset)
+                            var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                            if (platformToolset.IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                             {
-                                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                                    // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                    llvmClangCompilerOptions = "-m64 -fmsc-version=1700";
-                                    fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                    break;
-                                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
-                                    // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                    llvmClangCompilerOptions = "-m64 -fmsc-version=1900";
-                                    fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                    break;
-                                case Options.Vc.General.PlatformToolset.LLVM:
-                                    // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                    // TODO: figure out what version number to put there
-                                    // maybe use the DevEnv value
-                                    llvmClangCompilerOptions = "-m64 -fmsc-version=1910"; // -m$(PlatformArchitecture)
-                                    fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                    break;
+                                switch (platformToolset)
+                                {
+                                    case Options.Vc.General.PlatformToolset.LLVM_vs2012:
+                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
+                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1700";
+                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+                                        break;
+                                    case Options.Vc.General.PlatformToolset.LLVM_vs2014:
+                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
+                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1900";
+                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+                                        break;
+                                    case Options.Vc.General.PlatformToolset.LLVM:
+                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
+                                        // TODO: figure out what version number to put there
+                                        // maybe use the DevEnv value
+                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1910"; // -m$(PlatformArchitecture)
+                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+                                        break;
+                                }
                             }
                         }
 
@@ -1373,7 +1376,8 @@ namespace Sharpmake.Generators.FastBuild
                 var resourceDirs = new List<string>();
                 resourceDirs.AddRange(resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p, defaultCmdLineIncludePrefix)));
 
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
+                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
+                    Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
                     // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
                     // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many

@@ -196,8 +196,11 @@ namespace Sharpmake.Generators.VisualStudio
             if (!context.Configuration.IsFastBuild)
             {
                 // support of PCH requires them to be set as ForceIncludes with ClangCl
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain())
+                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
+                    Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
+                {
                     forcedIncludes.Add(context.Configuration.PrecompHeader);
+                }
             }
 
             forcedIncludes.AddRange(context.Configuration.ForcedIncludes);
