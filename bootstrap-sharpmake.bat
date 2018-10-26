@@ -17,8 +17,13 @@ call :NugetRestore Sharpmake/Sharpmake.csproj
 call :BuildCsproj Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
 
 set SM_CMD=%SHARPMAKE_EXECUTABLE% /sources("Sharpmake.Main.sharpmake.cs") /verbose
+
 echo %SM_CMD%
 %SM_CMD%
+
+if %errorlevel% NEQ 0 (
+    goto error
+)
 
 echo Sharpmake solution generated.
 goto end
