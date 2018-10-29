@@ -102,19 +102,25 @@ namespace Sharpmake.Application
         public static void WarningWrite(string msg, params object[] args)
         {
             Interlocked.Increment(ref s_warningCount);
-            Console.Write(msg, args);
+            string formattedMsg = args.Length > 0 ? string.Format(msg, args) : msg;
+
+            Console.Write(formattedMsg);
+
             if (Debugger.IsAttached)
-                Trace.Write(args.Length > 0 ? string.Format(msg, args) : msg);
+                Trace.Write(formattedMsg);
         }
 
         public static void ErrorWrite(string msg, params object[] args)
         {
             Interlocked.Increment(ref s_errorCount);
-            Console.Write(msg, args);
-            if (Debugger.IsAttached)
-                Trace.Write(args.Length > 0 ? string.Format(msg, args) : msg);
-        }
+            string formattedMsg = args.Length > 0 ? string.Format(msg, args) : msg;
 
+            Console.Write(formattedMsg);
+
+            if (Debugger.IsAttached)
+                Trace.Write(formattedMsg);
+        }
+        
         public static void ErrorWriteLine(string msg, params object[] args)
         {
             ErrorWrite(msg + Environment.NewLine, args);
