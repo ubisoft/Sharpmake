@@ -45,7 +45,7 @@ namespace Sharpmake
 
         public override string ToString()
         {
-            return Owner.GetType().Name + ":" + Target;
+            return Owner.GetType().ToNiceTypeName() + ":" + Target;
         }
     }
 
