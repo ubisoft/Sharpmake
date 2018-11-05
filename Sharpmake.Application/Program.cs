@@ -668,7 +668,7 @@ namespace Sharpmake.Application
                         + (diff.Value.Count > 1 ? $" shared by {diff.Value.Count} files:" : " only in '" + diff.Value.First() + "':")
                     );
                     int j = 0;
-                    foreach (var file in diff.Value)
+                    foreach (var file in diff.Value.OrderBy(f => f))
                         DebugWriteLine($"      {++j}/{diff.Value.Count}  {file}");
 
                     var diffLines = diff.Key.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
