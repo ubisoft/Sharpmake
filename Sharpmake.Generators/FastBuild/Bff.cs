@@ -331,6 +331,9 @@ namespace Sharpmake.Generators.FastBuild
                                     throw new Error("Sharpmake-FastBuild : Project dependencies refers to itself.");
                                 if (!conf.ResolvedDependencies.Contains(depProjConfig))
                                     throw new Error("Sharpmake-FastBuild : dependency was not resolved.");
+                                bool isExport = depProjConfig.Project.GetType().IsDefined(typeof(Export), false);
+                                if (isExport)
+                                    continue;
 
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
