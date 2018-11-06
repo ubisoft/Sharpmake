@@ -23,17 +23,59 @@ namespace Sharpmake
 {
     public class IncludeAttributeParser : SimpleSourceAttributeParser
     {
-        public IncludeAttributeParser() : base("Include", 1, "Sharpmake")
+        public IncludeAttributeParser() : base("Include", 1, 2, "Sharpmake")
         {
         }
 
+        string MatchIncludeInParentPath(string filePath, string initialDirectory, IncludeType includeMatchType)
+        {
+            string matchPath = Path.Combine(initialDirectory, filePath);
+            bool matchPathExists = Util.FileExists(matchPath);
+
+            if (matchPathExists && includeMatchType == IncludeType.NearestMatchInParentPath)
+            {
+                return matchPath;
+            }
+
+            // backtrace one level in the path
+            string matchResult = null;
+            DirectoryInfo info = Directory.GetParent(initialDirectory);
+            if (info != null)
+            {
+                string parentPath = info.FullName;
+
+                if (!parentPath.Equals(initialDirectory))
+                {
+                    matchResult = MatchIncludeInParentPath(filePath, parentPath, includeMatchType);
+                }
+            }
+
+            if (matchPathExists && matchResult == null)
+                return matchPath;
+
+            return matchResult;
+        }
         public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
         {
             string includeFilename = parameters[0];
+            IncludeType matchType = IncludeType.Relative;
+            if (parameters.Length > 1)
+            {
+                string incType = parameters[1].Replace("Sharpmake.", "");
+                incType = incType.Replace("IncludeType.", ""); 
+                if (!Enum.TryParse<IncludeType>(incType, out matchType))
+                {
+                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include invalid include type used ({0})", parameters[1]);
+                }
+            }
             string includeAbsolutePath = Path.IsPathRooted(includeFilename) ? includeFilename : null;
 
             if (Util.IsPathWithWildcards(includeFilename))
             {
+                if (matchType != IncludeType.Relative)
+                {
+                    throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include with non-relative match types, wildcards are not supported ({0})", includeFilename);
+                }
                 includeAbsolutePath = includeAbsolutePath ?? Path.Combine(sourceFilePath.DirectoryName, includeFilename);
                 context.AddSourceFiles(Util.DirectoryGetFilesWithWildcards(includeAbsolutePath));
             }
@@ -41,16 +83,24 @@ namespace Sharpmake
             {
                 includeAbsolutePath = includeAbsolutePath ?? Util.PathGetAbsolute(sourceFilePath.DirectoryName, includeFilename);
 
-                if (!Util.FileExists(includeAbsolutePath))
-                    includeAbsolutePath = Util.GetCapitalizedPath(includeAbsolutePath);
+                if (matchType == IncludeType.Relative)
+                {
+                    if (!Util.FileExists(includeAbsolutePath))
+                        includeAbsolutePath = Util.GetCapitalizedPath(includeAbsolutePath);
+                }
+                else
+                {
+                    includeAbsolutePath = Util.GetCapitalizedPath(MatchIncludeInParentPath(includeFilename, sourceFilePath.DirectoryName, matchType));
+                }
+
                 if (!Util.FileExists(includeAbsolutePath))
                     throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found {0}", includeFilename);
 
                 context.AddSourceFile(includeAbsolutePath);
             }
         }
-    }
-
+    }    
+    
     public class ReferenceAttributeParser : SimpleSourceAttributeParser
     {
         public ReferenceAttributeParser() : base("Reference", 1, "Sharpmake")

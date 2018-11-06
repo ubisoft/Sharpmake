@@ -53,10 +53,10 @@ namespace Sharpmake
             }
             else
             {
-                regex += $@"\({dp}@?\""([^""]*)""{dp}";
+                regex += $@"\({dp}@?\""?([^""]*)""?{dp}";
                 for (int i = 1; i < parameterCount; ++i)
                 {
-                    regex += $@",{dp}@?\""([^""]*)""{dp}";
+                    regex += $@",{dp}@?\""?([^""]*)""?{dp}";
                 }
                 regex += $@"\)";
             }
@@ -67,18 +67,30 @@ namespace Sharpmake
 
     public abstract class SimpleSourceAttributeParser : ISourceAttributeParser
     {
-        private Regex AttributeRegex { get; }
+        private List<Regex> AttributeRegexes = new List<Regex>();
 
         public SimpleSourceAttributeParser(string attributeName, uint parameterCount, params string[] namespaces)
         {
-            AttributeRegex = SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, parameterCount, namespaces);
+            AttributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, parameterCount, namespaces));
         }
+
+        public SimpleSourceAttributeParser(string attributeName, uint parameterMinCount, uint parameterMaxCount, params string[] namespaces)
+        {
+            for (uint i = parameterMinCount; i <= parameterMaxCount; i++)
+            {
+                AttributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, i, namespaces));
+            }
+        }
+
 
         public void ParseLine(string line, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
         {
-            Match match = AttributeRegex.Match(line);
-            if (match.Success)
-                ParseParameter(match.Groups.Cast<Group>().Skip(1).Select(group => group.Captures[0].Value).ToArray(), sourceFilePath, lineNumber, context);
+            foreach (Regex attributeRegex in AttributeRegexes)
+            {
+                Match match = attributeRegex.Match(line);
+                if (match.Success)
+                    ParseParameter(match.Groups.Cast<Group>().Skip(1).Select(group => group.Captures[0].Value).ToArray(), sourceFilePath, lineNumber, context);
+            }
         }
 
         public abstract void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context);
