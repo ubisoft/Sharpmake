@@ -1624,9 +1624,15 @@ namespace Sharpmake
                 }
 
                 // Check if we need to add dependencies on lib that we compile (in the current solution)
-                bool explicitDependenciesGlobal =
-                    Sharpmake.Options.GetObject<Options.Vc.Linker.LinkLibraryDependencies>(this) !=
-                    Sharpmake.Options.Vc.Linker.LinkLibraryDependencies.Enable;
+                bool explicitDependenciesGlobal = true;
+                if (IsFastBuild)
+                {
+                    explicitDependenciesGlobal = Sharpmake.Options.GetObject<Options.Vc.Linker.UseLibraryDependencyInputs>(this) != Sharpmake.Options.Vc.Linker.UseLibraryDependencyInputs.Enable;
+                }
+                else
+                {
+                    explicitDependenciesGlobal = Sharpmake.Options.GetObject<Options.Vc.Linker.LinkLibraryDependencies>(this) != Sharpmake.Options.Vc.Linker.LinkLibraryDependencies.Enable;
+                }
 
                 DependencyNode rootNode = new DependencyNode(this, DependencySetting.Default);
 
