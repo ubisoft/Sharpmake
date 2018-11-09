@@ -1337,7 +1337,6 @@ namespace Sharpmake
 
 
         internal bool Resolved { get; private set; }
-        internal bool DependenciesApplyed => _resolvedDependencies;
         public Dictionary<string, List<Project.Configuration>> ProjectFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
 
         internal static Project CreateProject(Type projectType, List<Object> fragmentMasks)
