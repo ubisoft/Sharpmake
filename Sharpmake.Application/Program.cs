@@ -120,7 +120,7 @@ namespace Sharpmake.Application
             if (Debugger.IsAttached)
                 Trace.Write(formattedMsg);
         }
-        
+
         public static void ErrorWriteLine(string msg, params object[] args)
         {
             ErrorWrite(msg + Environment.NewLine, args);

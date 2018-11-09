@@ -41,7 +41,7 @@ namespace Sharpmake
 
         /// <summary>
         /// Creates a new <see cref="FileSystemStringComparer"/> instance whose case sensitivity is
-        /// the same as the case sensitivity of the the host operating system's file system.
+        /// the same as the case sensitivity of the host operating system's file system.
         /// </summary>
         public FileSystemStringComparer()
             : this(s_hostOsIsCaseSensitive)

@@ -126,18 +126,18 @@ namespace Sharpmake
 
     public enum IncludeType
     {
-        Relative,                   // Default, search the the included file from the directory of the file doing the inclusion
-        FarthestMatchInParentPath,  // Search the the included file from the directory of the file doing the inclusion and go back in directory structure until a match is found, use the farthest match
-        NearestMatchInParentPath,   // Search the the included file from the directory of the file doing the inclusion and go back in directory structure until a match is found, use the nearest match
+        Relative,                   // Default, search the included file from the directory of the file doing the inclusion
+        FarthestMatchInParentPath,  // Search the included file from the directory of the file doing the inclusion and go back in directory structure until a match is found, use the farthest match
+        NearestMatchInParentPath,   // Search the included file from the directory of the file doing the inclusion and go back in directory structure until a match is found, use the nearest match
     };
 
     [System.AttributeUsage(AttributeTargets.Module, AllowMultiple = true)]
     public class Include : Attribute
-    {		
-        public Include(string fileName) { }		
-        public Include(string fileName, IncludeType type) { }   
+    {
+        public Include(string fileName) { }
+        public Include(string fileName, IncludeType type) { }
     }
-    
+
     [System.AttributeUsage(AttributeTargets.Module, AllowMultiple = true)]
     public class Reference : Attribute
     {

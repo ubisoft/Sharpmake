@@ -67,25 +67,25 @@ namespace Sharpmake
 
     public abstract class SimpleSourceAttributeParser : ISourceAttributeParser
     {
-        private List<Regex> AttributeRegexes = new List<Regex>();
+        private List<Regex> _attributeRegexes = new List<Regex>();
 
         public SimpleSourceAttributeParser(string attributeName, uint parameterCount, params string[] namespaces)
         {
-            AttributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, parameterCount, namespaces));
+            _attributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, parameterCount, namespaces));
         }
 
         public SimpleSourceAttributeParser(string attributeName, uint parameterMinCount, uint parameterMaxCount, params string[] namespaces)
         {
             for (uint i = parameterMinCount; i <= parameterMaxCount; i++)
             {
-                AttributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, i, namespaces));
+                _attributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, i, namespaces));
             }
         }
 
 
         public void ParseLine(string line, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
         {
-            foreach (Regex attributeRegex in AttributeRegexes)
+            foreach (Regex attributeRegex in _attributeRegexes)
             {
                 Match match = attributeRegex.Match(line);
                 if (match.Success)

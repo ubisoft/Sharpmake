@@ -27,7 +27,7 @@ namespace Sharpmake
         {
         }
 
-        string MatchIncludeInParentPath(string filePath, string initialDirectory, IncludeType includeMatchType)
+        private string MatchIncludeInParentPath(string filePath, string initialDirectory, IncludeType includeMatchType)
         {
             string matchPath = Path.Combine(initialDirectory, filePath);
             bool matchPathExists = Util.FileExists(matchPath);
@@ -62,7 +62,7 @@ namespace Sharpmake
             if (parameters.Length > 1)
             {
                 string incType = parameters[1].Replace("Sharpmake.", "");
-                incType = incType.Replace("IncludeType.", ""); 
+                incType = incType.Replace("IncludeType.", "");
                 if (!Enum.TryParse<IncludeType>(incType, out matchType))
                 {
                     throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include invalid include type used ({0})", parameters[1]);
@@ -99,8 +99,8 @@ namespace Sharpmake
                 context.AddSourceFile(includeAbsolutePath);
             }
         }
-    }    
-    
+    }
+
     public class ReferenceAttributeParser : SimpleSourceAttributeParser
     {
         public ReferenceAttributeParser() : base("Reference", 1, "Sharpmake")
