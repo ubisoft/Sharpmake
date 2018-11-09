@@ -148,6 +148,8 @@ namespace Sharpmake.Application
 
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 string versionString = string.Join(".", version.Major, version.Minor, version.Build);
+                if (version.Revision != 0)
+                    versionString += " (non-official)";
                 LogWriteLine($"sharpmake {versionString}");
                 LogWriteLine("  arguments : {0}", CommandLine.GetProgramCommandLine());
                 LogWriteLine("  directory : {0}", Directory.GetCurrentDirectory());
