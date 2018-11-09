@@ -139,6 +139,8 @@ namespace Sharpmake
         private ConcurrentDictionary<Type, GenerationOutput> _generationReport = new ConcurrentDictionary<Type, GenerationOutput>();
         private HashSet<Type> _buildScheduledType = new HashSet<Type>();
 
+        private HashSet<Project.Configuration> _usedProjectConfigurations = null;
+
         private readonly List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
 
         public Builder(
@@ -168,7 +170,7 @@ namespace Sharpmake
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             if (Diagnostics)
-                EventPostGeneration += LogUnusedConfigs;
+                EventPostGeneration += LogUnusedProjectConfigurations;
 
             if (_multithreaded)
             {
@@ -256,14 +258,12 @@ namespace Sharpmake
                         if (type.IsSubclassOf(typeof(Project)))
                         {
                             Project project = LoadProjectType(type);
-                            // Add the project to the instances projects.
                             _projects.Add(type, project);
                             projectDependenciesTypes = project.GetUnresolvedDependenciesTypes();
                         }
                         else if (type.IsSubclassOf(typeof(Solution)))
                         {
                             Solution solution = LoadSolutionType(type);
-                            // Add the project to the instances projects.
                             _solutions.Add(type, solution);
                             projectDependenciesTypes = solution.GetDependenciesProjectTypes();
                         }
@@ -728,57 +728,35 @@ namespace Sharpmake
             }
         }
 
-        internal class ProjectGenerationTask
+        private void DetermineUsedProjectConfigurations(List<Solution> solutions)
         {
-            internal Project _project;
-            internal Builder _builder;
+            Trace.Assert(_usedProjectConfigurations == null);
+            Trace.Assert(_linked, "This method can only be called *after* the link has occured");
 
-            internal ProjectGenerationTask(Builder builder, Project project)
+            // if this becomes too slow, we can move the creation of the list to the tasks per solution, and group them after
+            var usedProjectConfigs = new HashSet<Project.Configuration>();
+            using (new Util.StopwatchProfiler(ms => { LogWriteLine("    figuring out used project configs took {0:0.0} sec", ms / 1000.0f); }, minThresholdMs: 100))
             {
-                _builder = builder;
-                _project = project;
-            }
-
-            internal void Generate(object parameter)
-            {
-                _builder.Generate(_project);
-            }
-        }
-
-        internal class SolutionGenerationTask
-        {
-            internal Solution _solution;
-            internal Builder _builder;
-
-            internal SolutionGenerationTask(Builder builder, Solution solution)
-            {
-                _builder = builder;
-                _solution = solution;
-            }
-
-            internal void Generate(object parameter)
-            {
-                _builder.Generate(_solution);
-            }
-        }
-
-        private void LogUnusedConfigs(List<Project> projects, List<Solution> solutions)
-        {
-            var usedConfigs = new List<Project.Configuration>();
-
-            foreach (Solution s in solutions)
-            {
-                foreach (var pair in s.SolutionFilesMapping)
+                foreach (Solution s in solutions)
                 {
-                    List<Solution.Configuration> configurations = pair.Value;
-                    foreach (var solutionConfig in configurations)
+                    foreach (var pair in s.SolutionFilesMapping)
                     {
-                        foreach (var includedProject in solutionConfig.IncludedProjectInfos)
-                            usedConfigs.Add(includedProject.Configuration);
+                        List<Solution.Configuration> configurations = pair.Value;
+                        foreach (var solutionConfig in configurations)
+                        {
+                            foreach (var includedProject in solutionConfig.IncludedProjectInfos)
+                                usedProjectConfigs.Add(includedProject.Configuration);
+                        }
                     }
                 }
             }
 
+            _usedProjectConfigurations = usedProjectConfigs;
+        }
+
+        private void LogUnusedProjectConfigurations(List<Project> projects, List<Solution> solutions)
+        {
+            Trace.Assert(_usedProjectConfigurations != null);
             foreach (Project p in projects)
             {
                 if (p.GetType().IsDefined(typeof(Export), false))
@@ -786,7 +764,7 @@ namespace Sharpmake
 
                 foreach (var conf in p.Configurations)
                 {
-                    if (!usedConfigs.Contains(conf))
+                    if (!_usedProjectConfigurations.Contains(conf))
                         LogWarningLine(conf.Project.SharpmakeCsFileName + ": Warning: Config not used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);
                 }
             }
@@ -820,6 +798,8 @@ namespace Sharpmake
                 foreach (Solution solution in solutions)
                     Generate(solution);
 
+                DetermineUsedProjectConfigurations(solutions);
+
                 // start with huge projects to balance task with small one at the end.
                 projects.Sort((p0, p1) => p1.ProjectFilesMapping.Count.CompareTo(p0.ProjectFilesMapping.Count));
                 foreach (Project project in projects)
@@ -844,7 +824,7 @@ namespace Sharpmake
 
         private void GenerateSolutionFile(object arg)
         {
-            KeyValuePair<string, List<Solution.Configuration>> pair = (KeyValuePair<string, List<Solution.Configuration>>)arg;
+            var pair = (KeyValuePair<string, List<Solution.Configuration>>)arg;
             string solutionFile = pair.Key;
             List<Solution.Configuration> configurations = pair.Value;
             Solution.Configuration firstConf = configurations.FirstOrDefault();
@@ -896,7 +876,7 @@ namespace Sharpmake
 
         private void GenerateProjectFile(object arg)
         {
-            KeyValuePair<string, List<Project.Configuration>> pair = (KeyValuePair<string, List<Project.Configuration>>)arg;
+            var pair = (KeyValuePair<string, List<Project.Configuration>>)arg;
 
             string projectFile = pair.Key;
             List<Project.Configuration> configurations = pair.Value;
@@ -909,20 +889,35 @@ namespace Sharpmake
 
                 try
                 {
+                    bool generateProject = false;
+
                     DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
                     for (int i = 0; i < configurations.Count; ++i)
                     {
                         Project.Configuration conf = pair.Value[i];
                         if (devEnv != conf.Target.GetFragment<DevEnv>())
+                        {
                             throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\tBoth {0} and {1} try to generate {2}",
                                 devEnv,
                                 conf.Target.GetFragment<DevEnv>(),
                                 projectFile);
+                        }
+
+                        if (!generateProject)
+                        {
+                            if (_usedProjectConfigurations == null ||
+                                Arguments.TypesToGenerate.Contains(project.GetType()) || // generate the project if it was explicitely queried by the user-code
+                                _usedProjectConfigurations.Contains(conf))
+                            {
+                                generateProject = true;
+                            }
+                        }
                     }
 
                     if (project.SourceFilesFilters == null || (project.SourceFilesFiltersCount != 0 && !project.SkipProjectWhenFiltersActive))
                     {
-                        _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
+                        if (generateProject)
+                            _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
                     }
                 }
                 catch (Exception ex)
