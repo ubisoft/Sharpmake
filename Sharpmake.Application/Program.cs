@@ -350,27 +350,9 @@ namespace Sharpmake.Application
             LogWriteLine("    {0} {1} loaded from '{2}'", extensionName.Name, versionString, assembly.Location);
         }
 
-        private static void GenerateAll(BuildContext.BaseBuildContext buildContext, Argument parameters)
+        private static void CreateBuilderAndGenerate(BuildContext.BaseBuildContext buildContext, Argument parameters, bool generateDebugSolution)
         {
-            if (parameters.GenerateDebugSolution)
-            {
-                using (Builder builder = CreateBuilder(buildContext, parameters, true, true))
-                {
-                    LogWriteLine("Generate debug solution...");
-
-                    var outputs = builder.Generate();
-                    foreach (var output in outputs)
-                    {
-                        if (output.Value.Exception != null)
-                            throw new Error(output.Value.Exception, "Error encountered while generating {0}", output.Key);
-                    }
-
-                    LogWriteGenerateResults(outputs);
-                    Console.WriteLine("");
-                }
-            }
-
-            using (Builder builder = CreateBuilder(buildContext, parameters, true))
+            using (Builder builder = CreateBuilder(buildContext, parameters, true, generateDebugSolution))
             {
                 if (parameters.CleanBlobsOnly)
                 {
@@ -384,6 +366,9 @@ namespace Sharpmake.Application
                 }
                 else
                 {
+                    if (parameters.GenerateDebugSolution)
+                        LogWriteLine("Generate debug solution...");
+
                     var outputs = builder.Generate();
                     foreach (var output in outputs)
                     {
@@ -392,7 +377,7 @@ namespace Sharpmake.Application
                     }
 
                     if (parameters.DumpDependency)
-                        Sharpmake.DependencyTracker.Instance.DumpGraphs(outputs);
+                        DependencyTracker.Instance.DumpGraphs(outputs);
 
                     LogWriteGenerateResults(outputs);
                 }
@@ -400,6 +385,19 @@ namespace Sharpmake.Application
 
             LogWriteLine("  time: {0:0.00} sec.", (DateTime.Now - s_startTime).TotalSeconds);
             LogWriteLine("  completed on {0}.", DateTime.Now);
+        }
+
+        private static void GenerateAll(BuildContext.BaseBuildContext buildContext, Argument parameters)
+        {
+            if (parameters.GenerateDebugSolution)
+            {
+                CreateBuilderAndGenerate(buildContext, parameters, generateDebugSolution: true);
+                // because the debug solution generation runs before the user code,
+                // we need to do some cleanup so we don't pollute the subsequent generation
+                ExtensionMethods.ClearVisualStudioDirCaches();
+            }
+
+            CreateBuilderAndGenerate(buildContext, parameters, generateDebugSolution: false);
         }
 
         private static ExitCode AnalyzeConfigureOrder(Argument parameters, bool stopOnFirstError)
@@ -509,7 +507,8 @@ namespace Sharpmake.Application
                 parameters.BlobOnly,
                 parameters.SkipInvalidPath,
                 parameters.Diagnostics,
-                Program.GetGeneratorsManager);
+                Program.GetGeneratorsManager
+            );
 
             // Allow message log from builder.
             builder.EventOutputError += ErrorWrite;

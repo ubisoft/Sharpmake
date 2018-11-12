@@ -184,6 +184,12 @@ namespace Sharpmake
             }
         }
 
+        internal static void ClearVisualStudioDirCaches()
+        {
+            s_visualStudioDirectories.Clear();
+            s_visualStudioVCRootPathCache.Clear();
+        }
+
         private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioDirOverrides = new ConcurrentDictionary<DevEnv, string>();
         public static void SetVisualStudioDirOverride(this DevEnv visualVersion, string path)
         {
