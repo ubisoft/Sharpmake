@@ -148,6 +148,9 @@ namespace Sharpmake
         public Strings NoneFiles = new Strings();
         public Strings NoneExtensions = new Strings();
 
+        public Strings NoneFilesCopyIfNewer = new Strings();
+        public Strings NoneExtensionsCopyIfNewer = new Strings();
+
         public Strings XResourcesResw = new Strings();
         public Strings XResourcesImg = new Strings();
 
@@ -697,8 +700,13 @@ namespace Sharpmake
                 Debugger.Break();
             ResolvedSourceFilesBuildExclude.AddRange(SourceFilesBuildExclude);
 
+            if (NoneExtensionsCopyIfNewer.Count != 0)
+            {
+                NoneExtensions.RemoveAll(s => NoneExtensionsCopyIfNewer.Contains(s));
+            }
+
             // Only scan directory for files if needed
-            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0 || NoneExtensions.Count != 0)
+            if (SourceFilesExtensions.Count != 0 || ResourceFilesExtensions.Count != 0 || PRIFilesExtensions.Count != 0 || NoneExtensions.Count != 0 || NoneExtensionsCopyIfNewer.Count != 0)
             {
                 string capitalizedSourceRootPath = Util.GetCapitalizedPath(SourceRootPath);
 
@@ -732,6 +740,7 @@ namespace Sharpmake
                     AddMatchExtensionFiles(additionalFiles, ref ResourceFiles, ResourceFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref NatvisFiles, NatvisFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref NoneFiles, NoneExtensions);
+                    AddMatchExtensionFiles(additionalFiles, ref NoneFilesCopyIfNewer, NoneExtensionsCopyIfNewer);
                 }
 
                 // Apply Filters 
@@ -762,6 +771,9 @@ namespace Sharpmake
 
                 AddMatchExtensionFiles(files, ref NoneFiles, NoneExtensions);
                 Util.ResolvePath(SourceRootPath, ref NoneFiles);
+
+                AddMatchExtensionFiles(files, ref NoneFilesCopyIfNewer, NoneExtensionsCopyIfNewer);
+                Util.ResolvePath(SourceRootPath, ref NoneFilesCopyIfNewer);
             }
 
             if (SourceFilesFilters != null)
@@ -784,6 +796,7 @@ namespace Sharpmake
                 ResourceFiles.IntersectWith(SourceFilesFilters);
                 NatvisFiles.IntersectWith(SourceFilesFilters);
                 NoneFiles.IntersectWith(SourceFilesFilters);
+                NoneFilesCopyIfNewer.IntersectWith(SourceFilesFilters);
             }
 
             AdditionalFiltering(SourceFiles, ref SourceFilesExclude);

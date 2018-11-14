@@ -1453,16 +1453,25 @@ namespace Sharpmake.Generators.VisualStudio
                 .Concat(project.AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))))
                 .Where(f => !allContents.Contains(f) && !resolvedResources.Contains(f) && !resolvedEmbeddedResource.Contains(f)).Distinct().ToList();
 
-            List<string> publicResources = project.PublicResourceFiles.Select(source => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(source))).ToList();
-
             //Add the None files from the configuration
             resolvedNoneFiles = resolvedNoneFiles.Concat(
                 configurations.First().AdditionalNone.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f)))).ToList();
+
+            var resolvedNoneFilesAddIfNewer = project.NoneFilesCopyIfNewer
+                .Select(file => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(file)))
+                .Where(f => !allContents.Contains(f) && !resolvedResources.Contains(f) && !resolvedEmbeddedResource.Contains(f)).Distinct().ToList();
+
+            List<string> publicResources = project.PublicResourceFiles.Select(source => Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(source))).ToList();
 
             #region exclusions
             // None file exclusions
             List<Regex> exclusionRegexs = project.SourceFilesExcludeRegex.Concat(project.SourceNoneFilesExcludeRegex).Select(p => new Regex(p, RegexOptions.Compiled | RegexOptions.IgnoreCase)).ToList();
             resolvedNoneFiles = resolvedNoneFiles.Where(f =>
+            {
+                string filePath = Util.PathGetAbsolute(_projectPath, f);
+                return exclusionRegexs.All(r => !r.IsMatch(filePath));
+            }).ToList();
+            resolvedNoneFilesAddIfNewer = resolvedNoneFilesAddIfNewer.Where(f =>
             {
                 string filePath = Util.PathGetAbsolute(_projectPath, f);
                 return exclusionRegexs.All(r => !r.IsMatch(filePath));
@@ -1880,11 +1889,12 @@ namespace Sharpmake.Generators.VisualStudio
                 remainingNoneFiles.Remove(ttFile);
                 if (generatedFileFound)
                 {
-                    //Remove generated file wherever it is.                
+                    //Remove generated file wherever it is.
                     remainingEmbeddedResourcesFiles.Remove(generatedFile);
                     remainingResourcesFiles.Remove(generatedFile);
                     remainingSourcesFiles.Remove(generatedFile);
                     remainingNoneFiles.Remove(generatedFile);
+                    resolvedNoneFilesAddIfNewer.Remove(generatedFile);
                 }
                 else
                 {
@@ -1947,6 +1957,12 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 itemGroups.Nones.Add(new ItemGroups.None { Include = file, LinkFolder = project.GetLinkFolder(file) });
             }
+
+            foreach (var file in resolvedNoneFilesAddIfNewer)
+            {
+                itemGroups.Nones.Add(new ItemGroups.None { Include = file, CopyToOutputDirectory = CopyToOutputDirectory.PreserveNewest, LinkFolder = project.GetLinkFolder(file) });
+            }
+
             #endregion
 
             #region References
