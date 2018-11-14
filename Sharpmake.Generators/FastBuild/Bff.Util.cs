@@ -121,18 +121,20 @@ namespace Sharpmake.Generators.FastBuild
 
         public interface IUnityResolver
         {
-            void ResolveUnities(Project project, ref Dictionary<Unity, List<Project.Configuration>> unities);
+            void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities);
         }
 
         public class HashUnityResolver : IUnityResolver
         {
-            public void ResolveUnities(Project project, ref Dictionary<Unity, List<Project.Configuration>> unities)
+            public void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities)
             {
                 foreach (var unityFile in unities)
                 {
                     var unity = unityFile.Key;
 
-                    unity.UnityName = $"{project.Name}_unity_{unity.GetHashCode():X8}";
+                    int hashcode = unity.GetHashCode() ^ projectPath.GetHashCode();
+
+                    unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
                 }
             }
@@ -140,7 +142,7 @@ namespace Sharpmake.Generators.FastBuild
 
         public class FragmentUnityResolver : IUnityResolver
         {
-            public void ResolveUnities(Project project, ref Dictionary<Unity, List<Project.Configuration>> unities)
+            public void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities)
             {
                 // we need to compute the missing member values in the Unity objects:
                 // UnityName and UnityOutputPattern

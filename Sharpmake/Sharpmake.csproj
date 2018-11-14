@@ -74,6 +74,7 @@
     <Compile Include="DependencyTracker.cs" />
     <Compile Include="DotNetDependency.cs" />
     <Compile Include="DotNetReferenceCollection.cs" />
+    <Compile Include="EnumExtensions.cs" />
     <Compile Include="Exception.cs" />
     <Compile Include="ExtensionLoader.cs" />
     <Compile Include="ExtensionMethods.cs" />

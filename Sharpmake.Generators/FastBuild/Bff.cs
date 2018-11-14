@@ -199,7 +199,7 @@ namespace Sharpmake.Generators.FastBuild
                 }
             }
 
-            ResolveUnities(project);
+            ResolveUnities(project, projectPath);
 
             // Start writing Bff
             Resolver resolver = new Resolver();
@@ -1687,12 +1687,12 @@ namespace Sharpmake.Generators.FastBuild
             confListForUnity.Add(conf);
         }
 
-        private void ResolveUnities(Project project)
+        private void ResolveUnities(Project project, string projectPath)
         {
             if (_unities.Count == 0)
                 return;
 
-            UnityResolver.ResolveUnities(project, ref _unities);
+            UnityResolver.ResolveUnities(project, projectPath, ref _unities);
         }
 
         // For now, this will do.
