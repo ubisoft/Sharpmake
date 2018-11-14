@@ -830,6 +830,15 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.ShowIncludes.Enable, () => { context.Options["ShowIncludes"] = "true"; })
             );
 
+            //Options.Vc.Compiler.SupportJustMyCode.
+            //    Yes                                   SupportJustMyCode="true"                          /JMC
+            //    No
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.SupportJustMyCode.No, () => { context.Options["SupportJustMyCode"] = "false"; }),
+            Options.Option(Options.Vc.Compiler.SupportJustMyCode.Yes, () => { context.Options["SupportJustMyCode"] = "true"; context.CommandLineOptions["SupportJustMyCode"] = "/JMC"; })
+            );
+
             // Options.Vc.Compiler.DisableSpecificWarnings
             Strings disableWarnings = Options.GetStrings<Options.Vc.Compiler.DisableSpecificWarnings>(context.Configuration);
             if (disableWarnings.Count > 0)

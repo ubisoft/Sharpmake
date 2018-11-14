@@ -514,6 +514,14 @@ namespace Sharpmake
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Latest
                 }
+
+                public enum SupportJustMyCode
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    Yes,
+                    [Default] // The actual default for VS is Yes, but this will not work for old VS versions.
+                    No
+                }
             }
 
             public static class CodeAnalysis
