@@ -1287,7 +1287,10 @@ namespace Sharpmake.Generators.VisualStudio
                 using (resolver.NewScopedParameter("project", project))
                 using (resolver.NewScopedParameter("targetElement", element))
                 {
-                    Write(Template.TargetElement.CustomTarget, writer, resolver);
+                    if (string.IsNullOrEmpty(element.TargetParameters))
+                        Write(Template.TargetElement.CustomTargetNoParameters, writer, resolver);
+                    else
+                        Write(Template.TargetElement.CustomTarget, writer, resolver);
                 }
             }
 

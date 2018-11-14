@@ -27,11 +27,8 @@ namespace Sharpmake.Generators
         public Resolver Resolver { get; }
 
         public FileGenerator()
-        {
-            _stream = new MemoryStream();
-            _writer = new StreamWriter(_stream);
-            Resolver = new Resolver();
-        }
+            : this(new Resolver())
+        { }
 
         public FileGenerator(Resolver resolver)
         {
@@ -40,6 +37,22 @@ namespace Sharpmake.Generators
 
             _stream = new MemoryStream();
             _writer = new StreamWriter(_stream);
+            Resolver = resolver;
+        }
+
+        public FileGenerator(Encoding encoding)
+            : this(encoding, new Resolver())
+        { }
+
+        public FileGenerator(Encoding encoding, Resolver resolver)
+        {
+            if (encoding == null)
+                throw new ArgumentNullException(nameof(encoding));
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
+
+            _stream = new MemoryStream();
+            _writer = new StreamWriter(_stream, encoding);
             Resolver = resolver;
         }
 

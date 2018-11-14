@@ -134,7 +134,7 @@ namespace Sharpmake.Generators.VisualStudio
 @"  <Import Project=""[importProject]"" />
 ";
                 public static string ImportProjectItem =
-@"  <Import Project=""[importProject]"" Condition=""[importCondition]""/>
+@"  <Import Project=""[importProject]"" Condition=""[importCondition]"" />
 ";
 
                 public static string VsixConfiguration =
@@ -274,11 +274,11 @@ namespace Sharpmake.Generators.VisualStudio
 @"      <CachedDynamicPropName>[cachedDynamicPropName]</CachedDynamicPropName>";
 
             public static string CachedAppSettingsObjectName =
-                @"<CachedAppSettingsObjectName>[cachedAppSettingsObjectName]</CachedAppSettingsObjectName>
+@"      <CachedAppSettingsObjectName>[cachedAppSettingsObjectName]</CachedAppSettingsObjectName>
 ";
 
             public static string CachedSettingsPropName =
-@"<CachedSettingsPropName>[cachedSettingsPropName]</CachedSettingsPropName>
+@"      <CachedSettingsPropName>[cachedSettingsPropName]</CachedSettingsPropName>
 ";
 
 
@@ -506,7 +506,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string VsdConfigXmlSimple =
-@"    <VsdConfigXmlFiles Include=""[include]""/>
+@"    <VsdConfigXmlFiles Include=""[include]"" />
 ";
 
                 public static string ResourceName =
@@ -518,7 +518,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ContentSimple =
-@"    <Content Include=""[include]""/>
+@"    <Content Include=""[include]"" />
 ";
 
                 public static string ContentBegin =
@@ -530,7 +530,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string Analyzer =
-@"    <Analyzer Include=""[include]""/>
+@"    <Analyzer Include=""[include]"" />
 ";
 
                 public static string IncludeInVsix =
@@ -552,11 +552,18 @@ namespace Sharpmake.Generators.VisualStudio
             public static class UsingTaskElement
             {
                 public static string UsingTask =
-@"  <UsingTask AssemblyFile=""[usingTaskElement.AssemblyFile]"" TaskName=""[usingTaskElement.TaskName]"" />";
+@"  <UsingTask AssemblyFile=""[usingTaskElement.AssemblyFile]"" TaskName=""[usingTaskElement.TaskName]"" />
+";
             }
 
             public static class TargetElement
             {
+                public static string CustomTargetNoParameters =
+@"  <Target Name=""[targetElement.Name]"">
+    [targetElement.CustomTasks]
+  </Target>
+";
+
                 public static string CustomTarget =
 @"  <Target Name=""[targetElement.Name]"" [targetElement.TargetParameters]>
     [targetElement.CustomTasks]

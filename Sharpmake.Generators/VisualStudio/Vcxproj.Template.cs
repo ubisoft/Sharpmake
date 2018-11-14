@@ -420,7 +420,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                     public static string FileWithDependencyFilter =
-@"    <CustomBuild Include=""[fileName]""/>
+@"    <CustomBuild Include=""[fileName]"" />
 ";
 
                     public static string Filter =

@@ -237,7 +237,7 @@ namespace Sharpmake.Generators.VisualStudio
             return Util.BuildGuid(reletiveToCsProjectFile).ToString().ToUpper();
         }
 
-        private void WriteWindowsKitsOverrides(GenerationContext context, ref FileGenerator fileGenerator)
+        private void WriteWindowsKitsOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
             KitsRootEnum? kitsRootWritten = null;
             for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; ++devEnv)
@@ -310,7 +310,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        private void WriteVcOverrides(GenerationContext context, ref FileGenerator fileGenerator)
+        private void WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
             bool registrySettingWritten = false;
 
@@ -392,7 +392,7 @@ namespace Sharpmake.Generators.VisualStudio
                 sccProvider = "MSSCCI:Perforce SCM";
             }
 
-            var fileGenerator = new FileGenerator();
+            var fileGenerator = new XmlFileGenerator();
 
             var firstConf = context.ProjectConfigurations.First();
 
@@ -465,9 +465,9 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             if (hasNonFastBuildConfig)
-                WriteWindowsKitsOverrides(context, ref fileGenerator);
+                WriteWindowsKitsOverrides(context, fileGenerator);
 
-            WriteVcOverrides(context, ref fileGenerator);
+            WriteVcOverrides(context, fileGenerator);
 
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
             // xml end header
@@ -1217,7 +1217,7 @@ namespace Sharpmake.Generators.VisualStudio
         )
         {
             // write [].vcxproj.filters
-            var fileGenerator = new FileGenerator(resolver);
+            var fileGenerator = new XmlFileGenerator(resolver);
             using (fileGenerator.Declare("toolsVersion", context.DevelopmentEnvironmentsRange.MinDevEnv.GetVisualProjectToolsVersionString()))
             {
                 fileGenerator.Write(Vcxproj.Template.Project.Filers.Begin);
@@ -1848,7 +1848,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Write the "copy dependencies" build step (as a custom build tool on a dummy file, to make sure the copy is always done when needed)
             bool hasDependenciesToCopy = copyDependenciesBuildStepDictionary.Any();
-            var dependenciesFileGenerator = new FileGenerator(fileGenerator.Resolver); // borrowing resolver
+            var dependenciesFileGenerator = new XmlFileGenerator(fileGenerator.Resolver); // borrowing resolver
             if (hasDependenciesToCopy)
             {
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);

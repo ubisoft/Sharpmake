@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -98,6 +98,7 @@
     <Compile Include="VisualStudio\UserFile.cs" />
     <Compile Include="VisualStudio\Vcxproj.Template.cs" />
     <Compile Include="VisualStudio\Vcxproj.cs" />
+    <Compile Include="XmlFileGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj">

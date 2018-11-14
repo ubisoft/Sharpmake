@@ -1377,7 +1377,15 @@ namespace Sharpmake
 
         public static string EscapeXml(string value)
         {
-            return System.Security.SecurityElement.Escape(value);
+            // Visual Studio only escapes what it absolutely has to for XML to be valid.
+
+            // escape the < and >
+            value = value.Replace("<", "&lt;").Replace(">", "&gt;").ToString();
+
+            // any & that is not part of an escape needs to be escaped with &amp;
+            value = Regex.Replace(value, @"(\&(?![a-zA-Z0-9#]+;))", "&amp;");
+
+            return value;
         }
 
         public static bool CreateSymbolicLink(string source, string target, bool isDirectory)
@@ -1935,13 +1943,20 @@ namespace Sharpmake
 
         public static MemoryStream RemoveLineTags(MemoryStream inputMemoryStream, string removeLineTag)
         {
+            //
+            // TODO: This method should be deprecated and/or removed.
+            //       Use FileGenerator or a derived class to build your output files, and call its
+            //       RemoveTaggedLines method.
+            //
+
+
             // remove all line that contain RemoveLineTag
             inputMemoryStream.Seek(0, SeekOrigin.Begin);
 
             StreamReader streamReader = new StreamReader(inputMemoryStream);
 
             MemoryStream cleanMemoryStream = new MemoryStream((int)inputMemoryStream.Length);
-            StreamWriter cleanWriter = new StreamWriter(cleanMemoryStream);
+            StreamWriter cleanWriter = new StreamWriter(cleanMemoryStream, new UTF8Encoding(true));
 
             string readline = streamReader.ReadLine();
             while (readline != null)
@@ -1952,6 +1967,13 @@ namespace Sharpmake
             }
 
             cleanWriter.Flush();
+
+            // removes the end of line from the last WriteLine to be consistent with VS project
+            // output; this will stop the pointless "Do you want to refresh?" prompts because of a
+            // new line.
+            if (cleanMemoryStream.Length != 0)
+                cleanMemoryStream.SetLength(cleanMemoryStream.Length - Environment.NewLine.Length);
+
             return cleanMemoryStream;
         }
 

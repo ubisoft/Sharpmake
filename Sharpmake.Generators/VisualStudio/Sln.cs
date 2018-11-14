@@ -108,8 +108,15 @@ namespace Sharpmake.Generators.VisualStudio
             string solutionFileName = fileInfo.Name;
             bool addMasterBff = FastBuildSettings.IncludeBFFInProjects && FastBuild.UtilityMethods.HasFastBuildConfig(configurations);
 
+            // sort configurations because that's the way they are sorted in a solution
+            Solution.Configuration[] sortedConfigurations;
+            if (solution.MergePlatformConfiguration)
+                sortedConfigurations = configurations.OrderBy(conf => conf.Name).ToArray();
+            else
+                sortedConfigurations = configurations.OrderBy(conf => $"{conf.Name}|{conf.PlatformName}").ToArray();
+
             bool updated;
-            string solutionFileResult = Generate(solution, configurations, solutionPath, solutionFileName, addMasterBff, out updated);
+            string solutionFileResult = Generate(solution, sortedConfigurations, solutionPath, solutionFileName, addMasterBff, out updated);
             if (updated)
                 generatedFiles.Add(solutionFileResult);
             else
@@ -241,7 +248,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private string Generate(
             Solution solution,
-            List<Solution.Configuration> solutionConfigurations,
+            IReadOnlyList<Solution.Configuration> solutionConfigurations,
             string solutionPath,
             string solutionFile,
             bool addMasterBff,
@@ -676,7 +683,7 @@ namespace Sharpmake.Generators.VisualStudio
             return solutionFileInfo.FullName;
         }
 
-        private Solution.Configuration.IncludedProjectInfo ResolveStartupProject(Solution solution, List<Solution.Configuration> solutionConfigurations)
+        private Solution.Configuration.IncludedProjectInfo ResolveStartupProject(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
         {
             // Set the default startup project.
             var configuration = solutionConfigurations.FirstOrDefault();
@@ -713,7 +720,7 @@ namespace Sharpmake.Generators.VisualStudio
             return executableProjects.FirstOrDefault()?.First();
         }
 
-        private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, List<Solution.Configuration> solutionConfigurations)
+        private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
         {
             bool projectsWereFiltered;
             List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(solutionConfigurations, out projectsWereFiltered).ToList();
