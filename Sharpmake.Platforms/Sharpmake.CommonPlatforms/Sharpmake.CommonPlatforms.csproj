@@ -18,8 +18,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\debug</OutputPath>
-    <IntermediateOutputPath>..\..\tmp\obj\sharpmake.commonplatforms\debug</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\tmp\obj\Sharpmake.CommonPlatforms\Debug</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\..\tmp\obj\debug\sharpmake.commonplatforms</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\tmp\obj\Debug\Sharpmake.CommonPlatforms</BaseIntermediateOutputPath>
     <DocumentationFile>..\..\bin\Debug\Sharpmake.CommonPlatforms.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -34,8 +34,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\release</OutputPath>
-    <IntermediateOutputPath>..\..\tmp\obj\sharpmake.commonplatforms\release</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\tmp\obj\Sharpmake.CommonPlatforms\Release</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\..\tmp\obj\release\sharpmake.commonplatforms</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\tmp\obj\Release\Sharpmake.CommonPlatforms</BaseIntermediateOutputPath>
     <DocumentationFile>..\..\bin\Release\Sharpmake.CommonPlatforms.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
