@@ -100,7 +100,7 @@ namespace Sharpmake
                         {
                             CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, platformToolSetPath, devEnv, projectRootPath, false);
                             compilerSettings.PlatformFlags |= Platform.durango;
-                            SetConfiguration(compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
+                            SetConfiguration(conf, compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
                         }
                         break;
                     case DevEnv.vs2015:
@@ -111,7 +111,8 @@ namespace Sharpmake
                             string overrideName = "Compiler-" + Sharpmake.Util.GetSimplePlatformString(Platform.win64) + "-" + devEnv;
                             CompilerSettings compilerSettings = win64PlatformSettings.GetMasterCompilerSettings(masterCompilerSettings, overrideName, devEnv, projectRootPath, Sharpmake.Options.Vc.General.PlatformToolset.Default, false);
                             compilerSettings.PlatformFlags |= Platform.durango;
-                            SetConfiguration(compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
+
+                            SetConfiguration(conf, compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
                         }
                         break;
                     default:
@@ -169,9 +170,14 @@ namespace Sharpmake
                 return compilerSettings;
             }
 
-            private void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+            private void SetConfiguration(Project.Configuration conf, IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
             {
                 string configName = ".durangoConfig";
+
+                string linkerPathOverride = null;
+                string linkerExeOverride = null;
+                string librarianExeOverride = null;
+                GetLinkerExecutableInfo(conf, out linkerPathOverride, out linkerExeOverride, out librarianExeOverride);
 
                 if (!configurations.ContainsKey(configName))
                 {
@@ -181,14 +187,20 @@ namespace Sharpmake
                         binPath = devEnv.GetDurangoBinPath();
 
                     string linkerPath;
+                    if (!string.IsNullOrEmpty(linkerPathOverride))
+                        linkerPath = linkerPathOverride;
                     if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
                         linkerPath = binPath;
 
                     string linkerExe;
+                    if (!string.IsNullOrEmpty(linkerExeOverride))
+                        linkerExe = linkerExeOverride;
                     if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                         linkerExe = "link.exe";
 
                     string librarianExe;
+                    if (!string.IsNullOrEmpty(librarianExeOverride))
+                        librarianExe = librarianExeOverride;
                     if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
                         librarianExe = "lib.exe";
 

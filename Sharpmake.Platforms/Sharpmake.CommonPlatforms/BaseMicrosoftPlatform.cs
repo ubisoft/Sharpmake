@@ -11,9 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
 using System.Collections.Generic;
-using Sharpmake.Generators;
+using System.IO;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
@@ -76,6 +75,23 @@ namespace Sharpmake
 
         #region IMicrosoftPlatformBff implementation
         public virtual bool SupportsResourceFiles => false;
+
+        protected void GetLinkerExecutableInfo(Project.Configuration conf, out string linkerPathOverride, out string linkerExeOverride, out string librarianExeOverride)
+        {
+            linkerPathOverride = null;
+            linkerExeOverride = null;
+            librarianExeOverride = null;
+
+            var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+            var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
+            if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable ||
+               (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset == Options.Vc.General.PlatformToolset.LLVM))
+            {
+                linkerPathOverride = Path.Combine(ClangForWindows.Settings.LLVMInstallDir, "bin");
+                linkerExeOverride = "lld-link.exe";
+                librarianExeOverride = "llvm-lib.exe";
+            }
+        }
         #endregion
 
         #region IPlatformVcxproj implementation

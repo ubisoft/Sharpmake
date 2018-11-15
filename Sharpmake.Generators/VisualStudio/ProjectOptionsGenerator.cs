@@ -1793,7 +1793,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             context.SelectOption
             (
-            Options.Option(Options.Vc.LLVM.UseLldLink.Enable, () => { context.Options["UseLldLink"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.LLVM.UseLldLink.Default, () => { context.Options["UseLldLink"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.LLVM.UseLldLink.Enable, () => { context.Options["UseLldLink"] = "true"; }),
             Options.Option(Options.Vc.LLVM.UseLldLink.Disable, () => { context.Options["UseLldLink"] = "false"; })
             );
         }

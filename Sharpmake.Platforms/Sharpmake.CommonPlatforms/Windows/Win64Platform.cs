@@ -56,11 +56,11 @@ namespace Sharpmake
                     platformToolsetString = $"_{platformToolset}";
 
                 string lldString = string.Empty;
-                if (platformToolset == Options.Vc.General.PlatformToolset.LLVM)
+                var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
+                if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable ||
+                   (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset == Options.Vc.General.PlatformToolset.LLVM))
                 {
-                    var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
-                    if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable)
-                        lldString = "_LLD";
+                    lldString = "_LLD";
                 }
 
                 return $".win64{platformToolsetString}{lldString}Config";
@@ -82,8 +82,6 @@ namespace Sharpmake
 
                 string compilerName = "Compiler-" + Util.GetSimplePlatformString(platform);
 
-                string linkerPathOverride = null;
-                string linkerExeOverride = null;
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
                 if (platformToolset == Options.Vc.General.PlatformToolset.LLVM)
                 {
@@ -92,13 +90,6 @@ namespace Sharpmake
                     // Use default platformToolset to get MS compiler instead of Clang, when ClanCl is disabled
                     if (useClangCl == Options.Vc.LLVM.UseClangCl.Disable)
                         platformToolset = Options.Vc.General.PlatformToolset.Default;
-
-                    var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
-                    if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable)
-                    {
-                        linkerPathOverride = Path.Combine(ClangForWindows.Settings.LLVMInstallDir, "bin");
-                        linkerExeOverride = "lld-link.exe";
-                    }
                 }
 
                 if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
@@ -108,7 +99,7 @@ namespace Sharpmake
 
                 CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, devEnv, projectRootPath, platformToolset, false);
                 compilerSettings.PlatformFlags |= Platform.win64;
-                SetConfiguration(compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false, linkerPathOverride, linkerExeOverride);
+                SetConfiguration(conf, compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false);
             }
 
             public CompilerSettings GetMasterCompilerSettings(
@@ -281,15 +272,18 @@ namespace Sharpmake
             }
 
             private void SetConfiguration(
+                Project.Configuration conf,
                 IDictionary<string, CompilerSettings.Configuration> configurations,
                 string configName,
                 string projectRootPath,
                 DevEnv devEnv,
-                bool useCCompiler,
-                string linkerPathOverride,
-                string linkerExeOverride
-            )
+                bool useCCompiler)
             {
+                string linkerPathOverride = null;
+                string linkerExeOverride = null;
+                string librarianExeOverride = null;
+                GetLinkerExecutableInfo(conf, out linkerPathOverride, out linkerExeOverride, out librarianExeOverride);
+
                 if (!configurations.ContainsKey(configName))
                 {
                     var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
@@ -310,7 +304,9 @@ namespace Sharpmake
                         linkerExe = "link.exe";
 
                     string librarianExe;
-                    if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
+                    if (!string.IsNullOrEmpty(librarianExeOverride))
+                        librarianExe = librarianExeOverride;
+                    else if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
                         librarianExe = "lib.exe";
 
                     string resCompiler;

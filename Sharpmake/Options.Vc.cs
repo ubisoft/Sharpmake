@@ -917,6 +917,7 @@ namespace Sharpmake
                 public enum UseLldLink
                 {
                     [Default]
+                    Default,
                     Enable,
                     Disable
                 }
