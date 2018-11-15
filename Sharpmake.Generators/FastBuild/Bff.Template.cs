@@ -280,10 +280,15 @@ Compiler( '[fastbuildCompilerName]' )
 ";
 
                 public static string MasmCompilerExtraOptions = @"
-    // General options
-    // ---------------
-    .CompilerExtraOptions   = '/nologo /W3 /errorReport:queue'
-
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /nologo'
+            + ' /W3'
+            + ' /errorReport:queue'
+            // Preprocessor options
+            // ---------------------------
+            + ' [cmdLineOptions.PreprocessorDefinitions]'
 ";
 
                 public static string CPPCompilerExtraOptions = @"
