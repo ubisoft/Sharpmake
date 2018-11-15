@@ -177,22 +177,16 @@ namespace Sharpmake
                         compilerExeName = "cl.exe";
                     }
 
-                    if (pathToCompiler.StartsWith(platformToolSetPath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        string rootRelative = pathToCompiler.Substring(platformToolSetPath.Length).TrimStart(Util._pathSeparators);
-                        pathToCompiler = Path.Combine("$ExecutableRootPath$", rootRelative);
-                    }
-
                     Strings extraFiles = new Strings();
                     if (compilerDevEnv.HasValue)
                     {
                         extraFiles.Add(
-                            Path.Combine(pathToCompiler, "c1.dll"),
-                            Path.Combine(pathToCompiler, "c1xx.dll"),
-                            Path.Combine(pathToCompiler, "c2.dll"),
-                            Path.Combine(pathToCompiler, "mspdbcore.dll"),
-                            Path.Combine(pathToCompiler, "mspdbsrv.exe"),
-                            Path.Combine(pathToCompiler, @"1033\clui.dll")
+                            @"$ExecutableRootPath$\c1.dll",
+                            @"$ExecutableRootPath$\c1xx.dll",
+                            @"$ExecutableRootPath$\c2.dll",
+                            @"$ExecutableRootPath$\mspdbcore.dll",
+                            @"$ExecutableRootPath$\mspdbsrv.exe",
+                            @"$ExecutableRootPath$\1033\clui.dll"
                         );
 
                         switch (devEnv)
@@ -200,28 +194,28 @@ namespace Sharpmake
                             case DevEnv.vs2012:
                                 {
                                     extraFiles.Add(
-                                        Path.Combine(pathToCompiler, "c1ast.dll"),
-                                        Path.Combine(pathToCompiler, "c1xxast.dll"),
-                                        Path.Combine(pathToCompiler, "mspft110.dll"),
-                                        Path.Combine(pathToCompiler, "msobj110.dll"),
-                                        Path.Combine(pathToCompiler, "mspdb110.dll"),
-                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC110.CRT\msvcp110.dll",
-                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC110.CRT\msvcr110.dll",
-                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC110.CRT\vccorlib110.dll"
+                                        @"$ExecutableRootPath$\c1ast.dll",
+                                        @"$ExecutableRootPath$\c1xxast.dll",
+                                        @"$ExecutableRootPath$\mspft110.dll",
+                                        @"$ExecutableRootPath$\msobj110.dll",
+                                        @"$ExecutableRootPath$\mspdb110.dll",
+                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC110.CRT\msvcp110.dll"),
+                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC110.CRT\msvcr110.dll"),
+                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC110.CRT\vccorlib110.dll")
                                     );
                                 }
                                 break;
                             case DevEnv.vs2013:
                                 {
                                     extraFiles.Add(
-                                        Path.Combine(pathToCompiler, "c1ast.dll"),
-                                        Path.Combine(pathToCompiler, "c1xxast.dll"),
-                                        Path.Combine(pathToCompiler, "mspft120.dll"),
-                                        Path.Combine(pathToCompiler, "msobj120.dll"),
-                                        Path.Combine(pathToCompiler, "mspdb120.dll"),
-                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC120.CRT\msvcp120.dll",
-                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC120.CRT\msvcr120.dll",
-                                        @"$ExecutableRootPath$\redist\x64\Microsoft.VC120.CRT\vccorlib120.dll"
+                                        @"$ExecutableRootPath$\c1ast.dll",
+                                        @"$ExecutableRootPath$\c1xxast.dll",
+                                        @"$ExecutableRootPath$\mspft120.dll",
+                                        @"$ExecutableRootPath$\msobj120.dll",
+                                        @"$ExecutableRootPath$\mspdb120.dll",
+                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC120.CRT\msvcp120.dll"),
+                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC120.CRT\msvcr120.dll"),
+                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC120.CRT\vccorlib120.dll")
                                     );
                                 }
                                 break;
@@ -236,32 +230,31 @@ namespace Sharpmake
                                         systemDllPath = Util.SimplifyPath(Path.Combine(projectRootPath, systemDllPath));
 
                                     extraFiles.Add(
-                                        Path.Combine(pathToCompiler, "msobj140.dll"),
-                                        Path.Combine(pathToCompiler, "mspft140.dll"),
-                                        Path.Combine(pathToCompiler, "mspdb140.dll")
+                                        @"$ExecutableRootPath$\msobj140.dll",
+                                        @"$ExecutableRootPath$\mspft140.dll",
+                                        @"$ExecutableRootPath$\mspdb140.dll"
                                     );
 
                                     if (devEnv == DevEnv.vs2015)
                                     {
                                         extraFiles.Add(
-
-                                            Path.Combine(pathToCompiler, "vcvars64.bat"),
-                                            @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\concrt140.dll",
-                                            @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\msvcp140.dll",
-                                            @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\vccorlib140.dll",
-                                            @"$ExecutableRootPath$\redist\x64\Microsoft.VC140.CRT\vcruntime140.dll",
+                                            @"$ExecutableRootPath$\vcvars64.bat",
+                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\concrt140.dll"),
+                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\msvcp140.dll"),
+                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\vccorlib140.dll"),
+                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\vcruntime140.dll"),
                                             Path.Combine(systemDllPath, "ucrtbase.dll")
                                         );
                                     }
                                     else
                                     {
                                         extraFiles.Add(
-                                            Path.Combine(pathToCompiler, "mspdbcore.dll"),
-                                            Path.Combine(pathToCompiler, "msvcdis140.dll"),
-                                            Path.Combine(pathToCompiler, "msvcp140.dll"),
-                                            Path.Combine(pathToCompiler, "pgodb140.dll"),
-                                            Path.Combine(pathToCompiler, "vcruntime140.dll"),
-                                            @"$ExecutableRootPath$\Auxiliary\Build\vcvars64.bat"
+                                            @"$ExecutableRootPath$\mspdbcore.dll",
+                                            @"$ExecutableRootPath$\msvcdis140.dll",
+                                            @"$ExecutableRootPath$\msvcp140.dll",
+                                            @"$ExecutableRootPath$\pgodb140.dll",
+                                            @"$ExecutableRootPath$\vcruntime140.dll",
+                                            Path.Combine(platformToolSetPath, @"Auxiliary\Build\vcvars64.bat")
                                         );
                                     }
 
@@ -278,9 +271,9 @@ namespace Sharpmake
                         }
                     }
 
-                    string executable = Path.Combine(pathToCompiler, compilerExeName);
+                    string executable = Path.Combine("$ExecutableRootPath$", compilerExeName);
 
-                    compilerSettings = new CompilerSettings(compilerName, Platform.win64, extraFiles, executable, platformToolSetPath, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
+                    compilerSettings = new CompilerSettings(compilerName, Platform.win64, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
                     masterCompilerSettings.Add(compilerName, compilerSettings);
                 }
 
