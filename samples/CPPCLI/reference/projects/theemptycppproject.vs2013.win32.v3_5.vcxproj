@@ -105,8 +105,6 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <UndefinePreprocessorDefinitions>
-      </UndefinePreprocessorDefinitions>
       <ProgramDatabaseFileName>temp\vs2013\win32\noblob_msbuild_vs2013_v3_5_debug_dll_win32\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
@@ -177,8 +175,6 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <UndefinePreprocessorDefinitions>
-      </UndefinePreprocessorDefinitions>
       <ProgramDatabaseFileName>temp\vs2013\win32\noblob_msbuild_vs2013_v3_5_release_dll_win32\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>

@@ -85,8 +85,6 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <UndefinePreprocessorDefinitions>
-      </UndefinePreprocessorDefinitions>
       <ProgramDatabaseFileName>obj\win32\release\foobarproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>

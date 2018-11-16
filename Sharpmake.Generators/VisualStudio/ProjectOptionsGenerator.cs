@@ -845,15 +845,20 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Options.Vc.Compiler.UndefinePreprocessorDefinitions
             Strings undefinePreprocessors = Options.GetStrings<Options.Vc.Compiler.UndefinePreprocessorDefinitions>(context.Configuration);
-            context.Options["UndefinePreprocessorDefinitions"] = undefinePreprocessors.JoinStrings(";");
-            context.CommandLineOptions["UndefinePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
             if (undefinePreprocessors.Count > 0)
             {
+                context.Options["UndefinePreprocessorDefinitions"] = undefinePreprocessors.JoinStrings(";");
+
                 StringBuilder result = new StringBuilder();
                 foreach (string undefine in undefinePreprocessors)
                     result.Append(@"/U""" + undefine + @""" ");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["UndefinePreprocessorDefinitions"] = result.ToString();
+            }
+            else
+            {
+                context.Options["UndefinePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["UndefinePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
             // concat defines, don't add options.Defines since they are automatically added by VS
