@@ -516,6 +516,11 @@ namespace Sharpmake
             }
         }
 
+        public int GetOrderNumber(int index)
+        {
+            return _list[index].OrderNumber;
+        }
+
         // When doing a for loop to change all values, like resolving them, it's
         // possible to end up with duplicates after resolve.  This function can
         // be called to set value at index, remove it if already there and return
