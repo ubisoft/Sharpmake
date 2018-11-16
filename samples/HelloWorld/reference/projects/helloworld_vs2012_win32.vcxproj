@@ -86,7 +86,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>obj\win32\debug\HelloWorld.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win32\debug\helloworld_compiler.pdb</ProgramDatabaseFileName>

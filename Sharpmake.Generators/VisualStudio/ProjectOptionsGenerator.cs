@@ -886,9 +886,16 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.PlatformVcxproj.SelectCompilerOptions(context);
 
             // Options.Vc.Compiler.AdditionalOptions
-            context.Configuration.AdditionalCompilerOptions.Sort();
-            string additionalCompilerOptions = context.Configuration.AdditionalCompilerOptions.JoinStrings(" ");
-            context.Options["AdditionalCompilerOptions"] = additionalCompilerOptions;
+            if (context.Configuration.AdditionalCompilerOptions.Any())
+            {
+                context.Configuration.AdditionalCompilerOptions.Sort();
+                string additionalCompilerOptions = context.Configuration.AdditionalCompilerOptions.JoinStrings(" ");
+                context.Options["AdditionalCompilerOptions"] = additionalCompilerOptions;
+            }
+            else
+            {
+                context.Options["AdditionalCompilerOptions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
 
             optionsContext.HasClrSupport = clrSupport;
         }

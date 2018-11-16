@@ -111,7 +111,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <ProgramDatabaseFileName>temp\vs2013\win32\noblob_msbuild_vs2013_v3_5_debug_dll_win32\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
@@ -202,7 +201,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <ProgramDatabaseFileName>temp\vs2013\win32\noblob_msbuild_vs2013_v3_5_release_dll_win32\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>

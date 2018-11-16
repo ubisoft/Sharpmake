@@ -107,7 +107,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <ProgramDatabaseFileName>temp\vs2012\win32\noblob_msbuild_vs2012_v4_5_debug_dll_win32\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
@@ -180,7 +179,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <ProgramDatabaseFileName>temp\vs2012\win32\noblob_msbuild_vs2012_v4_5_release_dll_win32\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>

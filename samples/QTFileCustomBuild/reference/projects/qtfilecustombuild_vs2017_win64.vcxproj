@@ -130,7 +130,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>obj\win64\debug\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win64\debug\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
@@ -224,7 +223,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>obj\win64\release\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win64\release\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
@@ -318,7 +316,6 @@
       </DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <AdditionalOptions></AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>obj\win64\retail\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win64\retail\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
