@@ -82,8 +82,6 @@
       <BrowseInformation>false</BrowseInformation>
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>obj\win32\debug\HelloWorld.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win32\debug\helloworld_compiler.pdb</ProgramDatabaseFileName>

@@ -107,8 +107,6 @@
       <BrowseInformation>false</BrowseInformation>
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
       <ProgramDatabaseFileName>temp\vs2012\win32\noblob_msbuild_vs2012_v4_5_debug_dll_win32\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
@@ -195,8 +193,6 @@
       <BrowseInformation>false</BrowseInformation>
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
       <ProgramDatabaseFileName>temp\vs2012\win32\noblob_msbuild_vs2012_v4_5_release_dll_win32\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>

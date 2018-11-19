@@ -67,8 +67,7 @@ namespace Sharpmake
       <BrowseInformation>false</BrowseInformation>
       <CallingConvention>[options.CallingConvention]</CallingConvention>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>[options.DisableSpecificWarnings]
-      </DisableSpecificWarnings>
+      <DisableSpecificWarnings>[options.DisableSpecificWarnings]</DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>[options.UndefinePreprocessorDefinitions]</UndefinePreprocessorDefinitions>
       <AdditionalOptions>[options.AdditionalCompilerOptions]</AdditionalOptions>
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>

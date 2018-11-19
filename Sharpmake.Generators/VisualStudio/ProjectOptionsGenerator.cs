@@ -832,15 +832,19 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Options.Vc.Compiler.DisableSpecificWarnings
             Strings disableWarnings = Options.GetStrings<Options.Vc.Compiler.DisableSpecificWarnings>(context.Configuration);
-            context.Options["DisableSpecificWarnings"] = disableWarnings.JoinStrings(";");
-            context.CommandLineOptions["DisableSpecificWarnings"] = FileGeneratorUtilities.RemoveLineTag;
             if (disableWarnings.Count > 0)
             {
                 StringBuilder result = new StringBuilder();
                 foreach (string disableWarning in disableWarnings)
                     result.Append(@"/wd""" + disableWarning + @""" ");
                 result.Remove(result.Length - 1, 1);
+                context.Options["DisableSpecificWarnings"] = disableWarnings.JoinStrings(";");
                 context.CommandLineOptions["DisableSpecificWarnings"] = result.ToString();
+            }
+            else
+            {
+                context.Options["DisableSpecificWarnings"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["DisableSpecificWarnings"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
             // Options.Vc.Compiler.UndefinePreprocessorDefinitions
