@@ -835,7 +835,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (disableWarnings.Count > 0)
             {
                 StringBuilder result = new StringBuilder();
-                foreach (string disableWarning in disableWarnings)
+                foreach (string disableWarning in disableWarnings.SortedValues)
                     result.Append(@"/wd""" + disableWarning + @""" ");
                 result.Remove(result.Length - 1, 1);
                 context.Options["DisableSpecificWarnings"] = disableWarnings.JoinStrings(";");
