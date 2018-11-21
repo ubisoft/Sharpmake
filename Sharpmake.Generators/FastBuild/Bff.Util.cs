@@ -533,6 +533,36 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
+        internal static UniqueList<Project.Configuration> GetOrderedFlattenedBuildOnlyDependencies(Project.Configuration conf)
+        {
+            var dependencies = new UniqueList<Project.Configuration>();
+            GetOrderedFlattenedBuildOnlyDependenciesInternal(conf, dependencies);
+            return dependencies;
+        }
+
+        private static void GetOrderedFlattenedBuildOnlyDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies)
+        {
+            if (!conf.IsFastBuild)
+                return;
+
+            IEnumerable<Project.Configuration> confDependencies = conf.BuildOrderDependencies;
+
+            if (confDependencies.Contains(conf))
+                throw new Error("Cyclic dependency detected in project " + conf);
+
+            UniqueList<Project.Configuration> tmpDeps = new UniqueList<Project.Configuration>();
+            foreach (var dep in confDependencies)
+            {
+                GetOrderedFlattenedBuildOnlyDependenciesInternal(dep, tmpDeps);
+                tmpDeps.Add(dep);
+            }
+            foreach (var dep in tmpDeps)
+            {
+                if (dep.IsFastBuild && confDependencies.Contains(dep) && (conf != dep))
+                    dependencies.Add(dep);
+            }
+        }
+
         public static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null)
         {
             // Select items.

@@ -1113,6 +1113,7 @@ namespace Sharpmake
             public UniqueList<Configuration> ConfigurationDependencies = new UniqueList<Configuration>();
             public UniqueList<Configuration> ForceUsingDependencies = new UniqueList<Configuration>();
             public UniqueList<Configuration> GenericBuildDependencies = new UniqueList<Configuration>();
+            internal UniqueList<Configuration> BuildOrderDependencies = new UniqueList<Configuration>();
 
             /// <summary>
             /// Gets the list of public dependencies for .NET projects.
@@ -2839,6 +2840,8 @@ namespace Sharpmake
                                         PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
+                                    if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                        BuildOrderDependencies.Add(dependency);
                                 }
 
                                 if (!goesThroughDLL)
@@ -2870,6 +2873,8 @@ namespace Sharpmake
                                         ConfigurationDependencies.Add(dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         ForceUsingDependencies.Add(dependency);
+                                    if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                        BuildOrderDependencies.Add(dependency);
 
                                     // check if that case is valid: dll with additional libs
                                     if (isExport && !goesThroughDLL)
@@ -2941,7 +2946,10 @@ namespace Sharpmake
                                 else if (isImmediate)
                                     resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
 
-                                ConfigurationDependencies.Add(dependency);
+                                if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                    BuildOrderDependencies.Add(dependency);
+                                else
+                                    ConfigurationDependencies.Add(dependency);
                             }
                             break;
                         case OutputType.Utility: throw new NotImplementedException(dependency.Project.Name + " " + dependency.Output);

@@ -457,6 +457,7 @@ Copy( '[fastBuildCopyAlias]' )
      [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
     .Libraries              = [fastBuildProjectDependencies]
+    .PreBuildDependencies   = [fastBuildBuildOnlyDependencies]
     .LinkerAssemblyResources = { [fastBuildObjectListEmbeddedResources] }
     .LinkerOutput           = '[fastBuildLinkerOutputFile]'
     .LinkerLinkObjects      = [fastBuildLinkerLinkObjects]
