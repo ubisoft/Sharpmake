@@ -372,11 +372,12 @@ namespace Sharpmake.Generators.VisualStudio
                 else if (projectName != conf.ProjectName)
                     throw new Error("Project configurations in the same project files must be the same: {0} != {1} in {2}", projectName, conf.ProjectName, context.ProjectFileName);
 
-                var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
+                var platformVcxproj = context.PresentPlatforms[conf.Platform];
+                var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(conf.Platform);
                 conf.GeneratorSetGeneratedInformation(
                     platformVcxproj.ExecutableFileExtension,
                     platformVcxproj.PackageFileExtension,
-                    platformVcxproj.SharedLibraryFileExtension,
+                    configurationTasks.GetDefaultOutputExtension(Project.Configuration.OutputType.Dll),
                     platformVcxproj.ProgramDatabaseFileExtension);
             }
 
@@ -484,23 +485,20 @@ namespace Sharpmake.Generators.VisualStudio
 
             // generate all configuration options onces...
             Dictionary<Project.Configuration, Options.ExplicitOptions> options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
-            Dictionary<Project.Configuration, ProjectOptionsGenerator.VcxprojCmdLineOptions> cmdLineOptions = new Dictionary<Project.Configuration, ProjectOptionsGenerator.VcxprojCmdLineOptions>();
             ProjectOptionsGenerator projectOptionsGen = new ProjectOptionsGenerator();
             foreach (Project.Configuration conf in context.ProjectConfigurations)
             {
-                var confOptions = new Options.ExplicitOptions();
-                var confCmdLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
+                context.Options = new Options.ExplicitOptions();
+                context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
 
                 context.Configuration = conf;
-                context.Options = confOptions;
-                context.CommandLineOptions = confCmdLineOptions;
                 projectOptionsGen.GenerateOptions(context);
                 FillIncludeDirectoriesOptions(context);
+                FillLibrariesOptions(context);
+
+                options.Add(conf, context.Options);
 
                 context.Reset(); // just a safety, not necessary to clean up
-
-                options.Add(conf, confOptions);
-                cmdLineOptions.Add(conf, confCmdLineOptions);
             }
 
             // user file
@@ -791,6 +789,112 @@ namespace Sharpmake.Generators.VisualStudio
             // Fill resource include dirs
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);
             context.Options["AdditionalResourceIncludeDirectories"] = resourceIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, resourceIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+        }
+
+        private static void FillLibrariesOptions(GenerationContext context)
+        {
+            IPlatformVcxproj platformVcxproj = context.PresentPlatforms[context.Configuration.Platform];
+
+            Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
+            ignoreSpecificLibraryNames.ToLower();
+            ignoreSpecificLibraryNames.InsertSuffix("." + platformVcxproj.StaticLibraryFileExtension, true);
+
+            context.Options["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
+            context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+            if (!(context.Configuration.Output == Project.Configuration.OutputType.None || context.Configuration.Output == Project.Configuration.OutputType.Lib && !context.Configuration.ExportAdditionalLibrariesEvenForStaticLib))
+            {
+                //AdditionalLibraryDirectories
+                //                                            AdditionalLibraryDirectories="dir1;dir2"    /LIBPATH:"dir1" /LIBPATH:"dir2"
+                SelectAdditionalLibraryDirectoriesOption(context);
+
+                //AdditionalDependencies
+                //                                            AdditionalDependencies="lib1;lib2"      "lib1;lib2" 
+                SelectAdditionalDependenciesOption(context, ignoreSpecificLibraryNames);
+            }
+
+            ////IgnoreSpecificLibraryNames
+            ////                                            IgnoreDefaultLibraryNames=[lib]         /NODEFAULTLIB:[lib]
+            context.Options["IgnoreDefaultLibraryNames"] = ignoreSpecificLibraryNames.JoinStrings(";");
+        }
+
+        private static void SelectAdditionalLibraryDirectoriesOption(GenerationContext context)
+        {
+            IPlatformVcxproj platformVcxproj = context.PresentPlatforms[context.Configuration.Platform];
+
+            var libDirs = new OrderableStrings(context.Configuration.LibraryPaths);
+            libDirs.AddRange(context.Configuration.DependenciesOtherLibraryPaths);
+            libDirs.AddRange(context.Configuration.DependenciesBuiltTargetsLibraryPaths);
+            libDirs.AddRange(platformVcxproj.GetLibraryPaths(context));
+
+            if (libDirs.Any())
+            {
+                libDirs.Sort();
+
+                var relativeAdditionalLibraryDirectories = Util.PathGetRelative(context.ProjectDirectory, libDirs);
+                context.Options["AdditionalLibraryDirectories"] = string.Join(";", relativeAdditionalLibraryDirectories);
+            }
+            else
+            {
+                context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+        }
+
+        private static void SelectAdditionalDependenciesOption(
+            GenerationContext context,
+            Strings ignoreSpecificLibraryNames
+        )
+        {
+            IPlatformVcxproj platformVcxproj = context.PresentPlatforms[context.Configuration.Platform];
+
+            var otherLibraryFiles = new OrderableStrings(context.Configuration.LibraryFiles);
+            otherLibraryFiles.AddRange(context.Configuration.DependenciesOtherLibraryFiles);
+            otherLibraryFiles.AddRange(platformVcxproj.GetLibraryFiles(context));
+            otherLibraryFiles.Sort();
+
+            // put the built library files before any other
+            var libraryFiles = new OrderableStrings(context.Configuration.DependenciesBuiltTargetsLibraryFiles);
+            libraryFiles.Sort();
+            libraryFiles.AddRange(otherLibraryFiles);
+
+            // convert all root paths to be relative to the project folder
+            for (int i = 0; i < libraryFiles.Count; ++i)
+            {
+                string libraryFile = libraryFiles[i];
+                if (Path.IsPathRooted(libraryFile))
+                    libraryFiles[i] = Util.GetConvertedRelativePath(context.ProjectDirectory, libraryFile, context.ProjectDirectory, true, context.Project.RootPath);
+            }
+
+            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
+
+            var additionalDependencies = new Strings();
+            foreach (string libraryFile in libraryFiles)
+            {
+                // We've got two kinds of way of listing a library:
+                // - With a filename without extension we must add the potential prefix and potential extension.
+                //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
+                // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
+                string decoratedName = libraryFile;
+                string extension = Path.GetExtension(libraryFile).ToLower();
+                if (extension.StartsWith(".", StringComparison.Ordinal))
+                    extension = extension.Substring(1);
+
+                if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
+                {
+                    decoratedName = libPrefix + libraryFile;
+                    if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
+                        decoratedName += "." + platformVcxproj.StaticLibraryFileExtension;
+                }
+
+                if (!ignoreSpecificLibraryNames.Contains(decoratedName))
+                    additionalDependencies.Add(decoratedName);
+                else
+                    ignoreSpecificLibraryNames.Remove(decoratedName);
+            }
+
+            context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies);
+
+            platformVcxproj.SelectPlatformAdditionalDependenciesOptions(context);
         }
 
         private void WriteCustomProperties(IVcxprojGenerationContext context, IFileGenerator fileGenerator)

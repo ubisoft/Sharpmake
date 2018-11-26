@@ -114,6 +114,14 @@ namespace Sharpmake
 
             private const string RemoveLineTag = "REMOVE_LINE_TAG";
 
+            private enum LinkState
+            {
+                NotLinked,
+                Linking,
+                Linked
+            }
+            private LinkState _linkState = LinkState.NotLinked;
+
             public Configuration()
             {
                 PrecompSourceExcludeExtension.Add(".asm");
@@ -493,7 +501,25 @@ namespace Sharpmake
             /// </summary>
             public OrderableStrings LibraryPaths = new OrderableStrings();
 
-            public OrderableStrings DependenciesLibraryPaths = new OrderableStrings();
+            public OrderableStrings DependenciesOtherLibraryPaths = new OrderableStrings();
+            public OrderableStrings DependenciesBuiltTargetsLibraryPaths = new OrderableStrings();
+
+            public OrderableStrings DependenciesLibraryPaths
+            {
+                get
+                {
+                    var allLibraryPaths = new OrderableStrings(DependenciesBuiltTargetsLibraryPaths);
+                    allLibraryPaths.AddRange(DependenciesOtherLibraryPaths);
+                    return allLibraryPaths;
+                }
+            }
+
+            public void AddDependencyBuiltTargetLibraryPath(string libraryPath, int orderNumber)
+            {
+                if (_linkState != LinkState.Linking)
+                    throw new Error($"Cannot add built target lib '{libraryPath}' outside of the link process of the Project.Configuration");
+                DependenciesBuiltTargetsLibraryPaths.Add(libraryPath, orderNumber);
+            }
 
             /// <summary>
             /// Library linker files
@@ -504,7 +530,27 @@ namespace Sharpmake
             public OrderableStrings LibraryFiles = new OrderableStrings();
 
             public OrderableStrings AdditionalUsingDirectories = new OrderableStrings();
-            public OrderableStrings DependenciesLibraryFiles = new OrderableStrings();
+
+            public OrderableStrings DependenciesOtherLibraryFiles = new OrderableStrings();
+            public OrderableStrings DependenciesBuiltTargetsLibraryFiles = new OrderableStrings();
+
+            public OrderableStrings DependenciesLibraryFiles
+            {
+                get
+                {
+                    var allLibraryFiles = new OrderableStrings(DependenciesBuiltTargetsLibraryFiles);
+                    allLibraryFiles.AddRange(DependenciesOtherLibraryFiles);
+                    return allLibraryFiles;
+                }
+            }
+
+            public void AddDependencyBuiltTargetLibraryFile(string libraryFile, int orderNumber)
+            {
+                if (_linkState != LinkState.Linking)
+                    throw new Error($"Cannot add built target lib '{libraryFile}' outside of the link process of the Project.Configuration");
+                DependenciesBuiltTargetsLibraryFiles.Add(libraryFile, orderNumber);
+            }
+
             public OrderableStrings DependenciesForceUsingFiles = new OrderableStrings();
             public UniqueList<Configuration> ConfigurationDependencies = new UniqueList<Configuration>();
             public UniqueList<Configuration> ForceUsingDependencies = new UniqueList<Configuration>();
@@ -1617,6 +1663,9 @@ namespace Sharpmake
 
             internal void Link(Builder builder)
             {
+                Trace.Assert(_linkState == LinkState.NotLinked);
+                _linkState = LinkState.Linking;
+
                 if (builder.DumpDependencyGraph)
                 {
                     DependencyTracker.Instance.AddDependency(DependencyType.Public, Project, this, UnResolvedPublicDependencies, _dependenciesSetting);
@@ -1802,10 +1851,10 @@ namespace Sharpmake
                                 if (!goesThroughDLL)
                                 {
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                                        DependenciesLibraryPaths.AddRange(dependency.LibraryPaths);
+                                        DependenciesOtherLibraryPaths.AddRange(dependency.LibraryPaths);
 
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                                        DependenciesLibraryFiles.AddRange(dependency.LibraryFiles);
+                                        DependenciesOtherLibraryFiles.AddRange(dependency.LibraryFiles);
 
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
@@ -1831,10 +1880,10 @@ namespace Sharpmake
                                     if (isExport && !goesThroughDLL)
                                     {
                                         if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                                            DependenciesLibraryPaths.AddRange(dependency.LibraryPaths);
+                                            DependenciesOtherLibraryPaths.AddRange(dependency.LibraryPaths);
 
                                         if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                                            DependenciesLibraryFiles.AddRange(dependency.LibraryFiles);
+                                            DependenciesOtherLibraryFiles.AddRange(dependency.LibraryFiles);
                                     }
                                 }
 
@@ -1942,6 +1991,8 @@ namespace Sharpmake
                 _resolvedDependencies = new List<Configuration>();
                 _resolvedDependencies.AddRange(_resolvedPublicDependencies);
                 _resolvedDependencies.AddRange(_resolvedPrivateDependencies);
+
+                _linkState = LinkState.Linked;
             }
 
             internal void SetDefaultOutputExtension()

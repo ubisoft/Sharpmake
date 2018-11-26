@@ -75,7 +75,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             var optionsContext = new ProjectOptionsGenerationContext(context.Configuration,
                 new VariableAssignment("project", context.Project),
-                new VariableAssignment("target", context.Configuration),
+                new VariableAssignment("target", context.Configuration.Target),
                 new VariableAssignment("conf", context.Configuration));
 
             GenerateGeneralOptions(context, optionsContext);
@@ -349,7 +349,7 @@ namespace Sharpmake.Generators.VisualStudio
             additionalUsingDirectories.AddRange(optionsContext.PlatformVcxproj.GetCxUsingPath(context));
             if (additionalUsingDirectories.Count > 0 && optionsContext.Resolver != null)
             {
-                var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, "/AI"));
+                var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/AI"));
                 context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
             }
             else
@@ -909,16 +909,6 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.HasClrSupport = clrSupport;
         }
 
-        private static string CmdLineConvertIncludePathsFunc(IGenerationContext context, ProjectOptionsGenerationContext optionsContext, string include, string prefix)
-        {
-            // if the include is below the global root, we compute the relative path,
-            // otherwise it's probably a system include for which we keep the full path
-            string resolvedInclude = optionsContext.Resolver.Resolve(include);
-            if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
-                resolvedInclude = Bff.CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
-            return $@"{prefix}""{resolvedInclude}""";
-        }
-
         public static List<KeyValuePair<string, string>> ConvertPostBuildCopiesToRelative(Project.Configuration conf, string relativeTo)
         {
             var relativePostBuildCopies = new List<KeyValuePair<string, string>>();
@@ -1043,17 +1033,21 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["UsePrecompiledHeader"] = "NotUsing";
                 context.Options["PrecompiledHeaderThrough"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["PrecompiledHeaderFile"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["PrecompiledHeaderOutputFileDirectory"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["PrecompiledHeaderFile"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["PrecompiledHeaderOutputFileDirectory"] = FileGeneratorUtilities.RemoveLineTag;
             }
             else
             {
                 context.Options["UsePrecompiledHeader"] = "Use";
                 context.Options["PrecompiledHeaderThrough"] = context.Configuration.PrecompHeader;
-                string outputFolder = string.IsNullOrEmpty(context.Configuration.PrecompHeaderOutputFolder) ? optionsContext.IntermediateDirectoryRelative : Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PrecompHeaderOutputFolder);
-                context.Options["PrecompiledHeaderFile"] = outputFolder + Util.WindowsSeparator + context.Configuration.Project.Name + ".pch";
+                string pchOutputDirectoryRelative = string.IsNullOrEmpty(context.Configuration.PrecompHeaderOutputFolder) ? optionsContext.IntermediateDirectoryRelative : Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PrecompHeaderOutputFolder);
+                context.Options["PrecompiledHeaderFile"] = pchOutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.Project.Name + ".pch";
+                context.Options["PrecompiledHeaderOutputFileDirectory"] = pchOutputDirectoryRelative;
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = context.Options["PrecompiledHeaderThrough"];
                 context.CommandLineOptions["PrecompiledHeaderFile"] = Bff.CurrentBffPathKeyCombine(context.Options["PrecompiledHeaderFile"]);
+                context.CommandLineOptions["PrecompiledHeaderOutputFileDirectory"] = Bff.CurrentBffPathKeyCombine(pchOutputDirectoryRelative);
 
                 if (!optionsContext.PlatformDescriptor.HasPrecompiledHeaderSupport)
                     throw new Error("Precompiled header not supported for spu configuration: {0}", context.Configuration);
@@ -1241,12 +1235,8 @@ namespace Sharpmake.Generators.VisualStudio
             );
 
             // Delay Loaded DLLs
-            var libFiles = new OrderableStrings(context.Configuration.LibraryFiles);
-            libFiles.AddRange(context.Configuration.DependenciesLibraryFiles);
-            libFiles.AddRange(optionsContext.PlatformVcxproj.GetLibraryFiles(context));
-
             Strings delayedDLLs = Options.GetStrings<Options.Vc.Linker.DelayLoadDLLs>(context.Configuration);
-            if (delayedDLLs.Count() > 0)
+            if (delayedDLLs.Any())
             {
                 context.Options["DelayLoadedDLLs"] = delayedDLLs.JoinStrings(";");
 
@@ -1255,35 +1245,11 @@ namespace Sharpmake.Generators.VisualStudio
                     result.Append(@"/DELAYLOAD:""" + delayedDLL + @""" ");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["DelayLoadedDLLs"] = result.ToString();
-
-                if (context.Configuration.IsFastBuild)
-                    libFiles.Add("Delayimp.lib");
             }
             else
             {
                 context.Options["DelayLoadedDLLs"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["DelayLoadedDLLs"] = FileGeneratorUtilities.RemoveLineTag;
-            }
-
-            Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
-            ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix(optionsContext.PlatformLibraryExtension, true);
-
-            context.Options["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-
-            if (!(context.Configuration.Output == Project.Configuration.OutputType.None ||
-                context.Configuration.Output == Project.Configuration.OutputType.Lib && !context.Configuration.ExportAdditionalLibrariesEvenForStaticLib))
-            {
-                //AdditionalLibraryDirectories
-                //                                            AdditionalLibraryDirectories="dir1;dir2"    /LIBPATH:"dir1" /LIBPATH:"dir2"
-                SelectAdditionalLibraryDirectoriesOption(context, optionsContext);
-
-                //AdditionalDependencies                      
-                //                                            AdditionalDependencies="lib1;lib2"      "lib1;lib2" 
-                SelectAdditionalDependenciesOption(context, optionsContext, libFiles, ignoreSpecificLibraryNames);
             }
 
             // Set module definition
@@ -1307,23 +1273,6 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Linker.IgnoreAllDefaultLibraries.Enable, () => { context.Options["IgnoreAllDefaultLibraries"] = "true"; context.CommandLineOptions["IgnoreAllDefaultLibraries"] = "/NODEFAULTLIB"; }),
             Options.Option(Options.Vc.Linker.IgnoreAllDefaultLibraries.Disable, () => { context.Options["IgnoreAllDefaultLibraries"] = "false"; context.CommandLineOptions["IgnoreAllDefaultLibraries"] = FileGeneratorUtilities.RemoveLineTag; })
             );
-
-            //IgnorSpecificLibraryNames
-            //                                            IgnoreDefaultLibraryNames=[lib]         /NODEFAULTLIB:[lib]
-            context.Options["IgnoreDefaultLibraryNames"] = ignoreSpecificLibraryNames.JoinStrings(";");
-            context.CommandLineOptions["IgnoreDefaultLibraryNames"] = FileGeneratorUtilities.RemoveLineTag;
-            if (optionsContext.Resolver != null)
-            {
-                string[] ignoreLibs = optionsContext.Resolver.Resolve(context.Options["IgnoreDefaultLibraryNames"]).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                if (ignoreLibs.GetLength(0) > 0)
-                {
-                    StringBuilder result = new StringBuilder();
-                    foreach (string ignoreLib in ignoreLibs)
-                        result.Append(@"/NODEFAULTLIB:""" + ignoreLib + @""" ");
-                    result.Remove(result.Length - 1, 1);
-                    context.CommandLineOptions["IgnoreDefaultLibraryNames"] = result.ToString();
-                }
-            }
 
             //GenerateManifest
             //    Enable                                  GenerateManifest="true"                 /MANIFEST
@@ -1621,7 +1570,7 @@ namespace Sharpmake.Generators.VisualStudio
                 if (embedManifest == Options.Vc.Linker.EmbedManifest.No)
                     throw new NotImplementedException("Sharpmake does not support manifestinputs without embedding the manifest!");
 
-                var cmdManifests = manifestInputs.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, "/manifestinput:"));
+                var cmdManifests = manifestInputs.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/manifestinput:"));
 
                 context.CommandLineOptions["ManifestInputs"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdManifests);
             }
@@ -1903,115 +1852,6 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 throw new Error("error, BuildStep not supported: {0}", eventBuildStep.GetType().FullName);
             }
-        }
-
-        private static void SelectAdditionalLibraryDirectoriesOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
-        {
-            context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-
-            var libDirs = new OrderableStrings(context.Configuration.LibraryPaths);
-            libDirs.AddRange(context.Configuration.DependenciesLibraryPaths);
-            libDirs.AddRange(optionsContext.PlatformVcxproj.GetLibraryPaths(context));
-
-            if (libDirs.Any())
-            {
-                var relativeAdditionalLibraryDirectories = Util.PathGetRelative(context.ProjectDirectory, libDirs);
-                context.Options["AdditionalLibraryDirectories"] = string.Join(";", relativeAdditionalLibraryDirectories);
-            }
-
-            if (optionsContext.Resolver != null)
-            {
-                var configTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
-                libDirs.AddRange(configTasks.GetPlatformLibraryPaths(context.Configuration));
-                if (libDirs.Count > 0)
-                {
-                    string linkOption;
-                    if (!PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
-                        linkOption = @"/LIBPATH:";
-                    else
-                        linkOption = @"-L";
-
-                    var cmdAdditionalLibDirectories = libDirs.Select(p => CmdLineConvertIncludePathsFunc(context, optionsContext, p, linkOption));
-
-                    context.CommandLineOptions["AdditionalLibraryDirectories"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdAdditionalLibDirectories);
-                }
-            }
-        }
-
-        private static void SelectAdditionalDependenciesOption(
-            IGenerationContext context,
-            ProjectOptionsGenerationContext optionsContext,
-            OrderableStrings libraryFiles,
-            Strings ignoreSpecificLibraryNames
-        )
-        {
-            // convert all root paths to be relative to the project folder
-            var convertedPaths = new Strings();
-            for (int i = 0; i < libraryFiles.Count; ++i)
-            {
-                string libraryFile = libraryFiles[i];
-                if (Path.IsPathRooted(libraryFile))
-                {
-                    libraryFiles[i] = Util.GetConvertedRelativePath(context.ProjectDirectory, libraryFile, context.ProjectDirectory, true, context.Project.RootPath);
-
-                    // keep track of the converted paths, we'll need it later
-                    convertedPaths.Add(libraryFiles[i]);
-                }
-            }
-            libraryFiles.Sort();
-
-            var additionalDependencies = new Strings();
-            foreach (string libraryFile in libraryFiles)
-            {
-                // We've got two kinds of way of listing a library:
-                // - With a filename without extension we must add the potential prefix and potential extension.
-                //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
-                // - With a filename with the lib extension (.a or .lib), we shouldn't touch it as it's already set by the script.
-                string decoratedName = libraryFile;
-                if (Path.GetExtension(libraryFile) != optionsContext.PlatformLibraryExtension)
-                    decoratedName = optionsContext.PlatformPrefixExtension + libraryFile + optionsContext.PlatformOutputLibraryExtension;
-
-                if (!ignoreSpecificLibraryNames.Contains(decoratedName))
-                    additionalDependencies.Add(decoratedName);
-                else
-                    ignoreSpecificLibraryNames.Remove(decoratedName);
-            }
-
-            context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies);
-
-            if (optionsContext.Resolver != null)
-            {
-                var platformAdditionalDependencies = optionsContext.PlatformVcxproj.GetPlatformLibraryFiles(context);
-
-                // Joins the list of dependencies with a ; and then re-split them after a resolve.
-                // We have to do it that way because a token can be resolved into a
-                // semicolon -separated list of dependencies.
-                string[] resolvedAdditionalDependencies = optionsContext.Resolver.Resolve(
-                        string.Join(";", additionalDependencies.Concat(platformAdditionalDependencies))
-                    ).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (resolvedAdditionalDependencies.Any())
-                {
-                    var finalDependencies = new Strings();
-
-                    foreach (string additionalDependency in resolvedAdditionalDependencies)
-                    {
-                        string dependencyPath = additionalDependency;
-
-                        // if the path to this dependency was converted
-                        // convert it again to make it relative to the bff
-                        if (convertedPaths.Contains(additionalDependency))
-                            dependencyPath = Bff.CurrentBffPathKeyCombine(additionalDependency);
-
-                        finalDependencies.Add(dependencyPath);
-                    }
-
-                    context.CommandLineOptions["AdditionalDependencies"] = string.Join(";", finalDependencies);
-                }
-            }
-
-            optionsContext.PlatformVcxproj.SelectPlatformAdditionalDependenciesOptions(context);
         }
 
         private static void SelectGenerateManifestOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)

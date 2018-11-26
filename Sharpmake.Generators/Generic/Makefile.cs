@@ -509,7 +509,8 @@ namespace Sharpmake.Generators.Generic
             // LibraryPaths
             OrderableStrings libraryPaths = new OrderableStrings();
             libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.LibraryPaths));
-            libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesLibraryPaths));
+            libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesOtherLibraryPaths));
+            libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesBuiltTargetsLibraryPaths));
             PathMakeUnix(libraryPaths);
             libraryPaths.InsertPrefix("-L");
             options["LibraryPaths"] = libraryPaths.JoinStrings(" ");

@@ -28,6 +28,8 @@ namespace Sharpmake.Generators.FastBuild
     {
         private class BffGenerationContext : IGenerationContext
         {
+            private Resolver _envVarResolver;
+
             public Builder Builder { get; }
 
             public Project Project { get; }
@@ -45,6 +47,19 @@ namespace Sharpmake.Generators.FastBuild
             public string ProjectDirectoryCapitalized { get; }
 
             public string ProjectSourceCapitalized { get; }
+
+            public Resolver EnvironmentVariableResolver
+            {
+                get
+                {
+                    Debug.Assert(_envVarResolver != null);
+                    return _envVarResolver;
+                }
+                set
+                {
+                    _envVarResolver = value;
+                }
+            }
 
             public BffGenerationContext(Builder builder, Project project, string projectDir)
             {
@@ -150,14 +165,24 @@ namespace Sharpmake.Generators.FastBuild
             // Generate all configuration options onces...
             var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
             var cmdLineOptions = new Dictionary<Project.Configuration, ProjectOptionsGenerator.VcxprojCmdLineOptions>();
+            var additionalDependenciesPerConf = new Dictionary<Project.Configuration, OrderableStrings>();
             var projectOptionsGen = new ProjectOptionsGenerator();
             foreach (Project.Configuration conf in configurations)
             {
-                context.Configuration = conf;
                 context.Options = new Options.ExplicitOptions();
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
+                context.Configuration = conf;
+                var resolverParams = new[] {
+                    new VariableAssignment("project", context.Project),
+                    new VariableAssignment("target", context.Configuration.Target),
+                    new VariableAssignment("conf", context.Configuration)
+                };
+                context.EnvironmentVariableResolver = PlatformRegistry.Get<IPlatformDescriptor>(conf.Platform).GetPlatformEnvironmentResolver(resolverParams);
                 projectOptionsGen.GenerateOptions(context);
                 FillIncludeDirectoriesOptions(context);
+
+                OrderableStrings additionalDependencies = FillLibrariesOptions(context);
+                additionalDependenciesPerConf.Add(conf, additionalDependencies);
 
                 options.Add(conf, context.Options);
                 cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
@@ -193,6 +218,9 @@ namespace Sharpmake.Generators.FastBuild
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
             {
+                if (!conf.Platform.IsSupportedFastBuildPlatform())
+                    continue;
+
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
@@ -200,7 +228,7 @@ namespace Sharpmake.Generators.FastBuild
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
 
-                if (conf.Platform.IsSupportedFastBuildPlatform())
+                using (resolver.NewScopedParameter("conf", conf))
                 {
                     if (conf.IsBlobbed && conf.FastBuildBlobbed)
                     {
@@ -225,12 +253,7 @@ namespace Sharpmake.Generators.FastBuild
                     List<string> resourceFilesSections = new List<string>();
                     List<string> embeddedResourceFilesSections = new List<string>();
 
-                    var additionalDependencies = new Strings();
-                    {
-                        string confCmdLineOptionsAddDeps = confCmdLineOptions["AdditionalDependencies"];
-                        if (confCmdLineOptionsAddDeps != FileGeneratorUtilities.RemoveLineTag)
-                            additionalDependencies.Add(confCmdLineOptionsAddDeps.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
-                    }
+                    OrderableStrings additionalDependencies = additionalDependenciesPerConf[conf];
 
                     foreach (var tuple in confSubConfigs.Keys)
                     {
@@ -531,78 +554,10 @@ namespace Sharpmake.Generators.FastBuild
                             }
                         }
 
-                        // Remove from cmdLineOptions["AdditionalDependencies"] dependencies that are already listed in fastBuildProjectDependencyList
-                        {
-                            string libExt = ".lib";
-                            string outExt = ".a";
-                            string prefixExt = "-l";
-                            vcxprojPlatform.SetupPlatformLibraryOptions(ref libExt, ref outExt, ref prefixExt);
-
-                            // test prefixes, usually it is either -l or lib, to know if we can shorten it
-                            // Note that the output filename prefix is not case sensitive (ideally it should depend on the OS)
-                            string libPrefix = vcxprojPlatform.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
-                            Tuple<string, StringComparison>[] prefixesToTest = {
-                                Tuple.Create(prefixExt, StringComparison.Ordinal),
-                                Tuple.Create(libPrefix, StringComparison.OrdinalIgnoreCase)
-                            };
-
-                            var finalDependencies = new Strings();
-                            foreach (var additionalDependency in additionalDependencies)
-                            {
-                                // compute dependency identifier by removing platform lib prefix and extension (if necessary)
-                                int subStringStartIndex = 0;
-                                int subStringLength = additionalDependency.Length;
-                                if (additionalDependency.EndsWith(libExt, StringComparison.OrdinalIgnoreCase))
-                                    subStringLength -= libExt.Length;
-
-                                foreach (var prefixTuple in prefixesToTest)
-                                {
-                                    string prefix = prefixTuple.Item1;
-                                    if (additionalDependency.StartsWith(prefix, prefixTuple.Item2))
-                                    {
-                                        subStringStartIndex = prefix.Length;
-                                        subStringLength -= prefix.Length;
-
-                                        break;
-                                    }
-                                }
-
-                                string testedDep = additionalDependency.Substring(subStringStartIndex, subStringLength);
-
-                                // add this link dependency if it's not a project dependency nor a project object file
-                                if (!fastBuildProjectDependencyList.Contains(testedDep) && !IsObjectList(fastBuildProjectDependencyList, testedDep))
-                                {
-                                    if (clangPlatformBff == null)
-                                    {
-                                        // just add the original dependency
-                                        finalDependencies.Add(@"""" + additionalDependency + @"""");
-                                    }
-                                    else
-                                    {
-                                        bool prefixed = subStringStartIndex != 0;
-                                        if (prefixed)
-                                        {
-                                            // the dependency is a "global" lib (ie it doesn't contain a file path)
-                                            // use the -l switch to link it.
-                                            finalDependencies.Add(@"""-l" + testedDep + @"""");
-                                        }
-                                        else
-                                        {
-                                            if (additionalDependency[0] != '$') // quick test that the path begins with $CurrentBffPath$
-                                                builder.LogWarningLine($"{additionalDependency} doesn't follow naming convention {libPrefix}NAME.ext. Add it to LibraryFiles with its full path or the link may fail.");
-
-                                            // the dependency is a "local" lib use the file path to link it
-                                            finalDependencies.Add(@"""" + additionalDependency + @"""");
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (finalDependencies.Any())
-                                confCmdLineOptions["AdditionalDependencies"] = string.Join($"'{Environment.NewLine}                            + ' ", finalDependencies);
-                            else
-                                confCmdLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
-                        }
+                        if (additionalDependencies != null && additionalDependencies.Any())
+                            confCmdLineOptions["AdditionalDependencies"] = string.Join($"'{Environment.NewLine}                            + ' ", additionalDependencies);
+                        else
+                            confCmdLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
 
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
@@ -1334,7 +1289,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private static string CmdLineConvertIncludePathsFunc(IGenerationContext context, Resolver resolver, string include, string prefix)
+        internal static string CmdLineConvertIncludePathsFunc(IGenerationContext context, Resolver resolver, string include, string prefix)
         {
             // if the include is below the global root, we compute the relative path,
             // otherwise it's probably a system include for which we keep the full path
@@ -1355,36 +1310,30 @@ namespace Sharpmake.Generators.FastBuild
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
 
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
-            var resolver = platformDescriptor.GetPlatformEnvironmentResolver(
-                new VariableAssignment("project", context.Project),
-                new VariableAssignment("target", context.Configuration),
-                new VariableAssignment("conf", context.Configuration)
-            );
-
-            if (resolver != null)
+            if (context.EnvironmentVariableResolver != null)
             {
                 string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I" : "/I";
 
                 // Fill include dirs
                 var dirs = new List<string>();
-                dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p, defaultCmdLineIncludePrefix)));
+                dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
 
                 var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
-                var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p.Path, p.CmdLinePrefix)).ToList();
+                var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)).ToList();
                 dirs.AddRange(platformIncludePathsPrefixed);
                 if (dirs.Any())
                     context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
 
                 // Fill resource include dirs
                 var resourceDirs = new List<string>();
-                resourceDirs.AddRange(resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p, defaultCmdLineIncludePrefix)));
+                resourceDirs.AddRange(resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
 
                 if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
                     Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
                     // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
                     // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
-                    var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, resolver, p.Path, defaultCmdLineIncludePrefix));
+                    var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, defaultCmdLineIncludePrefix));
                     resourceDirs.AddRange(platformIncludePathsDefaultPrefix);
                 }
                 else
@@ -1397,9 +1346,176 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
+        private static OrderableStrings FillLibrariesOptions(BffGenerationContext context)
+        {
+            OrderableStrings additionalDependencies = null;
+
+            // TODO: really not ideal, refactor and move the properties we need from it someplace else
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+
+            var libFiles = new OrderableStrings(context.Configuration.LibraryFiles);
+            libFiles.AddRange(context.Configuration.DependenciesOtherLibraryFiles);
+            libFiles.AddRange(platformVcxproj.GetLibraryFiles(context));
+
+            if (context.Configuration.Platform.IsMicrosoft())
+            {
+                Strings delayedDLLs = Options.GetStrings<Options.Vc.Linker.DelayLoadDLLs>(context.Configuration);
+                if (delayedDLLs.Any())
+                    libFiles.Add("Delayimp.lib");
+            }
+
+            libFiles.Sort();
+
+            Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
+            ignoreSpecificLibraryNames.ToLower();
+            ignoreSpecificLibraryNames.InsertSuffix("." + platformVcxproj.StaticLibraryFileExtension, true);
+
+            context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+            if (!(context.Configuration.Output == Project.Configuration.OutputType.None || context.Configuration.Output == Project.Configuration.OutputType.Lib && !context.Configuration.ExportAdditionalLibrariesEvenForStaticLib))
+            {
+                //AdditionalLibraryDirectories
+                //                                            AdditionalLibraryDirectories="dir1;dir2"    /LIBPATH:"dir1" /LIBPATH:"dir2"
+                SelectAdditionalLibraryDirectoriesOption(context);
+
+                //AdditionalDependencies
+                //                                            AdditionalDependencies="lib1;lib2"      "lib1;lib2" 
+                additionalDependencies = SelectAdditionalDependenciesOption(context, libFiles, ignoreSpecificLibraryNames);
+            }
+
+            ////IgnoreSpecificLibraryNames
+            ////                                            IgnoreDefaultLibraryNames=[lib]         /NODEFAULTLIB:[lib]
+            if (ignoreSpecificLibraryNames.Any())
+            {
+                var result = new StringBuilder();
+                foreach (string ignoreLib in ignoreSpecificLibraryNames.SortedValues)
+                    result.Append(@"/NODEFAULTLIB:""" + ignoreLib + @""" ");
+                result.Remove(result.Length - 1, 1);
+                context.CommandLineOptions["IgnoreDefaultLibraryNames"] = result.ToString();
+            }
+            else
+            {
+                context.CommandLineOptions["IgnoreDefaultLibraryNames"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            return additionalDependencies;
+        }
+
+        private static void SelectAdditionalLibraryDirectoriesOption(BffGenerationContext context)
+        {
+            // TODO: really not ideal, refactor and move the properties we need from it someplace else
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+
+            context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+            var libDirs = new OrderableStrings(context.Configuration.LibraryPaths);
+            libDirs.AddRange(context.Configuration.DependenciesOtherLibraryPaths);
+            libDirs.AddRange(platformVcxproj.GetLibraryPaths(context));
+
+            libDirs.Sort();
+
+            if (context.EnvironmentVariableResolver != null)
+            {
+                var configTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+                libDirs.AddRange(configTasks.GetPlatformLibraryPaths(context.Configuration));
+                if (libDirs.Count > 0)
+                {
+                    string linkOption;
+                    if (!PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
+                        linkOption = @"/LIBPATH:";
+                    else
+                        linkOption = @"-L";
+
+                    var cmdAdditionalLibDirectories = libDirs.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, linkOption));
+
+                    context.CommandLineOptions["AdditionalLibraryDirectories"] = string.Join($"'{Environment.NewLine}                            + ' ", cmdAdditionalLibDirectories);
+                }
+            }
+        }
+
+        private static OrderableStrings SelectAdditionalDependenciesOption(
+            BffGenerationContext context,
+            OrderableStrings libraryFiles,
+            Strings ignoreSpecificLibraryNames
+        )
+        {
+            // TODO: really not ideal, refactor and move the properties we need from it someplace else
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+
+            string platformLibraryExtension = string.Empty;
+            string platformOutputLibraryExtension = string.Empty;
+            string platformPrefix = string.Empty;
+            platformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefix);
+            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
+
+            var additionalDependencies = new OrderableStrings();
+
+            for (int i = 0; i < libraryFiles.Count; ++i)
+            {
+                string libraryFile = libraryFiles[i];
+
+                // convert all root paths to be relative to the project folder
+                if (Path.IsPathRooted(libraryFile))
+                {
+                    // if the path is below the global root, we compute the relative path, otherwise we keep the full path
+                    if (libraryFile.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                        additionalDependencies.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, libraryFile, true)), libraryFiles.GetOrderNumber(i));
+                    else
+                        additionalDependencies.Add(libraryFile, libraryFiles.GetOrderNumber(i));
+                }
+                else
+                {
+                    // If not a path, we've got two kinds of way of listing a library:
+                    // - With a filename without extension we must add the potential prefix and potential extension.
+                    //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
+                    // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
+                    string extension = Path.GetExtension(libraryFile).ToLower();
+                    if (extension.StartsWith(".", StringComparison.Ordinal))
+                        extension = extension.Substring(1);
+
+                    // here we could also verify that the path is rooted
+                    if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
+                    {
+                        libraryFile = libPrefix + libraryFile;
+                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
+                            libraryFile += "." + platformVcxproj.StaticLibraryFileExtension;
+                    }
+                    libraryFile = platformPrefix + libraryFile + platformOutputLibraryExtension;
+
+                    // LCTODO: this might be broken, clarify the rules for which this is supposed to work
+                    if (!ignoreSpecificLibraryNames.Contains(libraryFile))
+                        additionalDependencies.Add(libraryFile);
+                    else
+                        ignoreSpecificLibraryNames.Remove(libraryFile);
+                }
+            }
+
+            var finalDependencies = new OrderableStrings();
+            if (context.EnvironmentVariableResolver != null)
+            {
+                var platformAdditionalDependencies = platformVcxproj.GetPlatformLibraryFiles(context);
+
+                // Joins the list of dependencies with a ; and then re-split them after a resolve.
+                // We have to do it that way because a token can be resolved into a
+                // semicolon -separated list of dependencies.
+                var resolvedAdditionalDependencies = new Strings(context.EnvironmentVariableResolver.Resolve(
+                        string.Join(";", additionalDependencies.Concat(platformAdditionalDependencies))
+                    ).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+
+                if (resolvedAdditionalDependencies.Any())
+                {
+                    foreach (string additionalDependency in resolvedAdditionalDependencies)
+                        finalDependencies.Add(@"""" + additionalDependency + @"""");
+                }
+            }
+            return finalDependencies;
+        }
+
+
         /// <summary>
-        /// Method that allows to determine for a speicified dependency if it's a library or an object list. if a dep is within 
-        /// the list, the second condition check if objects is present which means that the current dependency is considered to be 
+        /// Method that allows to determine for a specified dependency if it's a library or an object list. if a dep is within
+        /// the list, the second condition check if objects is present which means that the current dependency is considered to be
         /// a force objectlist.
         /// </summary>
         /// <param name="dependencies">all the dependencies of a specific project configuration</param>

@@ -217,7 +217,7 @@ namespace Sharpmake
 
             #region IPlatformVcxproj implementation
             public override string ExecutableFileExtension => "exe";
-            public override string SharedLibraryFileExtension => "dll";
+            public override string SharedLibraryFileExtension => "lib";
             public override string ProgramDatabaseFileExtension => "pdb";
             public override string StaticLibraryFileExtension => "lib";
             public override bool HasEditAndContinueDebuggingSupport => true;

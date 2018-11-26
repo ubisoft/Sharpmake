@@ -44,14 +44,25 @@ namespace Sharpmake
 
             public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
-                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                    configuration.DependenciesLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-
-                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                if (!dependency.Project.GetType().IsDefined(typeof(Export), false))
                 {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+
                     // Clang and GCC have trouble finding "Additional Dependencies" through "Additional Library Directories" when compiling
                     // for Android under VS. As a work around, we use rooted path for dependencies library files.
-                    configuration.DependenciesLibraryFiles.Add(dependency.TargetPath + "\\" + dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetPath + "\\" + dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                }
+                else
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+
+                    // Clang and GCC have trouble finding "Additional Dependencies" through "Additional Library Directories" when compiling
+                    // for Android under VS. As a work around, we use rooted path for dependencies library files.
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetPath + "\\" + dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
                 }
             }
 

@@ -280,7 +280,7 @@ namespace Sharpmake
         public virtual void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
         {
             platformLibExtension = ".lib";
-            platformOutputLibExtension = ".lib";
+            platformOutputLibExtension = "";
             platformPrefixExtension = string.Empty;
         }
 

@@ -37,11 +37,20 @@ namespace Sharpmake
         #region Project.Configuration.IConfigurationTasks implementation
         public static void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
-            if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                configuration.DependenciesLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-
-            if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                configuration.DependenciesLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+            if (!dependency.Project.GetType().IsDefined(typeof(Export), false))
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                    configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+            }
+            else
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                    configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+            }
         }
 
         void Project.Configuration.IConfigurationTasks.SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
