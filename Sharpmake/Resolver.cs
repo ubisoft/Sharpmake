@@ -739,7 +739,7 @@ namespace Sharpmake
 
         public override string Resolve(string str)
         {
-            return Resolve(str, string.Empty);
+            return Resolve(str, null);
         }
     }
 }
