@@ -125,6 +125,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             UsePrecomp,
             CreatePrecomp,
             PrecompPath,
+            IncludePath,
         }
 
         private static readonly IDictionary<CompilerFlags, string> s_clangFlags = new Dictionary<CompilerFlags, string>
@@ -132,6 +133,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             { CompilerFlags.OutputFile, "-o {0}" },
             { CompilerFlags.UsePrecomp, "-include-pch {0}" },
             { CompilerFlags.CreatePrecomp, "-x c++-header {0}" },
+            { CompilerFlags.IncludePath, "-I" },
         };
 
         private static readonly IDictionary<CompilerFlags, string> s_vcFlags = new Dictionary<CompilerFlags, string>
@@ -140,6 +142,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             { CompilerFlags.UsePrecomp, "/Yu\"{0}\" /FI\"{0}\"" },
             { CompilerFlags.CreatePrecomp, "/Yc\"{0}\" /FI\"{0}\"" },
             { CompilerFlags.PrecompPath, "/Fp\"{0}\"" },
+            { CompilerFlags.IncludePath, "/I" },
         };
 
         private static readonly ProjectOptionsGenerator s_optionGenerator = new ProjectOptionsGenerator();
