@@ -52,11 +52,11 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
                 if (builder.Context.WriteGeneratedFile(type, file, stream))
                 {
-                    generatedFiles.Add(path);
+                    generatedFiles.Add(Path.Combine(file.DirectoryName, file.Name));
                 }
                 else
                 {
-                    skipFiles.Add(path);
+                    skipFiles.Add(Path.Combine(file.DirectoryName, file.Name));
                 }
             }
         }
