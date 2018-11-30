@@ -23,23 +23,34 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 {
     public class JsonCompilationDatabase
     {
+        /// <summary>
+        /// Compile command format.
+        /// - Command: Compilation command specified as a shell command
+        /// - Arguments: Compilation command specified as a list of arguments
+        /// </summary>
+        public enum CompileCommandFormat
+        {
+            Command,
+            Arguments
+        }
+
         public const string FileName = "compile_commands.json";
 
         public event Action<IGenerationContext, CompileCommand> CompileCommandGenerated;
 
-        public void Generate(Builder builder, Solution solution, string path, IEnumerable<Project.Configuration> projectConfigurations, List<string> generatedFiles, List<string> skipFiles)
+        public void Generate(Builder builder, Solution solution, string path, IEnumerable<Project.Configuration> projectConfigurations, CompileCommandFormat format, List<string> generatedFiles, List<string> skipFiles)
         {
-            var database = new List<IDictionary<string, string>>();
+            var database = new List<IDictionary<string, object>>();
 
             foreach (var configuration in projectConfigurations)
             {
-                database.AddRange(GetEntries(builder, configuration));
+                database.AddRange(GetEntries(builder, configuration, format));
             }
 
             WriteGeneratedFile(builder, solution.GetType(), path, database, generatedFiles, skipFiles);
         }
 
-        private void WriteGeneratedFile(Builder builder, Type type, string path, IEnumerable<IDictionary<string, string>> database, List<string> generatedFiles, List<string> skipFiles)
+        private void WriteGeneratedFile(Builder builder, Type type, string path, IEnumerable<IDictionary<string, object>> database, List<string> generatedFiles, List<string> skipFiles)
         {
             var file = new FileInfo(Path.Combine(path, FileName));
 
@@ -61,7 +72,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             }
         }
 
-        private IEnumerable<IDictionary<string, string>> GetEntries(Builder builder, Project.Configuration projectConfiguration)
+        private IEnumerable<IDictionary<string, object>> GetEntries(Builder builder, Project.Configuration projectConfiguration, CompileCommandFormat format)
         {
             var context = new CompileCommandGenerationContext(builder, projectConfiguration.Project, projectConfiguration);
             var resolverParams = new[] {
@@ -81,12 +92,25 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             foreach (var cc in database)
             {
                 CompileCommandGenerated?.Invoke(context, cc);
-                yield return new Dictionary<string, string>
+
+                if (format == CompileCommandFormat.Arguments)
                 {
-                    { "directory", cc.Directory },
-                    { "command", cc.Command },
-                    { "file", cc.File },
-                };
+                   yield return new Dictionary<string, object>
+                   {
+                       { "directory", cc.Directory },
+                       { "arguments", cc.Arguments },
+                       { "file", cc.File },
+                   };
+                }
+                else
+                {
+                    yield return new Dictionary<string, object>
+                    {
+                        { "directory", cc.Directory },
+                        { "command", cc.Command },
+                        { "file", cc.File },
+                    };
+                }
             }
         }
     }
@@ -96,6 +120,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         public string File { get; set; }
         public string Directory { get; set; }
         public string Command { get; set; }
+        public List<string> Arguments { get; set; }
     }
 
     internal class CompileCommandFactory
@@ -157,7 +182,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         private string _precompFile;
         private string _usePrecompArgument;
         private string _createPrecompArgument;
-        private string _arguments;
+        private List<string> _arguments = new List<string>();
 
         public CompileCommandFactory(CompileCommandGenerationContext context)
         {
@@ -172,9 +197,8 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             _flags = isClang ? s_clangFlags : s_vcFlags;
 
             s_optionGenerator.GenerateOptions(context, ProjectOptionGenerationLevel.Compiler);
-            var argsList = new List<string>();
 
-            argsList.Add(isClang ? "-c" : "/c");
+            _arguments.Add(isClang ? "-c" : "/c");
 
             // Precomp arguments flags are actually written by the bff generator (see bff.template.cs)
             // Therefore, the CommandLineOptions entries only contain the pch name and file.
@@ -185,7 +209,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
                 string name;
                 if (_flags.ContainsKey(CompilerFlags.PrecompPath))
                 {
-                    argsList.Add(string.Format(_flags[CompilerFlags.PrecompPath], _precompFile));
+                    _arguments.Add(string.Format(_flags[CompilerFlags.PrecompPath], _precompFile));
                     name = context.Options[PrecompNameKey];
                 }
                 else
@@ -200,8 +224,6 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             // AdditionalCompilerOptions are referenced from Options in the bff template.
             context.CommandLineOptions.Add(AdditionalOptionsKey, context.Options[AdditionalOptionsKey]);
 
-            FillIncludeDirectoriesOptions(context);
-
             var validOptions = context.CommandLineOptions
                 .Where(IsValidOption)
                 .ToDictionary(kvp => kvp.Key, FlattenMultilineArgument);
@@ -211,12 +233,12 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
                 // Required to avoid errors in VC headers.
                 var flag = isClang ? "-D" : "/D";
                 var value = validOptions.ContainsKey("ExceptionHandling") ? 1 : 0;
-                argsList.Add($"{flag}_HAS_EXCEPTIONS={value}");
+                _arguments.Add($"{flag}_HAS_EXCEPTIONS={value}");
             }
 
-            argsList.AddRange(validOptions.Values);
+            _arguments.AddRange(validOptions.Values.SelectMany(x => x));
 
-            _arguments = string.Join(" ", argsList);
+            FillIncludeDirectoriesOptions(context);
         }
 
         private bool IsValidOption(KeyValuePair<string, string> option)
@@ -296,15 +318,20 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         // ProjectOptionsGenerator will generate format some arguments
         // (includes, defines, manifests...) specifically for the bff template.
         // The string is split on multiple lines and concatenated ('foo'\r\n + 'bar')
-        private string FlattenMultilineArgument(KeyValuePair<string, string> kvp)
+        private IList<string> FlattenMultilineArgument(KeyValuePair<string, string> kvp)
         {
             if (!s_multilineArgumentKeys.Contains(kvp.Key))
-                return kvp.Value;
+            {
+                var parts = kvp.Value.Split(' ');
+                return parts.ToList();
+            }
+            else
+            {
+                var parts = kvp.Value.Split('\r', '\n')
+                    .Select(s => s.Trim(' ', '\t', '\'', '+'));
 
-            var parts = kvp.Value.Split('\r', '\n')
-                .Select(s => s.Trim(' ', '\t', '\'', '+'));
-
-            return string.Join(" ", parts);
+                return parts.Where(s => s.Count() > 0).ToList();
+            }
         }
 
         // TODO: Consider sub-configurations (file specific)
@@ -351,13 +378,16 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             if (!string.IsNullOrEmpty(precompArgument))
                 args.Add(precompArgument);
 
-            var command = string.Join(" ", args) + " " + _arguments;
+            var command = string.Join(" ", args) + " " + string.Join(" ", _arguments);
+
+            args.AddRange(_arguments);
 
             return new CompileCommand
             {
                 File = inputFile,
                 Directory = _projectDirectory,
                 Command = command,
+                Arguments = args
             };
         }
     }
