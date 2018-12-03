@@ -47,7 +47,8 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
                 database.AddRange(GetEntries(builder, configuration, format));
             }
 
-            WriteGeneratedFile(builder, solution.GetType(), path, database, generatedFiles, skipFiles);
+            if (database.Count > 0)
+                WriteGeneratedFile(builder, solution.GetType(), path, database, generatedFiles, skipFiles);
         }
 
         private void WriteGeneratedFile(Builder builder, Type type, string path, IEnumerable<IDictionary<string, object>> database, List<string> generatedFiles, List<string> skipFiles)
