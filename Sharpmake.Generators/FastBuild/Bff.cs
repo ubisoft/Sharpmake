@@ -195,9 +195,7 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
                 {
-                    var unityTuple = GetDefaultTupleConfig();
-                    var confSubConfigs = confSourceFiles[conf];
-                    ConfigureUnities(context, confSubConfigs[unityTuple]);
+                    ConfigureUnities(context, confSourceFiles);
                 }
             }
 
@@ -1539,9 +1537,12 @@ namespace Sharpmake.Generators.FastBuild
             return null;
         }
 
-        private void ConfigureUnities(IGenerationContext context, List<Vcxproj.ProjectFile> sourceFiles)
+        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles )
         {
             var conf = context.Configuration;
+            var unityTuple = GetDefaultTupleConfig();
+            var confSubConfigs = confSourceFiles[conf];
+            var sourceFiles = confSubConfigs[unityTuple];
             var project = context.Project;
 
             // Only add unity build to non blobbed projects -> which they will be blobbed by FBuild
@@ -1564,22 +1565,31 @@ namespace Sharpmake.Generators.FastBuild
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude);
 
-            // Conditional statement depending on the blobbing strategy
-            if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Include)
-            {
-                List<string> items = new List<string>();
+            List<string> items = new List<string>();
 
-                foreach (var file in sourceFiles)
+            foreach (var file in sourceFiles)
+            {
+                // TODO: use SourceFileExtension array instead of ".cpp"
+                if ((string.Compare(file.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) == 0) &&
+                   (conf.PrecompSource == null || !file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase)) &&
+                   !conf.ResolvedSourceFilesBlobExclude.Contains(file.FileName))
                 {
-                    // TODO: use SourceFileExtension array instead of ".cpp"
-                    if ((string.Compare(file.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) == 0) &&
-                       (conf.PrecompSource == null || !file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase)) &&
-                       !conf.ResolvedSourceFilesBlobExclude.Contains(file.FileName))
-                    {
-                        string sourceFileRelative = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, file.FileName));
-                        items.Add(sourceFileRelative);
-                    }
+                    string sourceFileRelative = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, file.FileName));
+                    items.Add(sourceFileRelative);
+
+                    // stop here in case we are in exclude mode, as we only need to verify that the unity section has some files
+                    if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Exclude)
+                        break;
                 }
+            }
+
+            // Conditional statement depending on the blobbing strategy
+            if (items.Count == 0)
+            {
+                fastBuildUnityInputFiles = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Include)
+            {
                 fastBuildUnityInputFiles = UtilityMethods.FBuildFormatList(items, spaceLength);
             }
             else
@@ -1632,6 +1642,10 @@ namespace Sharpmake.Generators.FastBuild
             if (fastBuildUnityInputFiles == FileGeneratorUtilities.RemoveLineTag &&
                 fastBuildUnityPaths == FileGeneratorUtilities.RemoveLineTag)
             {
+                // completely drop the subconfig in case it was only a unity tuple, without any files
+                if (sourceFiles.Count == 0)
+                    confSubConfigs.Remove(unityTuple);
+
                 // no input path nor files => no unity
                 return;
             }
