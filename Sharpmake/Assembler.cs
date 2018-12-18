@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Microsoft.Build.Utilities;
 
 namespace Sharpmake
@@ -594,8 +595,7 @@ namespace Sharpmake
 
             while (s_nextTempFile < int.MaxValue)
             {
-                int currentTempFile = s_nextTempFile;
-                ++s_nextTempFile;
+                int currentTempFile = Interlocked.Increment(ref s_nextTempFile);
                 string tmpFile = Path.Combine(Path.GetTempPath(), tmpFilePrefix + currentTempFile + tmpFileSuffix);
                 if (!File.Exists(tmpFile) || Util.TryDeleteFile(tmpFile))
                 {
