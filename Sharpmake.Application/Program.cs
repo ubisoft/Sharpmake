@@ -519,17 +519,17 @@ namespace Sharpmake.Application
             if (parameters.ProfileOutput)
                 builder.EventOutputProfile += LogWrite;
 
-            // Generate debug solution
-            if (generateDebugSolution)
-            {
-                DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments);
-                builder.BuildProjectAndSolution();
-                return builder;
-            }
-
-            // Load user input (either files or pre-built assemblies)
             try
             {
+                // Generate debug solution
+                if (generateDebugSolution)
+                {
+                    DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments);
+                    builder.BuildProjectAndSolution();
+                    return builder;
+                }
+
+                // Load user input (either files or pre-built assemblies)
                 switch (parameters.Input)
                 {
                     case Argument.InputType.File:
