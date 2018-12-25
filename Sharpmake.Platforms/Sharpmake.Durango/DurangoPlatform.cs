@@ -262,15 +262,23 @@ namespace Sharpmake
                     options["LibraryWPath"] = "$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath);";
                 }
 
-                //Options.Vc.General.DeployMode.     
+                //Options.Vc.General.DeployMode.
                 //    Push                                  DeployMode="Push"
-                //    Pull                                  DeployMode="Pull"                          
-                //    External                              DeployMode="External"                          
+                //    Pull                                  DeployMode="Pull"
+                //    External                              DeployMode="External"
+                context.Options["NetworkSharePath"] = FileGeneratorUtilities.RemoveLineTag;
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.DeployMode.Push, () => { context.Options["DeployMode"] = FileGeneratorUtilities.RemoveLineTag; }),
                     Sharpmake.Options.Option(Options.General.DeployMode.Pull, () => { context.Options["DeployMode"] = "Pull"; }),
-                    Sharpmake.Options.Option(Options.General.DeployMode.External, () => { context.Options["DeployMode"] = "External"; })
+                    Sharpmake.Options.Option(Options.General.DeployMode.External, () => { context.Options["DeployMode"] = "External"; }),
+                    Sharpmake.Options.Option(Options.General.DeployMode.RegisterNetworkShare, () =>
+                    {
+                        context.Options["DeployMode"] = "RegisterNetworkShare";
+                        string networkSharePath = Sharpmake.Options.PathOption.Get<Durango.Options.General.NetworkSharePath>(context.Configuration, null);
+                        if (networkSharePath != null)
+                            context.Options["NetworkSharePath"] = Sharpmake.Util.PathGetRelative(context.ProjectDirectoryCapitalized, networkSharePath, true);
+                    })
                 );
             }
 

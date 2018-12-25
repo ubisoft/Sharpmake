@@ -31,7 +31,15 @@ namespace Sharpmake
                     [Default]
                     Push,
                     Pull,
+                    RegisterNetworkShare,
                     External,
+                }
+
+                public class NetworkSharePath : PathOption
+                {
+                    public NetworkSharePath(string networkSharePath)
+                        : base(networkSharePath)
+                    { }
                 }
             }
         }

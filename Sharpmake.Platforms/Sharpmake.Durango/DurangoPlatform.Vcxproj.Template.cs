@@ -185,6 +185,7 @@ namespace Sharpmake
     <LayoutDir>[options.LayoutDir]</LayoutDir>
     <PullMappingFile>[options.PullMappingFile]</PullMappingFile>
     <DeployMode>[options.DeployMode]</DeployMode>
+    <NetworkSharePath>[options.NetworkSharePath]</NetworkSharePath>
     <PullTemporaryFolder>[options.PullTemporaryFolder]</PullTemporaryFolder>
     <LayoutExtensionFilter>[options.LayoutExtensionFilter]</LayoutExtensionFilter>
   </PropertyGroup>
@@ -198,6 +199,7 @@ namespace Sharpmake
         <LayoutDir>[options.LayoutDir]</LayoutDir>
         <PullMappingFile>[options.PullMappingFile]</PullMappingFile>
         <DeployMode>[options.DeployMode]</DeployMode>
+        <NetworkSharePath>[options.NetworkSharePath]</NetworkSharePath>
         <LayoutExtensionFilter>[options.LayoutExtensionFilter]</LayoutExtensionFilter>
   </PropertyGroup>
       <PropertyGroup>
