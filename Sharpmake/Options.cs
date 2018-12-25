@@ -52,6 +52,15 @@ namespace Sharpmake
             public string Value { get; }
         }
 
+        /// <summary>
+        /// Used to hold an option that's a path, either to a file or directory
+        /// </summary>
+        public abstract class PathOption : StringOption
+        {
+            protected PathOption(string path)
+                : base(path) { }
+        }
+
         public abstract class IntOption
         {
             public static string Get<T>(Project.Configuration conf)
