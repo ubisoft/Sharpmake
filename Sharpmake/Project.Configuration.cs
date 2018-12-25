@@ -1268,6 +1268,16 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SourceRootPath, ref CustomBuildSettings.OutputFile);
                 }
 
+                foreach (var option in Options)
+                {
+                    var pathOption = option as Options.PathOption;
+                    if (pathOption != null)
+                    {
+                        pathOption.Path = resolver.Resolve(pathOption.Path);
+                        Util.ResolvePath(Project.SourceRootPath, ref pathOption.Path);
+                    }
+                }
+
                 foreach (var eventDictionary in new[]{
                     EventPreBuildExecute,
                     EventCustomPrebuildExecute,

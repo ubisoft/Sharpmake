@@ -53,12 +53,26 @@ namespace Sharpmake
         }
 
         /// <summary>
-        /// Used to hold an option that's a path, either to a file or directory
+        /// Used to hold an option that's a path, either to a file or directory, that's gonna be resolved
         /// </summary>
-        public abstract class PathOption : StringOption
+        public abstract class PathOption
         {
+            public static string Get<T>(Project.Configuration conf, string fallback = RemoveLineTag)
+                where T : PathOption
+            {
+                var option = Options.GetObject<T>(conf);
+                if (option == null)
+                    return fallback;
+
+                return option.Path;
+            }
+
             protected PathOption(string path)
-                : base(path) { }
+            {
+                Path = path;
+            }
+
+            public string Path;
         }
 
         public abstract class IntOption
