@@ -229,11 +229,12 @@ namespace Sharpmake.Application
                                 List<BuildContext.RegressionTest.OutputInfo> fileChanges = regressions.Where(x => x.FileStatus == BuildContext.RegressionTest.FileStatus.Different).ToList();
                                 LogFileChanges(fileChanges);
 
-                                var fileMissing = regressions.Where(x => x.FileStatus == BuildContext.RegressionTest.FileStatus.NotGenerated).ToList();
+                                var fileMissing = regressions.Where(x => x.FileStatus == BuildContext.RegressionTest.FileStatus.NotGenerated).Select(x => x.ReferencePath).ToList();
                                 if (fileMissing.Count > 0)
                                 {
+                                    fileMissing.Sort();
                                     DebugWriteLine($"  {fileMissing.Count} files are missing from the output:");
-                                    fileMissing.ForEach(x => DebugWriteLine($"    {x.ReferencePath}"));
+                                    fileMissing.ForEach(x => DebugWriteLine($"    {x}"));
                                 }
                             }
                         }
