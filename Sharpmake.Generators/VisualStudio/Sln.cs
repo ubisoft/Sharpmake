@@ -17,6 +17,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace Sharpmake.Generators.VisualStudio
 {
@@ -178,6 +179,7 @@ namespace Sharpmake.Generators.VisualStudio
             return guid;
         }
 
+        [DebuggerDisplay("{Path} - {Guid}")]
         private class SolutionFolder
         {
             public string Name;
@@ -294,7 +296,17 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // Write all needed folders before the projects to make sure the proper startup project is selected.
-            _solutionFolders.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.InvariantCultureIgnoreCase)); // Ensure folders are always in the same order to avoid random shuffles
+
+            // Ensure folders are always in the same order to avoid random shuffles
+            _solutionFolders.Sort((a, b) =>
+            {
+                int nameComparison = string.Compare(a.Name, b.Name, StringComparison.InvariantCultureIgnoreCase);
+                if (nameComparison != 0)
+                    return nameComparison;
+
+                return a.Guid.CompareTo(b.Guid);
+            });
+
             foreach (SolutionFolder folder in _solutionFolders)
             {
                 using (fileGenerator.Declare("folderName", folder.Name))
