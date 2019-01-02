@@ -1537,7 +1537,7 @@ namespace Sharpmake.Generators.FastBuild
             return null;
         }
 
-        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles )
+        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles)
         {
             var conf = context.Configuration;
             var unityTuple = GetDefaultTupleConfig();
