@@ -203,10 +203,12 @@ namespace Sharpmake
             return s_visualStudioDirOverrides.ContainsKey(visualVersion);
         }
 
-        private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioDirectories = new ConcurrentDictionary<DevEnv, string>();
-        public static string GetVisualStudioDir(this DevEnv visualVersion)
+        private static readonly ConcurrentDictionary<Tuple<DevEnv, bool>, string> s_visualStudioDirectories = new ConcurrentDictionary<Tuple<DevEnv, bool>, string>();
+        public static string GetVisualStudioDir(this DevEnv visualVersion, bool ignoreVisualStudioPathOverride = false)
         {
-            string visualStudioDirectory = s_visualStudioDirectories.GetOrAdd(visualVersion, devEnv =>
+            // TODO: Replace Tuple with ValueTuple once we support C# 8 because ValueTuple is
+            //       allocated on the stack. That should be faster here.
+            string visualStudioDirectory = s_visualStudioDirectories.GetOrAdd(Tuple.Create(visualVersion, ignoreVisualStudioPathOverride), devEnv =>
             {
                 // First check if the visual studio path is overriden from default value.
                 string pathOverride;
