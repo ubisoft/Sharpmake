@@ -14,9 +14,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Sharpmake
@@ -580,13 +580,13 @@ namespace Sharpmake
 
         internal Strings GetConfigurationsNoBlobSourceFiles(Strings sourceFiles)
         {
-            System.Diagnostics.Trace.Assert(_blobPathContents.Count == 0);
+            Trace.Assert(_blobPathContents.Count == 0);
 
             Strings precompSource = new Strings();              // full path
             Strings noBlobbebSourceFiles = new Strings();       // partial path
 
             if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Blobbing, sourceFiles))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
 
             // Add all precomp files
             foreach (Configuration conf in Configurations)
@@ -603,9 +603,9 @@ namespace Sharpmake
                 if (!_blobPathContents.TryGetValue(blobPath, out content))
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Blobbing, conf.ResolvedSourceFilesBuildExclude, conf))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Blobbing, conf.ResolvedSourceFilesBlobExclude, conf))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                     string workBlobHeader = conf.BlobWorkFileHeader ?? DefaultBlobWorkFileHeader;
                     string workBlobFooter = conf.BlobWorkFileFooter ?? DefaultBlobWorkFileFooter;
                     content = new BlobPathContent(conf.ResolvedSourceFilesBuildExclude, conf.ResolvedSourceFilesBlobExclude, workBlobHeader, workBlobFooter);
@@ -614,9 +614,9 @@ namespace Sharpmake
                 else
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Blobbing, conf.ResolvedSourceFilesBuildExclude, conf))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Blobbing, conf.ResolvedSourceFilesBlobExclude, conf))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                     content.RegisterExclusion(conf.ResolvedSourceFilesBuildExclude, conf.ResolvedSourceFilesBlobExclude);
                 }
                 content.Configurations.Add(conf);
@@ -634,7 +634,7 @@ namespace Sharpmake
             foreach (string sourceFile in sourceFiles)
             {
                 if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Blobbing, sourceFile))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 foreach (string precompSourceFile in precompSource)
                 {
@@ -691,7 +691,7 @@ namespace Sharpmake
             }
 
             if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, SourceFilesBuildExclude))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             ResolvedSourceFilesBuildExclude.AddRange(SourceFilesBuildExclude);
 
             // Only scan directory for files if needed
@@ -708,7 +708,7 @@ namespace Sharpmake
                 if (SourceFilesIncludeRegex.Count != 0)
                 {
                     if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, files), files, ref SourceFiles, sourceFilesIncludeRegex))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                 }
 
                 // Additional source directories if any
@@ -722,7 +722,7 @@ namespace Sharpmake
                     if (SourceFilesIncludeRegex.Count != 0)
                     {
                         if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, additionalFiles), additionalFiles, ref SourceFiles, sourceFilesIncludeRegex))
-                            System.Diagnostics.Debugger.Break();
+                            Debugger.Break();
                     }
 
                     AddMatchExtensionFiles(additionalFiles, ref PRIFiles, PRIFilesExtensions);
@@ -737,7 +737,7 @@ namespace Sharpmake
                     SourceFiles = new Strings();
 
                     if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, allSourceFile), allSourceFile, ref SourceFiles, sourceFilesFiltersRegex))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                 }
 
                 Util.ResolvePath(SourceRootPath, ref SourceFiles);
@@ -788,11 +788,11 @@ namespace Sharpmake
 
             // Remove file that match SourceFilesExcludeRegex
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, SourceFiles), SourceFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, ResourceFiles), ResourceFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, NatvisFiles), NatvisFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
 
             // Remove exclude file
             foreach (string excludeSourceFile in SourceFilesExclude)
@@ -819,70 +819,70 @@ namespace Sharpmake
 
                 // add SourceFilesBuildExclude from the project
                 if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, ResolvedSourceFilesBuildExclude))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
                 conf.ResolvedSourceFilesBuildExclude.AddRange(ResolvedSourceFilesBuildExclude);
                 if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, conf.SourceFilesBuildExclude))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
                 conf.ResolvedSourceFilesBuildExclude.AddRange(conf.SourceFilesBuildExclude);
                 var configSourceFilesBuildExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesBuildExcludeRegex);
 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesBuildExclude, configSourceFilesBuildExcludeRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 if (SourceFilesBuildExcludeRegex.Count > 0)
                 {
                     if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesBuildExclude, sourceFilesBuildExcludeRegex) &&
                         DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                 }
 
                 // Resolve files that will be built as C Files 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCOption, sourceFilesCompileAsCRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesCompileAsCRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCRegex);
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCOption, configSourceFilesCompileAsCRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCOption);
 
                 // Resolve files that will be built as CPP Files 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCPPOption, sourceFilesCompileAsCPPRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesCompileAsCPPRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCPPRegex);
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCPPOption, configSourceFilesCompileAsCPPRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCPPOption);
 
                 // Resolve files that will be built as CLR Files 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCLROption, sourceFilesCompileAsCLRRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesCompileAsCLRRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRRegex);
 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCLROption, configSourceFilesCompileAsCLRRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 // Remove file that match SourceFilesCompileAsCLRExcludeRegex
                 var compileAsClrFilesExclude = new Strings();
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref compileAsClrFilesExclude, sourceFilesCompileAsCLRExcludeRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesCompileAsCLRExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRExcludeRegex);
 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref compileAsClrFilesExclude, configSourceFilesCompileAsCLRExcludeRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 foreach (var excludeSourceFile in compileAsClrFilesExclude)
                 {
@@ -895,7 +895,7 @@ namespace Sharpmake
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles,
                     ref conf.ResolvedSourceFilesWithCompileAsNonCLROption, sourceFilesCompileAsNonCLRRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesCompileAsNonCLRRegex =
                     RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsNonCLRRegex);
@@ -903,31 +903,31 @@ namespace Sharpmake
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles,
                     ref conf.ResolvedSourceFilesWithCompileAsNonCLROption, configSourceFilesCompileAsNonCLRRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsNonCLROption);
 
                 // Resolve files that will be built as WinRT Files 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsWinRTOption, sourceFilesCompileAsWinRTRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesCompileAsWinRTRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsWinRTRegex);
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsWinRTOption, configSourceFilesCompileAsWinRTRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsWinRTOption);
 
                 // Resolve files that will not be built as WinRT Files 
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithExcludeAsWinRTOption, sourceFilesExcludeAsWinRTRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 var configSourceFilesExcludeAsWinRTRegex = RegexCache.GetCachedRegexes(conf.SourceFilesExcludeAsWinRTRegex);
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithExcludeAsWinRTOption, configSourceFilesExcludeAsWinRTRegex) &&
                     DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithExcludeAsWinRTOption);
 
@@ -962,7 +962,7 @@ namespace Sharpmake
 
                 // Exclude from blob all files that match any SourceFilesBlobExcludeRegex.
                 if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref SourceFilesBlobExclude, sourceFilesBlobExcludeRegex))
-                    System.Diagnostics.Debugger.Break();
+                    Debugger.Break();
 
                 foreach (var conf in Configurations)
                     conf.ResolvedSourceFilesBlobExclude.AddRange(SourceFilesBlobExclude);
@@ -970,7 +970,7 @@ namespace Sharpmake
                 foreach (string sourceFile in ResolvedSourceFiles)
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.BlobbingResolving, sourceFile))
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
                     string sourceFileExtension = Path.GetExtension(sourceFile);
 
                     if (SourceFilesCompileExtensions.Contains(sourceFileExtension))
@@ -2161,11 +2161,11 @@ namespace Sharpmake
 
             AddMatchExtensionFiles(sourceFiles, ref ResolvedNoneFullFileNames, NoneExtensions);
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, ResolvedNoneFullFileNames), ResolvedNoneFullFileNames, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             AddMatchExtensionFiles(sourceFiles, ref ResolvedContentFullFileNames, ContentExtension);
             AddMatchExtensionFiles(sourceFiles, ref VsctCompileFiles, VsctExtension);
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, VsctCompileFiles), VsctCompileFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
 
             if ((ResolvedResourcesFullFileNames.Count + ResolvedContentFullFileNames.Count + ResolvedNoneFullFileNames.Count) == 0)
                 return;
