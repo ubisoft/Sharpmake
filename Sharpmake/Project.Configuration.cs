@@ -1900,7 +1900,9 @@ namespace Sharpmake
                                 if (dependencySetting.HasFlag(DependencySetting.AdditionalUsingDirectories))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
-                                if ((Output == OutputType.Exe || ExecuteTargetCopy) && dependency.TargetPath != TargetPath)
+                                if ((Output == OutputType.Exe || ExecuteTargetCopy)
+                                    && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
+                                    && dependency.TargetPath != TargetPath)
                                 {
                                     // If using OnlyBuildOrder, ExecuteTargetCopy must be set to enable the copy.
                                     if (dependencySetting != DependencySetting.OnlyBuildOrder || ExecuteTargetCopy)
