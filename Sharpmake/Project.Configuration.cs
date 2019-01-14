@@ -1341,7 +1341,8 @@ namespace Sharpmake
             {
                 AddPublicDependency(target, typeof(TPROJECT), dependencySetting, sourceFilePath, sourceLineNumber);
             }
-            public void AddPublicDependency(
+
+            public virtual void AddPublicDependency(
                 ITarget target,
                 Type projectType,
                 DependencySetting dependencySetting = DependencySetting.Default,
@@ -1391,7 +1392,8 @@ namespace Sharpmake
             {
                 AddPrivateDependency(target, typeof(TPROJECT), dependencySetting, sourceFilePath, sourceLineNumber);
             }
-            public void AddPrivateDependency(
+
+            public virtual void AddPrivateDependency(
                 ITarget target,
                 Type projectType,
                 DependencySetting dependencySetting = DependencySetting.Default,
