@@ -129,7 +129,8 @@ namespace Sharpmake
         public bool BlobOnly = false;
         public bool Diagnostics = false;
         private ThreadPool _tasks;
-        private readonly List<Assembly> _builtAssemblies = new List<Assembly>(); // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
+        // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
+        private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
         private readonly Dictionary<string, string> _references = new Dictionary<string, string>(); // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
 
         public BuildContext.BaseBuildContext Context { get; private set; }
@@ -425,7 +426,7 @@ namespace Sharpmake
             }
 
             if (newAssemblyInfo.Assembly != null)
-                _builtAssemblies.Add(newAssemblyInfo.Assembly);
+                _builtAssemblies[newAssemblyInfo.Assembly.FullName] = newAssemblyInfo.Assembly;
             return newAssemblyInfo;
         }
 
@@ -443,7 +444,8 @@ namespace Sharpmake
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             // Check if this is a built assembly of .sharpmake.cs files that is requested to be loaded
-            var builtAssembly = _builtAssemblies.FirstOrDefault(assembly => assembly.FullName == args.Name);
+            Assembly builtAssembly = null;
+            _builtAssemblies.TryGetValue(args.Name, out builtAssembly);
             if (builtAssembly != null)
                 return builtAssembly;
 
