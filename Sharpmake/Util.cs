@@ -662,7 +662,8 @@ namespace Sharpmake
                 }
                 else
                 {
-                    pathBuilder.Append(dirInfo.Name);
+                    // Make root drive always uppercase
+                    pathBuilder.Append(dirInfo.Name.ToUpper());
                 }
             }
             s_capitalizedPaths.TryAdd(lowerPath, pathBuilder.ToString());
