@@ -901,7 +901,8 @@ namespace Sharpmake
                         {
                             // Read the list of files.
                             IFormatter formatter = new BinaryFormatter();
-                            dbFiles = (Dictionary<string, DateTime>)formatter.Deserialize(readStream);
+                            var tmpDbFiles = (Dictionary<string, DateTime>)formatter.Deserialize(readStream);
+                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
                         }
                         else if (version == 1)
                         {
@@ -977,7 +978,7 @@ namespace Sharpmake
                     alternateDatabases.Add(alternateDBFiles);
             }
 
-            Dictionary<string, DateTime> newDbFiles = new Dictionary<string, DateTime>(s_writtenFiles);
+            Dictionary<string, DateTime> newDbFiles = new Dictionary<string, DateTime>(s_writtenFiles, StringComparer.InvariantCultureIgnoreCase);
 
             if (dbFiles != null)
             {
