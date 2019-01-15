@@ -315,10 +315,8 @@ namespace Sharpmake
                         string kitsRoot10Path = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
                         string platformVersion = windowsTargetPlatformVersion.ToVersionString();
 
-                        // Use WindowsSdkVerBinPath (the version specific folder), if it exists
-                        string candidateWindowsSdkVerBinPath = Path.Combine(kitsRoot10Path, "bin", platformVersion, targetPlatform);
-                        if (Util.DirectoryExists(candidateWindowsSdkVerBinPath))
-                            paths.Add(candidateWindowsSdkVerBinPath);
+                        if (windowsTargetPlatformVersion >= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0)
+                            paths.Add(Path.Combine(kitsRoot10Path, "bin", platformVersion, targetPlatform));
                         else
                             paths.Add(Path.Combine(kitsRoot10Path, "bin", targetPlatform));
 
