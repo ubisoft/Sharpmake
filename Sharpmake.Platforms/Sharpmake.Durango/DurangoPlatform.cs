@@ -289,7 +289,7 @@ namespace Sharpmake
                         context.Options["DeployMode"] = "RegisterNetworkShare";
                         string networkSharePath = Sharpmake.Options.PathOption.Get<Durango.Options.General.NetworkSharePath>(context.Configuration, null);
                         if (networkSharePath != null)
-                            context.Options["NetworkSharePath"] = Sharpmake.Util.PathGetRelative(context.ProjectDirectoryCapitalized, networkSharePath, true);
+                            context.Options["NetworkSharePath"] = "$(ProjectDir)" + Sharpmake.Util.PathGetRelative(context.ProjectDirectoryCapitalized, networkSharePath, true);
                     })
                 );
             }
