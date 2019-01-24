@@ -107,43 +107,67 @@ namespace Sharpmake
         {
         }
 
+        private IEnumerable<string> EnumerateReferencePathCandidates(FileInfo sourceFilePath, string reference)
+        {
+            // Try with the full path
+            if (Path.IsPathRooted(reference))
+                yield return reference;
+
+            // Try relative from the sharpmake file
+            yield return Util.PathGetAbsolute(sourceFilePath.DirectoryName, reference);
+
+            // Try next to the Sharpmake binary
+            string pathToBinary = System.Reflection.Assembly.GetEntryAssembly()?.Location;
+            if (!string.IsNullOrEmpty(pathToBinary))
+                yield return Util.PathGetAbsolute(Path.GetDirectoryName(pathToBinary), reference);
+
+            // In some cases, the main module is not the current binary, so try it if so
+            string mainModule = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            if (!string.IsNullOrEmpty(mainModule) && pathToBinary != mainModule)
+                yield return Util.PathGetAbsolute(Path.GetDirectoryName(mainModule), reference);
+
+            // Try in the current working directory
+            yield return Util.PathGetAbsolute(Directory.GetCurrentDirectory(), reference);
+
+            // Try using .net framework locations
+            foreach (string frameworkDirectory in Assembler.EnumeratePathToDotNetFramework())
+                yield return Path.Combine(Path.Combine(frameworkDirectory, reference));
+        }
+
         public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
         {
-            string referenceFilename = parameters[0];
-            string referenceAbsolutePath = Path.IsPathRooted(referenceFilename) ? referenceFilename : null;
+            string reference = parameters[0];
 
-            if (Util.IsPathWithWildcards(referenceFilename))
+            if (Util.IsPathWithWildcards(reference))
             {
-                referenceAbsolutePath = referenceAbsolutePath ?? Path.Combine(sourceFilePath.DirectoryName, referenceFilename);
+                string referenceAbsolutePath = Path.IsPathRooted(reference) ? reference : null;
+                referenceAbsolutePath = referenceAbsolutePath ?? Path.Combine(sourceFilePath.DirectoryName, reference);
                 context.AddReferences(Util.DirectoryGetFilesWithWildcards(referenceAbsolutePath));
             }
             else
             {
-                referenceAbsolutePath = referenceAbsolutePath ?? Util.PathGetAbsolute(sourceFilePath.DirectoryName, referenceFilename);
-
-                // Try with the full path
-                if (!Util.FileExists(referenceAbsolutePath))
+                bool foundReference = false;
+                foreach (string candidateReferenceLocation in EnumerateReferencePathCandidates(sourceFilePath, reference))
                 {
-                    // Try next to the Sharpmake binary
-                    referenceAbsolutePath = Util.PathGetAbsolute(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location), referenceFilename);
-
-                    if (!File.Exists(referenceAbsolutePath))
+                    if (Util.FileExists(candidateReferenceLocation))
                     {
-                        // Try in the current working directory
-                        referenceAbsolutePath = Util.PathGetAbsolute(Directory.GetCurrentDirectory(), referenceFilename);
-
-                        if (!File.Exists(referenceAbsolutePath))
-                        {
-                            // Try using .net framework locations
-                            referenceAbsolutePath = Assembler.GetAssemblyDllPath(referenceFilename);
-
-                            if (referenceAbsolutePath == null)
-                                throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Reference file not found: {0}", referenceFilename);
-                        }
+                        context.AddReference(candidateReferenceLocation);
+                        foundReference = true;
+                        break;
                     }
                 }
 
-                context.AddReference(referenceAbsolutePath);
+                if (!foundReference)
+                {
+                    throw new Error(
+                        "\t{0}({1}): error: Sharpmake.Reference file not found: {2}{3}Those paths were evaluated as candidates:{3}  - {4}",
+                        sourceFilePath.FullName,
+                        lineNumber,
+                        reference,
+                        Environment.NewLine,
+                        string.Join(Environment.NewLine + "  - ", EnumerateReferencePathCandidates(sourceFilePath, reference))
+                    );
+                }
             }
         }
     }

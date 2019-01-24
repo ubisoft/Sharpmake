@@ -573,17 +573,23 @@ namespace Sharpmake
             }
         }
 
-        public static string GetAssemblyDllPath(string fileName)
+        public static IEnumerable<string> EnumeratePathToDotNetFramework()
         {
             for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
             {
                 string frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
                 if (frameworkDirectory != null)
-                {
-                    string result = Path.Combine(frameworkDirectory, fileName);
-                    if (File.Exists(result))
-                        return result;
-                }
+                    yield return frameworkDirectory;
+            }
+        }
+
+        public static string GetAssemblyDllPath(string fileName)
+        {
+            foreach (string frameworkDirectory in EnumeratePathToDotNetFramework())
+            {
+                string result = Path.Combine(frameworkDirectory, fileName);
+                if (File.Exists(result))
+                    return result;
             }
             return null;
         }
