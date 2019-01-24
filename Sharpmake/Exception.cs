@@ -16,6 +16,7 @@ using System.Runtime.Serialization;
 
 namespace Sharpmake
 {
+    [Serializable]
     public class Error : Exception
     {
         public Error()
