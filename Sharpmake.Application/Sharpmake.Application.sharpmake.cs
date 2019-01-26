@@ -22,6 +22,8 @@ namespace SharpmakeGen
 
             conf.Output = Configuration.OutputType.DotNetConsoleApp;
 
+            conf.Options.Add(Options.CSharp.AutoGenerateBindingRedirects.Enabled);
+
             conf.ReferencesByName.Add("System.Windows.Forms");
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
