@@ -1055,12 +1055,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.PlatformToolset.v140_xp, () => { context.Options["PlatformToolset"] = "v140_xp"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141, () => { context.Options["PlatformToolset"] = "v141"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141_xp, () => { context.Options["PlatformToolset"] = "v141_xp"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012, () => { context.Options["PlatformToolset"] = "LLVM-vs2012"; context.Options["TrackFileAccess"] = "false"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012_xp, () => { context.Options["PlatformToolset"] = "LLVM-vs2012_xp"; context.Options["TrackFileAccess"] = "false"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2013, () => { context.Options["PlatformToolset"] = "LLVM-vs2013"; context.Options["TrackFileAccess"] = "false"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2013_xp, () => { context.Options["PlatformToolset"] = "LLVM-vs2013_xp"; context.Options["TrackFileAccess"] = "false"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2014, () => { context.Options["PlatformToolset"] = "LLVM-vs2014"; context.Options["TrackFileAccess"] = "false"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2014_xp, () => { context.Options["PlatformToolset"] = "LLVM-vs2014_xp"; context.Options["TrackFileAccess"] = "false"; })
+                Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012, () => { context.Options["PlatformToolset"] = "LLVM-vs2012"; context.Options["TrackFileAccess"] = "false"; })
             );
             optionsContext.PlatformVcxproj.SetupPlatformToolsetOptions(context);
         }
