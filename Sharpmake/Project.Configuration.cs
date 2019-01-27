@@ -496,9 +496,9 @@ namespace Sharpmake
 
             /// <summary>
             /// Gets or sets whether dependent projects will copy their debugging database to the
-            /// target path of their dependency projects. The default value is <c>true</c>.
+            /// target path of their dependency projects. The default value is <c>false</c>.
             /// </summary>
-            public bool CopyCompilerPdbToDependentTargets = true;
+            public bool CopyCompilerPdbToDependentTargets = false;
 
             // Xcopy parameters
             // /d           Copy file only if the source time is newer than the destination time.
