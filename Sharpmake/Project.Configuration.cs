@@ -2679,11 +2679,11 @@ namespace Sharpmake
                     }
                 }
 
-                internal DependencySetting _dependencySetting;
-                internal bool _isImmediate;
-                internal bool _hasPublicPathToRoot;
-                internal bool _hasPublicPathToImmediate;
-                internal bool _goesThroughDLL;
+                internal readonly DependencySetting _dependencySetting;
+                internal readonly bool _isImmediate;
+                internal readonly bool _hasPublicPathToRoot;
+                internal readonly bool _hasPublicPathToImmediate;
+                internal readonly bool _goesThroughDLL;
             }
 
             internal void Link(Builder builder)
