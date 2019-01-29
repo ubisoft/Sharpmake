@@ -37,9 +37,10 @@ namespace Sharpmake
         /// </summary>
         /// <param name="sources"></param>
         /// <param name="arguments"></param>
-        public static void GenerateDebugSolution(string[] sources, Sharpmake.Arguments arguments)
+        /// <param name="startArguments"></param>
+        public static void GenerateDebugSolution(string[] sources, Sharpmake.Arguments arguments, string startArguments)
         {
-            FindAllSources(sources);
+            FindAllSources(sources, startArguments);
             arguments.Generate<DebugSolution>();
         }
 
@@ -54,10 +55,12 @@ namespace Sharpmake
             public readonly List<Type> ProjectReferences = new List<Type>();
 
             public bool IsSetupProject;
+
+            public string StartArguments;
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
-        private static void FindAllSources(string[] sourcesArguments)
+        private static void FindAllSources(string[] sourcesArguments, string startArguments)
         {
             MainSources = sourcesArguments;
             RootPath = Path.GetDirectoryName(sourcesArguments[0]);
@@ -66,10 +69,10 @@ namespace Sharpmake
             assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
             IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 
-            GenerateDebugProject(assemblyInfo, true, new Dictionary<string, Type>());
+            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>());
         }
 
-        private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, IDictionary<string, Type> visited)
+        private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, string startArguments, IDictionary<string, Type> visited)
         {
             string displayName = assemblyInfo.DebugProjectName;
             if (string.IsNullOrEmpty(displayName))
@@ -89,7 +92,8 @@ namespace Sharpmake
             {
                 ProjectFolder = RootPath,
                 IsSetupProject = isSetupProject,
-                DisplayName = displayName
+                DisplayName = displayName,
+                StartArguments = startArguments
             };
             generatedProject = CreateProject(displayName);
             DebugProjects.Add(generatedProject, project);
@@ -120,7 +124,7 @@ namespace Sharpmake
 
             foreach (var refInfo in assemblyInfo.SourceReferences.Values)
             {
-                project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, visited));
+                project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, string.Empty, visited));
             }
 
             visited[assemblyInfo.Id] = generatedProject;
@@ -226,12 +230,13 @@ namespace Sharpmake
         /// Set up debug configuration in user file
         /// </summary>
         /// <param name="conf"></param>
-        public static void SetupProjectOptions(this Project.Configuration conf)
+        /// <param name="startArguments"></param>
+        public static void SetupProjectOptions(this Project.Configuration conf, string startArguments)
         {
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
             string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
-            conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote})";
+            conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
             conf.CsprojUserFile.StartProgram = s_sharpmakeApplicationExePath;
         }
     }
@@ -309,7 +314,7 @@ namespace Sharpmake
             if (string.CompareOrdinal(conf.ProjectPath.ToLower(), RootPath.ToLower()) == 0
                 && _projectInfo.IsSetupProject)
             {
-                conf.SetupProjectOptions();
+                conf.SetupProjectOptions(_projectInfo.StartArguments);
             }
         }
     }
