@@ -1519,7 +1519,7 @@ namespace Sharpmake
                         {
                             if (!folder.StartsWith("$") && !includePathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
                             {
-                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Error: Folder contained in include paths doesn't exist: {folder}.", true);
+                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: Folder contained in include paths doesn't exist: {folder}.", true);
                             }
                         }
                     }
