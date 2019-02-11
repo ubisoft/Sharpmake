@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{49D4B01A-C2BD-2872-6865-E03AB44639E0}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>FastBuildFunctionalTest</RootNamespace>
+    <ProjectName>FastBuildFunctionalTest</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>output\win64\debug\</OutDir>
+    <IntDir>obj\win64\debug\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildFunctionalTest_Debug_win64 -vs -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_Debug_win64 -vs -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" >NUL 2>NUL
+del "obj\win64\debug\*.obj" >NUL 2>NUL
+del "obj\win64\debug\*.a" >NUL 2>NUL
+del "obj\win64\debug\*.lib" >NUL 2>NUL
+del "output\win64\debug\fastbuildfunctionaltest.exe" >NUL 2>NUL
+del "output\win64\debug\fastbuildfunctionaltest.elf" >NUL 2>NUL
+del "output\win64\debug\fastbuildfunctionaltest.exp" >NUL 2>NUL
+del "output\win64\debug\fastbuildfunctionaltest.ilk" >NUL 2>NUL
+del "output\win64\debug\fastbuildfunctionaltest.lib" >NUL 2>NUL
+del "output\win64\debug\fastbuildfunctionaltest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\win64\debug\fastbuildfunctionaltest.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <TargetFileName>fastbuildfunctionaltest.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>output\win64\release\</OutDir>
+    <IntDir>obj\win64\release\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildFunctionalTest_Release_win64 -vs -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_Release_win64 -vs -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" >NUL 2>NUL
+del "obj\win64\release\*.obj" >NUL 2>NUL
+del "obj\win64\release\*.a" >NUL 2>NUL
+del "obj\win64\release\*.lib" >NUL 2>NUL
+del "output\win64\release\fastbuildfunctionaltest.exe" >NUL 2>NUL
+del "output\win64\release\fastbuildfunctionaltest.elf" >NUL 2>NUL
+del "output\win64\release\fastbuildfunctionaltest.exp" >NUL 2>NUL
+del "output\win64\release\fastbuildfunctionaltest.ilk" >NUL 2>NUL
+del "output\win64\release\fastbuildfunctionaltest.lib" >NUL 2>NUL
+del "output\win64\release\fastbuildfunctionaltest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\win64\release\fastbuildfunctionaltest.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <TargetFileName>fastbuildfunctionaltest.exe</TargetFileName>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="fastbuildfunctionaltest_vs2017_win64.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -3,21 +3,23 @@
 :: main
 set ERRORLEVEL_BACKUP=0
 
-call :UpdateRef samples ConfigureOrder    main.sharpmake.cs              reference ConfigureOrder
+call :UpdateRef samples ConfigureOrder              main.sharpmake.cs                          reference         ConfigureOrder
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples CPPCLI            CLRTest.sharpmake.cs           reference CPPCLI
+call :UpdateRef samples CPPCLI                      CLRTest.sharpmake.cs                       reference         CPPCLI
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples CSharpHelloWorld  HelloWorld.sharpmake.cs        reference CSharpHelloWorld
+call :UpdateRef samples CSharpHelloWorld            HelloWorld.sharpmake.cs                    reference         CSharpHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples HelloWorld        HelloWorld.sharpmake.cs        reference HelloWorld
+call :UpdateRef samples HelloWorld                  HelloWorld.sharpmake.cs                    reference         HelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples CSharpVsix        CSharpVsix.sharpmake.cs        reference CSharpVsix
+call :UpdateRef samples CSharpVsix                  CSharpVsix.sharpmake.cs                    reference         CSharpVsix
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples CSharpWCF         CSharpWCF.sharpmake.cs         reference CSharpWCF\codebase
+call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF\codebase
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples PackageReferences PackageReferences.sharpmake.cs reference PackageReferences
+call :UpdateRef samples PackageReferences           PackageReferences.sharpmake.cs             reference         PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples QTFileCustomBuild QTFileCustomBuild.sharpmake.cs reference QTFileCustomBuild
+call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 @COLOR 2F

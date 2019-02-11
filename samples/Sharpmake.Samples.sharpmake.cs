@@ -86,6 +86,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class FastBuildSimpleExecutable : SampleProject
+    {
+        public FastBuildSimpleExecutable()
+        {
+            Name = "FastBuildSimpleExecutable";
+        }
+    }
+
+    [Generate]
     public class QTFileCustomBuildProject : SampleProject
     {
         public QTFileCustomBuildProject()

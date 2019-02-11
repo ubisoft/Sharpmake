@@ -1,0 +1,330 @@
+
+//=================================================================================================================
+// FastBuildFunctionalTest FASTBuild config file
+//=================================================================================================================
+#once
+
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+// ObjectList FastBuildFunctionalTest_Debug_win64_objects
+//=================================================================================================================
+ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '$CurrentBffPath$\obj\win64\debug\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd"$CurrentBffPath$\obj\win64\debug\fastbuildfunctionaltest_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '$CurrentBffPath$\..\codebase\main.cpp'
+
+}
+
+
+//=================================================================================================================
+// Executable FastBuildFunctionalTest_Debug_win64_Executable
+//=================================================================================================================
+Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '$CurrentBffPath$\obj\win64\debug\'
+    .Libraries              = { 
+                                'FastBuildFunctionalTest_Debug_win64_objects'
+                              }
+    .LinkerOutput           = '$CurrentBffPath$\output\win64\debug\fastbuildfunctionaltest.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:"$CurrentBffPath$\obj\win64\debug\fastbuildfunctionaltest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:"$CurrentBffPath$\output\win64\debug\fastbuildfunctionaltest.pdb"'
+                            + ' /MAP":$CurrentBffPath$\output\win64\debug\fastbuildfunctionaltest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE' 
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+                            + ' '
+}
+
+
+//=================================================================================================================
+// Alias FastBuildFunctionalTest_Debug_win64
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_Debug_win64' )
+{
+    .Targets = 'FastBuildFunctionalTest_Debug_win64_Executable'
+}
+
+
+//=================================================================================================================
+// ObjectList FastBuildFunctionalTest_Release_win64_objects
+//=================================================================================================================
+ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '$CurrentBffPath$\obj\win64\release\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd"$CurrentBffPath$\obj\win64\release\fastbuildfunctionaltest_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '$CurrentBffPath$\..\codebase\main.cpp'
+
+}
+
+
+//=================================================================================================================
+// Executable FastBuildFunctionalTest_Release_win64_Executable
+//=================================================================================================================
+Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '$CurrentBffPath$\obj\win64\release\'
+    .Libraries              = { 
+                                'FastBuildFunctionalTest_Release_win64_objects'
+                              }
+    .LinkerOutput           = '$CurrentBffPath$\output\win64\release\fastbuildfunctionaltest.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:"$CurrentBffPath$\obj\win64\release\fastbuildfunctionaltest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:"$CurrentBffPath$\output\win64\release\fastbuildfunctionaltest.pdb"'
+                            + ' /MAP":$CurrentBffPath$\output\win64\release\fastbuildfunctionaltest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE' 
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+                            + ' '
+}
+
+
+//=================================================================================================================
+// Alias FastBuildFunctionalTest_Release_win64
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_Release_win64' )
+{
+    .Targets = 'FastBuildFunctionalTest_Release_win64_Executable'
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////
