@@ -516,7 +516,7 @@ namespace Sharpmake.Generators.Generic
             options["LibraryPaths"] = libraryPaths.JoinStrings(" ");
 
             // Dependencies
-            var deps = new Strings();
+            var deps = new OrderableStrings();
             foreach (Project.Configuration depConf in conf.ResolvedDependencies)
             {
                 switch (depConf.Output)
@@ -525,16 +525,16 @@ namespace Sharpmake.Generators.Generic
                     case Project.Configuration.OutputType.Lib:
                     case Project.Configuration.OutputType.Dll:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
-                        deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)));
+                        deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
                         break;
                     default:
-                        deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)));
+                        deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
                         break;
                 }
             }
             var depsRelative = Util.PathGetRelative(projectFileInfo.DirectoryName, deps);
             PathMakeUnix(depsRelative);
-            options["LDDEPS"] = string.Join(" ", depsRelative);
+            options["LDDEPS"] = depsRelative.JoinStrings(" ");
 
             // LinkCommand
             if (conf.Output == Project.Configuration.OutputType.Lib)
