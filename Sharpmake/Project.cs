@@ -1401,7 +1401,7 @@ namespace Sharpmake
         {
             var expectedType = typeof(Project.Configuration);
             if (configurationType == null || (configurationType != expectedType && !configurationType.IsSubclassOf(expectedType)))
-                throw new InternalError("configuration type {0} must be a subclass of {1}", configurationType.FullName, expectedType.FullName);
+                throw new InternalError("configuration type '{0}' must be a subclass of '{1}'", configurationType?.FullName ?? "<null>", expectedType.FullName);
 
             ConfigurationType = configurationType;
 
