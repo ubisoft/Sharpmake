@@ -428,9 +428,15 @@ namespace Sharpmake
         {
             foreach (string file in sourceFiles.Values)
             {
-                string extension = Path.GetExtension(file);
-                if (extensions.Contains(extension))
-                    files.Add(file);
+                // Support composite extensions(such as .sharpmake.cs)
+                foreach (string matchExtension in extensions.Values)
+                {
+                    if (file.EndsWith(matchExtension, StringComparison.OrdinalIgnoreCase))
+                    {
+                        files.Add(file);
+                        break;
+                    }
+                }
             }
         }
 
