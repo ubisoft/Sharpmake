@@ -1927,8 +1927,8 @@ namespace Sharpmake.Generators.VisualStudio
                 itemGroups.Nones.Add(new ItemGroups.None { Include = file, LinkFolder = project.GetLinkFolder(file) });
 
                 // Removing from remainingSourceFiles because sometimes the file is in both list. Could happen for example if
-                // you want all .sharpmake.cs files as None files and SourceFilesExtensions contains .cs
-                // If you don't remove the file, it will be duplicated in the csproj in a <Compile> section and in a <None> section.
+                // NoneExtensions contains .sharpmake.cs and SourceFilesExtensions contains .cs
+                // If we don't remove the file, it will be duplicated in the csproj in a <Compile> section and in a <None> section.
                 remainingSourcesFiles.Remove(file);
             }
 
