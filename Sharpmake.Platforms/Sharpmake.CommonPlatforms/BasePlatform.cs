@@ -309,6 +309,7 @@ namespace Sharpmake
             includePaths.AddRange(context.Configuration.IncludePaths);
             includePaths.AddRange(context.Configuration.DependenciesIncludePaths);
 
+            includePaths.StableSort();
             return includePaths;
         }
 
