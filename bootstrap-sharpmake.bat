@@ -6,12 +6,19 @@ pushd "%~dp0"
 
 set SHARPMAKE_EXECUTABLE=bin\debug\Sharpmake.Application.exe
 
-if not defined VS140COMNTOOLS (
-    echo ERROR: Cannot determine the location of the VS Common Tools folder.
-    goto error
+if defined VS140COMNTOOLS (
+    call "%VS140COMNTOOLS%VsMSBuildCmd.bat"
+    goto buildcmdcalled
+)
+if defined VS150COMNTOOLS (
+    call "%VS150COMNTOOLS%VsMSBuildCmd.bat"
+    goto buildcmdcalled
 )
 
-call "%VS140COMNTOOLS%VsMSBuildCmd.bat"
+echo ERROR: Cannot determine the location of the VS Common Tools folder.
+goto error
+
+:buildcmdcalled
 if %errorlevel% NEQ 0 goto error
 
 call :NugetRestore Sharpmake/Sharpmake.csproj
