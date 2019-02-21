@@ -37,6 +37,7 @@ namespace SharpmakeGen
                         BuildSystem.FastBuild
                 ));
 
+                RootPath = @"[project.SharpmakeCsPath]\codebase";
                 SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
             }
 
