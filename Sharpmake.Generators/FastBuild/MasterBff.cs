@@ -530,12 +530,17 @@ namespace Sharpmake.Generators.FastBuild
 
             string cachePath = FileGeneratorUtilities.RemoveLineTag;
             string cachePluginDLL = FileGeneratorUtilities.RemoveLineTag;
+            string workerConnectionLimit = FileGeneratorUtilities.RemoveLineTag;
             if (FastBuildSettings.CachePath != null)
             {
                 cachePath = ".CachePath = '" + FastBuildSettings.CachePath + "'";
 
                 if (FastBuildSettings.CachePluginDLLFilePath != null)
                     cachePluginDLL = ".CachePluginDLL = '" + FastBuildSettings.CachePluginDLLFilePath + "'";
+            }
+            if (FastBuildSettings.FastBuildWorkerConnectionLimit >= 0)
+            {
+                workerConnectionLimit = ".WorkerConnectionLimit = " + FastBuildSettings.FastBuildWorkerConnectionLimit.ToString();
             }
 
             string fastBuildPATH = FileGeneratorUtilities.RemoveLineTag;
@@ -595,6 +600,7 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("fastBuildTempFolder", tempFolder))
             using (masterBffGenerator.Declare("CachePath", cachePath))
             using (masterBffGenerator.Declare("CachePluginDLL", cachePluginDLL))
+            using (masterBffGenerator.Declare("WorkerConnectionLimit", workerConnectionLimit))
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
             using (masterBffGenerator.Declare("fastBuildUserProfile", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
             using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))

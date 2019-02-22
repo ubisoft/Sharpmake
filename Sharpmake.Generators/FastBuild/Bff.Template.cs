@@ -69,6 +69,7 @@ Settings
 
     [CachePluginDLL]
     [CachePath]
+    [WorkerConnectionLimit]
 }
 ";
                 public static string MasmConfigNameSuffix = "Masm";

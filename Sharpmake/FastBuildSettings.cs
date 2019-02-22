@@ -85,6 +85,9 @@ namespace Sharpmake
         public static bool FastBuildMonitor = false;
         public static bool FastBuildFastCancel = false;
 
+        // Limit of distributed workers. In FastBuild code the default is 15
+        public static int FastBuildWorkerConnectionLimit = -1;
+
         // Configuration Files Generation Settings
 
         /// <summary>
