@@ -280,8 +280,30 @@ namespace Sharpmake.Generators.Generic
                 // Configurations variables.
                 foreach (Project.Configuration conf in configurations)
                 {
+                    string precompHeader = "";
+                    string precompHeaderOut = "";
+                    string precompIntermediate = "";
+                    string precompCommand = "";
+
+                    if (!string.IsNullOrEmpty(conf.PrecompHeader))
+                    {
+                        // Support pch files in sub folders
+                        var pchFile = PathMakeUnix(conf.PrecompHeader);
+                        // Don't make additional subfolder in temp directory
+                        var pchObj = Path.GetFileName(conf.PrecompHeader);
+                        var fileName = Path.Combine(Util.GetCapitalizedPath(project.SourceRootPath), pchFile);
+                        precompHeader = PathMakeUnix(Util.PathGetRelative(projectFileInfo.DirectoryName, fileName, true));
+                        precompHeaderOut = $"$(OBJDIR)/{pchObj}";
+                        precompIntermediate = $"$(OBJDIR)/{pchObj}.gch";
+                        precompCommand = "-include $(PCHOUT)";
+                    }
+
                     using (fileGenerator.Declare("name", conf.Name.ToLower()))
                     using (fileGenerator.Declare("options", options[conf]))
+                    using (fileGenerator.Declare("precompHeader", precompHeader))
+                    using (fileGenerator.Declare("precompHeaderOut", precompHeaderOut))
+                    using (fileGenerator.Declare("precompIntermediate", precompIntermediate))
+                    using (fileGenerator.Declare("precompCommand", precompCommand))
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationVariables);
                     }

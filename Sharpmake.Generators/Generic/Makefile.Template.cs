@@ -103,6 +103,10 @@ endif
   RESFLAGS  += $(DEFINES) $(INCLUDES)
   LDDEPS    += [options.LDDEPS]
   LINKCMD    = [options.LinkCommand]
+  PCH        = [precompHeader]
+  PCHOUT     = [precompHeaderOut]
+  GCH        = [precompIntermediate]
+  PCHCMD     = [precompCommand]
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -180,32 +184,35 @@ prelink:
 	$(PRELINKCMDS)
 
 ifneq (,$(PCH))
-$(GCH): $(PCH)
+$(GCH): $(PCH) | $(OBJDIR)
 	@echo $(notdir $<)
 	-$(SILENT) cp $< $(OBJDIR)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o ""$@"" -c ""$<""
+	$(SILENT) $(CXX) $(CXXFLAGS) -xc++-header -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 endif
 
 ";
 
                 public static readonly string ObjectRuleCxx =
-@"$(OBJDIR)/[objectFile]: [sourceFile] | $(OBJDIR)
+@"$(OBJDIR)/[objectFile]: [sourceFile] $(GCH) | $(OBJDIR)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o ""$@"" -c ""$<""
+	$(SILENT) $(CXX) $(CXXFLAGS) $(PCHCMD) -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 
 ";
 
                 public static readonly string ObjectRuleC =
-@"$(OBJDIR)/[objectFile]: [sourceFile] | $(OBJDIR)
+@"$(OBJDIR)/[objectFile]: [sourceFile] $(GCH) | $(OBJDIR)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX)  $(CFLAGS) -x c -o ""$@"" -c ""$<""
+	$(SILENT) $(CXX)  $(CFLAGS) $(PCHCMD) -x c -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 
 ";
 
-                public static string Footer = "-include $(OBJECTS:%.o=%.d)\n";
+                public static string Footer =
+@"-include $(OBJECTS:%.o=%.d)
+-include $(GCH:%.gch=%.d)
+";
             }
         }
     }
