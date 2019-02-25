@@ -41,7 +41,6 @@ namespace QTFileCustomBuild
 
         public QtSharpmakeMocTool()
         {
-            AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2012, "WIN32", "_MSC_VER=1700"));
             AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2015, "WIN32", "_MSC_VER=1900"));
             AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2017, "WIN32", "_MSC_VER=1910"));
         }

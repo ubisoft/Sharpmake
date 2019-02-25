@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CSharpVsix")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("CSharpVsix")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Copyright © Ubisoft 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

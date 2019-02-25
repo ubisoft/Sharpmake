@@ -13,7 +13,7 @@ namespace SimpleExeLibDependency
 
             AddTargets(new Target(
                 Platform.win64,
-                DevEnv.vs2013,
+                DevEnv.vs2017,
                 Optimization.Debug,
                 OutputType.Lib
             ));

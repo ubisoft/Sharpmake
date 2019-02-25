@@ -10,34 +10,15 @@ namespace CLR_SharpmakeTest
 {
     public static class Common
     {
-        // Splitting 2008 for Framework v4.0 since it is not supported
         public static Target[] CommonTarget = {
             new Target(
                 Platform.win32,
-                DevEnv.vs2010,
+                DevEnv.vs2015 | DevEnv.vs2017,
                 Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v3_5 | DotNetFramework.v4_0),
-
-            new Target(
-                Platform.win32,
-                DevEnv.vs2012,
-                Optimization.Debug | Optimization.Release,
-                OutputType.Dll,
-                Blob.NoBlob,
-                BuildSystem.MSBuild,
-                DotNetFramework.v3_5 | DotNetFramework.v4_0 | DotNetFramework.v4_5),
-
-            new Target(
-                Platform.win32,
-                DevEnv.vs2013,
-                Optimization.Debug | Optimization.Release,
-                OutputType.Dll,
-                Blob.NoBlob,
-                BuildSystem.MSBuild,
-                DotNetFramework.v3_5 | DotNetFramework.v4_0 | DotNetFramework.v4_5)};
+                DotNetFramework.v4_5 | DotNetFramework.v4_6_2)};
     }
 
     [Sharpmake.Generate]

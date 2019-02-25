@@ -8,25 +8,32 @@ namespace Common
         {
             switch (env)
             {
-                case DevEnv.vs2010: return "2010";
-                case DevEnv.vs2012: return "2012";
-                case DevEnv.vs2013: return "2013";
+                case DevEnv.vs2015: return "2015";
+                case DevEnv.vs2017: return "2017";
                 default: return "";
             }
         }
 
-        // Splitting 2008 for Framework v4.0 since it is not supported
         public static Target[] GetDefaultTargets()
         {
             return new Target[]{
             new Target(
-            Platform.anycpu,
-            DevEnv.vs2010 | DevEnv.vs2013,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v3_5 | DotNetFramework.v4_0)};
+                        Platform.anycpu,
+                        DevEnv.vs2015,
+                        Optimization.Debug | Optimization.Release,
+                        OutputType.Dll,
+                        Blob.NoBlob,
+                        BuildSystem.MSBuild,
+                        DotNetFramework.v4_5),
+            new Target(
+                        Platform.anycpu,
+                        DevEnv.vs2017,
+                        Optimization.Debug | Optimization.Release,
+                        OutputType.Dll,
+                        Blob.NoBlob,
+                        BuildSystem.MSBuild,
+                        DotNetFramework.v4_6_1)
+            };
         }
     }
 

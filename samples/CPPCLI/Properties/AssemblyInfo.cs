@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CPPCLI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("CPPCLI")]
-[assembly: AssemblyCopyright("Copyright \u00A9 Microsoft 2012")]
+[assembly: AssemblyCopyright("Copyright © Ubisoft 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

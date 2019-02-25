@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("FastBuildSimpleExecutable")]
-[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2019")]
+[assembly: AssemblyCopyright("Copyright © Ubisoft 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

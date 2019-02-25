@@ -11,7 +11,7 @@ namespace HelloWorld
 
             AddTargets(new Target(
                     Platform.win32 | Platform.win64,
-                    DevEnv.vs2012,
+                    DevEnv.vs2017,
                     Optimization.Debug // | Optimization.Release
             ));
 
@@ -39,7 +39,7 @@ namespace HelloWorld
 
             AddTargets(new Target(
                     Platform.win32 | Platform.win64,
-                    DevEnv.vs2012,
+                    DevEnv.vs2017,
                     Optimization.Debug // | Optimization.Release
             ));
         }

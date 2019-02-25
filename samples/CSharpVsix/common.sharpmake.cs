@@ -13,7 +13,6 @@ namespace Common
             }
         }
 
-        // Splitting 2008 for Framework v4.0 since it is not supported
         public static Target[] GetDefaultTargets()
         {
             return new Target[]{

@@ -10,12 +10,12 @@ namespace CSharpHelloWorld
         {
             AddTargets(new Target(
             Platform.anycpu,
-            DevEnv.vs2013,
+            DevEnv.vs2017,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.v4_5));
+            DotNetFramework.v4_6_1));
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
@@ -41,12 +41,12 @@ namespace CSharpHelloWorld
         {
             AddTargets(new Target(
             Platform.anycpu,
-            DevEnv.vs2013,
+            DevEnv.vs2017,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.v4_5));
+            DotNetFramework.v4_6_1));
         }
 
         [Configure()]

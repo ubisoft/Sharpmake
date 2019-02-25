@@ -10,7 +10,7 @@ namespace SimpleExeLibDependency
         public SimpleExeProject()
         {
             Name = "SimpleExeProjectName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2013, Optimization.Debug));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug));
             SourceRootPath = "[project.SharpmakeCsPath]/src";
 
             IsFileNameToLower = false;
@@ -32,7 +32,7 @@ namespace SimpleExeLibDependency
         public ExeLibSolution()
         {
             Name = "ExeLibSolutionName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2013, Optimization.Debug));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug));
 
             IsFileNameToLower = false;
         }
