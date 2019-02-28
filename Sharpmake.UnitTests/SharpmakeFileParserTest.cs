@@ -330,5 +330,124 @@ namespace Sharpmake.UnitTests
             Assert.That(assemblerContext.References.Count, Is.EqualTo(0));
         }
         #endregion
+
+        #region DefinesTests
+
+        private struct LineTest
+        {
+            public string Line { get; }
+            public bool ExpectedResult { get; }
+
+            public LineTest(string line, bool expectedResult)
+            {
+                Line = line;
+                ExpectedResult = expectedResult;
+            }
+        }
+
+        private void EvaluateLines(LineTest[] lines, HashSet<string> defines)
+        {
+            var assemblerContext = new AssemblerContext();
+            IParsingFlowParser parser = new PreprocessorConditionParser(defines);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                parser.ParseLine(lines[i].Line, _fakeFileInfo, i, assemblerContext);
+                bool shouldParseLine = parser.ShouldParseLine();
+                Assert.AreEqual(lines[i].ExpectedResult, shouldParseLine, $"ShouldParseLine for line ({i}) \"{lines[i].Line}\" should return {lines[i].ExpectedResult}!");
+            }
+        }
+
+        [Test]
+        public void SimpleConditionsTest()
+        {
+            const string defineA = "DEFINE_A";
+            HashSet<string> defines = new HashSet<string>() { defineA };
+
+            LineTest[] lines = new[]
+            {
+                new LineTest("",                true),
+                new LineTest($"#if {defineA}",  true),
+                new LineTest("...",             true),
+                new LineTest("#endif",          true),
+                new LineTest("#if _{defineA}_", false),
+                new LineTest("...",             false),
+                new LineTest("#endif",          true),
+                new LineTest("",                true),
+            };
+            
+            EvaluateLines(lines, defines);
+        }
+
+        [Test]
+        public void SimpleElseConditionsTest()
+        {
+            HashSet<string> defines = new HashSet<string>() { };
+
+            LineTest[] lines = new[]
+            {
+                new LineTest($"#if NOT_DEFINED", false),
+                new LineTest("...",              false),
+                new LineTest("#else",            true),
+                new LineTest("...",              true),
+                new LineTest("#endif",           true),
+            };
+
+            EvaluateLines(lines, defines);
+        }
+
+        [Test]
+        public void MultipleBranchesConditionsTest()
+        {
+            const string defineA = "DEFINE_A";
+            const string defineB = "DEFINE_B";
+            HashSet<string> defines = new HashSet<string>() { defineA, defineB };
+
+            LineTest[] lines = new[]
+            {
+                new LineTest($"#if NOT_DEFINED", false),
+                new LineTest("...",              false),
+                new LineTest($"#elif {defineA}", true),
+                new LineTest("...",              true),
+                new LineTest($"#elif {defineB}", false),
+                new LineTest("...",              false),
+                new LineTest("#else",            false),
+                new LineTest("...",              false),
+                new LineTest("#endif",           true),
+            };
+
+            EvaluateLines(lines, defines);
+
+        }
+
+        [Test]
+        public void NestedConditionsTest()
+        {
+            const string defineA = "DEFINE_A";
+            const string defineB = "DEFINE_B";
+            HashSet<string> defines = new HashSet<string>() { defineA, defineB };
+
+            LineTest[] lines = new[]
+            {
+                new LineTest($"#if NOT_DEFINED",  false),
+                new LineTest("...",               false),
+                new LineTest($"#elif {defineA}",  true),
+                new LineTest("  #if NOT_DEFINED", false),
+                new LineTest("  ...",             false),
+                new LineTest($" #elif {defineB}", true),
+                new LineTest("  ...",             true),
+                new LineTest("  #else",           false),
+                new LineTest("  ...",             false),
+                new LineTest("  #endif",          false),
+                new LineTest("#else",             false),
+                new LineTest("...",               false),
+                new LineTest("#endif",            true),
+            };
+
+            EvaluateLines(lines, defines);
+
+        }
+
+        #endregion
     }
 }

@@ -40,7 +40,7 @@ namespace Sharpmake
         /// <param name="startArguments"></param>
         public static void GenerateDebugSolution(string[] sources, Sharpmake.Arguments arguments, string startArguments)
         {
-            FindAllSources(sources, startArguments);
+            FindAllSources(sources, arguments, startArguments);
             arguments.Generate<DebugSolution>();
         }
 
@@ -60,12 +60,12 @@ namespace Sharpmake
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
-        private static void FindAllSources(string[] sourcesArguments, string startArguments)
+        private static void FindAllSources(string[] sourcesArguments, Sharpmake.Arguments sharpmakeArguments, string startArguments)
         {
             MainSources = sourcesArguments;
             RootPath = Path.GetDirectoryName(sourcesArguments[0]);
 
-            Assembler assembler = new Assembler();
+            Assembler assembler = new Assembler(sharpmakeArguments.Builder.Defines);
             assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
             IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 

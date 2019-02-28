@@ -36,7 +36,7 @@ namespace Sharpmake
 
     public interface IBuilderContext
     {
-        ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, params string[] files);
+        ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, IEnumerable<IParsingFlowParser> flowParsers, params string[] files);
         ILoadInfo LoadExtension(string file);
         BuilderCompileErrorBehavior CompileErrorBehavior { get; }
     }

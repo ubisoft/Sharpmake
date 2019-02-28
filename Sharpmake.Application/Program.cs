@@ -199,6 +199,17 @@ namespace Sharpmake.Application
                 if (parameters.Exit)
                     return (int)ExitCode.Success;
 
+                const string sharpmakeSymbolPrefix = "_SHARPMAKE";
+                List<string> invalidSymbols = parameters.Defines.Where(define => define.StartsWith(sharpmakeSymbolPrefix)).ToList();
+                if (invalidSymbols.Any())
+                {
+                    string invalidSymbolsString = string.Join(", ", invalidSymbols);
+                    throw new Error($"Only Sharpmake process can define symbols starting with {sharpmakeSymbolPrefix}. Invalid symbols defined: {invalidSymbolsString}");
+                }
+
+                parameters.Defines.Add($"{sharpmakeSymbolPrefix}_{version.Major}_{version.Minor}_X");
+                parameters.Defines.Add($"{sharpmakeSymbolPrefix}_{version.Major}_{version.Minor}_{version.Build}");
+
                 parameters.Validate();
 
                 // CommonPlatforms.dll is always loaded by default because those are shipped with
@@ -534,7 +545,8 @@ namespace Sharpmake.Application
                 parameters.BlobOnly,
                 parameters.SkipInvalidPath,
                 parameters.Diagnostics,
-                Program.GetGeneratorsManager
+                Program.GetGeneratorsManager,
+                parameters.Defines
             );
 
             // Allow message log from builder.

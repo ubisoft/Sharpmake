@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Sharpmake.Application
 {
@@ -42,6 +44,7 @@ namespace Sharpmake.Application
 
             public string[] Sources = new string[0];
             public string[] Assemblies = new string[0];
+            public HashSet<string> Defines = new HashSet<string>();
             public InputType Input = InputType.Undefined;
             public bool Exit = false;
             public bool BlobOnly = false;
@@ -78,6 +81,15 @@ namespace Sharpmake.Application
                 Assemblies = ValidateFiles(files);
                 DebugWriteLine("input assemblies: ");
                 Array.ForEach(Assemblies, (string assembly) => DebugWriteLine("  " + assembly));
+            }
+
+            [CommandLine.Option("defines", @"sharpmake compilation defines: ex: /defines( ""SHARPMAKE_0_8_0"", ""GITLAB"" )")]
+            public void SetDefines(params string[] defines)
+            {
+                Defines = ValidateDefines(defines);
+                DebugWriteLine("compilation defines: ");
+                foreach (string define in Defines)
+                    DebugWriteLine("  " + define);
             }
 
             [CommandLine.Option("projectlogfiles", @"log files contained in a project for debug purpose: ex: /projectlogfiles( ""s:\p4\ac\dev\sharpmake\projects\win32\system\system.vcproj"" )")]
@@ -363,6 +375,23 @@ ex: /forcecleanup( ""tmp/sharpmakeautocleanupdb.bin"" ")]
                         throw new Error("error: input file not found: {0}", files[i]);
                 }
                 return fullPathFiles;
+            }
+
+            // Will check that the given compilation defines are valid
+            public static HashSet<string> ValidateDefines(string[] defines)
+            {
+                Regex defineValidationRegex = new Regex(@"^\w+$");
+
+                HashSet<string> uniqueDefines = new HashSet<string>();
+                foreach (string define in defines)
+                {
+                    if (!defineValidationRegex.IsMatch(define))
+                        throw new Error("error: invalid define '{0}', a define must be a single word");
+                    if (uniqueDefines.Contains(define))
+                        throw new Error("error: define '{0}' already defined");
+                    uniqueDefines.Add(define);
+                }
+                return uniqueDefines;
             }
         }
     }

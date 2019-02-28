@@ -41,10 +41,17 @@ namespace Sharpmake
         /// </summary>
         public IReadOnlyList<string> References { get { return _references; } }
 
+        private readonly HashSet<string> _defines;
+
         /// <summary>
         /// Source attribute parser to use to add configuration based on source code
         /// </summary>
         public List<ISourceAttributeParser> AttributeParsers { get { return _attributeParsers; } }
+
+        /// <summary>
+        /// Parsing flow parsers to use to add configuration based on source code
+        /// </summary>
+        public List<IParsingFlowParser> ParsingFlowParsers { get { return _parsingFlowParsers; } }
 
         public bool UseDefaultParsers = true;
 
@@ -67,6 +74,16 @@ namespace Sharpmake
             public Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
         }
 
+        public Assembler() 
+            : this(new HashSet<string>())
+        {
+
+        }
+
+        public Assembler(HashSet<string> defines)
+        {
+            _defines = defines;
+        }
 
         public Assembly BuildAssembly(params string[] sourceFiles)
         {
@@ -267,6 +284,7 @@ namespace Sharpmake
         private List<Assembly> _assemblies = new List<Assembly>();
         private List<string> _references = new List<string>();
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
+        private List<IParsingFlowParser> _parsingFlowParsers = new List<IParsingFlowParser>();
 
         private static bool IsDelegate(Type delegateType)
         {
@@ -289,6 +307,7 @@ namespace Sharpmake
             private readonly AssemblyInfo _assemblyInfo;
             public IReadOnlyList<string> SourceFiles => _assemblyInfo.SourceFiles.ToList();
             private Strings _visiting;
+            public readonly List<IParsingFlowParser> AllParsingFlowParsers;
             public readonly List<ISourceAttributeParser> AllParsers;
             public List<ISourceAttributeParser> ImportedParsers = new List<ISourceAttributeParser>();
             private readonly IBuilderContext _builderContext;
@@ -299,6 +318,7 @@ namespace Sharpmake
                 _assemblyInfo = assemblyInfo;
                 _builderContext = builderContext;
                 AllParsers = assembler.ComputeParsers();
+                AllParsingFlowParsers = assembler.ComputeParsingFlowParsers();
                 _assemblyInfo._sourceFiles.AddRange(sources);
                 _visiting = new Strings(new FileSystemStringComparer(), sources);
             }
@@ -346,7 +366,7 @@ namespace Sharpmake
                 if (_builderContext == null)
                     throw new NotSupportedException("BuildAndLoadSharpmakeFiles is not supported on builds without a IBuilderContext");
 
-                var loadInfo = _builderContext.BuildAndLoadSharpmakeFiles(AllParsers, files);
+                var loadInfo = _builderContext.BuildAndLoadSharpmakeFiles(AllParsers, AllParsingFlowParsers, files);
                 this.AddSourceAttributeParsers(loadInfo.Parsers);
                 return loadInfo.AssemblyInfo;
             }
@@ -399,6 +419,12 @@ namespace Sharpmake
             // Set compiler argument to optimize output.
             // TODO : figure out why it does not work when uncommenting the following line
             // cp.CompilerOptions = "/optimize";
+
+            // If any defines are specified, pass them to the CSC.
+            if (_defines.Any())
+            {
+                cp.CompilerOptions = "-DEFINE:" + string.Join(",", _defines);
+            }
 
             // Specify the assembly file name to generate
             if (libraryFile == null)
@@ -455,6 +481,14 @@ namespace Sharpmake
             return parsers;
         }
 
+        private List<IParsingFlowParser> ComputeParsingFlowParsers()
+        {
+            List<IParsingFlowParser> parsers = ParsingFlowParsers.ToList();
+            if (UseDefaultParsers)
+                AddDefaultParsingFlowParsers(parsers);
+            return parsers;
+        }
+
         private AssemblyInfo LoadAssemblyInfo(IBuilderContext builderContext, string[] sources)
         {
             var assemblyInfo = new AssemblyInfo()
@@ -496,6 +530,11 @@ namespace Sharpmake
             parsers.Add(new PackageAttributeParser());
         }
 
+        private void AddDefaultParsingFlowParsers(ICollection<IParsingFlowParser> parsers)
+        {
+            parsers.Add(new PreprocessorConditionParser(_defines));
+        }
+
         private void AnalyseSourceFiles(AssemblerContext context)
         {
             var newParsers = Enumerable.Empty<ISourceAttributeParser>();
@@ -510,7 +549,7 @@ namespace Sharpmake
                     string sourceFile = context.SourceFiles[i];
                     if (File.Exists(sourceFile))
                     {
-                        AnalyseSourceFile(sourceFile, (i < partiallyParsedCount) ? newParsers : allParsers, context);
+                        AnalyseSourceFile(sourceFile, (i < partiallyParsedCount) ? newParsers : allParsers, context.AllParsingFlowParsers, context);
                     }
                     else
                     {
@@ -551,24 +590,45 @@ namespace Sharpmake
             }
         }
 
-        private void AnalyseSourceFile(string sourceFile, IEnumerable<ISourceAttributeParser> parsers, IAssemblerContext context)
+        private void AnalyseSourceFile(string sourceFile, IEnumerable<ISourceAttributeParser> parsers, IEnumerable<IParsingFlowParser> flowParsers, IAssemblerContext context)
         {
             using (StreamReader reader = new StreamReader(sourceFile))
             {
                 FileInfo sourceFilePath = new FileInfo(sourceFile);
+                List<IParsingFlowParser> flowParsersList = flowParsers.ToList();
+
+                foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
+                {
+                    parsingFlowParser.FileParsingBegin(sourceFile);
+                }
 
                 int lineNumber = 0;
-                string line = reader.ReadLine();
+                string line = reader.ReadLine()?.TrimStart();
                 while (line != null)
                 {
                     ++lineNumber;
 
-                    ParseSourceAttributesFromLine(line, sourceFilePath, lineNumber, parsers, context);
+                    // First, update the parsing flow with the current line
+                    foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
+                    {
+                        parsingFlowParser.ParseLine(line, sourceFilePath, lineNumber, context);
+                    }
+
+                    // We only want to parse the lines inside valid blocks
+                    if (!flowParsersList.Any() || flowParsersList.All(p => p.ShouldParseLine()))
+                    {
+                        ParseSourceAttributesFromLine(line, sourceFilePath, lineNumber, parsers, context);
+                    }
 
                     line = reader.ReadLine()?.TrimStart();
 
                     if (!string.IsNullOrEmpty(line) && line.StartsWith("namespace", StringComparison.Ordinal))
                         break;
+                }
+
+                foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
+                {
+                    parsingFlowParser.FileParsingEnd(sourceFile);
                 }
             }
         }

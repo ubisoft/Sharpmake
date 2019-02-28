@@ -22,9 +22,24 @@ using System.Threading.Tasks;
 
 namespace Sharpmake
 {
-    public interface ISourceAttributeParser
+    /// <summary>
+    /// ISourceParser classes are tasked with parsing lines in a file.
+    /// They can add Sharpmake references through the AssemblerContext.
+    /// </summary>
+    public interface ISourceParser
     {
+        /// <summary>
+        /// Parse the current line of the file and update the context if necessary. Parsers MUST NOT assume that the lines will be parsed sequentially.
+        /// </summary>
         void ParseLine(string line, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context);
+    }
+
+    /// <summary>
+    /// A parser that parses C# Attributes, eg [Sharpmake.Include(...)]
+    /// </summary>
+    public interface ISourceAttributeParser : ISourceParser
+    {
+
     }
 
     public static class SourceAttributeParserHelpers

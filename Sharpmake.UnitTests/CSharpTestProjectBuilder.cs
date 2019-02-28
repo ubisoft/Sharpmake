@@ -50,7 +50,8 @@ namespace SharpmakeUnitTests
                 false,
                 false,
                 false,
-                GetGeneratorsManager
+                GetGeneratorsManager,
+                null
             );
 
             // Force the test to load and register CommonPlatforms.dll as a Sharpmake extension

@@ -142,6 +142,8 @@ namespace Sharpmake
 
         private HashSet<Project.Configuration> _usedProjectConfigurations = null;
 
+        public HashSet<string> Defines { get; }
+
         private readonly List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
 
         public Builder(
@@ -152,7 +154,8 @@ namespace Sharpmake
             bool blobOnly,
             bool skipInvalidPath,
             bool diagnostics,
-            Func<IGeneratorManager> getGeneratorsManagerCallBack)
+            Func<IGeneratorManager> getGeneratorsManagerCallBack,
+            HashSet<string> defines)
         {
             Context = context;
             Arguments = new Arguments(this);
@@ -167,6 +170,7 @@ namespace Sharpmake
             Trace.Assert(Instance == null);
             Instance = this;
             _builderExt = new BuilderExtension(this);
+            Defines = defines ?? new HashSet<string>();
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
@@ -386,9 +390,9 @@ namespace Sharpmake
             return BuildAndLoadAssembly(sharpmakeFiles, new BuilderContext(this, compileErrorBehavior));
         }
 
-        private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, IBuilderContext context, IEnumerable<ISourceAttributeParser> parsers = null)
+        private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, IBuilderContext context, IEnumerable<ISourceAttributeParser> parsers = null, IEnumerable<IParsingFlowParser> flowParsers = null)
         {
-            Assembler assembler = new Assembler();
+            Assembler assembler = new Assembler(Defines);
 
             // Add sharpmake assembly
             assembler.Assemblies.Add(_sharpmakeAssembly.Value);
@@ -406,6 +410,11 @@ namespace Sharpmake
             {
                 foreach (var parser in _attributeParsers)
                     assembler.AttributeParsers.Add(parser);
+            }
+
+            if (flowParsers != null)
+            {
+                assembler.ParsingFlowParsers.AddRange(flowParsers);
             }
 
             var newAssemblyInfo = assembler.BuildAssembly(context, sharpmakeFiles.ToArray());
@@ -995,10 +1004,10 @@ namespace Sharpmake
                 CompileErrorBehavior = compileErrorBehavior;
             }
 
-            public ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, params string[] files)
+            public ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, IEnumerable<IParsingFlowParser> flowParsers, params string[] files)
             {
                 var parserCount = _builder._attributeParsers.Count;
-                var assemblyInfo = _builder.BuildAndLoadAssembly(files, this, parsers);
+                var assemblyInfo = _builder.BuildAndLoadAssembly(files, this, parsers, flowParsers);
                 if (assemblyInfo.Assembly != null)
                     _builder.ExecuteEntryPointInAssemblies<EntryPoint>(assemblyInfo.Assembly);
 

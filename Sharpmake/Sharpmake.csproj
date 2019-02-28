@@ -106,6 +106,7 @@
     <Compile Include="PlatformEventArgs.cs" />
     <Compile Include="PlatformExceptions.cs" />
     <Compile Include="PlatformRegistry.cs" />
+    <Compile Include="PreprocessorConditionParser.cs" />
     <Compile Include="Project.Configuration.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

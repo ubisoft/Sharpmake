@@ -50,7 +50,8 @@ namespace SharpmakeUnitTests
                 false,
                 false,
                 false,
-                GetGeneratorsManager
+                GetGeneratorsManager,
+                null
             );
 
             // HACK: Explicitely reference something from CommonPlatforms to get
