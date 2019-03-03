@@ -1086,7 +1086,6 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["PrecompiledHeaderOutputFileDirectory"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["PrecompiledHeaderFile"] = FileGeneratorUtilities.RemoveLineTag;
-                context.CommandLineOptions["PrecompiledHeaderOutputFileDirectory"] = FileGeneratorUtilities.RemoveLineTag;
             }
             else
             {
@@ -1097,7 +1096,6 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["PrecompiledHeaderOutputFileDirectory"] = pchOutputDirectoryRelative;
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = context.Options["PrecompiledHeaderThrough"];
                 context.CommandLineOptions["PrecompiledHeaderFile"] = FormatCommandLineOptionPath(context, context.Options["PrecompiledHeaderFile"]);
-                context.CommandLineOptions["PrecompiledHeaderOutputFileDirectory"] = Bff.CurrentBffPathKeyCombine(pchOutputDirectoryRelative);
 
                 if (!optionsContext.PlatformDescriptor.HasPrecompiledHeaderSupport)
                     throw new Error("Precompiled header not supported for spu configuration: {0}", context.Configuration);
