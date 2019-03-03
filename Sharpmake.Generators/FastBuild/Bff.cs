@@ -1306,6 +1306,7 @@ namespace Sharpmake.Generators.FastBuild
             var resourceIncludePaths = new OrderableStrings(platformVcxproj.GetResourceIncludePaths(context));
             context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
 
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
             if (context.EnvironmentVariableResolver != null)
@@ -1341,6 +1342,16 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (resourceDirs.Any())
                     context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", resourceDirs);
+
+                // Fill using dirs
+                Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
+                additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
+                additionalUsingDirectories.AddRange(platformVcxproj.GetCxUsingPath(context));
+                if (additionalUsingDirectories.Any())
+                {
+                    var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, "/AI"));
+                    context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
+                }
             }
         }
 

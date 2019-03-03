@@ -315,9 +315,23 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.PlatformVcxproj.SetupSdkOptions(context);
 
             // Options.Vc.Compiler.AdditionalUsingDirectories
-            Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
-            additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
+            {
+                Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
+                additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
 
+                context.Options["AdditionalUsingDirectories"] = additionalUsingDirectories.Count > 0 ? string.Join(";", additionalUsingDirectories.Select(s => Util.PathGetRelative(context.ProjectDirectory, s))) : FileGeneratorUtilities.RemoveLineTag;
+
+                additionalUsingDirectories.AddRange(optionsContext.PlatformVcxproj.GetCxUsingPath(context));
+                if (additionalUsingDirectories.Count > 0 && optionsContext.Resolver != null)
+                {
+                    var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/AI"));
+                    context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
+                }
+                else
+                {
+                    context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+                }
+            }
 
             bool writeResourceCompileTag = optionsContext.PlatformVcxproj.GetResourceIncludePaths(context).Any();
 
@@ -344,21 +358,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             context.Options["ResourceCompileTag"] = writeResourceCompileTag ? string.Empty : FileGeneratorUtilities.RemoveLineTag;
 
-            context.Options["AdditionalUsingDirectories"] = additionalUsingDirectories.Count > 0 ? string.Join(";", additionalUsingDirectories.Select(s => Util.PathGetRelative(context.ProjectDirectory, s))) : FileGeneratorUtilities.RemoveLineTag;
-
-            additionalUsingDirectories.AddRange(optionsContext.PlatformVcxproj.GetCxUsingPath(context));
-            if (additionalUsingDirectories.Count > 0 && optionsContext.Resolver != null)
-            {
-                var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/AI"));
-                context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
-            }
-            else
-            {
-                context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-            }
-
-            //Options.Vc.General.DebugInformation.   
-            //    Disabled                                Project.ProjectConfiguration.Tool.DebugInformationFormat="0"   
+            //Options.Vc.General.DebugInformation.
+            //    Disabled                                Project.ProjectConfiguration.Tool.DebugInformationFormat="0"
             //    C7Compatible                            Project.ProjectConfiguration.Tool.DebugInformationFormat="1"   /Z7
             //    ProgramDatabase                         Project.ProjectConfiguration.Tool.DebugInformationFormat="3"   /Zi
             //    ProgramDatabaseForEditAndContinue       Project.ProjectConfiguration.Tool.DebugInformationFormat="4"   /ZI
