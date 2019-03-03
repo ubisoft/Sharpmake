@@ -92,6 +92,13 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         private IEnumerable<IDictionary<string, string>> GetProjectEntries(Builder builder, Project project, Project.Configuration config)
         {
             var context = new CompileCommandGenerationContext(builder, project, config);
+            var resolverParams = new[] {
+                    new VariableAssignment("project", context.Project),
+                    new VariableAssignment("target", context.Configuration.Target),
+                    new VariableAssignment("conf", context.Configuration)
+            };
+            context.EnvironmentVariableResolver = PlatformRegistry.Get<IPlatformDescriptor>(config.Platform).GetPlatformEnvironmentResolver(resolverParams);
+
             var factory = new CompileCommandFactory(context);
 
             var database = project.GetSourceFilesForConfigurations(new[] { config })
@@ -135,9 +142,6 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         };
 
         private static readonly string[] s_multilineArgumentKeys = new[] {
-            "AdditionalResourceIncludeDirectories",
-            "AdditionalIncludeDirectories",
-            "AdditionalUsingDirectories",
             "AdditionalLibraryDirectories",
             "PreprocessorDefinitions",
             "ManifestInputs"
@@ -221,6 +225,8 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             // AdditionalCompilerOptions are referenced from Options in the bff template.
             context.CommandLineOptions.Add(AdditionalOptionsKey, context.Options[AdditionalOptionsKey]);
 
+            FillIncludeDirectoriesOptions(context);
+
             var validOptions = context.CommandLineOptions
                 .Where(IsValidOption)
                 .ToDictionary(kvp => kvp.Key, FlattenMultilineArgument);
@@ -241,6 +247,75 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         private bool IsValidOption(KeyValuePair<string, string> option)
         {
             return !option.Value.Equals(FileGeneratorUtilities.RemoveLineTag) && !s_ignoredOptions.Contains(option.Key);
+        }
+
+        internal static string CmdLineConvertIncludePathsFunc(CompileCommandGenerationContext context, string include, string prefix)
+        {
+            // if the include is below the global root, we compute the relative path,
+            // otherwise it's probably a system include for which we keep the full path
+            string resolvedInclude = context.EnvironmentVariableResolver.Resolve(include);
+            if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                resolvedInclude = Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true);
+            return $@"{prefix}""{resolvedInclude}""";
+        }
+
+        private static void FillIncludeDirectoriesOptions(CompileCommandGenerationContext context)
+        {
+            // TODO: really not ideal, refactor and move the properties we need from it someplace else
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+
+            var includePaths = new OrderableStrings(platformVcxproj.GetIncludePaths(context));
+            var resourceIncludePaths = new OrderableStrings(platformVcxproj.GetResourceIncludePaths(context));
+            context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+            var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
+
+            string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I" : "/I";
+
+            // Fill include dirs
+            var dirs = new List<string>();
+
+            var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
+            var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p.Path, p.CmdLinePrefix)).ToList();
+            dirs.AddRange(platformIncludePathsPrefixed);
+
+            // TODO: move back up, just below the creation of the dirs list
+            dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludePrefix)));
+
+            if (dirs.Any())
+                context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join(" ", dirs);
+
+            // Fill resource include dirs
+            var resourceDirs = new List<string>();
+            resourceDirs.AddRange(resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludePrefix)));
+
+            if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
+                Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
+            {
+                // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
+                // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
+                var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p.Path, defaultCmdLineIncludePrefix));
+                resourceDirs.AddRange(platformIncludePathsDefaultPrefix);
+            }
+            else
+            {
+                resourceDirs.AddRange(platformIncludePathsPrefixed);
+            }
+
+            if (resourceDirs.Any())
+                context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join(" ", resourceDirs);
+
+            // Fill using dirs
+            Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
+            additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
+            additionalUsingDirectories.AddRange(platformVcxproj.GetCxUsingPath(context));
+            if (additionalUsingDirectories.Any())
+            {
+                var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, p, "/AI"));
+                context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join(" ", cmdAdditionalUsingDirectories);
+            }
         }
 
         // ProjectOptionsGenerator will generate format some arguments
@@ -300,6 +375,8 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
     internal class CompileCommandGenerationContext : IGenerationContext
     {
+        private Resolver _envVarResolver;
+
         public Builder Builder { get; private set; }
 
         public Project Project { get; private set; }
@@ -319,6 +396,19 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
         public string ProjectSourceCapitalized { get; private set; }
 
         public bool PlainOutput { get { return true; } }
+
+        public Resolver EnvironmentVariableResolver
+        {
+            get
+            {
+                System.Diagnostics.Debug.Assert(_envVarResolver != null);
+                return _envVarResolver;
+            }
+            set
+            {
+                _envVarResolver = value;
+            }
+        }
 
         public CompileCommandGenerationContext(Builder builder, Project project, Project.Configuration config)
         {
