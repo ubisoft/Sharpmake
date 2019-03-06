@@ -148,6 +148,9 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.v141_xp:
                             compilerDevEnv = DevEnv.vs2017;
                             break;
+                        case Options.Vc.General.PlatformToolset.v142:
+                            compilerDevEnv = DevEnv.vs2019;
+                            break;
                         case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                         case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                         case Options.Vc.General.PlatformToolset.LLVM:
@@ -212,6 +215,7 @@ namespace Sharpmake
                                 break;
                             case DevEnv.vs2015:
                             case DevEnv.vs2017:
+                            case DevEnv.vs2019:
                                 {
                                     string systemDllPath = FastBuildSettings.SystemDllRoot;
                                     if (systemDllPath == null)

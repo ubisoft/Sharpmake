@@ -122,6 +122,8 @@ namespace Sharpmake
                     return "14.0";
                 case DevEnv.vs2017:
                     return "15.0";
+                case DevEnv.vs2019:
+                    return "16.0";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -141,6 +143,8 @@ namespace Sharpmake
                     return 14;
                 case DevEnv.vs2017:
                     return 15;
+                case DevEnv.vs2019:
+                    return 16;
                 default:
                     throw new NotImplementedException("DevEnv " + visualVersion + " not recognized!");
             }
@@ -165,6 +169,8 @@ namespace Sharpmake
                     return "v140";
                 case DevEnv.vs2017:
                     return "v141";
+                case DevEnv.vs2019:
+                    return "v142";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -179,6 +185,7 @@ namespace Sharpmake
                 case DevEnv.vs2013: return "2013";
                 case DevEnv.vs2015: return "2015";
                 case DevEnv.vs2017: return "2017";
+                case DevEnv.vs2019: return "2019";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -218,15 +225,35 @@ namespace Sharpmake
                 string installDir = Util.GetVisualStudioInstallPathFromQuery(visualVersion);
                 if (string.IsNullOrEmpty(installDir))
                 {
-                    installDir = visualVersion == DevEnv.vs2017
-                        ? @"Microsoft Visual Studio\2017\Professional"
-                        : string.Format(@"Microsoft Visual Studio {0}", visualVersion.GetVisualVersionString());
+                    switch ( visualVersion )
+                    {
+                        case DevEnv.vs2017:
+                        case DevEnv.vs2019:
+                            installDir = @"Microsoft Visual Studio\" + GetVSYear( visualVersion ) + @"\Professional";
+                            break;
+                        default:
+                            installDir = string.Format(@"Microsoft Visual Studio {0}", visualVersion.GetVisualVersionString());
+                            break;
+                    }
                     installDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), installDir);
                 }
                 return Util.SimplifyPath(installDir);
             });
 
             return visualStudioDirectory;
+        }
+
+        private static string GetDefaultCompilerVersion( this DevEnv visualVersion )
+        {
+            switch (visualVersion)
+            {
+                case DevEnv.vs2017:
+                    return "14.10.25017";
+                case DevEnv.vs2019:
+                    return "14.20.27404";
+                default:
+                    throw new Error( "DevEnv " + visualVersion + " not recognized for default compiler version" );
+            }
         }
 
         private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioVCRootPathCache = new ConcurrentDictionary<DevEnv, string>();
@@ -244,7 +271,8 @@ namespace Sharpmake
                         return Path.Combine(vsDir, "VC");
 
                     case DevEnv.vs2017:
-                        string compilerVersion = "14.10.25017"; // default fallback
+                    case DevEnv.vs2019:
+                        string compilerVersion = visualVersion.GetDefaultCompilerVersion(); // default fallback
                         try
                         {
                             string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
@@ -277,6 +305,7 @@ namespace Sharpmake
                         return Path.Combine(visualVersion.GetVisualStudioVCRootPath(), "bin", targetPlatform);
                     }
                 case DevEnv.vs2017:
+                case DevEnv.vs2019:
                     {
                         string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
                         string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
@@ -436,7 +465,7 @@ namespace Sharpmake
         {
             string visualStudioVCDir = Util.EnsureTrailingSeparator(visualVersion.GetVisualStudioVCRootPath());
             string subDir = platform == Platform.win64 ? @"\amd64" : "";
-            if (visualVersion == DevEnv.vs2017)
+            if ( (visualVersion == DevEnv.vs2017) || (visualVersion == DevEnv.vs2019) )
                 subDir = platform == Platform.win64 ? @"\x64" : @"\x86";
 
             string visualStudioLib = string.Format(@"{0}lib{1};{0}atlmfc\lib{1};", visualStudioVCDir, subDir);
@@ -540,6 +569,8 @@ namespace Sharpmake
                     return visualVersion == DevEnv.vs2015;
                 case Options.Vc.General.PlatformToolset.v141:
                     return visualVersion == DevEnv.vs2017;
+                case Options.Vc.General.PlatformToolset.v142:
+                    return visualVersion == DevEnv.vs2019;
                 case Options.Vc.General.PlatformToolset.v110_xp:
                 case Options.Vc.General.PlatformToolset.v120_xp:
                 case Options.Vc.General.PlatformToolset.v140_xp:
@@ -576,6 +607,19 @@ namespace Sharpmake
             return (0 != (devEnv & DevEnv.VisualStudio));
         }
 
+        private static bool IsAbiCompatibleWithVS2015( this DevEnv devEnv )
+        {
+            switch ( devEnv )
+            {
+                case DevEnv.vs2015:
+                case DevEnv.vs2017:
+                case DevEnv.vs2019:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         /// <summary>
         /// Gets whether two <see cref="DevEnv"/> values generate ABI-compatible binaries with
         /// their respective C++ compiler.
@@ -597,8 +641,8 @@ namespace Sharpmake
             if (devEnv == other)
                 return true;
 
-            // VS2017 is guaranteed by Microsoft to be ABI-compatible with VS2015 for C++.
-            if ((devEnv == DevEnv.vs2015 && other == DevEnv.vs2017) || (devEnv == DevEnv.vs2017 && other == DevEnv.vs2015))
+            // VS2017 and VS2019 are guaranteed by Microsoft to be ABI-compatible with VS2015 for C++.
+            if ( devEnv.IsAbiCompatibleWithVS2015() && other.IsAbiCompatibleWithVS2015() )
                 return true;
 
             return false;

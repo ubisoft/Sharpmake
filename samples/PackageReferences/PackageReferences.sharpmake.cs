@@ -10,7 +10,7 @@ namespace CSharpPackageReference
         {
             AddTargets(new Target(
             Platform.anycpu,
-            DevEnv.vs2015 | DevEnv.vs2017,
+            DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,
@@ -46,7 +46,7 @@ namespace CSharpPackageReference
         {
             AddTargets(new Target(
             Platform.anycpu,
-            DevEnv.vs2015 | DevEnv.vs2017,
+            DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
             Optimization.Debug | Optimization.Release,
             OutputType.Dll,
             Blob.NoBlob,

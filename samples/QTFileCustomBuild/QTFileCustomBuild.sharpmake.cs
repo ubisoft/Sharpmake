@@ -43,6 +43,7 @@ namespace QTFileCustomBuild
         {
             AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2015, "WIN32", "_MSC_VER=1900"));
             AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2017, "WIN32", "_MSC_VER=1910"));
+            AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2019, "WIN32", "_MSC_VER=1920"));
         }
 
         // Stores the source file and target file of a moc operation.

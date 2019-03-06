@@ -289,6 +289,7 @@ namespace Sharpmake.Generators.VisualStudio
                 case DevEnv.vs2013: fileGenerator.Write(Template.Solution.HeaderBeginVs2013); break;
                 case DevEnv.vs2015: fileGenerator.Write(Template.Solution.HeaderBeginVs2015); break;
                 case DevEnv.vs2017: fileGenerator.Write(Template.Solution.HeaderBeginVs2017); break;
+                case DevEnv.vs2019: fileGenerator.Write(Template.Solution.HeaderBeginVs2019); break;
                 default:
                     Console.WriteLine("Unsupported DevEnv for solution " + solutionConfigurations[0].Target.GetFragment<DevEnv>());
                     break;

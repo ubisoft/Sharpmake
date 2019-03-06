@@ -1001,6 +1001,7 @@ namespace Sharpmake.Generators.VisualStudio
                 case DevEnv.vs2013:
                 case DevEnv.vs2015:
                 case DevEnv.vs2017:
+                case DevEnv.vs2019:
                     {
                         context.Options["_IsNativeEnvironment"] = FileGeneratorUtilities.RemoveLineTag;
                         context.SelectOption
@@ -1028,6 +1029,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.PlatformToolset.v140_xp, () => { context.Options["PlatformToolset"] = "v140_xp"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141, () => { context.Options["PlatformToolset"] = "v141"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141_xp, () => { context.Options["PlatformToolset"] = "v141_xp"; }),
+                Options.Option(Options.Vc.General.PlatformToolset.v142, () => { context.Options["PlatformToolset"] = "v142"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012, () => { context.Options["PlatformToolset"] = "LLVM-vs2012"; context.Options["TrackFileAccess"] = "false"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2014, () => { context.Options["PlatformToolset"] = "LLVM-vs2014"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.LLVM, () => { context.Options["PlatformToolset"] = "llvm"; })
@@ -1929,7 +1931,7 @@ namespace Sharpmake.Generators.VisualStudio
             //    GenerateDebugInformation.EnableFastLink GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
             //    Disable                                 GenerateDebugInformation="No"
             //
-            //    VS2017
+            //    VS2017-VS2019
             //    Enable                                  GenerateDebugInformation="true"           /DEBUG
             //    EnableFastLink                          GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
             //    Disable                                 GenerateDebugInformation="No"
@@ -1958,7 +1960,8 @@ namespace Sharpmake.Generators.VisualStudio
                 }
                 else
                 {
-                    if (isMicrosoftPlatform && context.DevelopmentEnvironment == DevEnv.vs2017 && forceFullPDB)
+                    if ( isMicrosoftPlatform && forceFullPDB &&
+                         ( (context.DevelopmentEnvironment == DevEnv.vs2017) || (context.DevelopmentEnvironment == DevEnv.vs2019)) )
                     {
                         context.Options["GenerateDebugInformation"] = "DebugFull";
                         context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG:FULL";

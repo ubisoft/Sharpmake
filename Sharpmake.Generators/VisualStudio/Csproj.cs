@@ -998,6 +998,7 @@ namespace Sharpmake.Generators.VisualStudio
                         Write(Template.Project.ProjectBegin, writer, resolver);
                         break;
                     case DevEnv.vs2017:
+                    case DevEnv.vs2019:
                         Write(Template.Project.ProjectBeginVs2017, writer, resolver);
                         break;
                     default:

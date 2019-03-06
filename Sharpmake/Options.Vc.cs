@@ -43,6 +43,8 @@ namespace Sharpmake
                     v141, // Visual Studio 2017
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     v141_xp, // Visual Studio 2017 - Windows XP
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    v142, // Visual Studio 2019
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     LLVM_vs2012, // LLVM from Visual Studio 2012
                     [DevEnvVersion(minimum = DevEnv.vs2015)]

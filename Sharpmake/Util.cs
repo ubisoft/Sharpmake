@@ -1725,6 +1725,7 @@ namespace Sharpmake
                     return DotNetFramework.v4_5.ToVersionString();
                 case DevEnv.vs2015:
                 case DevEnv.vs2017:
+                case DevEnv.vs2019:
                     return env.GetVisualProjectToolsVersionString();
                 case DevEnv.xcode4ios:
                     throw new NotSupportedException("XCode does not support Tool Version. ");
@@ -1780,6 +1781,7 @@ namespace Sharpmake
                     case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
+                    case DevEnv.vs2019:
                         {
                             extension = ".vcxproj";
                         }
