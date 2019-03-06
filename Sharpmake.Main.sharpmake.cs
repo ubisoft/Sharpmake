@@ -29,7 +29,7 @@ namespace SharpmakeGen
             result.Add(
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2015,
+                    DevEnv.vs2017,
                     Optimization.Debug | Optimization.Release,
                     framework: DotNetFramework.v4_6_1
                 )
