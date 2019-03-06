@@ -2001,7 +2001,7 @@ namespace Sharpmake
 
             if (!fullInputPath.StartsWith(inputHeadPath, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("The subpath to be replaced is not found at the beginning of the input path.");
+                throw new ArgumentException($"The subpath to be replaced '{inputHeadPath}'\n is not found at the beginning of the input path '{fullInputPath}'.");
             }
 
             var pathRelativeToOutput = fullInputPath.Substring(inputHeadPath.Length);
