@@ -477,6 +477,13 @@ namespace Sharpmake
                     Enable
                 }
 
+                public enum DefineCPlusPlus
+                {
+                    Disable,
+                    [Default]
+                    Enable
+                }
+
                 public class DisableSpecificWarnings : Strings
                 {
                     public DisableSpecificWarnings(params string[] warnings)
