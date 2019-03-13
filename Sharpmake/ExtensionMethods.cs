@@ -217,10 +217,13 @@ namespace Sharpmake
             //       allocated on the stack. That should be faster here.
             string visualStudioDirectory = s_visualStudioDirectories.GetOrAdd(Tuple.Create(visualVersion, ignoreVisualStudioPathOverride), devEnv =>
             {
-                // First check if the visual studio path is overriden from default value.
-                string pathOverride;
-                if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
-                    return pathOverride;
+                if (!ignoreVisualStudioPathOverride)
+                {
+                    // First check if the visual studio path is overriden from default value.
+                    string pathOverride;
+                    if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
+                        return pathOverride;
+                }
 
                 string installDir = Util.GetVisualStudioInstallPathFromQuery(visualVersion);
                 if (string.IsNullOrEmpty(installDir))
@@ -533,9 +536,9 @@ namespace Sharpmake
             return @"kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib";
         }
 
-        public static string GetCommonToolsPath(this DevEnv visualVersion)
+        public static string GetCommonToolsPath(this DevEnv visualVersion, bool ignoreVisualStudioPathOverride = false)
         {
-            return Path.Combine(GetVisualStudioDir(visualVersion), "Common7\\Tools");
+            return Path.Combine(GetVisualStudioDir(visualVersion, ignoreVisualStudioPathOverride), "Common7\\Tools");
         }
 
         public static string ToVersionString(this Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion)
