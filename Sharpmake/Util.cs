@@ -1407,8 +1407,8 @@ namespace Sharpmake
                 }
 
                 success = CreateSymbolicLink(source, target,
-                    (isDirectory ? s_SYMBOLIC_LINK_FLAG_DIRECTORY : s_SYMBOLIC_LINK_FLAG_FILE)
-                    | s_SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);
+                    (isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : SYMBOLIC_LINK_FLAG_FILE)
+                    | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);
             }
             catch { }
             return success;
@@ -1416,9 +1416,9 @@ namespace Sharpmake
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
         private static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, int dwFlags);
-        private static int s_SYMBOLIC_LINK_FLAG_FILE = 0x0;
-        private static int s_SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1;
-        private static int s_SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x2;
+        private const int SYMBOLIC_LINK_FLAG_FILE = 0x0;
+        private const int SYMBOLIC_LINK_FLAG_DIRECTORY = 0x1;
+        private const int SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x2;
 
         public static bool IsSymbolicLink(string path)
         {
