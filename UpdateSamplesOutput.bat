@@ -1,5 +1,9 @@
 @echo off
 
+:: First compile sharpmake to insure we are trying to deploy using an executable corresponding to the code.
+call CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
+if %errorlevel% NEQ 0 goto error
+
 :: main
 set ERRORLEVEL_BACKUP=0
 
