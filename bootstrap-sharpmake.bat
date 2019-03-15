@@ -6,12 +6,28 @@ pushd "%~dp0"
 
 set SHARPMAKE_EXECUTABLE=bin\debug\Sharpmake.Application.exe
 
-if not defined VS140COMNTOOLS (
+:: Try to use vswhere to find the latest Visual Studio installation
+set VSWHERE_PATH=C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
+if exist %VSWHERE_PATH% (
+    for /f "usebackq tokens=1* delims=: " %%i in (`"%VSWHERE_PATH%" -latest -requires Microsoft.VisualStudio.Workload.NativeDesktop`) do (
+         if /i "%%i"=="installationPath" set VSINSTALLATION=%%j
+    )
+)
+
+if "%VSINSTALLATION%"=="" (
+    :: Fallback on VS2015 path
+    set "VSCOMNTOOLS=%VS140COMNTOOLS%"
+) else (
+    :: Use latest Visual Studio installation
+    set "VSCOMNTOOLS=%VSINSTALLATION%\Common7\Tools\"
+)
+
+if "%VSCOMNTOOLS%" == "" (
     echo ERROR: Cannot determine the location of the VS Common Tools folder.
     goto error
 )
 
-call "%VS140COMNTOOLS%VsMSBuildCmd.bat"
+call "%VSCOMNTOOLS%VsMSBuildCmd.bat"
 if %errorlevel% NEQ 0 goto error
 
 call :NugetRestore Sharpmake/Sharpmake.csproj
