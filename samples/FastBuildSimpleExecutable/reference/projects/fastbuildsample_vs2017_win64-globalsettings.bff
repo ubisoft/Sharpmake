@@ -12,9 +12,9 @@ Settings
 {
     .Environment =
     {
-        "TMP=C:\Users\volodymyr.nikolaychu\AppData\Local\Temp\",
-        "TEMP=C:\Users\volodymyr.nikolaychu\AppData\Local\Temp\",
-        "USERPROFILE=C:\Users\volodymyr.nikolaychu",
+        "TMP=C:\Users\jspelletier\AppData\Local\Temp\",
+        "TEMP=C:\Users\jspelletier\AppData\Local\Temp\",
+        "USERPROFILE=C:\Users\jspelletier",
         "SystemRoot=C:\WINDOWS"
     }
 
@@ -25,7 +25,7 @@ Settings
 //=================================================================================================================
 Compiler( 'Compiler-x64-vs2017' )
 {
-    .ExecutableRootPath     = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\bin\HostX64\x64'
+    .ExecutableRootPath     = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\bin\HostX64\x64'
     .Executable             = '$ExecutableRootPath$\cl.exe'
     .ExtraFiles             = {
                                 '$ExecutableRootPath$\1033\clui.dll',
@@ -87,8 +87,8 @@ Compiler( 'Compiler-x64-vs2017' )
 
 .win64Config = 
 [
-    .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64'
-    .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64'
+    .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\bin\Hostx64\x64'
+    .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\bin\Hostx64\x64'
     .ResourceCompiler       = 'C:\Program Files (x86)\Windows Kits\10\bin\x64\rc.exe'
     .Compiler               = 'Compiler-x64-vs2017'
     .Librarian              = '$LinkerPath$\lib.exe'

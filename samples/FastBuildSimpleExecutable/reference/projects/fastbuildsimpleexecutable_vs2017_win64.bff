@@ -20,8 +20,8 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
@@ -65,6 +65,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
+            + ' /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -104,8 +105,8 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
@@ -178,8 +179,8 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
@@ -223,6 +224,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
+            + ' /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -263,8 +265,8 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
