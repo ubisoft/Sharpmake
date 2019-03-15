@@ -7,7 +7,7 @@ pushd "%~dp0"
 set SHARPMAKE_EXECUTABLE=bin\debug\Sharpmake.Application.exe
 
 :: Try to use vswhere to find the latest Visual Studio installation
-set VSWHERE_PATH=C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
+set VSWHERE_PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 if exist %VSWHERE_PATH% (
     for /f "usebackq tokens=1* delims=: " %%i in (`"%VSWHERE_PATH%" -latest -requires Microsoft.VisualStudio.Workload.NativeDesktop`) do (
          if /i "%%i"=="installationPath" set VSINSTALLATION=%%j
