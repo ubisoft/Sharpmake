@@ -1583,8 +1583,7 @@ namespace Sharpmake.Generators.FastBuild
 
             foreach (var file in sourceFiles)
             {
-                // TODO: use SourceFileExtension array instead of ".cpp"
-                if ((string.Compare(file.FileExtension, ".cpp", StringComparison.OrdinalIgnoreCase) == 0) &&
+                if (project.SourceFilesBlobExtensions.Contains(file.FileExtension) &&
                    (conf.PrecompSource == null || !file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase)) &&
                    !conf.ResolvedSourceFilesBlobExclude.Contains(file.FileName))
                 {
