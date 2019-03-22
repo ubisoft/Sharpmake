@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -84,6 +84,7 @@ namespace Sharpmake
         public static bool FastBuildNoStopOnError = false;
         public static bool FastBuildMonitor = false;
         public static bool FastBuildFastCancel = false;
+        public static bool FastBuildUseIDE = true;
 
         // Limit of distributed workers. In FastBuild code the default is 15
         public static int FastBuildWorkerConnectionLimit = -1;

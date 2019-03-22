@@ -573,7 +573,10 @@ namespace Sharpmake.Generators.VisualStudio
 
                     if (conf.IsFastBuild)
                     {
-                        string fastBuildCommandLineOptions = "-vs";
+                        string fastBuildCommandLineOptions = string.Empty;
+
+                        if (FastBuildSettings.FastBuildUseIDE)
+                            fastBuildCommandLineOptions += " -ide";
 
                         if (FastBuildSettings.FastBuildReport)
                             fastBuildCommandLineOptions += " -report";
