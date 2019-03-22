@@ -2870,7 +2870,8 @@ namespace Sharpmake
                                     }
                                 }
 
-                                if (dependencySetting.HasFlag(DependencySetting.AdditionalUsingDirectories))
+                                if (dependencySetting.HasFlag(DependencySetting.AdditionalUsingDirectories) ||
+                                    dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
@@ -2923,7 +2924,8 @@ namespace Sharpmake
                         case OutputType.DotNetClassLibrary:
                         case OutputType.DotNetWindowsApp:
                             {
-                                if (dependencySetting.HasFlag(DependencySetting.AdditionalUsingDirectories))
+                                if (dependencySetting.HasFlag(DependencySetting.AdditionalUsingDirectories) ||
+                                    dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
                                 bool? referenceOutputAssembly = ReferenceOutputAssembly;
