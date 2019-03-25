@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Linq;
 using Sharpmake;
-using System;
 
 namespace SharpmakeGen
 {

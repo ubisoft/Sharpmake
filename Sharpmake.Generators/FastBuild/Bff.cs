@@ -19,7 +19,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.FastBuild

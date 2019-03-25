@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace Sharpmake
 {
