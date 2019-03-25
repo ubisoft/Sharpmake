@@ -449,7 +449,6 @@ namespace Sharpmake
                 /// box for the user.
                 /// </summary>
                 requireAdministrator
-
             }
 
             public Strings PathExcludeBuild = new Strings();
@@ -582,7 +581,7 @@ namespace Sharpmake
             /// To place the project in a sub-directory, use a `/` as a directory separator.
             /// </para>
             /// </remarks>
-             public string SolutionFolder = "";
+            public string SolutionFolder = "";
 
             /// <summary>
             /// Gets or sets the suffix to use in <see cref="LinkerPdbSuffix"/>.

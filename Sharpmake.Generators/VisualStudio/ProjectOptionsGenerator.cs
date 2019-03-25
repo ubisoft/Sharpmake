@@ -1979,8 +1979,8 @@ namespace Sharpmake.Generators.VisualStudio
                 }
                 else
                 {
-                    if ( isMicrosoftPlatform && forceFullPDB &&
-                         ( (context.DevelopmentEnvironment == DevEnv.vs2017) || (context.DevelopmentEnvironment == DevEnv.vs2019)) )
+                    if (isMicrosoftPlatform && forceFullPDB &&
+                         ((context.DevelopmentEnvironment == DevEnv.vs2017) || (context.DevelopmentEnvironment == DevEnv.vs2019)))
                     {
                         context.Options["GenerateDebugInformation"] = "DebugFull";
                         context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG:FULL";

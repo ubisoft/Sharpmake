@@ -435,7 +435,6 @@ namespace Sharpmake
         {
             if (_list.Any(entry => entry.OrderNumber != 0))
             {
-
                 int count = _list.Count;
                 for (int j = 1; j < count; j++)
                 {
