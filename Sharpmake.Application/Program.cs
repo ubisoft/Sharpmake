@@ -715,7 +715,7 @@ namespace Sharpmake.Application
                     var diffLines = diff.Key.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     if (diffLines.Length == 0)
                     {
-                        DebugWriteLine($"        // only whitespace or casing changes");
+                        DebugWriteLine("        // only whitespace or casing changes");
                     }
                     else
                     {
