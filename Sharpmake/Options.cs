@@ -57,13 +57,18 @@ namespace Sharpmake
         /// </summary>
         public abstract class PathOption
         {
-            public static string Get<T>(Project.Configuration conf, string fallback = RemoveLineTag)
+            public static string Get<T>(Project.Configuration conf, string fallback = RemoveLineTag, string rootpath = null)
                 where T : PathOption
             {
                 var option = Options.GetObject<T>(conf);
                 if (option == null)
+                {
                     return fallback;
-
+                }
+                if (!string.IsNullOrEmpty(rootpath))
+                {
+                    return Util.PathGetRelative(rootpath, option.Path, true);
+                }
                 return option.Path;
             }
 

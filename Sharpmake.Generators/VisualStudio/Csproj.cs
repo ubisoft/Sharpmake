@@ -3090,8 +3090,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.AutoGenerateBindingRedirects.Disabled, () => { options["AutoGenerateBindingRedirects"] = RemoveLineTag; })
             );
 
-            // Options.CSharp.OriginatorKeyFile
-            options["AssemblyOriginatorKeyFile"] = Options.StringOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf);
+            options["AssemblyOriginatorKeyFile"] = Options.PathOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf, RemoveLineTag, _projectPath);
             options["MinimumVisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.MinimumVisualStudioVersion>(conf);
             options["OldToolsVersion"] = Options.StringOption.Get<Options.CSharp.OldToolsVersion>(conf);
             options["ApplicationRevision"] = Options.StringOption.Get<Options.CSharp.ApplicationRevision>(conf);

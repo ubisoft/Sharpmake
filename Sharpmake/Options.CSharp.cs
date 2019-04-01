@@ -201,7 +201,7 @@ namespace Sharpmake
                 public ApplicationVersion(string version) : base(version) { }
             }
 
-            public class AssemblyOriginatorKeyFile : StringOption
+            public class AssemblyOriginatorKeyFile : PathOption
             {
                 public AssemblyOriginatorKeyFile(string keyFile) : base(keyFile) { }
             }
