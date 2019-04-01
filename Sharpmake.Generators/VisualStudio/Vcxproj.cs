@@ -2014,7 +2014,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             protected override bool HasContentForConfiguration(Project.Configuration conf, out bool overwriteFile)
             {
-                overwriteFile = conf.CsprojUserFile?.OverwriteExistingFile ?? true;
+                overwriteFile = conf.VcxprojUserFile?.OverwriteExistingFile ?? true;
                 return conf.VcxprojUserFile != null;
             }
         }
