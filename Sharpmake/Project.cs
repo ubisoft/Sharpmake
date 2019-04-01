@@ -95,6 +95,9 @@ namespace Sharpmake
 
         public Strings AdditionalSourceRootPaths = new Strings();  // More source directories to parse for files in addition to SourceRootPath
         public Strings SourceFiles = new Strings();                                     // Files in the project, may be full path of partial path from SourceRootPath
+        private Strings _preFilterSourceFiles = new Strings();                          // Files in the project before we applied fitlering, may be full path of partial path from SourceRootPath
+        public Strings PreFilterSourceFiles { get { return _preFilterSourceFiles; } }
+
 
         protected internal Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
         public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm");         // File that match this regex compile
@@ -781,6 +784,8 @@ namespace Sharpmake
                 AddMatchExtensionFiles(files, ref NoneFilesCopyIfNewer, NoneExtensionsCopyIfNewer);
                 Util.ResolvePath(SourceRootPath, ref NoneFilesCopyIfNewer);
             }
+
+            _preFilterSourceFiles.AddRange(SourceFiles);
 
             if (SourceFilesFilters != null)
             {
