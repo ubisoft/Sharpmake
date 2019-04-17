@@ -89,7 +89,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     var differBy = Util.MakeDifferenceString(conf, otherConf);
                     throw new Error(
-                        "Project {0} ({5} in {6}) have 2 configurations with the same name: \"{1}\" for {2} and {3}"
+                        "Project {0} ({5} in {6}) has 2 configurations with the same name: \"{1}\" for {2} and {3}"
                         + Environment.NewLine + "Nb: ps3 and win32 cannot have same conf name: {4}",
                         project.Name, conf.Name, otherConf.Target, conf.Target, differBy, projectFile, projectPath);
                 }

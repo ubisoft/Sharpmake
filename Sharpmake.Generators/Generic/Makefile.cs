@@ -206,7 +206,7 @@ namespace Sharpmake.Generators.Generic
                 string configurationPlatformAndName = conf.Name + "|" + conf.PlatformName;
 
                 if (solutionNameMapping.TryGetValue(configurationPlatformAndName, out otherConf))
-                    throw new Error("Solution {0} have 2 configurations with the same name: \"{1}\" for {2} and {3}", solution.Name, conf.Name, otherConf.Target, conf.Target);
+                    throw new Error("Solution {0} has 2 configurations with the same name: \"{1}\" for {2} and {3}", solution.Name, conf.Name, otherConf.Target, conf.Target);
 
                 solutionNameMapping[configurationPlatformAndName] = conf;
             }
@@ -354,7 +354,7 @@ namespace Sharpmake.Generators.Generic
                 if (configurationNameMapping.TryGetValue(projectUniqueName, out otherConf))
                 {
                     throw new Error(
-                        "Project {0} ({4} in {5}) have 2 configurations with the same name: \"{1}\" for {2} and {3}",
+                        "Project {0} ({4} in {5}) has 2 configurations with the same name: \"{1}\" for {2} and {3}",
                         project.Name, conf.Name, otherConf.Target, conf.Target, projectFileInfo.Name, projectFileInfo.DirectoryName);
                 }
 
