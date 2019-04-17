@@ -34,14 +34,14 @@ exit /b 0
 @REM -----------------------------------------------------------------------
 :success
 COLOR 2F
-echo Bootstrap succeeded^^!
+echo Bootstrap succeeded^!
 timeout /t 5
 exit /b 0
 
 @REM -----------------------------------------------------------------------
 :error
 COLOR 4F
-echo Bootstrap failed^^!
+echo Bootstrap failed^!
 pause
 set ERROR_CODE=1
 goto end
