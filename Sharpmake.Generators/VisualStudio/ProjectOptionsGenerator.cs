@@ -627,7 +627,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             bool clrSupport = Util.IsDotNet(context.Configuration);
-            if (!clrSupport)
+            if (!clrSupport && context.DevelopmentEnvironment.IsVisualStudio() && context.DevelopmentEnvironment < DevEnv.vs2019) // Gm is deprecated starting with vs2019
             {
                 //Options.Vc.Compiler.MinimalRebuild.
                 //    Disable                                 MinimalRebuild="false"
@@ -637,7 +637,15 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.MinimalRebuild.Disable, () => { context.Options["MinimalRebuild"] = "false"; context.CommandLineOptions["MinimalRebuild"] = "/Gm-"; }),
                 Options.Option(Options.Vc.Compiler.MinimalRebuild.Enable, () => { context.Options["MinimalRebuild"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["MinimalRebuild"] = "/Gm"; })
                 );
+            }
+            else
+            {
+                context.Options["MinimalRebuild"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["MinimalRebuild"] = FileGeneratorUtilities.RemoveLineTag;
+            }
 
+            if (!clrSupport)
+            {
                 //Options.Vc.Compiler.RTTI.
                 //    Disable                                 RuntimeTypeInfo="false"                         /GR-
                 //    Enable                                  RuntimeTypeInfo="true"
@@ -649,9 +657,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
-                context.Options["MinimalRebuild"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["RuntimeTypeInfo"] = FileGeneratorUtilities.RemoveLineTag;
-                context.CommandLineOptions["MinimalRebuild"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["RuntimeTypeInfo"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
