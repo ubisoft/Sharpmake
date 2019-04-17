@@ -228,7 +228,24 @@ namespace Sharpmake
         public string GetTargetString()
         {
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
-            string result = String.Join("_", fieldInfos.Select(f => s_cachedFieldValueToString.GetOrAdd(f.GetValue(this), value => value.ToString())).ToArray());
+            string result = string.Join(
+                "_",
+                fieldInfos.Select(
+                    f => s_cachedFieldValueToString.GetOrAdd(
+                        f.GetValue(this),
+                        value =>
+                        {
+                            if (value is Platform)
+                            {
+                                var platform = (Platform)value;
+                                if (platform >= Platform._reserved9)
+                                    return Util.GetSimplePlatformString(platform).ToLower();
+                            }
+                            return value.ToString();
+                        }
+                    )
+                )
+            );
             return result;
         }
 
