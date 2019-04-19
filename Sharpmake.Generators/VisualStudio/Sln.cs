@@ -544,8 +544,12 @@ namespace Sharpmake.Generators.VisualStudio
                         int maxEqualFragments = 0;
                         int[] solutionTargetValues = solutionTarget.GetFragmentsValue();
 
+                        Platform previousPlatform = Platform._reserved1;
+
                         foreach (var conf in solutionProject.Configurations)
                         {
+                            Platform currentTargetPlatform = conf.Target.GetPlatform();
+
                             int[] candidateTargetValues = conf.Target.GetFragmentsValue();
                             if (solutionTargetValues.Length != candidateTargetValues.Length)
                                 continue;
@@ -557,10 +561,11 @@ namespace Sharpmake.Generators.VisualStudio
                                     equalFragments++;
                             }
 
-                            if (equalFragments > maxEqualFragments)
+                            if ((equalFragments == maxEqualFragments && currentTargetPlatform < previousPlatform) || equalFragments > maxEqualFragments)
                             {
                                 projectTarget = conf.Target;
                                 maxEqualFragments = equalFragments;
+                                previousPlatform = currentTargetPlatform;
                             }
                         }
 
