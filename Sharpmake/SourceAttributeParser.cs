@@ -44,10 +44,14 @@ namespace Sharpmake
 
     public static class SourceAttributeParserHelpers
     {
-        public static Regex CreateAttributeRegex(string attributeName, uint parameterCount, params string[] namespaces)
+        public static Regex CreateAttributeRegex(string attributeTarget, string attributeName, uint parameterCount, params string[] namespaces)
         {
             const string dp = @"(?:/\*.*?\*/|\s)*"; // Discardable Part, we use dp to make it small in the following lines
-            string regex = $@"^{dp}\[{dp}module{dp}:{dp}";
+            string regex = $@"^{dp}\[{dp}";
+            if (!string.IsNullOrWhiteSpace(attributeTarget))
+            {
+                regex += $"{attributeTarget}{dp}:{dp}";
+            }
             // Handle namespaces being optional
             // First we open groups for every namespace
             foreach (var ns in namespaces)
@@ -78,6 +82,11 @@ namespace Sharpmake
             regex += $@"{dp}\]";
             return new Regex(regex, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant);
         }
+
+        public static Regex CreateModuleAttributeRegex(string attributeName, uint parameterCount, params string[] namespaces)
+        {
+            return CreateAttributeRegex("module", attributeName, parameterCount, namespaces);
+        }
     }
 
     public abstract class SimpleSourceAttributeParser : ISourceAttributeParser
@@ -86,14 +95,14 @@ namespace Sharpmake
 
         public SimpleSourceAttributeParser(string attributeName, uint parameterCount, params string[] namespaces)
         {
-            _attributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, parameterCount, namespaces));
+            _attributeRegexes.Add(SourceAttributeParserHelpers.CreateModuleAttributeRegex(attributeName, parameterCount, namespaces));
         }
 
         public SimpleSourceAttributeParser(string attributeName, uint parameterMinCount, uint parameterMaxCount, params string[] namespaces)
         {
             for (uint i = parameterMinCount; i <= parameterMaxCount; i++)
             {
-                _attributeRegexes.Add(SourceAttributeParserHelpers.CreateAttributeRegex(attributeName, i, namespaces));
+                _attributeRegexes.Add(SourceAttributeParserHelpers.CreateModuleAttributeRegex(attributeName, i, namespaces));
             }
         }
 
