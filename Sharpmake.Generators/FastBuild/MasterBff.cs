@@ -271,6 +271,7 @@ namespace Sharpmake.Generators.FastBuild
 
             var platformBffCache = new Dictionary<Platform, IPlatformBff>();
 
+            var verificationPostBuildCopies = new Dictionary<string, string>();
             foreach (Solution.Configuration solutionConfiguration in configurationsPerBff)
             {
                 foreach (var solutionProject in solutionProjects)
@@ -320,6 +321,22 @@ namespace Sharpmake.Generators.FastBuild
 
                                 // use the global root for alias computation, as the project has not idea in which master bff it has been included
                                 var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffDirectory, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
+
+                                {
+                                    string key = sourceFileName + destinationRelativeToGlobal;
+                                    string currentSourceFullPath = Util.PathGetAbsolute(masterBffDirectory, sourceFile);
+                                    string previous;
+                                    if (verificationPostBuildCopies.TryGetValue(key, out previous))
+                                    {
+                                        if (previous != currentSourceFullPath)
+                                            builder.LogErrorLine("A post-build copy to the destination '{0}' already exist but from different sources: '{1}' and '{2}'!", Util.PathGetAbsolute(masterBffDirectory, destinationFolder), previous, currentSourceFullPath);
+                                    }
+                                    else
+                                    {
+                                        verificationPostBuildCopies.Add(key, currentSourceFullPath);
+                                    }
+                                }
+
                                 string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
                                 {
                                     using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
