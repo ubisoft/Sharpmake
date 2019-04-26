@@ -352,7 +352,7 @@ namespace Sharpmake.Generators.VisualStudio
             Solution.ResolvedProject fastBuildAllProjectForSolutionDependency = null;
             if (solution.FastBuildAllSlnDependencyFromExe)
             {
-                var fastBuildAllProjects = solutionProjects.Where(p => p.Project is FastBuildAllProject).ToArray();
+                var fastBuildAllProjects = solutionProjects.Where(p => p.Project.IsFastBuildAll).ToArray();
                 if (fastBuildAllProjects.Length > 1)
                     throw new Error("More than one FastBuildAll project");
                 if (fastBuildAllProjects.Length == 1)

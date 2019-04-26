@@ -328,6 +328,11 @@ namespace Sharpmake
             set { SetProperty(ref _stripFastBuildSourceFiles, value); }
         }
 
+        public bool IsFastBuildAll
+        {
+            get { return this is FastBuildAllProject; }
+        }
+
         private IEnumerable<Strings> GetStringFields()
         {
             yield return AdditionalSourceRootPaths;

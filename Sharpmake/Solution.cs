@@ -158,7 +158,7 @@ namespace Sharpmake
             {
                 foreach (Configuration.IncludedProjectInfo includedProjectInfo in solutionConfiguration.IncludedProjectInfos)
                 {
-                    if (solutionConfiguration.IncludeOnlyFilterProject && !(includedProjectInfo.Project is FastBuildAllProject) && (includedProjectInfo.Project.SourceFilesFiltersCount == 0 || includedProjectInfo.Project.SkipProjectWhenFiltersActive))
+                    if (solutionConfiguration.IncludeOnlyFilterProject && !(includedProjectInfo.Project.IsFastBuildAll) && (includedProjectInfo.Project.SourceFilesFiltersCount == 0 || includedProjectInfo.Project.SkipProjectWhenFiltersActive))
                     {
                         projectsWereFiltered = true;
                         continue;

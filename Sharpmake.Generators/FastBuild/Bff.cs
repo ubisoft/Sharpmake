@@ -489,7 +489,7 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_objects");
                             }
-                            else if (conf.Output == Project.Configuration.OutputType.None && project is FastBuildAllProject)
+                            else if (conf.Output == Project.Configuration.OutputType.None && project.IsFastBuildAll)
                             {
                                 // filter to only get the configurations of projects that were explicitely added, not the dependencies
                                 var minResolvedConf = conf.ResolvedPrivateDependencies.Where(x => conf.UnResolvedPrivateDependencies.ContainsKey(x.Project.GetType()));
@@ -1864,7 +1864,7 @@ namespace Sharpmake.Generators.FastBuild
             // Check if we need to add a compatible config for unity build - For now this is limited to C++ files compiled with no special options.... 
             foreach (Project.Configuration conf in configurations)
             {
-                if (conf.FastBuildBlobbed && (sourceFiles.Count > 0 || conf.Project is FastBuildAllProject))
+                if (conf.FastBuildBlobbed && (sourceFiles.Count > 0 || conf.Project.IsFastBuildAll))
                 {
                     // For now, this will do.
                     var tuple = GetDefaultTupleConfig();
