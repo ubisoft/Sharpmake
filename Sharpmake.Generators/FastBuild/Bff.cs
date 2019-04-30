@@ -107,17 +107,14 @@ namespace Sharpmake.Generators.FastBuild
             return Path.Combine(path, bffFileName + FastBuildSettings.FastBuildConfigFileExtension);
         }
 
-        public static string GetShortProjectName(Project project, Configuration conf)
+        public static string GetShortProjectName(Project project, Project.Configuration conf)
         {
             string platformString = conf.Platform.ToString();
             if (conf.Platform >= Platform._reserved9)
                 platformString = Util.GetSimplePlatformString(conf.Platform).ToLower();
 
-            var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
-            if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(conf.Target.GetFragment<DevEnv>()))
-                platformString += "_" + platformToolset;
-
-            return (project.Name + "_" + conf.Target.Name + "_" + platformString).Replace(' ', '_');
+            string dirtyConfigName = string.Join("_", project.Name, conf.Name, platformString);
+            return string.Join("_", dirtyConfigName.Split(new char[] { ' ', ':' }));
         }
 
         public static string GetPlatformSpecificDefine(Platform platform)
