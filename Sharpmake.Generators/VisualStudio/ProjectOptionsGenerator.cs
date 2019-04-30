@@ -1583,7 +1583,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 if (linkerAdditionalOptions.Length > 0)
                     linkerAdditionalOptions += " ";
-                linkerAdditionalOptions += " /ignore:" + disableLinkerWarnings.JoinStrings(",");
+                linkerAdditionalOptions += "/ignore:" + disableLinkerWarnings.JoinStrings(",");
             }
 
             context.Options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
