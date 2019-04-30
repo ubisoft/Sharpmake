@@ -56,6 +56,7 @@ namespace Sharpmake.Application
             private bool _testOptionValid = true;
             public bool ProfileOutput = false;
             internal TestOptions TestOption;
+            internal bool RegressionDiff = true;
             public DirectoryInfo OutputDirectory;
             public DirectoryInfo ReferenceDirectory;
             public DirectoryInfo RemapRoot;
@@ -160,6 +161,12 @@ Configure: tests if the configure methods are reversible, track the problems. re
             public void CommandLineStrict(string option)
             {
                 _testOptionValid = Enum.TryParse(option, out TestOption);
+            }
+
+            [CommandLine.Option("regressionDiff", @"Use diff tool if found to show regression differences (enabled by default): ex: /regressionDiff(<true|false>)")]
+            public void CommandLineRegressionDiff(bool value)
+            {
+                RegressionDiff = value;
             }
 
             [CommandLine.Option("writefiles", @"Sets if the generated files should be written or not. Default value: true. ex: /writefiles(<true|false>)")]

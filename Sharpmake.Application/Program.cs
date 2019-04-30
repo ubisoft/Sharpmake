@@ -253,7 +253,7 @@ namespace Sharpmake.Application
                                 exitCode = ExitCode.Error;
                                 DebugWriteLine($"{regressions.Count} Regressions detected:");
                                 List<BuildContext.RegressionTest.OutputInfo> fileChanges = regressions.Where(x => x.FileStatus == BuildContext.RegressionTest.FileStatus.Different).ToList();
-                                LogFileChanges(fileChanges);
+                                LogFileChanges(fileChanges, parameters.RegressionDiff);
 
                                 var fileMissing = regressions.Where(x => x.FileStatus == BuildContext.RegressionTest.FileStatus.NotGenerated).Select(x => x.ReferencePath).ToList();
                                 if (fileMissing.Count > 0)
@@ -626,7 +626,7 @@ namespace Sharpmake.Application
             return null;
         }
 
-        private static void LogFileChanges(List<BuildContext.RegressionTest.OutputInfo> fileChanges)
+        private static void LogFileChanges(List<BuildContext.RegressionTest.OutputInfo> fileChanges, bool showRegressionDiff)
         {
             if (fileChanges.Count == 0)
                 return;
@@ -636,7 +636,7 @@ namespace Sharpmake.Application
 
 
             string diffExecutable = LocateDiffExecutable();
-            if (diffExecutable == null)
+            if (!showRegressionDiff || diffExecutable == null)
             {
                 DebugWriteLine($"  {fileChanges.Count} files have changed from the reference:");
                 fileChanges.ForEach(x =>
