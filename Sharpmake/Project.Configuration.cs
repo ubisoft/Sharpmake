@@ -2780,6 +2780,10 @@ namespace Sharpmake
                         resolvedPrivateDependencies.Add(dependency);
                     }
 
+                    bool isExport = dependency.Project.GetType().IsDefined(typeof(Export), false);
+                    bool compile = dependency.Project.GetType().IsDefined(typeof(Generate), false) ||
+                                   dependency.Project.GetType().IsDefined(typeof(Compile), false);
+
                     var dependencySetting = propagationSetting._dependencySetting;
                     if (dependencySetting != DependencySetting.OnlyBuildOrder)
                     {
@@ -2793,10 +2797,10 @@ namespace Sharpmake
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
                     }
-
-                    bool isExport = dependency.Project.GetType().IsDefined(typeof(Export), false);
-                    bool compile = dependency.Project.GetType().IsDefined(typeof(Generate), false) ||
-                                   dependency.Project.GetType().IsDefined(typeof(Compile), false);
+                    else if (Output == OutputType.None && isExport == false)
+                    {
+                        GenericBuildDependencies.Add(dependency);
+                    }
 
                     if (dependency.Output == OutputType.Lib || dependency.Output == OutputType.Dll || dependency.Output == OutputType.None)
                     {
