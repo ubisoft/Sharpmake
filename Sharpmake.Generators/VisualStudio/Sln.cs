@@ -373,7 +373,9 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         fileGenerator.Write(Template.Solution.ProjectBegin);
                         Strings buildDepsGuids = new Strings(resolvedProject.Configurations.SelectMany(
-                            c => c.GenericBuildDependencies.Select(
+                            c => c.GenericBuildDependencies.Where(
+                                p => (p.Project is FastBuildAllProject) == false || fastBuildAllProjectForSolutionDependency == null || p.Project == fastBuildAllProjectForSolutionDependency.Project
+                            ).Select(
                                 p => p.ProjectGuid ?? ReadGuidFromProjectFile(p.ProjectFullFileNameWithExtension)
                             )
                         ));
