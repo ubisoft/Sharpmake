@@ -413,7 +413,7 @@ namespace Sharpmake.Generators.VisualStudio
                         fileGenerator.Write(Template.Solution.SolutionItemBegin);
                         foreach (string file in items.Value)
                         {
-                            using (fileGenerator.Declare("solutionItemPath", file))
+                            using (fileGenerator.Declare("solutionItemPath", Util.PathGetRelative(solutionPath, file)))
                                 fileGenerator.Write(Template.Solution.SolutionItem);
                         }
                         fileGenerator.Write(Template.Solution.ProjectSectionEnd);
