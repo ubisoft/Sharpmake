@@ -574,22 +574,22 @@ namespace Sharpmake.Generators.VisualStudio
 
                     if (conf.IsFastBuild)
                     {
-                        string fastBuildCommandLineOptions = string.Empty;
+                        var fastBuildCommandLineOptions = new List<string>();
 
                         if (FastBuildSettings.FastBuildUseIDE)
-                            fastBuildCommandLineOptions += " -ide";
+                            fastBuildCommandLineOptions.Add("-ide");
 
                         if (FastBuildSettings.FastBuildReport)
-                            fastBuildCommandLineOptions += " -report";
+                            fastBuildCommandLineOptions.Add("-report");
 
                         if (FastBuildSettings.FastBuildSummary)
-                            fastBuildCommandLineOptions += " -summary";
+                            fastBuildCommandLineOptions.Add("-summary");
 
                         if (FastBuildSettings.FastBuildVerbose)
-                            fastBuildCommandLineOptions += " -verbose";
+                            fastBuildCommandLineOptions.Add("-verbose");
 
                         if (FastBuildSettings.FastBuildMonitor)
-                            fastBuildCommandLineOptions += " -monitor";
+                            fastBuildCommandLineOptions.Add("-monitor");
 
                         // Configuring cache mode if that configuration is allowed to use caching
                         if (conf.FastBuildCacheAllowed)
@@ -598,13 +598,13 @@ namespace Sharpmake.Generators.VisualStudio
                             switch (FastBuildSettings.CacheType)
                             {
                                 case FastBuildSettings.CacheTypes.CacheRead:
-                                    fastBuildCommandLineOptions += " -cacheread";
+                                    fastBuildCommandLineOptions.Add("-cacheread");
                                     break;
                                 case FastBuildSettings.CacheTypes.CacheWrite:
-                                    fastBuildCommandLineOptions += " -cachewrite";
+                                    fastBuildCommandLineOptions.Add("-cachewrite");
                                     break;
                                 case FastBuildSettings.CacheTypes.CacheReadWrite:
-                                    fastBuildCommandLineOptions += " -cache";
+                                    fastBuildCommandLineOptions.Add("-cache");
                                     break;
                                 default:
                                     break;
@@ -612,29 +612,32 @@ namespace Sharpmake.Generators.VisualStudio
                         }
 
                         if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
-                            fastBuildCommandLineOptions += " -dist";
+                            fastBuildCommandLineOptions.Add("-dist");
 
                         if (FastBuildSettings.FastBuildWait)
-                            fastBuildCommandLineOptions += " -wait";
+                            fastBuildCommandLineOptions.Add("-wait");
 
                         if (FastBuildSettings.FastBuildNoStopOnError)
-                            fastBuildCommandLineOptions += " -nostoponerror";
+                            fastBuildCommandLineOptions.Add("-nostoponerror");
                         if (FastBuildSettings.FastBuildFastCancel)
-                            fastBuildCommandLineOptions += " -fastcancel";
+                            fastBuildCommandLineOptions.Add("-fastcancel");
 
                         if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
-                            fastBuildCommandLineOptions += " " + conf.FastBuildCustomArgs;
+                            fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
 
-                        fastBuildCommandLineOptions += FastBuildCustomArguments;
+                        if (!string.IsNullOrEmpty(FastBuildCustomArguments))
+                            fastBuildCommandLineOptions.Add(FastBuildCustomArguments);
+
+                        string commandLine = string.Join(" ", fastBuildCommandLineOptions);
 
                         // Make the commandline written in the bff available, except the master bff -config
-                        Bff.SetCommandLineArguments(conf, fastBuildCommandLineOptions);
+                        Bff.SetCommandLineArguments(conf, commandLine);
 
-                        fastBuildCommandLineOptions += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
+                        commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
 
                         using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
-                        using (fileGenerator.Declare("fastBuildMakeCommandBuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, fastBuildCommandLineOptions)))
-                        using (fileGenerator.Declare("fastBuildMakeCommandRebuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, fastBuildCommandLineOptions)))
+                        using (fileGenerator.Declare("fastBuildMakeCommandBuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
+                        using (fileGenerator.Declare("fastBuildMakeCommandRebuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
                         {
                             platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                         }
