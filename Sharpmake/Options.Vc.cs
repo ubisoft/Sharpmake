@@ -64,6 +64,7 @@ namespace Sharpmake
                     v10_0_17134_0, // 1803, April 2018 Update
                     v10_0_17763_0, // 1809, October 2018 Update
                     v10_0_18362_0, // 1903, May 2019 Update
+                    Latest,       // latest available in host machine
                 }
 
                 public enum CharacterSet

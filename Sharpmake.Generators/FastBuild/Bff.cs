@@ -131,6 +131,41 @@ namespace Sharpmake.Generators.FastBuild
                 FastBuildSettings.MakeCommandGenerator = new FastBuildDefaultMakeCommandGenerator();
         }
 
+        private static ConcurrentDictionary<DevEnv, string> s_LatestTargetPlatformVersions = new ConcurrentDictionary<DevEnv, string>();
+
+        /// <summary>
+        /// Find the latest usable kit root
+        /// </summary>
+        /// <param name="devEnv"></param>
+        /// <returns></returns>
+        private static string GetLatestTargetPlatformVersion(DevEnv devEnv)
+        {
+            string value;
+            if (!s_LatestTargetPlatformVersions.TryGetValue(devEnv, out value))
+            {
+                value = FileGeneratorUtilities.RemoveLineTag;
+                KitsRootEnum kitsRootVersion = KitsRootPaths.GetUseKitsRootForDevEnv(devEnv);
+                if (kitsRootVersion != KitsRootEnum.KitsRoot81)
+                {
+                    string kitRoot = KitsRootPaths.GetRoot(kitsRootVersion);
+                    Options.Vc.General.WindowsTargetPlatformVersion[] platformVersionsEnumValues = (Options.Vc.General.WindowsTargetPlatformVersion[])Enum.GetValues(Options.Vc.General.WindowsTargetPlatformVersion.Latest.GetType());
+
+                    foreach (var version in platformVersionsEnumValues.Reverse())
+                    {
+                        string binPath = Path.Combine(kitRoot, "bin", version.ToVersionString());
+                        if (Directory.Exists(binPath))
+                        {
+                            // Stop once we found something
+                            value = version.ToVersionString();
+                            break;
+                        }
+                    }
+                }
+                s_LatestTargetPlatformVersions.TryAdd(devEnv, value);
+            }
+            return value;
+        }
+
         // ===================================================================================
         // BFF Generation
         // ===================================================================================
@@ -170,10 +205,15 @@ namespace Sharpmake.Generators.FastBuild
                 context.Options = new Options.ExplicitOptions();
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
                 context.Configuration = conf;
+
+                // resolve targetPlatformVersion as it may be used in includes
+                string targetPlatformVersionString = GetLatestTargetPlatformVersion(conf.Compiler);
+
                 var resolverParams = new[] {
                     new VariableAssignment("project", context.Project),
                     new VariableAssignment("target", context.Configuration.Target),
-                    new VariableAssignment("conf", context.Configuration)
+                    new VariableAssignment("conf", context.Configuration),
+                    new VariableAssignment("latesttargetplatformversion", targetPlatformVersionString)
                 };
                 context.EnvironmentVariableResolver = PlatformRegistry.Get<IPlatformDescriptor>(conf.Platform).GetPlatformEnvironmentResolver(resolverParams);
                 projectOptionsGen.GenerateOptions(context);
