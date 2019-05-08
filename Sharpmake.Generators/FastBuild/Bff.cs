@@ -464,6 +464,8 @@ namespace Sharpmake.Generators.FastBuild
 
                         var postBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
 
+                        Strings preBuildTargets = new Strings();
+
                         var fastBuildTargetSubTargets = new List<string>();
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
@@ -490,11 +492,11 @@ namespace Sharpmake.Generators.FastBuild
                             if (isFirstSubConfig) // pre-build steps on the first config
                             {
                                 // the pre-steps are written in the master bff, we only need to refer their aliases
-                                fastBuildTargetSubTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
-                                fastBuildTargetSubTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
+                                preBuildTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
+                                preBuildTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
 
-                                fastBuildTargetSubTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
-                                fastBuildTargetSubTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
+                                preBuildTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
+                                preBuildTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
                             }
 
                             fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
@@ -855,20 +857,11 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildEmbeddedResources = UtilityMethods.FBuildFormatList(fastbuildEmbeddedResourceFilesList, 30);
                         }
 
+                        Strings fastBuildPreBuildDependencies = new Strings();
                         UniqueList<Project.Configuration> orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
-                        string fastBuildPreBuildDependencies = "";
-                        if (orderedForceUsingDeps.Count != 0)
-                        {
-                            StringBuilder builderPreBuild = new StringBuilder();
-                            foreach (var dep in orderedForceUsingDeps)
-                            {
-                                builderPreBuild.AppendFormat(@"'{0}',", GetShortProjectName(dep.Project, dep));
-                            }
+                        fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
+                        fastBuildPreBuildDependencies.AddRange(preBuildTargets);
 
-                            fastBuildPreBuildDependencies = builderPreBuild.ToString();
-                            if (fastBuildPreBuildDependencies.Length > 0)
-                                fastBuildPreBuildDependencies = fastBuildPreBuildDependencies.Remove(fastBuildPreBuildDependencies.Length - 1, 1);
-                        }
                         if (projectHasResourceFiles)
                             resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
                         if (projectHasEmbeddedResources)
@@ -921,7 +914,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildEmbeddedResources", fastBuildEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
                                     using (bffGenerator.Declare("fastBuildProjectDependencies", UtilityMethods.FBuildFormatList(fastBuildProjectDependencies, 30)))
-                                    using (bffGenerator.Declare("fastBuildPreBuildTargets", fastBuildPreBuildDependencies))
+                                    using (bffGenerator.Declare("fastBuildPreBuildTargets", UtilityMethods.FBuildFormatList(fastBuildPreBuildDependencies.ToList(), 28)))
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
@@ -1005,10 +998,7 @@ namespace Sharpmake.Generators.FastBuild
                                                 }
                                             }
 
-                                            if (orderedForceUsingDeps.Count != 0)
-                                            {
-                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
-                                            }
+                                            bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
@@ -1058,10 +1048,7 @@ namespace Sharpmake.Generators.FastBuild
                                                 // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
                                             }
 
-                                            if (orderedForceUsingDeps.Count != 0)
-                                            {
-                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
-                                            }
+                                            bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
@@ -1158,6 +1145,8 @@ namespace Sharpmake.Generators.FastBuild
                                                         }
                                                     }
                                                 }
+
+                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
                                             }
                                             else
                                             {

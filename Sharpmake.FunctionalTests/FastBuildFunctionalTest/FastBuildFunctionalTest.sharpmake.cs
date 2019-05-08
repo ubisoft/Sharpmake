@@ -305,6 +305,33 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class RequirePreBuildStep : CommonExeProject
+    {
+        public RequirePreBuildStep()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            string tempGeneratedPath = @"[project.SharpmakeCsPath]\projects\generated";
+            string generatedHeaderFile = Path.Combine(tempGeneratedPath, "header_generated_by_prebuild_step.h");
+
+            // Create a PreBuild step that creates a header file that is required for compilation
+            var preBuildStep = new Configuration.BuildStepExecutable(
+                @"[project.SourceRootPath]\execute.bat",
+                @"[project.SourceRootPath]\main.cpp",
+                generatedHeaderFile,
+                "echo #define PREBUILD_GENERATED_DEFINE() 0 > " + generatedHeaderFile);
+
+            conf.EventCustomPrebuildExecute.Add("GenerateHeader", preBuildStep);
+
+            conf.IncludePrivatePaths.Add(tempGeneratedPath);
+        }
+    }
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -326,6 +353,7 @@ namespace SharpmakeGen.FunctionalTests
 
             conf.AddProject<MixCppAndCExe>(target);
             conf.AddProject<UsePrecompExe>(target);
+            conf.AddProject<RequirePreBuildStep>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {
