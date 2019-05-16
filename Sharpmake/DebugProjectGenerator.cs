@@ -192,9 +192,10 @@ namespace Sharpmake
 
                 s_sharpmakePackageVersion = match.Groups[1].Value;
                 string assemblyProductVariation = match.Groups[2].Value;
+                string assemblyProductVariationWithoutSubGroup = assemblyProductVariation.Split('/')[0];
                 s_sharpmakePackageName = $"{assemblyProductName}";
-                if (!string.IsNullOrWhiteSpace(assemblyProductVariation))
-                    s_sharpmakePackageName += $"-{assemblyProductVariation}";
+                if (!string.IsNullOrWhiteSpace(assemblyProductVariationWithoutSubGroup))
+                    s_sharpmakePackageName += $"-{assemblyProductVariationWithoutSubGroup}";
 
                 if (assemblyProductVariation == "LocalBuild")
                 {
