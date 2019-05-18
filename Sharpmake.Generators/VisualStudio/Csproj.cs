@@ -2191,11 +2191,7 @@ namespace Sharpmake.Generators.VisualStudio
                         itemGroups.AddReference(dotNetFramework, referencesByName);
                     }
                 }
-            }
 
-            foreach (var conf in configurations)
-            {
-                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                 foreach (var str in conf.ReferencesByNameExternal)
                 {
                     var referencesByNameExternal = new ItemGroups.Reference
@@ -2205,11 +2201,18 @@ namespace Sharpmake.Generators.VisualStudio
                     };
                     itemGroups.AddReference(dotNetFramework, referencesByNameExternal);
                 }
-            }
 
-            foreach (var conf in configurations)
-            {
-                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                foreach (var str in conf.ReferencesByNameInterop)
+                {
+                    var referencesByNameExternal = new ItemGroups.Reference
+                    {
+                        Include = str,
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
+                        EmbedInteropTypes = true,
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByNameExternal);
+                }
+
                 foreach (var str in conf.ReferencesByPath.Select(Util.GetCapitalizedPath))
                 {
                     var referencesByPath = new ItemGroups.Reference
@@ -2246,11 +2249,7 @@ namespace Sharpmake.Generators.VisualStudio
                     };
                     itemGroups.AddReference(dotNetFramework, referencesByPath);
                 }
-            }
 
-            foreach (var conf in configurations)
-            {
-                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                 if (dotNetFramework.IsDotNetFramework())
                 {
                     foreach (var r in conf.DotNetReferences)
