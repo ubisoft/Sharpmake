@@ -1971,71 +1971,72 @@ namespace Sharpmake.Generators.VisualStudio
 
             #region References
 
-            var referencesByName = new List<ItemGroups.Reference>();
-            configurations.ForEach(
-                conf => referencesByName.AddRange(
-                    conf.ReferencesByName.Select(
+            var referencesByName = configurations.SelectMany(
+                conf => conf.ReferencesByName.Select(
                     str => new ItemGroups.Reference
                     {
                         Include = str,
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
-                    })));
-            itemGroups.References.AddRange(referencesByName);
+                    }));
 
-            var referencesByNameExternal = new List<ItemGroups.Reference>();
-            configurations.ForEach(
-                conf => referencesByNameExternal.AddRange(
-                    conf.ReferencesByNameExternal.Select(
+			var interopReferencesByName = configurations.SelectMany(
+				conf => conf.InteropReferencesByName.Select(
+					str => new ItemGroups.Reference
+					{
+						Include = str,
+						Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
+						EmbedInteropTypes = true
+					}));
+
+			var referencesByNameExternal = configurations.SelectMany(
+				conf => conf.ReferencesByNameExternal.Select(
                     str => new ItemGroups.Reference
                     {
                         Include = str,
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
-                    })));
-            itemGroups.References.AddRange(referencesByNameExternal);
-
-            var referencesByPath = new List<ItemGroups.Reference>();
-
-            foreach (var conf in configurations)
-            {
-                referencesByPath.AddRange(
-                    conf.ReferencesByPath.Select(Util.GetCapitalizedPath)
-                    .Select(str => new ItemGroups.Reference
-                    {
-                        Include = Path.GetFileNameWithoutExtension(str),
-                        SpecificVersion = false,
-                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
-                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
                     }));
 
-                referencesByPath.AddRange(
-                    conf.InteropReferencesByPath.Select(Util.GetCapitalizedPath)
-                    .Select(str => new ItemGroups.Reference
-                    {
-                        Include = Path.GetFileNameWithoutExtension(str),
-                        SpecificVersion = false,
-                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
-                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
-                        EmbedInteropTypes = true,
-                    }));
+			var referencesByPath = configurations.SelectMany(
+				conf => conf.ReferencesByPath.Select(Util.GetCapitalizedPath).Select(
+					str => new ItemGroups.Reference
+					{
+						Include = Path.GetFileNameWithoutExtension(str),
+						SpecificVersion = false,
+						HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+						Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+					}));
 
-                referencesByPath.AddRange(
-                    project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath)
-                    .Select(str => new ItemGroups.Reference
-                    {
-                        Include = Path.GetFileNameWithoutExtension(str),
-                        SpecificVersion = false,
-                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
-                        Private = false
-                    }));
-            }
+			var interopReferencesByPath = configurations.SelectMany(
+				conf => conf.InteropReferencesByPath.Select(Util.GetCapitalizedPath).Select(
+					str => new ItemGroups.Reference
+					{
+						Include = Path.GetFileNameWithoutExtension(str),
+						SpecificVersion = false,
+						HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+						Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+						EmbedInteropTypes = true,
+					}));
 
-            itemGroups.References.AddRange(referencesByPath);
+			var additionalEmbeddedAssemblies = project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath).Select(
+					str => new ItemGroups.Reference
+					{
+						Include = Path.GetFileNameWithoutExtension(str),
+						SpecificVersion = false,
+						HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+						Private = false
+					});
 
-            var references = configurations.SelectMany(
-                conf => conf.DotNetReferences.Select(
-                    r => GetItemGroupsReference(r, project.DependenciesCopyLocal)));
+			var references = configurations.SelectMany(
+				conf => conf.DotNetReferences.Select(
+					r => GetItemGroupsReference(r, project.DependenciesCopyLocal)));
 
-            itemGroups.References.AddRange(references);
+			itemGroups.References.AddRange(referencesByName
+				.Concat(interopReferencesByName)
+				.Concat(referencesByNameExternal)
+				.Concat(referencesByPath)
+				.Concat(interopReferencesByPath)
+				.Concat(additionalEmbeddedAssemblies)
+				.Concat(references));
 
             if (Util.DirectoryExists(Path.Combine(project.SourceRootPath, "Web References")))
                 itemGroups.WebReferences.Add(new ItemGroups.WebReference { Include = @"Web References\" });
