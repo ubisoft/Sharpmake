@@ -207,6 +207,7 @@ namespace Sharpmake.Application
                     throw new Error($"Only Sharpmake process can define symbols starting with {sharpmakeSymbolPrefix}. Invalid symbols defined: {invalidSymbolsString}");
                 }
 
+                parameters.Defines.Add(sharpmakeSymbolPrefix); // A generic sharpmake define to allow scripts to exclude part of code if not used with sharpmake
                 parameters.Defines.Add($"{sharpmakeSymbolPrefix}_{version.Major}_{version.Minor}_X");
                 parameters.Defines.Add($"{sharpmakeSymbolPrefix}_{version.Major}_{version.Minor}_{version.Build}");
 
