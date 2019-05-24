@@ -2666,57 +2666,8 @@ namespace Sharpmake
                     explicitDependenciesGlobal = Sharpmake.Options.GetObject<Options.Vc.Linker.LinkLibraryDependencies>(this) != Sharpmake.Options.Vc.Linker.LinkLibraryDependencies.Enable;
                 }
 
-                DependencyNode rootNode = new DependencyNode(this, DependencySetting.Default);
-
-                Dictionary<Configuration, DependencyNode> visited = new Dictionary<Configuration, DependencyNode>();
-
-                Stack<DependencyNode> visiting = new Stack<DependencyNode>();
-                visiting.Push(rootNode);
-                while (visiting.Count > 0)
-                {
-                    DependencyNode visitedNode = visiting.Pop();
-                    Configuration visitedConfiguration = visitedNode._configuration;
-
-                    // if we already know that configuration, just reattach its children to the current node
-                    DependencyNode alreadyExisting = null;
-                    if (visited.TryGetValue(visitedConfiguration, out alreadyExisting))
-                    {
-                        foreach (var child in alreadyExisting._childNodes)
-                        {
-                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(child.Key));
-                            visitedNode._childNodes.Add(child.Key, child.Value);
-                        }
-                        continue;
-                    }
-
-                    visited.Add(visitedConfiguration, visitedNode);
-
-                    var unresolvedDependencies = new[] { visitedConfiguration.UnResolvedPublicDependencies, visitedConfiguration.UnResolvedPrivateDependencies };
-                    foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
-                    {
-                        if (dependencies.Count == 0)
-                            continue;
-
-                        bool isPrivateDependency = dependencies == visitedConfiguration.UnResolvedPrivateDependencies;
-                        DependencyType dependencyType = isPrivateDependency ? DependencyType.Private : DependencyType.Public;
-
-                        foreach (KeyValuePair<Type, ITarget> pair in dependencies)
-                        {
-                            Configuration dependencyConf = GetDependencyConfiguration(builder, visitedConfiguration, pair);
-
-                            // Get the dependency settings from the owner of the dependency.
-                            DependencySetting dependencySetting;
-                            if (!visitedConfiguration._dependenciesSetting.TryGetValue(pair, out dependencySetting))
-                                dependencySetting = DependencySetting.Default;
-
-                            DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
-                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(childNode));
-                            visitedNode._childNodes.Add(childNode, dependencyType);
-
-                            visiting.Push(childNode);
-                        }
-                    }
-                }
+                // create a tree of dependency from this configuration
+                DependencyNode rootNode = BuildDependencyNodeTree(builder, this);
 
                 HashSet<Configuration> resolvedPublicDependencies = new HashSet<Configuration>();
                 HashSet<Configuration> resolvedPrivateDependencies = new HashSet<Configuration>();
@@ -2988,6 +2939,63 @@ namespace Sharpmake
                 _resolvedDependencies.AddRange(_resolvedPrivateDependencies);
 
                 _linkState = LinkState.Linked;
+            }
+
+            static private DependencyNode BuildDependencyNodeTree(Builder builder, Configuration conf)
+            {
+                DependencyNode rootNode = new DependencyNode(conf, DependencySetting.Default);
+
+                Dictionary<Configuration, DependencyNode> visited = new Dictionary<Configuration, DependencyNode>();
+
+                Stack<DependencyNode> visiting = new Stack<DependencyNode>();
+                visiting.Push(rootNode);
+                while (visiting.Count > 0)
+                {
+                    DependencyNode visitedNode = visiting.Pop();
+                    Configuration visitedConfiguration = visitedNode._configuration;
+
+                    // if we already know that configuration, just reattach its children to the current node
+                    DependencyNode alreadyExisting = null;
+                    if (visited.TryGetValue(visitedConfiguration, out alreadyExisting))
+                    {
+                        foreach (var child in alreadyExisting._childNodes)
+                        {
+                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(child.Key));
+                            visitedNode._childNodes.Add(child.Key, child.Value);
+                        }
+                        continue;
+                    }
+
+                    visited.Add(visitedConfiguration, visitedNode);
+
+                    var unresolvedDependencies = new[] { visitedConfiguration.UnResolvedPublicDependencies, visitedConfiguration.UnResolvedPrivateDependencies };
+                    foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
+                    {
+                        if (dependencies.Count == 0)
+                            continue;
+
+                        bool isPrivateDependency = dependencies == visitedConfiguration.UnResolvedPrivateDependencies;
+                        DependencyType dependencyType = isPrivateDependency ? DependencyType.Private : DependencyType.Public;
+
+                        foreach (KeyValuePair<Type, ITarget> pair in dependencies)
+                        {
+                            Configuration dependencyConf = conf.GetDependencyConfiguration(builder, visitedConfiguration, pair);
+
+                            // Get the dependency settings from the owner of the dependency.
+                            DependencySetting dependencySetting;
+                            if (!visitedConfiguration._dependenciesSetting.TryGetValue(pair, out dependencySetting))
+                                dependencySetting = DependencySetting.Default;
+
+                            DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
+                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(childNode));
+                            visitedNode._childNodes.Add(childNode, dependencyType);
+
+                            visiting.Push(childNode);
+                        }
+                    }
+                }
+
+                return rootNode;
             }
 
             internal void SetDefaultOutputExtension()
