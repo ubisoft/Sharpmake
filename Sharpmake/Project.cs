@@ -556,6 +556,19 @@ namespace Sharpmake
         // everything blobbed anyway.
         internal Strings ResolvedNoBlobbedSourceFiles = new Strings();  // all source excluded from by [project.Name]_xyz.blob.cpp
 
+        public HashSet<string> GetAllConfigurationBuildExclude(IEnumerable<Configuration> configurations)
+        {
+            HashSet<string> result = new HashSet<string>();
+            result.UnionWith(ResolvedSourceFiles);
+
+            foreach (Project.Configuration conf in configurations)
+            {
+                result.IntersectWith(conf.ResolvedSourceFilesBuildExclude);
+            }
+
+            return result;
+        }
+
         public Strings GetSourceFilesForConfigurations(IEnumerable<Configuration> configurations)
         {
             // Remove blob files ?
@@ -563,16 +576,12 @@ namespace Sharpmake
             bool allNoBlobbed = true;
             bool includeBlobbedSourceFiles = true;
 
-            HashSet<string> allConfigurationBuildExclude = new HashSet<string>();
-            allConfigurationBuildExclude.UnionWith(ResolvedSourceFiles);
-
             foreach (Project.Configuration conf in configurations)
             {
                 bool isBlobbed = conf.IsBlobbed;
                 allBlobbed &= isBlobbed;
                 allNoBlobbed &= !isBlobbed;
                 includeBlobbedSourceFiles &= conf.IncludeBlobbedSourceFiles;
-                allConfigurationBuildExclude.IntersectWith(conf.ResolvedSourceFilesBuildExclude);
             }
 
             Strings result = new Strings();
@@ -585,7 +594,7 @@ namespace Sharpmake
                     result.AddRange(entry.Value.ResolvedBlobSourceFiles);
                 }
                 result.AddRange(ResolvedNoBlobbedSourceFiles);
-                result.RemoveRange(allConfigurationBuildExclude);
+                result.RemoveRange(GetAllConfigurationBuildExclude(configurations));
             }
             else if (allNoBlobbed)
             {

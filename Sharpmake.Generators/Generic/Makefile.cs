@@ -39,10 +39,12 @@ namespace Sharpmake.Generators.Generic
             public string FileNameProjectRelative;
             public string FileNameWithoutExtension;
             public string FileExtensionLower;
+            public int FileIndex; // When the file name is used multiple times
 
-            public ProjectFile(string fileName, string projectPathCapitalized, string projectSourceCapitalized)
+            public ProjectFile(string fileName, string projectPathCapitalized, string projectSourceCapitalized, int index)
             {
                 FileName = Project.GetCapitalizedFile(fileName) ?? fileName; // LC TODO can it really return null ???
+                FileIndex = index;
 
                 FileNameProjectRelative = Util.PathGetRelative(projectPathCapitalized, FileName, true);
                 string fileNameSourceRelative = Util.PathGetRelative(projectSourceCapitalized, FileName, true);
@@ -59,6 +61,18 @@ namespace Sharpmake.Generators.Generic
                 else
                 {
                     DirectorySourceRelative = "";
+                }
+            }
+
+            public string GetObjectFileName()
+            {
+                if (FileIndex > 0)
+                {
+                    return FileNameWithoutExtension + FileIndex + ObjectExtension;
+                }
+                else
+                {
+                    return FileNameWithoutExtension + ObjectExtension;
                 }
             }
         }
@@ -285,7 +299,7 @@ namespace Sharpmake.Generators.Generic
                             // This support the use case where you have a huge unit tests suite that take too long to compile.
                             // In this case, you just exclude all unit tests from the build and manually uncomment only the unit tests you want to build.
                             using (fileGenerator.Declare("excludeChar", conf.ResolvedSourceFilesBuildExclude.Contains(file.FileName) ? "#" : ""))
-                            using (fileGenerator.Declare("objectFile", file.FileNameWithoutExtension + ObjectExtension))
+                            using (fileGenerator.Declare("objectFile", file.GetObjectFileName()))
                             {
                                 fileGenerator.Write(Template.Project.ObjectsVariableElement);
                             }
@@ -303,9 +317,9 @@ namespace Sharpmake.Generators.Generic
                 // Source file rules
                 // Since we write excluded source files commented. Here we write rules for all files
                 // in case one of the commented out object file is manually uncomment.
-                foreach (ProjectFile file in GetSourceFiles(project, configurations, projectFileInfo))
+                foreach (ProjectFile file in sourceFiles)
                 {
-                    using (fileGenerator.Declare("objectFile", file.FileNameWithoutExtension + ObjectExtension))
+                    using (fileGenerator.Declare("objectFile", file.GetObjectFileName()))
                     using (fileGenerator.Declare("sourceFile", PathMakeUnix(file.FileNameProjectRelative)))
                     {
                         if (file.FileExtensionLower == ".c")
@@ -569,7 +583,12 @@ namespace Sharpmake.Generators.Generic
             List<Project.Configuration> configurations,
             FileInfo projectFileInfo)
         {
+
+
+            Dictionary<string, int > fileNamesOccurences = new Dictionary<string, int >();
+
             Strings projectSourceFiles = project.GetSourceFilesForConfigurations(configurations);
+            projectSourceFiles.RemoveRange(project.GetAllConfigurationBuildExclude(configurations));
 
             // Add source files
             List<ProjectFile> allFiles = new List<ProjectFile>();
@@ -577,7 +596,18 @@ namespace Sharpmake.Generators.Generic
 
             foreach (string file in projectSourceFiles)
             {
-                ProjectFile projectFile = new ProjectFile(file, projectFileInfo.DirectoryName, Util.GetCapitalizedPath(project.SourceRootPath));
+                string fileName = Path.GetFileName(file);
+                int fileNameOccurences = 0;
+                if (fileNamesOccurences.TryGetValue(fileName, out fileNameOccurences))
+                {
+                    fileNamesOccurences[fileName] = fileNameOccurences++;
+                }
+                else
+                {
+                    fileNamesOccurences.Add(fileName, fileNameOccurences);
+                }
+
+                ProjectFile projectFile = new ProjectFile(file, projectFileInfo.DirectoryName, Util.GetCapitalizedPath(project.SourceRootPath), fileNameOccurences);
                 allFiles.Add(projectFile);
             }
 
