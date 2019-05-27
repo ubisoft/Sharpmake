@@ -237,6 +237,13 @@ namespace Sharpmake
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
             string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
+
+            // Apply the same arguments that are currently applied to this application, excluding /sources and /generateDebugSolution.
+            string customArgs = string.Join(" ", Environment.GetCommandLineArgs()
+                .Skip(1)
+                .Where(s => !s.StartsWith("/sources") && s != "/generateDebugSolution"));
+            conf.CsprojUserFile.StartArguments += $@" {customArgs}";
+
             conf.CsprojUserFile.StartProgram = s_sharpmakeApplicationExePath;
         }
     }
