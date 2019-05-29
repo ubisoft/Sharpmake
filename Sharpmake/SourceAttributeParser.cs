@@ -39,7 +39,6 @@ namespace Sharpmake
     /// </summary>
     public interface ISourceAttributeParser : ISourceParser
     {
-
     }
 
     public static class SourceAttributeParserHelpers

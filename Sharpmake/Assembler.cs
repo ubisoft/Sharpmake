@@ -74,10 +74,9 @@ namespace Sharpmake
             public Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
         }
 
-        public Assembler() 
+        public Assembler()
             : this(new HashSet<string>())
         {
-
         }
 
         public Assembler(HashSet<string> defines)

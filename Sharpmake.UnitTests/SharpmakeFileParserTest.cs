@@ -375,7 +375,7 @@ namespace Sharpmake.UnitTests
                 new LineTest("#endif",          true),
                 new LineTest("",                true),
             };
-            
+
             EvaluateLines(lines, defines);
         }
 
@@ -417,7 +417,6 @@ namespace Sharpmake.UnitTests
             };
 
             EvaluateLines(lines, defines);
-
         }
 
         [Test]
@@ -445,7 +444,6 @@ namespace Sharpmake.UnitTests
             };
 
             EvaluateLines(lines, defines);
-
         }
 
         #endregion

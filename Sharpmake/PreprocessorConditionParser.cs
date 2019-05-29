@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright (c) 2017 Ubisoft Entertainment
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,13 +52,12 @@ namespace Sharpmake
     /// </summary>
     public class PreprocessorConditionParser : IParsingFlowParser
     {
-
         // These regexes DO NOT support complex expressions like #if (A || !B)
-        private static readonly RegexOptions _regexOptions = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant;
-        private static readonly Regex _ifRegex = new Regex(@"^\s*#if\s+(?<symbolName>\w+)", _regexOptions);
-        private static readonly Regex _elifRegex = new Regex(@"^\s*#elif\s+(?<symbolName>\w+)", _regexOptions);
-        private static readonly Regex _elseRegex = new Regex(@"^\s*#else", _regexOptions);
-        private static readonly Regex _endifRegex = new Regex(@"^\s*#endif", _regexOptions);
+        private static readonly RegexOptions s_regexOptions = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant;
+        private static readonly Regex s_ifRegex = new Regex(@"^\s*#if\s+(?<symbolName>\w+)", s_regexOptions);
+        private static readonly Regex s_elifRegex = new Regex(@"^\s*#elif\s+(?<symbolName>\w+)", s_regexOptions);
+        private static readonly Regex s_elseRegex = new Regex(@"^\s*#else", s_regexOptions);
+        private static readonly Regex s_endifRegex = new Regex(@"^\s*#endif", s_regexOptions);
 
         // It is possible that the parser might be called from different threads, the state of the parser must be per thread so that we don't mix files.
         private ThreadLocal<State> _state = new ThreadLocal<State>(() => new State());
@@ -64,7 +77,7 @@ namespace Sharpmake
                 return;
 
             // Are we in a #if block ?
-            Match match = _ifRegex.Match(trimmedLine);
+            Match match = s_ifRegex.Match(trimmedLine);
             if (match.Success)
             {
                 PushNewConditionBlock();
@@ -73,7 +86,7 @@ namespace Sharpmake
             }
 
             // Are we in a #elif block ?
-            match = _elifRegex.Match(trimmedLine);
+            match = s_elifRegex.Match(trimmedLine);
             if (match.Success)
             {
                 TestConditionBlockBranch(match.Groups["symbolName"].Value);
@@ -81,7 +94,7 @@ namespace Sharpmake
             }
 
             // Are we in a #else block ?
-            match = _elseRegex.Match(trimmedLine);
+            match = s_elseRegex.Match(trimmedLine);
             if (match.Success)
             {
                 TestConditionBlockBranch(null);
@@ -89,7 +102,7 @@ namespace Sharpmake
             }
 
             // Are we in a #endif block ?
-            match = _endifRegex.Match(trimmedLine);
+            match = s_endifRegex.Match(trimmedLine);
             if (match.Success)
             {
                 PopConditionBlock();
@@ -138,7 +151,6 @@ namespace Sharpmake
 
         public bool ShouldParseLine()
         {
-
             return _state.Value.IsCurrentCodeBlockDefined;
         }
 
@@ -165,7 +177,6 @@ namespace Sharpmake
             /// The current code block is defined if we are currently parsing a line that is inside a block where all nested conditions are defined.
             /// </summary>
             public bool IsCurrentCodeBlockDefined { get; set; } = true;
-
         }
 
         private class ConditionBlock
@@ -186,5 +197,4 @@ namespace Sharpmake
             public string CurrentDefine { get; set; } = "";
         }
     }
-
 }
