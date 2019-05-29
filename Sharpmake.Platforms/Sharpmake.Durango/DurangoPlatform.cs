@@ -67,12 +67,26 @@ namespace Sharpmake
 
             public override string CConfigName(Configuration conf)
             {
-                return ".durangoConfig";
+                var devEnv = conf.Target.GetFragment<DevEnv>();
+                string platformToolsetString = string.Empty;
+                var platformToolset = Sharpmake.Options.GetObject<Sharpmake.Options.Vc.General.PlatformToolset>(conf);
+                if (platformToolset != Sharpmake.Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
+                    platformToolsetString = $"_{platformToolset}";
+
+                string lldString = string.Empty;
+                var useLldLink = Sharpmake.Options.GetObject<Sharpmake.Options.Vc.LLVM.UseLldLink>(conf);
+                if (useLldLink == Sharpmake.Options.Vc.LLVM.UseLldLink.Enable ||
+                   (useLldLink == Sharpmake.Options.Vc.LLVM.UseLldLink.Default && platformToolset == Sharpmake.Options.Vc.General.PlatformToolset.LLVM))
+                {
+                    lldString = "_LLD";
+                }
+
+                return $".durango{platformToolsetString}{lldString}Config";
             }
 
             public override string CppConfigName(Configuration conf)
             {
-                return ".durangoConfig";
+                return CConfigName(conf);
             }
 
             public override bool SupportsResourceFiles => false;
@@ -108,11 +122,28 @@ namespace Sharpmake
                         {
                             var win64PlatformSettings = PlatformRegistry.Get<IPlatformBff>(Platform.win64) as Windows.Win64Platform; // TODO: make cleaner
 
-                            string overrideName = "Compiler-" + Sharpmake.Util.GetSimplePlatformString(Platform.win64) + "-" + devEnv;
-                            CompilerSettings compilerSettings = win64PlatformSettings.GetMasterCompilerSettings(masterCompilerSettings, overrideName, devEnv, projectRootPath, Sharpmake.Options.Vc.General.PlatformToolset.Default, false);
+                            string overrideName = "Compiler-" + Sharpmake.Util.GetSimplePlatformString(Platform.win64);
+
+                            var platformToolset = Sharpmake.Options.GetObject<Sharpmake.Options.Vc.General.PlatformToolset>(conf);
+                            if (platformToolset == Sharpmake.Options.Vc.General.PlatformToolset.LLVM)
+                            {
+                                var useClangCl = Sharpmake.Options.GetObject<Sharpmake.Options.Vc.LLVM.UseClangCl>(conf);
+
+                                // Use default platformToolset to get MS compiler instead of Clang, when ClanCl is disabled
+                                if (useClangCl == Sharpmake.Options.Vc.LLVM.UseClangCl.Disable)
+                                    platformToolset = Sharpmake.Options.Vc.General.PlatformToolset.Default;
+                            }
+
+                            if (platformToolset != Sharpmake.Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
+                                overrideName += "-" + platformToolset;
+                            else
+                                overrideName += "-" + devEnv;
+
+
+                            CompilerSettings compilerSettings = win64PlatformSettings.GetMasterCompilerSettings(masterCompilerSettings, overrideName, devEnv, projectRootPath, platformToolset, false);
                             compilerSettings.PlatformFlags |= Platform.durango;
 
-                            SetConfiguration(conf, compilerSettings.Configurations, string.Empty, projectRootPath, devEnv, false);
+                            SetConfiguration(conf, compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false);
                         }
                         break;
                     default:
@@ -120,7 +151,14 @@ namespace Sharpmake
                 }
             }
 
-            private CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, string rootPath, DevEnv devEnv, string projectRootPath, bool useCCompiler)
+            private CompilerSettings GetMasterCompilerSettings(
+                IDictionary<string, CompilerSettings> masterCompilerSettings,
+                string compilerName,
+                string rootPath,
+                DevEnv devEnv,
+                string projectRootPath,
+                bool useCCompiler
+            )
             {
                 CompilerSettings compilerSettings;
 
@@ -170,10 +208,15 @@ namespace Sharpmake
                 return compilerSettings;
             }
 
-            private void SetConfiguration(Project.Configuration conf, IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+            private void SetConfiguration(
+                Project.Configuration conf,
+                IDictionary<string, CompilerSettings.Configuration> configurations,
+                string configName,
+                string projectRootPath,
+                DevEnv devEnv,
+                bool useCCompiler
+            )
             {
-                string configName = ".durangoConfig";
-
                 string linkerPathOverride = null;
                 string linkerExeOverride = null;
                 string librarianExeOverride = null;
@@ -189,19 +232,19 @@ namespace Sharpmake
                     string linkerPath;
                     if (!string.IsNullOrEmpty(linkerPathOverride))
                         linkerPath = linkerPathOverride;
-                    if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
+                    else if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
                         linkerPath = binPath;
 
                     string linkerExe;
                     if (!string.IsNullOrEmpty(linkerExeOverride))
                         linkerExe = linkerExeOverride;
-                    if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
+                    else if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                         linkerExe = "link.exe";
 
                     string librarianExe;
                     if (!string.IsNullOrEmpty(librarianExeOverride))
                         librarianExe = librarianExeOverride;
-                    if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
+                    else if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
                         librarianExe = "lib.exe";
 
                     configurations.Add(
@@ -216,7 +259,7 @@ namespace Sharpmake
                     );
 
                     configurations.Add(
-                        ".durangoConfigMasm",
+                        configName + "Masm",
                         new CompilerSettings.Configuration(
                             Platform.durango,
                             compiler: @"$BinPath$\ml64.exe",
@@ -430,11 +473,18 @@ namespace Sharpmake
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
                 bool isApplication = context.ProjectConfigurations.Any(conf => conf.Output == Project.Configuration.OutputType.Exe);
-                bool hasPlatformSpecificGlobals = GlobalSettings.OverridenDurangoXDK || isApplication;
+                bool hasPlatformSpecificGlobals = GlobalSettings.OverridenDurangoXDK || isApplication || ClangForWindows.Settings.OverridenLLVMInstallDir;
 
                 if (hasPlatformSpecificGlobals)
                 {
                     generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                }
+
+                if (ClangForWindows.Settings.OverridenLLVMInstallDir)
+                {
+                    using (generator.Declare("custompropertyname", "LLVMInstallDir"))
+                    using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Sharpmake.Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                        generator.Write(Vcxproj.Template.Project.CustomProperty);
                 }
 
                 if (GlobalSettings.OverridenDurangoXDK)

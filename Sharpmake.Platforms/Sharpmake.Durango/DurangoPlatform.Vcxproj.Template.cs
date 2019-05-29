@@ -188,6 +188,8 @@ namespace Sharpmake
     <NetworkSharePath>[options.NetworkSharePath]</NetworkSharePath>
     <PullTemporaryFolder>[options.PullTemporaryFolder]</PullTemporaryFolder>
     <LayoutExtensionFilter>[options.LayoutExtensionFilter]</LayoutExtensionFilter>
+    <UseClangCl>[options.UseClangCl]</UseClangCl>
+    <UseLldLink>[options.UseLldLink]</UseLldLink>
   </PropertyGroup>
   <PropertyGroup>
     <IsolateConfigurationsOnDeploy>true</IsolateConfigurationsOnDeploy>
