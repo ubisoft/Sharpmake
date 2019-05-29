@@ -131,6 +131,8 @@ namespace Sharpmake
       <BaseAddress>[options.BaseAddress]</BaseAddress>
       <UACExecutionLevel>[options.UACExecutionLevel]</UACExecutionLevel>
       <AllowIsolation>[options.AllowIsolation]</AllowIsolation>
+      <GenerateWindowsMetadata>[options.GenerateWindowsMetadata]</GenerateWindowsMetadata>
+      <WindowsMetadataFile>[options.WindowsMetadataFile]</WindowsMetadataFile>
     </Link>
 ";
 

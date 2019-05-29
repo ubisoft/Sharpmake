@@ -144,6 +144,8 @@ namespace Sharpmake
       <ImportLibrary>[options.ImportLibrary]</ImportLibrary>
       <FunctionOrder>[options.FunctionOrder]</FunctionOrder>
       <ForceFileOutput>[options.ForceFileOutput]</ForceFileOutput>
+      <GenerateWindowsMetadata>[options.GenerateWindowsMetadata]</GenerateWindowsMetadata>
+      <WindowsMetadataFile>[options.WindowsMetadataFile]</WindowsMetadataFile>
     </Link>
 ";
 

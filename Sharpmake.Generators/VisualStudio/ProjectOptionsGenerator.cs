@@ -1484,6 +1484,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Linker.GenerateWindowsMetadata.Default, () =>
             {
                 context.Options["GenerateWindowsMetadata"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["WindowsMetadataFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["GenerateWindowsMetadata"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["WindowsMetadataFile"] = FileGeneratorUtilities.RemoveLineTag;
             }),
@@ -1491,12 +1492,14 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.Options["GenerateWindowsMetadata"] = "true";
                 string windowsMetadataFile = @"$(OutDir)\$(RootNamespace).winmd";
+                context.Options["WindowsMetadataFile"] = windowsMetadataFile;
                 context.CommandLineOptions["GenerateWindowsMetadata"] = "/WINMD";
                 context.CommandLineOptions["WindowsMetadataFile"] = @"/WINMDFILE:""" + windowsMetadataFile + @"""";
             }),
             Options.Option(Options.Vc.Linker.GenerateWindowsMetadata.Disable, () =>
             {
                 context.Options["GenerateWindowsMetadata"] = "false";
+                context.Options["WindowsMetadataFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["GenerateWindowsMetadata"] = "/WINMD:NO";
                 context.CommandLineOptions["WindowsMetadataFile"] = FileGeneratorUtilities.RemoveLineTag;
             })
