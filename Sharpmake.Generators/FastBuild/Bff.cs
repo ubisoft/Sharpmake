@@ -674,6 +674,18 @@ namespace Sharpmake.Generators.FastBuild
                                 fastBuildAdditionalCompilerOptionsFromCode += " " + llvmClangCompilerOptions;
                         }
 
+                        // c1xx: warning C4199: two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP; use /Zc:twoPhase-
+                        if (isConsumeWinRTExtensions && context.DevelopmentEnvironment >= DevEnv.vs2017)
+                        {
+                            if (conf.AdditionalCompilerOptions.Contains("/permissive-") && !conf.AdditionalCompilerOptions.Contains("/Zc:twoPhase-"))
+                            {
+                                if (fastBuildAdditionalCompilerOptionsFromCode == FileGeneratorUtilities.RemoveLineTag)
+                                    fastBuildAdditionalCompilerOptionsFromCode = "/Zc:twoPhase-";
+                                else
+                                    fastBuildAdditionalCompilerOptionsFromCode += " /Zc:twoPhase-";
+                            }
+                        }
+
                         if (conf.ReferencesByName.Count > 0)
                         {
                             throw new Exception("Use ReferencesByPath instead of ReferencesByName for FastBuild support; ");
