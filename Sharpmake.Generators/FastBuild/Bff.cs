@@ -671,7 +671,7 @@ namespace Sharpmake.Generators.FastBuild
                             if (fastBuildAdditionalCompilerOptionsFromCode == FileGeneratorUtilities.RemoveLineTag)
                                 fastBuildAdditionalCompilerOptionsFromCode = llvmClangCompilerOptions;
                             else
-                                fastBuildAdditionalCompilerOptionsFromCode += llvmClangCompilerOptions;
+                                fastBuildAdditionalCompilerOptionsFromCode += " " + llvmClangCompilerOptions;
                         }
 
                         if (conf.ReferencesByName.Count > 0)
