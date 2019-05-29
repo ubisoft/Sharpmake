@@ -86,6 +86,11 @@ namespace Sharpmake
         public static bool FastBuildFastCancel = false;
         public static bool FastBuildUseIDE = true;
 
+        /// <summary>
+        /// Allows retention of build state across BFF changes. Requires v0.97
+        /// </summary>
+        public static bool FastBuildAllowDBMigration = false;
+
         // Limit of distributed workers. In FastBuild code the default is 15
         public static int FastBuildWorkerConnectionLimit = -1;
 

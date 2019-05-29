@@ -622,6 +622,7 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
             using (masterBffGenerator.Declare("fastBuildUserProfile", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
             using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))
+            using (masterBffGenerator.Declare("fastBuildAllowDBMigration", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
             {
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.GlobalSettings);

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2017 Ubisoft Entertainment
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,6 +70,7 @@ Settings
     [CachePluginDLL]
     [CachePath]
     [WorkerConnectionLimit]
+    .AllowDBMigration_Experimental = [fastBuildAllowDBMigration]
 }
 ";
                 public static string MasmConfigNameSuffix = "Masm";
@@ -89,7 +90,7 @@ Compiler( '[fastbuildCompilerName]' )
 ";
 
                 public static string CompilerConfiguration = @"
-[fastBuildConfigurationName] = 
+[fastBuildConfigurationName] =
 [
     Using( [fastBuildUsing] )
     .BinPath                = '[fastBuildBinPath]'
@@ -159,13 +160,13 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.WindowsMetadataFile]'
                             // Advanced
                             // ---------------------------
-                            + ' [cmdLineOptions.BaseAddress]' 
-                            + ' [cmdLineOptions.RandomizedBaseAddress]' 
-                            + ' [cmdLineOptions.FixedBaseAddress]' 
+                            + ' [cmdLineOptions.BaseAddress]'
+                            + ' [cmdLineOptions.RandomizedBaseAddress]'
+                            + ' [cmdLineOptions.FixedBaseAddress]'
                             + ' [cmdLineOptions.ImportLibrary]'
                             + ' [cmdLineOptions.TargetMachine]'
                             + ' /errorReport:queue'
-                            + ' [cmdLineOptions.ModuleDefinitionFile]' 
+                            + ' [cmdLineOptions.ModuleDefinitionFile]'
                             // Additional linker options
                             //--------------------------
                             + ' [options.AdditionalLinkerOptions]'
@@ -205,8 +206,8 @@ Compiler( '[fastbuildCompilerName]' )
     // Resource Compiler options
     // -------------------------
     .Compiler               = .ResourceCompiler
-    .CompilerOutputExtension= '.res' 
-    .CompilerOptions        = '/fo""%2"" $ResourceCompilerExtraOptions$ ""%1""' 
+    .CompilerOutputExtension= '.res'
+    .CompilerOptions        = '/fo""%2"" $ResourceCompilerExtraOptions$ ""%1""'
     .CompilerOutputPath     = '$Intermediate$'
     .CompilerInputFiles     = [fastBuildResourceFiles]
 
