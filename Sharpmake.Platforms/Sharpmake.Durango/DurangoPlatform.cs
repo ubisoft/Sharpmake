@@ -482,9 +482,14 @@ namespace Sharpmake
 
                 if (ClangForWindows.Settings.OverridenLLVMInstallDir)
                 {
-                    using (generator.Declare("custompropertyname", "LLVMInstallDir"))
-                    using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Sharpmake.Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
-                        generator.Write(Vcxproj.Template.Project.CustomProperty);
+                    bool hasClangConfiguration = context.ProjectConfigurations.Any(conf => Sharpmake.Options.GetObject<Sharpmake.Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain());
+
+                    if (hasClangConfiguration)
+                    {
+                        using (generator.Declare("custompropertyname", "LLVMInstallDir"))
+                        using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Sharpmake.Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                            generator.Write(Vcxproj.Template.Project.CustomProperty);
+                    }
                 }
 
                 if (GlobalSettings.OverridenDurangoXDK)
