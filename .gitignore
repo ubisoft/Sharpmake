@@ -11,6 +11,7 @@
 !Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj
 
 # Samples generated projects
+samples/*/package/*.androidproj
 samples/*/projects/*
 samples/winformssubtypesdb.bin
 !samples/*/reference/*.sln

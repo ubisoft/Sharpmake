@@ -13,6 +13,7 @@ namespace SharpmakeGen.Samples
             SourceRootPath = @"[project.RootPath]\samples\[project.Name]";
             SourceFilesExcludeRegex.Add(
                 @"\\codebase\\",
+                @"\\package\\",
                 @"\\projects\\",
                 @"\\reference\\"
             );
@@ -28,6 +29,15 @@ namespace SharpmakeGen.Samples
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
+        }
+    }
+
+    [Generate]
+    public class AndroidProject : SampleProject
+    {
+        public AndroidProject()
+        {
+            Name = "Android";
         }
     }
 
