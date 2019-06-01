@@ -1086,6 +1086,43 @@ namespace Sharpmake.UnitTests
                 Assert.True(conf.DependenciesLibraryFiles.ContainsElement("LibDependOnDLLProject"));
             }
         }
+
+        [Test]
+        public void AutoDependencyOrder()
+        {
+            var project = GetProject<SharpmakeProjects.ProjectDependencyOrder>();
+            Assert.IsNotNull(project);
+            Assert.IsNotNull(project);
+
+            foreach (var conf in project.Configurations)
+            {
+                Assert.That(conf.ResolvedDependencies.Count, Is.EqualTo(4));
+
+                Assert.True(conf.ResolvedDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject1)));
+                Assert.True(conf.ResolvedDependencies.ContainsProjectType(typeof(SharpmakeProjects.NoDependencyProject2)));
+                Assert.True(conf.ResolvedDependencies.ContainsProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)));
+                Assert.True(conf.ResolvedDependencies.ContainsProjectType(typeof(SharpmakeProjects.TwoPrivateDependenciesProject)));
+
+                int rootProjectOrder = conf.TargetFileOrderNumber;
+                int project1Order = conf.ResolvedDependencies.OfProjectType(typeof(SharpmakeProjects.NoDependencyProject1)).First().TargetFileOrderNumber;
+                int project2Order = conf.ResolvedDependencies.OfProjectType(typeof(SharpmakeProjects.NoDependencyProject2)).First().TargetFileOrderNumber;
+                int onePrivateOrder = conf.ResolvedDependencies.OfProjectType(typeof(SharpmakeProjects.OnePrivateDependencyProject)).First().TargetFileOrderNumber;
+                int twoPrivateOrder = conf.ResolvedDependencies.OfProjectType(typeof(SharpmakeProjects.TwoPrivateDependenciesProject)).First().TargetFileOrderNumber;
+
+                // I can't know the exact values but dependencies should at least appear as higher values
+                Assert.Less(rootProjectOrder, project1Order);
+                Assert.Less(rootProjectOrder, project2Order);
+
+                Assert.Less(onePrivateOrder, project1Order);
+                Assert.Less(onePrivateOrder, project2Order);
+
+                Assert.Less(twoPrivateOrder, project1Order);
+                Assert.Less(twoPrivateOrder, project2Order);
+
+                Assert.AreEqual(onePrivateOrder, twoPrivateOrder);
+                Assert.AreEqual(project1Order, project2Order);
+            }
+        }
     }
 
     public static class UTestUtilities
@@ -1093,9 +1130,13 @@ namespace Sharpmake.UnitTests
         public static readonly string IncludeFolder = "include";
         public static readonly string LibOutputFolder = "lib_output";
 
-        public static bool ContainsProjectType(this System.Collections.Generic.IEnumerable<Project.Configuration> dependencies, System.Type projectType)
+        public static bool ContainsProjectType(this IEnumerable<Project.Configuration> dependencies, Type projectType)
         {
             return dependencies.Select(x => x.Project.GetType()).Contains(projectType);
+        }
+        public static IEnumerable<Project.Configuration> OfProjectType(this IEnumerable<Project.Configuration> dependencies, Type projectType)
+        {
+            return dependencies.Where(x => x.Project.GetType() == projectType);
         }
 
         public static bool ContainsProjectType(this IEnumerable<DotNetDependency> dependencies, Type projectType)
@@ -1739,6 +1780,21 @@ namespace Sharpmake.UnitTests
             {
                 conf.AddPrivateDependency<OnePublicDependencyProject>(target, DependencySetting.OnlyBuildOrder);
                 conf.AddPrivateDependency<OnePrivateDependencyProject>(target);
+            }
+        }
+
+        [Sharpmake.Generate]
+        public class ProjectDependencyOrder : UTestUtilities.UnitTestCommonProject
+        {
+            public ProjectDependencyOrder() { }
+
+            [Configure()]
+            public void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.AddPrivateDependency<OnePrivateDependencyProject>(target);
+                conf.AddPrivateDependency<TwoPrivateDependenciesProject>(target);
+                conf.AddPrivateDependency<NoDependencyProject1>(target);
+                conf.AddPrivateDependency<NoDependencyProject2>(target);
             }
         }
     }
