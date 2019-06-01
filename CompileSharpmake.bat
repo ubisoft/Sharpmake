@@ -29,32 +29,14 @@ echo MSBuild batch path: !VSMSBUILDCMD!
 call !VSMSBUILDCMD!
 if %errorlevel% NEQ 0 goto end
 
-call :NugetRestore %1 win
-if %errorlevel% NEQ 0 goto end
-
 call :BuildSharpmake %1 %2 %3
-if %errorlevel% NEQ 0 goto end
-
-
-:: Restore nuget
-:NugetRestore
-echo Restoring nuget packages for %~1
-
-set DOTNET_RESTORE=dotnet restore "%~1"
-if "%~2" neq "" set DOTNET_RESTORE=%DOTNET_RESTORE% -r %2
-echo %DOTNET_RESTORE%
-%DOTNET_RESTORE%
-if %errorlevel% NEQ 0 (
-    echo ERROR: Failed to restore nuget package for %~1
-    exit /b 1
-)
-exit /b 0
+goto end
 
 :: Build Sharpmake using specified arguments
 :BuildSharpmake
 echo Compiling %~1 in "%~2|%~3"...
 
-set MSBUILD_CMD=msbuild "%~1" /nologo /verbosity:quiet /p:Configuration="%~2" /p:Platform="%~3"
+set MSBUILD_CMD=msbuild -t:build -restore "%~1" /nologo /verbosity:quiet /p:Configuration="%~2" /p:Platform="%~3"
 echo %MSBUILD_CMD%
 %MSBUILD_CMD%
 if %errorlevel% NEQ 0 (

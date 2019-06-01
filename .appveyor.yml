@@ -1,6 +1,6 @@
 # Sharpmake AppVeyor CI configuration
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 platform:
 - Any CPU
@@ -11,7 +11,7 @@ configuration:
 
 before_build:
 - cmd: bootstrap-sharpmake.bat
-- cmd: dotnet restore
+- cmd: nuget restore Sharpmake.sln
 
 build:
   project: Sharpmake.sln
