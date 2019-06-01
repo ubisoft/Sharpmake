@@ -128,8 +128,12 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </ItemGroup>
 ";
 
-                public const string ProjectFilesHeader =
-@"    <ClInclude Include=""[file.FileNameProjectRelative]"" />
+                public const string ProjectFilesSource =
+@"    <JavaCompile Include=""[file.FileNameProjectRelative]"" />
+";
+
+                public const string ProjectFilesContent =
+@"    <Content Include=""[file.FileNameProjectRelative]"" />
 ";
             }
         }

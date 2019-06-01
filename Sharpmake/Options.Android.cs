@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
+
 namespace Sharpmake
 {
     public static partial class Options
@@ -27,7 +29,11 @@ namespace Sharpmake
                     Android21,
                     Android22,
                     Android23,
-                    Android24
+                    Android24,
+                    Android25,
+                    Android26,
+                    Android27,
+                    Android28
                 }
 
                 public enum PlatformToolset
@@ -36,6 +42,8 @@ namespace Sharpmake
                     Default,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Clang_3_8,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    Clang_5_0,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Gcc_4_9
                 }
@@ -81,9 +89,20 @@ namespace Sharpmake
                     Default,
                     Cpp98,
                     Cpp11,
+                    Cpp14,
+                    Cpp17,
+                    GnuCpp98,
+                    GnuCpp11,
+                    GnuCpp14,
+                    GnuCpp17,
+
+                    [Obsolete("Enum value obsolue, use Cpp14 instead", error: false)]
                     Cpp1y,
+                    [Obsolete("Enum value obsolue, use GnuCpp98 instead", error: false)]
                     GNU_Cpp98,
+                    [Obsolete("Enum value obsolue, use GnuCpp11 instead", error: false)]
                     GNU_Cpp11,
+                    [Obsolete("Enum value obsolue, use GnuCpp14 instead", error: false)]
                     GNU_Cpp1y
                 }
 

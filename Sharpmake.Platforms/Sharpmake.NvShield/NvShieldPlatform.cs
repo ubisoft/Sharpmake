@@ -69,7 +69,6 @@ namespace Sharpmake
             public override string SharedLibraryFileExtension => "so";
             public override string ProgramDatabaseFileExtension => "so";
             public override string StaticLibraryFileExtension => string.Empty;
-            public override string StaticOutputLibraryFileExtension => string.Empty;
 
             public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
             {

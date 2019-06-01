@@ -15,7 +15,7 @@ namespace Sharpmake
 {
     public static partial class Android
     {
-        public sealed partial class AndroidPlatform
+        public abstract partial class AndroidPlatformBase
         {
             private const string _projectDescriptionPlatformSpecific =
 @"    <ApplicationType>Android</ApplicationType>
@@ -62,7 +62,7 @@ namespace Sharpmake
       <WarningLevel>[options.WarningLevel]</WarningLevel>
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
       <OmitFramePointers>[options.OmitFramePointers]</OmitFramePointers>
@@ -87,7 +87,7 @@ namespace Sharpmake
 @"    <Link>
       <DebuggerSymbolInformation>[options.DebuggerSymbolInformation]</DebuggerSymbolInformation>
       <OutputFile>[options.OutputFile]</OutputFile>
-      <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories];%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
       <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]</IgnoreSpecificDefaultLibraries>
