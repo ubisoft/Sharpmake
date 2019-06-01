@@ -139,6 +139,14 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <ClInclude Include=""[file.FileNameProjectRelative]"" />
 ";
 
+                public const string ProjectFilesSource =
+@"    <JavaCompile Include=""[file.FileNameProjectRelative]"" />
+";
+
+                public const string ProjectFilesContent =
+@"    <Content Include=""[file.FileNameProjectRelative]"" />
+";
+
                 public static string ContentSimple =
 @"    <Content Include=""[file.FileNameSourceRelative]"" />
 ";

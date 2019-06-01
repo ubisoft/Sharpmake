@@ -275,9 +275,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Add source files
             var allFiles = new List<Vcxproj.ProjectFile>();
-            var includeFiles = new List<Vcxproj.ProjectFile>();
-            var sourceFiles = new List<Vcxproj.ProjectFile>();
-            var contentFiles = new List<Vcxproj.ProjectFile>();
 
             foreach (string file in projectFiles)
             {
@@ -287,29 +284,14 @@ namespace Sharpmake.Generators.VisualStudio
 
             allFiles.Sort((l, r) => { return string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCultureIgnoreCase); });
 
-            // type -> files
-            var customSourceFiles = new Dictionary<string, List<Vcxproj.ProjectFile>>();
+            var sourceFiles = new List<Vcxproj.ProjectFile>();
+            var contentFiles = new List<Vcxproj.ProjectFile>();
+
             foreach (var projectFile in allFiles)
             {
-                string type = null;
-                if (context.Project.ExtensionBuildTools.TryGetValue(projectFile.FileExtension, out type))
-                {
-                    List<Vcxproj.ProjectFile> files = null;
-                    if (!customSourceFiles.TryGetValue(type, out files))
-                    {
-                        files = new List<Vcxproj.ProjectFile>();
-                        customSourceFiles[type] = files;
-                    }
-                    files.Add(projectFile);
-                }
-                else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                         (string.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension))
                 {
                     sourceFiles.Add(projectFile);
-                }
-                else if (string.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    includeFiles.Add(projectFile);
                 }
                 else
                 {
@@ -317,26 +299,37 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            // Write header files
-            if (includeFiles.Count > 0)
+            // Write content files
+            if (contentFiles.Count > 0)
             {
-                fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                foreach (var file in includeFiles)
+                // Filter out the main 3 files from the list since they might share extensions
+                string[] coreFiles =
                 {
-                    using (fileGenerator.Declare("file", file))
-                        fileGenerator.Write(Template.Project.ProjectFilesHeader);
+                    fileGenerator.Resolver.Resolve(context.AndroidPackageProject.AntBuildXml),
+                    fileGenerator.Resolver.Resolve(context.AndroidPackageProject.AntProjectPropertiesFile),
+                    fileGenerator.Resolver.Resolve(context.AndroidPackageProject.AndroidManifest),
+                };
+
+                fileGenerator.Write(Template.Project.ProjectFilesBegin);
+                foreach (var file in contentFiles)
+                {
+                    if (!coreFiles.Contains(fileGenerator.Resolver.Resolve(file.FileNameProjectRelative)))
+                    {
+                        using (fileGenerator.Declare("file", file))
+                            fileGenerator.Write(Template.Project.ContentSimple);
+                    }
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
 
-            // Write content files
-            if (contentFiles.Count > 0)
+            // Write source files
+            if (sourceFiles.Count > 0)
             {
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                foreach (var file in contentFiles)
+                foreach (var file in sourceFiles)
                 {
                     using (fileGenerator.Declare("file", file))
-                        fileGenerator.Write(Template.Project.ContentSimple);
+                        fileGenerator.Write(Template.Project.ProjectFilesSource);
                 }
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
