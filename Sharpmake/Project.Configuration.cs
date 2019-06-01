@@ -1106,7 +1106,7 @@ namespace Sharpmake
             {
                 if (_linkState != LinkState.Linking)
                     throw new Error($"Cannot add built target lib '{libraryFile}' outside of the link process of the Project.Configuration");
-                DependenciesBuiltTargetsLibraryFiles.Add(libraryFile, orderNumber);
+                DependenciesBuiltTargetsLibraryFiles.Add(libraryFile, orderNumber, OrderableStrings.OrderResolve.Greater);
             }
 
             public OrderableStrings DependenciesForceUsingFiles = new OrderableStrings();
@@ -2608,15 +2608,17 @@ namespace Sharpmake
 
             internal class DependencyNode
             {
-                internal DependencyNode(Configuration inConfiguration, DependencySetting inDependencySetting)
+                internal DependencyNode(Configuration inConfiguration, DependencySetting inDependencySetting, int autoDependenciesOrder = 0)
                 {
                     _configuration = inConfiguration;
                     _dependencySetting = inDependencySetting;
+                    _autoDependenciesOrder = autoDependenciesOrder;
                 }
 
                 internal Configuration _configuration;
                 internal DependencySetting _dependencySetting;
                 internal Dictionary<DependencyNode, DependencyType> _childNodes = new Dictionary<DependencyNode, DependencyType>();
+                internal int _autoDependenciesOrder;
             }
 
             public class VcxprojUserFileSettings
@@ -3027,6 +3029,7 @@ namespace Sharpmake
 
                 Stack<DependencyNode> visiting = new Stack<DependencyNode>();
                 visiting.Push(rootNode);
+
                 while (visiting.Count > 0)
                 {
                     DependencyNode visitedNode = visiting.Pop();
@@ -3046,6 +3049,11 @@ namespace Sharpmake
 
                     visited.Add(visitedConfiguration, visitedNode);
 
+                    if (visitedConfiguration.Project.AutoDependenciesOrder)
+                    {
+                        visitedConfiguration.TargetFileOrderNumber = Math.Max(visitedConfiguration.TargetFileOrderNumber, visitedNode._autoDependenciesOrder);
+                    }
+
                     var unresolvedDependencies = new[] { visitedConfiguration.UnResolvedPublicDependencies, visitedConfiguration.UnResolvedPrivateDependencies };
                     foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
                     {
@@ -3064,7 +3072,7 @@ namespace Sharpmake
                             if (!visitedConfiguration._dependenciesSetting.TryGetValue(pair, out dependencySetting))
                                 dependencySetting = DependencySetting.Default;
 
-                            DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
+                            DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting, visitedNode._autoDependenciesOrder + 1);
                             System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(childNode));
                             visitedNode._childNodes.Add(childNode, dependencyType);
 
