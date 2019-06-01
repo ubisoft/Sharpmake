@@ -227,8 +227,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Add source files
             List<ProjectFile> allFiles = new List<ProjectFile>();
-            List<ProjectFile> includeFiles = new List<ProjectFile>();
-            List<ProjectFile> sourceFiles = new List<ProjectFile>();
 
             foreach (string file in projectFiles)
             {
@@ -238,43 +236,53 @@ namespace Sharpmake.Generators.VisualStudio
 
             allFiles.Sort((ProjectFile l, ProjectFile r) => { return l.FileNameProjectRelative.CompareTo(r.FileNameProjectRelative); });
 
-            // type -> files
-            var customSourceFiles = new Dictionary<string, List<ProjectFile>>();
+            List<ProjectFile> sourceFiles = new List<ProjectFile>();
+            List<ProjectFile> contentFiles = new List<ProjectFile>();
+
             foreach (ProjectFile projectFile in allFiles)
             {
-                string type = null;
-                if (_Project.ExtensionBuildTools.TryGetValue(projectFile.FileExtension, out type))
-                {
-                    List<ProjectFile> files = null;
-                    if (!customSourceFiles.TryGetValue(type, out files))
-                    {
-                        files = new List<ProjectFile>();
-                        customSourceFiles[type] = files;
-                    }
-                    files.Add(projectFile);
-                }
-                else if (_Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                         (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                if (String.Compare(projectFile.FileExtension, ".java", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     sourceFiles.Add(projectFile);
                 }
-                else // if (projectFile.FileExtension == "h")
+                else // if (String.Compare(projectFile.FileExtension, ".xml", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    includeFiles.Add(projectFile);
+                    contentFiles.Add(projectFile);
                 }
             }
 
-            // Write header files
+            // Write source files
             Write(Template.Project.ProjectFilesBegin, writer, resolver);
-            foreach (ProjectFile file in includeFiles)
+            foreach (ProjectFile file in sourceFiles)
             {
                 using (resolver.NewScopedParameter("file", file))
-                    Write(Template.Project.ProjectFilesHeader, writer, resolver);
+                    Write(Template.Project.ProjectFilesSource, writer, resolver);
             }
             Write(Template.Project.ProjectFilesEnd, writer, resolver);
 
             Write(Template.Project.ItemGroupBegin, writer, resolver);
 
+            // Add content files, filter out the main 3 files from the list since they might share extensions
+            // Content files are added alongside the main 3 files.
+            string[] coreFiles =
+            {
+                resolver.Resolve(project.AntBuildXml),
+                resolver.Resolve(project.AntProjectPropertiesFile),
+                resolver.Resolve(project.AndroidManifest),
+            };
+
+            foreach (ProjectFile file in contentFiles)
+            {
+                if (!coreFiles.Contains(resolver.Resolve(file.FileNameProjectRelative)))
+                {
+                    using (resolver.NewScopedParameter("file", file))
+                    {
+                        Write(Template.Project.ProjectFilesContent, writer, resolver);
+                    }
+                }
+            }
+
+            // Add the main 3
             using (resolver.NewScopedParameter("antBuildXml", project.AntBuildXml))
             using (resolver.NewScopedParameter("antProjectPropertiesFile", project.AntProjectPropertiesFile))
             using (resolver.NewScopedParameter("androidManifest", project.AndroidManifest))
@@ -283,6 +291,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Write(Template.Project.AndroidManifest, writer, resolver);
                 Write(Template.Project.AntProjectPropertiesFile, writer, resolver);
             }
+
             Write(Template.Project.ItemGroupEnd, writer, resolver);
         }
 
@@ -353,6 +362,10 @@ namespace Sharpmake.Generators.VisualStudio
                     throw new Error("Missing dependency of type \"{0}\" in configuration \"{1}\" dependencies.", _Project.AppLibType.ToNiceTypeName(), conf);
                 }
             }
+            else
+            {
+                throw new Error("AppLibType not set in configuration \"{0}\" dependencies.", conf);
+            }
 
             //Options.Vc.General.UseDebugLibraries.
             //    Disable                                 WarnAsError="false"
@@ -370,7 +383,11 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Android.General.AndroidAPILevel.Android21, () => { options["AndroidAPILevel"] = "android-21"; }),
             Options.Option(Options.Android.General.AndroidAPILevel.Android22, () => { options["AndroidAPILevel"] = "android-22"; }),
             Options.Option(Options.Android.General.AndroidAPILevel.Android23, () => { options["AndroidAPILevel"] = "android-23"; }),
-            Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; })
+            Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android25, () => { options["AndroidAPILevel"] = "android-25"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android26, () => { options["AndroidAPILevel"] = "android-26"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android27, () => { options["AndroidAPILevel"] = "android-27"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android28, () => { options["AndroidAPILevel"] = "android-28"; })
             );
 
             //OutputDirectory

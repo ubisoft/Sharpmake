@@ -19,14 +19,9 @@ namespace Sharpmake
 {
     public static partial class Android
     {
-        [PlatformImplementation(Platform.android,
-            typeof(IPlatformDescriptor),
-            typeof(IPlatformVcxproj),
-            typeof(Project.Configuration.IConfigurationTasks))]
-        public sealed partial class AndroidPlatform : BasePlatform, Project.Configuration.IConfigurationTasks
+        public abstract partial class AndroidPlatformBase : BasePlatform, Project.Configuration.IConfigurationTasks
         {
             #region IPlatformDescriptor implementation.
-            public override string SimplePlatformString => "ARM";
             public override bool IsMicrosoftPlatform => false;
             public override bool IsPcPlatform => false;
             public override bool IsUsingClang => true;
@@ -38,8 +33,20 @@ namespace Sharpmake
             #region Project.Configuration.IConfigurationTasks implementation
             public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
-                // Not tested. We may need to root the path like we do in SetupStaticLibraryPaths.
-                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+                if (!dependency.Project.GetType().IsDefined(typeof(Export), false))
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                }
+                else
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                }
+
+                // Refernce library using -l<name>, build system knows to look for lib<name>.so
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.AdditionalLinkerOptions.Add("-l" + dependency.TargetFileName);
             }
 
             public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
@@ -88,16 +95,26 @@ namespace Sharpmake
             #region IPlatformVcxproj implementation
             public override string ProgramDatabaseFileExtension => string.Empty;
             public override string SharedLibraryFileExtension => "so";
+            public override string StaticLibraryFileExtension => "a";
             public override string ExecutableFileExtension => string.Empty;
+
+            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
+            {
+                return "lib";
+            }
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
                 string applicationTypeRevision = context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2017 ? "3.0" : "2.0";
 
+                generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+
                 using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
+
+                generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
             }
 
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
@@ -140,13 +157,18 @@ namespace Sharpmake
                 Options.Option(Options.Android.General.AndroidAPILevel.Android21, () => { options["AndroidAPILevel"] = "android-21"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android22, () => { options["AndroidAPILevel"] = "android-22"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android23, () => { options["AndroidAPILevel"] = "android-23"; }),
-                Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; })
+                Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android25, () => { options["AndroidAPILevel"] = "android-25"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android26, () => { options["AndroidAPILevel"] = "android-26"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android27, () => { options["AndroidAPILevel"] = "android-27"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android28, () => { options["AndroidAPILevel"] = "android-28"; })
                 );
 
                 context.SelectOption
                 (
                 Options.Option(Options.Android.General.PlatformToolset.Default, () => { options["PlatformToolset"] = RemoveLineTag; }),
                 Options.Option(Options.Android.General.PlatformToolset.Clang_3_8, () => { options["PlatformToolset"] = "Clang_3_8"; }),
+                Options.Option(Options.Android.General.PlatformToolset.Clang_5_0, () => { options["PlatformToolset"] = "Clang_5_0"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Gcc_4_9, () => { options["PlatformToolset"] = "Gcc_4_9"; })
                 );
 
@@ -180,10 +202,12 @@ namespace Sharpmake
                 (
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "c++98"; cmdLineOptions["CppLanguageStandard"] = "-std=c++98"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "c++11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp1y, () => { options["CppLanguageStandard"] = "c++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1y"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp98, () => { options["CppLanguageStandard"] = "gnu++98"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++98"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp11, () => { options["CppLanguageStandard"] = "gnu++11"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++11"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1y, () => { options["CppLanguageStandard"] = "gnu++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1y"; })
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "c++14"; cmdLineOptions["CppLanguageStandard"] = "-std=c++14"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "c++1z"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1z"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GnuCpp98, () => { options["CppLanguageStandard"] = "gnu++98"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++98"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GnuCpp11, () => { options["CppLanguageStandard"] = "gnu++11"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++11"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GnuCpp14, () => { options["CppLanguageStandard"] = "gnu++14"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++14"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GnuCpp17, () => { options["CppLanguageStandard"] = "gnu++1z"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1z"; })
                 );
 
                 context.SelectOption
@@ -281,5 +305,23 @@ namespace Sharpmake
             }
             #endregion
         }
-    }
+
+        [PlatformImplementation(Platform.android,
+            typeof(IPlatformDescriptor),
+            typeof(IPlatformVcxproj),
+            typeof(Project.Configuration.IConfigurationTasks))]
+        public sealed partial class AndroidPlatform : AndroidPlatformBase
+        {
+            public override string SimplePlatformString => "ARM";
+        }
+
+        [PlatformImplementation(Platform.android64,
+            typeof(IPlatformDescriptor),
+            typeof(IPlatformVcxproj),
+            typeof(Project.Configuration.IConfigurationTasks))]
+        public sealed partial class AndroidPlatform64 : AndroidPlatformBase
+        {
+            public override string SimplePlatformString => "ARM64";
+        }
+}
 }

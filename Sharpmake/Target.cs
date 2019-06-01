@@ -100,8 +100,9 @@ namespace Sharpmake
         ctr        = 1 << 12,
         ios        = 1 << 13,
         android    = 1 << 14,
-        linux      = 1 << 15,
-        mac        = 1 << 16,
+        android64  = 1 << 15,
+        linux      = 1 << 16,
+        mac        = 1 << 17,
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,

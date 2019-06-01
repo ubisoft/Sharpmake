@@ -102,7 +102,6 @@ namespace Sharpmake
         public abstract string SharedLibraryFileExtension { get; }
         public abstract string ProgramDatabaseFileExtension { get; }
         public virtual string StaticLibraryFileExtension => "lib";
-        public virtual string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;
         public virtual bool ExcludesPrecompiledHeadersFromBuild => false;
         public virtual bool HasUserAccountControlSupport => false;
         public virtual bool HasEditAndContinueDebuggingSupport => false;

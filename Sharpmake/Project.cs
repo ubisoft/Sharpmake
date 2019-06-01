@@ -2398,6 +2398,7 @@ namespace Sharpmake
 
         public AndroidPackageProject(Type targetType) : base(targetType)
         {
+            SourceFilesExtensions = new Strings(".java", ".xml");
         }
     }
 }

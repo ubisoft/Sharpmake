@@ -34,7 +34,6 @@ namespace Sharpmake.Generators.VisualStudio
         string SharedLibraryFileExtension { get; }
         string ProgramDatabaseFileExtension { get; }
         string StaticLibraryFileExtension { get; }
-        string StaticOutputLibraryFileExtension { get; }
         bool ExcludesPrecompiledHeadersFromBuild { get; }
         bool HasUserAccountControlSupport { get; }
         bool HasEditAndContinueDebuggingSupport { get; }
