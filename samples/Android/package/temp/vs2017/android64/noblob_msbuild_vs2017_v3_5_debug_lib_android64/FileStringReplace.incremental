@@ -1,0 +1,1 @@
+$(AntDependencies)=;$(ApplicationId)=applicationId = "";$(ConfigurationType)=application;$(AarDependencies)=;$(AarDependenciesSettings)=;$(ApplicationName)=AndroidPackage;$(AndroidAppLibName)=androidproject;$(AndroidBuildToolsVersion)=25.0.3;$(AndroidAPILevelNumber)=21;$(androidapilevel)=android-21;$(projectname)=AndroidPackage;

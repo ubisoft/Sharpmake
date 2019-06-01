@@ -7,6 +7,8 @@ if %errorlevel% NEQ 0 goto error
 :: main
 set ERRORLEVEL_BACKUP=0
 
+call :UpdateRef samples Android                     android.sharpmake.cs                       reference         Android
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples ConfigureOrder              main.sharpmake.cs                          reference         ConfigureOrder
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CPPCLI                      CLRTest.sharpmake.cs                       reference         CPPCLI
