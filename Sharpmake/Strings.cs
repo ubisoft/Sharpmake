@@ -253,7 +253,14 @@ namespace Sharpmake
                 _list.Add(new StringEntry(item));
         }
 
-        public void Add(string item, int orderNumber)
+        public enum OrderResolve
+        {
+            None,
+            Less,
+            Greater
+        }
+
+        public void Add(string item, int orderNumber, OrderResolve resolveMethod = OrderResolve.None)
         {
             if (_hashSet.Add(item))
                 _list.Add(new StringEntry(item, orderNumber));
@@ -268,9 +275,22 @@ namespace Sharpmake
                             _list[i] = new StringEntry(item, orderNumber);
                         else if (_list[i].OrderNumber != orderNumber)
                         {
-                            throw new Error(
-                                "Cannot specify 2 different non-zero order number for \"" +
-                                item + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            if (resolveMethod == OrderResolve.Less)
+                            {
+                                if (orderNumber < _list[i].OrderNumber)
+                                    _list[i] = new StringEntry(item, orderNumber);
+                            }
+                            else if (resolveMethod == OrderResolve.Greater)
+                            {
+                                if (orderNumber > _list[i].OrderNumber)
+                                    _list[i] = new StringEntry(item, orderNumber);
+                            }
+                            else
+                            {
+                                throw new Error(
+                                    "Cannot specify 2 different non-zero order number for \"" +
+                                    item + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            }
                         }
                     }
                 }

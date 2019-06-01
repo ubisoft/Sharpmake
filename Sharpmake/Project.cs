@@ -200,6 +200,13 @@ namespace Sharpmake
             set { SetProperty(ref _dependenciesOrder, value); }
         }
 
+        private bool _autoDependenciesOrder = false;
+        public bool AutoDependenciesOrder
+        {
+            get { return _autoDependenciesOrder; }
+            set { SetProperty(ref _autoDependenciesOrder, value); }
+        }
+
         // For projects that output both dll and lib depending on the configuration (often the case in TG projects)
         // Setting this to true will force dependencies regardless of different output types.
         public bool AllowInconsistentDependencies = false;
