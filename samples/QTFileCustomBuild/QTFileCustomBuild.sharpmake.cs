@@ -63,16 +63,18 @@ namespace QTFileCustomBuild
         // Stores the source file and target file of a moc operation.
         public class MocSourceAndTargetFile : ProjConfiguration.CustomFileBuildStep
         {
-            // The true input file.
+            // Relative path of the input file.
             public string SourceFile;
-            // Intermediate file used for a custom build step to produce the output from the input when the input is a source file.
+            // Intermediate file used for a custom build step to produce the output from the input.
             public string IntermediateFile;
             // True if source file, false if header file.
             public bool IsCPPFile;
+            // True if the output target file should never be compiled (For !IsCPPFile)
+            public bool TargetFileNotCompiled;
             // List of includes to use.
             public Strings IncludePaths = new Strings();
-            // List of force-includes
-            public Strings ForceIncludes = new Strings();
+            // List of force-includes.  The order matters.
+            public List<string> ForceIncludes = new List<string>();
             // Defines
             public string CombinedDefines = "";
 
@@ -82,6 +84,7 @@ namespace QTFileCustomBuild
                 SourceFile = sourceFile;
                 KeyInput = SourceFile;
                 IsCPPFile = sourceFile.EndsWith(".cpp", StringComparison.InvariantCultureIgnoreCase);
+                TargetFileNotCompiled = false;
                 if (IsCPPFile)
                 {
                     // Put this one up one level, as it's just a boot strap file.
@@ -105,6 +108,8 @@ namespace QTFileCustomBuild
             {
                 Filter = ProjectFilter.ExcludeBFF;
                 Executable = reference.Executable;
+                // Input is SourceFile not KeyInput
+                ExecutableArguments = " -o [output]";
                 // Input is the intermediate file.
                 KeyInput = reference.IntermediateFile;
                 // We also depend on the actual input file.
@@ -115,6 +120,7 @@ namespace QTFileCustomBuild
                 SourceFile = reference.SourceFile;
                 IntermediateFile = reference.IntermediateFile;
                 IsCPPFile = reference.IsCPPFile;
+                TargetFileNotCompiled = reference.TargetFileNotCompiled;
 
                 IncludePaths.AddRange(reference.IncludePaths);
                 ForceIncludes.AddRange(reference.ForceIncludes);
@@ -126,18 +132,26 @@ namespace QTFileCustomBuild
             {
                 var relativeData = base.MakePathRelative(resolver, MakeRelativeTool);
 
+                if(Filter == ProjectFilter.ExcludeBFF)
+                {
+                    // Need to use the right input.
+                    relativeData.ExecutableArguments = MakeRelativeTool(SourceFile, true) + relativeData.ExecutableArguments;
+                }
+
                 // These are command line relative.
                 Strings RelativeIncludePaths = new Strings();
                 foreach (string key in IncludePaths)
                     RelativeIncludePaths.Add(MakeRelativeTool(key, true));
                 // These should be compiler relative instead of command line relative, but generally they're the same.
-                Strings RelativeForceIncludes = new Strings();
+                var RelativeForceIncludes = new System.Text.StringBuilder(ForceIncludes.Count * 64);
                 foreach (string key in ForceIncludes)
-                    RelativeForceIncludes.Add(MakeRelativeTool(key, false));
+                {
+                    RelativeForceIncludes.Append(" -f");
+                    RelativeForceIncludes.Append(MakeRelativeTool(key, false));
+                }
 
                 RelativeIncludePaths.InsertPrefix("-I");
-                RelativeForceIncludes.InsertPrefix("-f");
-                relativeData.ExecutableArguments = CombinedDefines + " " + RelativeIncludePaths.JoinStrings(" ") + " " + RelativeForceIncludes.JoinStrings(" ") + " " + relativeData.ExecutableArguments;
+                relativeData.ExecutableArguments = CombinedDefines + " " + RelativeIncludePaths.JoinStrings(" ") + " " + RelativeForceIncludes.ToString() + " " + relativeData.ExecutableArguments;
 
                 return relativeData;
             }
@@ -248,15 +262,16 @@ namespace QTFileCustomBuild
         // Call this from Project::ExcludeOutputFiles() to find the list of files we need to moc.
         // This is after resolving files, but before filtering them, and before they get mapped to
         // configurations, so this is a good spot to add additional files.
-        public void GenerateListOfFilesToMoc(Project project, string sharedFolder, string QTExecFolder)
+        public void GenerateListOfFilesToMoc(Project project, string QTExecFolder)
         {
             string mocExe = QTExecFolder + "moc.exe";
             string rccExe = QTExecFolder + "rcc.exe";
             string uicExe = QTExecFolder + "uic.exe";
 
             // Filter all the files by the filters we've already specified, so we don't moc a file that's excluded from the solution.
-            List<Regex> filters = project.SourceFilesExcludeRegex.Select(filter => new Regex(filter, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)).ToList();
-            filters.AddRange(ExcludeMocRegex.Select(filter => new Regex(filter, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)));
+            RegexOptions filterOptions = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase;
+            List<Regex> filters = project.SourceFilesExcludeRegex.Select(filter => new Regex(filter, filterOptions)).ToList();
+            filters.AddRange(ExcludeMocRegex.Select(filter => new Regex(filter, filterOptions)));
 
             var preFilteredFiles = project.ResolvedSourceFiles.Where(file => !filters.Any(filter => filter.IsMatch(file)) && !project.Configurations.Any(conf => FileIsPrecompiledHeader(file, conf))).ToList();
 
@@ -272,7 +287,7 @@ namespace QTFileCustomBuild
             Strings FilteredResolvedSourceFiles = new Strings(filterPass.Where(result => result.runMoc).Select(result => result.file));
 
             // Compile a list of files where we don't want to compile the moc output.
-            List<Regex> filesToExclude = ExcludeMocFromCompileRegex.Select(filter => new Regex(filter, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)).ToList();
+            List<Regex> filesToExclude = ExcludeMocFromCompileRegex.Select(filter => new Regex(filter, filterOptions)).ToList();
 
 
             foreach (ProjConfiguration conf in project.Configurations)
@@ -283,8 +298,9 @@ namespace QTFileCustomBuild
                 string outputFolder = QTMocOutputBase + @"\qt\" + targetName.ToLowerInvariant() + @"\";
 
                 // We make the current output folder included directly so you can use the same #include directive to get the correct cpp file.
-                conf.IncludePrivatePaths.Add(sharedFolder);
                 conf.IncludePrivatePaths.Add(outputFolder);
+                // Also include the project file folder, since the moc tool generates includes from this location.
+                conf.IncludePrivatePaths.Add(conf.ProjectPath);
 
                 // We need to exclude the generation files folder from the build on all targets except our own.
                 string rootFolderForRegex = Util.GetCapitalizedPath(conf.ProjectPath);
@@ -301,12 +317,12 @@ namespace QTFileCustomBuild
                 var mocTargets = new List<MocSourceAndTargetFile>();
                 foreach (string file in FilteredResolvedSourceFiles)
                 {
-                    var target = new MocSourceAndTargetFile(targetName, mocExe, sharedFolder, outputFolder, file);
-                    mocTargets.Add(target);
+                    var target = new MocSourceAndTargetFile(targetName, mocExe, outputFolder, outputFolder, file);
                     if (filesToExclude.Any(filter => filter.IsMatch(file)))
                     {
-                        conf.SourceFilesBuildExcludeRegex.Add(Path.GetFileName(target.Output));
+                        target.TargetFileNotCompiled = true;
                     }
+                    mocTargets.Add(target);
                     if (target.IsCPPFile)
                     {
                         mocTargets.Add(new MocVcxprojBuildStep(target));
@@ -319,11 +335,11 @@ namespace QTFileCustomBuild
 
                 if (qrcFiles.Count > 0)
                 {
-                    RccTargetsPerConfiguration.Add(conf, qrcFiles.Select(file => new RccSourceAndTargetFile(targetName, rccExe, sharedFolder, file)).ToList());
+                    RccTargetsPerConfiguration.Add(conf, qrcFiles.Select(file => new RccSourceAndTargetFile(targetName, rccExe, outputFolder, file)).ToList());
                 }
                 if (uiFiles.Count > 0)
                 {
-                    UicTargetsPerConfiguration.Add(conf, uiFiles.Select(file => new UicSourceAndTargetFile(targetName, uicExe, sharedFolder, file)).ToList());
+                    UicTargetsPerConfiguration.Add(conf, uiFiles.Select(file => new UicSourceAndTargetFile(targetName, uicExe, outputFolder, file)).ToList());
                 }
             }
 
@@ -332,10 +348,13 @@ namespace QTFileCustomBuild
             {
                 foreach (var target in values.Value)
                 {
+                    // We only need to include outputs that have build steps.  For source files, that's the intermediate file, for
+                    // header files, that's the target file, if it wasn't excluded.
                     values.Key.CustomFileBuildSteps.Add(target);
-                    project.ResolvedSourceFiles.Add(target.Output);
                     if (target.IsCPPFile)
                         project.ResolvedSourceFiles.Add(target.IntermediateFile);
+                    else if(!target.TargetFileNotCompiled)
+                        project.ResolvedSourceFiles.Add(target.Output);
                 }
             }
 
@@ -353,7 +372,8 @@ namespace QTFileCustomBuild
                 foreach (var target in values.Value)
                 {
                     values.Key.CustomFileBuildSteps.Add(target);
-                    project.ResolvedSourceFiles.Add(target.Output);
+                    // uic files generate header files - we don't need to run a build step on them, so don't include them in the vcxproj listing.
+                    //project.ResolvedSourceFiles.Add(target.Output);
                 }
             }
         }
@@ -426,14 +446,14 @@ namespace QTFileCustomBuild
                 }
             }
 
-            Strings precompiledHeader = new Strings();
+            string precompiledHeader = null;
 
             // Build the string we need to pass to moc for all calls.
             if (conf.PrecompHeader != null)
             {
                 // If we have a precompiled header, we need the new cpp file to include this also.
                 // Technically we don't need to do this if the file is in ExcludeMocFromCompileRegex
-                precompiledHeader.Add(conf.PrecompHeader);
+                precompiledHeader = conf.PrecompHeader;
             }
 
             // Apply these settings to all Moc targets.
@@ -441,8 +461,12 @@ namespace QTFileCustomBuild
             {
                 target.CombinedDefines = combinedDefines;
                 target.IncludePaths.AddRange(confIncludes);
-                if (!target.IsCPPFile)
-                    target.ForceIncludes.AddRange(precompiledHeader);
+                // Precompiled header must go first in the force include list.
+                if (!target.IsCPPFile && precompiledHeader != null)
+                    target.ForceIncludes.Insert(0, precompiledHeader);
+                // VCX CPP file should create the intermediate file.
+                else if (target.Filter == ProjConfiguration.CustomFileBuildStepData.ProjectFilter.ExcludeBFF)
+                    CreateIntermediateFile(target.SourceFile, target.KeyInput);
             }
         }
 
@@ -465,15 +489,13 @@ namespace QTFileCustomBuild
         public QtSharpmakeMocTool mocTool;
         // Path the qt executables
         public string QTExeFolder;
-        // Path for generated QT files that don't depend on compiler parameters.
-        public string QTSharedFolder;
         // Path to QT
         public string QTPath;
 
         protected override void ExcludeOutputFiles()
         {
             base.ExcludeOutputFiles();
-            mocTool.GenerateListOfFilesToMoc(this, QTSharedFolder, QTExeFolder);
+            mocTool.GenerateListOfFilesToMoc(this, QTExeFolder);
         }
 
         // At this point all of our includes and defines have been resolved, so now we can compute the arguments to moc.
@@ -487,7 +509,6 @@ namespace QTFileCustomBuild
         {
             Name = "QTFileCustomBuild";
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
-            QTSharedFolder = @"[project.SharpmakeCsPath]\projects\obj\" + Name.ToLower() + @"\qt\";
             QTPath = @"[project.SharpmakeCsPath]\qt\5.9.2\msvc2017_64";
             QTExeFolder = @"[project.QTPath]\bin\";
 

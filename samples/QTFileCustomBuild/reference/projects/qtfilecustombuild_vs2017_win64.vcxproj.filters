@@ -5,51 +5,27 @@
     <ClCompile Include="..\codebase\floatcosanglespinbox.cpp" />
     <ClCompile Include="..\codebase\privatewidget.cpp" />
     <ClCompile Include="..\codebase\stdafx.cpp" />
-    <ClCompile Include="obj\qtfilecustombuild\qt\qrc_exec.cpp">
-      <Filter>projects\obj\qtfilecustombuild\qt</Filter>
-    </ClCompile>
     <ClCompile Include="obj\win64\qt\debug\moc_floatanglespinbox.cpp">
       <Filter>projects\obj\win64\qt\debug</Filter>
     </ClCompile>
-    <ClCompile Include="obj\win64\qt\debug\moc_floatcosanglespinbox.cpp">
-      <Filter>projects\obj\win64\qt\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="obj\win64\qt\debug\moc_privatewidget.cpp">
+    <ClCompile Include="obj\win64\qt\debug\qrc_exec.cpp">
       <Filter>projects\obj\win64\qt\debug</Filter>
     </ClCompile>
     <ClCompile Include="obj\win64\qt\release\moc_floatanglespinbox.cpp">
       <Filter>projects\obj\win64\qt\release</Filter>
     </ClCompile>
-    <ClCompile Include="obj\win64\qt\release\moc_floatcosanglespinbox.cpp">
-      <Filter>projects\obj\win64\qt\release</Filter>
-    </ClCompile>
-    <ClCompile Include="obj\win64\qt\release\moc_privatewidget.cpp">
+    <ClCompile Include="obj\win64\qt\release\qrc_exec.cpp">
       <Filter>projects\obj\win64\qt\release</Filter>
     </ClCompile>
     <ClCompile Include="obj\win64\qt\retail\moc_floatanglespinbox.cpp">
       <Filter>projects\obj\win64\qt\retail</Filter>
     </ClCompile>
-    <ClCompile Include="obj\win64\qt\retail\moc_floatcosanglespinbox.cpp">
-      <Filter>projects\obj\win64\qt\retail</Filter>
-    </ClCompile>
-    <ClCompile Include="obj\win64\qt\retail\moc_privatewidget.cpp">
+    <ClCompile Include="obj\win64\qt\retail\qrc_exec.cpp">
       <Filter>projects\obj\win64\qt\retail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\codebase\stdafx.h" />
-    <ClInclude Include="obj\qtfilecustombuild\qt\ui_privatewidget.h">
-      <Filter>projects\obj\qtfilecustombuild\qt</Filter>
-    </ClInclude>
-    <ClInclude Include="obj\win64\qt\debug\privatewidget.moc">
-      <Filter>projects\obj\win64\qt\debug</Filter>
-    </ClInclude>
-    <ClInclude Include="obj\win64\qt\release\privatewidget.moc">
-      <Filter>projects\obj\win64\qt\release</Filter>
-    </ClInclude>
-    <ClInclude Include="obj\win64\qt\retail\privatewidget.moc">
-      <Filter>projects\obj\win64\qt\retail</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\codebase\exec.qrc" />
@@ -57,8 +33,14 @@
     <CustomBuild Include="..\codebase\floatcosanglespinbox.h" />
     <CustomBuild Include="..\codebase\privatewidget.h" />
     <CustomBuild Include="..\codebase\privatewidget.ui" />
-    <CustomBuild Include="obj\qtfilecustombuild\qt\privatewidget.inl">
-      <Filter>projects\obj\qtfilecustombuild\qt</Filter>
+    <CustomBuild Include="obj\win64\qt\debug\privatewidget.inl">
+      <Filter>projects\obj\win64\qt\debug</Filter>
+    </CustomBuild>
+    <CustomBuild Include="obj\win64\qt\release\privatewidget.inl">
+      <Filter>projects\obj\win64\qt\release</Filter>
+    </CustomBuild>
+    <CustomBuild Include="obj\win64\qt\retail\privatewidget.inl">
+      <Filter>projects\obj\win64\qt\retail</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -67,12 +49,6 @@
     </Filter>
     <Filter Include="projects\obj">
       <UniqueIdentifier>{5e02705e-e6d7-a0b7-5f30-ae822b4373fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\obj\qtfilecustombuild">
-      <UniqueIdentifier>{e2f96836-e363-dd64-45a1-c16be3e0a290}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\obj\qtfilecustombuild\qt">
-      <UniqueIdentifier>{ca2617a6-0ffb-a02c-74d2-71a21c30acf2}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\obj\win64">
       <UniqueIdentifier>{021c73ca-da3f-8dd7-8fdf-1a18eb9caeeb}</UniqueIdentifier>
