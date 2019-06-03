@@ -2885,7 +2885,10 @@ namespace Sharpmake
                         GenericBuildDependencies.Add(dependency);
                     }
 
-                    if (dependency.Output == OutputType.Lib || dependency.Output == OutputType.Dll || dependency.Output == OutputType.None)
+                    if (dependency.Output == OutputType.Lib
+                        || dependency.Output == OutputType.Dll
+                        || dependency.Output == OutputType.Utility
+                        || dependency.Output == OutputType.None)
                     {
                         bool wantIncludePaths = isImmediate || hasPublicPathToImmediate;
                         if (wantIncludePaths && dependencySetting.HasFlag(DependencySetting.IncludePaths))
@@ -3030,7 +3033,20 @@ namespace Sharpmake
                                     ConfigurationDependencies.Add(dependency);
                             }
                             break;
-                        case OutputType.Utility: throw new NotImplementedException(dependency.Project.Name + " " + dependency.Output);
+                        case OutputType.Utility:
+                            {
+                                // As visual studio do not handle reference being different between configuration,
+                                // We use the "utility" output to mark a configuration as exclude from build.
+                                if (!goesThroughDLL &&
+                                        (Output == OutputType.Lib ||
+                                         dependency.ExportSymbolThroughProject == null ||
+                                         dependency.ExportSymbolThroughProject == Project.GetType()) &&
+                                         dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                                {
+                                    ConfigurationDependencies.Add(dependency);
+                                }
+                            }
+                            break;
                         case OutputType.DotNetConsoleApp:
                         case OutputType.DotNetClassLibrary:
                         case OutputType.DotNetWindowsApp:
