@@ -160,6 +160,11 @@ namespace Sharpmake.Generators
                             SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
+                    case DevEnv.xcode4ios:
+                        {
+                            XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            break;
+                        }
                     default:
                         {
                             throw new Error("Generate called with unknown DevEnv: " + configurations[0].Target.GetFragment<DevEnv>());

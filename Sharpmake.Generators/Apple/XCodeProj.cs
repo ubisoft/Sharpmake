@@ -163,7 +163,7 @@ namespace Sharpmake.Generators.Apple
             }
 
             // Write the scheme file
-            var defaultTarget = _nativeTargets.Values.Where(target => target.OutputFile.OutputType != Project.Configuration.OutputType.IosTestBundle).First();
+            var defaultTarget = _nativeTargets.Values.Where(target => target.OutputFile.OutputType != Project.Configuration.OutputType.IosTestBundle).FirstOrDefault();
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
             using (fileGenerator.Declare("testableElements", testableElements))
@@ -248,39 +248,42 @@ namespace Sharpmake.Generators.Apple
                 {
                     foreach (Project.Configuration dependentConfiguration in conf.ResolvedDependencies)
                     {
-                        ProjectReference projectReference = new ProjectReference(dependentConfiguration.ProjectFullFileNameWithExtension);
-                        _projectItems.Add(projectReference);
-                        if (!_projectsFolder.Children.Contains(projectReference))
-                            _projectsFolder.Children.Add(projectReference);
-
-                        ProjectOutputFile outputFileProxy = new ProjectOutputFile(dependentConfiguration);
-                        ProjectNativeTarget nativeTargetProxy = new ProjectNativeTarget(dependentConfiguration.TargetFileFullName);
-                        ProjectContainerProxy projectProxy = new ProjectContainerProxy(projectReference, nativeTargetProxy, ProjectContainerProxy.Type.Target);
-                        _projectItems.Add(projectProxy);
-
-                        ProjectTargetDependency targetDependency = new ProjectTargetDependency(projectReference, projectProxy);
-                        _projectItems.Add(targetDependency);
-                        _targetDependencies[conf].Add(targetDependency);
-
-                        projectProxy = new ProjectContainerProxy(projectReference, outputFileProxy, ProjectContainerProxy.Type.Archive);
-                        _projectItems.Add(projectProxy);
-
-                        ProjectReferenceProxy referenceProxy = new ProjectReferenceProxy(projectReference, projectProxy, outputFileProxy);
-                        _projectItems.Add(referenceProxy);
-
-                        ProjectProductsFolder projectDependencyGroup = new ProjectProductsFolder(projectReference.Name);
-
-                        if (!_projectReferencesGroups.ContainsKey(projectDependencyGroup))
+                        if (dependentConfiguration.Output != Project.Configuration.OutputType.None)
                         {
-                            projectDependencyGroup.Children.Add(referenceProxy);
-                            _projectReferencesGroups.Add(projectDependencyGroup, projectReference);
+                            ProjectReference projectReference = new ProjectReference(dependentConfiguration.ProjectFullFileNameWithExtension);
+                            _projectItems.Add(projectReference);
+                            if (!_projectsFolder.Children.Contains(projectReference))
+                                _projectsFolder.Children.Add(projectReference);
+
+                            ProjectOutputFile outputFileProxy = new ProjectOutputFile(dependentConfiguration);
+                            ProjectNativeTarget nativeTargetProxy = new ProjectNativeTarget(dependentConfiguration.TargetFileFullName);
+                            ProjectContainerProxy projectProxy = new ProjectContainerProxy(projectReference, nativeTargetProxy, ProjectContainerProxy.Type.Target);
+                            _projectItems.Add(projectProxy);
+
+                            ProjectTargetDependency targetDependency = new ProjectTargetDependency(projectReference, projectProxy);
+                            _projectItems.Add(targetDependency);
+                            _targetDependencies[conf].Add(targetDependency);
+
+                            projectProxy = new ProjectContainerProxy(projectReference, outputFileProxy, ProjectContainerProxy.Type.Archive);
+                            _projectItems.Add(projectProxy);
+
+                            ProjectReferenceProxy referenceProxy = new ProjectReferenceProxy(projectReference, projectProxy, outputFileProxy);
+                            _projectItems.Add(referenceProxy);
+
+                            ProjectProductsFolder projectDependencyGroup = new ProjectProductsFolder(projectReference.Name);
+
+                            if (!_projectReferencesGroups.ContainsKey(projectDependencyGroup))
+                            {
+                                projectDependencyGroup.Children.Add(referenceProxy);
+                                _projectReferencesGroups.Add(projectDependencyGroup, projectReference);
+                            }
+
+                            _projectItems.Add(projectDependencyGroup);
+
+                            ProjectBuildFile libraryBuildFile = new ProjectBuildFile(referenceProxy);
+                            _projectItems.Add(libraryBuildFile);
+                            _frameworksBuildPhases[conf].Files.Add(libraryBuildFile);
                         }
-
-                        _projectItems.Add(projectDependencyGroup);
-
-                        ProjectBuildFile libraryBuildFile = new ProjectBuildFile(referenceProxy);
-                        _projectItems.Add(libraryBuildFile);
-                        _frameworksBuildPhases[conf].Files.Add(libraryBuildFile);
                     }
                 }
 
@@ -313,7 +316,8 @@ namespace Sharpmake.Generators.Apple
                 {
                     ProjectDeveloperFrameworkFile testFrameworkItem = new ProjectDeveloperFrameworkFile(_unitTestFramework);
                     ProjectBuildFile buildFileItem = new ProjectBuildFile(testFrameworkItem);
-                    _frameworksFolder.Children.Add(testFrameworkItem);
+                    if (_frameworksFolder != null)
+                        _frameworksFolder.Children.Add(testFrameworkItem);
                     _projectItems.Add(testFrameworkItem);
                     _projectItems.Add(buildFileItem);
                     _frameworksBuildPhases[conf].Files.Add(buildFileItem);
@@ -351,7 +355,7 @@ namespace Sharpmake.Generators.Apple
                 {
                     Project.Configuration bundleLoadingAppConfiguration = FindBundleLoadingApp(configurations);
 
-                    if (_nativeTargets.ContainsKey(bundleLoadingAppConfiguration))
+                    if (bundleLoadingAppConfiguration != null &&_nativeTargets.ContainsKey(bundleLoadingAppConfiguration))
                     {
                         ProjectNativeTarget bundleLoadingAppTarget = _nativeTargets[bundleLoadingAppConfiguration];
 
