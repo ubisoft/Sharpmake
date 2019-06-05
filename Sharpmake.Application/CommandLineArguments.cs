@@ -386,9 +386,9 @@ ex: /forcecleanup( ""tmp/sharpmakeautocleanupdb.bin"" ")]
                 foreach (string define in defines)
                 {
                     if (!defineValidationRegex.IsMatch(define))
-                        throw new Error("error: invalid define '{0}', a define must be a single word");
+                        throw new Error("error: invalid define '{0}', a define must be a single word", define);
                     if (uniqueDefines.Contains(define))
-                        throw new Error("error: define '{0}' already defined");
+                        throw new Error("error: define '{0}' already defined", define);
                     uniqueDefines.Add(define);
                 }
                 return uniqueDefines;
