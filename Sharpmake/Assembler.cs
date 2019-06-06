@@ -443,8 +443,18 @@ namespace Sharpmake
             // C# will give compilation errors if a LIB variable contains non-existing directories.
             Environment.SetEnvironmentVariable("LIB", null);
 
+            // Configure Temp file collection to avoid deleting its temp file. We will delete them ourselves after the compilation
+            // For some reasons, this seems to add just enough delays to avoid the following first chance exception(probably caused by some handles in csc.exe)
+            // System.IO.IOException: 'The process cannot access the file 'C:\Users\xxx\AppData\Local\Temp\sa205152\sa205152.out' because it is being used by another process.'            
+            // That exception wasn't causing real problems but was really annoying when debugging!
+            // Executed several times sharpmake and this first chance exception no longer occurs when KeepFiles is true.
+            cp.TempFiles.KeepFiles = true;
+
             // Invoke compilation of the source file.
             CompilerResults cr = provider.CompileAssemblyFromFile(cp, assemblyInfo.SourceFiles.ToArray());
+
+            // Manually delete the files in the temp files collection.
+            cp.TempFiles.Delete();
 
             if (cr.Errors.HasErrors || cr.Errors.HasWarnings)
             {
