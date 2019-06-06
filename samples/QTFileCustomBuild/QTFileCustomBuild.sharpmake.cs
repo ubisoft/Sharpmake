@@ -132,7 +132,7 @@ namespace QTFileCustomBuild
             {
                 var relativeData = base.MakePathRelative(resolver, MakeRelativeTool);
 
-                if(Filter == ProjectFilter.ExcludeBFF)
+                if (Filter == ProjectFilter.ExcludeBFF)
                 {
                     // Need to use the right input.
                     relativeData.ExecutableArguments = MakeRelativeTool(SourceFile, true) + relativeData.ExecutableArguments;
@@ -353,7 +353,7 @@ namespace QTFileCustomBuild
                     values.Key.CustomFileBuildSteps.Add(target);
                     if (target.IsCPPFile)
                         project.ResolvedSourceFiles.Add(target.IntermediateFile);
-                    else if(!target.TargetFileNotCompiled)
+                    else if (!target.TargetFileNotCompiled)
                         project.ResolvedSourceFiles.Add(target.Output);
                 }
             }

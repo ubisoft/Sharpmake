@@ -686,7 +686,7 @@ namespace Sharpmake
         {
             // Erase any remaining file that has the prefix that will be used for temporary assemblies(dll, pdb, etc...)
             // This avoids exceptions occuring when executing sharpmake several times in loops(for example when running stability tests)
-            string [] oldTmpFiles = Directory.GetFiles(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + "*.*", SearchOption.TopDirectoryOnly);
+            string[] oldTmpFiles = Directory.GetFiles(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + "*.*", SearchOption.TopDirectoryOnly);
             foreach (string f in oldTmpFiles)
             {
                 Util.TryDeleteFile(f);
