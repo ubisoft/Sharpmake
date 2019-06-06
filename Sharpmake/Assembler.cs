@@ -92,7 +92,7 @@ namespace Sharpmake
         public IAssemblyInfo BuildAssembly(IBuilderContext context, params string[] sourceFiles)
         {
             // Alway compile to a physic dll to be able to debug
-            string tmpFile = GetTmpAssemblyFile();
+            string tmpFile = GetNextTmpAssemblyFilePath();
             return Build(context, tmpFile, sourceFiles);
         }
 
@@ -653,25 +653,74 @@ namespace Sharpmake
             return null;
         }
 
-        private static int s_nextTempFile = 0;
+        /// <summary>
+        /// Static constructor called at executable init time
+        /// </summary>
+        static Assembler()
+        {
+            CleanupTmpAssemblies();
+        }
 
-        [System.Diagnostics.DebuggerNonUserCode]
-        private string GetTmpAssemblyFile()
+        /// <summary>
+        /// This method is intended to be called at executable init time. 
+        /// It let us avoid exceptions when executing sharpmake several times in loops(exception can occur in the cs compiler
+        /// when it tries to create pdb files and some already exists. Maybe that previous sharpmake sometimes still has some handles to the file?).
+        /// With this cleanup code active there is no exception anymore on my PC. Previously I had the exception almost 100% on the second or third iteration
+        /// of a stability test(executing sharpmake in loop to insure it always generate the same thing).
+        /// </summary>
+        /// <remarks>
+        /// Was previously having the following exception when running stability tests(on subsequents sharpmake execution runs):
+        /// Unexpected error creating debug information file 'c:\Users\xxxx\AppData\Local\Temp\Sharpmake.Assembler_1.tmp.PDB' -- 'c:\Users\xxxx\AppData\Local\Temp\Sharpmake.Assembler_1.tmp.pdb: The process cannot access the file because it is being used by another process.
+        /// </remarks>
+        private static void CleanupTmpAssemblies()
+        {
+            // Erase any remaining file that has the prefix that will be used for temporary assemblies(dll, pdb, etc...)
+            // This avoids exceptions occuring when executing sharpmake several times in loops(for example when running stability tests)
+            string [] oldTmpFiles = Directory.GetFiles(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + "*.*", SearchOption.TopDirectoryOnly);
+            foreach (string f in oldTmpFiles)
+            {
+                Util.TryDeleteFile(f);
+            }
+        }
+
+        /// <summary>
+        /// Get the base path of temporary assembly files.
+        /// </summary>
+        /// <returns>the base path</returns>
+        private static string GetTmpAssemblyBasePath()
+        {
+            return Path.GetTempPath();
+        }
+
+        /// <summary>
+        /// Get the assembly files common prefixes for all temporary assemblies generated in this process.
+        /// </summary>
+        /// <returns>the prefix</returns>
+        private static string GetTmpAssemblyFilePrefix()
+        {
+            // Now taking into account the working directory when setting the temporary assembly prefix.
+            // That is useful to be able to run several sharpmake concurrently with /sharpmakemutexsuffix otherwise they can cause harm to each others.
+
+            // Note: Util.BuildGuid is converting the argument to a MD5.
+            string md5WorkingDir = Util.BuildGuid(Environment.CurrentDirectory).ToString().ToLower();
+            return $"Sharpmake_Assembly_{md5WorkingDir}_";
+        }
+
+        private static int s_nextTempFile = 0; // Index of last assembly temporary file
+
+        /// <summary>
+        /// Get the next temporary assembly file path.
+        /// </summary>
+        /// <returns>path of next temporary assembly</returns>
+        private string GetNextTmpAssemblyFilePath()
         {
             // try to re use the same file name to not pollute tmp directory
-            string tmpFilePrefix = GetType().FullName + "_";
+            string tmpFileBasePath = GetTmpAssemblyBasePath();
             string tmpFileSuffix = ".tmp.dll";
 
-            while (s_nextTempFile < int.MaxValue)
-            {
-                int currentTempFile = Interlocked.Increment(ref s_nextTempFile);
-                string tmpFile = Path.Combine(Path.GetTempPath(), tmpFilePrefix + currentTempFile + tmpFileSuffix);
-                if (!File.Exists(tmpFile) || Util.TryDeleteFile(tmpFile))
-                {
-                    return tmpFile;
-                }
-            }
-            return null;
+            int currentTempFile = Interlocked.Increment(ref s_nextTempFile);
+            string tmpFile = Path.Combine(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + currentTempFile + tmpFileSuffix);
+            return tmpFile;
         }
 
         #endregion
