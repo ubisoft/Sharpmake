@@ -181,6 +181,7 @@ namespace Sharpmake
     <TrackFileAccess>[options.TrackFileAccess]</TrackFileAccess>
     <CLRSupport>[options.CLRSupport]</CLRSupport>
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
+    <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
   </PropertyGroup>
 ";
 

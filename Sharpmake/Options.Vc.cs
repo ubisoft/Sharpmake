@@ -532,6 +532,15 @@ namespace Sharpmake
                     [Default] // The actual default for VS is Yes, but this will not work for old VS versions.
                     No
                 }
+
+                public enum SpectreMitigation
+                {
+                    [Default]
+                    Default,
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    Enabled,
+                    Disabled
+                }
             }
 
             public static class CodeAnalysis
