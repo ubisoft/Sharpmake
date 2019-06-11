@@ -189,7 +189,7 @@ namespace Sharpmake.Generators.VisualStudio
         public static Dictionary<string, CombinedCustomFileBuildStep> CombineCustomFileBuildSteps(string referencePath, Resolver resolver, IEnumerable<Project.Configuration.CustomFileBuildStep> buildSteps)
         {
             // Map from relative input file to command to run on that file, for this configuration.
-            var steps = new Dictionary<string, CombinedCustomFileBuildStep>();
+            var steps = new Dictionary<string, CombinedCustomFileBuildStep>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var customBuildStep in buildSteps)
             {
