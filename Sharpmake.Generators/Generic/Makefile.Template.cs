@@ -153,12 +153,14 @@ else
 	$(SILENT) if not exist $(subst /,\\,$(TARGETDIR)) mkdir $(subst /,\\,$(TARGETDIR))
 endif
 
+ifneq ($(OBJDIR),$(TARGETDIR))
 $(OBJDIR):
 	@echo Creating $(OBJDIR)
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) mkdir -p $(OBJDIR)
 else
 	$(SILENT) if not exist $(subst /,\\,$(OBJDIR)) mkdir $(subst /,\\,$(OBJDIR))
+endif
 endif
 
 clean:
