@@ -20,8 +20,7 @@ namespace Sharpmake.Generators.VisualStudio
             public class Project
             {
                 public static string ProjectBegin =
-                @"<?xml version=""1.0"" encoding=""Windows-1252""?>
-<Project ToolsVersion=""4.0"" DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+                @"<Project DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"" ToolsVersion=""4.0"">
 ";
 
                 public static string ProjectEnd =
@@ -41,9 +40,9 @@ namespace Sharpmake.Generators.VisualStudio
 @"  <PropertyGroup>
     <Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{[guid]}</ProjectGuid>
+    <ProjectGuid>[guid]</ProjectGuid>
     <ProjectHome>[projectHome]</ProjectHome>
-    <StartupFile />
+    <StartupFile>[startupFile]</StartupFile>
     <SearchPath>[searchPath]</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

@@ -2342,6 +2342,7 @@ namespace Sharpmake
         public List<PythonEnvironment> Environments = new List<PythonEnvironment>();
         public List<PythonVirtualEnvironment> VirtualEnvironments = new List<PythonVirtualEnvironment>();
         public Strings SearchPaths = new Strings();
+        public string StartupFile = String.Empty;
         public bool IsSourceFilesCaseSensitive = true;
 
         private void InitPythonSpecifics()
