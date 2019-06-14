@@ -259,6 +259,7 @@ namespace Sharpmake.Generators.Apple
 				CODE_SIGN_ENTITLEMENTS = ""[item.Options.CodeSignEntitlements]"";
 				INSTALL_PATH = ""[item.NativeTarget.ProductInstallPath]"";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
+				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
 				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
 				PROVISIONING_PROFILE = ""[item.Options.ProvisioningProfile]"";
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";

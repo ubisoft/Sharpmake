@@ -75,6 +75,11 @@ namespace Sharpmake
                     }
                 }
 
+                public class ProductBundleIdentifier : StringOption
+                {
+                    public ProductBundleIdentifier(string value) : base(value) { }
+                }
+
                 public enum CppLanguageStandard
                 {
                     CPP98,

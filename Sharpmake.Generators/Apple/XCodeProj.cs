@@ -755,6 +755,8 @@ namespace Sharpmake.Generators.Apple
             else
                 options["CodeSigningIdentity"] = RemoveLineTag;
 
+            options["ProductBundleIdentifier"] = Options.StringOption.Get<Options.XCode.Compiler.ProductBundleIdentifier>(conf);
+
             Options.SelectOption(conf,
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP98, () => options["CppStandard"] = "c++98"),
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP11, () => options["CppStandard"] = "c++11"),
