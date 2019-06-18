@@ -42,9 +42,9 @@
     <OutDir>output\win64\debug\</OutDir>
     <IntDir>obj\win64\debug\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildSimpleExecutable_Debug_win64 -vs -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildSimpleExecutable_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildSimpleExecutable_Debug_win64 -vs -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildSimpleExecutable_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" >NUL 2>NUL
 del "obj\win64\debug\*.obj" >NUL 2>NUL
 del "obj\win64\debug\*.a" >NUL 2>NUL
@@ -63,9 +63,9 @@ del "output\win64\debug\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCom
     <OutDir>output\win64\release\</OutDir>
     <IntDir>obj\win64\release\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildSimpleExecutable_Release_win64 -vs -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildSimpleExecutable_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildSimpleExecutable_Release_win64 -vs -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildSimpleExecutable_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" >NUL 2>NUL
 del "obj\win64\release\*.obj" >NUL 2>NUL
 del "obj\win64\release\*.a" >NUL 2>NUL
