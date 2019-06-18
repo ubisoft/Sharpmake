@@ -900,7 +900,7 @@ namespace Sharpmake.Generators.VisualStudio
                 if (extension.StartsWith(".", StringComparison.Ordinal))
                     extension = extension.Substring(1);
 
-                if (string.IsNullOrWhiteSpace(extension))
+                if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
                 {
                     decoratedName = libPrefix + libraryFile;
                     if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
