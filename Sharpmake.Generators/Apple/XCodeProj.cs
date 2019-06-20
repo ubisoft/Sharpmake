@@ -355,7 +355,7 @@ namespace Sharpmake.Generators.Apple
                 {
                     Project.Configuration bundleLoadingAppConfiguration = FindBundleLoadingApp(configurations);
 
-                    if (bundleLoadingAppConfiguration != null &&_nativeTargets.ContainsKey(bundleLoadingAppConfiguration))
+                    if (bundleLoadingAppConfiguration != null && _nativeTargets.ContainsKey(bundleLoadingAppConfiguration))
                     {
                         ProjectNativeTarget bundleLoadingAppTarget = _nativeTargets[bundleLoadingAppConfiguration];
 
