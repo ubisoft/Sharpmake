@@ -152,7 +152,6 @@ namespace Sharpmake.Generators.VisualStudio
                 // validate that 2 conf name in the same project don't have the same name
                 Dictionary<string, Project.Configuration> configurationNameMapping = new Dictionary<string, Project.Configuration>();
 
-                bool hasNvShieldConfiguration = false;
                 foreach (Project.Configuration conf in configurations)
                 {
                     var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project) + conf.Target.GetFragment<DevEnv>();
