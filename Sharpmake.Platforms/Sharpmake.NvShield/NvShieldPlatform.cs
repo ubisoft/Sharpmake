@@ -48,6 +48,12 @@ namespace Sharpmake
                         return "a";
                 }
             }
+
+            public string GetLibraryOutputPrefix()
+            {
+                return "lib";
+            }
+
             public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
                 DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
@@ -69,11 +75,6 @@ namespace Sharpmake
             public override string SharedLibraryFileExtension => "so";
             public override string ProgramDatabaseFileExtension => "so";
             public override string StaticLibraryFileExtension => string.Empty;
-
-            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-            {
-                return "lib";
-            }
 
             public override void SelectCompilerOptions(IGenerationContext context)
             {

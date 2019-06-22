@@ -259,6 +259,12 @@ namespace Sharpmake
                 string GetDefaultOutputExtension(OutputType outputType);
 
                 /// <summary>
+                /// Gets the default prefix for libraries. Some linux platforms require libraries to have 'lib' prefix on them.
+                /// </summary>
+                /// <returns>A string, containing the file extension (not including the dot (.) prefix).</returns>
+                string GetLibraryOutputPrefix();
+
+                /// <summary>
                 /// Gets the library paths native to the specified configuration's platform.
                 /// </summary>
                 /// <param name="configuration">The <see cref="Configuration"/> to get the paths for.</param>
@@ -492,6 +498,13 @@ namespace Sharpmake
             /// </para>
             /// </remarks>
             public bool ExecuteTargetCopy = false;
+
+            /// <summary>
+            /// Gets or sets whether dependent projects will copy their dll debugging database to the
+            /// target path of their dependency projects. The default value is <c>true</c>.
+            /// </summary>
+            public bool CopyDLLPdbToDependentTargets = true;
+
 
             /// <summary>
             /// Gets or sets whether dependent projects will copy their debugging database to the
@@ -2833,6 +2846,9 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
+                                var configurationTasks = PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform);
+                                string extension = "." + configurationTasks.GetDefaultOutputExtension(OutputType.Dll);
+
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
                                     && dependency.TargetPath != TargetPath)
@@ -2840,10 +2856,12 @@ namespace Sharpmake
                                     // If using OnlyBuildOrder, ExecuteTargetCopy must be set to enable the copy.
                                     if (dependencySetting != DependencySetting.OnlyBuildOrder || ExecuteTargetCopy)
                                     {
-                                        _resolvedTargetCopyFiles.Add(Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + ".dll"));
+                                        string decoratedName = configurationTasks.GetLibraryOutputPrefix() + dependency.TargetFileFullName + extension;
+                                        _resolvedTargetCopyFiles.Add(Path.Combine(dependency.TargetPath, decoratedName));
                                         if (!isExport) // Add PDBs only if the dependency is not an [export] project
                                         {
-                                            _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
+                                            if (dependency.CopyDLLPdbToDependentTargets)
+                                                _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
 
                                             if (dependency.CopyCompilerPdbToDependentTargets)
                                                 _resolvedTargetCopyFiles.Add(dependency.CompilerPdbFilePath);
@@ -2854,7 +2872,7 @@ namespace Sharpmake
                                     _resolvedEventCustomPreBuildExe.AddRange(dependency.EventCustomPreBuildExe);
                                     _resolvedEventCustomPostBuildExe.AddRange(dependency.EventCustomPostBuildExe);
                                 }
-                                _resolvedTargetDependsFiles.Add(Path.Combine(TargetPath, dependency.TargetFileFullName + ".dll"));
+                                _resolvedTargetDependsFiles.Add(Path.Combine(TargetPath, dependency.TargetFileFullName + extension));
 
                                 if (Util.IsDotNet(this))
                                 {

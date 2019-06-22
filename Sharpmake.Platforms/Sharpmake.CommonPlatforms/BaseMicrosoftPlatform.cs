@@ -62,6 +62,11 @@ namespace Sharpmake
             }
         }
 
+        public string GetLibraryOutputPrefix()
+        {
+            return string.Empty;
+        }
+
         public virtual IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
         {
             var dirs = new List<string>();

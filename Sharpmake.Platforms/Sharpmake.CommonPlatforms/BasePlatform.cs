@@ -160,11 +160,6 @@ namespace Sharpmake
             yield break;
         }
 
-        public virtual string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-        {
-            return string.Empty;
-        }
-
         public virtual void SetupSdkOptions(IGenerationContext context)
         {
         }
