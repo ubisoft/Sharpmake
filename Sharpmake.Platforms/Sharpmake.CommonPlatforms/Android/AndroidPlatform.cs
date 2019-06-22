@@ -87,6 +87,13 @@ namespace Sharpmake
                 }
             }
 
+            public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+            {
+                if (outputType != Project.Configuration.OutputType.Exe)
+                    return "lib";
+                return string.Empty;
+            }
+
             public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
             {
                 yield break;
@@ -98,13 +105,6 @@ namespace Sharpmake
             public override string SharedLibraryFileExtension => "so";
             public override string StaticLibraryFileExtension => "a";
             public override string ExecutableFileExtension => string.Empty;
-
-            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-            {
-                if (outputType != Project.Configuration.OutputType.Exe)
-                    return "lib";
-                return string.Empty;
-            }
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {

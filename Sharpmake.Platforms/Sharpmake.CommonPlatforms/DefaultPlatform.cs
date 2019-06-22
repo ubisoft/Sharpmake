@@ -84,6 +84,11 @@ namespace Sharpmake
             }
         }
 
+        public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+        {
+            return string.Empty;
+        }
+
         public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
         {
             yield break;

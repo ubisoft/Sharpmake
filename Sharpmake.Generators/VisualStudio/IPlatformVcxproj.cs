@@ -59,8 +59,6 @@ namespace Sharpmake.Generators.VisualStudio
 
         IEnumerable<VariableAssignment> GetEnvironmentVariables(IGenerationContext context);
 
-        string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType);
-
         void SetupDeleteExtensionsOnCleanOptions(IGenerationContext context);
         void SetupSdkOptions(IGenerationContext context);
         void SetupPlatformToolsetOptions(IGenerationContext context);

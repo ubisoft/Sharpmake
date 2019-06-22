@@ -260,6 +260,12 @@ namespace Sharpmake
                 string GetDefaultOutputExtension(OutputType outputType);
 
                 /// <summary>
+                /// Gets the required prefix for the given output type. Some linux platforms require libraries to have 'lib' prefix on libraries and so files.
+                /// </summary>
+                /// <returns>A string, containing the full previx to add to generated and dependant names</returns>
+                string GetOutputFileNamePrefix(OutputType outputType);
+
+                /// <summary>
                 /// Gets the library paths native to the specified configuration's platform.
                 /// </summary>
                 /// <param name="configuration">The <see cref="Configuration"/> to get the paths for.</param>
@@ -493,6 +499,13 @@ namespace Sharpmake
             /// </para>
             /// </remarks>
             public bool ExecuteTargetCopy = false;
+
+            /// <summary>
+            /// Gets or sets whether dependent projects will copy their dll debugging database to the
+            /// target path of their dependency projects. The default value is <c>true</c>.
+            /// </summary>
+            public bool CopyDLLPdbToDependentTargets = true;
+
 
             /// <summary>
             /// Gets or sets whether dependent projects will copy their debugging database to the
@@ -2901,8 +2914,9 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
+                                string platformDLLPrefix = configTasks.GetOutputFileNamePrefix(OutputType.Dll);
                                 string platformDllExtension = "." + dependency.OutputExtension;
-                                string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + platformDllExtension);
+                                string dependencyDllFullPath = Path.Combine(dependency.TargetPath, platformDLLPrefix + dependency.TargetFileFullName + platformDllExtension);
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
                                     && dependency.TargetPath != TargetPath)
@@ -2914,7 +2928,8 @@ namespace Sharpmake
                                         // Add PDBs only if they exist and the dependency is not an [export] project
                                         if (!isExport && Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
                                         {
-                                            _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
+                                            if (dependency.CopyDLLPdbToDependentTargets)
+                                                _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
 
                                             if (dependency.CopyCompilerPdbToDependentTargets)
                                                 _resolvedTargetCopyFiles.Add(dependency.CompilerPdbFilePath);

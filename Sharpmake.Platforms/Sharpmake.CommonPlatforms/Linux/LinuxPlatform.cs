@@ -62,6 +62,13 @@ namespace Sharpmake
                 }
             }
 
+            public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+            {
+                if (outputType != Project.Configuration.OutputType.Exe)
+                    return "lib";
+                return string.Empty;
+            }
+
             public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration conf)
             {
                 if (GlobalSettings.SystemPathProvider != null)
@@ -90,13 +97,6 @@ namespace Sharpmake
             public override string ExecutableFileExtension => string.Empty;
 
             // Ideally the object files should be suffixed .o when compiling with FastBuild, using the CompilerOutputExtension property in ObjectLists
-
-            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-            {
-                if (outputType != Project.Configuration.OutputType.Exe)
-                    return "lib";
-                return string.Empty;
-            }
 
             public override void SetupPlatformToolsetOptions(IGenerationContext context)
             {

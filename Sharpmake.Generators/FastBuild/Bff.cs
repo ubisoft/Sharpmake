@@ -1598,7 +1598,9 @@ namespace Sharpmake.Generators.FastBuild
             string platformOutputLibraryExtension = string.Empty;
             string platformPrefix = string.Empty;
             platformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefix);
-            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
+
+            var configurationTasks = PlatformRegistry.Query<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
 
             var additionalDependencies = new OrderableStrings();
 

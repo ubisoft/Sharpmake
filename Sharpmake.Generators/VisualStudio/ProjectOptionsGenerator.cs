@@ -1217,7 +1217,9 @@ namespace Sharpmake.Generators.VisualStudio
             if (outputExtension.Length > 0 && !outputExtension.StartsWith(".", StringComparison.Ordinal))
                 outputExtension = outputExtension.Insert(0, ".");
 
-            string outputFileName = optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output) + optionsContext.TargetName;
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+            string outputPrefixPrefix = configurationTasks.GetOutputFileNamePrefix(context.Configuration.Output);
+            string outputFileName = outputPrefixPrefix + optionsContext.TargetName;
 
             context.Options["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
@@ -2234,8 +2236,11 @@ namespace Sharpmake.Generators.VisualStudio
             Action enableMapOption = () =>
             {
                 context.Options["GenerateMapFile"] = "true";
-                string targetNamePrefix = optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output);
-                string mapFile = Path.Combine(optionsContext.OutputDirectoryRelative, targetNamePrefix + optionsContext.TargetName + ".map");
+
+                var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+                string outputPrefixPrefix = configurationTasks.GetOutputFileNamePrefix(context.Configuration.Output);
+                string outputFileName = outputPrefixPrefix + optionsContext.TargetName + ".map";
+                string mapFile = Path.Combine(optionsContext.OutputDirectoryRelative, outputFileName);
                 context.Options["MapFileName"] = mapFile;
 
                 string mapFileBffRelative = FormatCommandLineOptionPath(context, mapFile);

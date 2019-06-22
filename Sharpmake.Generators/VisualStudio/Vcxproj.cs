@@ -797,7 +797,8 @@ namespace Sharpmake.Generators.VisualStudio
                     libraryFiles[i] = Util.GetConvertedRelativePath(context.ProjectDirectory, libraryFile, context.ProjectDirectory, true, context.Project.RootPath);
             }
 
-            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
 
             var additionalDependencies = new Strings();
             foreach (string libraryFile in libraryFiles)
