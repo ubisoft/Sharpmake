@@ -471,6 +471,12 @@ namespace Sharpmake
             public bool ExecuteTargetCopy = false;
 
             /// <summary>
+            /// Gets or sets whether dependent projects will copy their dll debugging database to the
+            /// target path of their dependency projects. The default value is <c>true</c>.
+            /// </summary>
+            public bool CopyLinkerPdbToDependentTargets = true;
+
+            /// <summary>
             /// Gets or sets whether dependent projects will copy their debugging database to the
             /// target path of their dependency projects. The default value is <c>false</c>.
             /// </summary>
@@ -2945,7 +2951,8 @@ namespace Sharpmake
                                         // Add PDBs only if they exist and the dependency is not an [export] project
                                         if (!isExport && Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
                                         {
-                                            _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
+                                            if (dependency.CopyLinkerPdbToDependentTargets)
+                                                _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
 
                                             if (dependency.CopyCompilerPdbToDependentTargets)
                                                 _resolvedTargetCopyFiles.Add(dependency.CompilerPdbFilePath);
