@@ -38,6 +38,11 @@ namespace Sharpmake
             set { SetProperty(ref _isFileNameToLower, value); }
         }
 
+        public string LowerName
+        {
+            get { return _name.ToLower(); }
+        }
+
         private bool _isTargetFileNameToLower = true;                                         // Makes the ProjectName ToLower or not
         public bool IsTargetFileNameToLower
         {

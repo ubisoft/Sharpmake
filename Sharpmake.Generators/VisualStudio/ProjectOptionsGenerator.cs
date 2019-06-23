@@ -169,7 +169,14 @@ namespace Sharpmake.Generators.VisualStudio
             context.SelectOptionWithFallback(
                 () => { context.Options["WindowsTargetPlatformVersion"] = FileGeneratorUtilities.RemoveLineTag; },
                 winTargetPlatformVersionOptionActions.ToArray()
-                );
+            );
+
+            if (context.Configuration.Target.GetPlatform() == Platform.linux)
+            {
+                context.Options["ProjectDirectory"] = "/mnt/" + context.ProjectDirectoryCapitalized.Replace(@":", string.Empty).Replace('\\', '/');
+                context.Options["OutputDirectoryRemote"] = (@"$(RemoteProjectDir)" + context.Options["OutputDirectory"]).Replace('\\', '/');
+                context.Options["IntermediateDirectoryRemote"] = (@"$(RemoteProjectDir)" + context.Options["IntermediateDirectory"]).Replace('\\', '/');
+            }
         }
 
         private static void SelectConfigurationTypeOption(IGenerationContext context)
@@ -251,9 +258,24 @@ namespace Sharpmake.Generators.VisualStudio
 
                 context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
+
+                context.SelectOption
+                (
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Default, () => { context.Options["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp98, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++98"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++11"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++14"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp17, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp98, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++98"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++11"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++14"; })
+                );
             }
             else
             {
+                context.Options["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
+
                 //Options.Vc.General.CharacterSet.
                 //    NotSet                                  CharacterSet="0"
                 //    UseUnicodeCharaterSet                   Project.ProjectConfiguration.CharacterSet="1"                  /D "_UNICODE" /D "UNICODE"

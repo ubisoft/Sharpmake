@@ -712,7 +712,7 @@ namespace Sharpmake.Generators.VisualStudio
             // For all projects configurations that are fastbuild only, do not add the cpp
             // source file requires to be remove from the projects, so that not 2 same cpp file be in 2 different project.
             // TODO: make a better check
-            if (hasNonFastBuildConfig || !context.Project.StripFastBuildSourceFiles)
+            if (hasNonFastBuildConfig || !context.Project.StripFastBuildSourceFiles || context.ProjectConfigurations.Any(conf => !conf.StripFastBuildSourceFiles))
                 GenerateFilesSection(context, options, fileGenerator, generatedFiles, skipFiles);
             else if (hasFastBuildConfig)
                 GenerateBffFilesSection(context, fileGenerator);

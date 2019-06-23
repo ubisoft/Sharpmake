@@ -59,6 +59,10 @@
     <Compile Include="BasePlatform.cs" />
     <Compile Include="DefaultPlatform.cs" />
     <Compile Include="DotNetPlatform.cs" />
+    <Compile Include="Linux\GlobalSettings.cs" />
+    <Compile Include="Linux\LinuxOptions.cs" />
+    <Compile Include="Linux\LinuxPlatform.Bff.Template.cs" />
+    <Compile Include="Linux\LinuxPlatform.Vcxproj.Template.cs" />
     <Compile Include="Linux\LinuxPlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Windows\BaseWindowsPlatform.cs" />

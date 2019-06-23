@@ -829,6 +829,14 @@ namespace Sharpmake
             public Strings AdditionalNone = new Strings();
 
             /// <summary>
+            /// Adds commands for VS debugger
+            /// </summary>
+            /// <remarks>
+            /// Used only by the Visual Studio generators.
+            /// </remarks>
+            public string AdditionalDebuggerCommands = RemoveLineTag;
+
+            /// <summary>
             /// Gets or sets the name of the source file for the precompiled header in C and C++
             /// projects, ie: <c>stdafx.cpp</c>. This property must be <c>null</c> for projects that don't
             /// have a precompiled header.
@@ -2012,6 +2020,9 @@ namespace Sharpmake
             /// </summary>
             public string FastBuildCustomArgs = string.Empty;
 
+            // If true, remove the source files from a FastBuild project's associated vcxproj file.
+            public bool StripFastBuildSourceFiles = true;
+
             private Dictionary<KeyValuePair<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<KeyValuePair<Type, ITarget>, DependencySetting>();
 
             // These dependencies will not be propagated to other projects that depend on us
@@ -2573,6 +2584,9 @@ namespace Sharpmake
                 public string LocalDebuggerCommandArguments = RemoveLineTag;
                 public string LocalDebuggerEnvironment = RemoveLineTag;
                 public string LocalDebuggerWorkingDirectory = RemoveLineTag;
+                public string RemoteDebuggerCommand = RemoveLineTag;
+                public string RemoteDebuggingMode = RemoveLineTag;
+                public string RemoteDebuggerWorkingDirectory = RemoveLineTag;
                 public bool OverwriteExistingFile = true;
             }
 

@@ -17,8 +17,8 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public class IncludeWithPrefix
     {
-        public string CmdLinePrefix;
-        public string Path;
+        public string CmdLinePrefix { get; }
+        public string Path { get; }
 
         public IncludeWithPrefix(string cmdLinePrefix, string includePath)
         {

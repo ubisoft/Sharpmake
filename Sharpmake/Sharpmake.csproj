@@ -96,6 +96,7 @@
     <Compile Include="Options.Android.cs" />
     <Compile Include="Options.AndroidMakefile.cs" />
     <Compile Include="Options.CSharp.cs" />
+    <Compile Include="Options.Clang.cs" />
     <Compile Include="Options.Makefile.cs" />
     <Compile Include="Options.Vc.cs" />
     <Compile Include="Options.XCode.cs" />
