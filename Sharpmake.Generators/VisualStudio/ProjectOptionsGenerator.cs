@@ -1633,24 +1633,39 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.PlatformVcxproj.SetupPlatformTargetOptions(context);
             optionsContext.PlatformVcxproj.SelectLinkerOptions(context);
 
+            // Options.Vc.Librarian.AdditionalOptions
             context.Configuration.AdditionalLibrarianOptions.Sort();
             string additionalLibrarianOptions = context.Configuration.AdditionalLibrarianOptions.JoinStrings(" ").Trim();
-            context.Options["AdditionalLibrarianOptions"] = additionalLibrarianOptions.Length > 0 ? additionalLibrarianOptions : FileGeneratorUtilities.RemoveLineTag;
 
             // Options.Vc.Linker.AdditionalOptions
             context.Configuration.AdditionalLinkerOptions.Sort();
             string linkerAdditionalOptions = context.Configuration.AdditionalLinkerOptions.JoinStrings(" ").Trim();
 
-            // Treat Options.Vc.Linker.DisableSpecificWarnings here because
-            // it does not have a specific line in the vcxproj
-            Strings disableLinkerWarnings = Options.GetStrings<Options.Vc.Linker.DisableSpecificWarnings>(context.Configuration);
-            if (disableLinkerWarnings.Count > 0)
+            Func<Strings, string> formatIgnoredWarnings = disabledWarnings => {
+                if (disabledWarnings.Count > 0)
+                    return "/ignore:" + disabledWarnings.JoinStrings(",");
+                return string.Empty;
+            };
+
+            // Treat Options.Vc.Librarian/Linker.DisableSpecificWarnings here because
+            // they do not have a specific line in the vcxproj
+            string ignoredLibWarnings = formatIgnoredWarnings(Options.GetStrings<Options.Vc.Librarian.DisableSpecificWarnings>(context.Configuration));
+            if (!string.IsNullOrEmpty(ignoredLibWarnings))
+            {
+                if (additionalLibrarianOptions.Length > 0)
+                    additionalLibrarianOptions += " ";
+                additionalLibrarianOptions += ignoredLibWarnings;
+            }
+
+            string ignoredLinkerWarnings = formatIgnoredWarnings(Options.GetStrings<Options.Vc.Linker.DisableSpecificWarnings>(context.Configuration));
+            if (!string.IsNullOrEmpty(ignoredLinkerWarnings))
             {
                 if (linkerAdditionalOptions.Length > 0)
                     linkerAdditionalOptions += " ";
-                linkerAdditionalOptions += "/ignore:" + disableLinkerWarnings.JoinStrings(",");
+                linkerAdditionalOptions += ignoredLinkerWarnings;
             }
 
+            context.Options["AdditionalLibrarianOptions"] = additionalLibrarianOptions.Length > 0 ? additionalLibrarianOptions : FileGeneratorUtilities.RemoveLineTag;
             context.Options["AdditionalLinkerOptions"] = linkerAdditionalOptions.Length > 0 ? linkerAdditionalOptions : FileGeneratorUtilities.RemoveLineTag;
         }
 

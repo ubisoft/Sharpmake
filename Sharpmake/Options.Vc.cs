@@ -562,6 +562,13 @@ namespace Sharpmake
                     [Default]
                     Disable
                 }
+
+                public class DisableSpecificWarnings : Strings
+                {
+                    public DisableSpecificWarnings(params string[] warnings)
+                        : base(warnings)
+                    { }
+                }
             }
 
             public static class Linker
