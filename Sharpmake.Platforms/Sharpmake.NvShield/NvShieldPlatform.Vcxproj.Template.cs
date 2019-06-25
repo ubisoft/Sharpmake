@@ -71,7 +71,7 @@ namespace Sharpmake
       <AndroidSystemLibs>[options.AndroidSystemLibs]</AndroidSystemLibs>
       <LinkGccLibThumb>[options.LinkGccLibThumb]</LinkGccLibThumb>
       <ReportUndefinedSymbols>[options.ReportUndefinedSymbols]</ReportUndefinedSymbols>
-      UseLinker>[options.UseLinker]</UseLinker>
+      <UseLinker>[options.UseLinker]</UseLinker>
       <AdditionalOptions>[options.AdditionalLinkerOptions] %(AdditionalOptions)</AdditionalOptions>
     </Link>
 ";
