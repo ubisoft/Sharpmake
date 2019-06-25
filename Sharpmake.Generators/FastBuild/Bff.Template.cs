@@ -113,6 +113,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.LinkerSuppressStartupBanner]'
                             + ' [cmdLineOptions.AdditionalLibraryDirectories]'
                             + ' [cmdLineOptions.ForceFileOutput]'
+                            + ' [cmdLineOptions.TreatLinkerWarningAsErrors]'
                             // Input
                             // ---------------------------
                             + ' [cmdLineOptions.AdditionalDependencies]'
@@ -271,7 +272,7 @@ Compiler( '[fastbuildCompilerName]' )
     .LibrarianOutput        = '[fastBuildOutputFile]'
     .LibrarianOptions       = '""%1"" /OUT:""%2""'
                             + ' [cmdLineOptions.LinkerSuppressStartupBanner]'
-                            + ' [options.AdditionalLinkerOptions]'
+                            + ' [cmdLineOptions.TreatLibWarningAsErrors]'
                             + ' [options.AdditionalLibrarianOptions]'
 
 ";

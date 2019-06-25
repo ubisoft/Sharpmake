@@ -146,6 +146,7 @@ namespace Sharpmake
       <ForceFileOutput>[options.ForceFileOutput]</ForceFileOutput>
       <GenerateWindowsMetadata>[options.GenerateWindowsMetadata]</GenerateWindowsMetadata>
       <WindowsMetadataFile>[options.WindowsMetadataFile]</WindowsMetadataFile>
+      <TreatLinkerWarningAsErrors>[options.TreatLinkerWarningAsErrors]</TreatLinkerWarningAsErrors>
     </Link>
 ";
 

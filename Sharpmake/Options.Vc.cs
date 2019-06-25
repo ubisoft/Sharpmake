@@ -554,6 +554,16 @@ namespace Sharpmake
                 }
             }
 
+            public static class Librarian
+            {
+                public enum TreatLibWarningAsErrors
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+            }
+
             public static class Linker
             {
                 public enum EmbedManifest
@@ -860,6 +870,13 @@ namespace Sharpmake
                     [Default]
                     Default,
                     Enable,
+                    Disable
+                }
+
+                public enum TreatLinkerWarningAsErrors
+                {
+                    Enable,
+                    [Default]
                     Disable
                 }
             }

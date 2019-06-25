@@ -24,6 +24,7 @@ namespace Sharpmake.Generators.VisualStudio
     {
         General,
         Compiler,
+        Librarian,
         Linker,
         Manifest,
         PostBuild,
@@ -92,6 +93,9 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (level >= ProjectOptionGenerationLevel.Compiler)
                 GenerateCompilerOptions(context, optionsContext);
+
+            if (level >= ProjectOptionGenerationLevel.Librarian)
+                GenerateLibrarianOptions(context, optionsContext);
 
             if (level >= ProjectOptionGenerationLevel.Linker)
                 GenerateLinkerOptions(context, optionsContext);
@@ -1141,6 +1145,15 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
+        private void GenerateLibrarianOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
+        {
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Librarian.TreatLibWarningAsErrors.Disable, () => { context.Options["TreatLibWarningAsErrors"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["TreatLibWarningAsErrors"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Librarian.TreatLibWarningAsErrors.Enable, () => { context.Options["TreatLibWarningAsErrors"] = "true"; context.CommandLineOptions["TreatLibWarningAsErrors"] = "/WX"; })
+            );
+        }
+
         private void GenerateLinkerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             string outputExtension = context.Configuration.OutputExtension;
@@ -1608,6 +1621,12 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Linker.CreateHotPatchableImage.X86Image, () => { context.Options["CreateHotPatchableImage"] = "X86Image"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN:5"; }),
                 Options.Option(Options.Vc.Linker.CreateHotPatchableImage.X64Image, () => { context.Options["CreateHotPatchableImage"] = "X64Image"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN:6"; }),
                 Options.Option(Options.Vc.Linker.CreateHotPatchableImage.ItaniumImage, () => { context.Options["CreateHotPatchableImage"] = "ItaniumImage"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN:16"; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Linker.TreatLinkerWarningAsErrors.Disable, () => { context.Options["TreatLinkerWarningAsErrors"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["TreatLinkerWarningAsErrors"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Linker.TreatLinkerWarningAsErrors.Enable, () => { context.Options["TreatLinkerWarningAsErrors"] = "true"; context.CommandLineOptions["TreatLinkerWarningAsErrors"] = "/WX"; })
             );
 
             // Target Machine

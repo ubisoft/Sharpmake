@@ -133,6 +133,7 @@ namespace Sharpmake
       <AllowIsolation>[options.AllowIsolation]</AllowIsolation>
       <GenerateWindowsMetadata>[options.GenerateWindowsMetadata]</GenerateWindowsMetadata>
       <WindowsMetadataFile>[options.WindowsMetadataFile]</WindowsMetadataFile>
+      <TreatLinkerWarningAsErrors>[options.TreatLinkerWarningAsErrors]</TreatLinkerWarningAsErrors>
     </Link>
 ";
 
@@ -142,6 +143,7 @@ namespace Sharpmake
       <FullProgramDatabaseFile>[options.FullProgramDatabaseFile]</FullProgramDatabaseFile>
       <EnableCOMDATFolding>[options.EnableCOMDATFolding]</EnableCOMDATFolding>
       <OptimizeReferences>[options.OptimizeReferences]</OptimizeReferences>
+      <TreatLinkerWarningAsErrors>[options.TreatLinkerWarningAsErrors]</TreatLinkerWarningAsErrors>
     </Link>
     <Lib>
       <TargetMachine>[options.TargetMachine]</TargetMachine>
@@ -153,6 +155,7 @@ namespace Sharpmake
     <Lib>
       <LinkTimeCodeGeneration>[options.LinkTimeCodeGeneration]</LinkTimeCodeGeneration>
       <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
+      <TreatLibWarningAsErrors>[options.TreatLibWarningAsErrors]</TreatLibWarningAsErrors>
       <OutputFile>[options.OutputFile]</OutputFile>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
       <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
