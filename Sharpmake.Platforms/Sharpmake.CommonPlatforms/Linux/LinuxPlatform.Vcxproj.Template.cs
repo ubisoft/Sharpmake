@@ -57,12 +57,7 @@ namespace Sharpmake
                 </Link>
                 <Lib>
                   <TargetMachine>[options.TargetMachine]</TargetMachine>
-                </Lib>
-                <Lib>
-                  <SubSystem>
-                  </SubSystem>
-                </Lib>
-                <Lib>
+                  <SubSystem/>
                   <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
                   <OutputFile>[options.OutputFile]</OutputFile>
                   <ThinArchive>[options.UseThinArchives]</ThinArchive>

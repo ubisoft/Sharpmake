@@ -147,12 +147,7 @@ namespace Sharpmake
     </Link>
     <Lib>
       <TargetMachine>[options.TargetMachine]</TargetMachine>
-    </Lib>
-    <Lib>
-      <SubSystem>
-      </SubSystem>
-    </Lib>
-    <Lib>
+      <SubSystem/>
       <LinkTimeCodeGeneration>[options.LinkTimeCodeGeneration]</LinkTimeCodeGeneration>
       <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
       <TreatLibWarningAsErrors>[options.TreatLibWarningAsErrors]</TreatLibWarningAsErrors>
