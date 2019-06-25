@@ -96,12 +96,7 @@
     </Link>
     <Lib>
       <TargetMachine>MachineX64</TargetMachine>
-    </Lib>
-    <Lib>
-      <SubSystem>
-      </SubSystem>
-    </Lib>
-    <Lib>
+      <SubSystem/>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
       <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
       <OutputFile>..\libstuff\lib\libstuffproject_projectname.lib</OutputFile>

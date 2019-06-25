@@ -114,12 +114,7 @@
     </Link>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
-    </Lib>
-    <Lib>
-      <SubSystem>
-      </SubSystem>
-    </Lib>
-    <Lib>
+      <SubSystem/>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
       <OutputFile>output\win32\debug\theemptycppproject.lib</OutputFile>
     </Lib>
@@ -181,12 +176,7 @@
     </Link>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
-    </Lib>
-    <Lib>
-      <SubSystem>
-      </SubSystem>
-    </Lib>
-    <Lib>
+      <SubSystem/>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
       <OutputFile>output\win32\release\theemptycppproject.lib</OutputFile>
     </Lib>

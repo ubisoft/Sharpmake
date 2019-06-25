@@ -150,12 +150,11 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // ---------------------------
                             // Advanced
                             // ---------------------------
-                            + ' /DYNAMICBASE' 
+                            + ' /DYNAMICBASE'
                             + ' /MACHINE:X64'
                             + ' /errorReport:queue'
                             // Additional linker options
                             //--------------------------
-                            + ' '
 }
 
 
@@ -310,12 +309,11 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // ---------------------------
                             // Advanced
                             // ---------------------------
-                            + ' /DYNAMICBASE' 
+                            + ' /DYNAMICBASE'
                             + ' /MACHINE:X64'
                             + ' /errorReport:queue'
                             // Additional linker options
                             //--------------------------
-                            + ' '
 }
 
 
