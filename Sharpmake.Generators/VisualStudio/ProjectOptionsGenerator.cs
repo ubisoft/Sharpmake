@@ -1614,6 +1614,10 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.PlatformVcxproj.SetupPlatformTargetOptions(context);
             optionsContext.PlatformVcxproj.SelectLinkerOptions(context);
 
+            context.Configuration.AdditionalLibrarianOptions.Sort();
+            string additionalLibrarianOptions = context.Configuration.AdditionalLibrarianOptions.JoinStrings(" ").Trim();
+            context.Options["AdditionalLibrarianOptions"] = additionalLibrarianOptions.Length > 0 ? additionalLibrarianOptions : FileGeneratorUtilities.RemoveLineTag;
+
             // Options.Vc.Linker.AdditionalOptions
             context.Configuration.AdditionalLinkerOptions.Sort();
             string linkerAdditionalOptions = context.Configuration.AdditionalLinkerOptions.JoinStrings(" ");

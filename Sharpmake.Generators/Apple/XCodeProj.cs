@@ -1052,6 +1052,8 @@ namespace Sharpmake.Generators.Apple
                 options["PreprocessorDefinitions"] = conf.Defines.Select(item => "\t\t\t\t\t\"" + item.Replace("\"", "") + "\"").Aggregate((first, next) => first + ",\n" + next).TrimEnd('\n', '\t');
             if (conf.AdditionalCompilerOptions.Any())
                 options["CompilerOptions"] = conf.AdditionalCompilerOptions.Select(item => "\t\t\t\t\t\"" + item.Replace("\"", "") + "\"").Aggregate((first, next) => first + ",\n" + next).TrimEnd('\n', '\t');
+            if (conf.AdditionalLibrarianOptions.Any())
+                throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with XCode generator");
             if (linkerOptions.Any())
                 options["LinkerOptions"] = linkerOptions.Select(item => "\t\t\t\t\t\"" + item.Replace("\"", "") + "\"").Aggregate((first, next) => first + ",\n" + next).TrimEnd('\n', '\t');
             return options;

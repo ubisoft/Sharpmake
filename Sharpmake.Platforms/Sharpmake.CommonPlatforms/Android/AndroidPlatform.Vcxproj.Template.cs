@@ -98,7 +98,7 @@ namespace Sharpmake
 
             private const string _projectConfigurationsStaticLinkTemplate =
 @"    <Lib>
-      <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
+      <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
       <OutputFile>[options.OutputFile]</OutputFile>
     </Lib>
 ";

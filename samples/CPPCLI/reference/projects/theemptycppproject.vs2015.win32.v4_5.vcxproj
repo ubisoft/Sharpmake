@@ -121,7 +121,6 @@
     </Lib>
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
-      <AdditionalOptions></AdditionalOptions>
       <OutputFile>output\win32\debug\theemptycppproject.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -189,7 +188,6 @@
     </Lib>
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
-      <AdditionalOptions></AdditionalOptions>
       <OutputFile>output\win32\release\theemptycppproject.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>

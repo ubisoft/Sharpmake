@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -545,6 +546,9 @@ namespace Sharpmake.Generators.Generic
             {
                 options["LinkCommand"] = Template.Project.LinkCommandExe;
             }
+
+            if (conf.AdditionalLibrarianOptions.Any())
+                throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with Makefile generator");
 
             string linkerAdditionalOptions = conf.AdditionalLinkerOptions.JoinStrings(" ");
             options["AdditionalLinkerOptions"] = linkerAdditionalOptions;

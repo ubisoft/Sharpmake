@@ -1127,6 +1127,11 @@ namespace Sharpmake
             public List<DotNetDependency> DotNetPrivateDependencies = new List<DotNetDependency>();
 
             /// <summary>
+            /// Options passed to the librarian / archiver
+            /// </summary>
+            public OrderableStrings AdditionalLibrarianOptions = new OrderableStrings();
+
+            /// <summary>
             /// Gets a list of linker options to send when calling the compiler.
             /// </summary>
             /// <remarks>

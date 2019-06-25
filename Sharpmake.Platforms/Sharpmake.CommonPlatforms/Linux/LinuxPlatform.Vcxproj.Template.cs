@@ -49,7 +49,6 @@ namespace Sharpmake
                 </ClCompile>
             ";
 
-            //Copy-Pasted from the generic Project. Simply changed <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions> to <AdditionalOptions></AdditionalOptions>
             private const string _projectConfigurationsStaticLinkTemplate =
                             @"    <Link>
                   <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
@@ -64,9 +63,8 @@ namespace Sharpmake
                   </SubSystem>
                 </Lib>
                 <Lib>
-                  <AdditionalOptions></AdditionalOptions>
+                  <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
                   <OutputFile>[options.OutputFile]</OutputFile>
-                  <!--AdditionalDependencies>[options.AdditionalLibraryDirectories];%(AdditionalDependencies)</AdditionalDependencies-->
                   <ThinArchive>[options.UseThinArchives]</ThinArchive>
                 </Lib>
             ";

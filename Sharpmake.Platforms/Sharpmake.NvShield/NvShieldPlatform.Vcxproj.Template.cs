@@ -53,6 +53,7 @@ namespace Sharpmake
             private const string _projectConfigurationsStaticLinkTemplate =
                 @"    <Lib>
       <OutputFile>[options.OutputFile]</OutputFile>
+      <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
       <AdditionalDependencies>[options.AdditionalDependencies]</AdditionalDependencies>
       <ThinArchive>[options.ThinArchive]</ThinArchive>

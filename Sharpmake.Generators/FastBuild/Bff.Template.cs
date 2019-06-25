@@ -272,6 +272,7 @@ Compiler( '[fastbuildCompilerName]' )
     .LibrarianOptions       = '""%1"" /OUT:""%2""'
                             + ' [cmdLineOptions.LinkerSuppressStartupBanner]'
                             + ' [options.AdditionalLinkerOptions]'
+                            + ' [options.AdditionalLibrarianOptions]'
 
 ";
 

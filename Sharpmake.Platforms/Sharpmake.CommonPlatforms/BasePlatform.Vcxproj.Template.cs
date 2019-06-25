@@ -152,7 +152,7 @@ namespace Sharpmake
     </Lib>
     <Lib>
       <LinkTimeCodeGeneration>[options.LinkTimeCodeGeneration]</LinkTimeCodeGeneration>
-      <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
+      <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
       <OutputFile>[options.OutputFile]</OutputFile>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
       <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
