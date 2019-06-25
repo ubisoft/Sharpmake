@@ -1620,7 +1620,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Options.Vc.Linker.AdditionalOptions
             context.Configuration.AdditionalLinkerOptions.Sort();
-            string linkerAdditionalOptions = context.Configuration.AdditionalLinkerOptions.JoinStrings(" ");
+            string linkerAdditionalOptions = context.Configuration.AdditionalLinkerOptions.JoinStrings(" ").Trim();
 
             // Treat Options.Vc.Linker.DisableSpecificWarnings here because
             // it does not have a specific line in the vcxproj
@@ -1632,7 +1632,7 @@ namespace Sharpmake.Generators.VisualStudio
                 linkerAdditionalOptions += "/ignore:" + disableLinkerWarnings.JoinStrings(",");
             }
 
-            context.Options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
+            context.Options["AdditionalLinkerOptions"] = linkerAdditionalOptions.Length > 0 ? linkerAdditionalOptions : FileGeneratorUtilities.RemoveLineTag;
         }
 
         private void GenerateManifestToolOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
