@@ -73,7 +73,8 @@ tests = [
     Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
     Test("CSharpWCF", "CSharpWCF.sharpmake.cs", "CSharpWCF\codebase"),
     Test("PackageReferences", "PackageReferences.sharpmake.cs"),
-    Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs")
+    Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"),
+    Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs")
 ]
 
 def find_target_path(directory, target):

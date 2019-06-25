@@ -36,6 +36,8 @@ namespace SimpleExeLibDependency
             conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
 
+            conf.Options.Add(Options.Vc.Linker.TreatLinkerWarningAsErrors.Enable);
+
             conf.AddPublicDependency<LibStuffProject>(target);
         }
     }

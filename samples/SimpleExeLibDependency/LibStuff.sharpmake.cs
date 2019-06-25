@@ -44,6 +44,8 @@ namespace SimpleExeLibDependency
             conf.IncludePaths.Add("[project.BasePath]");
             conf.TargetLibraryPath = "[project.BasePath]/lib";
             conf.ProjectPath = "[project.SharpmakeCsPath]/projects";
+
+            conf.Options.Add(Options.Vc.Librarian.TreatLibWarningAsErrors.Enable);
         }
     }
 }
