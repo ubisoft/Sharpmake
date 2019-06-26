@@ -396,8 +396,8 @@ namespace Sharpmake
                 string CCompilerSettingsName = "C-" + compilerName + "-" + "Linux";
                 string CompilerSettingsName = compilerName + "-" + "Linux";
 
-                string pathToCompiler = fastBuildSettings.BinPath[devEnv];
                 var projectRootPath = conf.Project.RootPath;
+                string pathToCompiler = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, fastBuildSettings.BinPath[devEnv]));
                 CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, CompilerSettingsName, devEnv, pathToCompiler, false);
                 compilerSettings.PlatformFlags |= Platform.linux;
                 CompilerSettings CcompilerSettings = GetMasterCompilerSettings(masterCompilerSettings, CCompilerSettingsName, devEnv, pathToCompiler, true);
