@@ -1061,10 +1061,15 @@ namespace Sharpmake.Generators.Apple
 
         private class XCodeOptions : Dictionary<string, string>
         {
+            public static Resolver Resolver { get; set; } = new Resolver();
+
             public static string ResolveProjectPaths(Project project, string stringToResolve)
             {
-                string resolvedString = stringToResolve.Replace("[project.SharpmakeCsPath]", project.SharpmakeCsPath).Replace("[project.SharpmakeCsProjectPath]", project.SharpmakeCsProjectPath);
-                return Util.SimplifyPath(resolvedString);
+                using (Resolver.NewScopedParameter("project", project))
+                {
+                    string resolvedString = Resolver.Resolve(stringToResolve);
+                    return Util.SimplifyPath(resolvedString);
+                }
             }
 
             public static void ResolveProjectPaths(Project project, Strings stringsToResolve)
