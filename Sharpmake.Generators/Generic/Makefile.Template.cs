@@ -182,7 +182,7 @@ prelink:
 	$(PRELINKCMDS)
 
 ifneq (,$(PCH))
-$(GCH): $(PCH)
+$(GCH): $(PCH) | $(OBJDIR)
 	@echo $(notdir $<)
 	-$(SILENT) cp $< $(OBJDIR)
 	$(SILENT) $(CXX) $(CXXFLAGS) -Wno-pragma-once-outside-header -xc++-header -o ""$@"" -c ""$<""
