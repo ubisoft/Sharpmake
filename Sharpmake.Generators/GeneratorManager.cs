@@ -133,6 +133,8 @@ namespace Sharpmake.Generators
             if (configurations[0].Platform == Platform.ios || configurations[0].Platform == Platform.mac)
             {
                 XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                if (configurations[0].Target.GetFragment<DevEnv>() == DevEnv.make)
+                    MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
             }
             else
             {
