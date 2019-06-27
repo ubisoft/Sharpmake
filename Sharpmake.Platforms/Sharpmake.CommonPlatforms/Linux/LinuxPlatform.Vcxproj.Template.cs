@@ -147,9 +147,9 @@ del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName]"" >NUL 2>
 
             private const string _projectDescriptionPlatformSpecific =
                 @"    <ApplicationType>[applicationType]</ApplicationType>
-        <ApplicationTypeRevision>[applicationTypeRevision]</ApplicationTypeRevision>
-        <TargetLinuxPlatform>[targetLinuxPlatform]</TargetLinuxPlatform>
-    ";
+    <ApplicationTypeRevision>[applicationTypeRevision]</ApplicationTypeRevision>
+    <TargetLinuxPlatform>[targetLinuxPlatform]</TargetLinuxPlatform>
+";
         }
     }
 }
