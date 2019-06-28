@@ -386,10 +386,6 @@ namespace Sharpmake
             {
                 var devEnv = conf.Target.GetFragment<DevEnv>();
                 var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
-                if (!fastBuildSettings.BinPath.ContainsKey(devEnv))
-                    fastBuildSettings.BinPath.Add(devEnv, ClangForWindows.GetWindowsClangExecutablePath());
-                if (!fastBuildSettings.LinkerPath.ContainsKey(devEnv))
-                    fastBuildSettings.LinkerPath.Add(devEnv, fastBuildSettings.BinPath[devEnv]);
 
                 var platform = conf.Target.GetFragment<Platform>();
                 string compilerName = $"Compiler-{Util.GetSimplePlatformString(platform)}-{devEnv}";
@@ -397,17 +393,16 @@ namespace Sharpmake
                 string CompilerSettingsName = compilerName + "-" + "Linux";
 
                 var projectRootPath = conf.Project.RootPath;
-                string pathToCompiler = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, fastBuildSettings.BinPath[devEnv]));
-                CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, CompilerSettingsName, devEnv, pathToCompiler, false);
+                CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, CompilerSettingsName, devEnv, projectRootPath, false);
                 compilerSettings.PlatformFlags |= Platform.linux;
-                CompilerSettings CcompilerSettings = GetMasterCompilerSettings(masterCompilerSettings, CCompilerSettingsName, devEnv, pathToCompiler, true);
+                CompilerSettings CcompilerSettings = GetMasterCompilerSettings(masterCompilerSettings, CCompilerSettingsName, devEnv, projectRootPath, true);
                 CcompilerSettings.PlatformFlags |= Platform.linux;
 
-                SetConfiguration(compilerSettings.Configurations, CompilerSettingsName, projectRootPath, devEnv, false);
-                SetConfiguration(CcompilerSettings.Configurations, CCompilerSettingsName, projectRootPath, devEnv, true);
+                SetConfiguration(compilerSettings, CompilerSettingsName, projectRootPath, devEnv, false);
+                SetConfiguration(CcompilerSettings, CCompilerSettingsName, projectRootPath, devEnv, true);
             }
 
-            private CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, DevEnv devEnv, string pathToCompiler, bool useCCompiler)
+            private CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, string compilerName, DevEnv devEnv, string projectRootPath, bool useCCompiler)
             {
                 CompilerSettings compilerSettings;
 
@@ -417,7 +412,17 @@ namespace Sharpmake
                 }
                 else
                 {
-                    Strings extraFiles = new Strings();
+                    var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
+
+                    string binPath;
+                    if (!fastBuildSettings.BinPath.TryGetValue(devEnv, out binPath))
+                        binPath = ClangForWindows.GetWindowsClangExecutablePath();
+
+                    string pathToCompiler = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
+
+                    Strings extraFiles;
+                    if (!fastBuildSettings.ExtraFiles.TryGetValue(devEnv, out extraFiles))
+                        extraFiles = new Strings();
 
                     string executable = useCCompiler ? @"$ExecutableRootPath$\clang.exe" : @"$ExecutableRootPath$\clang++.exe";
 
@@ -428,21 +433,35 @@ namespace Sharpmake
                 return compilerSettings;
             }
 
-            private void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
+            private void SetConfiguration(CompilerSettings compilerSettings, string compilerName, string projectRootPath, DevEnv devEnv, bool useCCompiler)
             {
                 string configName = useCCompiler ? ".linuxConfig" : ".linuxppConfig";
 
+                IDictionary<string, CompilerSettings.Configuration> configurations = compilerSettings.Configurations;
                 if (!configurations.ContainsKey(configName))
                 {
                     var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
+                    string binPath = compilerSettings.RootPath;
+                    string linkerPath;
+                    if (!fastBuildSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
+                        linkerPath = binPath;
+
+                    string linkerExe;
+                    if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
+                        linkerExe = "ld.lld.exe";
+
+                    string librarianExe;
+                    if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
+                        librarianExe = "llvm-ar.exe";
+
                     configurations.Add(configName,
                         new CompilerSettings.Configuration(
                             Platform.linux,
                             compiler: compilerName,
-                            binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, fastBuildSettings.BinPath[devEnv])),
-                            linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, fastBuildSettings.LinkerPath[devEnv])),
-                            librarian: @"$LinkerPath$\llvm-ar.exe",
-                            linker: @"$LinkerPath$\ld.lld.exe"
+                            binPath: binPath,
+                            linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
+                            librarian: @"$LinkerPath$\" + librarianExe,
+                            linker: @"$LinkerPath$\" + linkerExe
                         )
                     );
                 }
