@@ -1641,7 +1641,8 @@ namespace Sharpmake.Generators.VisualStudio
             context.Configuration.AdditionalLinkerOptions.Sort();
             string linkerAdditionalOptions = context.Configuration.AdditionalLinkerOptions.JoinStrings(" ").Trim();
 
-            Func<Strings, string> formatIgnoredWarnings = disabledWarnings => {
+            Func<Strings, string> formatIgnoredWarnings = disabledWarnings =>
+            {
                 if (disabledWarnings.Count > 0)
                     return "/ignore:" + disabledWarnings.JoinStrings(",");
                 return string.Empty;
