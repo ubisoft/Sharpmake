@@ -94,7 +94,11 @@ namespace Sharpmake
 
             public string ProjectName;
 
+            // The solution folder to use
             public string SolutionFolder;
+
+            // The solution folder, as reported by the solution. When set, this overrides the folder provided by the project config.
+            public string SolutionFolderOverride;
 
             public List<Project.Configuration> Configurations = new List<Project.Configuration>();
 
@@ -173,7 +177,8 @@ namespace Sharpmake
                             OriginalProjectFile = includedProjectInfo.Configuration.ProjectFullFileName,
                             ProjectFile = Util.GetCapitalizedPath(includedProjectInfo.Configuration.ProjectFullFileNameWithExtension),
                             ProjectName = includedProjectInfo.Configuration.ProjectName,
-                            SolutionFolder = includedProjectInfo.SolutionFolder
+                            SolutionFolder = includedProjectInfo.SolutionFolder,
+                            SolutionFolderOverride = includedProjectInfo.SolutionFolder
                         });
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
@@ -188,14 +193,20 @@ namespace Sharpmake
             {
                 foreach (Project.Configuration resolvedProjectConf in resolvedProject.Configurations)
                 {
-                    // Folder must all be the same for all config, else will be emptied.
-                    if (string.IsNullOrEmpty(resolvedProject.SolutionFolder) &&
-                        !string.IsNullOrEmpty(resolvedProjectConf.SolutionFolder))
+                    // If the solution provides the folder, the configuration should be ignored
+                    if (string.IsNullOrEmpty(resolvedProject.SolutionFolderOverride))
                     {
-                        resolvedProject.SolutionFolder = resolvedProjectConf.SolutionFolder;
+                        // Folder must all be the same for all config, else will be emptied.
+                        if (string.IsNullOrEmpty(resolvedProject.SolutionFolder) &&
+                            !string.IsNullOrEmpty(resolvedProjectConf.SolutionFolder))
+                        {
+                            resolvedProject.SolutionFolder = resolvedProjectConf.SolutionFolder;
+                        }
+                        else if (resolvedProject.SolutionFolder != resolvedProjectConf.SolutionFolder)
+                        {
+                            resolvedProject.SolutionFolder = "";
+                        }
                     }
-                    else if (resolvedProject.SolutionFolder != resolvedProjectConf.SolutionFolder)
-                        resolvedProject.SolutionFolder = "";
 
                     foreach (Project.Configuration dependencyConfiguration in resolvedProjectConf.ResolvedDependencies)
                     {
