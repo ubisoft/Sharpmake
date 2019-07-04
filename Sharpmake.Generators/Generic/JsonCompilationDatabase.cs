@@ -21,55 +21,27 @@ using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.JsonCompilationDatabase
 {
-    public class JsonCompilationDatabase : IProjectGenerator, ISolutionGenerator
+    public class JsonCompilationDatabase
     {
         public const string FileName = "compile_commands.json";
 
         public event Action<IGenerationContext, CompileCommand> CompileCommandGenerated;
 
-        public void Generate(Builder builder, Solution solution, List<Solution.Configuration> configurations, string solutionFile, List<string> generatedFiles, List<string> skipFiles)
+        public void Generate(Builder builder, Solution solution, string path, IEnumerable<Project.Configuration> projectConfigurations, List<string> generatedFiles, List<string> skipFiles)
         {
-            if (configurations.Count > 1)
-            {
-                builder.LogWarningLine("CompilationDatabase: Ignoring {0} configurations.", configurations.Count - 1);
-            }
-
-            var sConfig = configurations.First();
-
-            var projects = sConfig.IncludedProjectInfos.Select(pi => pi.Project);
-
             var database = new List<IDictionary<string, string>>();
 
-            foreach (var project in projects)
+            foreach (var configuration in projectConfigurations)
             {
-                var config = project.Configurations.FirstOrDefault(c => c.Target.IsEqualTo(sConfig.Target));
-                if (config == null)
-                {
-                    continue;
-                }
-                database.AddRange(GetProjectEntries(builder, project, config));
+                database.AddRange(GetEntries(builder, configuration));
             }
 
-            WriteGeneratedFile(builder, solution.GetType(), solutionFile, database, generatedFiles, skipFiles);
-        }
-
-        public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
-        {
-            if (configurations.Count > 1)
-            {
-                builder.LogWarningLine("CompilationDatabase: Ignoring {0} configurations.", configurations.Count - 1);
-            }
-
-            var config = configurations.First();
-
-            var database = GetProjectEntries(builder, project, config);
-
-            WriteGeneratedFile(builder, project.GetType(), projectFile, database, generatedFiles, skipFiles);
+            WriteGeneratedFile(builder, solution.GetType(), path, database, generatedFiles, skipFiles);
         }
 
         private void WriteGeneratedFile(Builder builder, Type type, string path, IEnumerable<IDictionary<string, string>> database, List<string> generatedFiles, List<string> skipFiles)
         {
-            var file = new FileInfo(Path.Combine(Path.GetDirectoryName(path), FileName));
+            var file = new FileInfo(Path.Combine(path, FileName));
 
             using (var stream = new MemoryStream())
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
@@ -89,21 +61,21 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             }
         }
 
-        private IEnumerable<IDictionary<string, string>> GetProjectEntries(Builder builder, Project project, Project.Configuration config)
+        private IEnumerable<IDictionary<string, string>> GetEntries(Builder builder, Project.Configuration projectConfiguration)
         {
-            var context = new CompileCommandGenerationContext(builder, project, config);
+            var context = new CompileCommandGenerationContext(builder, projectConfiguration.Project, projectConfiguration);
             var resolverParams = new[] {
                     new VariableAssignment("project", context.Project),
                     new VariableAssignment("target", context.Configuration.Target),
                     new VariableAssignment("conf", context.Configuration)
             };
-            context.EnvironmentVariableResolver = PlatformRegistry.Get<IPlatformDescriptor>(config.Platform).GetPlatformEnvironmentResolver(resolverParams);
+            context.EnvironmentVariableResolver = PlatformRegistry.Get<IPlatformDescriptor>(projectConfiguration.Platform).GetPlatformEnvironmentResolver(resolverParams);
 
             var factory = new CompileCommandFactory(context);
 
-            var database = project.GetSourceFilesForConfigurations(new[] { config })
-                .Except(config.ResolvedSourceFilesBuildExclude)
-                .Where(f => project.SourceFilesCPPExtensions.Contains(Path.GetExtension(f)))
+            var database = projectConfiguration.Project.GetSourceFilesForConfigurations(new[] { projectConfiguration })
+                .Except(projectConfiguration.ResolvedSourceFilesBuildExclude)
+                .Where(f => projectConfiguration.Project.SourceFilesCPPExtensions.Contains(Path.GetExtension(f)))
                 .Select(factory.CreateCompileCommand);
 
             foreach (var cc in database)
