@@ -796,6 +796,67 @@ namespace SharpmakeUnitTests
         }
     }
 
+    [TestFixture]
+    public class SymbolicLink
+    {
+        /// <summary>
+        ///     <c>CreateSymbolicLink</c> create a symbolic link
+        ///     The test cases are: 
+        ///     <list type="number">
+        ///         <item><description>Testing that a symbolic link is not created on a temporary directory pointing itself</description></item>
+        ///         <item><description>Testing that a symbolic link is created on a temporary directory pointing an other directory</description></item>
+        ///     </list>
+        ///     <remark>Implementation of create symbolic links doesn't work on linux so this test is discard on Mono</remark>
+        ///  </summary> 
+        [Test]
+        [Ignore("Test Broken")]
+        public void CreateSymbolicLinkOnDirectory()
+        {
+            if (!Util.IsRunningInMono())
+            {
+                var tempDirectory1 = Directory.CreateDirectory(Path.GetTempPath() + Path.DirectorySeparatorChar + "test-source");
+                var tempDirectory2 = Directory.CreateDirectory(Path.GetTempPath() + Path.DirectorySeparatorChar + "test-destination");
+
+                Assert.False(Util.CreateSymbolicLink(Path.GetTempPath(), Path.GetTempPath(), true));
+                Assert.False(tempDirectory1.Attributes.HasFlag(FileAttributes.ReparsePoint));
+                Assert.True(Util.CreateSymbolicLink(tempDirectory1.FullName, tempDirectory2.FullName, true));
+                Assert.True(tempDirectory1.Attributes.HasFlag(FileAttributes.ReparsePoint));
+
+                Directory.Delete(tempDirectory1.FullName);
+                Directory.Delete(tempDirectory2.FullName);
+            }
+
+        }
+
+        /// <summary>
+        ///     <c>IsSymbolicLink</c> verify if a file has a symbolic link
+        ///     The test cases are: 
+        ///     <list type="number">
+        ///         <item><description>Testing that the method detected the absence of a symbolic link</description></item>
+        ///         <item><description>Testing that the method detected the presence of a symbolic link</description></item>
+        ///     </list>
+        ///     <remark>Implementation of create symbolic links doesn't work on linux so this test is discard on Mono</remark>
+        ///  </summary>
+        [Test]
+        [Ignore("Test Broken")]
+        public void IsSymbolicLink()
+        {
+            if (!Util.IsRunningInMono())
+            {
+                var mockPath1 = Path.GetTempFileName();
+                var mockPath2 = Path.GetTempFileName();
+
+                Assert.False(Util.IsSymbolicLink(mockPath1));
+
+                Assert.True(Util.CreateSymbolicLink(mockPath1, mockPath2, false));
+                Assert.True(Util.IsSymbolicLink(mockPath1));
+
+                File.Delete(mockPath1);
+                File.Delete(mockPath2);
+            }
+        }
+    }
+
     public class StringsOperations
     {
         /// <summary>
