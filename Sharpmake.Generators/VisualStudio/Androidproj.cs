@@ -229,10 +229,11 @@ namespace Sharpmake.Generators.VisualStudio
             List<ProjectFile> allFiles = new List<ProjectFile>();
             List<ProjectFile> includeFiles = new List<ProjectFile>();
             List<ProjectFile> sourceFiles = new List<ProjectFile>();
+            List<ProjectFile> contentFiles = new List<ProjectFile>();
 
             foreach (string file in projectFiles)
             {
-                ProjectFile projectFile = new ProjectFile(file, _ProjectDirectoryCapitalized);
+                ProjectFile projectFile = new ProjectFile(file, _ProjectDirectoryCapitalized, _Project.SourceRootPath);
                 allFiles.Add(projectFile);
             }
 
@@ -258,9 +259,13 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     sourceFiles.Add(projectFile);
                 }
-                else // if (projectFile.FileExtension == "h")
+                else if (String.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     includeFiles.Add(projectFile);
+                }
+                else
+                {
+                    contentFiles.Add(projectFile);
                 }
             }
 
@@ -273,6 +278,17 @@ namespace Sharpmake.Generators.VisualStudio
             }
             Write(Template.Project.ProjectFilesEnd, writer, resolver);
 
+            // Write content files
+            Write(Template.Project.ProjectFilesBegin, writer, resolver);
+            foreach (ProjectFile file in contentFiles)
+            {
+                using (resolver.NewScopedParameter("file", file))
+                    Write(Template.Project.ContentSimple, writer, resolver);
+            }
+            Write(Template.Project.ProjectFilesEnd, writer, resolver);
+
+
+            // Write Android project files
             Write(Template.Project.ItemGroupBegin, writer, resolver);
 
             using (resolver.NewScopedParameter("antBuildXml", project.AntBuildXml))
@@ -391,15 +407,18 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public string FileName;
             public string FileNameProjectRelative;
+            public string FileNameSourceRelative;
             public string FileExtension;
 
-            public ProjectFile(string fileName, string projectDirectoryCapitalized)
+            public ProjectFile(string fileName, string projectDirectoryCapitalized, string sourceRootPath)
             {
                 FileName = Project.GetCapitalizedFile(fileName);
                 if (FileName == null)
                     FileName = fileName;
 
                 FileNameProjectRelative = Util.PathGetRelative(projectDirectoryCapitalized, FileName, true);
+
+                FileNameSourceRelative = Util.PathGetRelative(sourceRootPath, FileName, true);
 
                 FileExtension = Path.GetExtension(FileName);
             }
