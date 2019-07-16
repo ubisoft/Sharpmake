@@ -241,7 +241,7 @@ namespace Sharpmake
             // Apply the same arguments that are currently applied to this application, excluding /sources and /generateDebugSolution.
             string customArgs = string.Join(" ", Environment.GetCommandLineArgs()
                 .Skip(1)
-                .Where(s => !s.StartsWith("/sources") && s != "/generateDebugSolution"));
+                .Where(s => !s.StartsWith("/sources") && s != "/generateDebugSolution" && !startArguments.Contains(s)));
             conf.CsprojUserFile.StartArguments += $@" {customArgs}";
 
             conf.CsprojUserFile.StartProgram = s_sharpmakeApplicationExePath;
