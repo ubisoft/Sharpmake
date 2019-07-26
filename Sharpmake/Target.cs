@@ -155,6 +155,13 @@ namespace Sharpmake
         v4_7 = 1 << 12,
         v4_7_1 = 1 << 13,
         v4_7_2 = 1 << 14,
+
+        netcore1 = 1 << 15,
+        netcore1_1 = 1 << 16,
+        netcore2 = 1 << 17,
+        netcore2_1 = 1 << 18,
+        netcore2_2 = 1 << 19,
+        netcore3 = 1 << 20,
     }
 
     // Optional

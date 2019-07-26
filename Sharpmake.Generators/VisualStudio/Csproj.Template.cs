@@ -30,6 +30,10 @@ namespace Sharpmake.Generators.VisualStudio
   <Import Project=""$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"" Condition=""Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"" />
 ";
 
+                public static string ProjectBeginNetCore =
+@"<Project Sdk=""[sdkVersion]"">
+";
+
                 public static string ProjectEnd =
 @"</Project>";
 
@@ -48,7 +52,7 @@ namespace Sharpmake.Generators.VisualStudio
     <SccProjectName>[sccProjectName]</SccProjectName>
     <SccLocalPath>[sccLocalPath]</SccLocalPath>
     <SccProvider>[sccProvider]</SccProvider>
-    <TargetFrameworkVersion>[targetFramework]</TargetFrameworkVersion>
+    <[targetFrameworkVersionString]>[targetFramework]</[targetFrameworkVersionString]>
     <FileAlignment>[options.FileAlignment]</FileAlignment>
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
@@ -97,6 +101,7 @@ namespace Sharpmake.Generators.VisualStudio
     <VsixType>[options.VsixType]</VsixType>
     <ConcordSDKDir>[options.ConcordSDKDir]</ConcordSDKDir>
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
+    <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
   </PropertyGroup>
 ";
 

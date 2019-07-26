@@ -984,27 +984,44 @@ namespace Sharpmake.Generators.VisualStudio
             ITarget target = configurations[0].Target;
             var targetFramework = target.GetFragment<DotNetFramework>();
             var targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
+
+            bool isDotNetCore = targetFramework >= DotNetFramework.netcore1;
+
             var devenv = target.GetFragment<DevEnv>();
-            using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))
-            using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
+            var netCoreSdk = "Microsoft.NET.Sdk";
+            if (project.NetCoreSdk != NetCoreSdkType.Default)
+                netCoreSdk += "." + project.NetCoreSdk.ToString();
+
+            if (isDotNetCore)
             {
-                // xml begin header
-                switch (devenv)
+                using (resolver.NewScopedParameter("sdkVersion", netCoreSdk))
                 {
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
-                    case DevEnv.vs2015:
-                        Write(Template.Project.ProjectBegin, writer, resolver);
-                        break;
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                        Write(Template.Project.ProjectBeginVs2017, writer, resolver);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    Write(Template.Project.ProjectBeginNetCore, writer, resolver);
                 }
             }
+            else
+            {
+                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
+                {
+                    // xml begin header
+                    switch (devenv)
+                    {
+                        case DevEnv.vs2010:
+                        case DevEnv.vs2012:
+                        case DevEnv.vs2013:
+                        case DevEnv.vs2015:
+                            Write(Template.Project.ProjectBegin, writer, resolver);
+                            break;
+                        case DevEnv.vs2017:
+                        case DevEnv.vs2019:
+                            Write(Template.Project.ProjectBeginVs2017, writer, resolver);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+
             // generate all configuration options onces...
             var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
 
@@ -1015,17 +1032,33 @@ namespace Sharpmake.Generators.VisualStudio
                 _projectConfiguration = null;
                 options.Add(conf, option);
             }
+
+            // For .Net Core we disable all default items since we do the same thing for all platforms anyway
+            // The TargetFramework tag also doesn't have the "Version" suffix on it
+            string netCoreEnableDefaultItems = RemoveLineTag;
+            string targetFrameworkVersionString = "TargetFrameworkVersion";
+            string projectPropertyGuid = configurations[0].ProjectGuid;
+
+            if (isDotNetCore)
+            {
+                netCoreEnableDefaultItems = "false";
+                targetFrameworkVersionString = "TargetFramework";
+                projectPropertyGuid = RemoveLineTag;
+            }
+
             using (resolver.NewScopedParameter("project", project))
-            using (resolver.NewScopedParameter("guid", configurations[0].ProjectGuid))
+            using (resolver.NewScopedParameter("guid", projectPropertyGuid))
             using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
             using (resolver.NewScopedParameter("sccLocalPath", sccLocalPath))
             using (resolver.NewScopedParameter("sccProvider", sccProvider))
             using (resolver.NewScopedParameter("options", options[_projectConfigurationList[0]]))
             using (resolver.NewScopedParameter("outputType", outputType))
             using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))
+            using (resolver.NewScopedParameter("targetFrameworkVersionString", targetFrameworkVersionString))
             using (resolver.NewScopedParameter("projectTypeGuids", projectTypeGuids))
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project)))
+            using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }
@@ -1229,10 +1262,25 @@ namespace Sharpmake.Generators.VisualStudio
             }
             #endregion
 
+            // .Net Core doesn't use normal references, most are automatic from the SDK and everything else comes from Nuget and Project references
+            if (isDotNetCore)
+                itemGroups.References.Clear();
+
             writer.Write(itemGroups.Resolve(resolver));
 
             // TODO tjn move this outside ! we are generating .csproj, we shouldn't fill Import here
-            var importProjects = project.ImportProjects;
+            var importProjects = new UniqueList<ImportProject>();
+            
+            // For .NET Core the default import project is inferred instead of explicit.
+            if (isDotNetCore)
+            {
+                importProjects.AddRange(importProjects.Where(i => i.Project != CSharpProject.DefaultImportProject));
+            }
+            else
+            {
+                importProjects.AddRange(project.ImportProjects);
+            }
+
             if (project.ProjectTypeGuids == CSharpProjectType.Vsix)
             {
                 // Add an extra tag to setup VSIX on VS2017, which is generated on Visual Studio
@@ -1256,7 +1304,7 @@ namespace Sharpmake.Generators.VisualStudio
                 importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
             }
 
-            if (importProjects.Count == 0)
+            if (!isDotNetCore && importProjects.Count == 0)
                 throw new Error("ImportProjects must not be empty.");
 
             foreach (var import in importProjects)

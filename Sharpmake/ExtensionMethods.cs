@@ -70,6 +70,18 @@ namespace Sharpmake
                     return "4.7.1";
                 case DotNetFramework.v4_7_2:
                     return "4.7.2";
+                case DotNetFramework.netcore1:
+                    return "netcoreapp1.0";
+                case DotNetFramework.netcore1_1:
+                    return "netcoreapp1.1";
+                case DotNetFramework.netcore2:
+                    return "netcoreapp2.0";
+                case DotNetFramework.netcore2_1:
+                    return "netcoreapp2.1";
+                case DotNetFramework.netcore2_2:
+                    return "netcoreapp2.2";
+                case DotNetFramework.netcore3:
+                    return "netcoreapp3.0";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }

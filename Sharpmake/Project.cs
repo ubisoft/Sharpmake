@@ -1892,6 +1892,15 @@ namespace Sharpmake
         Default
     }
 
+    public enum NetCoreSdkType
+    {
+        Default,
+        Web,
+        Razor,
+        Worker,
+        WindowsDesktop
+    }
+
     public class CSharpVstoProject : CSharpProject
     {
         public enum OfficeApplication
@@ -2053,6 +2062,7 @@ namespace Sharpmake
         public CopyToOutputDirectory? DefaultContentCopyOperation = null;
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
+        public NetCoreSdkType NetCoreSdk = NetCoreSdkType.Default;
         public string ResourcesPath = null;
         public string ContentPath = null;
         public string ApplicationIcon = String.Empty;
@@ -2114,6 +2124,8 @@ namespace Sharpmake
 
         public string CodeAnalysisRuleSetFileName;
 
+        public const string DefaultImportProject = @"$(MSBuildBinPath)\Microsoft.CSharp.targets";
+
         [Resolver.Resolvable]
         public class UsingTask
         {
@@ -2140,7 +2152,7 @@ namespace Sharpmake
             IsTargetFileNameToLower = false;
             ResourcesPath = RootPath + @"\Resources\";
             ContentPath = RootPath + @"\Content\";
-            ImportProjects.Add(new ImportProject { Project = @"$(MSBuildBinPath)\Microsoft.CSharp.targets" });
+            ImportProjects.Add(new ImportProject { Project = DefaultImportProject });
             ApplicationDefinitionFilenames.Add("App.xaml", "MainApplication.xaml");
 
             //Default Excludes
