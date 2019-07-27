@@ -530,7 +530,6 @@ namespace Sharpmake.Generators.VisualStudio
                     using (resolver.NewScopedParameter("IncludeOutputGroupsInVSIX", IncludeOutputGroupsInVSIX))
                     {
                         var writer = new StringWriter();
-
                         writer.Write(Template.ItemGroups.ProjectReferenceBegin);
                         writer.Write(Template.ItemGroups.ProjectGUID);
                         writer.Write(Template.ItemGroups.ProjectRefName);
@@ -985,14 +984,12 @@ namespace Sharpmake.Generators.VisualStudio
             var targetFramework = target.GetFragment<DotNetFramework>();
             var targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
 
-            bool isDotNetCore = targetFramework >= DotNetFramework.netcore1;
-
             var devenv = target.GetFragment<DevEnv>();
             var netCoreSdk = "Microsoft.NET.Sdk";
             if (project.NetCoreSdk != NetCoreSdkType.Default)
                 netCoreSdk += "." + project.NetCoreSdk.ToString();
 
-            if (isDotNetCore)
+            if (targetFramework.IsDotNetCore())
             {
                 using (resolver.NewScopedParameter("sdkVersion", netCoreSdk))
                 {
@@ -1039,7 +1036,7 @@ namespace Sharpmake.Generators.VisualStudio
             string targetFrameworkVersionString = "TargetFrameworkVersion";
             string projectPropertyGuid = configurations[0].ProjectGuid;
 
-            if (isDotNetCore)
+            if (targetFramework.IsDotNetCore())
             {
                 netCoreEnableDefaultItems = "false";
                 targetFrameworkVersionString = "TargetFramework";
@@ -1146,6 +1143,47 @@ namespace Sharpmake.Generators.VisualStudio
             string projectFilePath = Path.Combine(projectPath, projectFile) + ProjectExtension;
             UserFile uf = new UserFile(projectFilePath);
             uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
+
+            // Directory.Build.props is only required if BaseIntermediateOutputPath is set on any configurations
+            if (targetFramework.IsDotNetCore())
+            {
+                if (_projectConfigurationList.Any(conf => options[conf]["BaseIntermediateOutputPath"] != RemoveLineTag))
+                {
+                    var fileName = Path.Combine(projectPath, "Directory.Build.props");
+                    var fileGenerator = new FileGenerator();
+                    fileGenerator.WriteLine(Template.DirectoryBuildProps.FileHeader);
+
+                    foreach (var conf in _projectConfigurationList)
+                    {
+                        if (options[conf]["BaseIntermediateOutputPath"] != RemoveLineTag)
+                        {
+                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                            using (fileGenerator.Declare("conf", conf))
+                            using (fileGenerator.Declare("project", project))
+                            using (fileGenerator.Declare("target", conf.Target))
+                            using (fileGenerator.Declare("options", options[conf]))
+                            {
+                                fileGenerator.WriteLine(Template.DirectoryBuildProps.ProjectConfiguration);
+                            }
+
+                            options[conf]["BaseIntermediateOutputPath"] = RemoveLineTag;
+                        }
+                    }
+
+                    fileGenerator.WriteLine(Template.DirectoryBuildProps.FileFooter);
+
+                    // remove all line that contain RemoveLineTag
+                    fileGenerator.RemoveTaggedLines();
+                    using (MemoryStream stream = fileGenerator.ToMemoryStream())
+                    {
+                        FileInfo userFileInfo = new FileInfo(fileName);
+                        if (_builder.Context.WriteGeneratedFile(project.GetType(), userFileInfo, stream))
+                            generatedFiles.Add(userFileInfo.FullName);
+                        else
+                            skipFiles.Add(userFileInfo.FullName);
+                    }
+                }
+            }
 
             // configuration general
             foreach (Project.Configuration conf in _projectConfigurationList)
@@ -1263,16 +1301,17 @@ namespace Sharpmake.Generators.VisualStudio
             #endregion
 
             // .Net Core doesn't use normal references, most are automatic from the SDK and everything else comes from Nuget and Project references
-            if (isDotNetCore)
+            if (targetFramework.IsDotNetCore())
                 itemGroups.References.Clear();
 
-            writer.Write(itemGroups.Resolve(resolver));
+            using (resolver.NewScopedParameter("NetCoreCleanLine", targetFramework.IsDotNetCore() ? RemoveLineTag : ""))
+                writer.Write(itemGroups.Resolve(resolver));
 
             // TODO tjn move this outside ! we are generating .csproj, we shouldn't fill Import here
             var importProjects = new UniqueList<ImportProject>();
             
             // For .NET Core the default import project is inferred instead of explicit.
-            if (isDotNetCore)
+            if (targetFramework.IsDotNetCore())
             {
                 importProjects.AddRange(importProjects.Where(i => i.Project != CSharpProject.DefaultImportProject));
             }
@@ -1304,7 +1343,7 @@ namespace Sharpmake.Generators.VisualStudio
                 importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
             }
 
-            if (!isDotNetCore && importProjects.Count == 0)
+            if (!targetFramework.IsDotNetCore() && importProjects.Count == 0)
                 throw new Error("ImportProjects must not be empty.");
 
             foreach (var import in importProjects)
@@ -2845,6 +2884,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             options["StartWorkingDirectory"] = string.IsNullOrEmpty(conf.StartWorkingDirectory) ? RemoveLineTag : conf.StartWorkingDirectory;
             options["DocumentationFile"] = string.IsNullOrEmpty(conf.XmlDocumentationFile) ? RemoveLineTag : Util.PathGetRelative(_projectPath, conf.XmlDocumentationFile);
+
+            options["GenerateAssemblyInfo"] = !conf.GenerateAssemblyInfo.HasValue ? RemoveLineTag : conf.GenerateAssemblyInfo.Value.ToString();
 
             ProcessDependencyCopy(project, conf);
 

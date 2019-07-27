@@ -36,6 +36,11 @@ namespace Sharpmake
             return PlatformRegistry.Get<IPlatformDescriptor>(platform).IsUsingClang;
         }
 
+        public static bool IsDotNetCore(this DotNetFramework framework)
+        {
+            return framework >= DotNetFramework.netcore1;
+        }
+
         public static string ToVersionString(this DotNetFramework framework)
         {
             switch (framework)
@@ -234,7 +239,7 @@ namespace Sharpmake
                 if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
                     return pathOverride;
 
-                string installDir = Util.GetVisualStudioInstallPathFromQuery(visualVersion);
+                string installDir = VisualStudioExtension.GetVisualStudioInstallPathFromQuery(visualVersion.GetVisualMajorVersion());
                 if (string.IsNullOrEmpty(installDir))
                 {
                     switch (visualVersion)
@@ -659,19 +664,6 @@ namespace Sharpmake
                 return true;
 
             return false;
-        }
-
-        public static int IndexOf<T>(this T[] source, T value)
-        {
-            return IndexOf<T>(source, value, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        public static int IndexOf<T>(this T[] source, T value, StringComparison stringComparison)
-        {
-            if (typeof(T) == typeof(string))
-                return Array.FindIndex(source, m => m.ToString().Equals(value.ToString(), stringComparison));
-            else
-                return Array.IndexOf(source, value);
         }
     }
 }

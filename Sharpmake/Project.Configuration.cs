@@ -1183,6 +1183,11 @@ namespace Sharpmake
             public bool SkipFilterGeneration = false;
 
             /// <summary>
+            /// Whether to set the propery to tell msbuil to autogenerate assembly info for you. Default is unset and will use the build system defaults.
+            /// </summary>
+            public bool? GenerateAssemblyInfo = null;
+
+            /// <summary>
             /// Gets or sets the path of the module definition file to be passed to the linker.
             /// </summary>
             /// <remarks>

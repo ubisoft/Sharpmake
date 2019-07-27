@@ -132,6 +132,7 @@ namespace Sharpmake.Generators.VisualStudio
     <LangVersion>[options.LanguageVersion]</LangVersion>
     <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
+    <GenerateAssemblyInfo>[options.GenerateAssemblyInfo]</GenerateAssemblyInfo>
   </PropertyGroup>
 ";
 
@@ -456,11 +457,11 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectGUID =
-@"      <Project>[projectGUID]</Project>
+@"      <Project>[projectGUID][NetCoreCleanLine]</Project>
 ";
 
                 public static string ProjectRefName =
-@"      <Name>[projectRefName]</Name>
+@"      <Name>[projectRefName][NetCoreCleanLine]</Name>
 ";
                 public static string Private =
 @"      <Private>[private]</Private>
@@ -680,6 +681,22 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static readonly string DebugUnmanaged =
 @"    <EnableUnmanagedDebugging>[unmanagedDebugEnabled]</EnableUnmanagedDebugging>";
+            }
+
+            public static class DirectoryBuildProps
+            {
+                public static string FileHeader =
+@"<Project>
+";
+
+                public static string FileFooter =
+@"</Project>";
+
+                public static string ProjectConfiguration =
+@"  <PropertyGroup Condition=""$([[System.Text.RegularExpressions.Regex]]::IsMatch('$(Configuration)|$(Platform)|$(TargetFramework)', '^[conf.Name]|[platformName]|net[[sc]]'))"">
+    <BaseIntermediateOutputPath>[options.BaseIntermediateOutputPath]</BaseIntermediateOutputPath>
+  </PropertyGroup>
+";
             }
         }
     }

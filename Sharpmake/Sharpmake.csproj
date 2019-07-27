@@ -19,8 +19,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
-    <IntermediateOutputPath>..\tmp\obj\debug\sharpmake</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\tmp\obj\v4_6_1_debug\sharpmake</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\v4_6_1_Debug\Sharpmake</BaseIntermediateOutputPath>
     <DocumentationFile>..\bin\Debug\Sharpmake.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -36,8 +36,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
-    <IntermediateOutputPath>..\tmp\obj\release\sharpmake</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\tmp\obj\v4_6_1_release\sharpmake</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\v4_6_1_Release\Sharpmake</BaseIntermediateOutputPath>
     <DocumentationFile>..\bin\Release\Sharpmake.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -48,9 +48,6 @@
     <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Utilities.v4.0">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -129,7 +126,10 @@
     <Compile Include="VariableAssignment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
+    <ProjectReference Include="..\Sharpmake.VisualStudio\Sharpmake.VisualStudio.csproj">
+      <Project>{6d8fe1dc-434a-7a38-4090-d36562e6e696}</Project>
+      <Name>Sharpmake.VisualStudio</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

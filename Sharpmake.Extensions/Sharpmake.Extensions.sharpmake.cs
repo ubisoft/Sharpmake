@@ -18,7 +18,6 @@ namespace SharpmakeGen.Extensions
         {
             base.ConfigureAll(conf, target);
 
-            conf.ProjectFileName = "[project.Name]";
             conf.SolutionFolder = "Extensions";
 
             conf.AddPrivateDependency<SharpmakeProject>(target);

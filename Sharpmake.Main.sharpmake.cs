@@ -11,6 +11,7 @@ using Sharpmake;
 [module: Sharpmake.Include("Sharpmake.Generators/Sharpmake.Generators.sharpmake.cs")]
 [module: Sharpmake.Include("Sharpmake.Platforms/Sharpmake.Platforms.sharpmake.cs")]
 [module: Sharpmake.Include("Sharpmake.UnitTests/Sharpmake.UnitTests.sharpmake.cs")]
+[module: Sharpmake.Include("Sharpmake.VisualStudio/Sharpmake.VisualStudio.sharpmake.cs")]
 [module: Sharpmake.Include("samples/Sharpmake.Samples.sharpmake.cs")]
 [module: Sharpmake.Include("Sharpmake.FunctionalTests/Sharpmake.FunctionalTests.sharpmake.cs")]
 
@@ -25,16 +26,20 @@ namespace SharpmakeGen
     {
         public static ITarget[] GetDefaultTargets()
         {
-            var result = new List<ITarget>();
-            result.Add(
+            return new[] {
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2017,
                     Optimization.Debug | Optimization.Release,
                     framework: DotNetFramework.v4_6_1
+                ),
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2017,
+                    Optimization.Debug | Optimization.Release,
+                    framework: DotNetFramework.netcore2
                 )
-            );
-            return result.ToArray();
+            };
         }
 
         public abstract class SharpmakeBaseProject : CSharpProject
@@ -61,11 +66,16 @@ namespace SharpmakeGen
             public virtual void ConfigureAll(Configuration conf, Target target)
             {
                 conf.ProjectFileName = "[project.Name]";
+                if (target.Framework.IsDotNetCore())
+                {
+                    conf.ProjectFileName += "_Core";
+                    conf.GenerateAssemblyInfo = false;
+                }
+
                 conf.ProjectPath = @"[project.SourceRootPath]";
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
                 conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]";
-
-                conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Optimization]\[project.Name]";
+                conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Framework]_[target.Optimization]\[project.Name]";
                 conf.BaseIntermediateOutputPath = conf.IntermediatePath;
 
                 conf.ReferencesByName.Add("System");
@@ -101,6 +111,9 @@ namespace SharpmakeGen
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.SolutionFileName = "[solution.Name]";
+            if (target.Framework.IsDotNetCore())
+                conf.SolutionFileName += "_Core";
+
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\";
 
             conf.AddProject<SharpmakeApplicationProject>(target);

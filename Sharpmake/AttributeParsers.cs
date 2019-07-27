@@ -130,7 +130,7 @@ namespace Sharpmake
             yield return Util.PathGetAbsolute(Directory.GetCurrentDirectory(), reference);
 
             // Try using .net framework locations
-            foreach (string frameworkDirectory in Assembler.EnumeratePathToDotNetFramework())
+            foreach (string frameworkDirectory in VisualStudioExtension.EnumeratePathToDotNetFramework())
                 yield return Path.Combine(Path.Combine(frameworkDirectory, reference));
         }
 

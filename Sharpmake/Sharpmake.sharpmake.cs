@@ -17,10 +17,14 @@ namespace SharpmakeGen
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
-            conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.v4.0");
-
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
-            conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "1.16.30");
+            conf.AddPrivateDependency<SharpmakeVisualStudio>(target);
+
+            if (target.Framework.IsDotNetCore())
+            {
+                conf.ReferencesByNuGetPackage.Add("System.CodeDom", "4.5.0");
+                conf.ReferencesByNuGetPackage.Add("Microsoft.Win32.Registry", "4.6.0-preview7.19362.9");
+            }
         }
     }
 }

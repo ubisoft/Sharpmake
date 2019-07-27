@@ -19,15 +19,15 @@ namespace SharpmakeGen
             }
 
             public override void ConfigureAll(Configuration conf, Target target)
-        {
-            base.ConfigureAll(conf, target);
+            {
+                base.ConfigureAll(conf, target);
 
-            conf.SolutionFolder = "FunctionalTests";
+                conf.SolutionFolder = "FunctionalTests";
 
-            conf.AddPrivateDependency<SharpmakeProject>(target);
-            conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
-            conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
-        }
+                conf.AddPrivateDependency<SharpmakeProject>(target);
+                conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
+                conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
+            }
         }
 
         [Generate]

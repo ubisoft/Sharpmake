@@ -158,7 +158,7 @@ namespace Sharpmake.Application
         {
             if (CommandLine.ContainParameter("breakintodebugger"))
             {
-                System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
+                VisualStudioExtension.BreakIntoDebugger();
                 Debugger.Break();
             }
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).

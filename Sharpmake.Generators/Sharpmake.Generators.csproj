@@ -19,8 +19,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
-    <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake.Generators</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\tmp\obj\v4_6_1_debug\sharpmake.generators</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\v4_6_1_Debug\Sharpmake.Generators</BaseIntermediateOutputPath>
     <DocumentationFile>..\bin\Debug\Sharpmake.Generators.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -35,8 +35,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
-    <IntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake.Generators</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\tmp\obj\v4_6_1_release\sharpmake.generators</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\v4_6_1_Release\Sharpmake.Generators</BaseIntermediateOutputPath>
     <DocumentationFile>..\bin\Release\Sharpmake.Generators.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>

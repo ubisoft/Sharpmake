@@ -9,6 +9,7 @@
 !Sharpmake.Application/Sharpmake.Application.csproj
 !Sharpmake.Generators/Sharpmake.Generators.csproj
 !Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj
+!Sharpmake.VisualStudio/Sharpmake.VisualStudio.csproj
 
 # Samples generated projects
 samples/*/package/*.androidproj
@@ -62,3 +63,4 @@ _ReSharper*/
 project.json
 project.lock.json
 Sharpmake.VC.db
+Directory.Build.props

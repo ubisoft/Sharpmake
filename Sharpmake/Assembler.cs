@@ -19,7 +19,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Microsoft.Build.Utilities;
 
 namespace Sharpmake
 {
@@ -632,19 +631,9 @@ namespace Sharpmake
             }
         }
 
-        public static IEnumerable<string> EnumeratePathToDotNetFramework()
-        {
-            for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
-            {
-                string frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
-                if (frameworkDirectory != null)
-                    yield return frameworkDirectory;
-            }
-        }
-
         public static string GetAssemblyDllPath(string fileName)
         {
-            foreach (string frameworkDirectory in EnumeratePathToDotNetFramework())
+            foreach (string frameworkDirectory in VisualStudioExtension.EnumeratePathToDotNetFramework())
             {
                 string result = Path.Combine(frameworkDirectory, fileName);
                 if (File.Exists(result))
