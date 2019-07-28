@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace Sharpmake
 {
@@ -56,7 +57,18 @@ namespace Sharpmake
 
         public bool UseDefaultReferences = true;
 
-        public static readonly string[] DefaultReferences = { "System.dll", "System.Core.dll" };
+        static readonly string[] _defaultReferences =
+        {
+            typeof(object).Assembly.Location, // mscorelib.dll for .NET, System.Private.CoreLib.dll for .NET Core
+            "System.dll",
+            "System.Core.dll",
+            "System.Linq.dll",
+            "System.Runtime.dll",
+            "System.Collections.dll",
+            "System.IO.FileSystem.dll",
+
+        };
+        public static readonly string[] DefaultReferences = _defaultReferences.Select(GetAssemblyDllPath).Where(f => !string.IsNullOrEmpty(f)).ToArray();
 
         private class AssemblyInfo : IAssemblyInfo
         {
@@ -379,94 +391,104 @@ namespace Sharpmake
         {
             var assemblyInfo = LoadAssemblyInfo(builderContext, sources);
 
-            HashSet<string> references = new HashSet<string>();
+            // Parse all input files
+            var parseOptions = new CSharpParseOptions(preprocessorSymbols: _defines);
 
-            Dictionary<string, string> providerOptions = new Dictionary<string, string>();
-            providerOptions.Add("CompilerVersion", "v4.0");
-            CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider(providerOptions);
+            var syntaxTrees = assemblyInfo.SourceFiles
+                .AsParallel()
+                .Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), options: parseOptions, path: file, encoding: System.Text.Encoding.UTF8))
+                .ToList();
 
-            CompilerParameters cp = new CompilerParameters();
+            // Build references list
+            HashSet<string> referenceFiles = new HashSet<string>();
 
             if (UseDefaultReferences)
             {
                 foreach (string defaultReference in DefaultReferences)
-                    references.Add(GetAssemblyDllPath(defaultReference));
+                    referenceFiles.Add(defaultReference);
             }
 
             foreach (string assemblyFile in _references)
-                references.Add(assemblyFile);
+                referenceFiles.Add(assemblyFile);
 
             foreach (Assembly assembly in _assemblies)
             {
                 if (!assembly.IsDynamic)
-                    references.Add(assembly.Location);
+                    referenceFiles.Add(assembly.Location);
             }
 
-            cp.ReferencedAssemblies.AddRange(references.ToArray());
+            var references = referenceFiles
+                .AsParallel()
+                .Where(f => !string.IsNullOrEmpty(f))
+                .Select(file => MetadataReference.CreateFromFile(file))
+                .ToList();
 
-            // Generate an library
-            cp.GenerateExecutable = false;
+            // Compiler Options
+            var options = new CSharpCompilationOptions(
+                outputKind: OutputKind.DynamicallyLinkedLibrary,
 
-            // Set the level at which the compiler
-            // should start displaying warnings.
-            cp.WarningLevel = 4;
+                generalDiagnosticOption: ReportDiagnostic.Error,
 
-            // Set whether to treat all warnings as errors.
-            cp.TreatWarningsAsErrors = false;
+                // Set the level at which the compiler
+                // should start displaying warnings.
+                warningLevel: 4,
+                
+                optimizationLevel: libraryFile == null ? OptimizationLevel.Release : OptimizationLevel.Debug
+            );
 
-            // Set compiler argument to optimize output.
-            // TODO : figure out why it does not work when uncommenting the following line
-            // cp.CompilerOptions = "/optimize";
+            // Create Compiler
+            var compiler = CSharpCompilation.Create("Sharpmake_Generated", syntaxTrees, references, options);
 
-            // If any defines are specified, pass them to the CSC.
-            if (_defines.Any())
-            {
-                cp.CompilerOptions = "-DEFINE:" + string.Join(",", _defines);
-            }
+            EmitResult compileResult;
 
             // Specify the assembly file name to generate
             if (libraryFile == null)
             {
-                cp.GenerateInMemory = true;
-                cp.IncludeDebugInformation = false;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    compileResult = compiler.Emit(stream);
+                    if (compileResult.Success)
+                        assemblyInfo.Assembly = Assembly.Load(stream.GetBuffer());
+                }
             }
             else
             {
-                cp.GenerateInMemory = false;
-                cp.IncludeDebugInformation = true;
-                cp.OutputAssembly = libraryFile;
-            }
-
-            // Notes:
-            // Avoid getting spoiled by environment variables. 
-            // C# will give compilation errors if a LIB variable contains non-existing directories.
-            Environment.SetEnvironmentVariable("LIB", null);
-
-            // Invoke compilation of the source file.
-            CompilerResults cr = provider.CompileAssemblyFromFile(cp, assemblyInfo.SourceFiles.ToArray());
-
-            if (cr.Errors.HasErrors || cr.Errors.HasWarnings)
-            {
-                string errorMessage = "";
-                foreach (CompilerError ce in cr.Errors)
+                var pdbFile = Path.ChangeExtension(libraryFile, "pdb");
+                using (var assemblyStream = File.Open(libraryFile, FileMode.Create, FileAccess.ReadWrite))
+                using (var pdbStream = File.Open(pdbFile, FileMode.Create, FileAccess.ReadWrite))
                 {
-                    if (ce.IsWarning)
-                        EventOutputWarning?.Invoke(ce + Environment.NewLine);
-                    else
-                        EventOutputError?.Invoke(ce + Environment.NewLine);
+                    var emitOptions = new EmitOptions(pdbFilePath: pdbFile);
+                    if (Util.IsRunningOnUnix() || Util.IsRunningInMono())
+                        emitOptions = emitOptions.WithDebugInformationFormat(DebugInformationFormat.PortablePdb);
 
-                    errorMessage += ce + Environment.NewLine;
+                    compileResult = compiler.Emit(assemblyStream, pdbStream, options:emitOptions);
                 }
 
-                if (cr.Errors.HasErrors)
+                if (compileResult.Success)
+                    assemblyInfo.Assembly = Assembly.LoadFile(libraryFile);
+            }
+
+            if (compileResult.Diagnostics.Any())
+            {
+                string errorMessage = "";
+                foreach (var diag in compileResult.Diagnostics)
                 {
-                    if (builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
+                    if (diag.Severity == DiagnosticSeverity.Warning)
+                        EventOutputWarning?.Invoke(diag.ToString() + Environment.NewLine);
+                    else if (diag.Severity == DiagnosticSeverity.Error)
+                        EventOutputError?.Invoke(diag.ToString() + Environment.NewLine);
+
+                    errorMessage += diag.ToString() + Environment.NewLine;
+                }
+
+                if (!compileResult.Success)
+                {
+                    if (builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
                         throw new Error(errorMessage);
                     return assemblyInfo;
                 }
             }
 
-            assemblyInfo.Assembly = cr.CompiledAssembly;
             assemblyInfo.Id = assemblyInfo.Assembly.Location;
             return assemblyInfo;
         }
@@ -633,13 +655,12 @@ namespace Sharpmake
 
         public static string GetAssemblyDllPath(string fileName)
         {
-            foreach (string frameworkDirectory in VisualStudioExtension.EnumeratePathToDotNetFramework())
-            {
-                string result = Path.Combine(frameworkDirectory, fileName);
-                if (File.Exists(result))
-                    return result;
-            }
-            return null;
+            if (File.Exists(fileName))
+                return fileName;
+
+            return VisualStudioExtension.EnumeratePathToDotNetFramework()
+                .Select(path => Path.Combine(path, fileName))
+                .FirstOrDefault(File.Exists);
         }
 
         private static int s_nextTempFile = 0;

@@ -176,7 +176,11 @@ namespace Sharpmake.Application
                 string versionString = string.Join(".", version.Major, version.Minor, version.Build);
                 if (version.Revision != 0)
                     versionString += " (non-official)";
-                LogWriteLine($"sharpmake {versionString}");
+
+                string osplatform = Util.IsRunningOnUnix() ? "Unix" : "Windows";
+                string framework = Util.IsRunningInMono() ? "Mono" : (Util.IsRunningDotNetCore() ? ".NET Core" : ".NET Framework");
+
+                LogWriteLine($"sharpmake {versionString} ({osplatform} | {framework})");
                 LogWriteLine("  arguments : {0}", CommandLine.GetProgramCommandLine());
                 LogWriteLine("  directory : {0}", Directory.GetCurrentDirectory());
                 LogWriteLine(string.Empty);

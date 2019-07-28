@@ -131,5 +131,9 @@
       <Name>Sharpmake.VisualStudio</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
+    <PackageReference Include="Microsoft.DiaSymReader.Native" Version="1.7.0" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

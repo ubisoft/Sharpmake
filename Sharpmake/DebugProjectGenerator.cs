@@ -109,7 +109,7 @@ namespace Sharpmake
             if (assemblyInfo.UseDefaultReferences)
             {
                 foreach (string defaultReference in Assembler.DefaultReferences)
-                    references.Add(Assembler.GetAssemblyDllPath(defaultReference));
+                    references.Add(defaultReference);
             }
 
             foreach (var assemblerRef in assemblyInfo.References)
@@ -235,8 +235,10 @@ namespace Sharpmake
         {
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
-            string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
-            conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
+            string quote = Util.IsRunningInMono() || Util.IsRunningDotNetCore() ? @"\""" : @""""; // When running in Mono, we must escape "
+            string lbracket = Util.IsRunningOnUnix() ? @"\(" : @"("; // When running in unix, we must escape brackets as well
+            string rbracket = Util.IsRunningOnUnix() ? @"\)" : @")"; // When running in unix, we must escape brackets as well
+            conf.CsprojUserFile.StartArguments = $@"/sources{lbracket}@{quote}{string.Join(";", MainSources)}{quote}{rbracket} {startArguments}";
             conf.CsprojUserFile.StartProgram = s_sharpmakeApplicationExePath;
         }
     }

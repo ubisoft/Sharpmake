@@ -20,9 +20,10 @@ namespace SharpmakeGen
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
             conf.AddPrivateDependency<SharpmakeVisualStudio>(target);
 
+            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.1.0");
+            conf.ReferencesByNuGetPackage.Add("Microsoft.DiaSymReader.Native", "1.7.0");
             if (target.Framework.IsDotNetCore())
             {
-                conf.ReferencesByNuGetPackage.Add("System.CodeDom", "4.5.0");
                 conf.ReferencesByNuGetPackage.Add("Microsoft.Win32.Registry", "4.6.0-preview7.19362.9");
             }
         }

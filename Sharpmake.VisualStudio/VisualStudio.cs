@@ -204,13 +204,25 @@ namespace Sharpmake
             return string.Empty;
         }
 
+        static string[] _FrameworkPaths =
+            ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))
+            .Split(System.IO.Path.PathSeparator)
+            .Select(System.IO.Path.GetDirectoryName)
+            .Distinct()
+            .ToArray();
+
         public static IEnumerable<string> EnumeratePathToDotNetFramework()
         {
-            return Enumerable.Empty<string>();
+            return _FrameworkPaths;
         }
 
         public static void BreakIntoDebugger()
         {
+            while (!System.Diagnostics.Debugger.IsAttached)
+            {
+                Console.Write("Waiting for debugger to attach...." + Environment.NewLine);
+                System.Threading.Thread.Sleep(1000);
+            }
         }
 #endif
     }

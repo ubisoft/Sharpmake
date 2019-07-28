@@ -19,9 +19,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
@@ -444,7 +444,7 @@ namespace Sharpmake
                         }
                         else
                         {
-                            if (Util.IsRunningInMono() &&
+                            if ((Util.IsRunningInMono() || Util.IsRunningOnUnix()) &&
                                 index == 0 && currentChar == Path.DirectorySeparatorChar && Path.IsPathRooted(path))
                                 pathHelper.Append(currentChar);
 
@@ -775,9 +775,6 @@ namespace Sharpmake
             return capitalizedPath;
         }
 
-        [System.Runtime.InteropServices.DllImport("msvcrt.dll", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
-        private static extern int memcmp(byte[] b1, byte[] b2, long count);
-
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
             const int BufferSize = 4096;
@@ -798,7 +795,7 @@ namespace Sharpmake
                 if (count1 == 0)
                     return true;
 
-                if (memcmp(buffer1, buffer2, count1) != 0)
+                if (!buffer1.SequenceEqual(buffer2))
                     return false;
             }
         }
@@ -2186,5 +2183,12 @@ namespace Sharpmake
         // http://www.mono-project.com/docs/faq/technical/#how-can-i-detect-if-am-running-in-mono
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
+
+        private static readonly bool s_isUnix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
+        public static bool IsRunningOnUnix() => s_isUnix;
+
+        private static readonly string s_framework = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+        private static readonly bool s_isDotNetCore = s_framework != null && !s_framework.StartsWith(".NETFramework");
+        public static bool IsRunningDotNetCore() => s_isDotNetCore;
     }
 }

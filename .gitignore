@@ -64,3 +64,4 @@ project.json
 project.lock.json
 Sharpmake.VC.db
 Directory.Build.props
+launchSettings.json
