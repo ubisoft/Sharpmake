@@ -53,6 +53,8 @@ namespace Sharpmake.Generators.VisualStudio
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
     <IsPublishable>[options.IsPublishable]</IsPublishable>
     <PublishUrl>[options.PublishUrl]</PublishUrl>
+    <PublishSingleFile>[options.PublishSingleFile]</PublishSingleFile>
+    <PublishTrimmed>[options.PublishTrimmed]</PublishTrimmed>
     <InstallUrl>[options.InstallUrl]</InstallUrl>
     <ManifestKeyFile>[options.ManifestKeyFile]</ManifestKeyFile>
     <ManifestCertificateThumbprint>[options.ManifestCertificateThumbprint]</ManifestCertificateThumbprint>
