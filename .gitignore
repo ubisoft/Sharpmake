@@ -5,11 +5,11 @@
 *.sln
 *.csproj
 # but negate for the following, mandatorily versionned
-!Sharpmake/Sharpmake.csproj
-!Sharpmake.Application/Sharpmake.Application.csproj
-!Sharpmake.Generators/Sharpmake.Generators.csproj
-!Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj
-!Sharpmake.VisualStudio/Sharpmake.VisualStudio.csproj
+!Sharpmake/Sharpmake*.csproj
+!Sharpmake.Application/Sharpmake.Application*.csproj
+!Sharpmake.Generators/Sharpmake.Generators*.csproj
+!Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms*.csproj
+!Sharpmake.VisualStudio/Sharpmake.VisualStudio*.csproj
 
 # Samples generated projects
 samples/*/package/*.androidproj

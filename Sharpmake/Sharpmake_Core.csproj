@@ -1,0 +1,130 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sharpmake</RootNamespace>
+    <AssemblyName>Sharpmake</AssemblyName>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <FileAlignment>512</FileAlignment>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\debug</OutputPath>
+    <IntermediateOutputPath>..\tmp\obj\netcore2_debug\sharpmake</IntermediateOutputPath>
+    <DocumentationFile>..\bin\Debug\Sharpmake.xml</DocumentationFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
+    <LangVersion>6</LangVersion>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\release</OutputPath>
+    <IntermediateOutputPath>..\tmp\obj\netcore2_release\sharpmake</IntermediateOutputPath>
+    <DocumentationFile>..\bin\Release\Sharpmake.xml</DocumentationFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
+    <LangVersion>6</LangVersion>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Analyzer\Analyzer.cs" />
+    <Compile Include="Assembler.cs" />
+    <Compile Include="AttributeParsers.cs" />
+    <Compile Include="Attributes.cs" />
+    <Compile Include="BuildContext\BaseBuildContext.cs" />
+    <Compile Include="BuildContext\ConfigureDependencyAnalyzer.cs" />
+    <Compile Include="BuildContext\GenerateAll.cs" />
+    <Compile Include="BuildContext\RedirectOutput.cs" />
+    <Compile Include="BuildContext\RegressionTest.cs" />
+    <Compile Include="Builder.cs" />
+    <Compile Include="BuilderExtension.cs" />
+    <Compile Include="CommandLine.cs" />
+    <Compile Include="Configurable.cs" />
+    <Compile Include="ConfigureCollection.cs" />
+    <Compile Include="DebugBreaks.cs" />
+    <Compile Include="DebugProjectGenerator.cs" />
+    <Compile Include="DependencyTracker.cs" />
+    <Compile Include="DotNetDependency.cs" />
+    <Compile Include="DotNetReferenceCollection.cs" />
+    <Compile Include="EnumExtensions.cs" />
+    <Compile Include="Exception.cs" />
+    <Compile Include="ExtensionLoader.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FakeFileTree.cs" />
+    <Compile Include="FastBuildSettings.cs" />
+    <Compile Include="FileSystemStringComparer.cs" />
+    <Compile Include="GenerationOutput.cs" />
+    <Compile Include="GeneratorManager.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IAssemblerContext.cs" />
+    <Compile Include="ICommandLineInterface.cs" />
+    <Compile Include="IFastBuildCompilerSettings.cs" />
+    <Compile Include="IPlatformDescriptor.cs" />
+    <Compile Include="IResolverHelper.cs" />
+    <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
+    <Compile Include="KitsRootPaths.cs" />
+    <Compile Include="MSBuildGlobalSettings.cs" />
+    <Compile Include="Options.Android.cs" />
+    <Compile Include="Options.AndroidMakefile.cs" />
+    <Compile Include="Options.CSharp.cs" />
+    <Compile Include="Options.Makefile.cs" />
+    <Compile Include="Options.Vc.cs" />
+    <Compile Include="Options.XCode.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="PackageReferences.Template.cs" />
+    <Compile Include="PackageReferences.cs" />
+    <Compile Include="PlatformAttributes.cs" />
+    <Compile Include="PlatformEventArgs.cs" />
+    <Compile Include="PlatformExceptions.cs" />
+    <Compile Include="PlatformRegistry.cs" />
+    <Compile Include="PreprocessorConditionParser.cs" />
+    <Compile Include="Project.Configuration.cs" />
+    <Compile Include="Project.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReferenceAlias.cs" />
+    <Compile Include="RegexCache.cs" />
+    <Compile Include="ResharperAnnotations.cs" />
+    <Compile Include="Resolver.cs" />
+    <Compile Include="SharpmakeExtension.cs" />
+    <Compile Include="Solution.Configuration.cs" />
+    <Compile Include="Solution.cs" />
+    <Compile Include="SourceAttributeParser.cs" />
+    <Compile Include="Strings.cs" />
+    <Compile Include="Target.cs" />
+    <Compile Include="ThreadPool.cs" />
+    <Compile Include="Tools.cs" />
+    <Compile Include="TrackedConfiguration.cs" />
+    <Compile Include="TrackedProject.cs" />
+    <Compile Include="UniqueList.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="VariableAssignment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sharpmake.VisualStudio\Sharpmake.VisualStudio_Core.csproj">
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
+    <PackageReference Include="Microsoft.DiaSymReader.Native" Version="1.7.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0-preview7.19362.9" />
+  </ItemGroup>
+</Project>

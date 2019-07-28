@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sharpmake</RootNamespace>
+    <AssemblyName>Sharpmake.CommonPlatforms</AssemblyName>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <FileAlignment>512</FileAlignment>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\debug</OutputPath>
+    <IntermediateOutputPath>..\..\tmp\obj\netcore2_debug\sharpmake.commonplatforms</IntermediateOutputPath>
+    <DocumentationFile>..\..\bin\Debug\Sharpmake.CommonPlatforms.xml</DocumentationFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
+    <LangVersion>6</LangVersion>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\release</OutputPath>
+    <IntermediateOutputPath>..\..\tmp\obj\netcore2_release\sharpmake.commonplatforms</IntermediateOutputPath>
+    <DocumentationFile>..\..\bin\Release\Sharpmake.CommonPlatforms.xml</DocumentationFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
+    <LangVersion>6</LangVersion>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Android\AndroidPlatform.Vcxproj.Template.cs" />
+    <Compile Include="Android\AndroidPlatform.cs" />
+    <Compile Include="Apple\MacOsPlatform.cs" />
+    <Compile Include="BaseMicrosoftPlatform.cs" />
+    <Compile Include="BasePlatform.Vcxproj.Template.cs" />
+    <Compile Include="BasePlatform.cs" />
+    <Compile Include="DefaultPlatform.cs" />
+    <Compile Include="DotNetPlatform.cs" />
+    <Compile Include="Linux\LinuxPlatform.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\BaseWindowsPlatform.cs" />
+    <Compile Include="Windows\ClangForWindowsSettings.cs" />
+    <Compile Include="Windows\Win32Platform.cs" />
+    <Compile Include="Windows\Win64EnvironmentVariableResolver.cs" />
+    <Compile Include="Windows\Win64Platform.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Sharpmake.Generators\Sharpmake.Generators_Core.csproj">
+    </ProjectReference>
+    <ProjectReference Include="..\..\Sharpmake\Sharpmake_Core.csproj">
+    </ProjectReference>
+  </ItemGroup>
+</Project>
