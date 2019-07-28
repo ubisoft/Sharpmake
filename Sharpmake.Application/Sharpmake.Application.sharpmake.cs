@@ -21,6 +21,8 @@ namespace SharpmakeGen
             base.ConfigureAll(conf, target);
 
             conf.Output = Configuration.OutputType.DotNetConsoleApp;
+            conf.Options.Add(Options.CSharp.PublishSingleFile.Enabled);
+            conf.Options.Add(Options.CSharp.PublishTrimmed.Enabled);
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);

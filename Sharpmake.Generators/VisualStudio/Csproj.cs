@@ -3186,6 +3186,25 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.AutoGenerateBindingRedirects.Disabled, () => { options["AutoGenerateBindingRedirects"] = RemoveLineTag; })
             );
 
+            if (conf.Target.GetFragment<DotNetFramework>().IsDotNetCore())
+            {
+                SelectOption
+                (
+                Options.Option(Options.CSharp.PublishSingleFile.Enabled, () => { options["PublishSingleFile"] = "true"; }),
+                Options.Option(Options.CSharp.PublishSingleFile.Disabled, () => { options["PublishSingleFile"] = RemoveLineTag; })
+                );
+                SelectOption
+                (
+                Options.Option(Options.CSharp.PublishTrimmed.Enabled, () => { options["PublishTrimmed"] = "true"; }),
+                Options.Option(Options.CSharp.PublishTrimmed.Disabled, () => { options["PublishTrimmed"] = RemoveLineTag; })
+                );
+            }
+            else
+            {
+                options["PublishSingleFile"] = RemoveLineTag;
+                options["PublishTrimmed"] = RemoveLineTag;
+            }
+
             // Options.CSharp.OriginatorKeyFile
             options["AssemblyOriginatorKeyFile"] = Options.StringOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf);
             options["MinimumVisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.MinimumVisualStudioVersion>(conf);

@@ -57,6 +57,8 @@ namespace Sharpmake.Generators.VisualStudio
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
     <PublishUrl>[options.PublishUrl]</PublishUrl>
+    <PublishSingleFile>[options.PublishSingleFile]</PublishSingleFile>
+    <PublishTrimmed>[options.PublishTrimmed]</PublishTrimmed>
     <InstallUrl>[options.InstallUrl]</InstallUrl>
     <ManifestKeyFile>[options.ManifestKeyFile]</ManifestKeyFile>
     <ManifestCertificateThumbprint>[options.ManifestCertificateThumbprint]</ManifestCertificateThumbprint>
