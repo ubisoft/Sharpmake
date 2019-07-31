@@ -1005,6 +1005,13 @@ namespace Sharpmake.Generators.VisualStudio
                         throw new ArgumentOutOfRangeException();
                 }
             }
+
+            var preImportProjects = new List<ImportProject>(project.PreImportProjects);
+
+            CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
+
+            WriteImportProjects(preImportProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
+
             // generate all configuration options onces...
             var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
 
@@ -1231,48 +1238,19 @@ namespace Sharpmake.Generators.VisualStudio
 
             writer.Write(itemGroups.Resolve(resolver));
 
-            // TODO tjn move this outside ! we are generating .csproj, we shouldn't fill Import here
-            var importProjects = project.ImportProjects;
+            var importProjects = new List<ImportProject>(project.ImportProjects);
+
             if (project.ProjectTypeGuids == CSharpProjectType.Vsix)
             {
                 // Add an extra tag to setup VSIX on VS2017, which is generated on Visual Studio
                 // 2017. (This is likely a Microsoft hack to plug 2017 on the 2015 toolset.)
                 if (devenv.IsVisualStudio() && devenv >= DevEnv.vs2017)
                     writer.Write(CSproj.Template.Project.VsixConfiguration);
-
-                // Copy in new list to avoid concurrent access
-                var newImportProjects = new UniqueList<ImportProject>();
-                newImportProjects.AddRange(importProjects);
-                importProjects = newImportProjects;
-                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets", Condition = @"'$(VSToolsPath)' != ''" });
             }
 
-            if (project.ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
-            {
-                var newImportProjects = new UniqueList<ImportProject>();
-                newImportProjects.AddRange(importProjects);
-                importProjects = newImportProjects;
-                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", Condition = "'$(VSToolsPath)' != ''" });
-                importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
-            }
+            project.AddCSharpSpecificImportProjects(importProjects, devenv);
 
-            if (importProjects.Count == 0)
-                throw new Error("ImportProjects must not be empty.");
-
-            foreach (var import in importProjects)
-            {
-                using (resolver.NewScopedParameter("project", project))
-                using (resolver.NewScopedParameter("importProject", import.Project))
-                {
-                    if (!string.IsNullOrEmpty(import.Condition))
-                        using (resolver.NewScopedParameter("importCondition", import.Condition))
-                        {
-                            Write(Template.Project.ImportProjectItem, writer, resolver);
-                        }
-                    else
-                        Write(Template.Project.ImportProjectItemSimple, writer, resolver);
-                }
-            }
+            WriteImportProjects(importProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
 
             foreach (var element in project.UsingTasks)
             {
@@ -1316,6 +1294,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             WriteEvents(options, writer, resolver);
             Write(Template.Project.ProjectEnd, writer, resolver);
+
             // Write the project file
             writer.Flush();
 
@@ -1327,6 +1306,25 @@ namespace Sharpmake.Generators.VisualStudio
                 skipFiles.Add(projectFileInfo.FullName);
 
             writer.Close();
+        }
+
+        private static void WriteImportProjects(IEnumerable<ImportProject> importProjects, Project project, Project.Configuration conf, StreamWriter writer, Resolver resolver)
+        {
+            foreach (var import in importProjects)
+            {
+                using (resolver.NewScopedParameter("project", project))
+                using (resolver.NewScopedParameter("importProject", import.Project))
+                using (resolver.NewScopedParameter("conf", conf))
+                {
+                    if (!string.IsNullOrEmpty(import.Condition))
+                        using (resolver.NewScopedParameter("importCondition", import.Condition))
+                        {
+                            Write(Template.Project.ImportProjectItem, writer, resolver);
+                        }
+                    else
+                        Write(Template.Project.ImportProjectItemSimple, writer, resolver);
+                }
+            }
         }
 
         private static void WriteCustomProperties(Project project, StreamWriter writer, Resolver resolver)

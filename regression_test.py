@@ -72,6 +72,7 @@ tests = [
     Test("HelloWorld", "HelloWorld.sharpmake.cs"),
     Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
     Test("CSharpWCF", "CSharpWCF.sharpmake.cs", "CSharpWCF\codebase"),
+    Test("CSharpImports", "CSharpImports.sharpmake.cs"),
     Test("PackageReferences", "PackageReferences.sharpmake.cs"),
     Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"),
     Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs")

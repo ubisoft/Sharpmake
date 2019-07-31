@@ -77,6 +77,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class CSharpImportsProject : SampleProject
+    {
+        public CSharpImportsProject()
+        {
+            Name = "CSharpImports";
+        }
+    }
+
+    [Generate]
     public class HelloWorldProject : SampleProject
     {
         public HelloWorldProject()

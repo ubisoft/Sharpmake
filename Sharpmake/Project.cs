@@ -2078,7 +2078,8 @@ namespace Sharpmake
         public Strings EmbeddedResourceExtensions; // this is used mainly for WinForms, for WPF applications use Resources for embedded and Content for linked
         public List<WebReferenceUrl> WebReferenceUrls = new List<WebReferenceUrl>();
         public List<ComReference> ComReferences = new List<ComReference>();
-        public UniqueList<ImportProject> ImportProjects = new UniqueList<ImportProject>();
+        public List<ImportProject> PreImportProjects = new List<ImportProject>();
+        public List<ImportProject> ImportProjects = new List<ImportProject>();
         public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
         public List<UsingTask> UsingTasks = new List<UsingTask>();
 
@@ -2181,6 +2182,32 @@ namespace Sharpmake
             : base(targetType, configurationType, isInternal)
         {
             InitCSharpSpecifics();
+        }
+
+        public static void AddCSharpSpecificPreImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
+        {
+            if (devEnv >= DevEnv.vs2017)
+            {
+                importProjects.Add(new ImportProject
+                {
+                    Project = @"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props",
+                    Condition = @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"
+                });
+            }
+        }
+
+        public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
+        {
+            if (ProjectTypeGuids == CSharpProjectType.Vsix)
+            {
+                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets", Condition = @"'$(VSToolsPath)' != ''" });
+            }
+
+            if (ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
+            {
+                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", Condition = "'$(VSToolsPath)' != ''" });
+                importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
+            }
         }
 
         public override bool IsValidConfigurationOutputType(Configuration.OutputType outputType)

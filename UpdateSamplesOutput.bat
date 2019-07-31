@@ -19,6 +19,8 @@ call :UpdateRef samples CSharpVsix                  CSharpVsix.sharpmake.cs     
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF\codebase
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples CSharpImports               CSharpImports.sharpmake.cs                 reference         CSharpImports
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences           PackageReferences.sharpmake.cs             reference         PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
