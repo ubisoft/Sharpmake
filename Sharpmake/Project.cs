@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -160,7 +161,37 @@ namespace Sharpmake
         public Strings NoneExtensionsCopyIfNewer = new Strings();
 
         public Strings XResourcesResw = new Strings();
-        public Strings XResourcesImg = new Strings();
+
+        public class XResourcesImgContainer : IEnumerable<string>
+        {
+            /// <summary>
+            /// Adds a new XResourcesImg path, with an optional link
+            /// </summary>
+            /// <param name="path">The path</param>
+            /// <param name="link">An optional link</param>
+            public void Add(string path, string link = null)
+            {
+                _xResourcesImg[path] = link;
+            }
+
+            public int Count => _xResourcesImg.Count;
+
+            public IEnumerator<string> GetEnumerator()
+            {
+                return _xResourcesImg.Keys.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return _xResourcesImg.Keys.GetEnumerator();
+            }
+
+            public Dictionary<string, string> GetXResourcesImg() { return _xResourcesImg; }
+
+            private readonly Dictionary<string, string> _xResourcesImg = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public XResourcesImgContainer XResourcesImg = new XResourcesImgContainer();
 
         public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
         public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files

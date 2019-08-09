@@ -232,6 +232,12 @@ namespace Sharpmake
                 @"    <Image Include=""[file.FileNameProjectRelative]""/>
 ";
 
+            private const string _projectImgResourceWithLink =
+    @"    <Image Include=""[file.FileNameProjectRelative]"">
+      <Link>[link]</Link>
+    </Image>
+";
+
             private const string _projectFilesXManifest =
                 @"    <AppxManifest Include=""[file.FileNameProjectRelative]"">
       <FileType>Document</FileType>

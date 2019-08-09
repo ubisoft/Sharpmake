@@ -433,12 +433,18 @@ namespace Sharpmake
                 if (context.Project.XResourcesImg.Count > 0)
                 {
                     fileGenerator.Write(_projectFilesBegin);
-                    foreach (string file in context.Project.XResourcesImg)
+                    foreach (var resource in context.Project.XResourcesImg.GetXResourcesImg())
                     {
-                        var projectFile = new Vcxproj.ProjectFile(context, file);
+                        var projectFile = new Vcxproj.ProjectFile(context, resource.Key);
                         using (fileGenerator.Declare("file", projectFile))
                         {
-                            fileGenerator.Write(_projectImgResource);
+                            if (!string.IsNullOrEmpty(resource.Value))
+                            {
+                                using (fileGenerator.Declare("link", resource.Value))
+                                    fileGenerator.Write(_projectImgResourceWithLink);
+                            }
+                            else
+                                fileGenerator.Write(_projectImgResource);
                         }
                         imageResourceFiles.Add(projectFile);
                     }
