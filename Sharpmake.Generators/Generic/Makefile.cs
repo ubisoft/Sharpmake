@@ -583,9 +583,7 @@ namespace Sharpmake.Generators.Generic
             List<Project.Configuration> configurations,
             FileInfo projectFileInfo)
         {
-
-
-            Dictionary<string, int > fileNamesOccurences = new Dictionary<string, int >();
+            Dictionary<string, int> fileNamesOccurences = new Dictionary<string, int>();
 
             Strings projectSourceFiles = project.GetSourceFilesForConfigurations(configurations);
             projectSourceFiles.RemoveRange(project.GetAllConfigurationBuildExclude(configurations));

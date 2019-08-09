@@ -222,9 +222,9 @@ namespace SharpmakeUnitTests
     ///  </summary>
     public class MockEnvironmentVariable
     {
-        const string DefaultValue = "Default";
-        const string VariableName = "SharpmakeDoNotExists";
-        const string ExpectedVariableValue = "Variable exists";
+        private const string DefaultValue = "Default";
+        private const string VariableName = "SharpmakeDoNotExists";
+        private const string ExpectedVariableValue = "Variable exists";
 
         [Test]
         public void GetEnvironmentVariableNotExisting()
@@ -809,8 +809,8 @@ namespace SharpmakeUnitTests
         [Test]
         public void VersionStringComparer()
         {
-            var versionArray = new [] {"10.2.0", "10.2.9", "11.2.6"};
-            
+            var versionArray = new[] { "10.2.0", "10.2.9", "11.2.6" };
+
             IComparer<string> comparer = new Util.VersionStringComparer();
 
             Assert.AreEqual(-1, comparer.Compare(versionArray[0], versionArray[1]));
@@ -828,7 +828,6 @@ namespace SharpmakeUnitTests
         {
             List<string> list1 = new List<string>()
             {
-
                 "a",
                 "b",
                 "c",
@@ -836,7 +835,6 @@ namespace SharpmakeUnitTests
             };
             List<string> list2 = new List<string>()
             {
-
                 "a&",
                 "b<",
                 "c>",
@@ -855,7 +853,6 @@ namespace SharpmakeUnitTests
         {
             List<string> list1 = new List<string>()
             {
-
                 "a",
                 "b",
                 "c",
@@ -863,7 +860,6 @@ namespace SharpmakeUnitTests
             };
             List<string> list2 = new List<string>()
             {
-
                 "a&",
                 "b<",
                 "c>",
@@ -882,7 +878,6 @@ namespace SharpmakeUnitTests
         {
             List<string> list1 = new List<string>()
             {
-
                 "a",
                 "b",
                 "c",
@@ -890,7 +885,6 @@ namespace SharpmakeUnitTests
             };
             List<string> list2 = new List<string>()
             {
-
                 "a&",
                 "b<",
                 "c>",
@@ -1014,7 +1008,6 @@ namespace SharpmakeUnitTests
                 mockPath1.Substring(mockPath1.IndexOf(Path.DirectorySeparatorChar)),
                 mockPath2.Substring(mockPath2.IndexOf(Path.DirectorySeparatorChar)),
                 mockPath3.Substring(mockPath3.IndexOf(Path.DirectorySeparatorChar)),
-
             };
             string root = mockPath1.Substring(0, mockPath1.IndexOf(Path.DirectorySeparatorChar));
             OrderableStrings expectedOutputPath = new OrderableStrings(paths.Select((p) => (root + p).ToLower()));

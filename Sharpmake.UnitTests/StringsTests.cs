@@ -24,7 +24,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestToString()
         {
-            Strings strings = new Strings("aa","bb","cc");
+            Strings strings = new Strings("aa", "bb", "cc");
 
             Assert.AreEqual("aa,bb,cc", strings.ToString());
         }
@@ -35,8 +35,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestToLower()
         {
-
-            Strings strings = new Strings("TEST","AA","BB","CC");
+            Strings strings = new Strings("TEST", "AA", "BB", "CC");
             Strings expectedStrings = new Strings("test", "aa", "bb", "cc");
 
             strings.ToLower();
@@ -50,11 +49,11 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertPrefixSuffix()
         {
-            Strings strings = new Strings("test","aa","bb","cc");
+            Strings strings = new Strings("test", "aa", "bb", "cc");
             Strings expectedStrings = new Strings("atestb", "aaab", "abbb", "accb");
 
             strings.InsertPrefixSuffix("a", "b");
-            
+
             Assert.AreEqual(expectedStrings, strings);
         }
 
@@ -64,7 +63,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertSuffixAbsent()
         {
-            Strings strings = new Strings("test","aa","cc","ppp");
+            Strings strings = new Strings("test", "aa", "cc", "ppp");
             Strings expectedStrings = new Strings("test", "aat", "cct", "pppt");
 
             strings.InsertSuffix("t", true);
@@ -78,7 +77,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertSuffixOnlyIfAbsentFalse()
         {
-            Strings strings = new Strings("test","ahhh","abc","jjjj");
+            Strings strings = new Strings("test", "ahhh", "abc", "jjjj");
             Strings expectedStrings = new Strings("testto", "ahhhto", "abcto", "jjjjto");
 
             strings.InsertSuffix("to", false);
@@ -92,7 +91,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertSuffix()
         {
-            Strings strings = new Strings("test","abc","alll","efgh");
+            Strings strings = new Strings("test", "abc", "alll", "efgh");
             Strings expecteStrings = new Strings("testt", "abct", "alllt", "efght");
 
             strings.InsertSuffix("t");
@@ -106,7 +105,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertPrefix()
         {
-            Strings strings = new Strings("test","defg","klm","qrst");
+            Strings strings = new Strings("test", "defg", "klm", "qrst");
             Strings expectedStrings = new Strings("abctest", "abcdefg", "abcklm", "abcqrst");
 
             strings.InsertPrefix("abc");
@@ -120,7 +119,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestJoinStringsPrefixSuffix()
         {
-            Strings strings1 = new Strings("test","test-no-escape");
+            Strings strings1 = new Strings("test", "test-no-escape");
             Strings strings2 = new Strings("<escape-test1>", "&escape-test2&");
 
             Assert.AreEqual("prefixtestsuffixprefixtest-no-escapesuffix", strings1.JoinStrings("", "prefix", "suffix", false));
@@ -133,12 +132,11 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestJoinStringsPrefix()
         {
-            Strings strings1 = new Strings("test","-escape");
-            Strings strings3 = new Strings("<escape-test>","&escape-test&");
-            
+            Strings strings1 = new Strings("test", "-escape");
+            Strings strings3 = new Strings("<escape-test>", "&escape-test&");
+
             Assert.AreEqual("prefix-escapeprefixtest", strings1.JoinStrings("", "prefix", false));
             Assert.AreEqual("1&amp;escape-test&amp;1&lt;escape-test&gt;", strings3.JoinStrings("", "1", true));
         }
-
     }
 }
