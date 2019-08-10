@@ -204,10 +204,16 @@ namespace Sharpmake.Generators.FastBuild
                         if (typedFragment is Platform)
                         {
                             Platform platformFragment = (Platform)typedFragment;
-                            string platformString = platformFragment.ToString();
-                            if (platformFragment >= Platform._reserved9)
-                                platformString = Util.GetSimplePlatformString(platformFragment);
-                            fragmentString += "_" + platformString.ToLower();
+                            foreach (Platform platformEnum in Enum.GetValues(typeof(Platform)))
+                            {
+                                if (!platformFragment.HasFlag(platformEnum))
+                                    continue;
+
+                                string platformString = platformEnum.ToString();
+                                if (platformEnum >= Platform._reserved9)
+                                    platformString = Util.GetSimplePlatformString(platformEnum);
+                                fragmentString += "_" + platformString.ToLower();
+                            }
                         }
                         else
                         {
