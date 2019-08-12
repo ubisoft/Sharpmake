@@ -274,6 +274,7 @@ namespace Sharpmake.Generators.FastBuild
                     }
                     List<string> resourceFilesSections = new List<string>();
                     List<string> embeddedResourceFilesSections = new List<string>();
+                    List<string> additionalLibs = new List<string>();
 
                     OrderableStrings additionalDependencies = additionalDependenciesPerConf[conf];
 
@@ -352,6 +353,7 @@ namespace Sharpmake.Generators.FastBuild
                         Options.ExplicitOptions confOptions = options[conf];
 
                         bool useObjectLists = Sharpmake.Options.GetObject<Options.Vc.Linker.UseLibraryDependencyInputs>(conf) == Sharpmake.Options.Vc.Linker.UseLibraryDependencyInputs.Enable;
+                        bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig;
                         string outputFile = confOptions["OutputFile"];
                         string fastBuildOutputFile = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, outputFile, true));
                         fastBuildOutputFile = platformBff.GetOutputFilename(conf.Output, fastBuildOutputFile);
@@ -363,6 +365,11 @@ namespace Sharpmake.Generators.FastBuild
                         bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
                         bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
                         bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+
+                        if (!useObjectLists && confSubConfigs.Count > 1 && !isLastSubConfig)
+                        {
+                            useObjectLists = true;
+                        }
 
                         if (isOutputTypeExeOrDll)
                         {
@@ -396,9 +403,7 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildProjectDependencies = result.ToString();
                         }
 
-                        string partialLibInfo = "";
-                        string partialLibs = FileGeneratorUtilities.RemoveLineTag;
-                        string librarianAdditionalInputs = FileGeneratorUtilities.RemoveLineTag; // TODO: implement
+                        string librarianAdditionalInputs = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildObjectListDependencies = FileGeneratorUtilities.RemoveLineTag;
 
                         string outputType;
@@ -422,7 +427,6 @@ namespace Sharpmake.Generators.FastBuild
                         {
                             if (!isLastSubConfig)
                             {
-                                partialLibInfo = "[Partial Lib of " + fastBuildOutputFileShortName + "]";
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
 
                                 var staticLibExtension = vcxprojPlatform.StaticLibraryFileExtension;
@@ -436,11 +440,10 @@ namespace Sharpmake.Generators.FastBuild
 
                                 subConfigLibs.Add(fastBuildOutputFile);
                                 subConfigObjectList.Add(fastBuildOutputFileShortName);
+                                additionalLibs.Add(fastBuildOutputFileShortName + "_objects");
                             }
                             else
                             {
-                                partialLibs = subConfigLibs.JoinStrings(" ");
-
                                 StringBuilder result = new StringBuilder();
                                 result.Append("\n");
                                 foreach (string subConfigLib in subConfigLibs)
@@ -889,6 +892,11 @@ namespace Sharpmake.Generators.FastBuild
                             confCmdLineOptions["EmbedResources"] = FileGeneratorUtilities.RemoveLineTag;
                         }
 
+                        if (mustGenerateLibrary)
+                        {
+                            librarianAdditionalInputs = UtilityMethods.FBuildFormatList(additionalLibs, 33);
+                        }
+
                         // It is useless to have an input pattern defined if there is no input path
                         if (fastBuildInputPath == FileGeneratorUtilities.RemoveLineTag)
                             fastBuildCompilerInputPattern = FileGeneratorUtilities.RemoveLineTag;
@@ -915,7 +923,6 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildOutputFile", fastBuildOutputFile))
                                     using (bffGenerator.Declare("fastBuildLinkerOutputFile", fastBuildLinkerOutputFile))
                                     using (bffGenerator.Declare("fastBuildLinkerLinkObjects", linkObjects ? "true" : "false"))
-                                    using (bffGenerator.Declare("fastBuildPartialLibInfo", partialLibInfo))
                                     using (bffGenerator.Declare("fastBuildInputPath", fastBuildInputPath))
                                     using (bffGenerator.Declare("fastBuildCompilerInputPattern", fastBuildCompilerInputPattern))
                                     using (bffGenerator.Declare("fastBuildInputExcludedFiles", fastBuildInputExcludedFiles))
@@ -932,7 +939,6 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
                                     using (bffGenerator.Declare("fastBuildPCHForceInclude", isUsePrecomp ? fastBuildPCHForceInclude : FileGeneratorUtilities.RemoveLineTag))
                                     using (bffGenerator.Declare("fastBuildConsumeWinRTExtension", fastBuildConsumeWinRTExtension))
-                                    using (bffGenerator.Declare("fastBuildPartialLibs", partialLibs))
                                     using (bffGenerator.Declare("fastBuildOutputType", outputType))
                                     using (bffGenerator.Declare("fastBuildLibrarianAdditionalInputs", librarianAdditionalInputs))
                                     using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
@@ -1124,8 +1130,11 @@ namespace Sharpmake.Generators.FastBuild
 
                                                     bffGenerator.Write(compilerOptions);
 
-                                                    bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
-                                                    bffGenerator.Write(Template.ConfigurationFile.LibrarianOptions);
+                                                    if (!useObjectLists)
+                                                    {
+                                                        bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
+                                                        bffGenerator.Write(Template.ConfigurationFile.LibrarianOptions);
+                                                    }
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
                                                         if (isUsePrecomp)
@@ -1153,8 +1162,11 @@ namespace Sharpmake.Generators.FastBuild
                                                             bffGenerator.Write(compilerOptionsClangDeoptimized);
                                                             bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                         }
-                                                        bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
-                                                        bffGenerator.Write(Template.ConfigurationFile.LibrarianOptionsClang);
+                                                        if (!useObjectLists)
+                                                        {
+                                                            bffGenerator.Write(Template.ConfigurationFile.LibrarianAdditionalInputs);
+                                                            bffGenerator.Write(Template.ConfigurationFile.LibrarianOptionsClang);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1249,7 +1261,8 @@ namespace Sharpmake.Generators.FastBuild
                                             // Write Target Alias
                                             if (isLastSubConfig)
                                             {
-                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                                string genLibName = "'" + fastBuildOutputFileShortName + "_" + outputType + "'";
+                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 33)))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                                 }

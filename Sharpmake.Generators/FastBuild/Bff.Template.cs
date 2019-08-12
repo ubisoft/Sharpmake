@@ -415,7 +415,7 @@ Compiler( '[fastbuildCompilerName]' )
 
                 public static string LibBeginSection = @"
 //=================================================================================================================
-// LIB [fastBuildOutputFileShortName]_[fastBuildOutputType] [fastBuildPartialLibInfo]
+// LIB [fastBuildOutputFileShortName]_[fastBuildOutputType]
 //=================================================================================================================
 Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
