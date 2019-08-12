@@ -206,21 +206,7 @@ namespace Sharpmake.Generators.FastBuild
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
                 context.Configuration = conf;
 
-                // resolve targetPlatformVersion as it may be used in includes
-                string targetPlatformVersionString = GetLatestTargetPlatformVersion(conf.Compiler);
-
-                var resolverParams = new[] {
-                    new VariableAssignment("project", context.Project),
-                    new VariableAssignment("target", context.Configuration.Target),
-                    new VariableAssignment("conf", context.Configuration),
-                    new VariableAssignment("latesttargetplatformversion", targetPlatformVersionString)
-                };
-                context.EnvironmentVariableResolver = PlatformRegistry.Get<IPlatformDescriptor>(conf.Platform).GetPlatformEnvironmentResolver(resolverParams);
-                projectOptionsGen.GenerateOptions(context);
-                FillIncludeDirectoriesOptions(context);
-
-                OrderableStrings additionalDependencies = FillLibrariesOptions(context);
-                additionalDependenciesPerConf.Add(conf, additionalDependencies);
+                GenerateBffOptions(projectOptionsGen, context, additionalDependenciesPerConf);
 
                 options.Add(conf, context.Options);
                 cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
@@ -1347,6 +1333,56 @@ namespace Sharpmake.Generators.FastBuild
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
                 resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
             return $@"{prefix}""{resolvedInclude}""";
+        }
+
+        private static void GenerateBffOptions(
+            ProjectOptionsGenerator projectOptionsGen,
+            BffGenerationContext context,
+            Dictionary<Project.Configuration, OrderableStrings> additionalDependenciesPerConf
+        )
+        {
+            // resolve targetPlatformVersion as it may be used in includes
+            string targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
+
+            var resolverParams = new[] {
+                    new VariableAssignment("project", context.Project),
+                    new VariableAssignment("target", context.Configuration.Target),
+                    new VariableAssignment("conf", context.Configuration),
+                    new VariableAssignment("latesttargetplatformversion", targetPlatformVersionString)
+                };
+            var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
+            context.EnvironmentVariableResolver = platformDescriptor.GetPlatformEnvironmentResolver(resolverParams);
+            projectOptionsGen.GenerateOptions(context);
+
+            GenerateResourceCompilerOptions(context, platformDescriptor);
+
+            FillIncludeDirectoriesOptions(context);
+
+            OrderableStrings additionalDependencies = FillLibrariesOptions(context);
+            additionalDependenciesPerConf.Add(context.Configuration, additionalDependencies);
+        }
+
+        private static void GenerateResourceCompilerOptions(BffGenerationContext context, IPlatformDescriptor platformDescriptor)
+        {
+            Strings resourceDefines = Options.GetStrings<Options.Vc.ResourceCompiler.PreprocessorDefinitions>(context.Configuration);
+            if (resourceDefines.Any())
+            {
+                var fastBuildDefines = new List<string>();
+                string platformDefineSwitch = platformDescriptor.IsUsingClang ? "-D" : "/D";
+
+                foreach (string resourceDefine in resourceDefines)
+                {
+                    if (string.IsNullOrWhiteSpace(resourceDefine))
+                        continue;
+
+                    fastBuildDefines.Add(string.Format(@"{0}""{1}""", platformDefineSwitch, resourceDefine.Replace(@"""", @"\""")));
+                }
+                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
         }
 
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)

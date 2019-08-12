@@ -217,6 +217,7 @@ Compiler( '[fastbuildCompilerName]' )
                 public static string ResourceCompilerExtraOptions = @"
     .ResourceCompilerExtraOptions   = ' /l 0x0409 /nologo'
                                     + ' [cmdLineOptions.AdditionalResourceIncludeDirectories]'
+                                    + ' [cmdLineOptions.ResourcePreprocessorDefinitions]'
 ";
 
                 public static string EmbeddedResourceCompilerOptions = @"
