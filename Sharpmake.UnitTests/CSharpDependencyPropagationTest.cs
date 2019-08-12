@@ -264,10 +264,7 @@ namespace Sharpmake.UnitTests
 
                 foreach (var dependency in conf.DotNetPublicDependencies)
                 {
-                    if (dependency.Configuration.Project.GetType() == typeof(CSharpTestProjects.CSharpNoDependencyProject2))
-                        Assert.False(dependency.ReferenceOutputAssembly);
-                    else
-                        Assert.IsNull(dependency.ReferenceOutputAssembly);
+                    Assert.IsNull(dependency.ReferenceOutputAssembly);
                 }
             }
         }

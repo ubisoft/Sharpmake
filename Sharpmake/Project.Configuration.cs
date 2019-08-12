@@ -3060,7 +3060,7 @@ namespace Sharpmake
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
                                 bool? referenceOutputAssembly = ReferenceOutputAssembly;
-                                if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                if (isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder)
                                     referenceOutputAssembly = false;
                                 if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     ForceUsingDependencies.Add(dependency);
