@@ -1101,65 +1101,19 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            bool addDependencies = false;
-            if (context.Project.AllowInconsistentDependencies)
+            if (context.Builder.Diagnostics
+                && context.Project.AllowInconsistentDependencies == false
+                && context.ProjectConfigurations.Any(c => ConfigurationNeedReferences(c)))
             {
-                foreach (var configuration in context.ProjectConfigurations)
-                {
-                    if (configuration.Output == Project.Configuration.OutputType.Exe || configuration.Output == Project.Configuration.OutputType.Dll ||
-                        configuration.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
-                        configuration.Output == Project.Configuration.OutputType.DotNetClassLibrary ||
-                        configuration.Output == Project.Configuration.OutputType.DotNetWindowsApp)
-                    {
-                        addDependencies = true;
-                        break;
-                    }
-                }
+                CheckReferenceDependenciesConsistency(context);
             }
-            else
-            {
-                if (firstConf.Output == Project.Configuration.OutputType.Exe || firstConf.Output == Project.Configuration.OutputType.Dll ||
-                    (firstConf.Output == Project.Configuration.OutputType.Lib && firstConf.ExportAdditionalLibrariesEvenForStaticLib) ||
-                    firstConf.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
-                    firstConf.Output == Project.Configuration.OutputType.DotNetClassLibrary ||
-                    firstConf.Output == Project.Configuration.OutputType.DotNetWindowsApp)
-                {
-                    addDependencies = true;
-                }
-            }
+
+            bool addDependencies = context.Project.AllowInconsistentDependencies
+                ? context.ProjectConfigurations.Any(c => ConfigurationNeedReferences(c))
+                : ConfigurationNeedReferences(firstConf);
 
             if (addDependencies)
             {
-                if (context.Builder.Diagnostics)
-                {
-                    bool inconsistencyDetected = false;
-                    string inconsistencyReports = "";
-                    for (int i = 0; i < context.ProjectConfigurations.Count; ++i)
-                    {
-                        var iDeps = context.ProjectConfigurations.ElementAt(i).ConfigurationDependencies.Where(d => !d.Project.GetType().IsDefined(typeof(Export), false)).Select(x => x.ProjectFullFileNameWithExtension);
-                        for (int j = 0; j < context.ProjectConfigurations.Count; ++j)
-                        {
-                            if (i == j)
-                                continue;
-
-                            var jDeps = context.ProjectConfigurations.ElementAt(j).ConfigurationDependencies.Where(d => !d.Project.GetType().IsDefined(typeof(Export), false)).Select(x => x.ProjectFullFileNameWithExtension);
-
-                            var ex = iDeps.Except(jDeps);
-                            if (ex.Count() != 0)
-                            {
-                                inconsistencyDetected = true;
-                                var inconsistency = "Config1: " + context.ProjectConfigurations.ElementAt(i) + Environment.NewLine +
-                                    "Config2: " + context.ProjectConfigurations.ElementAt(j) + Environment.NewLine + "=> " +
-                                    String.Join(Environment.NewLine + "=> ", ex.ToList());
-                                inconsistencyReports += inconsistency + Environment.NewLine;
-                            }
-                        }
-                    }
-
-                    if (inconsistencyDetected && context.Project.AllowInconsistentDependencies == false)
-                        Builder.Instance.LogErrorLine($"{context.Project.SharpmakeCsFileName}: Error: Dependencies in {FileName}{ProjectExtension} are different between configurations:\n{inconsistencyReports}");
-                }
-
                 var dependencies = new UniqueList<ProjectDependencyInfo>();
                 foreach (var configuration in context.ProjectConfigurations)
                 {
@@ -1227,6 +1181,47 @@ namespace Sharpmake.Generators.VisualStudio
 
             foreach (var platforms in context.PresentPlatforms.Values)
                 platforms.GeneratePlatformReferences(context, fileGenerator);
+        }
+
+        private static bool ConfigurationNeedReferences(Project.Configuration conf)
+        {
+            return conf.Output == Project.Configuration.OutputType.Exe
+                || conf.Output == Project.Configuration.OutputType.Dll
+                || (conf.Output == Project.Configuration.OutputType.Lib && conf.ExportAdditionalLibrariesEvenForStaticLib)
+                || conf.Output == Project.Configuration.OutputType.DotNetConsoleApp
+                || conf.Output == Project.Configuration.OutputType.DotNetClassLibrary
+                || conf.Output == Project.Configuration.OutputType.DotNetWindowsApp;
+        }
+
+        private void CheckReferenceDependenciesConsistency(IVcxprojGenerationContext context)
+        {
+            bool inconsistencyDetected = false;
+            System.Text.StringBuilder inconsistencyReports = new System.Text.StringBuilder("");
+            for (int i = 0; i < context.ProjectConfigurations.Count; ++i)
+            {
+                var iDeps = context.ProjectConfigurations.ElementAt(i).ConfigurationDependencies.Where(d => !d.Project.GetType().IsDefined(typeof(Export), false)).Select(x => x.ProjectFullFileNameWithExtension);
+                for (int j = 0; j < context.ProjectConfigurations.Count; ++j)
+                {
+                    if (i == j)
+                        continue;
+
+                    var jDeps = context.ProjectConfigurations.ElementAt(j).ConfigurationDependencies.Where(d => !d.Project.GetType().IsDefined(typeof(Export), false)).Select(x => x.ProjectFullFileNameWithExtension);
+
+                    var ex = iDeps.Except(jDeps);
+                    if (ex.Count() != 0)
+                    {
+                        inconsistencyDetected = true;
+                        inconsistencyReports.Append($"Config1: {context.ProjectConfigurations.ElementAt(i)}\n");
+                        inconsistencyReports.Append($"Config2: {context.ProjectConfigurations.ElementAt(j)}\n");
+                        inconsistencyReports.Append("Config1 depends on the following projects but not Config2:\n=> ");
+                        inconsistencyReports.Append(String.Join(Environment.NewLine + "=> ", ex.ToList()) + Environment.NewLine);
+                        inconsistencyReports.Append(new string('-', 70) + Environment.NewLine);
+                    }
+                }
+            }
+
+            if (inconsistencyDetected)
+                Builder.Instance.LogErrorLine($"{context.Project.SharpmakeCsFileName}: Error: Dependencies in {FileName}{ProjectExtension} are different between configurations:\n{inconsistencyReports.ToString()}");
         }
 
         private void GenerateBffFilesSection(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
