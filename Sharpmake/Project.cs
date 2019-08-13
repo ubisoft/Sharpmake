@@ -176,6 +176,8 @@ namespace Sharpmake
 
             public int Count => _xResourcesImg.Count;
 
+            public bool IsResolved { get; private set; } = false;
+
             public IEnumerator<string> GetEnumerator()
             {
                 return _xResourcesImg.Keys.GetEnumerator();
@@ -188,7 +190,25 @@ namespace Sharpmake
 
             public Dictionary<string, string> GetXResourcesImg() { return _xResourcesImg; }
 
-            private readonly Dictionary<string, string> _xResourcesImg = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            internal void Resolve(Resolver resolver)
+            {
+                if (IsResolved)
+                    return;
+
+                if (_xResourcesImg.Any())
+                {
+                    var resolvedDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var xResourcePair in _xResourcesImg)
+                    {
+                        resolvedDictionary.Add(resolver.Resolve(xResourcePair.Key), resolver.Resolve(xResourcePair.Value));
+                    }
+                    _xResourcesImg = resolvedDictionary;
+                }
+
+                IsResolved = true;
+            }
+
+            private Dictionary<string, string> _xResourcesImg = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
         public XResourcesImgContainer XResourcesImg = new XResourcesImgContainer();
@@ -1655,6 +1675,8 @@ namespace Sharpmake
 
             if (SourceFilesFilters != null)
                 Util.ResolvePath(SharpmakeCsPath, ref SourceFilesFilters);
+
+            XResourcesImg.Resolve(resolver);
 
             // Resolve Configuration
             foreach (Project.Configuration conf in Configurations)
