@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,24 +36,25 @@ namespace Sharpmake
 
         /// <summary>
         /// The dependent project inherits the library files of the dependency.
+        /// Valid only when the project is a C or a C++ project.
         /// </summary>
         LibraryFiles = 1 << 1,
 
         /// <summary>
         /// The dependent project inherits the library paths of the dependency.
-        /// Valid only when the project is not a C or a C++ project.
+        /// Valid only when the project is a C or a C++ project.
         /// </summary>
         LibraryPaths = 1 << 2,
 
         /// <summary>
         /// The dependent project inherits the include paths of the dependency.
-        /// Valid only when the project is not a C or a C++ project.
+        /// Valid only when the project is a C or a C++ project.
         /// </summary>
         IncludePaths = 1 << 3,
 
         /// <summary>
         /// The dependent project inherits the defined symbols of the dependency.
-        /// Valid only when the project is not a C or a C++ project.
+        /// Valid only when the project is a C or a C++ project.
         /// </summary>
         Defines = 1 << 4,
 
