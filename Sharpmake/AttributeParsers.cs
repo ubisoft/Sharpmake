@@ -68,6 +68,9 @@ namespace Sharpmake
                     throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include invalid include type used ({0})", parameters[1]);
                 }
             }
+
+            includeFilename = Environment.ExpandEnvironmentVariables(includeFilename);
+
             string includeAbsolutePath = Path.IsPathRooted(includeFilename) ? includeFilename : null;
 
             if (Util.IsPathWithWildcards(includeFilename))

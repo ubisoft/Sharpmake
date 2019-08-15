@@ -380,7 +380,8 @@ namespace Sharpmake
         private readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
         private readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
         {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            var baseAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(baseAssembly.Location));
             string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
             return Assembly.LoadFrom(generatorsAssembly);
         });

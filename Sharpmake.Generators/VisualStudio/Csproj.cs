@@ -2009,7 +2009,7 @@ namespace Sharpmake.Generators.VisualStudio
                         Include = Path.GetFileNameWithoutExtension(str),
                         SpecificVersion = false,
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
-                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences)
                     }));
 
                 referencesByPath.AddRange(
@@ -2021,6 +2021,16 @@ namespace Sharpmake.Generators.VisualStudio
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
                         Private = false
                     }));
+                referencesByPath.AddRange(
+                    conf.ReferencesByPathEmbedInterop.Select(Util.GetCapitalizedPath)
+                        .Select(str => new ItemGroups.Reference
+                        {
+                            Include = Path.GetFileNameWithoutExtension(str),
+                            SpecificVersion = false,
+                            HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+                            Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                            EmbedInteropTypes = true
+                        }));
             }
 
             itemGroups.References.AddRange(referencesByPath);
@@ -2903,7 +2913,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectOption
             (
-            Options.Option(Options.CSharp.WarningLevel.Level0, () => { options["WarningLevel"] = "TurnOffAllWarnings"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level0, () => { options["WarningLevel"] = "0"; }),
             Options.Option(Options.CSharp.WarningLevel.Level1, () => { options["WarningLevel"] = "1"; }),
             Options.Option(Options.CSharp.WarningLevel.Level2, () => { options["WarningLevel"] = "2"; }),
             Options.Option(Options.CSharp.WarningLevel.Level3, () => { options["WarningLevel"] = "3"; }),
@@ -2921,7 +2931,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.LanguageVersion.CSharp5, () => { options["LanguageVersion"] = "5"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp6, () => { options["LanguageVersion"] = "6"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp7, () => { options["LanguageVersion"] = "7"; }),
-            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; })
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_2, () => { options["LanguageVersion"] = "7.2"; })
             );
 
             SelectOption(
