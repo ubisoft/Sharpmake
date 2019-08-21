@@ -365,7 +365,7 @@ namespace Sharpmake.Generators.Generic
 
                 // Validate that 2 conf name in the same project and for a given platform don't have the same name.
                 Project.Configuration otherConf;
-                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project);
+                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
                 if (configurationNameMapping.TryGetValue(projectUniqueName, out otherConf))
                 {
                     throw new Error(

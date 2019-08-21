@@ -24,6 +24,7 @@ namespace Sharpmake
     {
         #region IPlatformDescriptor
         public abstract string SimplePlatformString { get; }
+        public virtual string GetPlatformString(ITarget target) { return SimplePlatformString; }
         public abstract bool IsMicrosoftPlatform { get; }
         public abstract bool IsPcPlatform { get; }
         public abstract bool IsUsingClang { get; }

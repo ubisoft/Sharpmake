@@ -58,7 +58,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                     overwriteFile &= overwriteFileConfig;
 
-                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("project", project))
                     {

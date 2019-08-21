@@ -25,6 +25,8 @@ namespace Sharpmake
         {
             #region IPlatformDescriptor implementation.
             public string SimplePlatformString => "Mac";
+            public string GetPlatformString(ITarget target) { return SimplePlatformString; }
+
             public bool IsMicrosoftPlatform => false;
             public bool IsPcPlatform => true;
             public bool IsUsingClang => true;

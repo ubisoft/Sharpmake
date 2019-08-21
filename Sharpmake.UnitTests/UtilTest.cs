@@ -473,11 +473,11 @@ namespace SharpmakeUnitTests
         [Test]
         public void GetPlatformString()
         {
-            Assert.AreEqual("x86", Util.GetPlatformString(Platform.win32, new CSharpProject(), false));
-            Assert.AreEqual("x64", Util.GetPlatformString(Platform.win64, new CSharpProject(), false));
-            Assert.AreEqual("AnyCPU", Util.GetPlatformString(Platform.win64, new PythonProject(), false));
-            Assert.AreEqual("Any CPU", Util.GetPlatformString(Platform.win64, new PythonProject(), true));
-            Assert.AreEqual("x64", Util.GetPlatformString(Platform.win64, new AndroidPackageProject(), true));
+            Assert.AreEqual("x86", Util.GetPlatformString(Platform.win32, new CSharpProject(), null, false));
+            Assert.AreEqual("x64", Util.GetPlatformString(Platform.win64, new CSharpProject(), null, false));
+            Assert.AreEqual("AnyCPU", Util.GetPlatformString(Platform.win64, new PythonProject(), null, false));
+            Assert.AreEqual("Any CPU", Util.GetPlatformString(Platform.win64, new PythonProject(), null, true));
+            Assert.AreEqual("x64", Util.GetPlatformString(Platform.win64, new AndroidPackageProject(), null, true));
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void GetPlatformStringException()
         {
-            Assert.Catch<Exception>(() => Util.GetPlatformString(Platform.android, new CSharpProject(), false));
+            Assert.Catch<Exception>(() => Util.GetPlatformString(Platform.android, new CSharpProject(), null, false));
         }
     }
 

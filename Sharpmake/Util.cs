@@ -2092,7 +2092,7 @@ namespace Sharpmake
             return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.SimplePlatformString ?? platform.ToString();
         }
 
-        public static string GetPlatformString(Platform platform, Project project, bool isForSolution = false)
+        public static string GetPlatformString(Platform platform, Project project, ITarget target, bool isForSolution = false)
         {
             if (project is CSharpProject)
             {
@@ -2110,7 +2110,13 @@ namespace Sharpmake
                 return isForSolution ? "Any CPU" : "AnyCPU";
             }
 
-            return GetSimplePlatformString(platform);
+            return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetPlatformString(target) ?? platform.ToString();
+        }
+
+        [Obsolete("GetPlatformString() now requires a `target` parameter.")]
+        public static string GetPlatformString(Platform platform, Project project, bool isForSolution = false)
+        {
+            return GetPlatformString( platform, project, isForSolution );
         }
 
         public static string CallerInfoTag = "CALLER_INFO: ";

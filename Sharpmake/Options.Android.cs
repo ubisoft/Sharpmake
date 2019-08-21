@@ -11,8 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace Sharpmake
 {
+    using System;
+
     public static partial class Options
     {
         public static class Android
@@ -27,7 +30,11 @@ namespace Sharpmake
                     Android21,
                     Android22,
                     Android23,
-                    Android24
+                    Android24,
+                    Android25,
+                    Android26,
+                    Android27,
+                    Android28,
                 }
 
                 public enum PlatformToolset
@@ -36,6 +43,8 @@ namespace Sharpmake
                     Default,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Clang_3_8,
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    Clang_5_0,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Gcc_4_9
                 }
@@ -82,9 +91,15 @@ namespace Sharpmake
                     Cpp98,
                     Cpp11,
                     Cpp1y,
+                    Cpp14,
+                    Cpp17,
+                    Cpp2a,
                     GNU_Cpp98,
                     GNU_Cpp11,
-                    GNU_Cpp1y
+                    GNU_Cpp1y,
+                    GNU_Cpp14,
+                    GNU_Cpp17,
+                    GNU_Cpp2a
                 }
 
                 public enum DataLevelLinking

@@ -26,7 +26,28 @@ namespace Sharpmake
         public sealed partial class AndroidPlatform : BasePlatform, Project.Configuration.IConfigurationTasks
         {
             #region IPlatformDescriptor implementation.
-            public override string SimplePlatformString => "ARM";
+            public override string SimplePlatformString => "Android";
+            public override string GetPlatformString(ITarget target)
+            {
+                if (target == null)
+                    return SimplePlatformString;
+
+                var buildTarget = target.GetFragment<AndroidBuildTargets>();
+                switch ( buildTarget )
+                {
+                    case AndroidBuildTargets.armeabi_v7a:
+                        return "ARM";
+                    case AndroidBuildTargets.arm64_v8a:
+                        return "ARM64";
+                    case AndroidBuildTargets.x86:
+                        return "x86";
+                    case AndroidBuildTargets.x86_64:
+                        return "x64";
+                    default:
+                        throw new System.Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
+                }
+            }
+
             public override bool IsMicrosoftPlatform => false;
             public override bool IsPcPlatform => false;
             public override bool IsUsingClang => true;
@@ -52,7 +73,7 @@ namespace Sharpmake
                     // Clang and GCC have trouble finding "Additional Dependencies" through "Additional Library Directories" when compiling
                     // for Android under VS. As a work around, we use rooted path for dependencies library files.
                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetPath + "\\" + dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetPath + "\\" + GetOutputFileNamePrefix(null, dependency.Output) + dependency.TargetFileFullName + "." + GetDefaultOutputExtension(dependency.Output), dependency.TargetFileOrderNumber);
                 }
                 else
                 {
@@ -88,16 +109,28 @@ namespace Sharpmake
             #region IPlatformVcxproj implementation
             public override string ProgramDatabaseFileExtension => string.Empty;
             public override string SharedLibraryFileExtension => "so";
+            public override string StaticLibraryFileExtension => "a";
             public override string ExecutableFileExtension => string.Empty;
+
+            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
+            {
+                if (outputType != Project.Configuration.OutputType.Exe)
+                    return "lib";
+                return string.Empty;
+            }
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
-                string applicationTypeRevision = context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2017 ? "3.0" : "2.0";
+                generator.Write(_projectStartPlatformConditional);
+
+                string applicationTypeRevision = (context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2017 || context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2019) ? "3.0" : "2.0";
 
                 using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
+
+                generator.Write(Vcxproj.Template.Project.ProjectDescriptionEnd);
             }
 
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
@@ -140,18 +173,24 @@ namespace Sharpmake
                 Options.Option(Options.Android.General.AndroidAPILevel.Android21, () => { options["AndroidAPILevel"] = "android-21"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android22, () => { options["AndroidAPILevel"] = "android-22"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android23, () => { options["AndroidAPILevel"] = "android-23"; }),
-                Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; })
+                Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android25, () => { options["AndroidAPILevel"] = "android-25"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android26, () => { options["AndroidAPILevel"] = "android-26"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android27, () => { options["AndroidAPILevel"] = "android-27"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android28, () => { options["AndroidAPILevel"] = "android-28"; })
                 );
 
                 context.SelectOption
                 (
                 Options.Option(Options.Android.General.PlatformToolset.Default, () => { options["PlatformToolset"] = RemoveLineTag; }),
                 Options.Option(Options.Android.General.PlatformToolset.Clang_3_8, () => { options["PlatformToolset"] = "Clang_3_8"; }),
+                Options.Option(Options.Android.General.PlatformToolset.Clang_5_0, () => { options["PlatformToolset"] = "Clang_5_0"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Gcc_4_9, () => { options["PlatformToolset"] = "Gcc_4_9"; })
                 );
 
                 context.SelectOption
                 (
+                Options.Option(Options.Android.General.UseOfStl.Default, () => { options["UseOfStl"] = RemoveLineTag; }),
                 Options.Option(Options.Android.General.UseOfStl.System, () => { options["UseOfStl"] = "system"; }),
                 Options.Option(Options.Android.General.UseOfStl.GAbiPP_Static, () => { options["UseOfStl"] = "gabi++_static"; }),
                 Options.Option(Options.Android.General.UseOfStl.GAbiPP_Shared, () => { options["UseOfStl"] = "gabi++_shared"; }),
@@ -165,6 +204,7 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
+                Options.Option(Options.Android.General.ThumbMode.Default, () => { options["ThumbMode"] = RemoveLineTag; }),
                 Options.Option(Options.Android.General.ThumbMode.Thumb, () => { options["ThumbMode"] = "Thumb"; }),
                 Options.Option(Options.Android.General.ThumbMode.ARM, () => { options["ThumbMode"] = "ARM"; }),
                 Options.Option(Options.Android.General.ThumbMode.Disabled, () => { options["ThumbMode"] = "Disabled"; })
@@ -178,12 +218,19 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Default, () => { options["CppLanguageStandard"] = "c++11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "c++98"; cmdLineOptions["CppLanguageStandard"] = "-std=c++98"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "c++11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp1y, () => { options["CppLanguageStandard"] = "c++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1y"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "c++14"; cmdLineOptions["CppLanguageStandard"] = "-std=c++14"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "c++17"; cmdLineOptions["CppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp2a, () => { options["CppLanguageStandard"] = "c++2a"; cmdLineOptions["CppLanguageStandard"] = "-std=c++2a"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp98, () => { options["CppLanguageStandard"] = "gnu++98"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++98"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp11, () => { options["CppLanguageStandard"] = "gnu++11"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++11"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1y, () => { options["CppLanguageStandard"] = "gnu++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1y"; })
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1y, () => { options["CppLanguageStandard"] = "gnu++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1y"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp14, () => { options["CppLanguageStandard"] = "gnu++14"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++14"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp17, () => { options["CppLanguageStandard"] = "gnu++17"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++17"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp2a, () => { options["CppLanguageStandard"] = "gnu++2a"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++2a"; })
                 );
 
                 context.SelectOption
@@ -279,7 +326,56 @@ namespace Sharpmake
                 platformOutputLibExtension = ".a";
                 platformPrefixExtension = string.Empty;
             }
-            #endregion
+
+            protected override IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)
+            {
+                var conf = context.Configuration;
+                var buildTarget = conf.Target.HaveFragment<AndroidBuildTargets>() ? conf.Target.GetFragment<AndroidBuildTargets>() : AndroidBuildTargets.arm64_v8a;
+                string archIncludePath = "";
+
+                switch (buildTarget)
+                {
+                    case AndroidBuildTargets.arm64_v8a:
+                        archIncludePath = "aarch64-linux-android";
+                        break;
+                    case AndroidBuildTargets.armeabi_v7a:
+                        archIncludePath = "arm-linux-androideabi";
+                        break;
+                    case AndroidBuildTargets.x86:
+                        archIncludePath = "i686-linux-android";
+                        break;
+                    case AndroidBuildTargets.x86_64:
+                        archIncludePath = "x86_64-linux-android";
+                        break;
+                    default:
+                        throw new System.Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
+                }
+
+                var androidIncludePaths = new List<string>();
+
+                androidIncludePaths.Add(@"$(VS_NdkRoot)\sources\android");
+                androidIncludePaths.Add(@"$(StlIncludeDirectories)");
+
+                // These include paths are necessary for compatiblitity between some Android API versions, VS versions and NDK versions; Google sometimes changes the folder 
+                // hierarchy inside the NDK between API versions and MS is slow to adapt. Without these include paths, sometimes the compiler can't find jni.h or asm/errno.h.
+                androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include");
+                androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include\" + archIncludePath);
+
+                androidIncludePaths.AddRange(base.GetIncludePathsImpl(context));
+
+                return androidIncludePaths;
+            }
+
+            public override IEnumerable<string> GetLibraryPaths(IGenerationContext context)
+            {
+                var dirs = new List<string>();
+                dirs.Add(@"$(StlLibraryPath)");
+                dirs.AddRange(base.GetLibraryPaths(context));
+
+                return dirs;
+            }
+
+            #endregion // IPlatformVcxproj implementation
         }
     }
 }

@@ -17,6 +17,10 @@ namespace Sharpmake
     {
         public sealed partial class AndroidPlatform
         {
+            private const string _projectStartPlatformConditional =
+    @"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='ARM64' Or '$(Platform)'=='x64' Or '$(Platform)'=='ARM' Or '$(Platform)'=='x86'"">
+";
+
             private const string _projectDescriptionPlatformSpecific =
 @"    <ApplicationType>Android</ApplicationType>
     <ApplicationTypeRevision>[applicationTypeRevision]</ApplicationTypeRevision>
@@ -62,7 +66,7 @@ namespace Sharpmake
       <WarningLevel>[options.WarningLevel]</WarningLevel>
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
       <OmitFramePointers>[options.OmitFramePointers]</OmitFramePointers>
@@ -87,7 +91,7 @@ namespace Sharpmake
 @"    <Link>
       <DebuggerSymbolInformation>[options.DebuggerSymbolInformation]</DebuggerSymbolInformation>
       <OutputFile>[options.OutputFile]</OutputFile>
-      <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories];%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
       <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]</IgnoreSpecificDefaultLibraries>

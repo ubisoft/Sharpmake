@@ -23,6 +23,8 @@ namespace Sharpmake
         /// </summary>
         string SimplePlatformString { get; }
 
+        string GetPlatformString(ITarget target);
+
         /// <summary>
         /// Gets whether this is a proprietary platform owned by Microsoft Corporation.
         /// </summary>

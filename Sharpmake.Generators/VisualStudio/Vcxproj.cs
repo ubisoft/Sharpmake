@@ -154,7 +154,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (Project.Configuration conf in configurations)
                 {
-                    var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project) + conf.Target.GetFragment<DevEnv>();
+                    var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target) + conf.Target.GetFragment<DevEnv>();
                     configurationNameMapping[projectUniqueName] = conf;
                 }
 
@@ -424,7 +424,7 @@ namespace Sharpmake.Generators.VisualStudio
             var configNames = new Strings();
             foreach (var conf in context.ProjectConfigurations)
             {
-                var platformName = Util.GetPlatformString(conf.Platform, conf.Project);
+                var platformName = Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
                 platformNames.Add(platformName);
                 configNames.Add(conf.Name);
 
@@ -519,7 +519,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.Configuration = conf;
 
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 using (fileGenerator.Declare("options", options[conf]))
                 using (fileGenerator.Declare("clrSupport", (conf.IsFastBuild || !clrSupport) ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
@@ -544,7 +544,7 @@ namespace Sharpmake.Generators.VisualStudio
             // configuration .props files
             foreach (Project.Configuration conf in context.ProjectConfigurations)
             {
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 {
                     foreach (string propsFile in conf.CustomPropsFiles)
@@ -572,7 +572,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Configuration = conf;
 
                 using (fileGenerator.Declare("project", context.Project))
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 using (fileGenerator.Declare("options", options[conf]))
                 using (fileGenerator.Declare("target", conf.Target))
@@ -667,7 +667,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (!conf.IsFastBuild)
                 {
-                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("project", conf.Project))
                     using (fileGenerator.Declare("target", conf.Target))
@@ -736,7 +736,7 @@ namespace Sharpmake.Generators.VisualStudio
             // configuration .targets files
             foreach (Project.Configuration conf in context.ProjectConfigurations)
             {
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 {
                     foreach (string targetsFile in conf.CustomTargetsFiles)
@@ -1464,7 +1464,7 @@ namespace Sharpmake.Generators.VisualStudio
                                 continue;
 
                             using (fileGenerator.Declare("conf", conf))
-                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                             using (fileGenerator.Declare("description", conf.CustomBuildForAllIncludes.Description))
                             using (fileGenerator.Declare("command", conf.CustomBuildForAllIncludes.CommandLines.JoinStrings(Environment.NewLine, escapeXml: true)))
                             using (fileGenerator.Declare("inputs", FileGeneratorUtilities.RemoveLineTag))
@@ -1509,7 +1509,7 @@ namespace Sharpmake.Generators.VisualStudio
                             if (configurationCustomFileBuildSteps[conf].TryGetValue(file.FileNameProjectRelative, out buildStep))
                             {
                                 using (fileGenerator.Declare("conf", conf))
-                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                                 using (fileGenerator.Declare("description", buildStep.Description))
                                 using (fileGenerator.Declare("command", buildStep.Commands))
                                 using (fileGenerator.Declare("inputs", buildStep.AdditionalInputs))
@@ -1597,7 +1597,7 @@ namespace Sharpmake.Generators.VisualStudio
                                 continue;
 
                             using (fileGenerator.Declare("conf", conf))
-                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                            using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                             using (fileGenerator.Declare("description", conf.CustomBuildForAllSources.Description))
                             using (fileGenerator.Declare("command", conf.CustomBuildForAllSources.CommandLines.JoinStrings(Environment.NewLine, escapeXml: true)))
                             using (fileGenerator.Declare("inputs", FileGeneratorUtilities.RemoveLineTag))
@@ -1700,7 +1700,7 @@ namespace Sharpmake.Generators.VisualStudio
                             if (haveFileOptions)
                             {
                                 using (fileGenerator.Declare("conf", conf))
-                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                                 {
                                     if (closeFileSource)
                                     {
@@ -1834,7 +1834,7 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Project.Configuration conf = context.ProjectConfigurations[i];
                                 using (fileGenerator.Declare("conf", conf))
-                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                                 {
                                     List<ProjectFile> compiledFiles = configurationCompiledFiles[i];
                                     bool isExcludeFromBuild = conf.ResolvedSourceFilesBuildExclude.Contains(file.FileName);
@@ -1905,7 +1905,7 @@ namespace Sharpmake.Generators.VisualStudio
                         Project.Configuration.FileCustomBuild copyDependencies = pair.Value;
 
                         using (fileGenerator.Declare("conf", conf))
-                        using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                        using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                         using (fileGenerator.Declare("description", copyDependencies.Description))
                         using (fileGenerator.Declare("command", copyDependencies.CommandLines.JoinStrings(Environment.NewLine, escapeXml: true)))
                         using (fileGenerator.Declare("inputs", copyDependencies.Inputs.JoinStrings(";")))

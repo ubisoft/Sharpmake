@@ -84,7 +84,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 Project.Configuration otherConf;
 
-                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project);
+                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
                 if (configurationNameMapping.TryGetValue(projectUniqueName, out otherConf))
                 {
                     var differBy = Util.MakeDifferenceString(conf, otherConf);
@@ -128,7 +128,7 @@ namespace Sharpmake.Generators.VisualStudio
             // xml header contain description of each target
             foreach (Project.Configuration conf in _ProjectConfigurationList)
             {
-                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 {
                     Write(Template.Project.ProjectConfigurationDescription, writer, resolver);
@@ -158,7 +158,7 @@ namespace Sharpmake.Generators.VisualStudio
             // configuration general
             foreach (Project.Configuration conf in _ProjectConfigurationList)
             {
-                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 using (resolver.NewScopedParameter("options", options[conf]))
                 {
@@ -175,7 +175,7 @@ namespace Sharpmake.Generators.VisualStudio
             // configuration ItemDefinitionGroup
             foreach (Project.Configuration conf in _ProjectConfigurationList)
             {
-                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project)))
+                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 using (resolver.NewScopedParameter("options", options[conf]))
                 using (resolver.NewScopedParameter("androidPackageDirectory", androidPackageDirectory))
@@ -386,7 +386,11 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Android.General.AndroidAPILevel.Android21, () => { options["AndroidAPILevel"] = "android-21"; }),
             Options.Option(Options.Android.General.AndroidAPILevel.Android22, () => { options["AndroidAPILevel"] = "android-22"; }),
             Options.Option(Options.Android.General.AndroidAPILevel.Android23, () => { options["AndroidAPILevel"] = "android-23"; }),
-            Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; })
+            Options.Option(Options.Android.General.AndroidAPILevel.Android24, () => { options["AndroidAPILevel"] = "android-24"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android25, () => { options["AndroidAPILevel"] = "android-25"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android26, () => { options["AndroidAPILevel"] = "android-26"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android27, () => { options["AndroidAPILevel"] = "android-27"; }),
+            Options.Option(Options.Android.General.AndroidAPILevel.Android28, () => { options["AndroidAPILevel"] = "android-28"; })
             );
 
             //OutputDirectory

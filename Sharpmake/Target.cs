@@ -239,7 +239,7 @@ namespace Sharpmake
                             {
                                 var platform = (Platform)value;
                                 if (platform >= Platform._reserved9)
-                                    return Util.GetSimplePlatformString(platform).ToLower();
+                                    return Util.GetPlatformString(platform, null, this).ToLower();
                             }
                             return value.ToString();
                         }

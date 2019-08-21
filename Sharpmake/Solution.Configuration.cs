@@ -93,7 +93,7 @@ namespace Sharpmake
             {
                 get
                 {
-                    return string.IsNullOrEmpty(_platformName) ? Util.GetSimplePlatformString(Platform) : _platformName;
+                    return string.IsNullOrEmpty(_platformName) ? Util.GetPlatformString(Platform, null, Target) : _platformName;
                 }
                 set
                 {
