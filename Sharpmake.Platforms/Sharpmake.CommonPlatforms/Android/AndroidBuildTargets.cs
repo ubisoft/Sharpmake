@@ -24,7 +24,7 @@ namespace Sharpmake
             armeabi_v7a = 1 << 0,
             arm64_v8a = 1 << 1,
             x86 = 1 << 2,
-            x86_64= 1 << 3,
+            x86_64 = 1 << 3,
         }
     }
 }

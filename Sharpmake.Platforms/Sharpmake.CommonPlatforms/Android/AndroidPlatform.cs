@@ -33,7 +33,7 @@ namespace Sharpmake
                     return SimplePlatformString;
 
                 var buildTarget = target.GetFragment<AndroidBuildTargets>();
-                switch ( buildTarget )
+                switch (buildTarget)
                 {
                     case AndroidBuildTargets.armeabi_v7a:
                         return "ARM";

@@ -2116,7 +2116,7 @@ namespace Sharpmake
         [Obsolete("GetPlatformString() now requires a `target` parameter.")]
         public static string GetPlatformString(Platform platform, Project project, bool isForSolution = false)
         {
-            return GetPlatformString( platform, project, isForSolution );
+            return GetPlatformString(platform, project, null, isForSolution);
         }
 
         public static string CallerInfoTag = "CALLER_INFO: ";
