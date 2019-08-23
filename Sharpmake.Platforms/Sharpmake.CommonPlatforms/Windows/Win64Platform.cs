@@ -170,7 +170,14 @@ namespace Sharpmake
                         compilerExeName = "cl.exe";
                     }
 
+                    var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.win64);
                     Strings extraFiles = new Strings();
+                    {
+                        Strings userExtraFiles;
+                        if (fastBuildSettings.ExtraFiles.TryGetValue(devEnv, out userExtraFiles))
+                            extraFiles.AddRange(userExtraFiles);
+                    }
+
                     if (compilerDevEnv.HasValue)
                     {
                         extraFiles.Add(

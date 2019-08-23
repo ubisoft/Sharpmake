@@ -169,9 +169,12 @@ namespace Sharpmake
                 else
                 {
                     var fastBuildCompilerSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.durango);
-                    Strings extraFiles;
-                    if (!fastBuildCompilerSettings.ExtraFiles.TryGetValue(devEnv, out extraFiles))
-                        extraFiles = new Strings();
+                    Strings extraFiles = new Strings();
+                    {
+                        Strings userExtraFiles;
+                        if (fastBuildCompilerSettings.ExtraFiles.TryGetValue(devEnv, out userExtraFiles))
+                            extraFiles.AddRange(userExtraFiles);
+                    }
                     string executable;
 
                     switch (devEnv)

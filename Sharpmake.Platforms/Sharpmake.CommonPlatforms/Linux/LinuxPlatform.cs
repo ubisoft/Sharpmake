@@ -420,9 +420,12 @@ namespace Sharpmake
 
                     string pathToCompiler = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
 
-                    Strings extraFiles;
-                    if (!fastBuildSettings.ExtraFiles.TryGetValue(devEnv, out extraFiles))
-                        extraFiles = new Strings();
+                    Strings extraFiles = new Strings();
+                    {
+                        Strings userExtraFiles;
+                        if (fastBuildSettings.ExtraFiles.TryGetValue(devEnv, out userExtraFiles))
+                            extraFiles.AddRange(userExtraFiles);
+                    }
 
                     string executable = useCCompiler ? @"$ExecutableRootPath$\clang.exe" : @"$ExecutableRootPath$\clang++.exe";
 
