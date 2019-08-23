@@ -252,6 +252,14 @@ namespace Sharpmake
                                         );
                                     }
 
+                                    if (devEnv == DevEnv.vs2019)
+                                    {
+                                        Version toolsVersion = devEnv.GetVisualStudioVCToolsVersion();
+
+                                        if (toolsVersion >= new Version("14.22.27905"))
+                                            extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
+                                    }
+
                                     try
                                     {
                                         foreach (string p in Util.DirectoryGetFiles(systemDllPath, "api-ms-win-*.dll"))

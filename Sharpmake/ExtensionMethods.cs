@@ -275,24 +275,42 @@ namespace Sharpmake
 
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
-                        string compilerVersion = visualVersion.GetDefaultCompilerVersion(); // default fallback
+                        return Path.Combine(vsDir, @"VC\Tools\MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
+                }
+                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+            });
+
+            return visualStudioVCRootPath;
+        }
+
+        private static readonly ConcurrentDictionary<DevEnv, Version> s_visualStudioVCToolsVersionCache = new ConcurrentDictionary<DevEnv, Version>();
+        public static Version GetVisualStudioVCToolsVersion(this DevEnv visualVersion)
+        {
+            Version version = s_visualStudioVCToolsVersionCache.GetOrAdd(visualVersion, devEnv =>
+            {
+                string vsDir = visualVersion.GetVisualStudioDir();
+                switch (visualVersion)
+                {
+                    case DevEnv.vs2017:
+                    case DevEnv.vs2019:
+                        string versionString = visualVersion.GetDefaultCompilerVersion(); // default fallback
                         try
                         {
                             string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
                             if (File.Exists(toolchainFile))
                             {
                                 using (StreamReader file = new StreamReader(toolchainFile))
-                                    compilerVersion = file.ReadLine().Trim();
+                                    versionString = file.ReadLine().Trim();
                             }
                         }
                         catch { }
 
-                        return Path.Combine(vsDir, @"VC\Tools\MSVC", compilerVersion);
+                        return new Version(versionString);
                 }
                 throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
             });
 
-            return visualStudioVCRootPath;
+            return version;
         }
 
         public static string GetVisualStudioBinPath(this DevEnv visualVersion, Platform platform)
