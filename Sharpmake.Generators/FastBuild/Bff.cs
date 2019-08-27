@@ -82,8 +82,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public const string CurrentBffPathVariable = ".CurrentBffPath";
-        public const string CurrentBffPathKey = "$CurrentBffPath$";
+        public const string CurrentBffPathKey = "$_CURRENT_BFF_DIR_$";
 
         public static IUnityResolver UnityResolver = new HashUnityResolver();
 
@@ -1222,13 +1221,8 @@ namespace Sharpmake.Generators.FastBuild
                                                     string destinationPath = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, copyCommand.DestinationPath);
 
                                                     using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
-                                                    using (bffGenerator.Declare("fastBuildCopyDest", destinationPath))
-                                                    using (bffGenerator.Declare("fastBuildCopyDirName", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(sourcePath)))
-                                                    using (bffGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(destinationPath)))
-                                                    using (bffGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                                                    using (bffGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                                                    using (bffGenerator.Declare("fastBuildCopySource", Bff.CurrentBffPathKeyCombine(sourcePath)))
+                                                    using (bffGenerator.Declare("fastBuildCopyDest", Bff.CurrentBffPathKeyCombine(destinationPath)))
                                                     {
                                                         bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
                                                     }

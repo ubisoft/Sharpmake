@@ -339,8 +339,8 @@ namespace Sharpmake.Generators.FastBuild
                                 string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(sourceFileName, destinationRelativeToGlobal);
                                 {
                                     using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
-                                    using (fileGenerator.Declare("fastBuildCopySource", sourceFile))
-                                    using (fileGenerator.Declare("fastBuildCopyDest", destinationFile))
+                                    using (fileGenerator.Declare("fastBuildCopySource", Bff.CurrentBffPathKeyCombine(sourceFile)))
+                                    using (fileGenerator.Declare("fastBuildCopyDest", Bff.CurrentBffPathKeyCombine(destinationFile)))
                                     {
                                         if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
                                             bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
@@ -394,17 +394,9 @@ namespace Sharpmake.Generators.FastBuild
                 string projectFullPath = Path.GetDirectoryName(projectBffFullPath);
                 var projectPathRelativeFromMasterBff = Util.PathGetRelative(masterBffDirectory, projectFullPath, true);
 
-                string bffKeyRelative = Path.Combine(Bff.CurrentBffPathKey, Path.GetFileName(projectBffFullPath));
+                string bffKeyRelative = Path.Combine(projectPathRelativeFromMasterBff, Path.GetFileName(projectBffFullPath));
 
-                string include = string.Join(
-                    Environment.NewLine,
-                    "{",
-                    $"    {Bff.CurrentBffPathVariable} = \"{projectPathRelativeFromMasterBff}\"",
-                    $"    #include \"{bffKeyRelative}\"",
-                    "}"
-                );
-
-                result.AppendLine(include);
+                result.AppendLine($"#include \"{bffKeyRelative}\"");
             }
 
             string fastBuildMasterBffDependencies = result.Length == 0 ? FileGeneratorUtilities.RemoveLineTag : result.ToString();
@@ -487,22 +479,23 @@ namespace Sharpmake.Generators.FastBuild
 
                     string sourcePath = Util.PathGetRelative(relativeTo, copyCommand.SourcePath);
                     string destinationPath = Util.PathGetRelative(relativeTo, copyCommand.DestinationPath);
-
-                    using (fileGenerator.Declare("fastBuildCopyAlias", buildEvent.Key))
-                    using (fileGenerator.Declare("fastBuildCopySource", sourcePath))
-                    using (fileGenerator.Declare("fastBuildCopyDest", destinationPath))
-                    using (fileGenerator.Declare("fastBuildCopyDirName", buildEvent.Key))
-                    using (fileGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(sourcePath)))
-                    using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(destinationPath)))
-                    using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
-                    using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
+                    string eventKey = fileGenerator.Resolver.Resolve(buildEvent.Key);
+                    if (!bffSection.ContainsKey(eventKey))
                     {
-                        string eventKey = fileGenerator.Resolver.Resolve(buildEvent.Key);
-                        if (!bffSection.ContainsKey(eventKey))
+                        if (copyCommand.IsFileCopy)
                         {
-                            if (copyCommand.IsFileCopy)
+                            using (fileGenerator.Declare("fastBuildCopyAlias", buildEvent.Key))
+                            using (fileGenerator.Declare("fastBuildCopySource", Bff.CurrentBffPathKeyCombine(sourcePath)))
+                            using (fileGenerator.Declare("fastBuildCopyDest", Bff.CurrentBffPathKeyCombine(destinationPath)))
                                 bffSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
-                            else
+                        }
+                        else
+                        {
+                            using (fileGenerator.Declare("fastBuildCopyDirName", buildEvent.Key))
+                            using (fileGenerator.Declare("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(Bff.CurrentBffPathKeyCombine(sourcePath))))
+                            using (fileGenerator.Declare("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(Bff.CurrentBffPathKeyCombine(destinationPath))))
+                            using (fileGenerator.Declare("fastBuildCopyDirRecurse", copyCommand.IsRecurse.ToString().ToLower()))
+                            using (fileGenerator.Declare("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(copyCommand.CopyPattern)))
                                 bffSection.Add(eventKey, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection));
                         }
                     }
