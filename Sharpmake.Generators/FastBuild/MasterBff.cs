@@ -39,7 +39,7 @@ namespace Sharpmake.Generators.FastBuild
             // Dependency dictionary based on the include string (many projects might be in one .bff or a single project might generate many
             public Dictionary<string, Strings> BffIncludeToDependencyIncludes = new Dictionary<string, Strings>();
             public readonly Dictionary<string, CompilerSettings> CompilerSettings = new Dictionary<string, CompilerSettings>();
-            public readonly List<string> AllConfigsSections = new List<string>(); // All Configs section when running with a source file filter
+            public readonly Strings AllConfigsSections = new Strings(); // All Configs section when running with a source file filter
         }
 
         private class ConfigurationsPerBff : IEnumerable<Solution.Configuration>
@@ -435,7 +435,7 @@ namespace Sharpmake.Generators.FastBuild
 
             if (masterBffInfo.AllConfigsSections.Count != 0)
             {
-                using (fileGenerator.Declare("fastBuildConfigs", UtilityMethods.FBuildFormatList(masterBffInfo.AllConfigsSections, 4)))
+                using (fileGenerator.Declare("fastBuildConfigs", UtilityMethods.FBuildFormatList(masterBffInfo.AllConfigsSections.SortedValues, 4)))
                 {
                     fileGenerator.Write(Bff.Template.ConfigurationFile.AllConfigsSection);
                 }
