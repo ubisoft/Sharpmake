@@ -41,7 +41,7 @@ namespace Sharpmake
         public string SharpmakeCsPath { get; private set; }                 // Path of the CsFileName, ex: "c:\dev\MyProject"
 
         // FastBuild specific
-        public string FastBuildAllProjectName = "All";
+        public string FastBuildAllProjectName = "[solution.Name]_All";
         public string FastBuildAllProjectFileSuffix = "_All"; // the fastbuild all project will be named after the solution, but the suffix can be custom. Warning: this cannot be empty!
 
         public string FastBuildAllSolutionFolder = "FastBuild"; // set to null to add to the root
