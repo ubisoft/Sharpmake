@@ -67,7 +67,6 @@ namespace Sharpmake.Generators.FastBuild
 
             public void Merge(ConfigurationsPerBff other)
             {
-                Debug.Assert(other.Solution == Solution);
                 Debug.Assert(other.BffFilePath == BffFilePath);
 
                 ProjectsWereFiltered = ProjectsWereFiltered && other.ProjectsWereFiltered;
