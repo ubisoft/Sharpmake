@@ -131,14 +131,11 @@ namespace Sharpmake.Generators.FastBuild
                 foreach (var unitySection in unities)
                 {
                     var unity = unitySection.Key;
-                    var configurations = unitySection.Value;
-                    var fragmentValuesComparisonBase = configurations[0].Target.GetFragmentsValue();
+                    var unityConfigurations = unitySection.Value;
 
-                    var merged = GetFragmentsAcrossFastBuildConfigurations(project);
+                    int[] unityFragments = GetMergedFragmentValuesAcrossConfigurations(unityConfigurations);
 
-                    var differentFragmentIndices = GetDifferentFragmentIndices(merged, fragmentValuesComparisonBase);
-
-                    int hashcode = unity.GetHashCode() ^ projectPath.GetHashCode() ^ differentFragmentIndices.GetHashCode();
+                    int hashcode = unity.GetHashCode() ^ projectPath.GetHashCode() ^ unityFragments.GetHashCode();
 
                     unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
@@ -156,9 +153,7 @@ namespace Sharpmake.Generators.FastBuild
 
                 List<FieldInfo> fragmentsInfos = null;
 
-                var merged = GetFragmentsAcrossFastBuildConfigurations(project);
-
-                // then we merge the fragment values of all configurations sharing a unity
+                // merge the fragment values of all configurations sharing a unity
                 foreach (var unitySection in unities)
                 {
                     var configurations = unitySection.Value;
@@ -173,15 +168,16 @@ namespace Sharpmake.Generators.FastBuild
                     masks.Add(Tuple.Create(unitySection.Key, unityMerged));
                 }
 
+                // get the fragment values for the whole project: could span multiple bff files
+                IEnumerable<Project.Configuration> fastBuildConfigurations = project.Configurations.Where(c => c.IsFastBuild);
+                int[] merged = GetMergedFragmentValuesAcrossConfigurations(fastBuildConfigurations);
 
                 // finally, create a unity name that only contains the varying fragments
                 foreach (var unitySection in masks)
                 {
                     var unity = unitySection.Item1;
                     var unityFragments = unitySection.Item2;
-                    var fragmentValuesComparisonBase = unityFragments;
-
-                    var differentFragmentIndices = GetDifferentFragmentIndices(merged, fragmentValuesComparisonBase);
+                    var differentFragmentIndices = GetDifferentFragmentIndices(merged, unityFragments);
 
                     string fragmentString = string.Empty;
                     for (int i = 0; i < unityFragments.Length; ++i)
@@ -242,23 +238,19 @@ namespace Sharpmake.Generators.FastBuild
             return merged;
         }
 
-        private static int[] GetFragmentsAcrossFastBuildConfigurations(Project project)
+        private static int[] GetMergedFragmentValuesAcrossConfigurations(IEnumerable<Project.Configuration> configurations)
         {
-            // we only need the projects across files which are using FastBuild
-            var projectConfigurations = project.Configurations.Where(c => c.IsFastBuild);
-
-            // figure out which fragments are different across all configurations
-            var fragments = projectConfigurations.Select(x => x.Target.GetFragmentsValue()).ToList();
+            var fragments = configurations.Select(x => x.Target.GetFragmentsValue()).ToList();
             var merged = GetMergedFragments(fragments);
 
             return merged;
         }
 
-        private static UniqueList<int> GetDifferentFragmentIndices(int[] merged, int[] fragmentValuesComparisonBase)
+        private static List<int> GetDifferentFragmentIndices(int[] merged, int[] fragmentValuesComparisonBase)
         {
-            var differentFragmentIndices = new UniqueList<int>();
+            var differentFragmentIndices = new List<int>();
 
-            // we want to store in a list what makes the configuration different than all the others available
+            // we want to store in that list the indices of fragments that are different from the base
             for (int j = 0; j < merged.Length; ++j)
             {
                 if (fragmentValuesComparisonBase[j] != merged[j])
