@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1597,9 +1597,13 @@ namespace Sharpmake
                     Directory.Delete(source);
                 }
 
-                success = CreateSymbolicLink(source, target,
-                    (isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : SYMBOLIC_LINK_FLAG_FILE)
-                    | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);
+                int releaseId = int.Parse(GetRegistryLocalMachineSubKeyValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "0"));
+
+                int flags = isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : SYMBOLIC_LINK_FLAG_FILE;
+                if ( releaseId >= 1703) // Verify that the Windows build is equal or above 1703, as SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE was introduced at that version. Using it on older version will cause an error 87 and symlinks won't be created
+                    flags |= SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
+
+                success = CreateSymbolicLink(source, target, flags);
             }
             catch { }
             return success;
