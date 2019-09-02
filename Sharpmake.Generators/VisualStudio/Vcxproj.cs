@@ -983,31 +983,9 @@ namespace Sharpmake.Generators.VisualStudio
                         }
                     }
                 }
-
-                // The check for the blobbed is so we add references to blobbed projects over non blobbed projects.
-                var projectReferencesByPathConfig =
-                    context.ProjectConfigurations.Where(x => x.IsBlobbed).FirstOrDefault(x => x.ProjectReferencesByPath.Count > 0) ??
-                    context.ProjectConfigurations.FirstOrDefault(x => x.ProjectReferencesByPath.Count > 0);
-
-                if (projectReferencesByPathConfig != null)
-                {
-                    foreach (var projectFileName in projectReferencesByPathConfig.ProjectReferencesByPath)
-                    {
-                        string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectFileName);
-                        string relativeToProjectFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, projectFullFileNameWithExtension);
-                        string projectGuid = Sln.ReadGuidFromProjectFile(projectFileName);
-
-                        using (projectFilesWriter.Declare("include", relativeToProjectFile))
-                        using (projectFilesWriter.Declare("projectGUID", projectGuid))
-                        using (projectFilesWriter.Declare("projectRefName", FileGeneratorUtilities.RemoveLineTag))
-                        using (projectFilesWriter.Declare("private", FileGeneratorUtilities.RemoveLineTag))
-                        using (projectFilesWriter.Declare("options", options))
-                        {
-                            projectFilesWriter.Write(Template.Project.ProjectReference);
-                        }
-                    }
-                }
             }
+
+            WriteProjectReferencesByPath(context, projectFilesWriter);
 
             if (context.Builder.Diagnostics
                 && context.Project.AllowInconsistentDependencies == false
@@ -1093,6 +1071,43 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platforms in context.PresentPlatforms.Values)
                 platforms.GeneratePlatformReferences(context, fileGenerator);
         }
+
+        private static void WriteProjectReferencesByPath(IVcxprojGenerationContext context, FileGenerator projectFilesWriter)
+        {
+            // The check for the blobbed is so we add references to blobbed projects over non blobbed projects.
+            var projectReferencesByPathConfig =
+                context.ProjectConfigurations.Where(x => x.IsBlobbed).FirstOrDefault(x => x.ProjectReferencesByPath.Count > 0) ??
+                context.ProjectConfigurations.FirstOrDefault(x => x.ProjectReferencesByPath.Count > 0);
+
+            if (projectReferencesByPathConfig != null)
+            {
+                foreach (var projectReferenceInfo in projectReferencesByPathConfig.ProjectReferencesByPath.ProjectsInfos)
+                {
+                    string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectReferenceInfo.projectFilePath);
+                    string relativeToProjectFile = Util.PathGetRelative(context.ProjectDirectoryCapitalized, projectFullFileNameWithExtension);
+
+                    Options.ExplicitOptions options = new Options.ExplicitOptions();
+                    options["ReferenceOutputAssembly"] = projectReferenceInfo.refOptions.HasFlag(Project.Configuration.ProjectReferencesByPathContainer.RefOptions.ReferenceOutputAssembly) ? "true" : "false";
+                    options["CopyLocalSatelliteAssemblies"] = projectReferenceInfo.refOptions.HasFlag(Project.Configuration.ProjectReferencesByPathContainer.RefOptions.CopyLocalSatelliteAssemblies) ? "true" : "false";
+                    options["LinkLibraryDependencies"] = projectReferenceInfo.refOptions.HasFlag(Project.Configuration.ProjectReferencesByPathContainer.RefOptions.LinkLibraryDependencies) ? "true" : "false";
+                    options["UseLibraryDependencyInputs"] = projectReferenceInfo.refOptions.HasFlag(Project.Configuration.ProjectReferencesByPathContainer.RefOptions.UseLibraryDependencyInputs) ? "true" : "false";
+
+                    var projectGuid = projectReferenceInfo.projectGuid;
+                    if (projectGuid == Guid.Empty)
+                        projectGuid = new Guid(Sln.ReadGuidFromProjectFile(projectReferenceInfo.projectFilePath));
+
+                    using (projectFilesWriter.Declare("include", relativeToProjectFile))
+                    using (projectFilesWriter.Declare("projectGUID", projectGuid.ToString("D").ToUpperInvariant()))
+                    using (projectFilesWriter.Declare("projectRefName", FileGeneratorUtilities.RemoveLineTag))
+                    using (projectFilesWriter.Declare("private", FileGeneratorUtilities.RemoveLineTag))
+                    using (projectFilesWriter.Declare("options", options))
+                    {
+                        projectFilesWriter.Write(Template.Project.ProjectReference);
+                    }
+                }
+            }
+        }
+
 
         private static bool ConfigurationNeedReferences(Project.Configuration conf)
         {

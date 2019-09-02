@@ -1411,21 +1411,24 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
-                foreach (var projectFileName in conf.ProjectReferencesByPath)
+                foreach (var projectReferenceInfo in conf.ProjectReferencesByPath.ProjectsInfos)
                 {
-                    string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectFileName);
+                    string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectReferenceInfo.projectFilePath);
                     string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized,
                                                                         projectFullFileNameWithExtension);
-                    string projectGuid = Sln.ReadGuidFromProjectFile(projectFileName);
+                    var projectGuid = projectReferenceInfo.projectGuid;
+                    if (projectGuid == Guid.Empty)
+                        projectGuid = new Guid(Sln.ReadGuidFromProjectFile(projectReferenceInfo.projectFilePath));
+
                     itemGroups.ProjectReferences.Add(new ItemGroups.ProjectReference
                     {
                         Include = relativeToProjectFile,
-                        Name = Path.GetFileNameWithoutExtension(projectFileName),
+                        Name = Path.GetFileNameWithoutExtension(projectReferenceInfo.projectFilePath),
                         Private =
                             project.DependenciesCopyLocal.HasFlag(
                                 Project.DependenciesCopyLocalTypes
                                              .ProjectReferences),
-                        Project = new Guid(projectGuid),
+                        Project = projectGuid,
                     });
                 }
             }

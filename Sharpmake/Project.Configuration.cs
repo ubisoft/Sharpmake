@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -2440,6 +2441,8 @@ namespace Sharpmake
                 if (PrecompSource != null)
                     PrecompSource = Util.SimplifyPath(PrecompSource);
 
+                ProjectReferencesByPath.Resolve(Project.SourceRootPath, resolver);
+
                 resolver.RemoveParameter("conf");
                 resolver.RemoveParameter("target");
 
@@ -2646,7 +2649,99 @@ namespace Sharpmake
 
             public DotNetReferenceCollection DotNetReferences = new DotNetReferenceCollection();
 
-            public Strings ProjectReferencesByPath = new Strings();
+            // For source compatibility, ProjectReferencesByPath is still an IEnumerable<string>
+            public class ProjectReferencesByPathContainer : IEnumerable<string>
+            {
+                public class Info
+                {
+                    public string projectFilePath { get; internal set; }
+                    public Guid projectGuid { get; internal set; }
+                    public RefOptions refOptions { get; internal set; }
+                    public Guid projectTypeGuid { get; internal set; }
+                };
+
+                [Flags]
+                public enum RefOptions
+                {
+                    ReferenceOutputAssembly = 1 << 0,
+                    CopyLocalSatelliteAssemblies = 1 << 1,
+                    LinkLibraryDependencies = 1 << 2,
+                    UseLibraryDependencyInputs = 1 << 3,
+                    // VC default option
+                    Default = ReferenceOutputAssembly | LinkLibraryDependencies,
+                };
+
+                /// <summary>
+                /// Adds a new ProjectReferencesByPath path, with optionally the guid.
+                /// Adding the guid allows to set the reference without opening the project.
+                /// </summary>
+                /// <param name="projectFilePath">The project file path</param>
+                /// <param name="projectGuid">An optional project guid</param>
+                /// <param name="refOptions">Reference options</param>
+                /// <param name="projectTypeGuid">An optional project type guid, one member of ProjectTypeGuids. Deduced from file extension if not provided.</param>
+                public void Add(string projectFilePath, Guid projectGuid = new Guid(), RefOptions refOptions = RefOptions.Default, Guid projectTypeGuid = new Guid())
+                {
+                    _projectsInfos.Add(new Info()
+                    {
+                        projectFilePath = projectFilePath,
+                        projectGuid = projectGuid,
+                        refOptions = refOptions,
+                        projectTypeGuid = projectTypeGuid
+                    });
+                }
+
+                public void AddRange(IEnumerable<string> projectFilePaths)
+                {
+                    foreach (var projectFilePath in projectFilePaths)
+                    {
+                        Add(projectFilePath);
+                    }
+                }
+
+                public int Count => ProjectsInfos.Count();
+
+                public IEnumerator<string> GetEnumerator()
+                {
+                    return ProjectsInfos.Select(pi => pi.projectFilePath).GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                public void Clear()
+                {
+                    _projectsInfos.Clear();
+                }
+
+
+                internal void Resolve(string sourceRootPath, Resolver resolver)
+                {
+                    if (IsResolved)
+                        return;
+
+                    if (_projectsInfos.Any())
+                    {
+                        for (int i = 0; i < _projectsInfos.Count; i++)
+                        {
+                            Info projectInfo = _projectsInfos[i];
+                            string path = resolver.Resolve(projectInfo.projectFilePath);
+                            Util.ResolvePath(sourceRootPath, ref path);
+                            projectInfo.projectFilePath = path;
+                        }
+                    }
+
+                    IsResolved = true;
+                }
+
+                public bool IsResolved { get; private set; } = false;
+                public IEnumerable<Info> ProjectsInfos => _projectsInfos;
+                private List<Info> _projectsInfos = new List<Info>();
+
+            }
+
+            public ProjectReferencesByPathContainer ProjectReferencesByPath = new ProjectReferencesByPathContainer();
             public Strings ReferencesByName = new Strings();
             public Strings ReferencesByNameExternal = new Strings();
             public Strings ReferencesByPath = new Strings();

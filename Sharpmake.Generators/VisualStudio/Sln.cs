@@ -161,6 +161,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static readonly ConcurrentDictionary<string, string> s_projectTypeGUIDS = new ConcurrentDictionary<string, string>();
 
+        // ReadTypeGuidFromProjectFile is currently just looking at the file extension to associate a type.
         public static string ReadTypeGuidFromProjectFile(string projectFile)
         {
             string filenameLC = Path.GetFullPath(projectFile).ToLower();
@@ -851,15 +852,16 @@ namespace Sharpmake.Generators.VisualStudio
 
         private IEnumerable<Solution.ResolvedProject> GetResolvedProjectsFromPaths(IEnumerable<string> paths)
         {
-            return paths.Select(p =>
+            return paths.Select(p => GetResolvedProjectFromPath(p));
+        }
+
+        private Solution.ResolvedProject GetResolvedProjectFromPath(string path)
+        {
+            return new Solution.ResolvedProject
             {
-                var resolvedProject = new Solution.ResolvedProject
-                {
-                    ProjectFile = p,
-                    ProjectName = Path.GetFileNameWithoutExtension(p)
-                };
-                return resolvedProject;
-            });
+                ProjectFile = path,
+                ProjectName = Path.GetFileNameWithoutExtension(path)
+            };
         }
 
         private List<Solution.ResolvedProject> ResolveReferencesByPath(List<Solution.ResolvedProject> solutionProjects, Strings referencedProjectPaths)
@@ -867,15 +869,35 @@ namespace Sharpmake.Generators.VisualStudio
             // solution's referenced projects
             var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
 
-            // user's projects references
-            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath).Distinct();
-            resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(projectByPath));
-
             foreach (Solution.ResolvedProject resolvedProject in resolvedPathReferences)
             {
                 resolvedProject.UserData["Guid"] = ReadGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["TypeGuid"] = ReadTypeGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
+            }
+
+            // user's projects references
+            var projectRefByPathInfos = solutionProjects
+                                            .SelectMany(p => p.Configurations)
+                                            .SelectMany(c => c.ProjectReferencesByPath.ProjectsInfos)
+                                            .Distinct();
+
+            foreach (var projectRefByPathInfo in projectRefByPathInfos)
+            {
+                var resolvedProject = GetResolvedProjectFromPath(projectRefByPathInfo.projectFilePath);
+
+                var projectGuid = projectRefByPathInfo.projectGuid;
+                if (projectGuid == Guid.Empty)
+                    projectGuid = new Guid(ReadGuidFromProjectFile(projectRefByPathInfo.projectFilePath));
+                resolvedProject.UserData["Guid"] = projectGuid.ToString("D").ToUpperInvariant();
+
+                var projectTypeGuid = projectRefByPathInfo.projectTypeGuid;
+                if (projectTypeGuid == Guid.Empty)
+                    projectTypeGuid = new Guid(ReadTypeGuidFromProjectFile(projectRefByPathInfo.projectFilePath)); // currently, just use the extension
+                resolvedProject.UserData["TypeGuid"] = projectTypeGuid.ToString("D").ToUpperInvariant();
+
+                resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
+                resolvedPathReferences.Add(resolvedProject);
             }
 
             return resolvedPathReferences;
