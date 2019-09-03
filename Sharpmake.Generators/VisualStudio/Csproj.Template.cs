@@ -96,6 +96,7 @@ namespace Sharpmake.Generators.VisualStudio
     <VsixType>[options.VsixType]</VsixType>
     <ConcordSDKDir>[options.ConcordSDKDir]</ConcordSDKDir>
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
+    <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
   </PropertyGroup>
 ";
 

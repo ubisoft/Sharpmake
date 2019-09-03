@@ -3088,6 +3088,12 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.AutoGenerateBindingRedirects.Disabled, () => { options["AutoGenerateBindingRedirects"] = RemoveLineTag; })
             );
 
+            SelectOption
+            (
+            Options.Option(Options.CSharp.SonarQubeExclude.Disabled, () => { options["SonarQubeExclude"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.SonarQubeExclude.Enabled, () => { options["SonarQubeExclude"] = "True"; })
+            );
+
             options["AssemblyOriginatorKeyFile"] = Options.PathOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf, RemoveLineTag, _projectPath);
             options["MinimumVisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.MinimumVisualStudioVersion>(conf);
             options["OldToolsVersion"] = Options.StringOption.Get<Options.CSharp.OldToolsVersion>(conf);

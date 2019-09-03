@@ -491,6 +491,16 @@ namespace Sharpmake
                 [Default]
                 Disabled
             }
+
+            /// <summary>
+            /// Exclude from SonarQube C# static analysis
+            /// </summary>
+            public enum SonarQubeExclude
+            {
+                [Default]
+                Disabled,
+                Enabled
+            }
         }
     }
 }
