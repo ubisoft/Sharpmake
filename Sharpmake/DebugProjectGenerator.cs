@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
@@ -255,6 +256,7 @@ namespace Sharpmake
             string quote = "\'"; // Use single quote that is cross platform safe
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join($"{quote},@{quote}", MainSources)}{quote}) {startArguments}";
             conf.CsprojUserFile.StartProgram = DebugProjectExtension.GetSharpmakeExecutableFullPath();
+            conf.CsprojUserFile.WorkingDirectory = Directory.GetCurrentDirectory();
         }
     }
 
