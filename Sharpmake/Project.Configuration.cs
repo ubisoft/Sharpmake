@@ -567,6 +567,35 @@ namespace Sharpmake
             public string SolutionFolder = "";
 
             /// <summary>
+            /// Set the solution folder associated with a solution name
+            /// </summary>
+            /// <remarks>
+            /// Ignored unless generating for Visual Studio
+            /// This property allows to get the same project being in different folder dependeng on the solution name. Ex. In Engine.sln the project Physic is at root, while in Tools.sln it is in a Engine/ directory
+            /// Use the property SolutionFolder if not found inside the dictionary.
+            /// <para>
+            /// To place the project in a sub-directory, use a `/` as a directory separator.
+            /// </para>
+            /// </remarks>
+            public void AddSolutionFolder(string solutionName, string solutionFolder)
+            {
+                _solutionFolders[solutionName] = solutionFolder;
+            }
+
+            /// <summary>
+            /// Gets the solution folder associated with a solution name.
+            /// </summary>
+            public string GetSolutionFolder(string solutionName)
+            {
+                string specificSolutionFolder = null;
+                if (_solutionFolders.TryGetValue(solutionName, out specificSolutionFolder) == false)
+                    return SolutionFolder;
+                return specificSolutionFolder;
+            }
+
+            private Dictionary<string, string> _solutionFolders = new Dictionary<string, string>();
+
+            /// <summary>
             /// Gets or sets the suffix to use in <see cref="LinkerPdbSuffix"/>.
             /// If unset, the pdb file names will be the target name with a suffix and the .pdb extension.
             /// </summary>

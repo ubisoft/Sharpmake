@@ -210,13 +210,14 @@ namespace Sharpmake
                     // If the solution provides the folder, the configuration should be ignored
                     if (string.IsNullOrEmpty(resolvedProject.SolutionFolderOverride))
                     {
+                        var confSolutionFolder = resolvedProjectConf.GetSolutionFolder(Name);
                         // Folder must all be the same for all config, else will be emptied.
                         if (string.IsNullOrEmpty(resolvedProject.SolutionFolder) &&
-                            !string.IsNullOrEmpty(resolvedProjectConf.SolutionFolder))
+                            !string.IsNullOrEmpty(confSolutionFolder))
                         {
-                            resolvedProject.SolutionFolder = resolvedProjectConf.SolutionFolder;
+                            resolvedProject.SolutionFolder = confSolutionFolder;
                         }
-                        else if (resolvedProject.SolutionFolder != resolvedProjectConf.SolutionFolder)
+                        else if (resolvedProject.SolutionFolder != confSolutionFolder)
                         {
                             resolvedProject.SolutionFolder = "";
                         }
