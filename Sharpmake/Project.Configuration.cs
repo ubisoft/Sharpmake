@@ -472,6 +472,20 @@ namespace Sharpmake
             public bool ExecuteTargetCopy = false;
 
             /// <summary>
+            /// Gets or sets whether the configuration output dll file will be copied in the target path of the projects depending on it.
+            /// </summary>
+            /// <remarks>
+            /// This setting only apply with <see cref="OutputType.Dll"/>
+            /// This setting is usefull for dlls that are dynamically loaded:
+            /// The dll do not need to be put along the executable.
+            /// <para>
+            /// The default is <c>true</c>. Setting this to <c>false</c> will prevent the generators
+            /// to copy the library artifact in the exe directory.
+            /// </para>
+            /// </remarks>
+            public bool AllowOutputDllCopy = true;
+
+            /// <summary>
             /// Gets or sets whether dependent projects will copy their dll debugging database to the
             /// target path of their dependency projects. The default value is <c>true</c>.
             /// </summary>
@@ -2738,7 +2752,6 @@ namespace Sharpmake
                 public bool IsResolved { get; private set; } = false;
                 public IEnumerable<Info> ProjectsInfos => _projectsInfos;
                 private List<Info> _projectsInfos = new List<Info>();
-
             }
 
             public ProjectReferencesByPathContainer ProjectReferencesByPath = new ProjectReferencesByPathContainer();
@@ -3072,6 +3085,7 @@ namespace Sharpmake
 
                                 string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullNameWithExtension);
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
+                                    && dependency.AllowOutputDllCopy
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
                                     && dependency.TargetPath != TargetPath)
                                 {
