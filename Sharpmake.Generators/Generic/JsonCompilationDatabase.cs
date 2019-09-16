@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+using System.Text.RegularExpressions;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.JsonCompilationDatabase
@@ -383,12 +383,16 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
             args.AddRange(_arguments);
 
+            // Remove unescaped double quote from arguments list (but keep them for the full command line).
+            // This is in fact what will do the shell when it will parse the full command line and give the argv/argc to the program.
+            var match_unescaped_double_quote = new Regex(@"(?<!\\)((\\{2})*)""");
+
             return new CompileCommand
             {
                 File = inputFile,
                 Directory = _projectDirectory,
                 Command = command,
-                Arguments = args
+                Arguments = args.Select(arg => match_unescaped_double_quote.Replace(arg, "$1")).ToList()
             };
         }
     }
