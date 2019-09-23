@@ -825,7 +825,6 @@ namespace SharpmakeUnitTests
                 Directory.Delete(tempDirectory1.FullName);
                 Directory.Delete(tempDirectory2.FullName);
             }
-
         }
 
         /// <summary>

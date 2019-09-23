@@ -1600,7 +1600,7 @@ namespace Sharpmake
                 int releaseId = int.Parse(GetRegistryLocalMachineSubKeyValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "0"));
 
                 int flags = isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : SYMBOLIC_LINK_FLAG_FILE;
-                if ( releaseId >= 1703) // Verify that the Windows build is equal or above 1703, as SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE was introduced at that version. Using it on older version will cause an error 87 and symlinks won't be created
+                if (releaseId >= 1703) // Verify that the Windows build is equal or above 1703, as SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE was introduced at that version. Using it on older version will cause an error 87 and symlinks won't be created
                     flags |= SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
 
                 success = CreateSymbolicLink(source, target, flags);

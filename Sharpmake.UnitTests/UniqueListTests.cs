@@ -95,7 +95,7 @@ namespace Sharpmake.UnitTests
                 "DDD"
             };
             uniqueList.Add("EE");
-            
+
             Assert.AreEqual("AA,BBB,CC,DDD,EE", uniqueList.ToString());
         }
 
@@ -130,14 +130,14 @@ namespace Sharpmake.UnitTests
                 "CC",
                 "DDD"
             };
-            uniqueList.Add(new []{
+            uniqueList.Add(new[]{
                 "EE",
                 "FFF",
                 "GG",
                 "H"
             });
 
-            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,H" , uniqueList.ToString());
+            Assert.AreEqual("AA,BBB,CC,DDD,EE,FFF,GG,H", uniqueList.ToString());
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace Sharpmake.UnitTests
                 "DDD"
             };
             uniqueList.RemoveAll(s => s.Length == 3);
-            
+
             Assert.AreEqual("AA,CC", uniqueList.ToString());
         }
 
@@ -350,13 +350,14 @@ namespace Sharpmake.UnitTests
                 return x.Length.CompareTo(y.Length);
             });
 
-            Assert.AreEqual(new List<string>(){"AA","CC","BBB","DDD"}, listReturn);
+            Assert.AreEqual(new List<string>() { "AA", "CC", "BBB", "DDD" }, listReturn);
         }
 
         /// <summary>
         ///     Verify that all elements were removed
         /// </summary>
-        [Test] public static void TestClear()
+        [Test]
+        public static void TestClear()
         {
             UniqueList<string> uniqueList = new UniqueList<string>
             {
