@@ -373,16 +373,16 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         fileGenerator.Write(Template.Solution.ProjectBegin);
                         Strings buildDepsGuids = new Strings(resolvedProject.Configurations.SelectMany(
-                            c => c.GenericBuildDependencies.Where(
-                                p => (p.Project is FastBuildAllProject) == false || fastBuildAllProjectForSolutionDependency == null || p.Project == fastBuildAllProjectForSolutionDependency.Project
-                            ).Select(
+                            c => c.GenericBuildDependencies.Select(
                                 p => p.ProjectGuid ?? ReadGuidFromProjectFile(p.ProjectFullFileNameWithExtension)
                             )
                         ));
 
                         if (fastBuildAllProjectForSolutionDependency != null)
                         {
-                            bool writeDependencyToFastBuildAll = resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe);
+                            bool writeDependencyToFastBuildAll = ( resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe) ) ||
+                                                                 solution.ProjectsDependingOnFastBuildAllForThisSolution.Contains(resolvedProject.Project);
+
                             if (writeDependencyToFastBuildAll)
                                 buildDepsGuids.Add(fastBuildAllProjectForSolutionDependency.UserData["Guid"] as string);
                         }

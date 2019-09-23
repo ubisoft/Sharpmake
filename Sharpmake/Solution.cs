@@ -118,6 +118,7 @@ namespace Sharpmake
         }
 
         public Dictionary<string, List<Solution.Configuration>> SolutionFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
+        internal List<Project> ProjectsDependingOnFastBuildAllForThisSolution { get; } = new List<Project>();
 
         internal class ResolvedProjectGuidComparer : IEqualityComparer<ResolvedProject>
         {
@@ -575,7 +576,7 @@ namespace Sharpmake
                     {
                         foreach (Project.Configuration config in projectConfigsToRelink.Distinct())
                         {
-                            config.GenericBuildDependencies.Add(projectConf);
+                            ProjectsDependingOnFastBuildAllForThisSolution.Add(config.Project);
                         }
                     }
 
