@@ -82,7 +82,10 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public const string CurrentBffPathKey = "$_CURRENT_BFF_DIR_$";
+        // NOTE: The dot slash prefix is a workaround because FastBuild sometimes resolve the current bff dir as an empty string,
+        // which if followed by a directory separator could create an invalid path...
+        // Once the bug is fixed upstream, nuke it!
+        public static readonly string CurrentBffPathKey = "." + Path.DirectorySeparatorChar + "$_CURRENT_BFF_DIR_$";
 
         public static IUnityResolver UnityResolver = new HashUnityResolver();
 
