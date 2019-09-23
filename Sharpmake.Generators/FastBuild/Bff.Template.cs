@@ -78,8 +78,6 @@ Settings
 
                 public static string CompilerSetting = @"
 //=================================================================================================================
-// [fastbuildCompilerName]
-//=================================================================================================================
 Compiler( '[fastbuildCompilerName]' )
 {
     .ExecutableRootPath     = '[fastBuildCompilerRootPath]'
@@ -187,7 +185,7 @@ Compiler( '[fastbuildCompilerName]' )
 ";
                 public static string PCHOptionsClang = @"
     // Precompiled Header options for Clang
-    // --------------------------
+    // ------------------------------------
     .PCHInputFile           = '[fastBuildPrecompiledSourceFile]'
     .PCHOutputFile          = '[cmdLineOptions.PrecompiledHeaderFile]'
     .PCHOptions             = '-o ""%2"" -c -x c++-header ""%1""'
@@ -415,8 +413,6 @@ Compiler( '[fastbuildCompilerName]' )
 
                 public static string LibBeginSection = @"
 //=================================================================================================================
-// LIB [fastBuildOutputFileShortName]_[fastBuildOutputType]
-//=================================================================================================================
 Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
     [fastBuildUsingPlatformConfig]
@@ -428,8 +424,6 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 
                 public static string TargetSection = @"
 //=================================================================================================================
-// Alias [fastBuildOutputFileShortName]
-//=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]' )
 {
     .Targets = [fastBuildTargetSubTargets]
@@ -437,8 +431,6 @@ Alias( '[fastBuildOutputFileShortName]' )
 
 ";
                 public static string CopyFileSection = @"
-//=================================================================================================================
-// Copy file [fastBuildCopySource] to [fastBuildCopyDest]
 //=================================================================================================================
 Copy( '[fastBuildCopyAlias]' )
 {
@@ -449,8 +441,6 @@ Copy( '[fastBuildCopyAlias]' )
 ";
 
                 public static string ExeDllBeginSection = @"
-//=================================================================================================================
-// [fastBuildOutputType] [fastBuildOutputFileShortName]_[fastBuildOutputType]
 //=================================================================================================================
 [fastBuildOutputType]( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
@@ -470,8 +460,6 @@ Copy( '[fastBuildCopyAlias]' )
 
                 public static string ResourcesBeginSection = @"
 //=================================================================================================================
-// ObjectList [fastBuildOutputFileShortName]_resources
-//=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_resources' )
 {
      [fastBuildUsingPlatformConfig]
@@ -479,8 +467,6 @@ ObjectList( '[fastBuildOutputFileShortName]_resources' )
 ";
 
                 public static string EmbeddedResourcesBeginSection = @"
-//=================================================================================================================
-// ObjectList [fastBuildOutputFileShortName]_embedded
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 {
@@ -490,8 +476,6 @@ ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 
                 public static string ObjectListBeginSection = @"
 //=================================================================================================================
-// ObjectList [fastBuildOutputFileShortName]_objects
-//=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_objects' )
 {
      [fastBuildUsingPlatformConfig]
@@ -499,8 +483,6 @@ ObjectList( '[fastBuildOutputFileShortName]_objects' )
 ";
 
                 public static string GenericExcutableSection = @"
-//=================================================================================================================
-// Exec [fastBuildPreBuildName]
 //=================================================================================================================
 Exec( '[fastBuildPreBuildName]' )
 {
@@ -516,8 +498,6 @@ Exec( '[fastBuildPreBuildName]' )
 ";
 
                 public static string TestSection = @"
-//=================================================================================================================
-// Test [fastBuildTest]
 //=================================================================================================================
 Test( '[fastBuildTest]' )
 {
