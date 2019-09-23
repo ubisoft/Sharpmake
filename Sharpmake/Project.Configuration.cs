@@ -2872,7 +2872,9 @@ namespace Sharpmake
                                 }
                                 _resolvedTargetDependsFiles.Add(Path.Combine(TargetPath, dependency.TargetFileFullName + ".dll"));
 
-                                if (Util.IsDotNet(this))
+                                // If this is not a .Net project, no .Net dependencies are needed
+                                // If the dependency is not a .Net project, it will not function properly when referenced by a .Net compilation process
+                                if (Util.IsDotNet(this) && Util.IsDotNet(dependency))
                                 {
                                     if (hasPublicPathToRoot)
                                         resolvedDotNetPublicDependencies.Add(new DotNetDependency(dependency));
