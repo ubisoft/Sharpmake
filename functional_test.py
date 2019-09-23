@@ -73,9 +73,13 @@ class FastBuildFunctionalTest(FunctionalTest):
         if not os.path.isfile(fastBuildPath):
             return -1
         
-        os.chdir(os.path.join(projectDir, self.directory, "projects"))
+        cmd_line = fastBuildPath + " All-Configs -vs -summary -verbose -config " + self.directory + ".bff"
+        working_dir = os.path.join(projectDir, self.directory, "projects")
 
-        return os.system(fastBuildPath + " All-Configs -vs -summary -verbose -config " + self.directory + ".bff")
+        os.chdir(working_dir)
+        write_line(cmd_line)
+        write_line("Working dir: " + working_dir)
+        return os.system(cmd_line)
 
 class MSBuildFunctionalTest(FunctionalTest):
 
