@@ -51,6 +51,12 @@ namespace Sharpmake
         public bool FastBuildAllSlnDependencyFromExe = false;
 
         /// <summary>
+        /// In case we've generated a "FastBuildAll" project, this flag will determine if we generate it for all
+        /// the configurations, or only the ones that need it
+        /// </summary>
+        public bool GenerateFastBuildAllOnlyForConfThatNeedIt = true;
+
+        /// <summary>
         /// For adding additional files/folders to the solution
         /// Keys are names of the directories in the virtual solution hierarchy, values are paths
         /// </summary>
@@ -460,7 +466,6 @@ namespace Sharpmake
 
         private bool _resolved = false;
         private bool _dependenciesResolved = false;
-        private bool _generateFastBuildAllOnlyForConfThatNeedIt = true;
 
         private void Initialize(Type targetType, Type configurationType)
         {
@@ -527,7 +532,7 @@ namespace Sharpmake
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
 
-                    if (_generateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                    if (GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
                         continue;
 
                     var solutionTarget = solutionConf.Target;
@@ -563,7 +568,7 @@ namespace Sharpmake
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
 
-                    if (_generateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                    if (GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
                         continue;
 
                     var solutionTarget = solutionConf.Target;
