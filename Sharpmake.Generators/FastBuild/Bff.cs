@@ -439,7 +439,7 @@ namespace Sharpmake.Generators.FastBuild
 
                                 foreach (string subConfigObject in subConfigObjectList)
                                 {
-                                    if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll)
+                                    if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe)
                                         fastBuildProjectDependencies.Add(subConfigObject + "_" + outputType);
                                     else
                                         fastBuildProjectDependencies.Add(subConfigObject + "_objects");
