@@ -265,7 +265,6 @@ namespace Sharpmake.Generators.FastBuild
 
                     // We will need as many "sub"-libraries as subConfigs to generate the final library
                     int subConfigIndex = 0;
-                    Strings subConfigLibs = new Strings();
                     Strings subConfigObjectList = new Strings();
                     bool isUnity = false;
 
@@ -360,9 +359,8 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildOutputFile = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, outputFile, true));
                         fastBuildOutputFile = platformBff.GetOutputFilename(conf.Output, fastBuildOutputFile);
                         string fastBuildOutputFileShortName = GetShortProjectName(project, conf);
-                        string fastBuildProjectDependencies = "''";
-                        List<string> fastBuildProjectDependencyList = new List<string>();
-                        List<string> fastBuildProjectExeUtilityDependencyList = new List<string>();
+                        var fastBuildProjectDependencies = new List<string>();
+                        var fastBuildProjectExeUtilityDependencyList = new List<string>();
 
                         bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
                         bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
@@ -375,9 +373,6 @@ namespace Sharpmake.Generators.FastBuild
 
                         if (isOutputTypeExeOrDll)
                         {
-                            StringBuilder result = new StringBuilder();
-                            result.Append("\n");
-
                             var orderedProjectDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false);
                             foreach (var depProjConfig in orderedProjectDeps)
                             {
@@ -392,21 +387,16 @@ namespace Sharpmake.Generators.FastBuild
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
-                                    result.Append("                                '" + GetShortProjectName(depProjConfig.Project, depProjConfig) + "',\n");
-                                    fastBuildProjectDependencyList.Add(GetOutputFileName(depProjConfig));
+                                    fastBuildProjectDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
                                 else
                                 {
                                     fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
                             }
-                            if (result.Length > 0)
-                                result.Remove(result.Length - 1, 1);
-                            fastBuildProjectDependencies = result.ToString();
                         }
 
                         string librarianAdditionalInputs = FileGeneratorUtilities.RemoveLineTag;
-                        string fastBuildObjectListDependencies = FileGeneratorUtilities.RemoveLineTag;
 
                         string outputType;
                         switch (conf.Output)
@@ -440,31 +430,20 @@ namespace Sharpmake.Generators.FastBuild
                                     fastBuildOutputFile += '.';
                                 fastBuildOutputFile += staticLibExtension;
 
-                                subConfigLibs.Add(fastBuildOutputFile);
                                 subConfigObjectList.Add(fastBuildOutputFileShortName);
                                 additionalLibs.Add(fastBuildOutputFileShortName + "_objects");
                             }
                             else
                             {
                                 StringBuilder result = new StringBuilder();
-                                result.Append("\n");
-                                foreach (string subConfigLib in subConfigLibs)
-                                    result.Append("                                   '" + subConfigLib + "',\n");
-                                if (result.Length > 1)
-                                    result.Remove(result.Length - 2, 2);
 
-                                result.Clear();
-                                int i = 0;
                                 foreach (string subConfigObject in subConfigObjectList)
                                 {
                                     if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll)
-                                        result.Append((i++ != 0 ? "                                '" : "'") + subConfigObject + "_" + outputType + "',\n");
+                                        fastBuildProjectDependencies.Add(subConfigObject + "_" + outputType);
                                     else
-                                        result.Append((i++ != 0 ? "                                '" : "'") + subConfigObject + "_objects',\n");
+                                        fastBuildProjectDependencies.Add(subConfigObject + "_objects");
                                 }
-                                if (result.Length > 0)
-                                    result.Remove(result.Length - 1, 1);
-                                fastBuildObjectListDependencies = result.ToString();
                             }
                         }
 
@@ -903,7 +882,8 @@ namespace Sharpmake.Generators.FastBuild
                         if (fastBuildInputPath == FileGeneratorUtilities.RemoveLineTag)
                             fastBuildCompilerInputPattern = FileGeneratorUtilities.RemoveLineTag;
 
-                        string fastBuildObjectListResourceDependencies = FormatListPartForTag(resourceFilesSections, 32, true);
+                        fastBuildProjectDependencies.AddRange(resourceFilesSections);
+                        fastBuildProjectDependencies.Add("[fastBuildOutputFileShortName]_objects");
                         string fastBuildObjectListEmbeddedResources = FormatListPartForTag(embeddedResourceFilesSections, 32, true);
 
                         using (bffGenerator.Declare("conf", conf))
@@ -932,11 +912,9 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildResourceFiles", fastBuildResourceFiles))
                                     using (bffGenerator.Declare("fastBuildEmbeddedResources", fastBuildEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
-                                    using (bffGenerator.Declare("fastBuildProjectDependencies", fastBuildProjectDependencies))
+                                    using (bffGenerator.Declare("fastBuildProjectDependencies", UtilityMethods.FBuildFormatList(fastBuildProjectDependencies, 30)))
                                     using (bffGenerator.Declare("fastBuildPreBuildTargets", fastBuildPreBuildDependencies))
-                                    using (bffGenerator.Declare("fastBuildObjectListResourceDependencies", fastBuildObjectListResourceDependencies))
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
-                                    using (bffGenerator.Declare("fastBuildObjectListDependencies", fastBuildObjectListDependencies))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
                                     using (bffGenerator.Declare("fastBuildPCHForceInclude", isUsePrecomp ? fastBuildPCHForceInclude : FileGeneratorUtilities.RemoveLineTag))
