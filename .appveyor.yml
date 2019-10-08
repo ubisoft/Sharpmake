@@ -10,7 +10,7 @@ configuration:
 - Release
 
 before_build:
-- cmd: bootstrap-sharpmake.bat
+- cmd: bootstrap.bat
 - cmd: nuget restore Sharpmake.sln
 
 build:
