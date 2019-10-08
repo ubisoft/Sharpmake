@@ -20,7 +20,7 @@ goto success
 COLOR 2F
 echo Bootstrap succeeded^!
 timeout /t 5
-exit /b 0
+goto end
 
 @REM -----------------------------------------------------------------------
 :error
