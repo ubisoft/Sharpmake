@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
+using System.Threading;
 
 namespace Sharpmake.UnitTests
 {
@@ -403,6 +404,97 @@ namespace Sharpmake.UnitTests
             };
 
             Assert.IsFalse(uniqueList.Contains("HHH"));
+        }
+
+        class ListContainer
+        {
+            public ListContainer()
+            {
+                List.Clear();
+            }
+            public UniqueList<string> List = new UniqueList<string>();
+            public IEnumerable<string> SortedList => List.SortedValues;
+        }
+
+        /// <summary>
+        /// The goal of this test is to test the reliability of the SortedValues property in UniqueList when
+        /// used via another property using IEnumerable similar to the way it is used in Project.Configuration for the 
+        /// ResolvedEventCustomPreBuildExe property. Previous implementation of UniqueList was sometimes causing 
+        /// exception when multiple threads were accessing the property.
+        /// </summary>
+        [Test]
+        public static void MultithreadEmptyValuesSorted()
+        {
+            int nbrThreads = Environment.ProcessorCount;
+            var container = new ListContainer();
+
+            int TOTAL_TEST_COUNT = 1000000;
+            long nbrThreadsFinished = 0;
+            long nbrThreadsGate1 = 0;
+            Exception taskTestException = null;
+
+            // Note: Using a Barrier to synchronize all the threads at each iteration
+            using (Barrier barrier = new Barrier(nbrThreads, (b) =>
+             {
+                 Interlocked.Increment(ref nbrThreadsGate1);
+                 container.List.AddRange(new List<string> { }); // Adding an empty collection makes the UniqueList dirty
+             }))
+            {
+                ThreadPool.TaskCallback taskLambda = (object taskParams) =>
+                {
+                    var listContainersTask = (ListContainer)taskParams;
+
+                    try
+                    {
+                        for (int i = 0; i < TOTAL_TEST_COUNT; ++i)
+                        {
+                            // Synchronize all threads
+                            barrier.SignalAndWait();
+
+                            if (taskTestException != null)
+                                break; // Abort once we got an exception
+
+                            // Attempt to access the SortedList property from multiple threads. 
+                            // It must not create any exception!
+                            foreach (var s in container.SortedList)
+                            {
+                                Console.WriteLine(s);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Keep the exception around as we will need it in the main thread of this test.
+                        taskTestException = e;
+                    }
+                    finally
+                    {
+                        barrier.RemoveParticipant(); // Must remove the participant to unblock all the other threads.
+                        Interlocked.Increment(ref nbrThreadsFinished);
+                    }
+                };
+
+                // Start a thread pool and execute tasks.
+                using (ThreadPool pool = new ThreadPool())
+                {
+                    // Add 1 task per thread
+                    pool.Start(nbrThreads);
+                    for (int i = 0; i < nbrThreads; ++i)
+                    {
+                        pool.AddTask(taskLambda, container);
+                    }
+
+                    // Wait for all the tasks to complete.
+                    pool.Wait();
+
+                    // Check the results.
+                    TestContext.Out.WriteLine("nbr Finished: {0}, nbr Gate1: {1}", nbrThreadsFinished, nbrThreadsGate1);
+                    if (taskTestException != null)
+                    {
+                        throw taskTestException;
+                    }
+                }
+            }
         }
     }
 }
