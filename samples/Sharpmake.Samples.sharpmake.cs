@@ -10,7 +10,8 @@ namespace SharpmakeGen.Samples
         public SampleProject()
             : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
         {
-            SourceRootPath = @"[project.RootPath]\samples\[project.Name]";
+            // samples are special, all the classes are here instead of in the subfolders
+            SourceRootPath = @"[project.SharpmakeCsPath]\[project.Name]";
             SourceFilesExcludeRegex.Add(
                 @"\\codebase\\",
                 @"\\projects\\",

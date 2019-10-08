@@ -9,7 +9,6 @@ namespace SharpmakeGen.Extensions
     {
         public ExtensionProject()
         {
-            SourceRootPath = @"[project.RootPath]\Sharpmake.Extensions\[project.Name]";
             AssemblyName = "[project.Name]";
             RootNamespace = "Sharpmake";
         }

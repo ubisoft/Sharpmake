@@ -51,7 +51,6 @@ namespace SharpmakeGen
                 _generateXmlDoc = generateXmlDoc;
 
                 RootPath = Globals.AbsoluteRootPath;
-                SourceRootPath = @"[project.RootPath]\[project.Name]";
 
                 if (excludeSharpmakeFiles)
                     SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");
