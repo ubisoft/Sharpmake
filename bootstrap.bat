@@ -23,7 +23,7 @@ goto success
 :success
 COLOR 2F
 echo Bootstrap succeeded^!
-timeout /t 5
+set ERROR_CODE=0
 goto end
 
 @REM -----------------------------------------------------------------------
