@@ -1063,13 +1063,12 @@ namespace Sharpmake.Generators.Apple
 
         private class XCodeOptions : Dictionary<string, string>
         {
-            public static Resolver Resolver { get; set; } = new Resolver();
-
             public static string ResolveProjectPaths(Project project, string stringToResolve)
             {
-                using (Resolver.NewScopedParameter("project", project))
+                Resolver resolver = new Resolver();
+                using (resolver.NewScopedParameter("project", project))
                 {
-                    string resolvedString = Resolver.Resolve(stringToResolve);
+                    string resolvedString = resolver.Resolve(stringToResolve);
                     return Util.SimplifyPath(resolvedString);
                 }
             }
