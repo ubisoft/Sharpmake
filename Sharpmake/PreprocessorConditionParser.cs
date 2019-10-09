@@ -113,16 +113,23 @@ namespace Sharpmake
 
         private void PushNewConditionBlock()
         {
-            _state.Value.NestedConditionBlocks.Push(new ConditionBlock());
+            State state = _state.Value;
+            if (!state.NestedFileStates.Any())
+                throw new Error("invalid condition block format. Missing current file from state");
+            state.NestedFileStates.Peek().NestedConditionBlocks.Push(new ConditionBlock());
         }
 
         private void TestConditionBlockBranch(string symbolName)
         {
             State state = _state.Value;
-            if (!state.NestedConditionBlocks.Any())
+            if (!state.NestedFileStates.Any())
                 throw new Error("invalid condition block format for symbol: {0}", symbolName);
 
-            ConditionBlock topBlock = state.NestedConditionBlocks.Peek();
+            FileState currentFile = state.NestedFileStates.Peek();
+            if (!currentFile.NestedConditionBlocks.Any())
+                throw new Error("invalid condition block format for symbol: {0}", symbolName);
+
+            ConditionBlock topBlock = currentFile.NestedConditionBlocks.Peek();
             topBlock.CurrentDefine = symbolName;
             topBlock.Defined = false;
 
@@ -134,19 +141,23 @@ namespace Sharpmake
             }
 
             // The current line being parsed is defined if all nested 'if' blocks are defined.
-            state.IsCurrentCodeBlockDefined = state.NestedConditionBlocks.All(d => d.Defined);
+            currentFile.IsCurrentCodeBlockDefined = currentFile.NestedConditionBlocks.All(d => d.Defined);
         }
 
         private void PopConditionBlock()
         {
             State state = _state.Value;
-            if (!state.NestedConditionBlocks.Any())
+            if (!state.NestedFileStates.Any())
+                throw new Error("invalid condition block format");
+            
+            FileState currentFile = state.NestedFileStates.Peek();
+            if (!currentFile.NestedConditionBlocks.Any())
                 throw new Error("invalid condition block format");
 
-            state.NestedConditionBlocks.Pop();
+            currentFile.NestedConditionBlocks.Pop();
 
             // The current line being parsed is defined if all nested 'if' blocks are defined or if we are not in any 'if' block.
-            state.IsCurrentCodeBlockDefined = !state.NestedConditionBlocks.Any();
+            currentFile.IsCurrentCodeBlockDefined = !currentFile.NestedConditionBlocks.Any();
         }
 
         public bool ShouldParseLine()
@@ -156,18 +167,44 @@ namespace Sharpmake
 
         public void FileParsingBegin(string file)
         {
-            // No logic here yet
+            // Add file to the nested files stack
+            _state.Value.NestedFileStates.Push(new FileState() { FilePath = file });
         }
 
         public void FileParsingEnd(string file)
         {
             // Basic validations so that we can catch early malformed Sharpmake files
-            if (_state.Value.NestedConditionBlocks.Any())
+            
+            State state = _state.Value;
+            if (!state.NestedFileStates.Any())
+                throw new Exception($"End of file reached with an already empty files stack, malformed Sharpmake {file}");
+
+            FileState currentFile = state.NestedFileStates.Pop();
+
+            if (currentFile.NestedConditionBlocks.Any())
                 throw new Exception($"End of file reached before all nested condition blocks (#if, #else, ...) have been closed, malformed Sharpmake {file}");
         }
 
         private class State
         {
+            /// <summary>
+            /// All nested files analyzed
+            /// </summary>
+            public Stack<FileState> NestedFileStates { get; } = new Stack<FileState>();
+
+            /// <summary>
+            /// The current code block is defined if we are currently parsing a line that is inside a block where all nested conditions are defined.
+            /// </summary>
+            public bool IsCurrentCodeBlockDefined => NestedFileStates.All(f => f.IsCurrentCodeBlockDefined);
+        }
+
+        private class FileState
+        {
+            /// <summary>
+            /// Current nested file path.
+            /// </summary>
+            public string FilePath { get; set; }
+            
             /// <summary>
             /// All nested condition blocks parsed so far (#if inside #if)
             /// </summary>

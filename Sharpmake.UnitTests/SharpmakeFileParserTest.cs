@@ -333,15 +333,47 @@ namespace Sharpmake.UnitTests
 
         #region DefinesTests
 
-        private struct LineTest
+        private abstract class LineTest
+        {
+            public abstract void Test(IParsingFlowParser parser, FileInfo fileInfo, int index, AssemblerContext assemblerContext);
+        }
+        
+        private class LineTestParse : LineTest
         {
             public string Line { get; }
             public bool ExpectedResult { get; }
 
-            public LineTest(string line, bool expectedResult)
+            public LineTestParse(string line, bool expectedResult)
             {
                 Line = line;
                 ExpectedResult = expectedResult;
+            }
+            
+            public override void Test(IParsingFlowParser parser, FileInfo fileInfo, int index, AssemblerContext assemblerContext)
+            {
+                parser.ParseLine(Line, fileInfo, index, assemblerContext);
+                bool shouldParseLine = parser.ShouldParseLine();
+                Assert.AreEqual(ExpectedResult, shouldParseLine, $"ShouldParseLine for line ({index}) \"{Line}\" should return {ExpectedResult} after evaluation!");
+            }
+        }
+        
+        private class LineTestNestedFile : LineTest
+        {
+            public LineTest[] Lines { get; }
+
+            public LineTestNestedFile(LineTest[] lines)
+            {
+                Lines = lines;
+            }
+
+            public override void Test(IParsingFlowParser parser, FileInfo fileInfo, int index, AssemblerContext assemblerContext)
+            {
+                Assert.DoesNotThrow(() => parser.FileParsingBegin(fileInfo.FullName));
+                for (int i = 0; i < Lines.Length; i++)
+                {
+                    Lines[i].Test(parser, fileInfo, i, assemblerContext);
+                }
+                Assert.DoesNotThrow(() => parser.FileParsingEnd(fileInfo.FullName));
             }
         }
 
@@ -349,13 +381,9 @@ namespace Sharpmake.UnitTests
         {
             var assemblerContext = new AssemblerContext();
             IParsingFlowParser parser = new PreprocessorConditionParser(defines);
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                parser.ParseLine(lines[i].Line, _fakeFileInfo, i, assemblerContext);
-                bool shouldParseLine = parser.ShouldParseLine();
-                Assert.AreEqual(lines[i].ExpectedResult, shouldParseLine, $"ShouldParseLine for line ({i}) \"{lines[i].Line}\" should return {lines[i].ExpectedResult}!");
-            }
+            
+            LineTestNestedFile wrapperFile = new LineTestNestedFile(lines);
+            wrapperFile.Test(parser, _fakeFileInfo, 0, assemblerContext);
         }
 
         [Test]
@@ -366,14 +394,14 @@ namespace Sharpmake.UnitTests
 
             LineTest[] lines = new[]
             {
-                new LineTest("",                true),
-                new LineTest($"#if {defineA}",  true),
-                new LineTest("...",             true),
-                new LineTest("#endif",          true),
-                new LineTest("#if _{defineA}_", false),
-                new LineTest("...",             false),
-                new LineTest("#endif",          true),
-                new LineTest("",                true),
+                new LineTestParse("",                true),
+                new LineTestParse($"#if {defineA}",  true),
+                new LineTestParse("...",             true),
+                new LineTestParse("#endif",          true),
+                new LineTestParse("#if _{defineA}_", false),
+                new LineTestParse("...",             false),
+                new LineTestParse("#endif",          true),
+                new LineTestParse("",                true),
             };
 
             EvaluateLines(lines, defines);
@@ -386,11 +414,11 @@ namespace Sharpmake.UnitTests
 
             LineTest[] lines = new[]
             {
-                new LineTest($"#if NOT_DEFINED", false),
-                new LineTest("...",              false),
-                new LineTest("#else",            true),
-                new LineTest("...",              true),
-                new LineTest("#endif",           true),
+                new LineTestParse($"#if NOT_DEFINED", false),
+                new LineTestParse("...",              false),
+                new LineTestParse("#else",            true),
+                new LineTestParse("...",              true),
+                new LineTestParse("#endif",           true),
             };
 
             EvaluateLines(lines, defines);
@@ -405,15 +433,15 @@ namespace Sharpmake.UnitTests
 
             LineTest[] lines = new[]
             {
-                new LineTest($"#if NOT_DEFINED", false),
-                new LineTest("...",              false),
-                new LineTest($"#elif {defineA}", true),
-                new LineTest("...",              true),
-                new LineTest($"#elif {defineB}", false),
-                new LineTest("...",              false),
-                new LineTest("#else",            false),
-                new LineTest("...",              false),
-                new LineTest("#endif",           true),
+                new LineTestParse($"#if NOT_DEFINED", false),
+                new LineTestParse("...",              false),
+                new LineTestParse($"#elif {defineA}", true),
+                new LineTestParse("...",              true),
+                new LineTestParse($"#elif {defineB}", false),
+                new LineTestParse("...",              false),
+                new LineTestParse("#else",            false),
+                new LineTestParse("...",              false),
+                new LineTestParse("#endif",           true),
             };
 
             EvaluateLines(lines, defines);
@@ -428,19 +456,62 @@ namespace Sharpmake.UnitTests
 
             LineTest[] lines = new[]
             {
-                new LineTest($"#if NOT_DEFINED",  false),
-                new LineTest("...",               false),
-                new LineTest($"#elif {defineA}",  true),
-                new LineTest("  #if NOT_DEFINED", false),
-                new LineTest("  ...",             false),
-                new LineTest($" #elif {defineB}", true),
-                new LineTest("  ...",             true),
-                new LineTest("  #else",           false),
-                new LineTest("  ...",             false),
-                new LineTest("  #endif",          false),
-                new LineTest("#else",             false),
-                new LineTest("...",               false),
-                new LineTest("#endif",            true),
+                new LineTestParse($"#if NOT_DEFINED",  false),
+                new LineTestParse("...",               false),
+                new LineTestParse($"#elif {defineA}",  true),
+                new LineTestParse("  #if NOT_DEFINED", false),
+                new LineTestParse("  ...",             false),
+                new LineTestParse($" #elif {defineB}", true),
+                new LineTestParse("  ...",             true),
+                new LineTestParse("  #else",           false),
+                new LineTestParse("  ...",             false),
+                new LineTestParse("  #endif",          false),
+                new LineTestParse("#else",             false),
+                new LineTestParse("...",               false),
+                new LineTestParse("#endif",            true),
+            };
+
+            EvaluateLines(lines, defines);
+        }
+        
+        [Test]
+        public void NestedFilesTest()
+        {
+            HashSet<string> defines = new HashSet<string>() {  };
+
+            LineTest[] lines = new LineTest[]
+            {
+                new LineTestParse("...",               true),
+                new LineTestNestedFile(new []
+                {
+                    new LineTestParse("...",true), 
+                }), 
+                new LineTestParse("...",               true),
+            };
+
+            EvaluateLines(lines, defines);
+        }
+        
+        [Test]
+        public void NestedFilesWithConditionsTest()
+        {
+            const string defineA = "DEFINE_A";
+            HashSet<string> defines = new HashSet<string>() { defineA };
+
+            LineTest[] lines = new LineTest[]
+            {
+                new LineTestParse($"#if NOT_DEFINED", false),
+                new LineTestNestedFile(new []
+                {
+                    new LineTestParse("...",          false),
+                }),
+                new LineTestParse($"#elif {defineA}", true),
+                new LineTestNestedFile(new []
+                {
+                    new LineTestParse("...",          true),
+                }),
+                new LineTestParse($"#endif",          true),
+                new LineTestParse("...",              true),
             };
 
             EvaluateLines(lines, defines);
