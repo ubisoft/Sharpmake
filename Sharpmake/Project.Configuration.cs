@@ -3132,9 +3132,6 @@ namespace Sharpmake
                         case OutputType.IosApp:
                         case OutputType.Exe:
                             {
-                                if (Output != OutputType.Utility && Output != OutputType.Exe && Output != OutputType.None)
-                                    throw new Error("Project {0} cannot depend on OutputType {1} {2}", this, Output, dependency);
-
                                 if (hasPublicPathToRoot)
                                     resolvedDotNetPublicDependencies.Add(new DotNetDependency(dependency));
                                 else if (isImmediate)
