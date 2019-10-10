@@ -279,10 +279,6 @@ namespace Sharpmake.Generators.Apple
                             }
 
                             _projectItems.Add(projectDependencyGroup);
-
-                            ProjectBuildFile libraryBuildFile = new ProjectBuildFile(referenceProxy);
-                            _projectItems.Add(libraryBuildFile);
-                            _frameworksBuildPhases[conf].Files.Add(libraryBuildFile);
                         }
                     }
                 }
@@ -335,7 +331,6 @@ namespace Sharpmake.Generators.Apple
                 foreach (Project.Configuration targetConf in configsList[conf])
                 {
                     XCodeOptions options = _optionMapping[targetConf];
-
                     ProjectBuildConfigurationForTarget configurationForNativeTarget;
                     if (targetConf.Output == Project.Configuration.OutputType.IosTestBundle)
                         configurationForNativeTarget = new ProjectBuildConfigurationForUnitTestTarget(targetConf, target, options);
@@ -1009,7 +1004,10 @@ namespace Sharpmake.Generators.Apple
             OrderableStrings includePaths = conf.IncludePaths;
             includePaths.AddRange(conf.DependenciesIncludePaths);
             options["IncludePaths"] = includePaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
-            if (conf.LibraryPaths.Count == 0)
+
+            OrderableStrings libraryPaths = conf.LibraryPaths;
+            libraryPaths.AddRange(conf.ResolvedDependencies.Select(libPaths => libPaths.TargetPath ));
+            if (libraryPaths.Count == 0)
             {
                 options["LibraryPaths"] = RemoveLineTag;
                 options["RemoveLibraryPaths"] = RemoveLineTag;
@@ -1049,6 +1047,7 @@ namespace Sharpmake.Generators.Apple
             Strings linkerOptions = new Strings(conf.AdditionalLinkerOptions);
             linkerOptions.Add("-ObjC");
             linkerOptions.AddRange(conf.LibraryFiles.Select(library => "-l" + library));
+            linkerOptions.AddRange(conf.ResolvedDependencies.Where(library => library.Output != Project.Configuration.OutputType.None).Select(library => "-l" + library.TargetFileFullName));
 
             if (conf.DefaultOption == Options.DefaultTarget.Debug)
                 conf.Defines.Add("_DEBUG");
