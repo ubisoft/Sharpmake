@@ -39,16 +39,20 @@ parser.add_option("-d", "--deploy-pdb",
 parser.add_option("-x", "--deploy-xmldoc",
                   dest="deploy_xmldoc", default=False, action="store_true",
                   help="Deploy XML API documentation along with the binaries.")
+parser.add_option("-e", "--extra-dir",
+                  dest="extra_directories", action="append",
+                  help="Additional directories with binaries to deploy. Repeat for each directory to add.")
 parser.add_option("-a", "--deploy-all",
                   dest="deploy_all", default=False, action="store_true",
                   help="Deploy all files that come with the binaries.")
 (options, args) = parser.parse_args()
 
-root_dir = options.root_dir
+root_dir = os.path.abspath(options.root_dir)
 target_dir = os.path.join(root_dir, options.target_dir)
 deploy_pdb = options.deploy_pdb or options.deploy_all
 deploy_xmldoc = options.deploy_xmldoc or options.deploy_all
 config = options.config
+extra_directories = options.extra_directories
 
 # Validate the configuration.
 if config.upper() == "RELEASE":
@@ -61,7 +65,7 @@ else:
 
 # Check if there are actual DLLs to copy, otherwise it must be compiled in VS.
 if not os.path.isfile(os.path.join(root_dir, "bin/{}/Sharpmake.dll".format(config))):
-    print("Please build Sharpmake in it's {} configuration.".format(config))
+    print("Please build Sharpmake in its {} configuration.".format(config))
     sys.exit(1)
 
 # If the directory exists, make sure that it is empty.
@@ -113,16 +117,29 @@ copy_list = [
 ]
 
 # Add the Extensions to the list of files to copy.
-if os.path.isdir("Sharpmake.Extensions"):
-    for extension_dir_name in os.listdir("Sharpmake.Extensions"):
-        site = BinarySite(extension_dir_name)
-        copy_list.append(site)
+extensions_dir = os.path.join(root_dir, "Sharpmake.Extensions")
+if os.path.isdir(extensions_dir):
+    for extension_dir_name in os.listdir(extensions_dir):
+        if os.path.isdir(os.path.join(extensions_dir, extension_dir_name)):
+            site = BinarySite(extension_dir_name)
+            copy_list.append(site)
 
 # Add the platforms to the list of files to copy.
-if os.path.isdir("Sharpmake.Platforms"):
-    for platform_dir_name in os.listdir("Sharpmake.Platforms"):
-        site = BinarySite(platform_dir_name)
-        copy_list.append(site)
+platforms_dir = os.path.join(root_dir, "Sharpmake.Platforms")
+if os.path.isdir(platforms_dir):
+    for platform_dir_name in os.listdir(platforms_dir):
+        if os.path.isdir(os.path.join(platforms_dir, platform_dir_name)):
+            site = BinarySite(platform_dir_name)
+            copy_list.append(site)
+
+# Add extra directories (if any) to the list of files to copy.
+for extra_dir in extra_directories:
+    extra_dir = os.path.abspath(extra_dir)
+    if os.path.isdir(extra_dir):
+        for extra_dir_name in os.listdir(extra_dir):
+            if os.path.isdir(os.path.join(extra_dir, extra_dir_name)):
+                site = BinarySite(extra_dir_name)
+                copy_list.append(site)
 
 # Finally, do the copying.
 for site in copy_list:
