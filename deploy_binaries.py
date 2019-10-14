@@ -133,13 +133,14 @@ if os.path.isdir(platforms_dir):
             copy_list.append(site)
 
 # Add extra directories (if any) to the list of files to copy.
-for extra_dir in extra_directories:
-    extra_dir = os.path.abspath(extra_dir)
-    if os.path.isdir(extra_dir):
-        for extra_dir_name in os.listdir(extra_dir):
-            if os.path.isdir(os.path.join(extra_dir, extra_dir_name)):
-                site = BinarySite(extra_dir_name)
-                copy_list.append(site)
+if extra_directories:
+    for extra_dir in extra_directories:
+        extra_dir = os.path.abspath(extra_dir)
+        if os.path.isdir(extra_dir):
+            for extra_dir_name in os.listdir(extra_dir):
+                if os.path.isdir(os.path.join(extra_dir, extra_dir_name)):
+                    site = BinarySite(extra_dir_name)
+                    copy_list.append(site)
 
 # Finally, do the copying.
 for site in copy_list:
