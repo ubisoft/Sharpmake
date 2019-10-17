@@ -172,7 +172,7 @@ namespace Sharpmake
         public static string GetNETFXToolsDir(DotNetFramework dotNetFramework)
         {
             string netFxToolsDir;
-            if (s_netFxKitsDir.TryGetValue(dotNetFramework, out netFxToolsDir))
+            if (s_netFxToolsDir.TryGetValue(dotNetFramework, out netFxToolsDir))
                 return netFxToolsDir;
 
             var microsoftSdksRegistryKeyString = string.Format(@"SOFTWARE{0}\Microsoft\Microsoft SDKs",
