@@ -581,6 +581,17 @@ namespace Sharpmake
             }
         }
 
+        internal static void ResolvePathAndFixCase(string root, ref Strings paths)
+        {
+            List<string> sortedPaths = paths.Values;
+            foreach (string path in sortedPaths)
+            {
+                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+                string fixedCase = GetProperFilePathCapitalization(resolvedPath);
+                paths.UpdateValue(path, fixedCase);
+            }
+        }
+
         public static void ResolvePath(string root, ref OrderableStrings paths)
         {
             for (int i = 0; i < paths.Count; ++i)

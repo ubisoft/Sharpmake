@@ -668,7 +668,7 @@ namespace Sharpmake.Generators.FastBuild
 
         private static void WriteMasterCopySection(IFileGenerator masterBffGenerator, List<string> sections)
         {
-            sections.Sort((x, y) => string.Compare(x, y, StringComparison.Ordinal));
+            sections.Sort((x, y) => string.Compare(x, y, StringComparison.OrdinalIgnoreCase));
 
             foreach (var copySection in sections)
                 masterBffGenerator.Write(new StringReader(copySection).ReadToEnd());

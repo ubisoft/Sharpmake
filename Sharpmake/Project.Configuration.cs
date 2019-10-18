@@ -2168,7 +2168,7 @@ namespace Sharpmake
                     System.Diagnostics.Debugger.Break();
                 Util.ResolvePath(Project.SharpmakeCsPath, ref IntermediatePath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref LibraryPaths);
-                Util.ResolvePath(Project.SharpmakeCsPath, ref TargetCopyFiles);
+                Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, ref TargetCopyFiles);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetDependsFiles);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetLibraryPath);
