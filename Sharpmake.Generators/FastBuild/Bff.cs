@@ -1237,7 +1237,7 @@ namespace Sharpmake.Generators.FastBuild
                                             if (isLastSubConfig)
                                             {
                                                 string genLibName = "'" + fastBuildOutputFileShortName + "_" + outputType + "'";
-                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 33)))
+                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                                 }
