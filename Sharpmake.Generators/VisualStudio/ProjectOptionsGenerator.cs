@@ -928,6 +928,7 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         context.SelectOption
                         (
+                        Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Default, () => {}),
                         Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Disable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:__cplusplus-"); }),
                         Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Enable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:__cplusplus"); })
                         );

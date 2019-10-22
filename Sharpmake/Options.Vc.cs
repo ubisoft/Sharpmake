@@ -489,6 +489,7 @@ namespace Sharpmake
 
                 public enum DefineCPlusPlus
                 {
+                    Default,
                     Disable,
                     [Default]
                     Enable
