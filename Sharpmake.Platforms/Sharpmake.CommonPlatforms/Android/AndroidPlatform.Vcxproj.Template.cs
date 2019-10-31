@@ -93,7 +93,7 @@ namespace Sharpmake
       <OutputFile>[options.OutputFile]</OutputFile>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories];%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
-      <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>[options.LibsStartGroup];[options.AdditionalDependencies];%(AdditionalDependencies);[options.LibsEndGroup]</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]</IgnoreSpecificDefaultLibraries>
       <GenerateMapFile>[options.MapFileName]</GenerateMapFile>
       <IncrementalLink>[options.IncrementalLink]</IncrementalLink>

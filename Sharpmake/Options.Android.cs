@@ -138,6 +138,13 @@ namespace Sharpmake
                     OmitDebuggerSymbolInformation,
                     OmitAllSymbolInformation
                 }
+
+                public enum LibGroup
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
             }
         }
     }
