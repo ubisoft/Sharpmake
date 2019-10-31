@@ -396,8 +396,9 @@ namespace Sharpmake.Generators.Apple
 
             bool iCloudSupport = (_optionMapping[configurations[0]]["iCloud"] == "1");
             string developmentTeam = _optionMapping[configurations[0]]["DevelopmentTeam"];
+            string provisioningStyle = _optionMapping[configurations[0]]["ProvisioningStyle"];
             List<ProjectNativeTarget> nativeTargets = new List<ProjectNativeTarget>(_nativeTargets.Values);
-            _projectMain = new ProjectMain(project.Name, _mainGroup, configurationListForProject, nativeTargets, iCloudSupport, developmentTeam);
+            _projectMain = new ProjectMain(project.Name, _mainGroup, configurationListForProject, nativeTargets, iCloudSupport, developmentTeam, provisioningStyle);
 
             configurationListForProject.RelatedItem = _projectMain;
             foreach (KeyValuePair<ProjectFolder, ProjectReference> referenceGroup in _projectReferencesGroups)
@@ -713,6 +714,7 @@ namespace Sharpmake.Generators.Apple
             options["Archs"] = "\"$(ARCHS_STANDARD_32_64_BIT)\"";
             options["CodeSignEntitlements"] = RemoveLineTag;
             options["DevelopmentTeam"] = RemoveLineTag;
+            options["ProvisioningStyle"] = "Automatic";
             options["InfoPListFile"] = RemoveLineTag;
             options["IPhoneOSDeploymentTarget"] = RemoveLineTag;
             options["MacOSDeploymentTarget"] = RemoveLineTag;
@@ -766,10 +768,13 @@ namespace Sharpmake.Generators.Apple
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU14, () => options["CppStandard"] = "gnu++14")
                 );
 
-
             Options.XCode.Compiler.DevelopmentTeam developmentTeam = Options.GetObject<Options.XCode.Compiler.DevelopmentTeam>(conf);
             if (developmentTeam != null)
                 options["DevelopmentTeam"] = developmentTeam.Value;
+
+            Options.XCode.Compiler.ProvisioningStyle provisioningStyle = Options.GetObject<Options.XCode.Compiler.ProvisioningStyle>(conf);
+            if (provisioningStyle != null)
+                options["ProvisioningStyle"] = provisioningStyle.Value;
 
             Options.SelectOption(conf,
                 Options.Option(Options.XCode.Compiler.DebugInformationFormat.Dwarf, () => options["DebugInformationFormat"] = "dwarf"),
@@ -1946,18 +1951,20 @@ namespace Sharpmake.Generators.Apple
             private ProjectFolder _mainGroup;
             private ProjectNativeTarget _nativeTarget;
             private string _developmentTeam;
+            private string _provisioningStyle;
             private ProjectConfigurationList _configurationList;
             private string _compatibilityVersion;
             private List<ProjectNativeTarget> _targets;
             private Dictionary<ProjectFolder, ProjectReference> _projectReferences;
             private bool _iCloudSupport;
 
-            public ProjectMain(string projectName, ProjectFolder mainGroup, ProjectConfigurationList configurationList, List<ProjectNativeTarget> targets, bool iCloudSupport, string developmentTeam)
+            public ProjectMain(string projectName, ProjectFolder mainGroup, ProjectConfigurationList configurationList, List<ProjectNativeTarget> targets, bool iCloudSupport, string developmentTeam, string provisioningStyle)
                 : base(ItemSection.PBXProject, projectName)
             {
                 _nativeTarget = null;
                 _mainGroup = mainGroup;
                 _developmentTeam = developmentTeam;
+                _provisioningStyle = provisioningStyle;
                 _configurationList = configurationList;
                 _compatibilityVersion = "Xcode 3.2";
                 _targets = targets;
@@ -1965,12 +1972,13 @@ namespace Sharpmake.Generators.Apple
                 _iCloudSupport = iCloudSupport;
             }
 
-            public ProjectMain(ProjectNativeTarget nativeTarget, ProjectFolder mainGroup, ProjectConfigurationList configurationList, bool iCloudSupport, string developmentTeam)
+            public ProjectMain(ProjectNativeTarget nativeTarget, ProjectFolder mainGroup, ProjectConfigurationList configurationList, bool iCloudSupport, string developmentTeam, string provisioningStyle)
                 : base(ItemSection.PBXProject, nativeTarget.Identifier)
             {
                 _nativeTarget = nativeTarget;
                 _mainGroup = mainGroup;
                 _developmentTeam = developmentTeam;
+                _provisioningStyle = provisioningStyle;
                 _configurationList = configurationList;
                 _compatibilityVersion = "Xcode 3.2";
                 _targets = new List<ProjectNativeTarget> { nativeTarget };
@@ -2027,6 +2035,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectNativeTarget NativeTarget { get { return _nativeTarget; } }
             public ProjectFolder MainGroup { get { return _mainGroup; } }
             public string DevelopmentTeam { get { return _developmentTeam; } }
+            public string ProvisioningStyle { get { return _provisioningStyle; } }
             public ProjectConfigurationList ConfigurationList { get { return _configurationList; } }
             public string CompatibilityVersion { get { return _compatibilityVersion; } }
             public string ICloudSupport { get { return _iCloudSupport ? "1" : "0"; } }

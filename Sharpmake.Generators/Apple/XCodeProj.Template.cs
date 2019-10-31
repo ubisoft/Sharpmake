@@ -55,6 +55,7 @@ namespace Sharpmake.Generators.Apple
 @"					[item.Uid] /* [item.Identifier] */ =
 					{
 						DevelopmentTeam = [project.DevelopmentTeam];
+						ProvisioningStyle = [project.ProvisioningStyle];
 						SystemCapabilities =
 						{
 							com.apple.iCloud =
@@ -261,7 +262,7 @@ namespace Sharpmake.Generators.Apple
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
 				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
 				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
-				PROVISIONING_PROFILE = ""[item.Options.ProvisioningProfile]"";
+				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
 			};

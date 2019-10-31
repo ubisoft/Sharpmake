@@ -113,6 +113,11 @@ namespace Sharpmake
                     public DevelopmentTeam(string value) : base(value) { }
                 }
 
+                public class ProvisioningStyle : StringOption
+                {
+                    public ProvisioningStyle(string value) : base(value) { }
+                }
+
                 public enum DeploymentPostProcessing
                 {
                     [Default]
