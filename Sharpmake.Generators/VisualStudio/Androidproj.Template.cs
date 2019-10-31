@@ -61,6 +61,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AndroidAPILevel>[options.AndroidAPILevel]</AndroidAPILevel>
     <OutDir>$(ProjectDir)[options.OutputDirectory]\</OutDir>
     <IntDir>[options.IntermediateDirectory]\</IntDir>
+    <TargetName>[options.OutputFile]</TargetName>
   </PropertyGroup>
 ";
 
