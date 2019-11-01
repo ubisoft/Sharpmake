@@ -178,11 +178,17 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var customBuildStep in buildSteps)
             {
                 var relativeBuildStep = customBuildStep.MakePathRelative(resolver, (path, commandRelative) => Util.SimplifyPath(Util.PathGetRelative(referencePath, path)));
-                relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
+                var executable = relativeBuildStep.Executable;
+                if (!executable.StartsWith("\"") && !executable.EndsWith("\"") && !executable.Contains("\n"))
+                {
+                    executable = string.Format("\"{0}\"", executable);
+                }
+
+                relativeBuildStep.AdditionalInputs.Add(executable);
                 // Build the command.
                 string command = string.Format(
                     "{0} {1}",
-                    relativeBuildStep.Executable,
+                    executable,
                     relativeBuildStep.ExecutableArguments
                 );
 
@@ -1430,10 +1436,12 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         fileGenerator.Write(Template.Project.ProjectFilesCustomBuildBegin);
 
+                        var standardPath = Util.PathMakeStandard(file.FileNameProjectRelative);
+
                         foreach (Project.Configuration conf in context.ProjectConfigurations)
                         {
                             CombinedCustomFileBuildStep buildStep;
-                            if (configurationCustomFileBuildSteps[conf].TryGetValue(file.FileNameProjectRelative, out buildStep))
+                            if (configurationCustomFileBuildSteps[conf].TryGetValue(standardPath, out buildStep))
                             {
                                 using (fileGenerator.Declare("conf", conf))
                                 using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
