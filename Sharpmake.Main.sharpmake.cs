@@ -31,7 +31,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2017,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.v4_6_1
+                    framework: DotNetFramework.v4_7_2
                 ),
                 new Target(
                     Platform.anycpu,

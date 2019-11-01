@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake</RootNamespace>
     <AssemblyName>Sharpmake.CommonPlatforms</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -19,8 +19,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\debug</OutputPath>
-    <IntermediateOutputPath>..\..\tmp\obj\v4_6_1_debug\sharpmake.commonplatforms</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\tmp\obj\v4_6_1_Debug\Sharpmake.CommonPlatforms</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\..\tmp\obj\v4_7_2_debug\sharpmake.commonplatforms</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\tmp\obj\v4_7_2_Debug\Sharpmake.CommonPlatforms</BaseIntermediateOutputPath>
     <DocumentationFile>..\..\bin\Debug\Sharpmake.CommonPlatforms.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -35,8 +35,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\release</OutputPath>
-    <IntermediateOutputPath>..\..\tmp\obj\v4_6_1_release\sharpmake.commonplatforms</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\..\tmp\obj\v4_6_1_Release\Sharpmake.CommonPlatforms</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>..\..\tmp\obj\v4_7_2_release\sharpmake.commonplatforms</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\..\tmp\obj\v4_7_2_Release\Sharpmake.CommonPlatforms</BaseIntermediateOutputPath>
     <DocumentationFile>..\..\bin\Release\Sharpmake.CommonPlatforms.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
