@@ -277,10 +277,12 @@ namespace QTFileCustomBuild
 
             foreach (ProjConfiguration conf in project.Configurations)
             {
+                char pathSep = Path.DirectorySeparatorChar;
+
                 // Setup exclusions.
                 string QTMocOutputBase = Path.GetDirectoryName(conf.IntermediatePath);
                 string targetName = conf.Target.Name;
-                string outputFolder = Path.Combine(QTMocOutputBase, "qt", targetName.ToLowerInvariant());
+                string outputFolder = Path.Combine(QTMocOutputBase, "qt", targetName.ToLowerInvariant()) + pathSep;
 
                 // We make the current output folder included directly so you can use the same #include directive to get the correct cpp file.
                 conf.IncludePrivatePaths.Add(sharedFolder);
@@ -289,11 +291,10 @@ namespace QTFileCustomBuild
                 // We need to exclude the generation files folder from the build on all targets except our own.
                 string rootFolderForRegex = Util.GetCapitalizedPath(conf.ProjectPath);
                 string outputRegex = Util.PathGetRelative(rootFolderForRegex, outputFolder);
-                char pathSep = Path.DirectorySeparatorChar;
                 outputRegex = outputRegex
                     .Replace("..{pathSep}", "") // remove all relative specifiers
                     .Replace("\\", "\\\\") // escape backslashes if they exist
-                    + pathSep; // trailing path
+                    + pathSep + pathSep; // trailing path
                 foreach (ProjConfiguration confToExclude in project.Configurations)
                 {
                     if (confToExclude == conf || confToExclude.ProjectFullFileNameWithExtension != conf.ProjectFullFileNameWithExtension)
