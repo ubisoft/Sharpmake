@@ -1202,8 +1202,8 @@ namespace Sharpmake.Generators.FastBuild
                                                     string destinationPath = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, copyCommand.DestinationPath);
 
                                                     using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildCopySource", Bff.CurrentBffPathKeyCombine(sourcePath)))
-                                                    using (bffGenerator.Declare("fastBuildCopyDest", Bff.CurrentBffPathKeyCombine(destinationPath)))
+                                                    using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
+                                                    using (bffGenerator.Declare("fastBuildCopyDest", destinationPath))
                                                     {
                                                         bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
                                                     }
