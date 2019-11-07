@@ -35,9 +35,9 @@ namespace SharpmakeGen
                 ),
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2017,
+                    DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.netcore2
+                    framework: DotNetFramework.netcore3_0
                 )
             };
         }

@@ -1771,7 +1771,7 @@ namespace Sharpmake
             if (string.IsNullOrEmpty(version))
                 return string.Empty;
 
-            return framework >= DotNetFramework.netcore1
+            return framework >= DotNetFramework.netcore1_0
                 ? version
                 : string.Format("v{0}", version);
         }

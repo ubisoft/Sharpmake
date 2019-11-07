@@ -1,2 +1,2 @@
 #!/bin/bash
-./bootstrap-sharpmake.sh ios
+./bootstrap-sharpmake.sh osx

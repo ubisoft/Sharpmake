@@ -9,8 +9,8 @@ fi
 
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
-SHARPMAKE_EXECUTABLE="$SCRIPTPATH/bin/debug/netcoreapp2.0/$platform-x64/publish/Sharpmake.Application"
-SHARPMAKE_EXECUTABLE_RELEASE="$SCRIPTPATH/bin/release/netcoreapp2.0/$platform-x64/publish/Sharpmake.Application"
+SHARPMAKE_EXECUTABLE="$SCRIPTPATH/bin/debug/netcoreapp3.0/$platform-x64/Sharpmake.Application"
+SHARPMAKE_EXECUTABLE_RELEASE="$SCRIPTPATH/bin/release/netcoreapp3.0/$platform-x64/Sharpmake.Application"
 
 # helpers to quiet pushd/popd
 pushd () {
@@ -61,10 +61,10 @@ CompileSharpmake()
   # Build Sharpmake using specified arguments
   echo Compiling $file in "$target|$platform-x64"...
 
-  BUILD_CMD="dotnet build \"$file\" -v q -nologo -c \"$target\""
+  BUILD_CMD="dotnet build \"$file\" -v q -nologo -c \"$target\" -r $platform-x64 /p:PublishSingleFile=true"
 
   if [ "$buildtype" = "publish" ]; then
-    BUILD_CMD="dotnet publish \"$file\" -v q -nologo -c \"$target\" -r $platform-x64 --self-contained true"
+    BUILD_CMD="dotnet publish \"$file\" -v q -nologo -c \"$target\" -r $platform-x64 /p:PublishSingleFile=true"
   fi
 
   echo $BUILD_CMD

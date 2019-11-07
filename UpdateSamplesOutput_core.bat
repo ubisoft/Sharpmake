@@ -1,8 +1,8 @@
 @echo off
 
 :: First compile sharpmake to insure we are trying to deploy using an executable corresponding to the code.
-call CompileSharpmake_core.bat Sharpmake.Application/Sharpmake.Application_Core.csproj Debug publish
-call CompileSharpmake_core.bat Sharpmake_Core.sln Debug build
+call CompileSharpmake_core.bat Sharpmake.Application/Sharpmake.Application_Core.csproj Debug
+call CompileSharpmake_core.bat Sharpmake_Core.sln Debug
 if %errorlevel% NEQ 0 goto error
 
 :: main
@@ -48,15 +48,15 @@ pushd %CD%
 :: set testScopedCurrentDirectory as current
 cd /d %~dp0%~1
 
-set SHARPMAKE_EXECUTABLE=%~dp0bin\debug\netcoreapp2.0\win-x64\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0bin\Release\netcoreapp2.0\win-x64\Sharpmake.Application.exe
+set SHARPMAKE_EXECUTABLE=%~dp0bin\debug\netcoreapp3.0\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0bin\Release\netcoreapp3.0\Sharpmake.Application.exe
 if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0bin & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 
 echo Updating references of %2...
 rd /s /q "%~2\%~4"
-call %SHARPMAKE_EXECUTABLE% /sources(@\"%~2\%~3\") /outputdir(@\"%~2\%~4\") /remaproot(@\"%~5\") /verbose
+call %SHARPMAKE_EXECUTABLE% /sources(@'%~2\%~3') /outputdir(@'%~2\%~4') /remaproot(@'%~5') /verbose
 set ERRORLEVEL_BACKUP=%errorlevel%
 :: restore caller current directory
 popd

@@ -29,7 +29,7 @@ namespace NetCoreHelloWorld
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.netcore1),
+            DotNetFramework.netcore1_0),
             new Target(
             Platform.anycpu,
             DevEnv.vs2019,
@@ -37,7 +37,7 @@ namespace NetCoreHelloWorld
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.netcore2));
+            DotNetFramework.netcore2_0));
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
@@ -68,7 +68,7 @@ namespace NetCoreHelloWorld
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.netcore1),
+            DotNetFramework.netcore1_0),
             new Target(
             Platform.anycpu,
             DevEnv.vs2019,
@@ -76,7 +76,7 @@ namespace NetCoreHelloWorld
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.netcore2));
+            DotNetFramework.netcore2_0));
         }
 
         [Configure()]

@@ -104,6 +104,7 @@ namespace Sharpmake.Generators.VisualStudio
     <ConcordSDKDir>[options.ConcordSDKDir]</ConcordSDKDir>
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <GenerateAssemblyInfo>[options.GenerateAssemblyInfo]</GenerateAssemblyInfo>
   </PropertyGroup>
 ";
 
@@ -134,7 +135,6 @@ namespace Sharpmake.Generators.VisualStudio
     <LangVersion>[options.LanguageVersion]</LangVersion>
     <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
-    <GenerateAssemblyInfo>[options.GenerateAssemblyInfo]</GenerateAssemblyInfo>
   </PropertyGroup>
 ";
 

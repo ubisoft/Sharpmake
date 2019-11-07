@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
 
@@ -155,14 +156,33 @@ namespace Sharpmake
 
         internal static Target GetTargets()
         {
+            var frameworkString = Assembly
+                .GetEntryAssembly()?
+                .GetCustomAttribute<TargetFrameworkAttribute>()?
+                .FrameworkName ?? "";
+
+            DotNetFramework framework = DotNetFramework.v4_7_2;
+            if (frameworkString.StartsWith(".NETFramework"))
+            {
+                Enum.TryParse(frameworkString.Split('=')[1].Replace('.', '_'), out framework);
+            }
+            else if (frameworkString.StartsWith(".NETCore"))
+            {
+                Enum.TryParse("netcore" + frameworkString.Split('=')[1].Substring(1).Replace('.', '_'), out framework);
+            }
+
+            var devEnv = DevEnv.vs2017;
+            if (framework >= DotNetFramework.netcore3_0)
+                devEnv = DevEnv.vs2019;
+
             return new Target(
                 Platform.anycpu,
-                DevEnv.vs2017,
+                devEnv,
                 Optimization.Debug,
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_7_2
+                framework
             );
         }
 
@@ -247,7 +267,7 @@ namespace Sharpmake
     public class DebugSolution : Solution
     {
         public DebugSolution()
-            : base(typeof(Target))
+            : base(typeof(Target), null, true)
         {
             Name = "Sharpmake_DebugSolution";
 

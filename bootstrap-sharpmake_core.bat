@@ -3,12 +3,12 @@
 :: set batch file directory as current
 pushd "%~dp0"
 
-set SHARPMAKE_EXECUTABLE=bin\debug\netcoreapp2.0\win-x64\Sharpmake.Application.exe
+set SHARPMAKE_EXECUTABLE=bin\debug\netcoreapp3.0\Sharpmake.Application.exe
 
-call CompileSharpmake_core.bat Sharpmake.Application/Sharpmake.Application_Core.csproj Debug publish
+call CompileSharpmake_core.bat Sharpmake.Application/Sharpmake.Application_Core.csproj Debug
 if %errorlevel% NEQ 0 goto error
 
-set SM_CMD=%SHARPMAKE_EXECUTABLE% /sources(\"Sharpmake.Main.sharpmake.cs\") /verbose %*
+set SM_CMD=%SHARPMAKE_EXECUTABLE% /sources('Sharpmake.Main.sharpmake.cs') /verbose %*
 echo %SM_CMD%
 %SM_CMD%
 if %errorlevel% NEQ 0 goto error

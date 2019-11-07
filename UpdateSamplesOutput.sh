@@ -14,7 +14,7 @@ updateref()
 
     echo Updating references of $testFolder...
     rm -rf "$testFolder/$outDir"
-    $SHARPMAKE_EXECUTABLE /sources\(@\"$testFolder/$testFile\"\) /outputdir\(@\"$testFolder/$outDir\"\) /remaproot\(@\"$remapRoot\"\) /verbose
+    $SHARPMAKE_EXECUTABLE /sources\(@'$testFolder/$testFile'\) /outputdir\(@'$testFolder/$outDir'\) /remaproot\(@'$remapRoot'\) /verbose
     errorlevel=$?
 
     # restore caller current directory

@@ -38,7 +38,7 @@ namespace Sharpmake
 
         public static bool IsDotNetCore(this DotNetFramework framework)
         {
-            return framework >= DotNetFramework.netcore1;
+            return framework >= DotNetFramework.netcore1_0;
         }
 
         public static string ToVersionString(this DotNetFramework framework)
@@ -75,18 +75,20 @@ namespace Sharpmake
                     return "4.7.1";
                 case DotNetFramework.v4_7_2:
                     return "4.7.2";
-                case DotNetFramework.netcore1:
+                case DotNetFramework.netcore1_0:
                     return "netcoreapp1.0";
                 case DotNetFramework.netcore1_1:
                     return "netcoreapp1.1";
-                case DotNetFramework.netcore2:
+                case DotNetFramework.netcore2_0:
                     return "netcoreapp2.0";
                 case DotNetFramework.netcore2_1:
                     return "netcoreapp2.1";
                 case DotNetFramework.netcore2_2:
                     return "netcoreapp2.2";
-                case DotNetFramework.netcore3:
+                case DotNetFramework.netcore3_0:
                     return "netcoreapp3.0";
+                case DotNetFramework.netcore3_1:
+                    return "netcoreapp3.1";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }

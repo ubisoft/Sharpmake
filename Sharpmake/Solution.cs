@@ -84,6 +84,12 @@ namespace Sharpmake
             Initialize(targetType ?? typeof(Target), configurationType ?? typeof(Solution.Configuration));
         }
 
+        // Internal solutions (i.e. DebugSolution) might not have source information available
+        internal Solution(Type targetType, Type configurationType, bool internalSolution)
+        {
+            Initialize(targetType ?? typeof(Target), configurationType ?? typeof(Solution.Configuration), true);
+        }
+
         #region Internal
 
         [DebuggerDisplay("{ProjectName}")]
@@ -450,7 +456,7 @@ namespace Sharpmake
         private bool _dependenciesResolved = false;
         private bool _generateFastBuildAllOnlyForConfThatNeedIt = true;
 
-        private void Initialize(Type targetType, Type configurationType)
+        private void Initialize(Type targetType, Type configurationType, bool isInternal = false)
         {
             var expectedType = typeof(Solution.Configuration);
             if (configurationType == null || (configurationType != expectedType && !configurationType.IsSubclassOf(expectedType)))
@@ -462,16 +468,21 @@ namespace Sharpmake
             Targets.Initialize(targetType);
 
             string file;
-            if (Util.GetStackSourceFileTopMostTypeOf(GetType(), out file))
+            if (!Util.GetStackSourceFileTopMostTypeOf(GetType(), out file))
             {
-                FileInfo fileInfo = new FileInfo(file);
-                SharpmakeCsFileName = Util.PathMakeStandard(fileInfo.FullName);
-                SharpmakeCsPath = Util.PathMakeStandard(fileInfo.DirectoryName);
+                if (isInternal)
+                {
+                    file = GetType().Module.Assembly.Location;
+                }
+                else if (!isInternal)
+                {
+                    throw new InternalError("Cannot locate cs source for type: {0}", GetType().FullName);
+                }
             }
-            else
-            {
-                throw new InternalError("Cannot locate cs source for type: {}", GetType().FullName);
-            }
+
+            FileInfo fileInfo = new FileInfo(file);
+            SharpmakeCsFileName = Util.PathMakeStandard(fileInfo.FullName);
+            SharpmakeCsPath = Util.PathMakeStandard(fileInfo.DirectoryName);
         }
 
         private void MakeFastBuildAllProjectIfNeeded(Builder builder, Dictionary<Solution.Configuration, List<Project.Configuration>> unlinkedConfigurations)

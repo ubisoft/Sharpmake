@@ -1,2 +1,2 @@
 #!/bin/bash
-./UpdateSamplesOutput.sh mac
+./UpdateSamplesOutput.sh osx
