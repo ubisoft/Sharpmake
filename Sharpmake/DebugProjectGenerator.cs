@@ -30,6 +30,8 @@ namespace Sharpmake
     {
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
+        public static string PackageVersion { get; set; }
+        public static string PackageName { get; set; }
 
         /// <summary>
         /// Generates debug projects and solutions
@@ -195,7 +197,7 @@ namespace Sharpmake
                 s_sharpmakePackageName = $"{assemblyProductName}";
                 if (!string.IsNullOrWhiteSpace(assemblyProductVariationWithoutSubGroup))
                     s_sharpmakePackageName += $"-{assemblyProductVariationWithoutSubGroup}";
-
+                
                 if (assemblyProductVariation == "LocalBuild")
                 {
                     // debug solution generated from local build
@@ -222,8 +224,10 @@ namespace Sharpmake
                 conf.ReferencesByPath.Add(s_sharpmakeDllPath);
                 conf.ReferencesByPath.Add(s_sharpmakeGeneratorDllPath);
             }
-            else
-                conf.ReferencesByNuGetPackage.Add(s_sharpmakePackageName, s_sharpmakePackageVersion);
+            else if (!string.IsNullOrEmpty(PackageName) && !string.IsNullOrEmpty(PackageVersion))
+            {
+                conf.ReferencesByNuGetPackage.Add(PackageName, PackageVersion);
+            }
         }
 
         /// <summary>
