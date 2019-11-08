@@ -354,7 +354,6 @@ namespace Sharpmake.Generators.FastBuild
                         Options.ExplicitOptions confOptions = options[conf];
 
                         bool useObjectLists = Sharpmake.Options.GetObject<Options.Vc.Linker.UseLibraryDependencyInputs>(conf) == Sharpmake.Options.Vc.Linker.UseLibraryDependencyInputs.Enable;
-                        bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig;
                         string outputFile = confOptions["OutputFile"];
                         string fastBuildOutputFile = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, outputFile, true));
                         fastBuildOutputFile = platformBff.GetOutputFilename(conf.Output, fastBuildOutputFile);
@@ -364,7 +363,10 @@ namespace Sharpmake.Generators.FastBuild
 
                         bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
                         bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
+                        bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
                         bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+
+                        bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig && isOutputTypeLib;
 
                         if (!useObjectLists && confSubConfigs.Count > 1 && !isLastSubConfig)
                         {
