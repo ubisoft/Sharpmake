@@ -74,7 +74,7 @@ namespace Sharpmake
 
         public static string PathMakeStandard(string path)
         {
-            return PathMakeStandard(path, !Util.IsRunningInMono());
+            return PathMakeStandard(path, !Util.IsRunningInMono() && !Util.IsRunningOnUnix());
         }
 
         private static string GetTextTemplateDirectiveParam(string[] templateText, string directive, string paramName)
