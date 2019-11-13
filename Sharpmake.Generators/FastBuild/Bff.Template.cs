@@ -130,6 +130,7 @@ Compiler( '[fastbuildCompilerName]' )
                             // Debugging
                             // ---------------------------
                             + ' [cmdLineOptions.GenerateDebugInformation]'
+                            + ' [cmdLineOptions.LinkerNatvisFiles]'
                             + ' [cmdLineOptions.LinkerProgramDatabaseFile]'
                             + ' [cmdLineOptions.GenerateMapFile]'
                             + ' [cmdLineOptions.MapExports]'

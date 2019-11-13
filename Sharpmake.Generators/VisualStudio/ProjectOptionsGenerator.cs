@@ -2120,6 +2120,19 @@ namespace Sharpmake.Generators.VisualStudio
                 else
                     context.CommandLineOptions["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
 
+
+                if (context.Configuration.Project.NatvisFiles.Count > 0)
+                {
+                    var cmdNatvisFiles = context.Configuration.Project.NatvisFiles.Select(n => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, n, "/NATVIS:"));
+                    string linkerNatvis = string.Join($"'{Environment.NewLine}                            + ' ", cmdNatvisFiles);
+
+                    context.CommandLineOptions["LinkerNatvisFiles"] = linkerNatvis;
+                }
+                else
+                {
+                    context.CommandLineOptions["LinkerNatvisFiles"] = FileGeneratorUtilities.RemoveLineTag;
+                }
+
                 if (!string.IsNullOrEmpty(cmdLineOptionsLinkerProgramDatabaseFile))
                     context.CommandLineOptions["LinkerProgramDatabaseFile"] = $@"/PDB:""{cmdLineOptionsLinkerProgramDatabaseFile}""";
                 else
