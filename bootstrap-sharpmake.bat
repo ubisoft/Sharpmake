@@ -3,6 +3,10 @@
 :: set batch file directory as current
 pushd "%~dp0"
 
+echo Cleaning up previous bootstrap
+:: This is a bit slow but needs to be done if switching between .net core and .net standard
+del /s /q project.assets.json >nul 2>&1
+
 set SHARPMAKE_EXECUTABLE=bin\debug\Sharpmake.Application.exe
 
 call CompileSharpmake.bat Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
