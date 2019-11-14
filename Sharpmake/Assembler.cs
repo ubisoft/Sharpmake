@@ -76,6 +76,7 @@ namespace Sharpmake
         
         // Get the super set of assemblies I currently have loaded and explicit default references
         public static readonly string[] DefaultReferences = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic)
             .Select(a => a.Location)
             .Where(f => f.IndexOf("Sharpmake", StringComparison.OrdinalIgnoreCase) == -1)
             .Concat(_defaultReferences.Select(GetAssemblyDllPath).Where(f => !string.IsNullOrEmpty(f)).ToArray())
