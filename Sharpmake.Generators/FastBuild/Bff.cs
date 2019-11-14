@@ -1348,6 +1348,8 @@ namespace Sharpmake.Generators.FastBuild
 
             FillIncludeDirectoriesOptions(context);
 
+            FillLinkerOptions(context);
+
             OrderableStrings additionalDependencies = FillLibrariesOptions(context);
             additionalDependenciesPerConf.Add(context.Configuration, additionalDependencies);
         }
@@ -1430,6 +1432,26 @@ namespace Sharpmake.Generators.FastBuild
                     var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, "/AI"));
                     context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
                 }
+            }
+        }
+
+        private static void FillLinkerOptions(BffGenerationContext context)
+        {
+            FillEmbeddedNatvisOptions(context);
+        }
+
+        private static void FillEmbeddedNatvisOptions(BffGenerationContext context)
+        {
+            if (context.Configuration.Project.NatvisFiles.Count > 0)
+            {
+                var cmdNatvisFiles = context.Configuration.Project.NatvisFiles.Select(n => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, n, "/NATVIS:"));
+                string linkerNatvis = string.Join($"'{Environment.NewLine}                            + ' ", cmdNatvisFiles);
+
+                context.CommandLineOptions["LinkerNatvisFiles"] = linkerNatvis;
+            }
+            else
+            {
+                context.CommandLineOptions["LinkerNatvisFiles"] = FileGeneratorUtilities.RemoveLineTag;
             }
         }
 
