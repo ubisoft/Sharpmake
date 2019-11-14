@@ -385,6 +385,9 @@ namespace Sharpmake
                 CSharp6,
                 CSharp7,
                 CSharp7_1,
+                CSharp7_2,
+                CSharp7_3,
+                CSharp8,
             }
 
             // Disable warning MSB3270 when disabled

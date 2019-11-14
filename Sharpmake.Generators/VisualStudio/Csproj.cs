@@ -3017,7 +3017,10 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.LanguageVersion.CSharp5, () => { options["LanguageVersion"] = "5"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp6, () => { options["LanguageVersion"] = "6"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp7, () => { options["LanguageVersion"] = "7"; }),
-            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; })
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_2, () => { options["LanguageVersion"] = "7.2"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_3, () => { options["LanguageVersion"] = "7.3"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp8, () => { options["LanguageVersion"] = "8"; })
             );
 
             SelectOption(
