@@ -406,7 +406,7 @@ namespace Sharpmake.UnitTests
             Assert.IsFalse(uniqueList.Contains("HHH"));
         }
 
-        class ListContainer
+        private class ListContainer
         {
             public ListContainer()
             {

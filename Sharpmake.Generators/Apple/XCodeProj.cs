@@ -1006,7 +1006,7 @@ namespace Sharpmake.Generators.Apple
             options["IncludePaths"] = includePaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
 
             OrderableStrings libraryPaths = conf.LibraryPaths;
-            libraryPaths.AddRange(conf.ResolvedDependencies.Select(libPaths => libPaths.TargetPath ));
+            libraryPaths.AddRange(conf.ResolvedDependencies.Select(libPaths => libPaths.TargetPath));
             if (libraryPaths.Count == 0)
             {
                 options["LibraryPaths"] = RemoveLineTag;

@@ -337,7 +337,7 @@ namespace Sharpmake.UnitTests
         {
             public abstract void Test(IParsingFlowParser parser, FileInfo fileInfo, int index, AssemblerContext assemblerContext);
         }
-        
+
         private class LineTestParse : LineTest
         {
             public string Line { get; }
@@ -348,7 +348,7 @@ namespace Sharpmake.UnitTests
                 Line = line;
                 ExpectedResult = expectedResult;
             }
-            
+
             public override void Test(IParsingFlowParser parser, FileInfo fileInfo, int index, AssemblerContext assemblerContext)
             {
                 parser.ParseLine(Line, fileInfo, index, assemblerContext);
@@ -356,7 +356,7 @@ namespace Sharpmake.UnitTests
                 Assert.AreEqual(ExpectedResult, shouldParseLine, $"ShouldParseLine for line ({index}) \"{Line}\" should return {ExpectedResult} after evaluation!");
             }
         }
-        
+
         private class LineTestNestedFile : LineTest
         {
             public LineTest[] Lines { get; }
@@ -381,7 +381,7 @@ namespace Sharpmake.UnitTests
         {
             var assemblerContext = new AssemblerContext();
             IParsingFlowParser parser = new PreprocessorConditionParser(defines);
-            
+
             LineTestNestedFile wrapperFile = new LineTestNestedFile(lines);
             wrapperFile.Test(parser, _fakeFileInfo, 0, assemblerContext);
         }
@@ -473,25 +473,25 @@ namespace Sharpmake.UnitTests
 
             EvaluateLines(lines, defines);
         }
-        
+
         [Test]
         public void NestedFilesTest()
         {
-            HashSet<string> defines = new HashSet<string>() {  };
+            HashSet<string> defines = new HashSet<string>() { };
 
             LineTest[] lines = new LineTest[]
             {
                 new LineTestParse("...",               true),
                 new LineTestNestedFile(new []
                 {
-                    new LineTestParse("...",true), 
-                }), 
+                    new LineTestParse("...",true),
+                }),
                 new LineTestParse("...",               true),
             };
 
             EvaluateLines(lines, defines);
         }
-        
+
         [Test]
         public void NestedFilesWithConditionsTest()
         {

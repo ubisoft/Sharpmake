@@ -197,7 +197,7 @@ namespace Sharpmake
                 s_sharpmakePackageName = $"{assemblyProductName}";
                 if (!string.IsNullOrWhiteSpace(assemblyProductVariationWithoutSubGroup))
                     s_sharpmakePackageName += $"-{assemblyProductVariationWithoutSubGroup}";
-                
+
                 if (assemblyProductVariation == "LocalBuild")
                 {
                     // debug solution generated from local build

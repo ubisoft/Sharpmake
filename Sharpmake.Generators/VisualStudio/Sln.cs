@@ -380,7 +380,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                         if (fastBuildAllProjectForSolutionDependency != null)
                         {
-                            bool writeDependencyToFastBuildAll = ( resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe) ) ||
+                            bool writeDependencyToFastBuildAll = (resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe)) ||
                                                                  solution.ProjectsDependingOnFastBuildAllForThisSolution.Contains(resolvedProject.Project);
 
                             if (writeDependencyToFastBuildAll)

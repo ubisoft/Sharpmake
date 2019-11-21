@@ -149,7 +149,7 @@ namespace Sharpmake
             State state = _state.Value;
             if (!state.NestedFileStates.Any())
                 throw new Error("invalid condition block format");
-            
+
             FileState currentFile = state.NestedFileStates.Peek();
             if (!currentFile.NestedConditionBlocks.Any())
                 throw new Error("invalid condition block format");
@@ -174,7 +174,7 @@ namespace Sharpmake
         public void FileParsingEnd(string file)
         {
             // Basic validations so that we can catch early malformed Sharpmake files
-            
+
             State state = _state.Value;
             if (!state.NestedFileStates.Any())
                 throw new Exception($"End of file reached with an already empty files stack, malformed Sharpmake {file}");
@@ -204,7 +204,7 @@ namespace Sharpmake
             /// Current nested file path.
             /// </summary>
             public string FilePath { get; set; }
-            
+
             /// <summary>
             /// All nested condition blocks parsed so far (#if inside #if)
             /// </summary>
