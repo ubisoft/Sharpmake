@@ -64,7 +64,6 @@ namespace Sharpmake.Generators.FastBuild
             public List<Solution.ResolvedProject> ResolvedProjects { get; }
             public bool ProjectsWereFiltered { get; private set; }
 
-
             public void Merge(ConfigurationsPerBff other)
             {
                 Debug.Assert(other.BffFilePath == BffFilePath);
@@ -77,6 +76,18 @@ namespace Sharpmake.Generators.FastBuild
 
                 ResolvedProjects.AddRange(other.ResolvedProjects);
                 Configurations = merged.ToArray();
+            }
+
+            public void Sort()
+            {
+                Configurations = Configurations.OrderBy(c => c.PlatformName).ThenBy(c => c.SolutionFileName).ThenBy(c => c.Name).ToArray();
+                ResolvedProjects.Sort((p0, p1) =>
+                {
+                    int projectNameComparison = p0.ProjectName.CompareTo(p1.ProjectName);
+                    if (projectNameComparison != 0)
+                        return projectNameComparison;
+                    return p0.TargetDefault.CompareTo(p1.TargetDefault);
+                });
             }
 
             public IEnumerator<Solution.Configuration> GetEnumerator()
@@ -238,6 +249,8 @@ namespace Sharpmake.Generators.FastBuild
 
         private static bool GenerateMasterBffFile(Builder builder, ConfigurationsPerBff configurationsPerBff)
         {
+            configurationsPerBff.Sort();
+
             string masterBffFilePath = Util.GetCapitalizedPath(configurationsPerBff.BffFilePathWithExtension);
             string masterBffDirectory = Path.GetDirectoryName(masterBffFilePath);
             string masterBffFileName = Path.GetFileName(masterBffFilePath);
