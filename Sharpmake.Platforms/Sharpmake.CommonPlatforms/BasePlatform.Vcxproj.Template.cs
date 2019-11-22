@@ -83,7 +83,7 @@ namespace Sharpmake
         private const string _projectConfigurationsLinkTemplate =
             @"    <Link>
       <SubSystem>[options.SubSystem]</SubSystem>
-      <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+      <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
       <FullProgramDatabaseFile>[options.FullProgramDatabaseFile]</FullProgramDatabaseFile>
       <OutputFile>[options.OutputFile]</OutputFile>
       <ShowProgress>[options.ShowProgress]</ShowProgress>
@@ -139,7 +139,7 @@ namespace Sharpmake
 
         private const string _projectConfigurationsStaticLinkTemplate =
             @"    <Link>
-      <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+      <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
       <FullProgramDatabaseFile>[options.FullProgramDatabaseFile]</FullProgramDatabaseFile>
       <EnableCOMDATFolding>[options.EnableCOMDATFolding]</EnableCOMDATFolding>
       <OptimizeReferences>[options.OptimizeReferences]</OptimizeReferences>

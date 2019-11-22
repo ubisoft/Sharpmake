@@ -82,7 +82,7 @@ namespace Sharpmake
 
             private const string _projectConfigurationsLinkSharedTemplate =
                 @"    <Link>
-      <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+      <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
       <OutputFile>[options.OutputFile]</OutputFile>
       <ShowProgress>[options.ShowProgress]</ShowProgress>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
@@ -146,7 +146,7 @@ namespace Sharpmake
 
             private const string _projectConfigurationsStaticLinkTemplate =
                 @"    <Link>
-      <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+      <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
       <EnableCOMDATFolding>[options.EnableCOMDATFolding]</EnableCOMDATFolding>
       <OptimizeReferences>[options.OptimizeReferences]</OptimizeReferences>
     </Link>

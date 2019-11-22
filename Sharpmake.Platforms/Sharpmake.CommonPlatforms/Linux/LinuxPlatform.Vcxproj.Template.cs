@@ -51,7 +51,7 @@ namespace Sharpmake
 
             private const string _projectConfigurationsStaticLinkTemplate =
                             @"    <Link>
-                  <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+                  <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
                   <EnableCOMDATFolding>[options.EnableCOMDATFolding]</EnableCOMDATFolding>
                   <OptimizeReferences>[options.OptimizeReferences]</OptimizeReferences>
                 </Link>

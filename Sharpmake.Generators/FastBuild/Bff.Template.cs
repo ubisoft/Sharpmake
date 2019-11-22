@@ -129,7 +129,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.ManifestFile]'
                             // Debugging
                             // ---------------------------
-                            + ' [cmdLineOptions.GenerateDebugInformation]'
+                            + ' [cmdLineOptions.LinkerGenerateDebugInformation]'
                             + ' [cmdLineOptions.LinkerNatvisFiles]'
                             + ' [cmdLineOptions.LinkerProgramDatabaseFile]'
                             + ' [cmdLineOptions.GenerateMapFile]'

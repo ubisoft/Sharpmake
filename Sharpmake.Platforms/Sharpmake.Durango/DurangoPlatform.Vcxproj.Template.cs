@@ -102,7 +102,7 @@ namespace Sharpmake
             private const string _projectConfigurationsLinkTemplate =
                 @"    <Link>
       <SubSystem>[options.SubSystem]</SubSystem>
-      <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+      <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
       <OutputFile>[options.OutputFile]</OutputFile>
       <ShowProgress>[options.ShowProgress]</ShowProgress>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>

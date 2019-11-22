@@ -2073,21 +2073,21 @@ namespace Sharpmake.Generators.VisualStudio
                     if (!isMicrosoftPlatform)
                         throw new Error("Cannot set EnableFastLink on non-microsoft platform " + context.Configuration.Platform);
 
-                    context.Options["GenerateDebugInformation"] = "DebugFastLink";
-                    context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG:FASTLINK";
+                    context.Options["LinkerGenerateDebugInformation"] = "DebugFastLink";
+                    context.CommandLineOptions["LinkerGenerateDebugInformation"] = "/DEBUG:FASTLINK";
                 }
                 else
                 {
                     if (isMicrosoftPlatform && forceFullPDB &&
                          ((context.DevelopmentEnvironment == DevEnv.vs2017) || (context.DevelopmentEnvironment == DevEnv.vs2019)))
                     {
-                        context.Options["GenerateDebugInformation"] = "DebugFull";
-                        context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG:FULL";
+                        context.Options["LinkerGenerateDebugInformation"] = "DebugFull";
+                        context.CommandLineOptions["LinkerGenerateDebugInformation"] = "/DEBUG:FULL";
                     }
                     else
                     {
-                        context.Options["GenerateDebugInformation"] = "true";
-                        context.CommandLineOptions["GenerateDebugInformation"] = "/DEBUG";
+                        context.Options["LinkerGenerateDebugInformation"] = "true";
+                        context.CommandLineOptions["LinkerGenerateDebugInformation"] = "/DEBUG";
                     }
                 }
 
@@ -2137,12 +2137,12 @@ namespace Sharpmake.Generators.VisualStudio
             }),
             Options.Option(Options.Vc.Linker.GenerateDebugInformation.Disable, () =>
             {
-                context.Options["GenerateDebugInformation"] = "false";
+                context.Options["LinkerGenerateDebugInformation"] = "false";
                 context.Options["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["LinkerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.Options["FullProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
 
-                context.CommandLineOptions["GenerateDebugInformation"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["LinkerGenerateDebugInformation"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["LinkerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
             })
