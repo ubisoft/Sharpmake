@@ -110,7 +110,7 @@ namespace SharpmakeGen
                 t.IsSubclassOf(typeof(Platforms.PlatformProject))   ||
                 t.IsSubclassOf(typeof(Extensions.ExtensionProject)) ||
                 t.IsSubclassOf(typeof(Samples.SampleProject))       ||
-                t.IsSubclassOf(typeof(FunctionalTests.TestProject)))
+                t.IsSubclassOf(typeof(FunctionalTests.FunctionalTestProject)))
             )
             {
                 conf.AddProject(projectType, target);

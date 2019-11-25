@@ -12,12 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using Sharpmake;
 
 namespace SharpmakeGen
 {
     namespace FunctionalTests
     {
+        public static class Utils
+        {
+            public static ITarget[] GetDefaultTargets()
+            {
+                var targets = new List<ITarget> {
+                    new Target(
+                        Platform.win64,
+                        DevEnv.vs2017,
+                        Optimization.Debug | Optimization.Release,
+                        buildSystem: BuildSystem.FastBuild
+                    )
+                };
+
+                return targets.ToArray();
+            }
+        }
+
         [Generate]
         public class FastBuildFunctionalTest : Project
         {
@@ -25,14 +43,7 @@ namespace SharpmakeGen
             {
                 Name = "FastBuildFunctionalTest";
 
-                AddTargets(new Target(
-                        Platform.win64,
-                        DevEnv.vs2017,
-                        Optimization.Debug | Optimization.Release,
-                        OutputType.Lib,
-                        Blob.NoBlob,
-                        BuildSystem.FastBuild
-                ));
+                AddTargets(Utils.GetDefaultTargets());
 
                 RootPath = @"[project.SharpmakeCsPath]\codebase";
                 SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
@@ -66,18 +77,10 @@ namespace SharpmakeGen
             public FastBuildFunctionalTestSolution()
             {
                 Name = "FastBuildFunctionalTest";
-
-                AddTargets(new Target(
-                            Platform.win64,
-                            DevEnv.vs2017,
-                            Optimization.Debug | Optimization.Release,
-                            OutputType.Lib,
-                            Blob.NoBlob,
-                            BuildSystem.FastBuild
-                ));
+                AddTargets(Utils.GetDefaultTargets());
             }
 
-            [Configure()]
+            [Configure]
             public void ConfigureAll(Configuration conf, Target target)
             {
                 conf.SolutionFileName = "[solution.Name]";

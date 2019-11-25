@@ -5,9 +5,9 @@ namespace SharpmakeGen
 {
     namespace FunctionalTests
     {
-        public abstract class TestProject : Common.SharpmakeBaseProject
+        public abstract class FunctionalTestProject : Common.SharpmakeBaseProject
         {
-            public TestProject()
+            public FunctionalTestProject()
                 : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
             {
                 // same a samples, tests are special, the class is here instead of in the subfolder
@@ -28,7 +28,7 @@ namespace SharpmakeGen
         }
 
         [Generate]
-        public class FastBuildFunctionalTest : TestProject
+        public class FastBuildFunctionalTest : FunctionalTestProject
         {
             public FastBuildFunctionalTest()
             {
