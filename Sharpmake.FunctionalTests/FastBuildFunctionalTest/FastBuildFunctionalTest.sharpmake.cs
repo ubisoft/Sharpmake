@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.IO;
 using Sharpmake;
 
 namespace SharpmakeGen
@@ -92,7 +93,10 @@ namespace SharpmakeGen
             [Sharpmake.Main]
             public static void SharpmakeMain(Sharpmake.Arguments arguments)
             {
-                FastBuildSettings.FastBuildMakeCommand = @"tools\FastBuild\FBuild.exe";
+                FileInfo fileInfo = Util.GetCurrentSharpmakeFileInfo();
+                string sharpmakeRootDirectory = Util.SimplifyPath(Path.Combine(fileInfo.DirectoryName, "..", ".."));
+
+                FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeRootDirectory, @"tools\FastBuild\FBuild.exe");
                 FastBuildSettings.WriteAllConfigsSection = true;
 
                 arguments.Generate<FastBuildFunctionalTestSolution>();
