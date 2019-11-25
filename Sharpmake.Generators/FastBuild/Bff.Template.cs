@@ -58,11 +58,14 @@ namespace Sharpmake.Generators.FastBuild
 //=================================================================================================================
 Settings
 {
+    #import TMP
+    #import TEMP
+    #import USERPROFILE
     .Environment =
     {
-        ""TMP=[fastBuildTempFolder]"",
-        ""TEMP=[fastBuildTempFolder]"",
-        ""USERPROFILE=[fastBuildUserProfile]"",
+        ""TMP=$TMP$"",
+        ""TEMP=$TEMP$"",
+        ""USERPROFILE=$USERPROFILE$"",
         ""SystemRoot=[fastBuildSystemRoot]""
         ""PATH=[fastBuildPATH]""
     }

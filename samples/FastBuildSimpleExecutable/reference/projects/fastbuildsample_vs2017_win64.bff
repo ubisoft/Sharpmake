@@ -14,8 +14,5 @@
 //=================================================================================================================
 // fastbuildsample_vs2017_win64.bff .bff includes
 //=================================================================================================================
-{
-    .CurrentBffPath = "."
-    #include "$CurrentBffPath$\fastbuildsimpleexecutable_vs2017_win64.bff"
-}
+#include ".\fastbuildsimpleexecutable_vs2017_win64.bff"
 

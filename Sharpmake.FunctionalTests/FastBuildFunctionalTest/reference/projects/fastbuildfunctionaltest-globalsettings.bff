@@ -10,18 +10,19 @@
 //=================================================================================================================
 Settings
 {
+    #import TMP
+    #import TEMP
+    #import USERPROFILE
     .Environment =
     {
-        "TMP=C:\Users\volodymyr.nikolaychu\AppData\Local\Temp\",
-        "TEMP=C:\Users\volodymyr.nikolaychu\AppData\Local\Temp\",
-        "USERPROFILE=C:\Users\volodymyr.nikolaychu",
+        "TMP=$TMP$",
+        "TEMP=$TEMP$",
+        "USERPROFILE=$USERPROFILE$",
         "SystemRoot=C:\WINDOWS"
     }
 
 }
 
-//=================================================================================================================
-// Compiler-x64-vs2017
 //=================================================================================================================
 Compiler( 'Compiler-x64-vs2017' )
 {
@@ -85,7 +86,7 @@ Compiler( 'Compiler-x64-vs2017' )
                             }
 }
 
-.win64Config = 
+.win64Config =
 [
     .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64'
     .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64'
@@ -95,7 +96,7 @@ Compiler( 'Compiler-x64-vs2017' )
     .Linker                 = '$LinkerPath$\link.exe'
 ]
 
-.win64ConfigMasm = 
+.win64ConfigMasm =
 [
     Using( .win64Config )
     .Compiler               = '$BinPath$\ml64.exe'

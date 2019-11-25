@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{49D4B01A-C2BD-2872-6865-E03AB44639E0}</ProjectGuid>
+    <ProjectGuid>{ACA5B4DC-A734-3921-DC86-718EFFDBC4D8}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>FastBuildFunctionalTest</RootNamespace>
     <ProjectName>FastBuildFunctionalTest</ProjectName>
@@ -42,9 +42,9 @@
     <OutDir>output\win64\debug\</OutDir>
     <IntDir>obj\win64\debug\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildFunctionalTest_Debug_win64 -vs -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\codebase\tools\FastBuild\FBuild.exe FastBuildFunctionalTest_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_Debug_win64 -vs -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)..\codebase\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" >NUL 2>NUL
 del "obj\win64\debug\*.obj" >NUL 2>NUL
 del "obj\win64\debug\*.a" >NUL 2>NUL
@@ -63,9 +63,9 @@ del "output\win64\debug\fastbuildfunctionaltest.pdb" >NUL 2>NUL</NMakeCleanComma
     <OutDir>output\win64\release\</OutDir>
     <IntDir>obj\win64\release\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe FastBuildFunctionalTest_Release_win64 -vs -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\codebase\tools\FastBuild\FBuild.exe FastBuildFunctionalTest_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_Release_win64 -vs -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)..\codebase\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" >NUL 2>NUL
 del "obj\win64\release\*.obj" >NUL 2>NUL
 del "obj\win64\release\*.a" >NUL 2>NUL

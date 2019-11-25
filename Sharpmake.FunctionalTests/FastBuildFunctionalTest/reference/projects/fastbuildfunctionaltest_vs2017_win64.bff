@@ -10,12 +10,10 @@
 #if WIN64
 
 //=================================================================================================================
-// ObjectList FastBuildFunctionalTest_Debug_win64_objects
-//=================================================================================================================
 ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
 
     .CompilerExtraOptions   = ''
             // General options
@@ -55,7 +53,7 @@ ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd"$CurrentBffPath$\obj\win64\debug\fastbuildfunctionaltest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildfunctionaltest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -65,6 +63,7 @@ ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
+            + ' /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -81,22 +80,18 @@ ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '$CurrentBffPath$\..\codebase\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
 }
 
 
 //=================================================================================================================
-// Executable FastBuildFunctionalTest_Debug_win64_Executable
-//=================================================================================================================
 Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\debug\'
-    .Libraries              = { 
-                                'FastBuildFunctionalTest_Debug_win64_objects'
-                              }
-    .LinkerOutput           = '$CurrentBffPath$\output\win64\debug\fastbuildfunctionaltest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Libraries              = 'FastBuildFunctionalTest_Debug_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildfunctionaltest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -128,12 +123,12 @@ Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:"$CurrentBffPath$\obj\win64\debug\fastbuildfunctionaltest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildfunctionaltest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:"$CurrentBffPath$\output\win64\debug\fastbuildfunctionaltest.pdb"'
-                            + ' /MAP":$CurrentBffPath$\output\win64\debug\fastbuildfunctionaltest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildfunctionaltest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildfunctionaltest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -149,17 +144,14 @@ Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
                             // ---------------------------
                             // Advanced
                             // ---------------------------
-                            + ' /DYNAMICBASE' 
+                            + ' /DYNAMICBASE'
                             + ' /MACHINE:X64'
                             + ' /errorReport:queue'
                             // Additional linker options
                             //--------------------------
-                            + ' '
 }
 
 
-//=================================================================================================================
-// Alias FastBuildFunctionalTest_Debug_win64
 //=================================================================================================================
 Alias( 'FastBuildFunctionalTest_Debug_win64' )
 {
@@ -168,12 +160,10 @@ Alias( 'FastBuildFunctionalTest_Debug_win64' )
 
 
 //=================================================================================================================
-// ObjectList FastBuildFunctionalTest_Release_win64_objects
-//=================================================================================================================
 ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
 
     .CompilerExtraOptions   = ''
             // General options
@@ -213,7 +203,7 @@ ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd"$CurrentBffPath$\obj\win64\release\fastbuildfunctionaltest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildfunctionaltest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -223,6 +213,7 @@ ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
+            + ' /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -240,22 +231,18 @@ ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '$CurrentBffPath$\..\codebase\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
 }
 
 
 //=================================================================================================================
-// Executable FastBuildFunctionalTest_Release_win64_Executable
-//=================================================================================================================
 Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\release\'
-    .Libraries              = { 
-                                'FastBuildFunctionalTest_Release_win64_objects'
-                              }
-    .LinkerOutput           = '$CurrentBffPath$\output\win64\release\fastbuildfunctionaltest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Libraries              = 'FastBuildFunctionalTest_Release_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildfunctionaltest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -287,12 +274,12 @@ Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:"$CurrentBffPath$\obj\win64\release\fastbuildfunctionaltest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildfunctionaltest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:"$CurrentBffPath$\output\win64\release\fastbuildfunctionaltest.pdb"'
-                            + ' /MAP":$CurrentBffPath$\output\win64\release\fastbuildfunctionaltest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildfunctionaltest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildfunctionaltest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -308,17 +295,14 @@ Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
                             // ---------------------------
                             // Advanced
                             // ---------------------------
-                            + ' /DYNAMICBASE' 
+                            + ' /DYNAMICBASE'
                             + ' /MACHINE:X64'
                             + ' /errorReport:queue'
                             // Additional linker options
                             //--------------------------
-                            + ' '
 }
 
 
-//=================================================================================================================
-// Alias FastBuildFunctionalTest_Release_win64
 //=================================================================================================================
 Alias( 'FastBuildFunctionalTest_Release_win64' )
 {

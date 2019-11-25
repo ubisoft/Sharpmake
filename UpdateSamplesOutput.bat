@@ -7,6 +7,7 @@ if %errorlevel% NEQ 0 goto error
 :: main
 set ERRORLEVEL_BACKUP=0
 
+:: samples
 call :UpdateRef samples ConfigureOrder              main.sharpmake.cs                          reference         ConfigureOrder
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CPPCLI                      CLRTest.sharpmake.cs                       reference         CPPCLI
@@ -28,6 +29,10 @@ if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SimpleExeLibDependency      SimpleExeLibDependency.sharpmake.cs        reference         SimpleExeLibDependency
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+
+:: functional tests
+call :UpdateRef Sharpmake.FunctionalTests FastBuildFunctionalTest FastBuildFunctionalTest.sharpmake.cs reference FastBuildFunctionalTest
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 @COLOR 2F

@@ -549,8 +549,6 @@ namespace Sharpmake.Generators.FastBuild
 
         private static void WriteMasterSettingsSection(FileGenerator masterBffGenerator, MasterBffInfo masterBffInfo)
         {
-            string tempFolder = Path.GetTempPath();
-
             string cachePath = FileGeneratorUtilities.RemoveLineTag;
             string cachePluginDLL = FileGeneratorUtilities.RemoveLineTag;
             string workerConnectionLimit = FileGeneratorUtilities.RemoveLineTag;
@@ -620,12 +618,10 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             using (masterBffGenerator.Declare("fastBuildProjectName", "Master"))
-            using (masterBffGenerator.Declare("fastBuildTempFolder", tempFolder))
             using (masterBffGenerator.Declare("CachePath", cachePath))
             using (masterBffGenerator.Declare("CachePluginDLL", cachePluginDLL))
             using (masterBffGenerator.Declare("WorkerConnectionLimit", workerConnectionLimit))
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
-            using (masterBffGenerator.Declare("fastBuildUserProfile", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
             using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))
             using (masterBffGenerator.Declare("fastBuildAllowDBMigration", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
             {

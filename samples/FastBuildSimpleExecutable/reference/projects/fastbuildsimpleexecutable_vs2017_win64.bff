@@ -10,18 +10,16 @@
 #if WIN64
 
 //=================================================================================================================
-// ObjectList FastBuildSimpleExecutable_Debug_win64_objects
-//=================================================================================================================
 ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
@@ -55,7 +53,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd"$CurrentBffPath$\obj\win64\debug\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildsimpleexecutable_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -82,22 +80,18 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '$CurrentBffPath$\..\codebase\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
 }
 
 
 //=================================================================================================================
-// Executable FastBuildSimpleExecutable_Debug_win64_Executable
-//=================================================================================================================
 Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\debug\'
-    .Libraries              = { 
-                                'FastBuildSimpleExecutable_Debug_win64_objects'
-                              }
-    .LinkerOutput           = '$CurrentBffPath$\output\win64\debug\fastbuildsimpleexecutable.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Libraries              = 'FastBuildSimpleExecutable_Debug_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -105,8 +99,8 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
@@ -133,8 +127,8 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:"$CurrentBffPath$\output\win64\debug\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":$CurrentBffPath$\output\win64\debug\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -159,8 +153,6 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
 
 
 //=================================================================================================================
-// Alias FastBuildSimpleExecutable_Debug_win64
-//=================================================================================================================
 Alias( 'FastBuildSimpleExecutable_Debug_win64' )
 {
     .Targets = 'FastBuildSimpleExecutable_Debug_win64_Executable'
@@ -168,18 +160,16 @@ Alias( 'FastBuildSimpleExecutable_Debug_win64' )
 
 
 //=================================================================================================================
-// ObjectList FastBuildSimpleExecutable_Release_win64_objects
-//=================================================================================================================
 ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
@@ -213,7 +203,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd"$CurrentBffPath$\obj\win64\release\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildsimpleexecutable_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -241,22 +231,18 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '$CurrentBffPath$\..\codebase\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
 }
 
 
 //=================================================================================================================
-// Executable FastBuildSimpleExecutable_Release_win64_Executable
-//=================================================================================================================
 Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '$CurrentBffPath$\obj\win64\release\'
-    .Libraries              = { 
-                                'FastBuildSimpleExecutable_Release_win64_objects'
-                              }
-    .LinkerOutput           = '$CurrentBffPath$\output\win64\release\fastbuildsimpleexecutable.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Libraries              = 'FastBuildSimpleExecutable_Release_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -264,8 +250,8 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.15.26726\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
@@ -292,8 +278,8 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:"$CurrentBffPath$\output\win64\release\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":$CurrentBffPath$\output\win64\release\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -317,8 +303,6 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 }
 
 
-//=================================================================================================================
-// Alias FastBuildSimpleExecutable_Release_win64
 //=================================================================================================================
 Alias( 'FastBuildSimpleExecutable_Release_win64' )
 {
