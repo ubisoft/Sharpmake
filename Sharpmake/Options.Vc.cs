@@ -392,6 +392,14 @@ namespace Sharpmake
                     Enable,
                 }
 
+                public enum ConformanceMode
+                {
+                    [Default]
+                    Disable,
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    Enable,
+                }
+
                 public enum DisableLanguageExtensions
                 {
                     [Default]

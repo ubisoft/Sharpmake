@@ -76,6 +76,7 @@ namespace Sharpmake
       <FloatingPointModel>[options.FloatingPointModel]</FloatingPointModel>
       <FloatingPointExceptions>[options.FloatingPointExceptions]</FloatingPointExceptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <ConformanceMode>[options.ConformanceMode]</ConformanceMode>
       <DisableLanguageExtensions>[options.DisableLanguageExtensions]</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>[options.TreatWChar_tAsBuiltInType]</TreatWChar_tAsBuiltInType>
       <RemoveUnreferencedCodeData>[options.RemoveUnreferencedCodeData]</RemoveUnreferencedCodeData>
