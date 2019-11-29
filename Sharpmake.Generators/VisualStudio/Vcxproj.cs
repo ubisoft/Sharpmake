@@ -18,10 +18,6 @@ using System.IO;
 using System.Linq;
 using Sharpmake.Generators.FastBuild;
 
-#pragma warning disable 0162    // Disables "unreacheable code" warning
-#pragma warning disable 0168    // Disables "variable is never used" warning
-#pragma warning disable 0219    // Disables "variable assigned but it's value is never used" warning
-
 namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Vcxproj : IProjectGenerator
