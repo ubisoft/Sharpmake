@@ -569,6 +569,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildSourceFileType;
                         string clangFileLanguage = String.Empty;
 
                         string previousCppLanguageStdSetting;
@@ -583,9 +584,11 @@ namespace Sharpmake.Generators.FastBuild
                             confOptions["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
+                            fastBuildSourceFileType = "/TC";
                         }
                         else
                         {
+                            fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
                         }
 
@@ -929,6 +932,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFilesWithToken", fastBuildDeoptimizationWritableFilesWithToken))
                                     using (bffGenerator.Declare("fastBuildCompilerForceUsing", fastBuildCompilerForceUsing))
+                                    using (bffGenerator.Declare("fastBuildSourceFileType", fastBuildSourceFileType))
                                     using (bffGenerator.Declare("fastBuildAdditionalCompilerOptionsFromCode", fastBuildAdditionalCompilerOptionsFromCode))
                                     using (bffGenerator.Declare("fastBuildStampExecutable", fastBuildStampExecutable))
                                     using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))

@@ -356,6 +356,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.CallingConvention]'
             + ' [cmdLineOptions.DisableSpecificWarnings]'
             + ' [cmdLineOptions.ForcedIncludeFiles]'
+            + ' [fastBuildSourceFileType]'
             + ' [fastBuildAdditionalCompilerOptionsFromCode]'
             + ' /errorReport:queue'
             // Character Set
