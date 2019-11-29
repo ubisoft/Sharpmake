@@ -239,6 +239,8 @@ namespace Sharpmake.Generators.FastBuild
 
             int configIndex = 0;
 
+            var defaultTuple = GetDefaultTupleConfig();
+
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
             {
@@ -259,7 +261,6 @@ namespace Sharpmake.Generators.FastBuild
                         throw new Error("Sharpmake-FastBuild: Configuration " + conf + " is configured for blobbing by fastbuild and sharpmake. This is illegal.");
                     }
 
-                    var defaultTuple = GetDefaultTupleConfig();
                     var confSubConfigs = confSourceFiles[conf];
                     ProjectOptionsGenerator.VcxprojCmdLineOptions confCmdLineOptions = cmdLineOptions[conf];
 
@@ -276,6 +277,16 @@ namespace Sharpmake.Generators.FastBuild
                     List<string> resourceFilesSections = new List<string>();
                     List<string> embeddedResourceFilesSections = new List<string>();
                     List<string> additionalLibs = new List<string>();
+
+                    Options.ExplicitOptions confOptions = options[conf];
+
+                    bool confUseLibraryDependencyInputs = Options.GetObject<Options.Vc.Linker.UseLibraryDependencyInputs>(conf) == Options.Vc.Linker.UseLibraryDependencyInputs.Enable;
+                    string outputFile = confOptions["OutputFile"];
+
+                    bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
+                    bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
+                    bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
+                    bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
 
                     OrderableStrings additionalDependencies = additionalDependenciesPerConf[conf];
 
@@ -328,13 +339,13 @@ namespace Sharpmake.Generators.FastBuild
                         string previousExceptionSettings = confCmdLineOptions["ExceptionHandling"];
                         switch (exceptionsSetting)
                         {
-                            case Sharpmake.Options.Vc.Compiler.Exceptions.Enable:
+                            case Options.Vc.Compiler.Exceptions.Enable:
                                 confCmdLineOptions["ExceptionHandling"] = "/EHsc";
                                 break;
-                            case Sharpmake.Options.Vc.Compiler.Exceptions.EnableWithExternC:
+                            case Options.Vc.Compiler.Exceptions.EnableWithExternC:
                                 confCmdLineOptions["ExceptionHandling"] = "/EHs";
                                 break;
-                            case Sharpmake.Options.Vc.Compiler.Exceptions.EnableWithSEH:
+                            case Options.Vc.Compiler.Exceptions.EnableWithSEH:
                                 confCmdLineOptions["ExceptionHandling"] = "/EHa";
                                 break;
                         }
@@ -351,20 +362,14 @@ namespace Sharpmake.Generators.FastBuild
                             }
                         }
 
-                        Options.ExplicitOptions confOptions = options[conf];
-
-                        bool useObjectLists = Sharpmake.Options.GetObject<Options.Vc.Linker.UseLibraryDependencyInputs>(conf) == Sharpmake.Options.Vc.Linker.UseLibraryDependencyInputs.Enable;
-                        string outputFile = confOptions["OutputFile"];
                         string fastBuildOutputFile = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, outputFile, true));
                         fastBuildOutputFile = platformBff.GetOutputFilename(conf.Output, fastBuildOutputFile);
+
+                        bool useObjectLists = confUseLibraryDependencyInputs;
+
                         string fastBuildOutputFileShortName = GetShortProjectName(project, conf);
                         var fastBuildProjectDependencies = new List<string>();
                         var fastBuildProjectExeUtilityDependencyList = new List<string>();
-
-                        bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
-                        bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
-                        bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
-                        bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
 
                         bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig && isOutputTypeLib;
 
@@ -736,7 +741,7 @@ namespace Sharpmake.Generators.FastBuild
                         bool linkObjects = false;
                         if (isOutputTypeExeOrDll)
                         {
-                            linkObjects = (confOptions["UseLibraryDependencyInputs"] == "true");
+                            linkObjects = confUseLibraryDependencyInputs;
                         }
 
                         Strings fullInputPaths = new Strings();
@@ -818,7 +823,7 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     fastBuildPrecompiledSourceFile = sourceFileName;
                                 }
-                                else if (String.Compare(sourceFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0)
+                                else if (string.Compare(sourceFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0)
                                 {
                                     if (microsoftPlatformBff != null && microsoftPlatformBff.SupportsResourceFiles)
                                     {
@@ -826,9 +831,9 @@ namespace Sharpmake.Generators.FastBuild
                                         projectHasResourceFiles = true;
                                     }
                                 }
-                                else if (String.Compare(sourceFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0)
+                                else if (string.Compare(sourceFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0)
                                 {
-                                    if (microsoftPlatformBff.SupportsResourceFiles)
+                                    if (microsoftPlatformBff != null && microsoftPlatformBff.SupportsResourceFiles)
                                     {
                                         fastbuildEmbeddedResourceFilesList.Add(sourceFileName);
                                         projectHasEmbeddedResources = true;
@@ -840,7 +845,8 @@ namespace Sharpmake.Generators.FastBuild
                                     bool isBlobbed = project.SourceFilesBlobExtensions.Contains(sourceFile.FileExtension);
                                     if ((isSourceFileExtension && !isBlobbed) ||
                                         conf.ResolvedSourceFilesBlobExclude.Contains(sourceFile.FileName) ||
-                                        (!isUnity && !isNoBlobImplicitConfig))
+                                        isNoBlobImplicitConfig ||
+                                        !isUnity)
                                     {
                                         if (!IsFileInInputPathList(fullInputPaths, sourceFile.FileName))
                                             fastbuildSourceFilesList.Add(sourceFileName);
@@ -1680,25 +1686,32 @@ namespace Sharpmake.Generators.FastBuild
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude);
 
-            List<string> items = new List<string>();
+            bool srcDirsAreEmpty = true;
+            var items = new List<string>();
+
+            // Fastbuild will process as unity all files contained in source Root folder and all additional roots.
+            var unityInputPaths = new Strings(context.ProjectSourceCapitalized);
+            unityInputPaths.AddRange(project.AdditionalSourceRootPaths.Select(Util.GetCapitalizedPath));
 
             foreach (var file in sourceFiles)
             {
-                if (project.SourceFilesBlobExtensions.Contains(file.FileExtension) &&
+                bool isBlobbed = project.SourceFilesBlobExtensions.Contains(file.FileExtension);
+                if (isBlobbed &&
                    (conf.PrecompSource == null || !file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase)) &&
                    !conf.ResolvedSourceFilesBlobExclude.Contains(file.FileName))
                 {
-                    string sourceFileRelative = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, file.FileName));
-                    items.Add(sourceFileRelative);
+                    if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Include || !IsFileInInputPathList(unityInputPaths, file.FileName))
+                    {
+                        string sourceFileRelative = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, file.FileName));
+                        items.Add(sourceFileRelative);
+                    }
 
-                    // stop here in case we are in exclude mode, as we only need to verify that the unity section has some files
-                    if (conf.FastBuildBlobbingStrategy == Project.Configuration.InputFileStrategy.Exclude)
-                        break;
+                    srcDirsAreEmpty = false;
                 }
             }
 
             // Conditional statement depending on the blobbing strategy
-            if (items.Count == 0)
+            if (items.Count == 0 && srcDirsAreEmpty)
             {
                 fastBuildUnityInputFiles = FileGeneratorUtilities.RemoveLineTag;
             }
@@ -1708,9 +1721,7 @@ namespace Sharpmake.Generators.FastBuild
             }
             else
             {
-                // Fastbuild will process as unity all files contained in source Root folder and all additional roots.
-                var unityInputPaths = new Strings(context.ProjectSourceCapitalized);
-                unityInputPaths.AddRange(project.AdditionalSourceRootPaths);
+                fastBuildUnityInputFiles = UtilityMethods.FBuildFormatList(items, spaceLength);
 
                 // check if there's some static blobs lying around to exclude
                 if (IsFileInInputPathList(unityInputPaths, conf.BlobPath))
