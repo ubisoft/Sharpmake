@@ -78,6 +78,7 @@ namespace Sharpmake
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
       <ForcedUsingFiles>[options.ForcedUsingFiles]</ForcedUsingFiles>
+      <SupportJustMyCode>[options.SupportJustMyCode]</SupportJustMyCode>
     </ClCompile>
 ";
 

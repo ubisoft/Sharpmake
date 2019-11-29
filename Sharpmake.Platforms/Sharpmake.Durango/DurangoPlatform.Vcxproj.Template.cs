@@ -97,6 +97,7 @@ namespace Sharpmake
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
       <ForcedUsingFiles>[options.ForcedUsingFiles]</ForcedUsingFiles>
       <ProgramDataBaseFileName>[options.CompilerProgramDatabaseFile]</ProgramDataBaseFileName>
+      <SupportJustMyCode>[options.SupportJustMyCode]</SupportJustMyCode>
     </ClCompile>
 ";
 
