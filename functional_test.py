@@ -73,7 +73,7 @@ class FastBuildFunctionalTest(FunctionalTest):
         if not os.path.isfile(fastBuildPath):
             return -1
 
-        cmd_line = fastBuildPath + " All-Configs -monitor -nosummaryonerror -config " + self.directory + ".bff"
+        cmd_line = fastBuildPath + " All-Configs -monitor -nosummaryonerror -clean -config " + self.directory + ".bff"
         working_dir = os.path.join(projectDir, self.directory, "projects")
 
         os.chdir(working_dir)

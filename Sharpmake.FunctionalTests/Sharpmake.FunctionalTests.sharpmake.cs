@@ -23,6 +23,7 @@ namespace SharpmakeGen
 
                 conf.AddPrivateDependency<SharpmakeProject>(target);
                 conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
+                conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
                 conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
             }
         }

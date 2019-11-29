@@ -1,0 +1,12 @@
+#include "util_noprecomp_excludedbyextension.h"
+
+#include <cstdio>
+
+#ifdef PRECOMP_INCLUDED
+#error This file must NOT include the pch
+#endif
+
+void Util_NoPrecomp_ExcludedByExtension::StaticUtilityMethod()
+{
+    printf("%s\n", __func__);
+}

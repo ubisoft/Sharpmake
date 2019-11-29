@@ -12,95 +12,354 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Sharpmake;
+using Sharpmake.Generators.FastBuild;
 
-namespace SharpmakeGen
+namespace SharpmakeGen.FunctionalTests
 {
-    namespace FunctionalTests
+    [DebuggerDisplay("\"{Platform}_{DevEnv}\" {Name}")]
+    public class Target : Sharpmake.ITarget
     {
-        public static class Utils
-        {
-            public static ITarget[] GetDefaultTargets()
-            {
-                var targets = new List<ITarget> {
-                    new Target(
-                        Platform.win64,
-                        DevEnv.vs2017,
-                        Optimization.Debug | Optimization.Release,
-                        buildSystem: BuildSystem.FastBuild
-                    )
-                };
+        public Platform Platform;
+        public DevEnv DevEnv;
+        public Optimization Optimization;
+        public Blob Blob;
+        public BuildSystem BuildSystem;
 
-                return targets.ToArray();
+        public Target() { }
+
+        public Target(
+            Platform platform,
+            DevEnv devEnv,
+            Optimization optimization,
+            Blob blob,
+            BuildSystem buildSystem
+        )
+        {
+            Platform = platform;
+            DevEnv = devEnv;
+            Optimization = optimization;
+            Blob = blob;
+            BuildSystem = buildSystem;
+        }
+
+        public override string Name
+        {
+            get
+            {
+                var nameParts = new List<string>();
+
+                nameParts.Add(Optimization.ToString());
+
+                nameParts.Add(BuildSystem.ToString());
+
+                if ((BuildSystem == BuildSystem.FastBuild && Blob == Blob.NoBlob) || Blob == Blob.Blob)
+                    nameParts.Add(Blob.ToString());
+
+                nameParts.Add(DevEnv.ToString());
+
+                return string.Join("_", nameParts);
             }
         }
 
-        [Generate]
-        public class FastBuildFunctionalTest : Project
+        public string NameForSolution
         {
-            public FastBuildFunctionalTest()
+            get
             {
-                Name = "FastBuildFunctionalTest";
-
-                AddTargets(Utils.GetDefaultTargets());
-
-                RootPath = @"[project.SharpmakeCsPath]\codebase";
-                SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
-            }
-
-            [Configure()]
-            public void ConfigureAll(Configuration conf, Target target)
-            {
-                conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
-                conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
-            }
-
-            [Configure(BuildSystem.FastBuild)]
-            public void ConfigureFastBuild(Configuration conf, Target target)
-            {
-                conf.IsFastBuild = true;
-                conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
-            }
-
-            [Configure(Platform.win64)]
-            public void ConfigureWin64(Configuration conf, Target target)
-            {
-                // workaround necessity of rc.exe
-                conf.Options.Add(Options.Vc.Linker.EmbedManifest.No);
+                return Optimization.ToString();
             }
         }
 
-        [Sharpmake.Generate]
-        public class FastBuildFunctionalTestSolution : Sharpmake.Solution
+        public string SolutionPlatformName
         {
-            public FastBuildFunctionalTestSolution()
+            get
             {
-                Name = "FastBuildFunctionalTest";
-                AddTargets(Utils.GetDefaultTargets());
-            }
+                var nameParts = new List<string>();
 
-            [Configure]
-            public void ConfigureAll(Configuration conf, Target target)
+                nameParts.Add(BuildSystem.ToString());
+
+                if (BuildSystem == BuildSystem.FastBuild && Blob == Blob.NoBlob)
+                    nameParts.Add(Blob.ToString());
+
+                return string.Join("_", nameParts);
+            }
+        }
+
+        public static ITarget[] GetDefaultTargets()
+        {
+            var targets = new List<ITarget> {
+                new Target(
+                    Platform.win64,
+                    DevEnv.vs2017,
+                    Optimization.Debug | Optimization.Release,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild
+                )
+            };
+
+            // make a fastbuild no-blob version of the target
+            targets.Add(targets.First().Clone(BuildSystem.FastBuild));
+
+            // and a fastbuild unity version of the target
+            targets.Add(targets.First().Clone(Blob.FastBuildUnitys, BuildSystem.FastBuild));
+
+            return targets.ToArray();
+        }
+    }
+
+    public abstract class CommonProject : Project
+    {
+        public CommonProject()
+            : base(typeof(Target))
+        {
+            RootPath = @"[project.SharpmakeCsPath]\codebase";
+            SourceRootPath = @"[project.RootPath]\[project.Name]";
+
+            AddTargets(Target.GetDefaultTargets());
+        }
+
+        [Configure]
+        public virtual void ConfigureAll(Configuration conf, Target target)
+        {
+            conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
+            conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+
+            conf.Output = Configuration.OutputType.Lib;
+
+            conf.IntermediatePath = @"[conf.ProjectPath]\build\[conf.Name]\[project.Name]";
+            conf.TargetPath = @"[conf.ProjectPath]\output\[conf.Name]";
+
+            // .lib files must be with the .obj files when running in fastbuild distributed mode or we'll have missing symbols due to merging of the .pdb
+            conf.TargetLibraryPath = "[conf.IntermediatePath]";
+        }
+
+        [Configure(BuildSystem.FastBuild)]
+        public virtual void ConfigureFastBuild(Configuration conf, Target target)
+        {
+            conf.IsFastBuild = true;
+            conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
+
+            // Force writing to pdb from different cl.exe process to go through the pdb server
+            conf.AdditionalCompilerOptions.Add("/FS");
+        }
+
+        [Configure(Blob.FastBuildUnitys)]
+        public virtual void FastBuildUnitys(Configuration conf, Target target)
+        {
+            conf.BlobPath = @"[conf.ProjectPath]\unity\[project.Name]";
+            conf.FastBuildBlobbingStrategy = Configuration.InputFileStrategy.Exclude;
+            conf.FastBuildNoBlobStrategy = Configuration.InputFileStrategy.Include;
+        }
+
+        [Configure(Blob.NoBlob)]
+        public virtual void BlobNoBlob(Configuration conf, Target target)
+        {
+        }
+
+        [Configure(Platform.win64)]
+        public virtual void ConfigureWin64(Configuration conf, Target target)
+        {
+        }
+    }
+
+    public abstract class CommonExeProject : CommonProject
+    {
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.Output = Configuration.OutputType.Exe;
+        }
+
+        public override void ConfigureWin64(Configuration conf, Target target)
+        {
+            base.ConfigureWin64(conf, target);
+
+            // workaround necessity of rc.exe
+            conf.Options.Add(Options.Vc.Linker.EmbedManifest.No);
+        }
+    }
+
+    [Generate]
+    public class MixCppAndCExe : CommonExeProject
+    {
+        public MixCppAndCExe() { }
+    }
+
+    public abstract class SpanMultipleSrcDirs : CommonExeProject
+    {
+        public SpanMultipleSrcDirs()
+        {
+            SourceRootPath = @"[project.RootPath]\SpanMultipleSrcDirs\main_dir";
+            AdditionalSourceRootPaths.Add(@"[project.RootPath]\SpanMultipleSrcDirs\additional_dir");
+            SourceFiles.Add(
+                @"..\dir_individual_files\floating_class.cpp",
+                @"..\dir_individual_files\floating_class.h",
+                @"..\dir_individual_files\floating_file.cpp"
+            );
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // needed to allow the files from the main SourceRootPath to include things from that dir
+            conf.IncludePrivatePaths.Add(@"[project.RootPath]\SpanMultipleSrcDirs\dir_individual_files");
+
+            // needed to allow the files from the main SourceRootPath to include things in AdditionalSourceRootPaths
+            conf.IncludePrivatePaths.AddRange(AdditionalSourceRootPaths);
+        }
+    }
+
+    [Generate]
+    public class SpanMultipleSrcDirsFBUnityInclude : SpanMultipleSrcDirs
+    {
+        public SpanMultipleSrcDirsFBUnityInclude()
+        {
+            AddFragmentMask(Blob.FastBuildUnitys);
+        }
+
+        public override void FastBuildUnitys(Configuration conf, Target target)
+        {
+            base.FastBuildUnitys(conf, target);
+            conf.FastBuildBlobbingStrategy = Configuration.InputFileStrategy.Include;
+        }
+    }
+
+    // FIXME: exclude mode doesn't work
+    [Generate]
+    public class SpanMultipleSrcDirsFBUnityExclude : SpanMultipleSrcDirs
+    {
+        public SpanMultipleSrcDirsFBUnityExclude()
+        {
+            AddFragmentMask(Blob.FastBuildUnitys);
+        }
+
+        public override void FastBuildUnitys(Configuration conf, Target target)
+        {
+            base.FastBuildUnitys(conf, target);
+            conf.FastBuildBlobbingStrategy = Configuration.InputFileStrategy.Exclude;
+        }
+    }
+
+    [Generate]
+    public class SpanMultipleSrcDirsFBNoBlobInclude : SpanMultipleSrcDirs
+    {
+        public SpanMultipleSrcDirsFBNoBlobInclude()
+        {
+            AddFragmentMask(Blob.NoBlob);
+        }
+
+        public override void BlobNoBlob(Configuration conf, Target target)
+        {
+            base.BlobNoBlob(conf, target);
+            conf.FastBuildNoBlobStrategy = Configuration.InputFileStrategy.Include;
+        }
+    }
+
+    // FIXME: exclude mode doesn't work
+    [Generate]
+    public class SpanMultipleSrcDirsFBNoBlobExclude : SpanMultipleSrcDirs
+    {
+        public SpanMultipleSrcDirsFBNoBlobExclude()
+        {
+            AddFragmentMask(Blob.NoBlob);
+        }
+
+        public override void BlobNoBlob(Configuration conf, Target target)
+        {
+            base.BlobNoBlob(conf, target);
+            conf.FastBuildNoBlobStrategy = Configuration.InputFileStrategy.Exclude;
+        }
+    }
+
+    [Generate]
+    public class UsePrecompExe : CommonExeProject
+    {
+        public UsePrecompExe()
+        {
+            SourceFilesExtensions.Add(
+                ".ceecee",
+                ".ceepeepee"
+            );
+            SourceFilesCompileExtensions.Add(
+                ".ceecee",
+                ".ceepeepee"
+            );
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.PrecompHeader = "precomp.h";
+            conf.PrecompSource = "precomp.cpp";
+
+            // FIXME: the following line exposes a bug, since the filename ends with the precomp name...
+            //conf.PrecompSourceExclude.Add("util_noprecomp.cpp");
+
+            conf.PrecompSourceExclude.Add("noprecomp_util.cpp");
+            conf.PrecompSourceExcludeExtension.Add(".ceepeepee");
+        }
+    }
+
+    [Sharpmake.Generate]
+    public class FastBuildFunctionalTestSolution : Sharpmake.Solution
+    {
+        public FastBuildFunctionalTestSolution()
+            : base(typeof(Target))
+        {
+            Name = "FastBuildFunctionalTest";
+            AddTargets(Target.GetDefaultTargets());
+        }
+
+        [Configure]
+        public void ConfigureAll(Configuration conf, Target target)
+        {
+            conf.SolutionFileName = "[solution.Name]";
+            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
+
+            conf.Name = "[target.NameForSolution]";
+            conf.PlatformName = "[target.SolutionPlatformName]";
+
+            //foreach (Type projectType in Assembly.GetExecutingAssembly().GetTypes().Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(CommonProject))))
+            //    conf.AddProject(projectType, target);
+
+            conf.AddProject<MixCppAndCExe>(target);
+            conf.AddProject<UsePrecompExe>(target);
+
+            if (target.Blob == Blob.FastBuildUnitys)
             {
-                conf.SolutionFileName = "[solution.Name]";
-                conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
-
-                conf.AddProject<FastBuildFunctionalTest>(target);
+                conf.AddProject<SpanMultipleSrcDirsFBUnityInclude>(target);
+                conf.AddProject<SpanMultipleSrcDirsFBUnityExclude>(target);
             }
-
-            [Sharpmake.Main]
-            public static void SharpmakeMain(Sharpmake.Arguments arguments)
+            else if (target.Blob == Blob.NoBlob)
             {
-                FileInfo fileInfo = Util.GetCurrentSharpmakeFileInfo();
-                string sharpmakeRootDirectory = Util.SimplifyPath(Path.Combine(fileInfo.DirectoryName, "..", ".."));
-
-                FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeRootDirectory, @"tools\FastBuild\FBuild.exe");
-                FastBuildSettings.WriteAllConfigsSection = true;
-
-                arguments.Generate<FastBuildFunctionalTestSolution>();
+                if (target.BuildSystem == BuildSystem.FastBuild)
+                {
+                    conf.AddProject<SpanMultipleSrcDirsFBNoBlobInclude>(target);
+                    conf.AddProject<SpanMultipleSrcDirsFBNoBlobExclude>(target);
+                }
             }
+        }
+
+        [Sharpmake.Main]
+        public static void SharpmakeMain(Sharpmake.Arguments arguments)
+        {
+            FileInfo fileInfo = Util.GetCurrentSharpmakeFileInfo();
+            string sharpmakeRootDirectory = Util.SimplifyPath(Path.Combine(fileInfo.DirectoryName, "..", ".."));
+
+            FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeRootDirectory, @"tools\FastBuild\FBuild.exe");
+            FastBuildSettings.FastBuildWait = true;
+            FastBuildSettings.WriteAllConfigsSection = true;
+
+            Bff.UnityResolver = new Bff.FragmentUnityResolver();
+
+            arguments.Generate<FastBuildFunctionalTestSolution>();
         }
     }
 }
