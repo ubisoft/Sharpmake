@@ -1,23 +1,42 @@
 
 //=================================================================================================================
-// FastBuildSimpleExecutable FASTBuild config file
+// SpanMultipleSrcDirsFBUnityExclude FASTBuild config file
 //=================================================================================================================
 #once
 
+
+Unity( 'SpanMultipleSrcDirsFBUnityExclude_unity' )
+{
+    .UnityInputPath                     = {
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir',
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir'
+                                          }
+    .UnityInputFiles                    = {
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp',
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp'
+                                          }
+    .UnityInputIsolateWritableFiles     =  true
+    .UnityInputIsolateWritableFilesLimit = 10
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\SpanMultipleSrcDirsFBUnityExclude'
+    .UnityOutputPattern                 = 'spanmultiplesrcdirsfbunityexclude_unity*.cpp'
+    .UnityNumFiles                      =  1
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // PLATFORM SPECIFIC SECTION
 #if WIN64
 
 //=================================================================================================================
-ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
+ObjectList( 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -53,7 +72,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\spanmultiplesrcdirsfbunityexclude_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -64,7 +83,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -80,19 +99,19 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
+    .CompilerInputUnity       = 'SpanMultipleSrcDirsFBUnityExclude_unity'
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
 }
 
 
 //=================================================================================================================
-Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
+Executable( 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
-    .Libraries              = 'FastBuildSimpleExecutable_Debug_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\'
+    .Libraries              = 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -124,12 +143,12 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /MANIFEST:EMBED'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\spanmultiplesrcdirsfbunityexclude.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -154,21 +173,23 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'FastBuildSimpleExecutable_Debug_win64' )
+Alias( 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2017_win64' )
 {
-    .Targets = 'FastBuildSimpleExecutable_Debug_win64_Executable'
+    .Targets = 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
+ObjectList( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -204,7 +225,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\spanmultiplesrcdirsfbunityexclude_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -215,7 +236,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -232,19 +253,19 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
+    .CompilerInputUnity       = 'SpanMultipleSrcDirsFBUnityExclude_unity'
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
 }
 
 
 //=================================================================================================================
-Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
+Executable( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
-    .Libraries              = 'FastBuildSimpleExecutable_Release_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\'
+    .Libraries              = 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -276,12 +297,12 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /MANIFEST:EMBED'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude\spanmultiplesrcdirsfbunityexclude.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\spanmultiplesrcdirsfbunityexclude.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -306,9 +327,9 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'FastBuildSimpleExecutable_Release_win64' )
+Alias( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2017_win64' )
 {
-    .Targets = 'FastBuildSimpleExecutable_Release_win64_Executable'
+    .Targets = 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2017_win64_Executable'
 }
 
 

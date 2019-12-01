@@ -1,6 +1,6 @@
 
 //=================================================================================================================
-// FastBuildFunctionalTest FASTBuild config file
+// SpanMultipleSrcDirsFBNoBlobExclude FASTBuild config file
 //=================================================================================================================
 #once
 
@@ -10,14 +10,16 @@
 #if WIN64
 
 //=================================================================================================================
-ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
+ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -53,17 +55,18 @@ ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildfunctionaltest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\spanmultiplesrcdirsfbnoblobexclude_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
+            + ' /TP'
             + ' /errorReport:queue'
             // Character Set
             // ---------------------------
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -80,18 +83,29 @@ ObjectList( 'FastBuildFunctionalTest_Debug_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
+    .CompilerInputPath        = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir'
+                                }
+    .CompilerInputPattern     = {
+                                    '*.cc',
+                                    '*.cpp'
+                                }
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp'
+                                }
 
 }
 
 
 //=================================================================================================================
-Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
+Executable( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
-    .Libraries              = 'FastBuildFunctionalTest_Debug_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildfunctionaltest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\'
+    .Libraries              = 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -123,12 +137,12 @@ Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildfunctionaltest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\spanmultiplesrcdirsfbnoblobexclude.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildfunctionaltest.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildfunctionaltest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -153,21 +167,23 @@ Executable( 'FastBuildFunctionalTest_Debug_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'FastBuildFunctionalTest_Debug_win64' )
+Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
-    .Targets = 'FastBuildFunctionalTest_Debug_win64_Executable'
+    .Targets = 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
+ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -203,17 +219,18 @@ ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildfunctionaltest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\spanmultiplesrcdirsfbnoblobexclude_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
+            + ' /TP'
             + ' /errorReport:queue'
             // Character Set
             // ---------------------------
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -231,18 +248,29 @@ ObjectList( 'FastBuildFunctionalTest_Release_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
+    .CompilerInputPath        = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir'
+                                }
+    .CompilerInputPattern     = {
+                                    '*.cc',
+                                    '*.cpp'
+                                }
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp'
+                                }
 
 }
 
 
 //=================================================================================================================
-Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
+Executable( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
-    .Libraries              = 'FastBuildFunctionalTest_Release_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildfunctionaltest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\'
+    .Libraries              = 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -274,12 +302,12 @@ Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildfunctionaltest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude\spanmultiplesrcdirsfbnoblobexclude.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildfunctionaltest.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildfunctionaltest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -304,9 +332,9 @@ Executable( 'FastBuildFunctionalTest_Release_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'FastBuildFunctionalTest_Release_win64' )
+Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_win64' )
 {
-    .Targets = 'FastBuildFunctionalTest_Release_win64_Executable'
+    .Targets = 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 

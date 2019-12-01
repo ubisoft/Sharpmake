@@ -1,0 +1,1019 @@
+
+//=================================================================================================================
+// UsePrecompExe FASTBuild config file
+//=================================================================================================================
+#once
+
+
+Unity( 'UsePrecompExe_FastBuildUnitys_unity' )
+{
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe'
+    .UnityInputExcludedFiles            = '.\$_CURRENT_BFF_DIR_$\..\codebase\useprecompexe\noprecomp_util.cpp'
+    .UnityInputIsolateWritableFiles     =  true
+    .UnityInputIsolateWritableFilesLimit = 10
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\UsePrecompExe'
+    .UnityOutputPattern                 = 'useprecompexe_fastbuildunitys_unity*.cpp'
+    .UnityNumFiles                      =  1
+    .UnityPCH                           = 'precomp.h'
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64_0_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Precompiled Headers options
+    // ---------------------------
+    .PCHInputFile           = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\precomp.cpp'
+    .PCHOutputFile          = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\UsePrecompExe.pch'
+    .PCHOptions             = '"%1" /Fp"%2" /Fo"%3" /c'
+                            + ' /Yc"precomp.h"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' /Yu"precomp.h" /Fp"$PCHOutputFile$"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\main.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_withprecomp_weirdextension.ceecee'
+                                }
+
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\noprecomp_util.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_noprecomp_excludedbyextension.ceepeepee'
+                                }
+
+}
+
+
+//=================================================================================================================
+Executable( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\'
+    .Libraries              = {
+                                  'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64_0_objects',
+                                  'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+                              }
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\useprecompexe.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\useprecompexe\useprecompexe.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\useprecompexe.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\useprecompexe.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64_0_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Precompiled Headers options
+    // ---------------------------
+    .PCHInputFile           = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\precomp.cpp'
+    .PCHOutputFile          = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\UsePrecompExe.pch'
+    .PCHOptions             = '"%1" /Fp"%2" /Fo"%3" /c'
+                            + ' /Yc"precomp.h"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' /Yu"precomp.h" /Fp"$PCHOutputFile$"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\main.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_withprecomp_weirdextension.ceecee'
+                                }
+
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\noprecomp_util.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_noprecomp_excludedbyextension.ceepeepee'
+                                }
+
+}
+
+
+//=================================================================================================================
+Executable( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\'
+    .Libraries              = {
+                                  'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64_0_objects',
+                                  'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64_objects'
+                              }
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\useprecompexe.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\useprecompexe\useprecompexe.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\useprecompexe.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\useprecompexe.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = 'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Debug_FastBuild_vs2017_win64_0_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Precompiled Headers options
+    // ---------------------------
+    .PCHInputFile           = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\precomp.cpp'
+    .PCHOutputFile          = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\UsePrecompExe.pch'
+    .PCHOptions             = '"%1" /Fp"%2" /Fo"%3" /c'
+                            + ' /Yc"precomp.h"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' /Yu"precomp.h" /Fp"$PCHOutputFile$"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'UsePrecompExe_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_withprecomp_weirdextension.ceecee'
+
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Debug_FastBuild_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\noprecomp_util.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_noprecomp_excludedbyextension.ceepeepee'
+                                }
+
+}
+
+
+//=================================================================================================================
+Executable( 'UsePrecompExe_Debug_FastBuild_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\'
+    .Libraries              = {
+                                  'UsePrecompExe_Debug_FastBuild_vs2017_win64_0_objects',
+                                  'UsePrecompExe_Debug_FastBuild_vs2017_win64_objects'
+                              }
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\useprecompexe.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\useprecompexe\useprecompexe.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\useprecompexe.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\useprecompexe.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'UsePrecompExe_Debug_FastBuild_vs2017_win64' )
+{
+    .Targets = 'UsePrecompExe_Debug_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Release_FastBuild_vs2017_win64_0_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Precompiled Headers options
+    // ---------------------------
+    .PCHInputFile           = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\precomp.cpp'
+    .PCHOutputFile          = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\UsePrecompExe.pch'
+    .PCHOptions             = '"%1" /Fp"%2" /Fo"%3" /c'
+                            + ' /Yc"precomp.h"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' /Yu"precomp.h" /Fp"$PCHOutputFile$"'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'UsePrecompExe_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_withprecomp_weirdextension.ceecee'
+
+}
+
+
+//=================================================================================================================
+ObjectList( 'UsePrecompExe_Release_FastBuild_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\useprecompexe_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\noprecomp_util.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\UsePrecompExe\util_noprecomp_excludedbyextension.ceepeepee'
+                                }
+
+}
+
+
+//=================================================================================================================
+Executable( 'UsePrecompExe_Release_FastBuild_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\'
+    .Libraries              = {
+                                  'UsePrecompExe_Release_FastBuild_vs2017_win64_0_objects',
+                                  'UsePrecompExe_Release_FastBuild_vs2017_win64_objects'
+                              }
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\useprecompexe.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\useprecompexe\useprecompexe.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\useprecompexe.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\useprecompexe.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'UsePrecompExe_Release_FastBuild_vs2017_win64' )
+{
+    .Targets = 'UsePrecompExe_Release_FastBuild_vs2017_win64_Executable'
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////

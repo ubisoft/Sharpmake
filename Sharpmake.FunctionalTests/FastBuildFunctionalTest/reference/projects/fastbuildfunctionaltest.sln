@@ -6,22 +6,93 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FastBuild", "FastBuild", "{
 		fastbuildfunctionaltest.bff = fastbuildfunctionaltest.bff
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest", "fastbuildfunctionaltest_vs2017_win64.vcxproj", "{ACA5B4DC-A734-3921-DC86-718EFFDBC4D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixCppAndCExe", "mixcppandcexe_vs2017_win64.vcxproj", "{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest_All", "fastbuildfunctionaltest_all.vcxproj", "{EF677716-81CF-5135-F114-CF023412BF82}"
+	ProjectSection(ProjectDependencies) = postProject
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87} = {913976F4-2FF2-07DC-D8E0-911ED6393F87}
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051} = {12D3CEE7-6EE6-69EF-593D-14F2E4414051}
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B} = {F9A17DAE-8E13-0A57-A569-73B8636C109B}
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975} = {1FD9F7AD-E2C9-15DE-D338-6161DCB22975}
+		{2CE861C7-785F-5E49-6C3F-A780F023352E} = {2CE861C7-785F-5E49-6C3F-A780F023352E}
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8} = {5F078DB6-58B6-290F-2266-DDD3B128FCD8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobExclude", "spanmultiplesrcdirsfbnoblobexclude_vs2017_win64.vcxproj", "{2CE861C7-785F-5E49-6C3F-A780F023352E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobInclude", "spanmultiplesrcdirsfbnoblobinclude_vs2017_win64.vcxproj", "{5F078DB6-58B6-290F-2266-DDD3B128FCD8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityExclude", "spanmultiplesrcdirsfbunityexclude_vs2017_win64.vcxproj", "{913976F4-2FF2-07DC-D8E0-911ED6393F87}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityInclude", "spanmultiplesrcdirsfbunityinclude_vs2017_win64.vcxproj", "{12D3CEE7-6EE6-69EF-593D-14F2E4414051}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UsePrecompExe", "useprecompexe_vs2017_win64.vcxproj", "{F9A17DAE-8E13-0A57-A569-73B8636C109B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Release|x64 = Release|x64
+		Debug|FastBuild = Debug|FastBuild
+		Debug|FastBuild_NoBlob = Debug|FastBuild_NoBlob
+		Debug|MSBuild = Debug|MSBuild
+		Release|FastBuild = Release|FastBuild
+		Release|FastBuild_NoBlob = Release|FastBuild_NoBlob
+		Release|MSBuild = Release|MSBuild
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ACA5B4DC-A734-3921-DC86-718EFFDBC4D8}.Debug|x64.ActiveCfg = Debug|x64
-		{ACA5B4DC-A734-3921-DC86-718EFFDBC4D8}.Debug|x64.Build.0 = Debug|x64
-		{ACA5B4DC-A734-3921-DC86-718EFFDBC4D8}.Release|x64.ActiveCfg = Release|x64
-		{ACA5B4DC-A734-3921-DC86-718EFFDBC4D8}.Release|x64.Build.0 = Release|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild.Build.0 = Debug_FastBuild_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild_NoBlob.Build.0 = Debug_FastBuild_NoBlob_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild.Build.0 = Release_FastBuild_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild_NoBlob.Build.0 = Release_FastBuild_NoBlob_vs2017|x64
+		{EF677716-81CF-5135-F114-CF023412BF82}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Release|FastBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Release|FastBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2017|x64
+		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2017|x64
+		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{EF677716-81CF-5135-F114-CF023412BF82} = {DD960562-8A51-64E6-3C0C-70331C285B31}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,61 @@
+
+//=================================================================================================================
+// FastBuildFunctionalTest_All FASTBuild config file
+//=================================================================================================================
+#once
+
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64',
+                   'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_win64',
+                   'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2017_win64',
+                   'UsePrecompExe_Debug_FastBuild_NoBlob_vs2017_win64'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64',
+                   'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_win64',
+                   'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2017_win64',
+                   'UsePrecompExe_Release_FastBuild_NoBlob_vs2017_win64'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'MixCppAndCExe_Debug_FastBuild_vs2017_win64',
+                   'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2017_win64',
+                   'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2017_win64',
+                   'UsePrecompExe_Debug_FastBuild_vs2017_win64'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'MixCppAndCExe_Release_FastBuild_vs2017_win64',
+                   'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2017_win64',
+                   'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2017_win64',
+                   'UsePrecompExe_Release_FastBuild_vs2017_win64'
+               }
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////

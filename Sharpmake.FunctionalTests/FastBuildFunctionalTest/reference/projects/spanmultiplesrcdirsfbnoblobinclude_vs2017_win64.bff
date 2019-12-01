@@ -1,6 +1,6 @@
 
 //=================================================================================================================
-// FastBuildSimpleExecutable FASTBuild config file
+// SpanMultipleSrcDirsFBNoBlobInclude FASTBuild config file
 //=================================================================================================================
 #once
 
@@ -10,14 +10,16 @@
 #if WIN64
 
 //=================================================================================================================
-ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
+ObjectList( 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -53,7 +55,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\spanmultiplesrcdirsfbnoblobinclude_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -64,7 +66,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -81,18 +83,26 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class1.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class2.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir\extra_file.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir\main.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir\util.cpp'
+                                }
 
 }
 
 
 //=================================================================================================================
-Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
+Executable( 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
-    .Libraries              = 'FastBuildSimpleExecutable_Debug_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\'
+    .Libraries              = 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -124,12 +134,12 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /MANIFEST:EMBED'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\spanmultiplesrcdirsfbnoblobinclude.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -154,21 +164,23 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'FastBuildSimpleExecutable_Debug_win64' )
+Alias( 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
-    .Targets = 'FastBuildSimpleExecutable_Debug_win64_Executable'
+    .Targets = 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
+ObjectList( 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -204,7 +216,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\spanmultiplesrcdirsfbnoblobinclude_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -215,7 +227,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /D"_MBCS"'
             // Additional compiler options
             //--------------------------
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     // Optimizations options
     // ---------------------
@@ -233,18 +245,26 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
+    .CompilerInputFiles       = {
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class1.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class2.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir\extra_file.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir\main.cpp',
+                                    '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir\util.cpp'
+                                }
 
 }
 
 
 //=================================================================================================================
-Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
+Executable( 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
-    .Libraries              = 'FastBuildSimpleExecutable_Release_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\'
+    .Libraries              = 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -276,12 +296,12 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /MANIFEST:EMBED'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude\spanmultiplesrcdirsfbnoblobinclude.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobinclude.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -306,9 +326,9 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'FastBuildSimpleExecutable_Release_win64' )
+Alias( 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2017_win64' )
 {
-    .Targets = 'FastBuildSimpleExecutable_Release_win64_Executable'
+    .Targets = 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 

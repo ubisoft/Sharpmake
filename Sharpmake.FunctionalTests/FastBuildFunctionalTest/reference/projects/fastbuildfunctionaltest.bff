@@ -14,7 +14,13 @@
 //=================================================================================================================
 // fastbuildfunctionaltest.bff .bff includes
 //=================================================================================================================
-#include ".\fastbuildfunctionaltest_vs2017_win64.bff"
+#include ".\mixcppandcexe_vs2017_win64.bff"
+#include ".\spanmultiplesrcdirsfbunityexclude_vs2017_win64.bff"
+#include ".\spanmultiplesrcdirsfbunityinclude_vs2017_win64.bff"
+#include ".\useprecompexe_vs2017_win64.bff"
+#include ".\spanmultiplesrcdirsfbnoblobexclude_vs2017_win64.bff"
+#include ".\spanmultiplesrcdirsfbnoblobinclude_vs2017_win64.bff"
+#include ".\fastbuildfunctionaltest_all.bff"
 
 
 //=================================================================================================================
@@ -24,7 +30,9 @@ Alias( 'All-Configs' )
 {
     .Targets =
     {
-        'FastBuildFunctionalTest_Debug_win64',
-        'FastBuildFunctionalTest_Release_win64'
+        'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2017_win64',
+        'FastBuildFunctionalTest_All_Debug_FastBuild_vs2017_win64',
+        'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2017_win64',
+        'FastBuildFunctionalTest_All_Release_FastBuild_vs2017_win64'
     }
 }
