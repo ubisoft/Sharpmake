@@ -231,7 +231,6 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
-    // FIXME: exclude mode doesn't work
     [Generate]
     public class SpanMultipleSrcDirsFBUnityExclude : SpanMultipleSrcDirs
     {
@@ -262,7 +261,6 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
-    // FIXME: exclude mode doesn't work
     [Generate]
     public class SpanMultipleSrcDirsFBNoBlobExclude : SpanMultipleSrcDirs
     {
@@ -325,9 +323,6 @@ namespace SharpmakeGen.FunctionalTests
 
             conf.Name = "[target.NameForSolution]";
             conf.PlatformName = "[target.SolutionPlatformName]";
-
-            //foreach (Type projectType in Assembly.GetExecutingAssembly().GetTypes().Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(CommonProject))))
-            //    conf.AddProject(projectType, target);
 
             conf.AddProject<MixCppAndCExe>(target);
             conf.AddProject<UsePrecompExe>(target);
