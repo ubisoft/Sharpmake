@@ -97,6 +97,32 @@ namespace Sharpmake
             public int Value { get; }
         }
 
+        internal class ScopedOption : IDisposable
+        {
+            private Dictionary<string, string> _options;
+            private string _name = null;
+            private bool _existed = false;
+            private string _previousValue = null;
+
+            public ScopedOption(Dictionary<string, string> options, string name, string value)
+            {
+                _name = name;
+                _options = options;
+
+                if (_options.TryGetValue(_name, out _previousValue))
+                    _existed = true;
+                _options[_name] = value;
+            }
+
+            public void Dispose()
+            {
+                if (_existed)
+                    _options[_name] = _previousValue;
+                else
+                    _options.Remove(_name);
+            }
+        }
+
         public class ExplicitOptions : Dictionary<string, string>
         {
             public Strings ExplicitDefines = new Strings();

@@ -292,6 +292,8 @@ namespace Sharpmake.Generators.FastBuild
 
                     foreach (var tuple in confSubConfigs.Keys)
                     {
+                        var scopedOptions = new List<Options.ScopedOption>();
+
                         bool isDefaultTuple = defaultTuple.Equals(tuple);
 
                         bool isUsePrecomp = tuple.Item1 && conf.PrecompSource != null;
@@ -336,17 +338,16 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildCompileAsC = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUnityName = isUnity ? GetUnityName(conf) : null;
 
-                        string previousExceptionSettings = confCmdLineOptions["ExceptionHandling"];
                         switch (exceptionsSetting)
                         {
                             case Options.Vc.Compiler.Exceptions.Enable:
-                                confCmdLineOptions["ExceptionHandling"] = "/EHsc";
+                                scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ExceptionHandling", "/EHsc"));
                                 break;
                             case Options.Vc.Compiler.Exceptions.EnableWithExternC:
-                                confCmdLineOptions["ExceptionHandling"] = "/EHs";
+                                scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ExceptionHandling", "/EHs"));
                                 break;
                             case Options.Vc.Compiler.Exceptions.EnableWithSEH:
-                                confCmdLineOptions["ExceptionHandling"] = "/EHa";
+                                scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ExceptionHandling", "/EHa"));
                                 break;
                         }
 
@@ -568,25 +569,21 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         if (additionalDependencies != null && additionalDependencies.Any())
-                            confCmdLineOptions["AdditionalDependencies"] = string.Join($"'{Environment.NewLine}                            + ' ", additionalDependencies);
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "AdditionalDependencies", string.Join($"'{Environment.NewLine}                            + ' ", additionalDependencies)));
                         else
-                            confCmdLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "AdditionalDependencies", FileGeneratorUtilities.RemoveLineTag));
 
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildSourceFileType;
                         string clangFileLanguage = String.Empty;
 
-                        string previousCppLanguageStdSetting;
-                        if (!confCmdLineOptions.TryGetValue("CppLanguageStd", out previousCppLanguageStdSetting))
-                            previousCppLanguageStdSetting = null;
-
                         if (isCompileAsCFile)
                         {
                             fastBuildUsingPlatformConfig = platformBff.CConfigName(conf);
                             // Do not take cpp Language conformance into account while compiling in C
-                            confCmdLineOptions["CppLanguageStd"] = FileGeneratorUtilities.RemoveLineTag;
-                            confOptions["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
                             fastBuildSourceFileType = "/TC";
@@ -877,11 +874,11 @@ namespace Sharpmake.Generators.FastBuild
                         if (projectHasEmbeddedResources)
                         {
                             embeddedResourceFilesSections.Add(fastBuildOutputFileShortName + "_embedded");
-                            confCmdLineOptions["EmbedResources"] = "/ASSEMBLYRESOURCE:\"%3\"";
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "EmbedResources", "/ASSEMBLYRESOURCE:\"%3\""));
                         }
                         else
                         {
-                            confCmdLineOptions["EmbedResources"] = FileGeneratorUtilities.RemoveLineTag;
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "EmbedResources", FileGeneratorUtilities.RemoveLineTag));
                         }
 
                         if (mustGenerateLibrary)
@@ -1270,12 +1267,7 @@ namespace Sharpmake.Generators.FastBuild
                             }
                         }
 
-                        confCmdLineOptions["ExceptionHandling"] = previousExceptionSettings;
-
-                        if (previousCppLanguageStdSetting == null)
-                            confCmdLineOptions.Remove("CppLanguageStd");
-                        else
-                            confCmdLineOptions["CppLanguageStd"] = previousCppLanguageStdSetting;
+                        scopedOptions.ForEach(scopedOption => scopedOption.Dispose());
 
                         string outputDirectory = Path.GetDirectoryName(fastBuildOutputFile);
 
