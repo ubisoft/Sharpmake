@@ -274,7 +274,7 @@ namespace Sharpmake
                         }
                         else
                         {
-                            throw new Error("error, class type note supported: {0}", type.FullName);
+                            throw new Error("error, class type not supported: {0}", type.FullName);
                         }
 
                         foreach (Type projectDependenciesType in projectDependenciesTypes)
@@ -319,7 +319,7 @@ namespace Sharpmake
             }
             else
             {
-                throw new Error("error, class type note supported: {0}", type.FullName);
+                throw new Error("error, class type not supported: {0}", type.FullName);
             }
 
             lock (_buildScheduledType)
