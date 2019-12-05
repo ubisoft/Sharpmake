@@ -733,7 +733,7 @@ namespace Sharpmake
             for (int i = 0; i < fragments.Length; ++i)
                 fragments[i].SetValue(target, current[i]);
 
-            string targetKey = target.GetType().FullName + "__" + target;
+            string targetKey = target.GetType().FullName + "__" + target.GetTargetString();
             if (!_addedTargets.ContainsKey(targetKey))
             {
                 _addedTargets.Add(targetKey, target);

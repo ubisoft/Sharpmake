@@ -202,7 +202,7 @@ namespace Sharpmake
 
             foreach (ITarget target in Targets.TargetObjects)
             {
-                string targetString = target.ToString();
+                string targetString = target.GetTargetString();
                 if (usedTargetNames.ContainsKey(targetString))
                 {
                     ITarget otherTarget = usedTargetNames[targetString];
