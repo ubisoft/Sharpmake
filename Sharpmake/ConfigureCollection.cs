@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -44,6 +45,13 @@ namespace Sharpmake
 
     internal class ConfigureCollection : IEnumerable<MethodInfo>
     {
+        private static readonly ConcurrentDictionary<Tuple<MethodInfo, bool>, Configure> s_cachedMethodInfoToConfigureAttributes = new ConcurrentDictionary<Tuple<MethodInfo, bool>, Configure>();
+
+        internal static Configure GetConfigureAttribute(MethodInfo configure, bool inherit)
+        {
+            return s_cachedMethodInfoToConfigureAttributes.GetOrAdd(Tuple.Create(configure, inherit), configure.GetCustomAttribute(typeof(Configure), inherit) as Configure);
+        }
+
         private readonly IEnumerable<MethodInfo> _orderedConfigureCollection;
 
         internal static ConfigureCollection Create(Type type,
@@ -70,61 +78,128 @@ namespace Sharpmake
             _orderedConfigureCollection = orderedConfigureDictionary.SelectMany(priority => orderProvider(type, priority.Key, priority.Value));
         }
 
-        private static IEnumerable<MethodInfo> GetConfigureMethods(Type type, ConfigureOrder baseOrder)
+        // will return a dictionary where the key will be the signature, and the value the list of
+        // method infos that share it, ordered with the most derived first and the base class last
+        private static Dictionary<string, List<MethodInfo>> GetMethodInfoBySignature(Type type)
         {
-            Dictionary<string, MethodInfo> configureMethodDictionary = new Dictionary<string, MethodInfo>();
-            List<MethodInfo> configureMethodInfos = new List<MethodInfo>();
+            var configureMethodsInfo = new Dictionary<string, List<MethodInfo>>();
+
+            var allConfigureFullSignatures = new HashSet<string>();
+
             Type currentType = type;
             while (currentType != typeof(object))
             {
                 MethodInfo[] methodInfos = currentType.GetMethods();
                 foreach (MethodInfo methodInfo in methodInfos)
                 {
-                    bool defineConfigure = methodInfo.IsDefined(typeof(Configure), true);
-
                     if (!methodInfo.IsAbstract &&
                         !methodInfo.IsConstructor &&
                         !methodInfo.IsGenericMethod &&
-                        defineConfigure)
+                        methodInfo.IsDefined(typeof(Configure), true))
                     {
                         string signature = methodInfo.ToString();
-                        if (!configureMethodDictionary.ContainsKey(signature))
+                        string fullSignature = methodInfo.DeclaringType.FullName + signature;
+
+                        // full signature could be found more than once when parsing inheritance chain
+                        if (allConfigureFullSignatures.Add(fullSignature))
                         {
-                            configureMethodDictionary.Add(signature, methodInfo);
-                            configureMethodInfos.Add(methodInfo);
+                            List<MethodInfo> configureMethods;
+                            if (configureMethodsInfo.TryGetValue(signature, out configureMethods))
+                                configureMethods.Add(methodInfo);
+                            else
+                                configureMethodsInfo.Add(signature, new List<MethodInfo> { methodInfo });
                         }
                     }
                 }
                 currentType = currentType.BaseType;
             }
 
-            List<MethodInfo> filterMethods = new List<MethodInfo>();
-            Dictionary<Type, List<MethodInfo>> typeMethodInfo = new Dictionary<Type, List<MethodInfo>>();
-            currentType = type;
-            while (currentType != typeof(object))
+            return configureMethodsInfo;
+        }
+
+        private static void VerifyAttributesConsistency(MethodInfo methodInfo, MethodInfo baseMethodInfo, string methodSignature)
+        {
+            // do the check here if a previous method was found
+            var configureAttribute = GetConfigureAttribute(methodInfo, inherit: false);
+            var baseConfigureAttribute = GetConfigureAttribute(baseMethodInfo, inherit: false);
+
+            // if the derived class configure has attributes, we only allow them if they are identical to the ones from the base class
+            if (configureAttribute != null)
             {
-                typeMethodInfo.Add(currentType, new List<MethodInfo>());
-                currentType = currentType.BaseType;
+                if (!configureAttribute.HasSameFlags(baseConfigureAttribute))
+                {
+                    throw new Error(
+                        "Attributes mismatch for signature {0}!\nType {1} has {2}\nBase {3} has {4}",
+                        methodSignature,
+                        methodInfo.DeclaringType.FullName,
+                        configureAttribute,
+                        baseMethodInfo.DeclaringType.FullName,
+                        baseConfigureAttribute == null ? "*no attributes*" : baseConfigureAttribute.ToString()
+                    );
+                }
+                else
+                {
+                    Builder.Instance.LogWarningLine(
+                        "Please remove attributes on {0} overriding {1}, they are useless.",
+                        methodInfo.DeclaringType.FullName + "." + methodInfo.Name,
+                        baseMethodInfo.DeclaringType.FullName + "." + baseMethodInfo.Name
+                    );
+                }
+            }
+            else
+            {
+                // if it didn't, do nothing
+            }
+        }
+
+        private static void ConfigureConsistencyCheck(Dictionary<string, List<MethodInfo>> configureMethodsInfo)
+        {
+            foreach (var configureMethodInfo in configureMethodsInfo)
+            {
+                // if there is only one configure method with that signature, there's nothing to check
+                if (configureMethodInfo.Value.Count <= 1)
+                    continue;
+
+                string methodSignature = configureMethodInfo.Key;
+                MethodInfo baseMethodInfo = null;
+                foreach (MethodInfo methodInfo in configureMethodInfo.Value.AsEnumerable().Reverse()) // start from the end, meaning the base class
+                {
+                    if (baseMethodInfo == null)
+                        baseMethodInfo = methodInfo;
+                    else
+                        VerifyAttributesConsistency(methodInfo, baseMethodInfo, methodSignature);
+                }
+            }
+        }
+
+        private static IEnumerable<MethodInfo> GetConfigureMethods(Type type, ConfigureOrder baseOrder)
+        {
+            var typeMethodInfo = new Dictionary<Type, List<MethodInfo>>();
+
+            var configureMethodsInfo = GetMethodInfoBySignature(type);
+            ConfigureConsistencyCheck(configureMethodsInfo);
+
+            foreach (var configureMethodInfo in configureMethodsInfo)
+            {
+                // Get the base declaring type (last in the array)
+                Type rootDeclaringType = configureMethodInfo.Value.Last().DeclaringType;
+                typeMethodInfo.GetValueOrAdd(rootDeclaringType, new List<MethodInfo>()).Add(configureMethodInfo.Value.First());
             }
 
-            foreach (MethodInfo method in configureMethodInfos)
-            {
-                // Get the first declaring type
-                Type rootDeclaringType = method.DeclaringType;
-                while (rootDeclaringType.BaseType.GetMethod(method.Name) != null)
-                    rootDeclaringType = rootDeclaringType.BaseType;
-                typeMethodInfo[rootDeclaringType].Add(method);
-            }
-
-            currentType = type;
+            var filterMethods = new List<MethodInfo>();
+            Type currentType = type;
             while (currentType != typeof(object))
             {
-                var typeConfigure = typeMethodInfo[currentType].AsEnumerable();
+                List<MethodInfo> methodInfoList;
+                if (typeMethodInfo.TryGetValue(currentType, out methodInfoList))
+                {
+                    var typeConfigure = methodInfoList.AsEnumerable();
+                    if (baseOrder == ConfigureOrder.New)
+                        typeConfigure = typeConfigure.OrderBy(configure => configure.MetadataToken);
 
-                if (baseOrder == ConfigureOrder.New)
-                    typeConfigure = typeConfigure.OrderBy(configure => configure.MetadataToken);
+                    filterMethods.InsertRange(0, typeConfigure);
+                }
 
-                filterMethods.InsertRange(0, typeConfigure);
                 currentType = currentType.BaseType;
             }
 

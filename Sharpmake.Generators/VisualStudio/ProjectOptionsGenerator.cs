@@ -896,7 +896,8 @@ namespace Sharpmake.Generators.VisualStudio
             //    No
             context.SelectOption
             (
-            Options.Option(Options.Vc.Compiler.SupportJustMyCode.No, () => {
+            Options.Option(Options.Vc.Compiler.SupportJustMyCode.No, () =>
+            {
                 if (context.DevelopmentEnvironment >= DevEnv.vs2017)
                     context.Options["SupportJustMyCode"] = "false";
                 else
@@ -928,7 +929,7 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         context.SelectOption
                         (
-                        Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Default, () => {}),
+                        Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Default, () => { }),
                         Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Disable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:__cplusplus-"); }),
                         Options.Option(Options.Vc.Compiler.DefineCPlusPlus.Enable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:__cplusplus"); })
                         );

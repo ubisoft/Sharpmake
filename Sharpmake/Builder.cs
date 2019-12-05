@@ -28,7 +28,7 @@ namespace Sharpmake
 
         public Builder Builder { get; }
 
-        public ConfigureOrder ConfigureOrder;
+        public ConfigureOrder ConfigureOrder = ConfigureOrder.New;
 
         public FileInfo MainFileInfo = null;
 

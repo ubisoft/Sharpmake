@@ -32,7 +32,7 @@ namespace Sharpmake.BuildContext
             return ConfigureCollection.Create(type, ConfigureOrder, OrderConfigure);
         }
 
-        public ConfigureOrder ConfigureOrder;
+        public ConfigureOrder ConfigureOrder = ConfigureOrder.New;
 
         internal virtual IEnumerable<MethodInfo> OrderConfigure(Type type, ConfigurePriority priority, IEnumerable<MethodInfo> methods)
         {
