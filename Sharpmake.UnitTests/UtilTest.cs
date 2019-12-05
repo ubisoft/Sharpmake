@@ -15,12 +15,10 @@ using NUnit.Framework;
 
 using System.IO;
 using System.Linq;
-using Sharpmake;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
     namespace NiceTypeNameTest
     {
@@ -36,17 +34,17 @@ namespace SharpmakeUnitTests
             [Test]
             public void NiceTypeNameOnSimpleType()
             {
-                Assert.That(typeof(DummyClass).ToNiceTypeName(), Is.EqualTo("SharpmakeUnitTests.NiceTypeNameTest.DummyClass"));
-                Assert.That(typeof(DummyClass2).ToNiceTypeName(), Is.EqualTo("SharpmakeUnitTests.NiceTypeNameTest.DummyClass2"));
+                Assert.That(typeof(DummyClass).ToNiceTypeName(), Is.EqualTo("Sharpmake.UnitTests.NiceTypeNameTest.DummyClass"));
+                Assert.That(typeof(DummyClass2).ToNiceTypeName(), Is.EqualTo("Sharpmake.UnitTests.NiceTypeNameTest.DummyClass2"));
             }
 
             [Test]
             public void NiceTypeNameOnGenericType()
             {
                 Assert.That(typeof(DummyGeneric<DummyClass>).ToNiceTypeName(),
-                            Is.EqualTo("SharpmakeUnitTests.NiceTypeNameTest.DummyGeneric<SharpmakeUnitTests.NiceTypeNameTest.DummyClass>"));
+                            Is.EqualTo("Sharpmake.UnitTests.NiceTypeNameTest.DummyGeneric<Sharpmake.UnitTests.NiceTypeNameTest.DummyClass>"));
                 Assert.That(typeof(DummyGeneric2<DummyClass, DummyClass2>).ToNiceTypeName(),
-                            Is.EqualTo("SharpmakeUnitTests.NiceTypeNameTest.DummyGeneric2<SharpmakeUnitTests.NiceTypeNameTest.DummyClass,SharpmakeUnitTests.NiceTypeNameTest.DummyClass2>"));
+                            Is.EqualTo("Sharpmake.UnitTests.NiceTypeNameTest.DummyGeneric2<Sharpmake.UnitTests.NiceTypeNameTest.DummyClass,Sharpmake.UnitTests.NiceTypeNameTest.DummyClass2>"));
             }
         }
     }

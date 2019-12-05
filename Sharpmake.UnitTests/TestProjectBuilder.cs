@@ -14,26 +14,31 @@
 using NUnit.Framework;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Sharpmake;
 
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
-    public class CSharpTestProjectBuilder
+    public class TestProjectBuilder
     {
         private readonly string _namespace;
 
-        public CSharpTestProjectBuilder(string buildNamespace)
+        protected TestProjectBuilder(string buildNamespace)
         {
             _namespace = buildNamespace;
         }
 
         public Builder Builder { get; private set; }
 
-        [OneTimeSetUp]
-        public void Init()
+        protected enum InitType
+        {
+            Cpp,
+            CSharp
+        }
+
+        protected void Init(InitType initType)
         {
             bool debugLog = true;
             bool multithreaded = false;
@@ -54,10 +59,34 @@ namespace SharpmakeUnitTests
                 null
             );
 
+            var fakeFileExtensions = new List<string>();
+
             // Force the test to load and register CommonPlatforms.dll as a Sharpmake extension
             // because sometimes you get the "no implementation of XX for platform YY."
-            var platformDotNetType = typeof(DotNetPlatform);
-            PlatformRegistry.RegisterExtensionAssembly(platformDotNetType.Assembly);
+            switch (initType)
+            {
+                case InitType.Cpp:
+                    {
+                        // HACK: Explicitely reference something from CommonPlatforms to get
+                        // visual studio to load the assembly
+                        var platformWin64Type = typeof(Windows.Win64Platform);
+                        PlatformRegistry.RegisterExtensionAssembly(platformWin64Type.Assembly);
+
+                        fakeFileExtensions.Add("_source.cpp");
+                        fakeFileExtensions.Add("_header.h");
+                    }
+                    break;
+                case InitType.CSharp:
+                    {
+                        var platformDotNetType = typeof(DotNetPlatform);
+                        PlatformRegistry.RegisterExtensionAssembly(platformDotNetType.Assembly);
+
+                        fakeFileExtensions.Add("_source.cs");
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(initType), initType, null);
+            }
 
             Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 
@@ -75,13 +104,15 @@ namespace SharpmakeUnitTests
 
             ////////////////////////////////////////////////////////////////////
             // Register projects to generate here
-            var sharpmakeProjects = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.Namespace == _namespace);
+            var sharpmakeProjects = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.Namespace == _namespace);
 
             // Also create some random source files
             Util.FakePathPrefix = Directory.GetCurrentDirectory();
+
             foreach (var sharpmakeProject in sharpmakeProjects)
             {
-                Util.AddNewFakeFile(Util.PathMakeStandard(Path.Combine(sharpmakeProject.Name, sharpmakeProject.Name + "_source.cs")), 0);
+                foreach (string fakeFileExtension in fakeFileExtensions)
+                    Util.AddNewFakeFile(Util.PathMakeStandard(Path.Combine(sharpmakeProject.Name, sharpmakeProject.Name + fakeFileExtension)), 0);
             }
 
             foreach (var sharpmakeProject in sharpmakeProjects)
@@ -113,4 +144,30 @@ namespace SharpmakeUnitTests
             return Builder._projects[typeof(T)];
         }
     }
+
+
+    public class CSharpTestProjectBuilder : TestProjectBuilder
+    {
+        public CSharpTestProjectBuilder(string buildNamespace)
+            : base(buildNamespace) { }
+
+        [OneTimeSetUp]
+        public void CSharpInit()
+        {
+            Init(InitType.CSharp);
+        }
+    }
+
+    public class CppTestProjectBuilder : TestProjectBuilder
+    {
+        public CppTestProjectBuilder(string buildNamespace)
+            : base(buildNamespace) { }
+
+        [OneTimeSetUp]
+        public void CppInit()
+        {
+            Init(InitType.Cpp);
+        }
+    }
+
 }

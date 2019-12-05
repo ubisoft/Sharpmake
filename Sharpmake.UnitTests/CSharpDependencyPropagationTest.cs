@@ -13,9 +13,8 @@
 // limitations under the License.
 using NUnit.Framework;
 using System.IO;
-using Sharpmake;
 
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
     [TestFixture]
     public class CSharpDependencyPropagation : CSharpTestProjectBuilder

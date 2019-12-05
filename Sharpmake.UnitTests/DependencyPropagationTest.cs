@@ -17,96 +17,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using Sharpmake;
 
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
     [TestFixture]
-    public class DependencyPropagation
+    public class DependencyPropagation : CppTestProjectBuilder
     {
-        private Builder _builder;
-
-        public static IGeneratorManager GetGeneratorsManager()
+        public DependencyPropagation()
+            : base(typeof(SharpmakeProjects.NoDependencyProject1).Namespace)
         {
-            return new Sharpmake.Generators.GeneratorManager();
-        }
-
-        [OneTimeSetUp]
-        public void Init()
-        {
-            bool debugLog = true;
-            bool multithreaded = false;
-            bool writeFiles = false;
-            bool dumpDependency = true;
-
-            DependencyTracker.GraphWriteLegend = false;
-
-            _builder = new Builder(
-                new Sharpmake.BuildContext.GenerateAll(debugLog, writeFiles),
-                multithreaded,
-                dumpDependency,
-                false,
-                false,
-                false,
-                false,
-                GetGeneratorsManager,
-                null
-            );
-
-            // HACK: Explicitely reference something from CommonPlatforms to get
-            // visual studio to load the assembly
-            var platformWin64Type = typeof(Windows.Win64Platform);
-
-            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
-
-            // Allow message log from builder.
-            Builder.OutputDelegate log = (msg, args) =>
-            {
-                Console.Write(msg, args);
-                if (System.Diagnostics.Debugger.IsAttached)
-                    System.Diagnostics.Trace.Write(string.Format(msg, args));
-            };
-            _builder.EventOutputError += log;
-            _builder.EventOutputWarning += log;
-            _builder.EventOutputMessage += log;
-            _builder.EventOutputDebug += log;
-
-            ////////////////////////////////////////////////////////////////////
-            // Register projects to generate here
-            var sharpmakeProjects = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.Namespace == typeof(SharpmakeProjects.NoDependencyProject1).Namespace);
-
-            // Also create some random source files
-            Util.FakePathPrefix = Directory.GetCurrentDirectory();
-            foreach (var sharpmakeProject in sharpmakeProjects)
-            {
-                Util.AddNewFakeFile(Util.PathMakeStandard(Path.Combine(sharpmakeProject.Name, sharpmakeProject.Name + "_header.h")), 0);
-                Util.AddNewFakeFile(Util.PathMakeStandard(Path.Combine(sharpmakeProject.Name, sharpmakeProject.Name + "_source.cpp")), 0);
-            }
-
-            foreach (var sharpmakeProject in sharpmakeProjects)
-            {
-                _builder.Arguments.Generate(sharpmakeProject);
-            }
-            ////////////////////////////////////////////////////////////////////
-
-            _builder.BuildProjectAndSolution();
-
-            var outputs = _builder.Generate();
-            if (dumpDependency)
-                DependencyTracker.Instance.DumpGraphs(outputs);
-        }
-
-        [OneTimeTearDown]
-        public void Shutdown()
-        {
-            _builder.Dispose();
         }
 
         [Test]
         public void NoDependency()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.NoDependencyProject1)];
+            var project = GetProject<SharpmakeProjects.NoDependencyProject1>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -120,7 +45,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void OnePublicDependency()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.OnePublicDependencyProject)];
+            var project = GetProject<SharpmakeProjects.OnePublicDependencyProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -143,7 +68,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void OnePublicDependencyWithoutLinking()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.OnePublicDependencyWithoutLinkingProject)];
+            var project = GetProject<SharpmakeProjects.OnePublicDependencyWithoutLinkingProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -164,7 +89,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void OnePublicOnePrivateDependency()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.OnePublicOnePrivateDependencyProject)];
+            var project = GetProject<SharpmakeProjects.OnePublicOnePrivateDependencyProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -191,7 +116,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void TwoPublicDependencies()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.TwoPublicDependenciesProject)];
+            var project = GetProject<SharpmakeProjects.TwoPublicDependenciesProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -218,7 +143,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void TwoPrivateDependencies()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.TwoPrivateDependenciesProject)];
+            var project = GetProject<SharpmakeProjects.TwoPrivateDependenciesProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -245,7 +170,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritOnePublicDependency()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.InheritOnePublicDependencyProject)];
+            var project = GetProject<SharpmakeProjects.InheritOnePublicDependencyProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -275,7 +200,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritOnePrivateDependency()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.InheritOnePrivateDependencyProject)];
+            var project = GetProject<SharpmakeProjects.InheritOnePrivateDependencyProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -307,7 +232,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritOnePrivateDependencyOnlyBuildOrder()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.InheritOnePrivateDependencyOnlyBuildOrderProject)];
+            var project = GetProject<SharpmakeProjects.InheritOnePrivateDependencyOnlyBuildOrderProject>();
             Assert.IsNotNull(project);
             foreach (var conf in project.Configurations)
             {
@@ -329,7 +254,7 @@ namespace SharpmakeUnitTests
         {
             // ProjectA and ProjectB share the same dependencies settings, as the only change
             // is the type of the immediate dependency to InheritOnePrivateDependencyProject
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectA)];
+            var project = GetProject<SharpmakeProjects.ProjectA>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -363,7 +288,7 @@ namespace SharpmakeUnitTests
         {
             // ProjectA and ProjectB share the same settings, as the only change
             // is the type of the immediate dependency to InheritOnePrivateDependencyProject
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectB)];
+            var project = GetProject<SharpmakeProjects.ProjectB>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -399,7 +324,7 @@ namespace SharpmakeUnitTests
         {
             // ProjectA and ProjectB share the same settings, as the only change
             // is the type of the immediate dependency to InheritOnePrivateDependencyProject
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectF)];
+            var project = GetProject<SharpmakeProjects.ProjectF>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -434,7 +359,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritPublicDependenciesWithPrivate()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectC)];
+            var project = GetProject<SharpmakeProjects.ProjectC>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -468,7 +393,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void DLLWithDependenciesPublic()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectDLLPublic)];
+            var project = GetProject<SharpmakeProjects.ProjectDLLPublic>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -498,7 +423,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void DLLWithDependenciesPrivate()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectDLLPrivate)];
+            var project = GetProject<SharpmakeProjects.ProjectDLLPrivate>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -528,7 +453,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void DLLWithDLLDependencyPrivate()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectDLLPrivateDLL)];
+            var project = GetProject<SharpmakeProjects.ProjectDLLPrivateDLL>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -556,7 +481,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void ExeWithDLLPrivate()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectExePrivate)];
+            var project = GetProject<SharpmakeProjects.ProjectExePrivate>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -584,7 +509,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void ExeWithDLLPublic()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectExePublic)];
+            var project = GetProject<SharpmakeProjects.ProjectExePublic>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -612,7 +537,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void ExeWithDLLPublicInheritance()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectExePublicDLLInheritance)];
+            var project = GetProject<SharpmakeProjects.ProjectExePublicDLLInheritance>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -641,7 +566,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void ExeDoublePublicDLLInheritance()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectExeDoublePublicDLLInheritance)];
+            var project = GetProject<SharpmakeProjects.ProjectExeDoublePublicDLLInheritance>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -677,7 +602,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void PrivateDependOnExported()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectPrivateDependOnExported)];
+            var project = GetProject<SharpmakeProjects.ProjectPrivateDependOnExported>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -703,7 +628,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void PrivateInheritExported()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectPrivateInheritExported)];
+            var project = GetProject<SharpmakeProjects.ProjectPrivateInheritExported>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -732,7 +657,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritExportAsPublic()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritExportAsPublic)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritExportAsPublic>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -762,7 +687,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void DuplicateInDeepInheritance()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectDuplicateInDeepInheritance)];
+            var project = GetProject<SharpmakeProjects.ProjectDuplicateInDeepInheritance>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -799,7 +724,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritAsPrivateAndPublic()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritAsPrivateAndPublic)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritAsPrivateAndPublic>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -829,7 +754,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritLibFromDllAndLib()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritLibFromDllAndLib)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritLibFromDllAndLib>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -868,7 +793,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritIdenticalFromDll()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritIdenticalFromDll)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritIdenticalFromDll>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -902,7 +827,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void ComplexDllInheritance()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectComplexDllInheritance)];
+            var project = GetProject<SharpmakeProjects.ProjectComplexDllInheritance>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -929,7 +854,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritFromComplexDllInheritance()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritComplexDllInheritance)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritComplexDllInheritance>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -961,7 +886,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritComplexDllInheritanceAndDirect()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritComplexDllInheritanceAndDirect)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritComplexDllInheritanceAndDirect>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -997,7 +922,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void OnlyBuildOrder()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectOnlyBuildOrder)];
+            var project = GetProject<SharpmakeProjects.ProjectOnlyBuildOrder>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -1018,7 +943,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void ProjectInheritBuildOrder()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritBuildOrder)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritBuildOrder>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -1046,7 +971,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void InheritAndBuildOrder()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectInheritAndBuildOrder)];
+            var project = GetProject<SharpmakeProjects.ProjectInheritAndBuildOrder>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -1078,7 +1003,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void PubToImmediateAndBuildOrder()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.ProjectPubToImmediateAndBuildOrder)];
+            var project = GetProject<SharpmakeProjects.ProjectPubToImmediateAndBuildOrder>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -1108,7 +1033,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void LibInheritLibAndDLLPublic()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.LibInheritLibAndDLLPublicProject)];
+            var project = GetProject<SharpmakeProjects.LibInheritLibAndDLLPublicProject>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)
@@ -1137,7 +1062,7 @@ namespace SharpmakeUnitTests
         [Test]
         public void LibInheritLibAndDLLPrivate()
         {
-            var project = _builder._projects[typeof(SharpmakeProjects.LibInheritLibAndDLLPrivateProject)];
+            var project = GetProject<SharpmakeProjects.LibInheritLibAndDLLPrivateProject>();
             Assert.IsNotNull(project);
 
             foreach (var conf in project.Configurations)

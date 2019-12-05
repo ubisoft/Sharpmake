@@ -13,9 +13,7 @@
 // limitations under the License.
 using NUnit.Framework;
 
-using Sharpmake;
-
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
     public class CommandLineTest
     {
