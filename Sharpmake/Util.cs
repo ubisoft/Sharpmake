@@ -1888,6 +1888,7 @@ namespace Sharpmake
 
             var candidates = installedVersions.Where(i =>
                     i.Version.Major == majorVersion
+                    && (!i.IsPrerelease || allowPrereleaseVersions)
                     && s_supportedVisualStudioProducts.Contains(i.ProductID, StringComparer.OrdinalIgnoreCase)
                     && (requiredComponents == null || !requiredComponents.Except(i.Components).Any())
                     && (requiredWorkloads == null || !requiredWorkloads.Except(i.Workloads).Any()))
@@ -1900,7 +1901,7 @@ namespace Sharpmake
             string[] requiredComponents = null, string[] requiredWorkloads = null)
         {
             var vsInstallations = GetVisualStudioInstallationsFromQuery(visualVersion, allowPrereleaseVersions, requiredComponents, requiredWorkloads);
-            VsInstallation priorityInstallation = vsInstallations.FirstOrDefault(i => allowPrereleaseVersions || !i.IsPrerelease);
+            VsInstallation priorityInstallation = vsInstallations.FirstOrDefault();
             return priorityInstallation != null ? SimplifyPath(priorityInstallation.InstallationPath) : null;
         }
 
