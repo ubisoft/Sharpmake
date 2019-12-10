@@ -1366,11 +1366,34 @@ namespace Sharpmake
                 public string ExecutableWorkingDirectory = "";
 
                 /// <summary>
+                /// Sets multiple files as executable input. Only supported by Bff generator.
+                /// </summary>
+                public Strings FastBuildExecutableInputFiles = new Strings();
+
+                /// <summary>
                 /// Gets or sets whether the output is to *stdout*.
                 /// </summary>
                 public bool FastBuildUseStdOutAsOutput = false;
 
                 public bool FastBuildAlwaysShowOutput = false;
+
+                internal override void Resolve(Resolver resolver)
+                {
+                    base.Resolve(resolver);
+
+                    if (!string.IsNullOrEmpty(ExecutableInputFileArgumentOption) &&
+                        FastBuildExecutableInputFiles.Count > 0)
+                    {
+                        throw new Error("BuildStepExecutable has both ExecutableInputFileArgumentOption and FastBuildExecutableInputFiles defined. " +
+                            "These options are mutually exclusive.\n" +
+                            "Executable: {0}\n" +
+                            "ExecutableInputFileArgumentOption: {1}\n" +
+                            "FastBuildExecutableInputFiles: {2}",
+                            ExecutableFile,
+                            ExecutableInputFileArgumentOption,
+                            FastBuildExecutableInputFiles);
+                    }
+                }
             }
 
             [Resolver.Resolvable]

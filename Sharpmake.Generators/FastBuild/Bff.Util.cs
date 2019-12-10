@@ -366,39 +366,39 @@ namespace Sharpmake.Generators.FastBuild
             return FBuildFormatList(items, spaceLength);
         }
 
+        public static string FBuildFormatSingleListItem(string item)
+        {
+            return string.Format("'{0}'", item);
+        }
+
         public static string FBuildFormatList(List<string> items, int spaceLength)
         {
             if (items.Count == 0)
                 return FileGeneratorUtilities.RemoveLineTag;
 
-            StringBuilder strBuilder = new StringBuilder(1024 * 16);
+            if (items.Count == 1)
+                return FBuildFormatSingleListItem(items.First());
 
             //
             // Write all selected items.
             //
+            StringBuilder strBuilder = new StringBuilder(1024 * 16);
 
-            if (items.Count == 1)
+            string indent = new string(' ', spaceLength);
+
+            strBuilder.Append("{");
+            strBuilder.AppendLine();
+
+            int itemIndex = 0;
+            foreach (string item in items)
             {
-                strBuilder.AppendFormat("'{0}'", items.First());
+                strBuilder.AppendFormat("{0}    '{1}'", indent, item);
+                if (++itemIndex < items.Count)
+                    strBuilder.AppendLine(",");
+                else
+                    strBuilder.AppendLine();
             }
-            else
-            {
-                string indent = new string(' ', spaceLength);
-
-                strBuilder.Append("{");
-                strBuilder.AppendLine();
-
-                int itemIndex = 0;
-                foreach (string item in items)
-                {
-                    strBuilder.AppendFormat("{0}    '{1}'", indent, item);
-                    if (++itemIndex < items.Count)
-                        strBuilder.AppendLine(",");
-                    else
-                        strBuilder.AppendLine();
-                }
-                strBuilder.AppendFormat("{0}}}", indent);
-            }
+            strBuilder.AppendFormat("{0}}}", indent);
 
             return strBuilder.ToString();
         }
@@ -417,7 +417,7 @@ namespace Sharpmake.Generators.FastBuild
 
             using (bffGenerator.Declare("fastBuildPreBuildName", relativeBuildStep.Description))
             using (bffGenerator.Declare("fastBuildPrebuildExeFile", relativeBuildStep.Executable))
-            using (bffGenerator.Declare("fastBuildPreBuildInputFile", relativeBuildStep.KeyInput))
+            using (bffGenerator.Declare("fastBuildPreBuildInputFiles", FBuildFormatSingleListItem(relativeBuildStep.KeyInput)))
             using (bffGenerator.Declare("fastBuildPreBuildOutputFile", relativeBuildStep.Output))
             using (bffGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(relativeBuildStep.ExecutableArguments) ? FileGeneratorUtilities.RemoveLineTag : relativeBuildStep.ExecutableArguments))
             // This is normally the project directory.

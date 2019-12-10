@@ -487,7 +487,7 @@ ObjectList( '[fastBuildOutputFileShortName]_objects' )
 Exec( '[fastBuildPreBuildName]' )
 {
   .ExecExecutable       = '[fastBuildPrebuildExeFile]'
-  .ExecInput            = '[fastBuildPreBuildInputFile]'
+  .ExecInput            = [fastBuildPreBuildInputFiles]
   .ExecOutput           = '[fastBuildPreBuildOutputFile]'
   .ExecArguments        = '[fastBuildPreBuildArguments]'
   .ExecWorkingDir       = '[fastBuildPrebuildWorkingPath]'

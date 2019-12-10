@@ -1180,9 +1180,12 @@ namespace Sharpmake.Generators.FastBuild
                                                 {
                                                     var execCommand = postBuildEvent.Value as Project.Configuration.BuildStepExecutable;
 
+                                                    IEnumerable<string> inputFiles = execCommand.FastBuildExecutableInputFiles.Count > 0 ? execCommand.FastBuildExecutableInputFiles : Enumerable.Repeat(execCommand.ExecutableInputFileArgumentOption, 1);
+                                                    inputFiles = inputFiles.Select(f => UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, f));
+
                                                     using (bffGenerator.Declare("fastBuildPreBuildName", postBuildEvent.Key))
                                                     using (bffGenerator.Declare("fastBuildPrebuildExeFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableFile)))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildInputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableInputFileArgumentOption)))
+                                                    using (bffGenerator.Declare("fastBuildPreBuildInputFiles", UtilityMethods.FBuildFormatList(inputFiles.ToList(), 26)))
                                                     using (bffGenerator.Declare("fastBuildPreBuildOutputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableOutputFileArgumentOption)))
                                                     using (bffGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(execCommand.ExecutableOtherArguments) ? FileGeneratorUtilities.RemoveLineTag : execCommand.ExecutableOtherArguments))
                                                     using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableWorkingDirectory)))
