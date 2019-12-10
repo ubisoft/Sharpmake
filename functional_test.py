@@ -67,6 +67,42 @@ class FunctionalTest:
 
 class FastBuildFunctionalTest(FunctionalTest):
 
+    def verifyCustomBuildEventsInTargetDir(self, targetDir):
+        #verify copied files exist
+        expected_copied_files = ["dummyfile_to_be_copied_to_buildoutput.txt", "main.cpp", "postbuildcopysinglefiletest.exe"]
+        for expected_file in expected_copied_files:
+            expected_file = os.path.join(targetDir, "file_copy_destination", expected_file)
+            if not os.path.isfile(expected_file):
+                write_line("Expected file does not exist: {}...".format(expected_file))
+                return 1
+
+        #verify test execution created the correct output
+        test_output = os.path.join(targetDir, "test_execution_output.txt")
+        f = open(test_output, "r")
+        if f.mode != "r":
+            write_line("Unable to open file {}...".format(test_output))
+            return 1
+
+        file_content = f.read()
+        if file_content != "Test successful.":
+            write_line("Incorrect output of test node execution: {}...".format(file_content))
+            return 1
+        
+        return 0
+
+    def verifyCustomBuildEvents(self, projectDir):
+        output_dir = os.path.join(projectDir, self.directory, "projects", "output")
+        target_dirs = ["debug_fastbuild_noblob_vs2017", "debug_fastbuild_vs2017", "release_fastbuild_noblob_vs2017", "release_fastbuild_vs2017"]
+
+        for target_dir in target_dirs:
+            target_dir = os.path.join(output_dir, target_dir)
+
+            verifyResult = self.verifyCustomBuildEventsInTargetDir(target_dir)
+            if verifyResult != 0:
+                return verifyResult
+
+        return 0
+
     def build(self, projectDir):
         entry_path = os.getcwd()
         fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", "FBuild.exe");
@@ -79,7 +115,12 @@ class FastBuildFunctionalTest(FunctionalTest):
         os.chdir(working_dir)
         write_line(cmd_line)
         write_line("Working dir: " + working_dir)
-        return os.system(cmd_line)
+        build_result = os.system(cmd_line)
+
+        if build_result != 0:
+            return build_result
+
+        return self.verifyCustomBuildEvents(projectDir)
 
 funcTests = [
     FastBuildFunctionalTest("FastBuildFunctionalTest", "FastBuildFunctionalTest.sharpmake.cs")

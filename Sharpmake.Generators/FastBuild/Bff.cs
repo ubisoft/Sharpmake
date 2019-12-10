@@ -1172,76 +1172,25 @@ namespace Sharpmake.Generators.FastBuild
                                                     if (!fileCustomBuildKeys.Contains(key))
                                                     {
                                                         fileCustomBuildKeys.Add(key);
-                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
+                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExecutableSection);
                                                     }
                                                     else
                                                     {
-                                                        throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExcutableSection)));
+                                                        throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExecutableSection)));
                                                     }
                                                     return false;
                                                 });
                                             // These are all pre-build steps, at least in principle, so insert them before the other build steps.
                                             fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
 
+                                            // Convert build steps to Bff resolvable objects
+                                            var resolvableBuildSteps = UtilityMethods.GetResolvablesFromBuildSteps(postBuildEvents);
+                                            // Resolve objects using the current project path
+                                            var resolvedBuildSteps = resolvableBuildSteps.Select(b => b.Resolve(project.RootPath, projectPath, resolver));
 
-                                            foreach (var postBuildEvent in postBuildEvents)
+                                            foreach (var buildStep in resolvedBuildSteps)
                                             {
-                                                if (postBuildEvent.Value is Project.Configuration.BuildStepExecutable)
-                                                {
-                                                    var execCommand = postBuildEvent.Value as Project.Configuration.BuildStepExecutable;
-
-                                                    IEnumerable<string> inputFiles = execCommand.FastBuildExecutableInputFiles.Count > 0 ? execCommand.FastBuildExecutableInputFiles : Enumerable.Repeat(execCommand.ExecutableInputFileArgumentOption, 1);
-                                                    inputFiles = inputFiles.Select(f => UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, f));
-
-                                                    using (bffGenerator.Declare("fastBuildPreBuildName", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildPrebuildExeFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableFile)))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildInputFiles", UtilityMethods.FBuildFormatList(inputFiles.ToList(), 26)))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildOutputFile", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableOutputFileArgumentOption)))
-                                                    using (bffGenerator.Declare("fastBuildPreBuildArguments", string.IsNullOrWhiteSpace(execCommand.ExecutableOtherArguments) ? FileGeneratorUtilities.RemoveLineTag : execCommand.ExecutableOtherArguments))
-                                                    using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, execCommand.ExecutableWorkingDirectory)))
-                                                    using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", execCommand.FastBuildUseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
-                                                    using (bffGenerator.Declare("fastBuildPrebuildAlwaysShowOutput", execCommand.FastBuildAlwaysShowOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
-                                                    {
-                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExcutableSection);
-                                                    }
-                                                }
-                                                else if (postBuildEvent.Value is Project.Configuration.BuildStepCopy)
-                                                {
-                                                    var copyCommand = postBuildEvent.Value as Project.Configuration.BuildStepCopy;
-
-                                                    string sourcePath = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, copyCommand.SourcePath);
-                                                    string destinationPath = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, copyCommand.DestinationPath);
-
-                                                    using (bffGenerator.Declare("fastBuildCopyAlias", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildCopySource", sourcePath))
-                                                    using (bffGenerator.Declare("fastBuildCopyDest", destinationPath))
-                                                    {
-                                                        bffGenerator.Write(Template.ConfigurationFile.CopyFileSection);
-                                                    }
-                                                }
-                                                else if (postBuildEvent.Value is Project.Configuration.BuildStepTest)
-                                                {
-                                                    var testCommand = postBuildEvent.Value as Project.Configuration.BuildStepTest;
-
-                                                    string fastBuildTestExecutable = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, conf.PostBuildStepTest.TestExecutable);
-                                                    string fastBuildTestOutput = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, conf.PostBuildStepTest.TestOutput);
-                                                    string fastBuildTestWorkingDir = UtilityMethods.GetNormalizedPathForPostBuildEvent(project.RootPath, projectPath, conf.PostBuildStepTest.TestWorkingDir);
-
-                                                    using (bffGenerator.Declare("fastBuildTest", postBuildEvent.Key))
-                                                    using (bffGenerator.Declare("fastBuildTestExecutable", fastBuildTestExecutable))
-                                                    using (bffGenerator.Declare("fastBuildTestWorkingDir", fastBuildTestWorkingDir))
-                                                    using (bffGenerator.Declare("fastBuildTestOutput", fastBuildTestOutput))
-                                                    using (bffGenerator.Declare("fastBuildTestArguments", string.IsNullOrWhiteSpace(conf.PostBuildStepTest.TestArguments) ? FileGeneratorUtilities.RemoveLineTag : conf.PostBuildStepTest.TestArguments))
-                                                    using (bffGenerator.Declare("fastBuildTestTimeOut", conf.PostBuildStepTest.TestTimeOutInSecond == 0 ? FileGeneratorUtilities.RemoveLineTag : conf.PostBuildStepTest.TestTimeOutInSecond.ToString()))
-                                                    using (bffGenerator.Declare("fastBuildTestAlwaysShowOutput", conf.PostBuildStepTest.TestAlwaysShowOutput ? "true" : "false"))
-                                                    {
-                                                        bffGenerator.Write(Template.ConfigurationFile.TestSection);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    throw new Error("error, BuildStep not supported: {0}", postBuildEvent.GetType().FullName);
-                                                }
+                                                bffGenerator.Write(buildStep);
                                             }
 
                                             // Write Target Alias

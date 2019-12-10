@@ -118,8 +118,8 @@ namespace SharpmakeGen.FunctionalTests
         public CommonProject()
             : base(typeof(Target))
         {
-            RootPath = @"[project.SharpmakeCsPath]\codebase";
-            SourceRootPath = @"[project.RootPath]\[project.Name]";
+            RootPath = @"[project.SharpmakeCsPath]";
+            SourceRootPath = @"[project.RootPath]\codebase\[project.Name]";
 
             AddTargets(Target.GetDefaultTargets());
         }
@@ -195,8 +195,8 @@ namespace SharpmakeGen.FunctionalTests
     {
         public SpanMultipleSrcDirs()
         {
-            SourceRootPath = @"[project.RootPath]\SpanMultipleSrcDirs\main_dir";
-            AdditionalSourceRootPaths.Add(@"[project.RootPath]\SpanMultipleSrcDirs\additional_dir");
+            SourceRootPath = @"[project.RootPath]\codebase\SpanMultipleSrcDirs\main_dir";
+            AdditionalSourceRootPaths.Add(@"[project.RootPath]\codebase\SpanMultipleSrcDirs\additional_dir");
             SourceFiles.Add(
                 @"..\dir_individual_files\floating_class.cpp",
                 @"..\dir_individual_files\floating_class.h",
@@ -209,7 +209,7 @@ namespace SharpmakeGen.FunctionalTests
             base.ConfigureAll(conf, target);
 
             // needed to allow the files from the main SourceRootPath to include things from that dir
-            conf.IncludePrivatePaths.Add(@"[project.RootPath]\SpanMultipleSrcDirs\dir_individual_files");
+            conf.IncludePrivatePaths.Add(@"[project.RootPath]\codebase\SpanMultipleSrcDirs\dir_individual_files");
 
             // needed to allow the files from the main SourceRootPath to include things in AdditionalSourceRootPaths
             conf.IncludePrivatePaths.AddRange(AdditionalSourceRootPaths);
@@ -332,6 +332,100 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class PostBuildCopySingleFileTest : CommonExeProject
+    {
+        public PostBuildCopySingleFileTest()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // Create a PostBuild step that copies the buildoutput to another subfolder.
+            // Note that the target path needs to be a file path, not a folder. Otherwise
+            // Sharpmake will create a CopyDir node instead of a Copy node.
+            var copyFileBuildStep = new Configuration.BuildStepCopy(
+                @"[conf.TargetPath]\[conf.TargetFileName].exe",
+                @"[conf.TargetPath]\file_copy_destination\[conf.TargetFileName].exe");
+
+            conf.EventCustomPostBuildExe.Add(copyFileBuildStep);
+        }
+    }
+
+    [Generate]
+    public class PostBuildCopyDirTest : CommonExeProject
+    {
+        public PostBuildCopyDirTest()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // Create a PostBuild step that copies all .cpp & .txt files from the source dir to another folder
+            // Note that this copy step will not depend on compilation output and thus FastBuild is free
+            // execute the copy operation during or before compilation.
+            var copyDirBuildStep = new Configuration.BuildStepCopy(
+                @"[project.SourceRootPath]",
+                @"[conf.TargetPath]\file_copy_destination");
+
+            copyDirBuildStep.IsFileCopy = false;
+            copyDirBuildStep.CopyPattern = "*.cpp *.txt";
+
+            conf.EventCustomPostBuildExe.Add(copyDirBuildStep);
+        }
+    }
+
+    [Generate]
+    public class PostBuildExecuteTest : CommonExeProject
+    {
+        public PostBuildExecuteTest()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // Create an Executable build step that executes the build output.
+            var execBuildStep = new Configuration.BuildStepExecutable(
+                @"[conf.TargetPath]\[conf.TargetFileName].exe",
+                @"",
+                @"[conf.TargetPath]\postbuild_exec_sentinel.txt",
+                @"");
+
+            execBuildStep.FastBuildUseStdOutAsOutput = true;
+
+            conf.EventCustomPostBuildExe.Add(execBuildStep);
+        }
+    }
+
+    [Generate]
+    public class PostBuildTestExecution : CommonExeProject
+    {
+        public PostBuildTestExecution()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // Create a Test build step that executes the build output.
+            // All output from the execution is written to 'test_execution_output.txt'.
+            var testBuildStep = new Configuration.BuildStepTest(
+                @"[conf.TargetPath]\[conf.TargetFileName].exe",
+                @"",
+                @"[conf.TargetPath]\test_execution_output.txt",
+                @"");
+
+            conf.EventCustomPostBuildExe.Add(testBuildStep);
+        }
+    }
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -354,6 +448,10 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<MixCppAndCExe>(target);
             conf.AddProject<UsePrecompExe>(target);
             conf.AddProject<RequirePreBuildStep>(target);
+            conf.AddProject<PostBuildCopySingleFileTest>(target);
+            conf.AddProject<PostBuildCopyDirTest>(target);
+            conf.AddProject<PostBuildExecuteTest>(target);
+            conf.AddProject<PostBuildTestExecution>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {

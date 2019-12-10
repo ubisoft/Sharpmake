@@ -11,6 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
+
 namespace Sharpmake.Generators.FastBuild
 {
     public partial class Bff
@@ -483,7 +486,7 @@ ObjectList( '[fastBuildOutputFileShortName]_objects' )
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
-                public static string GenericExcutableSection = @"
+                public static string GenericExecutableSection = @"
 //=================================================================================================================
 Exec( '[fastBuildPreBuildName]' )
 {
@@ -497,6 +500,8 @@ Exec( '[fastBuildPreBuildName]' )
 }
 
 ";
+                [Obsolete("Section has been renamed to: GenericExecutableSection")]
+                public static string GenericExcutableSection = GenericExecutableSection;
 
                 public static string TestSection = @"
 //=================================================================================================================
