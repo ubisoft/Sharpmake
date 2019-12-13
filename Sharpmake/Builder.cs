@@ -211,7 +211,7 @@ namespace Sharpmake
 
             foreach (Assembly assembly in assemblies)
             {
-                foreach (Type type in assembly.GetTypes())
+                foreach (Type type in assembly.GetTypes().Where(t => t.IsVisible))
                 {
                     foreach (MethodInfo methodInfo in type.GetMethods())
                     {
