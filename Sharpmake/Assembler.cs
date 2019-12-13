@@ -470,7 +470,7 @@ namespace Sharpmake
 
                 if (cr.Errors.HasErrors)
                 {
-                    if (builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
+                    if (builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
                         throw new Error(errorMessage);
                     return assemblyInfo;
                 }
