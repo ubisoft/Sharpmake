@@ -201,7 +201,7 @@ namespace Sharpmake
 
             public Dictionary<string, string> GetXResourcesImg() { return _xResourcesImg; }
 
-            internal void Resolve(Resolver resolver)
+            internal void Resolve(string sourceRootPath, Resolver resolver)
             {
                 if (IsResolved)
                     return;
@@ -211,7 +211,10 @@ namespace Sharpmake
                     var resolvedDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var xResourcePair in _xResourcesImg)
                     {
-                        resolvedDictionary.Add(resolver.Resolve(xResourcePair.Key), resolver.Resolve(xResourcePair.Value));
+                        string path = resolver.Resolve(xResourcePair.Key);
+                        Util.ResolvePath(sourceRootPath, ref path);
+                        string link = resolver.Resolve(xResourcePair.Value);
+                        resolvedDictionary.Add(path, link);
                     }
                     _xResourcesImg = resolvedDictionary;
                 }
@@ -1696,7 +1699,7 @@ namespace Sharpmake
             if (SourceFilesFilters != null)
                 Util.ResolvePath(SharpmakeCsPath, ref SourceFilesFilters);
 
-            XResourcesImg.Resolve(resolver);
+            XResourcesImg.Resolve(SourceRootPath, resolver);
 
             // Resolve Configuration
             foreach (Project.Configuration conf in Configurations)
