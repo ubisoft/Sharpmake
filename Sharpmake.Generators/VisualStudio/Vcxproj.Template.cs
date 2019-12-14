@@ -52,14 +52,6 @@ namespace Sharpmake.Generators.VisualStudio
     <ProjectName>[projectName]</ProjectName>
 ";
 
-                public static string WindowsSDKOverrides =
-@"    <UCRTContentRoot>[UCRTContentRoot]</UCRTContentRoot>
-    <UniversalCRTSdkDir_10>[UniversalCRTSdkDir_10]</UniversalCRTSdkDir_10>
-    <[windowsSdkDirKey]>[windowsSdkDirValue]</[windowsSdkDirKey]>
-    <WindowsSdkDir>$([windowsSdkDirKey])</WindowsSdkDir>
-    <WindowsTargetPlatformVersion>[targetPlatformVersion]</WindowsTargetPlatformVersion>
-";
-
                 public const string DisableRegistryUse =
 @"    <DisableRegistryUse>true</DisableRegistryUse>
 ";

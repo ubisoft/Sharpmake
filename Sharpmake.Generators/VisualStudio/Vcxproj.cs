@@ -246,79 +246,6 @@ namespace Sharpmake.Generators.VisualStudio
             return Util.BuildGuid(reletiveToCsProjectFile).ToString().ToUpper();
         }
 
-        private void WriteWindowsKitsOverrides(GenerationContext context, FileGenerator fileGenerator)
-        {
-            KitsRootEnum? kitsRootWritten = null;
-            for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; ++devEnv)
-            {
-                // there's no need to write the properties with older versions of vs, as we override
-                // completely the VC++ directories entries in the vcxproj
-                if (devEnv < DevEnv.vs2015)
-                    continue;
-
-                KitsRootEnum kitsRootVersion = KitsRootPaths.GetUseKitsRootForDevEnv(devEnv);
-                if (kitsRootWritten == null)
-                    kitsRootWritten = kitsRootVersion;
-                else if (kitsRootWritten != kitsRootVersion)
-                    throw new Error($"Different values of kitsRoot in the same vcxproj {context.ProjectFileName}");
-                else
-                    continue;
-
-                string windowsSdkDirKey = FileGeneratorUtilities.RemoveLineTag;
-                string windowsSdkDirValue = FileGeneratorUtilities.RemoveLineTag;
-
-                string UniversalCRTSdkDir_10 = FileGeneratorUtilities.RemoveLineTag;
-                string UCRTContentRoot = FileGeneratorUtilities.RemoveLineTag;
-
-                string targetPlatformVersionString = FileGeneratorUtilities.RemoveLineTag;
-                if (kitsRootVersion != KitsRootEnum.KitsRoot81) // 8.1 is the default value for vs2015 and vs2017, so only specify a different platformVersion if we need to
-                    targetPlatformVersionString = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(devEnv).ToVersionString();
-
-                if (devEnv.OverridenWindowsPath())
-                {
-                    windowsSdkDirValue = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(kitsRootVersion));
-                    switch (kitsRootVersion)
-                    {
-                        case KitsRootEnum.KitsRoot:
-                            windowsSdkDirKey = "WindowsSdkDir_80";
-                            break;
-                        case KitsRootEnum.KitsRoot81:
-                            windowsSdkDirKey = "WindowsSdkDir_81";
-                            break;
-                        case KitsRootEnum.KitsRoot10:
-                            {
-                                windowsSdkDirKey = "WindowsSdkDir_10";
-                                UniversalCRTSdkDir_10 = windowsSdkDirValue;
-
-                                // this variable is found in Windows Kits\10\DesignTime\CommonConfiguration\Neutral\uCRT.props
-                                // it is always read from the registry unless overriden, so we need to explicitely set it
-                                UCRTContentRoot = windowsSdkDirValue;
-                            }
-                            break;
-                        default:
-                            throw new NotImplementedException($"Unsupported kitsRoot '{kitsRootVersion}'");
-                    }
-                }
-
-                using (fileGenerator.Declare("windowsSdkDirKey", windowsSdkDirKey))
-                using (fileGenerator.Declare("windowsSdkDirValue", windowsSdkDirValue))
-                using (fileGenerator.Declare("UniversalCRTSdkDir_10", UniversalCRTSdkDir_10))
-                using (fileGenerator.Declare("UCRTContentRoot", UCRTContentRoot))
-                using (fileGenerator.Declare("targetPlatformVersion", targetPlatformVersionString))
-                {
-                    fileGenerator.Write(Template.Project.WindowsSDKOverrides);
-                }
-
-                // vs2015 specific, we need to set the UniversalCRTSdkDir to $(UniversalCRTSdkDir_10) because it is not done in the .props
-                if (devEnv == DevEnv.vs2015 && UniversalCRTSdkDir_10 != FileGeneratorUtilities.RemoveLineTag)
-                {
-                    using (fileGenerator.Declare("custompropertyname", "UniversalCRTSdkDir"))
-                    using (fileGenerator.Declare("custompropertyvalue", "$(UniversalCRTSdkDir_10)"))
-                        fileGenerator.Write(fileGenerator.Resolver.Resolve(Template.Project.CustomProperty));
-                }
-            }
-        }
-
         private void WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
             bool registrySettingWritten = false;
@@ -483,9 +410,6 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 fileGenerator.Write(Template.Project.ProjectDescription);
             }
-
-            if (hasNonFastBuildConfig)
-                WriteWindowsKitsOverrides(context, fileGenerator);
 
             WriteVcOverrides(context, fileGenerator);
 

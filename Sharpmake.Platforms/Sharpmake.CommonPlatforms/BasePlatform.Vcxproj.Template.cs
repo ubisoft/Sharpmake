@@ -213,7 +213,17 @@ namespace Sharpmake
   </PropertyGroup>
 ";
 
-        // Notes: 
+        private const string _windowsSDKOverrides =
+            @"  <PropertyGroup Label=""Globals"">
+    <UCRTContentRoot>[UCRTContentRoot]</UCRTContentRoot>
+    <UniversalCRTSdkDir_10>[UniversalCRTSdkDir_10]</UniversalCRTSdkDir_10>
+    <[windowsSdkDirKey]>[windowsSdkDirValue]</[windowsSdkDirKey]>
+    <WindowsSdkDir>$([windowsSdkDirKey])</WindowsSdkDir>
+    <WindowsTargetPlatformVersion>[targetPlatformVersion]</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+";
+
+        // Notes:
         // Clean:
         // Visual Studio automatically cleans most files from the intermediate directory as soon as the clean command is active. However, it doesn't
         // clean them all, so we manually delete everything!
