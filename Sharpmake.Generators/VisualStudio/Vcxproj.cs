@@ -2052,7 +2052,3 @@ namespace Sharpmake.Generators.VisualStudio
         }
     }
 }
-
-#pragma warning restore 0219
-#pragma warning restore 0168
-#pragma warning restore 0162
