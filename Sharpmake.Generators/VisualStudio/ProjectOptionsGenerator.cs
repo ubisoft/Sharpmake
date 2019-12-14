@@ -787,8 +787,8 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Enable, () => { context.Options["CreateHotPatchableCode"] = "true"; context.CommandLineOptions["CreateHotPatchableCode"] = "/hotpatch"; })
             );
 
-            //Options.Vc.Compiler.ConformanceMode.    
-            //    Disable                                 ConformanceMode="false"               
+            //Options.Vc.Compiler.ConformanceMode.
+            //    Disable                                 ConformanceMode="false"
             //    Enable                                  ConformanceMode="true"                          /permissive-
             context.SelectOption
             (
@@ -796,8 +796,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.ConformanceMode.Enable, () => { context.Options["ConformanceMode"] = "true"; context.CommandLineOptions["ConformanceMode"] = "/permissive-"; })
             );
 
-            //Options.Vc.Compiler.DisableLanguageExtensions.    
-            //    Disable                                 DisableLanguageExtensions="false"               
+            //Options.Vc.Compiler.DisableLanguageExtensions.
+            //    Disable                                 DisableLanguageExtensions="false"
             //    Enable                                  DisableLanguageExtensions="true"                /Za
             context.SelectOption
             (

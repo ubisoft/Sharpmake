@@ -166,6 +166,7 @@ namespace Sharpmake.Generators.VisualStudio
             string projectFileName = fileInfo.Name;
             GenerateImpl(context, generatedFiles, skipFiles);
         }
+
         public static string FastBuildCustomArguments = "";
         public const string ProjectExtension = ".vcxproj";
         private const string ProjectFilterExtension = ".filters";
