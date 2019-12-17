@@ -2880,7 +2880,8 @@ namespace Sharpmake
                                     if (dependencySetting != DependencySetting.OnlyBuildOrder || ExecuteTargetCopy)
                                     {
                                         _resolvedTargetCopyFiles.Add(Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + ".dll"));
-                                        if (!isExport) // Add PDBs only if the dependency is not an [export] project
+                                        // Add PDBs only if they exist and the dependency is not an [export] project
+                                        if (!isExport && Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
                                         {
                                             _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);
 
