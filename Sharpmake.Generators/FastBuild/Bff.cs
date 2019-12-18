@@ -998,7 +998,8 @@ namespace Sharpmake.Generators.FastBuild
                                                 }
                                             }
 
-                                            bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
+                                            if (fastBuildPreBuildDependencies.Any())
+                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
@@ -1048,7 +1049,8 @@ namespace Sharpmake.Generators.FastBuild
                                                 // TODO: Add BFF generation for Win64 on Windows/Mac/Linux?
                                             }
 
-                                            bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
+                                            if (fastBuildPreBuildDependencies.Any())
+                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
                                         }
@@ -1146,7 +1148,8 @@ namespace Sharpmake.Generators.FastBuild
                                                     }
                                                 }
 
-                                                bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
+                                                if (fastBuildPreBuildDependencies.Any())
+                                                    bffGenerator.Write(Template.ConfigurationFile.PreBuildDependencies);
                                             }
                                             else
                                             {
