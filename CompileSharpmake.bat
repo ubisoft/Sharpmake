@@ -3,6 +3,7 @@
 :: %~1: Project/Solution to build
 :: %~2: Target(Normally should be Debug or Release)
 :: %~3: Platform(Normally should be "Any CPU" for sln and AnyCPU for a csproj)
+:: if none are passed, defaults to building Sharpmake.sln in Debug|AnyCPU
 
 setlocal enabledelayedexpansion
 : set batch file directory as current
@@ -29,7 +30,11 @@ echo MSBuild batch path: !VSMSBUILDCMD!
 call !VSMSBUILDCMD!
 if %errorlevel% NEQ 0 goto end
 
-call :BuildSharpmake %1 %2 %3
+if "%~1" == "" (
+    call :BuildSharpmake "Sharpmake.sln" "Debug" "Any CPU"
+) else (
+    call :BuildSharpmake %1 %2 %3
+)
 goto end
 
 :: Build Sharpmake using specified arguments
