@@ -1148,7 +1148,7 @@ namespace Sharpmake.Generators.VisualStudio
                                                                             projectFullFileNameWithExtension);
 
                         // If dependency project is marked as [Compile], read the GUID from the project file
-                        if (dependencyConfiguration.Project.GetType().IsDefined(typeof(Compile), false) && dependencyConfiguration.ProjectGuid == null)
+                        if (dependencyConfiguration.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Compile && dependencyConfiguration.ProjectGuid == null)
                             dependencyConfiguration.ProjectGuid = ReadGuidFromProjectFile(dependencyConfiguration);
 
                         // FIXME : MsBuild does not seem to properly detect ReferenceOutputAssembly setting. 

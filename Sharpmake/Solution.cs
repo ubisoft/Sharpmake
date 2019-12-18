@@ -329,11 +329,10 @@ namespace Sharpmake
                     foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
                     {
                         Project dependencyProject = dependencyConfiguration.Project;
-                        Type dependencyProjectType = dependencyProject.GetType();
-
-                        if (dependencyProjectType.IsDefined(typeof(Export), false))
+                        if (dependencyProject.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                             continue;
 
+                        Type dependencyProjectType = dependencyProject.GetType();
                         ITarget dependencyProjectTarget = dependencyConfiguration.Target;
                         hasFastBuildProjectConf |= dependencyConfiguration.IsFastBuild;
 
@@ -546,7 +545,8 @@ namespace Sharpmake
                             Name = FastBuildAllProjectName,
                             RootPath = firstProject.Project.RootPath,
                             SourceRootPath = firstProject.Project.RootPath,
-                            IsFileNameToLower = firstProject.Project.IsFileNameToLower
+                            IsFileNameToLower = firstProject.Project.IsFileNameToLower,
+                            SharpmakeProjectType = Project.ProjectTypeAttribute.Generate
                         };
                     }
                     else

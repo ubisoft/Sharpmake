@@ -65,7 +65,7 @@ namespace Sharpmake
 
             public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
-                if (!dependency.Project.GetType().IsDefined(typeof(Export), false))
+                if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export)
                 {
                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                         configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);

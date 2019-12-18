@@ -37,7 +37,7 @@ namespace Sharpmake
         #region Project.Configuration.IConfigurationTasks implementation
         public static void SetupLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
-            if (!dependency.Project.GetType().IsDefined(typeof(Export), false) &&
+            if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export &&
                 !(configuration.IsFastBuild && !dependency.IsFastBuild))
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))

@@ -120,7 +120,7 @@ namespace Sharpmake.Generators.FastBuild
                         var project = solutionProject.Project;
 
                         // Export projects do not have any bff
-                        if (project.GetType().IsDefined(typeof(Export), false))
+                        if (project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                             continue;
 
                         // When the project has a source file filter, only keep it if the file list is not empty
@@ -291,7 +291,7 @@ namespace Sharpmake.Generators.FastBuild
                     var project = solutionProject.Project;
 
                     // Export projects do not have any bff
-                    if (project.GetType().IsDefined(typeof(Export), false))
+                    if (project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                         continue;
 
                     // When the project has a source file filter, only keep it if the file list is not empty
@@ -709,7 +709,7 @@ namespace Sharpmake.Generators.FastBuild
             string currentBffFullPath = Util.GetCapitalizedPath(conf.BffFullFileName) + FastBuildSettings.FastBuildConfigFileExtension;
             foreach (Project.Configuration dependency in conf.ResolvedDependencies)
             {
-                if (dependency.Project.GetType().IsDefined(typeof(Export), false))
+                if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                     continue;
 
                 if (!visitedConfigurations.Contains(dependency))

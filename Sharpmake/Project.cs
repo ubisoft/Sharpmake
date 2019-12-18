@@ -51,6 +51,17 @@ namespace Sharpmake
             set { SetProperty(ref _isTargetFileNameToLower, value); }
         }
 
+        private ProjectTypeAttribute _sharpmakeProjectType = ProjectTypeAttribute.Unknown;
+        public ProjectTypeAttribute SharpmakeProjectType
+        {
+            get
+            {
+                Trace.Assert(_sharpmakeProjectType != ProjectTypeAttribute.Unknown);
+                return _sharpmakeProjectType;
+            }
+            internal set { _sharpmakeProjectType = value; }
+        }
+
         public string ClassName { get; private set; }                                     // Project Class Name, ex: "MyProject"
         public string FullClassName { get; private set; }                                 // Full class name with is namespace, ex: "Sharpmake.Sample.MyProject"
         public string SharpmakeCsFileName { get; private set; }                           // File name of the c# project configuration, ex: "MyProject.sharpmake"
@@ -1444,12 +1455,21 @@ namespace Sharpmake
         internal bool Resolved { get; private set; }
         public Dictionary<string, List<Project.Configuration>> ProjectFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
 
-        internal static Project CreateProject(Type projectType, List<Object> fragmentMasks)
+        public enum ProjectTypeAttribute
+        {
+            Unknown,
+            Generate,
+            Export,
+            Compile
+        }
+
+        internal static Project CreateProject(Type projectType, List<Object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
         {
             Project project;
             try
             {
                 project = Activator.CreateInstance(projectType) as Project;
+                project.SharpmakeProjectType = projectTypeAttribute;
             }
             catch (Exception e)
             {
@@ -1682,7 +1702,7 @@ namespace Sharpmake
             foreach (Project.Configuration conf in Configurations)
                 conf.Resolve(resolver);
 
-            if (GetType().IsDefined(typeof(Generate), false))
+            if (SharpmakeProjectType == ProjectTypeAttribute.Generate)
             {
                 PreResolveSourceFiles();
                 ResolveSourceFiles(builder);

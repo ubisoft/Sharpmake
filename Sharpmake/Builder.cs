@@ -470,13 +470,18 @@ namespace Sharpmake
         {
             using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| load project {1}", ms, type.Name); }))
             {
-                if (!type.IsDefined(typeof(Generate), false) &&
-                !type.IsDefined(typeof(Compile), false) &&
-                !type.IsDefined(typeof(Export), false))
+                Project.ProjectTypeAttribute projectTypeAttribute;
+                if (type.IsDefined(typeof(Generate), false))
+                    projectTypeAttribute = Project.ProjectTypeAttribute.Generate;
+                else if (type.IsDefined(typeof(Export), false))
+                    projectTypeAttribute = Project.ProjectTypeAttribute.Export;
+                else if (type.IsDefined(typeof(Compile), false))
+                    projectTypeAttribute = Project.ProjectTypeAttribute.Compile;
+                else
                     throw new Error("cannot generate project type without [Sharpmake.Generate], [Sharpmake.Compile] or [Sharpmake.Export] attribute: {0}", type.Name);
 
                 // Create the project instance
-                Project project = Project.CreateProject(type, Arguments.FragmentMasks);
+                Project project = Project.CreateProject(type, Arguments.FragmentMasks, projectTypeAttribute);
 
                 // Pre event
                 EventPreProjectConfigure?.Invoke(project);
@@ -770,7 +775,7 @@ namespace Sharpmake
             Trace.Assert(_usedProjectConfigurations != null);
             foreach (Project p in projects)
             {
-                if (p.GetType().IsDefined(typeof(Export), false))
+                if (p.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                     continue;
 
                 foreach (var conf in p.Configurations)
@@ -947,7 +952,7 @@ namespace Sharpmake
 
         private void Generate(Project project)
         {
-            if (!project.GetType().IsDefined(typeof(Generate), false))
+            if (project.SharpmakeProjectType != Project.ProjectTypeAttribute.Generate)
                 return;
 
             foreach (KeyValuePair<string, List<Project.Configuration>> pair in project.ProjectFilesMapping)

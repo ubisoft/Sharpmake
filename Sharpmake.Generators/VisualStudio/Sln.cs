@@ -772,7 +772,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Project.Configuration firstConf = resolvedProject.Configurations.First();
                 if (firstConf.ProjectGuid == null)
                 {
-                    if (!firstConf.Project.GetType().IsDefined(typeof(Compile), false))
+                    if (firstConf.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Compile)
                         throw new Error("cannot read guid from existing project, project must have Compile attribute: {0}", resolvedProject.ProjectFile);
                     firstConf.ProjectGuid = ReadGuidFromProjectFile(resolvedProject.ProjectFile);
                 }

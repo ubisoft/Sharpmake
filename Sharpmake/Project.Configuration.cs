@@ -2170,7 +2170,7 @@ namespace Sharpmake
                 Project project = (Project)owner;
 
                 // Change Output default for Export
-                if (project.GetType().IsDefined(typeof(Export), false))
+                if (project.SharpmakeProjectType == ProjectTypeAttribute.Export)
                     Output = OutputType.None;
             }
 
@@ -2200,7 +2200,7 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SharpmakeCsPath, ref _blobPath);
 
                 // workaround for export projects: they do not generate pdb, so no need to resolve their paths
-                if (!Project.GetType().IsDefined(typeof(Export), false))
+                if (Project.SharpmakeProjectType != ProjectTypeAttribute.Export)
                 {
                     // Reset to the default if the script set it to an empty string.
                     if (!string.IsNullOrEmpty(LinkerPdbFilePath))
@@ -2308,7 +2308,7 @@ namespace Sharpmake
                 string dependencyExtension = Util.GetProjectFileExtension(this);
                 ProjectFullFileNameWithExtension = ProjectFullFileName + dependencyExtension;
 
-                if (string.IsNullOrEmpty(ProjectGuid) && !this.Project.GetType().IsDefined(typeof(Compile), false))
+                if (string.IsNullOrEmpty(ProjectGuid) && Project.SharpmakeProjectType != ProjectTypeAttribute.Compile)
                     ProjectGuid = Util.BuildGuid(ProjectFullFileNameWithExtension, Project.GuidReferencePath);
 
                 if (PrecompHeader != null)
@@ -2774,9 +2774,9 @@ namespace Sharpmake
                         resolvedPrivateDependencies.Add(dependency);
                     }
 
-                    bool isExport = dependency.Project.GetType().IsDefined(typeof(Export), false);
-                    bool compile = dependency.Project.GetType().IsDefined(typeof(Generate), false) ||
-                                   dependency.Project.GetType().IsDefined(typeof(Compile), false);
+                    bool isExport = dependency.Project.SharpmakeProjectType == ProjectTypeAttribute.Export;
+                    bool compile = dependency.Project.SharpmakeProjectType == ProjectTypeAttribute.Generate ||
+                                   dependency.Project.SharpmakeProjectType == ProjectTypeAttribute.Compile;
 
                     var dependencySetting = propagationSetting._dependencySetting;
                     if (dependencySetting != DependencySetting.OnlyBuildOrder)

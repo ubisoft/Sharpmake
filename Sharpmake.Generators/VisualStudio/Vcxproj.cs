@@ -1041,7 +1041,7 @@ namespace Sharpmake.Generators.VisualStudio
                         if (fastbuildOnly && dependency.IsFastBuild)
                             continue;
 
-                        if (dependency.Project.GetType().IsDefined(typeof(Export), false))
+                        if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                             continue; // Can't generate a project dependency for export projects(the project doesn't exist!!).
 
                         string include = Util.PathGetRelative(firstConf.ProjectPath, dependency.ProjectFullFileNameWithExtension);
@@ -1049,7 +1049,7 @@ namespace Sharpmake.Generators.VisualStudio
                         // If dependency project is marked as [Compile], read the GUID from the project file
                         if (string.IsNullOrEmpty(dependency.ProjectGuid) || dependency.ProjectGuid == Guid.Empty.ToString())
                         {
-                            if (dependency.Project.GetType().IsDefined(typeof(Compile), false))
+                            if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Compile)
                                 dependency.ProjectGuid = ReadGuidFromProjectFile(dependency);
                         }
 
@@ -1119,7 +1119,7 @@ namespace Sharpmake.Generators.VisualStudio
                     foreach (var configurationDependency in configuration.ConfigurationDependencies)
                     {
                         // Ignore projects marked as Export
-                        if (configurationDependency.Project.GetType().IsDefined(typeof(Export), false))
+                        if (configurationDependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                             continue;
 
                         // Ignore exe and utility outputs
@@ -1135,7 +1135,7 @@ namespace Sharpmake.Generators.VisualStudio
                         depInfo.ProjectFullFileNameWithExtension = configurationDependency.ProjectFullFileNameWithExtension;
 
                         // If dependency project is marked as [Compile], read the GUID from the project file
-                        depInfo.ProjectGuid = configurationDependency.Project.GetType().IsDefined(typeof(Compile), false) ? ReadGuidFromProjectFile(configurationDependency) : configurationDependency.ProjectGuid;
+                        depInfo.ProjectGuid = configurationDependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Compile ? ReadGuidFromProjectFile(configurationDependency) : configurationDependency.ProjectGuid;
 
                         depInfo.ContainsASM = configurationDependency.Project.ContainsASM;
 
@@ -1198,13 +1198,13 @@ namespace Sharpmake.Generators.VisualStudio
             System.Text.StringBuilder inconsistencyReports = new System.Text.StringBuilder("");
             for (int i = 0; i < context.ProjectConfigurations.Count; ++i)
             {
-                var iDeps = context.ProjectConfigurations.ElementAt(i).ConfigurationDependencies.Where(d => !d.Project.GetType().IsDefined(typeof(Export), false)).Select(x => x.ProjectFullFileNameWithExtension);
+                var iDeps = context.ProjectConfigurations.ElementAt(i).ConfigurationDependencies.Where(d => d.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export).Select(x => x.ProjectFullFileNameWithExtension);
                 for (int j = 0; j < context.ProjectConfigurations.Count; ++j)
                 {
                     if (i == j)
                         continue;
 
-                    var jDeps = context.ProjectConfigurations.ElementAt(j).ConfigurationDependencies.Where(d => !d.Project.GetType().IsDefined(typeof(Export), false)).Select(x => x.ProjectFullFileNameWithExtension);
+                    var jDeps = context.ProjectConfigurations.ElementAt(j).ConfigurationDependencies.Where(d => d.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export).Select(x => x.ProjectFullFileNameWithExtension);
 
                     var ex = iDeps.Except(jDeps);
                     if (ex.Count() != 0)
