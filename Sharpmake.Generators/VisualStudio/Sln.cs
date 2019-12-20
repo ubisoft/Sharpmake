@@ -481,7 +481,7 @@ namespace Sharpmake.Generators.VisualStudio
             // write solution configurations
             string visualStudioExe = GetVisualStudioIdePath(devEnv) + Util.WindowsSeparator + "devenv.com";
 
-            List<string> configurationSectionNames = new List<string>();
+            var configurationSectionNames = new List<string>();
 
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationBegin);
             foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
@@ -514,6 +514,9 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             configurationSectionNames.Sort();
+
+            VerifySectionNamesDuplicates(solutionFile, solutionConfigurations, configurationSectionNames);
+
             foreach (string configurationSectionName in configurationSectionNames)
                 fileGenerator.Write(configurationSectionName);
 
@@ -689,6 +692,30 @@ namespace Sharpmake.Generators.VisualStudio
             solution.PostGenerationCallback?.Invoke(solutionPath, solutionFile, SolutionExtension);
 
             return solutionFileInfo.FullName;
+        }
+
+        // Will check that two configurations in the solution do not share the same name
+        private void VerifySectionNamesDuplicates(
+            string solutionFile,
+            IReadOnlyList<Solution.Configuration> solutionConfigurations,
+            List<string> configurationSectionNames
+        )
+        {
+            int count = configurationSectionNames.Count;
+            var distinctSectionNames = configurationSectionNames.Distinct().ToList();
+            if (count != distinctSectionNames.Count)
+            {
+                throw new Error(
+                    "Solution '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
+                    solutionFile,
+                    string.Join(
+                        Environment.NewLine + "- ",
+                        solutionConfigurations.Select(
+                            sc => $"{sc.Name} => '{sc}'"
+                        ).OrderBy(name => name)
+                    )
+                );
+            }
         }
 
         private Solution.Configuration.IncludedProjectInfo ResolveStartupProject(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
