@@ -2244,7 +2244,13 @@ namespace Sharpmake
         }
 
         private static ConcurrentDictionary<Tuple<string, string>, string> s_registryCache = new ConcurrentDictionary<Tuple<string, string>, string>();
+
         public static string GetRegistryLocalMachineSubKeyValue(string registrySubKey, string value, string fallbackValue)
+        {
+            return GetRegistryLocalMachineSubKeyValue(registrySubKey, value, fallbackValue, enableLog: true);
+        }
+
+        public static string GetRegistryLocalMachineSubKeyValue(string registrySubKey, string value, string fallbackValue, bool enableLog)
         {
             var subKeyValueTuple = new Tuple<string, string>(registrySubKey, value);
             string registryValue;
@@ -2259,10 +2265,10 @@ namespace Sharpmake
                     if (localMachineKey != null)
                     {
                         key = (string)localMachineKey.GetValue(value);
-                        if (string.IsNullOrEmpty(key))
+                        if (enableLog && string.IsNullOrEmpty(key))
                             LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
                     }
-                    else
+                    else if (enableLog)
                         LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                 }
             }
