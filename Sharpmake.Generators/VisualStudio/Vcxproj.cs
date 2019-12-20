@@ -161,9 +161,6 @@ namespace Sharpmake.Generators.VisualStudio
         public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles, List<string> skipFiles)
         {
             var context = new GenerationContext(builder, projectFile, project, configurations);
-            FileInfo fileInfo = new FileInfo(projectFile);
-            string projectPath = fileInfo.Directory.FullName;
-            string projectFileName = fileInfo.Name;
             GenerateImpl(context, generatedFiles, skipFiles);
         }
 
@@ -524,7 +521,8 @@ namespace Sharpmake.Generators.VisualStudio
                 using (fileGenerator.Declare("options", options[conf]))
                 using (fileGenerator.Declare("clrSupport", (conf.IsFastBuild || !clrSupport) ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
                 {
-                    PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform).GenerateProjectConfigurationGeneral(context, fileGenerator);
+                    var platformVcxproj = context.PresentPlatforms[conf.Platform];
+                    platformVcxproj.GenerateProjectConfigurationGeneral(context, fileGenerator);
                 }
             }
 
@@ -577,7 +575,7 @@ namespace Sharpmake.Generators.VisualStudio
                 using (fileGenerator.Declare("options", options[conf]))
                 using (fileGenerator.Declare("target", conf.Target))
                 {
-                    var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
+                    var platformVcxproj = context.PresentPlatforms[conf.Platform];
 
                     if (conf.IsFastBuild)
                     {
@@ -676,7 +674,7 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
 
-                        IPlatformVcxproj platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
+                        var platformVcxproj = context.PresentPlatforms[conf.Platform];
                         platformVcxproj.GenerateProjectCompileVcxproj(context, fileGenerator);
                         platformVcxproj.GenerateProjectLinkVcxproj(context, fileGenerator);
 
@@ -701,7 +699,7 @@ namespace Sharpmake.Generators.VisualStudio
                         if (conf.Platform.IsPC())
                             fileGenerator.Write(Template.Project.ProjectConfigurationsResourceCompile);
 
-                        if (conf.AdditionalManifestFiles.Count != 0 || (Options.GetObjects<Options.Vc.ManifestTool.EnableDpiAwareness>(conf).Count() > 0) && (conf.Platform.IsPC() && conf.Platform.IsMicrosoft()))
+                        if (conf.AdditionalManifestFiles.Count != 0 || (Options.GetObjects<Options.Vc.ManifestTool.EnableDpiAwareness>(conf).Any()) && (conf.Platform.IsPC() && conf.Platform.IsMicrosoft()))
                             fileGenerator.Write(Template.Project.ProjectConfigurationsManifestTool);
 
                         fileGenerator.Write(Template.Project.ProjectConfigurationEndItemDefinition);
@@ -759,7 +757,7 @@ namespace Sharpmake.Generators.VisualStudio
             GenerateProjectReferences(context, fileGenerator, options, hasFastBuildConfig);
 
             // Environment variables
-            var environmentVariables = context.ProjectConfigurations.Select(conf => conf.Platform).Distinct().SelectMany(platform => PlatformRegistry.Get<IPlatformVcxproj>(platform).GetEnvironmentVariables(context));
+            var environmentVariables = context.ProjectConfigurations.Select(conf => conf.Platform).Distinct().SelectMany(platform => context.PresentPlatforms[platform].GetEnvironmentVariables(context));
             if (environmentVariables.Any())
             {
                 fileGenerator.Write(Template.Project.ItemGroupBegin);
@@ -1651,7 +1649,7 @@ namespace Sharpmake.Generators.VisualStudio
                             bool objsInSubdirectories = conf.ObjectFileName != null && !isResource;
                             bool isExcludeFromGenerateXmlDocumentation = conf.ResolvedSourceFilesGenerateXmlDocumentationExclude.Contains(file.FileName);
 
-                            var platformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
+                            var platformVcxproj = context.PresentPlatforms[conf.Platform];
                             if (isPrecompSource && platformVcxproj.ExcludesPrecompiledHeadersFromBuild)
                                 isExcludeFromBuild = true;
                             if (!isExcludeFromBuild && !isResource)
@@ -2002,9 +2000,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             public ProjectFile(IGenerationContext context, string fileName)
             {
-                FileName = Project.GetCapitalizedFile(fileName);
-                if (FileName == null)
-                    FileName = fileName;
+                FileName = Project.GetCapitalizedFile(fileName) ?? fileName;
 
                 FileNameProjectRelative = Util.PathGetRelative(context.ProjectDirectoryCapitalized, FileName, true);
                 FileNameSourceRelative = Util.PathGetRelative(context.ProjectSourceCapitalized, FileName, true);
