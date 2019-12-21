@@ -142,15 +142,30 @@ namespace Sharpmake.Generators.VisualStudio
             private IEnumerable<Project.Configuration> SortConfigurations(IEnumerable<Project.Configuration> unsortedConfigurations)
             {
                 // Need to sort by name and platform
-                List<Project.Configuration> configurations = new List<Project.Configuration>();
-                configurations.AddRange(unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform));
+                var configurations = new List<Project.Configuration>();
+                configurations.AddRange(unsortedConfigurations.OrderBy(conf => conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)));
 
                 // validate that 2 conf name in the same project don't have the same name
-                Dictionary<string, Project.Configuration> configurationNameMapping = new Dictionary<string, Project.Configuration>();
+                var configurationNameMapping = new Dictionary<string, Project.Configuration>();
 
                 foreach (Project.Configuration conf in configurations)
                 {
                     var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target) + conf.Target.GetFragment<DevEnv>();
+
+                    Project.Configuration previousConf;
+                    if (configurationNameMapping.TryGetValue(projectUniqueName, out previousConf))
+                    {
+                        throw new Error(
+                            "Project '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
+                            ProjectFileName,
+                            string.Join(
+                                Environment.NewLine + "- ",
+                                configurations.Select(
+                                    pc => pc.Name + Util.GetPlatformString(pc.Platform, pc.Project, pc.Target) + pc.Target.GetFragment<DevEnv>() + $"  => '{pc.Target.GetTargetString()}'"
+                                ).OrderBy(name => name)
+                            )
+                        );
+                    }
                     configurationNameMapping[projectUniqueName] = conf;
                 }
 
