@@ -11,7 +11,7 @@ configuration:
 
 before_build:
 - cmd: bootstrap-sharpmake.bat
-- cmd: nuget restore Sharpmake.sln
+- cmd: msbuild /restore Sharpmake.sln
 
 build:
   project: Sharpmake.sln
