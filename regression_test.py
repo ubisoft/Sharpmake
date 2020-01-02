@@ -66,10 +66,12 @@ class Test:
             os.chdir(entry_path)
 
 tests = [
+    Test("Android", "android.sharpmake.cs"),
     Test("ConfigureOrder", "main.sharpmake.cs"),
     Test("CPPCLI", "CLRTest.sharpmake.cs"),
     Test("CSharpHelloWorld", "HelloWorld.sharpmake.cs"),
     Test("HelloWorld", "HelloWorld.sharpmake.cs"),
+    Test("NetCoreHelloWorld", "HelloWorld.sharpmake.cs"),
     Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
     Test("CSharpWCF", "CSharpWCF.sharpmake.cs", "CSharpWCF\codebase"),
     Test("PackageReferences", "PackageReferences.sharpmake.cs"),

@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 16
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageReferences", "packagereferences\PackageReferences.vs2019.v4_5_2.csproj", "{4493707C-CA67-692A-56C0-0155AD7BF093}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageReferencesCPP", "packagereferencescpp\packagereferencescpp.vs2019.v4_5_2.vcxproj", "{19FAA633-5688-A4D5-ECC8-EF91F0BD9E7E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4493707C-CA67-692A-56C0-0155AD7BF093}.Debug|x64.ActiveCfg = Debug|x64
+		{4493707C-CA67-692A-56C0-0155AD7BF093}.Debug|x64.Build.0 = Debug|x64
+		{4493707C-CA67-692A-56C0-0155AD7BF093}.Release|x64.ActiveCfg = Release|x64
+		{4493707C-CA67-692A-56C0-0155AD7BF093}.Release|x64.Build.0 = Release|x64
+		{19FAA633-5688-A4D5-ECC8-EF91F0BD9E7E}.Debug|x64.ActiveCfg = Debug|x64
+		{19FAA633-5688-A4D5-ECC8-EF91F0BD9E7E}.Debug|x64.Build.0 = Debug|x64
+		{19FAA633-5688-A4D5-ECC8-EF91F0BD9E7E}.Release|x64.ActiveCfg = Release|x64
+		{19FAA633-5688-A4D5-ECC8-EF91F0BD9E7E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageReferences", "packagereferences\PackageReferences.vs2017.v4_5_2.csproj", "{3A94C712-464D-93BB-5A33-4627DB077D0C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PackageReferencesCPP", "packagereferencescpp\packagereferencescpp.vs2017.v4_5_2.vcxproj", "{6A57403E-623C-CFC3-C662-5118DA056EA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A94C712-464D-93BB-5A33-4627DB077D0C}.Debug|x64.ActiveCfg = Debug|x64
+		{3A94C712-464D-93BB-5A33-4627DB077D0C}.Debug|x64.Build.0 = Debug|x64
+		{3A94C712-464D-93BB-5A33-4627DB077D0C}.Release|x64.ActiveCfg = Release|x64
+		{3A94C712-464D-93BB-5A33-4627DB077D0C}.Release|x64.Build.0 = Release|x64
+		{6A57403E-623C-CFC3-C662-5118DA056EA9}.Debug|x64.ActiveCfg = Debug|x64
+		{6A57403E-623C-CFC3-C662-5118DA056EA9}.Debug|x64.Build.0 = Debug|x64
+		{6A57403E-623C-CFC3-C662-5118DA056EA9}.Release|x64.ActiveCfg = Release|x64
+		{6A57403E-623C-CFC3-C662-5118DA056EA9}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
