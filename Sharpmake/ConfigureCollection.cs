@@ -140,7 +140,7 @@ namespace Sharpmake
                 else
                 {
                     Builder.Instance.LogWarningLine(
-                        "Please remove attributes on {0} overriding {1}, they are useless.",
+                        "Warning: Please remove attributes on {0} overriding {1}, they are useless.",
                         methodInfo.DeclaringType.FullName + "." + methodInfo.Name,
                         baseMethodInfo.DeclaringType.FullName + "." + baseMethodInfo.Name
                     );
