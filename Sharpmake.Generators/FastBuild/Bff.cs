@@ -1671,7 +1671,7 @@ namespace Sharpmake.Generators.FastBuild
             if (unityCount > 0)
                 fastBuildUnityCount = unityCount.ToString(CultureInfo.InvariantCulture);
 
-            var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude);
+            var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude.Select(Util.GetCapitalizedPath));
 
             bool srcDirsAreEmpty = true;
             var items = new List<string>();
