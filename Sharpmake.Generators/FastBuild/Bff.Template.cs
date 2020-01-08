@@ -338,6 +338,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.FloatingPointModel]'
             + ' [cmdLineOptions.FloatingPointExceptions]'
             + ' [cmdLineOptions.CreateHotpatchableImage]'
+            + ' [cmdLineOptions.SupportJustMyCode]'
             + ' [cmdLineOptions.SpectreMitigation]'
             // Language options
             // ---------------------------

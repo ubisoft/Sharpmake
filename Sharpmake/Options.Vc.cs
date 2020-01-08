@@ -537,9 +537,10 @@ namespace Sharpmake
 
                 public enum SupportJustMyCode
                 {
+                    [Default]
+                    Default,
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     Yes,
-                    [Default] // The actual default for VS is Yes, but this will not work for old VS versions.
                     No
                 }
 

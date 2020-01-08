@@ -896,12 +896,19 @@ namespace Sharpmake.Generators.VisualStudio
             //    No
             context.SelectOption
             (
+            Options.Option(Options.Vc.Compiler.SupportJustMyCode.Default, () => { context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag; }),
             Options.Option(Options.Vc.Compiler.SupportJustMyCode.No, () =>
             {
                 if (context.DevelopmentEnvironment >= DevEnv.vs2017)
+                {
                     context.Options["SupportJustMyCode"] = "false";
+                    context.CommandLineOptions["SupportJustMyCode"] = "/JMC-";
+                }
                 else
+                {
                     context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
+                    context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
+                }
             }),
             Options.Option(Options.Vc.Compiler.SupportJustMyCode.Yes, () => { context.Options["SupportJustMyCode"] = "true"; context.CommandLineOptions["SupportJustMyCode"] = "/JMC"; })
             );
