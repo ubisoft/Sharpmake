@@ -711,7 +711,7 @@ namespace Sharpmake.Generators.VisualStudio
                     string.Join(
                         Environment.NewLine + "- ",
                         solutionConfigurations.Select(
-                            sc => $"{sc.Name} => '{sc}'"
+                            sc => $"{sc.Name}|{sc.PlatformName} => '{sc}'"
                         ).OrderBy(name => name)
                     )
                 );
