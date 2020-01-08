@@ -1284,9 +1284,9 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             // Write all unity sections together at the beginning of the .bff just after the header.
-            foreach (var unityFile in _unities)
+            foreach (var unityFile in _unities.Keys.OrderBy(u => u.UnityName))
             {
-                using (bffWholeFileGenerator.Declare("unityFile", unityFile.Key))
+                using (bffWholeFileGenerator.Declare("unityFile", unityFile))
                     bffWholeFileGenerator.Write(Template.ConfigurationFile.UnitySection);
             }
 
