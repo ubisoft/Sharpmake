@@ -193,7 +193,7 @@ namespace Sharpmake
         private void InvokeConfigurationInternal(BuildContext.BaseBuildContext context)
         {
             _readOnly = true;
-            IEnumerable<MethodInfo> configureMethods = context.CreateConfigureCollection(GetType());
+            var configureMethods = context.CreateConfigureCollection(GetType()).ToList();
 
             // Clear current configurations
             _configurations.Clear();
@@ -215,8 +215,11 @@ namespace Sharpmake
                 conf.Construct(this, target);
                 _configurations.Add(conf);
                 var param = new object[] { conf, target };
-                foreach (MethodInfo method in configureMethods.Where(configure => FilterMethodForTarget(configure, target)))
+                foreach (MethodInfo method in configureMethods)
                 {
+                    if (!FilterMethodForTarget(method, target))
+                        continue;
+
                     try
                     {
                         method.Invoke(this, param);
