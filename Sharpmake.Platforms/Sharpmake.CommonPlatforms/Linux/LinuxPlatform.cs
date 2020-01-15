@@ -343,6 +343,7 @@ namespace Sharpmake
 
             #region IFastBuildCompilerSettings implementation
             public IDictionary<DevEnv, string> BinPath { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; } = new Dictionary<IFastBuildCompilerKey, CompilerFamily>();
             public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
@@ -430,9 +431,14 @@ namespace Sharpmake
                             extraFiles.AddRange(userExtraFiles);
                     }
 
+                    var compilerFamily = Sharpmake.CompilerFamily.Clang;
+                    var compilerFamilyKey = new FastBuildCompilerKey(devEnv);
+                    if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
+                        compilerFamily = Sharpmake.CompilerFamily.Clang;
+
                     string executable = useCCompiler ? @"$ExecutableRootPath$\clang.exe" : @"$ExecutableRootPath$\clang++.exe";
 
-                    compilerSettings = new CompilerSettings(compilerName, Platform.linux, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
+                    compilerSettings = new CompilerSettings(compilerName, compilerFamily, Platform.linux, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
                     masterCompilerSettings.Add(compilerName, compilerSettings);
                 }
 
@@ -467,7 +473,8 @@ namespace Sharpmake
                             binPath: binPath,
                             linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
                             librarian: @"$LinkerPath$\" + librarianExe,
-                            linker: @"$LinkerPath$\" + linkerExe
+                            linker: @"$LinkerPath$\" + linkerExe,
+                            fastBuildLinkerType: CompilerSettings.LinkerType.GCC // Workaround: set GCC linker type since it will only enable response files
                         )
                     );
                 }

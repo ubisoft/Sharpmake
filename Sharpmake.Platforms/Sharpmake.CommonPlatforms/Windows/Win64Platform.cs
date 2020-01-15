@@ -122,6 +122,8 @@ namespace Sharpmake
                     string platformToolSetPath = null;
                     string pathToCompiler = null;
                     string compilerExeName = null;
+                    var compilerFamily = Sharpmake.CompilerFamily.Auto;
+                    var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.win64);
 
                     switch (platformToolset)
                     {
@@ -158,6 +160,10 @@ namespace Sharpmake
                             pathToCompiler = Path.Combine(platformToolSetPath, "bin");
                             compilerExeName = "clang-cl.exe";
 
+                            var compilerFamilyKey = new FastBuildWindowsCompilerFamilyKey(devEnv, platformToolset);
+                            if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
+                                compilerFamily = Sharpmake.CompilerFamily.ClangCl;
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -168,9 +174,12 @@ namespace Sharpmake
                         platformToolSetPath = Path.Combine(compilerDevEnv.Value.GetVisualStudioDir(), "VC");
                         pathToCompiler = compilerDevEnv.Value.GetVisualStudioBinPath(Platform.win64);
                         compilerExeName = "cl.exe";
+
+                        var compilerFamilyKey = new FastBuildWindowsCompilerFamilyKey(devEnv, platformToolset);
+                        if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
+                            compilerFamily = Sharpmake.CompilerFamily.MSVC;
                     }
 
-                    var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.win64);
                     Strings extraFiles = new Strings();
                     {
                         Strings userExtraFiles;
@@ -291,7 +300,7 @@ namespace Sharpmake
 
                     string executable = Path.Combine("$ExecutableRootPath$", compilerExeName);
 
-                    compilerSettings = new CompilerSettings(compilerName, Platform.win64, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
+                    compilerSettings = new CompilerSettings(compilerName, compilerFamily, Platform.win64, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
                     masterCompilerSettings.Add(compilerName, compilerSettings);
                 }
 

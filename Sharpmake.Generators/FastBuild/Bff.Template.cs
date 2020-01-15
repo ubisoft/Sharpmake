@@ -89,6 +89,7 @@ Compiler( '[fastbuildCompilerName]' )
     .ExecutableRootPath     = '[fastBuildCompilerRootPath]'
     .Executable             = '[fastBuildCompilerExecutable]'
     .ExtraFiles             = [fastBuildExtraFiles]
+    .CompilerFamily         = '[fastBuildCompilerFamily]'
     [fastBuildVS2012EnumBugWorkaround]
 }
 ";
@@ -105,6 +106,7 @@ Compiler( '[fastbuildCompilerName]' )
     .Linker                 = '[fastBuildLinker]'
     .PlatformLibPaths       = '[fastBuildPlatformLibPaths]'
     .Executable             = '[fastBuildExecutable]'
+    .LinkerType             = '[fastBuildLinkerType]'
 ]
 ";
 

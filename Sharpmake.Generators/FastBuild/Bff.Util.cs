@@ -420,6 +420,40 @@ namespace Sharpmake.Generators.FastBuild
 
     internal static class UtilityMethods
     {
+        public static string GetFBuildCompilerFamily(this CompilerFamily compilerFamily)
+        {
+            switch (compilerFamily)
+            {
+                case CompilerFamily.MSVC: return "msvc";
+                case CompilerFamily.Clang: return "clang";
+                case CompilerFamily.GCC: return "gcc";
+                case CompilerFamily.SNC: return "snc";
+                case CompilerFamily.CodeWarriorWii: return "codewarrior-wii";
+                case CompilerFamily.CudaNVCC: return "cuda-nvcc";
+                case CompilerFamily.QtRCC: return "qt-rcc";
+                case CompilerFamily.VBCC: return "vbcc";
+                case CompilerFamily.OrbisWavePsslc: return "orbis-wave-psslc";
+                case CompilerFamily.ClangCl: return "clang-cl";
+                case CompilerFamily.Auto: return string.Empty;
+                default: throw new Exception("Unrecognized compiler family");
+            }
+        }
+
+        public static string GetFBuildLinkerType(this CompilerSettings.LinkerType linkerType)
+        {
+            switch (linkerType)
+            {
+                case CompilerSettings.LinkerType.CodeWarriorLd: return "codewarrior-ld";
+                case CompilerSettings.LinkerType.GCC: return "gcc";
+                case CompilerSettings.LinkerType.GreenHillsExlr: return "greenhills-exlr";
+                case CompilerSettings.LinkerType.MSVC: return "msvc";
+                case CompilerSettings.LinkerType.ClangOrbis: return "clang-orbis";
+                case CompilerSettings.LinkerType.SNCPS3: return "snc-ps3";
+                case CompilerSettings.LinkerType.Auto: return string.Empty;
+                default: throw new Exception("Unrecognized linker type");
+            }
+        }
+
         public static bool TestPlatformFlags(this UniqueList<Platform> platforms, Platform platformFlags)
         {
             return platforms.Any(platform => platformFlags.HasFlag(platform));

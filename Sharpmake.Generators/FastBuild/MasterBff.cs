@@ -603,6 +603,7 @@ namespace Sharpmake.Generators.FastBuild
             {
                 var compilerSettings = compiler.Value;
                 var compilerPlatform = compilerSettings.PlatformFlags;
+                string fastBuildCompilerFamily = UtilityMethods.GetFBuildCompilerFamily(compilerSettings.FastBuildCompilerFamily);
 
                 string fastBuildVS2012EnumBugWorkaround = FileGeneratorUtilities.RemoveLineTag;
                 if (FastBuildSettings.EnableVS2012EnumBugWorkaround &&
@@ -616,12 +617,14 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastBuildCompilerRootPath", compilerSettings.RootPath))
                 using (masterBffGenerator.Declare("fastBuildCompilerExecutable", string.IsNullOrEmpty(compilerSettings.Executable) ? FileGeneratorUtilities.RemoveLineTag : compilerSettings.Executable))
                 using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28) : FileGeneratorUtilities.RemoveLineTag))
+                using (masterBffGenerator.Declare("fastBuildCompilerFamily", string.IsNullOrEmpty(fastBuildCompilerFamily) ? FileGeneratorUtilities.RemoveLineTag : fastBuildCompilerFamily))
                 using (masterBffGenerator.Declare("fastBuildVS2012EnumBugWorkaround", fastBuildVS2012EnumBugWorkaround))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);
                     foreach (var compilerConfiguration in compilerSettings.Configurations.OrderBy(x => x.Key))
                     {
                         var compConf = compilerConfiguration.Value;
+                        string fastBuildLinkerType = UtilityMethods.GetFBuildLinkerType(compConf.FastBuildLinkerType);
 
                         using (masterBffGenerator.Declare("fastBuildConfigurationName", compilerConfiguration.Key))
                         using (masterBffGenerator.Declare("fastBuildBinPath", compConf.BinPath))
@@ -630,6 +633,7 @@ namespace Sharpmake.Generators.FastBuild
                         using (masterBffGenerator.Declare("fastBuildCompilerName", compConf.Compiler != FileGeneratorUtilities.RemoveLineTag ? compConf.Compiler : compiler.Key))
                         using (masterBffGenerator.Declare("fastBuildLibrarian", compConf.Librarian))
                         using (masterBffGenerator.Declare("fastBuildLinker", compConf.Linker))
+                        using (masterBffGenerator.Declare("fastBuildLinkerType", string.IsNullOrEmpty(fastBuildLinkerType) ? FileGeneratorUtilities.RemoveLineTag : fastBuildLinkerType))
                         using (masterBffGenerator.Declare("fastBuildPlatformLibPaths", string.IsNullOrWhiteSpace(compConf.PlatformLibPaths) ? FileGeneratorUtilities.RemoveLineTag : compConf.PlatformLibPaths))
                         using (masterBffGenerator.Declare("fastBuildExecutable", compConf.Executable))
                         using (masterBffGenerator.Declare("fastBuildUsing", compConf.UsingOtherConfiguration))
