@@ -391,6 +391,10 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </ItemGroup>
 ";
 
+                public const string PlatformFolderOverride =
+@"    <_PlatformFolder>[platformFolder]</_PlatformFolder>
+";
+
                 internal static class Filers
                 {
                     public static string Begin =
