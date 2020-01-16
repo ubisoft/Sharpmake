@@ -80,6 +80,19 @@ namespace Sharpmake.Generators.VisualStudio
                 @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
 ";
 
+                public static string VCOverridesProperties =
+@"    <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
+    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
+";
+
+                public static string VCTargetsPathOverride =
+@"    <VCTargetsPath>[vcTargetsPath]</VCTargetsPath>
+";
+
+                public static string VCTargetsPathOverrideConditional =
+@"    <VCTargetsPath Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</VCTargetsPath>
+";
+
                 public static string ProjectEnd =
                 @"</Project>";
 

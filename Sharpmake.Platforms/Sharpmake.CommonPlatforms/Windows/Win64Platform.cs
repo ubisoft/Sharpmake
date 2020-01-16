@@ -409,23 +409,25 @@ namespace Sharpmake
                 if (string.IsNullOrEmpty(platformFolder) || !ClangForWindows.Settings.OverridenLLVMInstallDir)
                     return;
 
-                generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                using (generator.Declare("platformName", SimplePlatformString))
                 {
-                    if (!string.IsNullOrEmpty(platformFolder))
+                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
                     {
-                        using (generator.Declare("custompropertyname", "_PlatformFolder"))
-                        using (generator.Declare("custompropertyvalue", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
-                            generator.Write(Vcxproj.Template.Project.CustomProperty);
-                    }
+                        if (!string.IsNullOrEmpty(platformFolder))
+                        {
+                            using (generator.Declare("platformFolder", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
+                                generator.Write(Vcxproj.Template.Project.PlatformFolderOverride);
+                        }
 
-                    if (ClangForWindows.Settings.OverridenLLVMInstallDir)
-                    {
-                        using (generator.Declare("custompropertyname", "LLVMInstallDir"))
-                        using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
-                            generator.Write(Vcxproj.Template.Project.CustomProperty);
+                        if (ClangForWindows.Settings.OverridenLLVMInstallDir)
+                        {
+                            using (generator.Declare("custompropertyname", "LLVMInstallDir"))
+                            using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                                generator.Write(Vcxproj.Template.Project.CustomProperty);
+                        }
                     }
+                    generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
-                generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
             }
             #endregion
         }

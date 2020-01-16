@@ -235,10 +235,10 @@ namespace Sharpmake
         {
         }
 
-        private void WriteWindowsKitsOverrides(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
+        protected virtual void WriteWindowsKitsOverrides(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
         {
             KitsRootEnum? kitsRootWritten = null;
-            for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; ++devEnv)
+            for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; devEnv = (DevEnv)((int)devEnv << 1))
             {
                 // there's no need to write the properties with older versions of vs, as we override
                 // completely the VC++ directories entries in the vcxproj

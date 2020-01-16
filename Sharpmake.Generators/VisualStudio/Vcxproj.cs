@@ -246,12 +246,37 @@ namespace Sharpmake.Generators.VisualStudio
             return Util.BuildGuid(reletiveToCsProjectFile).ToString().ToUpper();
         }
 
+        private static string GetVCTargetsPathOverride(DevEnv devEnv)
+        {
+            switch (devEnv)
+            {
+                case DevEnv.vs2017:
+                    return Path.Combine(devEnv.GetVisualStudioDir(), @"Common7\IDE\VC\VCTargets\");
+                case DevEnv.vs2019:
+                    return Path.Combine(devEnv.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\v160\");
+                default:
+                    throw new NotImplementedException("VCTargetsPath redirection for " + devEnv);
+            }
+        }
+
+        private static string GetMSBuildExtensionsPathOverride(DevEnv devEnv)
+        {
+            switch (devEnv)
+            {
+                case DevEnv.vs2017:
+                case DevEnv.vs2019:
+                    return Path.Combine(devEnv.GetVisualStudioDir(), @"MSBuild\");
+                default:
+                    throw new NotImplementedException("MSBuildExtensionsPath redirection for " + devEnv);
+            }
+        }
+
         private void WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
             bool registrySettingWritten = false;
 
             bool? overrideCheck = null;
-            for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; ++devEnv)
+            for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; devEnv = (DevEnv)((int)devEnv << 1))
             {
                 bool vsDirOverriden = devEnv.OverridenVisualStudioDir();
                 if (overrideCheck.HasValue)
@@ -289,18 +314,29 @@ namespace Sharpmake.Generators.VisualStudio
                         vcRootPathKey = "VCInstallDir_140";
                         break;
                     case DevEnv.vs2017:
-                        vcRootPathKey = "VCToolsInstallDir_150";
+                        vcRootPathKey = "VCInstallDir_150";
                         break;
                     case DevEnv.vs2019:
-                        vcRootPathKey = "VCToolsInstallDir_160";
+                        vcRootPathKey = "VCInstallDir_160";
                         break;
                     default:
                         throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
                 }
 
-                using (fileGenerator.Declare("custompropertyname", vcRootPathKey))
-                using (fileGenerator.Declare("custompropertyvalue", Util.EnsureTrailingSeparator(devEnv.GetVisualStudioVCRootPath())))
-                    fileGenerator.Write(fileGenerator.Resolver.Resolve(Template.Project.CustomProperty));
+                using (fileGenerator.Declare("vcInstallDirKey", vcRootPathKey))
+                using (fileGenerator.Declare("vcInstallDirValue", Util.EnsureTrailingSeparator(Path.Combine(devEnv.GetVisualStudioDir(), @"VC\"))))
+                using (fileGenerator.Declare("msBuildExtensionsPath", Util.EnsureTrailingSeparator(GetMSBuildExtensionsPathOverride(devEnv))))
+                using (fileGenerator.Declare("vsVersion", devEnv.GetVisualProjectToolsVersionString()))
+                using (fileGenerator.Declare("vcTargetsPath", Util.EnsureTrailingSeparator(GetVCTargetsPathOverride(devEnv))))
+                {
+                    fileGenerator.Write(Template.Project.VCOverridesProperties);
+
+                    // only write the conditional on vs version if we need to
+                    if (context.DevelopmentEnvironmentsRange.MinDevEnv == context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        fileGenerator.Write(fileGenerator.Resolver.Resolve(Template.Project.VCTargetsPathOverride));
+                    else
+                        fileGenerator.Write(fileGenerator.Resolver.Resolve(Template.Project.VCTargetsPathOverrideConditional));
+                }
             }
         }
 
@@ -416,16 +452,13 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
             // xml end header
 
-            foreach (var platform in context.PresentPlatforms)
-            {
-                using (fileGenerator.Declare("platformName", Util.GetSimplePlatformString(platform.Key)))
-                    platform.Value.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
-            }
-
-            fileGenerator.Write(Template.Project.ImportCppDefaultProps);
+            foreach (var platform in context.PresentPlatforms.Values)
+                platform.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
+
+            fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
             // generate all configuration options onces...
             Dictionary<Project.Configuration, Options.ExplicitOptions> options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();

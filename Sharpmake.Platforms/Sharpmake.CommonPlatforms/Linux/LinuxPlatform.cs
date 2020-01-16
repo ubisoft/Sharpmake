@@ -270,28 +270,31 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
-                generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                using (generator.Declare("platformName", SimplePlatformString))
                 {
-                    string applicationTypeRevision;
-                    bool hasFastBuildConfig = context.ProjectConfigurations.Any(conf => conf.IsFastBuild);
-                    bool hasNonFastBuildConfig = context.ProjectConfigurations.Any(conf => !conf.IsFastBuild);
-                    if (hasFastBuildConfig && hasNonFastBuildConfig)
+                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
                     {
-                        applicationTypeRevision = "1.0";
-                    }
-                    else
-                    {
-                        applicationTypeRevision = hasFastBuildConfig ? FileGeneratorUtilities.RemoveLineTag : "1.0";
-                    }
+                        string applicationTypeRevision;
+                        bool hasFastBuildConfig = context.ProjectConfigurations.Any(conf => conf.IsFastBuild);
+                        bool hasNonFastBuildConfig = context.ProjectConfigurations.Any(conf => !conf.IsFastBuild);
+                        if (hasFastBuildConfig && hasNonFastBuildConfig)
+                        {
+                            applicationTypeRevision = "1.0";
+                        }
+                        else
+                        {
+                            applicationTypeRevision = hasFastBuildConfig ? FileGeneratorUtilities.RemoveLineTag : "1.0";
+                        }
 
-                    using (generator.Declare("applicationType", "Linux"))
-                    using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
-                    using (generator.Declare("targetLinuxPlatform", "Generic"))
-                    {
-                        generator.Write(_projectDescriptionPlatformSpecific);
+                        using (generator.Declare("applicationType", "Linux"))
+                        using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
+                        using (generator.Declare("targetLinuxPlatform", "Generic"))
+                        {
+                            generator.Write(_projectDescriptionPlatformSpecific);
+                        }
                     }
+                    generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
-                generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
             }
 
             public override void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator)
