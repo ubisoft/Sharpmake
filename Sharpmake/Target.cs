@@ -228,23 +228,21 @@ namespace Sharpmake
         public string GetTargetString()
         {
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
+
+            var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
+            var nonZeroValues = fieldInfoValues.Where(f => ((int)f) != 0);
             string result = string.Join(
                 "_",
-                fieldInfos.Select(
-                    f => s_cachedFieldValueToString.GetOrAdd(
-                        f.GetValue(this),
-                        value =>
-                        {
-                            if (value is Platform)
-                            {
-                                var platform = (Platform)value;
-                                if (platform >= Platform._reserved9)
-                                    return Util.GetPlatformString(platform, null, this).ToLower();
-                            }
-                            return value.ToString();
-                        }
-                    )
-                )
+                nonZeroValues.Select(f => s_cachedFieldValueToString.GetOrAdd(f, value =>
+                {
+                    if (value is Platform)
+                    {
+                        var platform = (Platform)value;
+                        if (platform >= Platform._reserved9)
+                            return Util.GetPlatformString(platform, null, this).ToLower();
+                    }
+                    return value.ToString();
+                }))
             );
             return result;
         }
@@ -419,7 +417,7 @@ namespace Sharpmake
                 {
                     int targetValue = (int)fragmentField.GetValue(this);
                     int maskValue = (int)fragmentMask;
-                    if ((targetValue & maskValue) != targetValue)
+                    if ((targetValue == 0) || (targetValue & maskValue) != targetValue)
                     {
                         return false;
                     }
@@ -701,12 +699,21 @@ namespace Sharpmake
 
             var fragments = TargetType.GetFields();
 
-            var cachedPossibilities = _targetPossibilities.Select(tp =>
+            var selectCP = _targetPossibilities.Select(tp =>
             {
-                var cachedPossibility = fragments.Select(f => BuildFilteredFragmentMask(f, (int)f.GetValue(tp))).ToArray();
+                var tuples = fragments.Select(f =>
+                {
+                    int value = (int)f.GetValue(tp);
+                    return Tuple.Create(value, BuildFilteredFragmentMask(f, value));
+                });
+                var filtered = tuples.Where(f =>
+                {
+                    return f.Item1 == 0 || f.Item2 != 0;
+                });
+                var cachedPossibility = filtered.Select(f => f.Item2).ToArray();
                 return cachedPossibility;
-            })
-            .Where(x => x.All(y => y != 0)) // Filtered out by the _fragmentMasks
+            });
+            var cachedPossibilities = selectCP.Where(f => f.Length == fragments.Length) // Filtered out by the _fragmentMasks
             .ToArray();
 
             //int[] masks;
@@ -718,7 +725,7 @@ namespace Sharpmake
                 bool configValid = IncrementCurrent(fragments, cachedPossibility, current);
                 while (configValid)
                 {
-                    GenerateConfiguration(fragments, current.Cast<int>().ToArray());
+                    GenerateConfiguration(fragments, current);
                     configValid = IncrementCurrent(fragments, cachedPossibility, current);
                 }
             }
@@ -726,12 +733,12 @@ namespace Sharpmake
 
         private readonly Dictionary<string, ITarget> _addedTargets = new Dictionary<string, ITarget>();
 
-        private void GenerateConfiguration(FieldInfo[] fragments, int[] current)
+        private void GenerateConfiguration(FieldInfo[] fragments, int?[] current)
         {
             ITarget target = Activator.CreateInstance(TargetType) as ITarget;
 
             for (int i = 0; i < fragments.Length; ++i)
-                fragments[i].SetValue(target, current[i]);
+                fragments[i].SetValue(target, current[i] ?? 0);
 
             string targetKey = target.GetType().FullName + "__" + target.GetTargetString();
             if (!_addedTargets.ContainsKey(targetKey))
@@ -741,7 +748,7 @@ namespace Sharpmake
             }
         }
 
-        private int BuildFilteredFragmentMask(FieldInfo fragment, int optionalMask = int.MaxValue)
+        private int BuildFilteredFragmentMask(FieldInfo fragment, int optionalMask)
         {
             int mask = 0;
 
@@ -843,8 +850,8 @@ namespace Sharpmake
                         for (int k = j + 1; k < fragments.Length; ++k)
                         {
                             nextState = GetNextBit(null, masks[k], out next);
-                            Trace.Assert(nextState == NextBitState.Initialized);
-                            current[k] = next;
+                            if (nextState == NextBitState.Initialized)
+                                current[k] = next;
                         }
                     }
 

@@ -255,7 +255,8 @@ namespace Sharpmake.Generators.FastBuild
             // we want to store in that list the indices of fragments that are different from the base
             for (int j = 0; j < merged.Length; ++j)
             {
-                if (fragmentValuesComparisonBase[j] != merged[j])
+                int value = fragmentValuesComparisonBase[j];
+                if (value != 0 && value != merged[j])
                     differentFragmentIndices.Add(j);
             }
 
