@@ -22,10 +22,10 @@ namespace Sharpmake
     /// </summary>
     public class MSBuildGlobalSettings
     {
-        private static readonly ConcurrentDictionary<Tuple<DevEnv, Platform>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, Platform>, string>();
+        private static readonly ConcurrentDictionary<Tuple<DevEnv, string>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, string>, string>();
 
         /// <summary>
-        /// Allows overwriting the MSBuild platform folder used for a given platform and Visual Studio version. 
+        /// Allows overwriting the MSBuild platform folder used for a known sharpmake platform and Visual Studio version.
         /// This is typically used if you want to put VS files in source control such as Perforce or nuget.
         /// </summary>
         /// <param name="devEnv">Visual studio version affected</param>
@@ -34,13 +34,38 @@ namespace Sharpmake
         /// <returns></returns>
         public static void SetCppPlatformFolder(DevEnv devEnv, Platform platform, string value)
         {
-            Tuple<DevEnv, Platform> key = Tuple.Create(devEnv, platform);
+            SetCppPlatformFolder(devEnv, platform.ToString(), value);
+        }
+
+        /// <summary>
+        /// Allows overwriting the MSBuild platform folder used for a custom platform passed as a string and Visual Studio version.
+        /// This is typically used if you want to put VS files in source control such as Perforce or nuget.
+        /// </summary>
+        /// <param name="devEnv">Visual studio version affected</param>
+        /// <param name="platform">Platform affected</param>
+        /// <param name="value">The location of the MSBuild platform folder. Warning: this *must* end with a trailing separator</param>
+        /// <returns></returns>
+        public static void SetCppPlatformFolder(DevEnv devEnv, string platform, string value)
+        {
+            var key = Tuple.Create(devEnv, platform);
             if (!string.Equals(s_cppPlatformFolders.GetOrAdd(key, value), value))
                 throw new Error("You can't register more than once a platform folder for a specific combinaison. Key already registered: " + key);
         }
 
         /// <summary>
-        /// Get the overwritten MSBuild platform folder used for a given platform and Visual studio version.
+        /// Use to reset the override of a platform
+        /// </summary>
+        /// <param name="devEnv">Visual studio version</param>
+        /// <param name="platform">Platform</param>
+        public void ResetCppPlatformFolder(DevEnv devEnv, string platform)
+        {
+            var key = Tuple.Create(devEnv, platform);
+            string value;
+            s_cppPlatformFolders.TryRemove(key, out value);
+        }
+
+        /// <summary>
+        /// Get the overwritten MSBuild platform folder used for a known sharpmake platform and Visual studio version.
         /// This is typically used if you want to put your VS files in source control such as Perforce or nuget.
         /// </summary>
         /// <param name="devEnv">Visual studio version affected</param>
@@ -48,7 +73,19 @@ namespace Sharpmake
         /// <returns>the registered msbuild foldervalue for the requested pair. null if not found</returns>
         public static string GetCppPlatformFolder(DevEnv devEnv, Platform platform)
         {
-            Tuple<DevEnv, Platform> key = Tuple.Create(devEnv, platform);
+            return GetCppPlatformFolder(devEnv, platform.ToString());
+        }
+
+        /// <summary>
+        /// Get the overwritten MSBuild platform folder used for a custom platform passed as a string and Visual studio version.
+        /// This is typically used if you want to put your VS files in source control such as Perforce or nuget.
+        /// </summary>
+        /// <param name="devEnv">Visual studio version affected</param>
+        /// <param name="platform">Platform affected</param>
+        /// <returns>the registered msbuild foldervalue for the requested pair. null if not found</returns>
+        public static string GetCppPlatformFolder(DevEnv devEnv, string platform)
+        {
+            var key = Tuple.Create(devEnv, platform);
             string value;
             if (s_cppPlatformFolders.TryGetValue(key, out value))
                 return value;
