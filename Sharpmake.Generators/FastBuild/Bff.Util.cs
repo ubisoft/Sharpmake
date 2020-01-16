@@ -203,18 +203,23 @@ namespace Sharpmake.Generators.FastBuild
                                 string platformString = platformEnum.ToString();
                                 if (platformEnum >= Platform._reserved9)
                                     platformString = Util.GetSimplePlatformString(platformEnum);
-                                fragmentString += "_" + platformString.ToLower();
+                                fragmentString += "_" + SanitizeForUnityName(platformString).ToLower();
                             }
                         }
                         else
                         {
-                            fragmentString += "_" + typedFragment.ToString().Replace(",", "").Replace(" ", "");
+                            fragmentString += "_" + SanitizeForUnityName(typedFragment.ToString());
                         }
                     }
                     unity.UnityName = project.Name + fragmentString + "_unity";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
                 }
             }
+        }
+
+        private static string SanitizeForUnityName(string name)
+        {
+            return string.Join("_", name.Split(new[] { ' ', ':', '.', ',' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
         public static string CurrentBffPathKeyCombine(string relativePath)
