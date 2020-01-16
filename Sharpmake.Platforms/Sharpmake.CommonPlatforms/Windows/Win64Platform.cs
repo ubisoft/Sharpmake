@@ -225,7 +225,16 @@ namespace Sharpmake
                                 {
                                     string systemDllPath = FastBuildSettings.SystemDllRoot;
                                     if (systemDllPath == null)
-                                        systemDllPath = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10) + @"Redist\ucrt\DLLs\x64\";
+                                    {
+                                        var windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(devEnv);
+                                        string redistDirectory;
+                                        if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0)
+                                            redistDirectory = @"Redist\ucrt\DLLs\x64\";
+                                        else
+                                            redistDirectory = $@"Redist\{windowsTargetPlatformVersion.ToVersionString()}\ucrt\DLLs\x64\";
+
+                                        systemDllPath = Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10), redistDirectory);
+                                    }
 
                                     if (!Path.IsPathRooted(systemDllPath))
                                         systemDllPath = Util.SimplifyPath(Path.Combine(projectRootPath, systemDllPath));
