@@ -53,6 +53,7 @@ namespace Sharpmake
             includePath.Add(@"{0}xdk\Include\um;");
             includePath.Add(@"{0}xdk\Include\shared;");
             includePath.Add(@"{0}xdk\Include\winrt;");
+            includePath.Add(@"{0}xdk\Include\cppwinrt;");
 
             switch (visualVersion)
             {
