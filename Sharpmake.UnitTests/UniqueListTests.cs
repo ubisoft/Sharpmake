@@ -426,7 +426,7 @@ namespace Sharpmake.UnitTests
             int nbrThreads = Environment.ProcessorCount;
             var container = new ListContainer();
 
-            int TOTAL_TEST_COUNT = 1000000;
+            int TOTAL_TEST_COUNT = 100000;
             long nbrThreadsFinished = 0;
             long nbrThreadsGate1 = 0;
             Exception taskTestException = null;
