@@ -333,9 +333,9 @@ namespace Sharpmake.Generators.VisualStudio
 
                     // only write the conditional on vs version if we need to
                     if (context.DevelopmentEnvironmentsRange.MinDevEnv == context.DevelopmentEnvironmentsRange.MaxDevEnv)
-                        fileGenerator.Write(fileGenerator.Resolver.Resolve(Template.Project.VCTargetsPathOverride));
+                        fileGenerator.Write(Template.Project.VCTargetsPathOverride);
                     else
-                        fileGenerator.Write(fileGenerator.Resolver.Resolve(Template.Project.VCTargetsPathOverrideConditional));
+                        fileGenerator.Write(Template.Project.VCTargetsPathOverrideConditional);
                 }
             }
         }
