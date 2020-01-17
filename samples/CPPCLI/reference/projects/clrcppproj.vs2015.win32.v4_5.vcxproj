@@ -18,6 +18,8 @@
     <RootNamespace>CLRCPPProj</RootNamespace>
     <ProjectName>CLRCPPProj</ProjectName>
   </PropertyGroup>
+  <PropertyGroup Label="Globals">
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>

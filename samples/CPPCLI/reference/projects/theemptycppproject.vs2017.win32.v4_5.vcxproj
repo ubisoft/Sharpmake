@@ -15,6 +15,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>theEmptyCPPProject</RootNamespace>
     <ProjectName>theEmptyCPPProject</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
     <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -108,7 +110,6 @@
       <ProgramDatabaseFileName>temp\vs2017\win32\noblob_msbuild_vs2017_v4_5_debug_dll_win32\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
-      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -172,7 +173,6 @@
       <ProgramDatabaseFileName>temp\vs2017\win32\noblob_msbuild_vs2017_v4_5_release_dll_win32\theemptycppproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
-      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

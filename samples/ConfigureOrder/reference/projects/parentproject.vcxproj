@@ -11,6 +11,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>ParentProject</RootNamespace>
     <ProjectName>ParentProject</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
     <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -88,7 +90,6 @@
       <ProgramDatabaseFileName>obj\win32\release\parentproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
-      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

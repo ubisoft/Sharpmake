@@ -11,6 +11,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>LibStuffProject_ProjectName</RootNamespace>
     <ProjectName>LibStuffProject_ProjectName</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
     <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -88,7 +90,6 @@
       <ProgramDatabaseFileName>obj\win64\debug\libstuffproject_projectname_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
-      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

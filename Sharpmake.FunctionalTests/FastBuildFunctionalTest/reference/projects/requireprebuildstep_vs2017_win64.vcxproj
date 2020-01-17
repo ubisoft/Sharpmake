@@ -27,10 +27,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}</ProjectGuid>
+    <ProjectGuid>{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <RootNamespace>MixCppAndCExe</RootNamespace>
-    <ProjectName>MixCppAndCExe</ProjectName>
+    <RootNamespace>RequirePreBuildStep</RootNamespace>
+    <ProjectName>RequirePreBuildStep</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
@@ -87,107 +87,111 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2017|x64'">
     <OutDir>output\debug_fastbuild_noblob_vs2017\</OutDir>
-    <IntDir>build\debug_fastbuild_noblob_vs2017\mixcppandcexe\</IntDir>
+    <IntDir>build\debug_fastbuild_noblob_vs2017\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2017\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2017\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2017\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2017\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\mixcppandcexe.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\mixcppandcexe.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\mixcppandcexe.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\mixcppandcexe.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\debug_fastbuild_noblob_vs2017\mixcppandcexe.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exe" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.elf" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exp" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.lib" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
+    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
+    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2017|x64'">
     <OutDir>output\debug_fastbuild_vs2017\</OutDir>
-    <IntDir>build\debug_fastbuild_vs2017\mixcppandcexe\</IntDir>
+    <IntDir>build\debug_fastbuild_vs2017\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe MixCppAndCExe_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean MixCppAndCExe_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2017\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2017\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2017\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2017\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\mixcppandcexe.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\mixcppandcexe.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\mixcppandcexe.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\mixcppandcexe.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\debug_fastbuild_vs2017\mixcppandcexe.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
+del "build\debug_fastbuild_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
+del "build\debug_fastbuild_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
+del "build\debug_fastbuild_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\requireprebuildstep.exe" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\requireprebuildstep.elf" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\requireprebuildstep.exp" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\requireprebuildstep.lib" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_vs2017\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
+    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
+    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2017|x64'">
-    <TargetName>mixcppandcexe</TargetName>
+    <TargetName>requireprebuildstep</TargetName>
     <OutDir>output\debug_msbuild_vs2017\</OutDir>
-    <IntDir>build\debug_msbuild_vs2017\mixcppandcexe\</IntDir>
+    <IntDir>build\debug_msbuild_vs2017\requireprebuildstep\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\debug_msbuild_vs2017\mixcppandcexe.exe</OutputFile>
+    <OutputFile>output\debug_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
     <EmbedManifest>false</EmbedManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2017|x64'">
     <OutDir>output\release_fastbuild_noblob_vs2017\</OutDir>
-    <IntDir>build\release_fastbuild_noblob_vs2017\mixcppandcexe\</IntDir>
+    <IntDir>build\release_fastbuild_noblob_vs2017\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2017\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2017\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2017\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2017\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\mixcppandcexe.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\mixcppandcexe.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\mixcppandcexe.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\mixcppandcexe.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\release_fastbuild_noblob_vs2017\mixcppandcexe.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.exe" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.elf" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.exp" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.lib" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_noblob_vs2017\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
+    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
+    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2017|x64'">
     <OutDir>output\release_fastbuild_vs2017\</OutDir>
-    <IntDir>build\release_fastbuild_vs2017\mixcppandcexe\</IntDir>
+    <IntDir>build\release_fastbuild_vs2017\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe MixCppAndCExe_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean MixCppAndCExe_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2017\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2017\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2017\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2017\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\mixcppandcexe.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\mixcppandcexe.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\mixcppandcexe.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\mixcppandcexe.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\release_fastbuild_vs2017\mixcppandcexe.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
+del "build\release_fastbuild_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
+del "build\release_fastbuild_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
+del "build\release_fastbuild_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\requireprebuildstep.exe" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\requireprebuildstep.elf" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\requireprebuildstep.exp" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\requireprebuildstep.lib" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_vs2017\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
+    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
+    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
-    <TargetName>mixcppandcexe</TargetName>
+    <TargetName>requireprebuildstep</TargetName>
     <OutDir>output\release_msbuild_vs2017\</OutDir>
-    <IntDir>build\release_msbuild_vs2017\mixcppandcexe\</IntDir>
+    <IntDir>build\release_msbuild_vs2017\requireprebuildstep\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\release_msbuild_vs2017\mixcppandcexe.exe</OutputFile>
+    <OutputFile>output\release_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
     <EmbedManifest>false</EmbedManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
@@ -197,6 +201,7 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>generated</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -237,17 +242,17 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>build\debug_msbuild_vs2017\mixcppandcexe\mixcppandcexe_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>build\debug_msbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\debug_msbuild_vs2017\mixcppandcexe.exe</OutputFile>
+      <OutputFile>output\debug_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ManifestFile>build\debug_msbuild_vs2017\mixcppandcexe\mixcppandcexe.intermediate.manifest</ManifestFile>
-      <ProgramDatabaseFile>output\debug_msbuild_vs2017\mixcppandcexe.pdb</ProgramDatabaseFile>
+      <ManifestFile>build\debug_msbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\debug_msbuild_vs2017\requireprebuildstep.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -273,7 +278,7 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\debug_msbuild_vs2017\mixcppandcexe.map</MapFileName>
+      <MapFileName>output\debug_msbuild_vs2017\requireprebuildstep.map</MapFileName>
       <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -283,6 +288,7 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
       <PreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>generated</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -324,17 +330,17 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>build\release_msbuild_vs2017\mixcppandcexe\mixcppandcexe_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>build\release_msbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\release_msbuild_vs2017\mixcppandcexe.exe</OutputFile>
+      <OutputFile>output\release_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ManifestFile>build\release_msbuild_vs2017\mixcppandcexe\mixcppandcexe.intermediate.manifest</ManifestFile>
-      <ProgramDatabaseFile>output\release_msbuild_vs2017\mixcppandcexe.pdb</ProgramDatabaseFile>
+      <ManifestFile>build\release_msbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\release_msbuild_vs2017\requireprebuildstep.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -360,19 +366,17 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\release_msbuild_vs2017\mixcppandcexe.map</MapFileName>
+      <MapFileName>output\release_msbuild_vs2017\requireprebuildstep.map</MapFileName>
       <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\codebase\MixCppAndCExe\hello_c.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\codebase\MixCppAndCExe\hello_c.c" />
-    <ClCompile Include="..\codebase\MixCppAndCExe\main.cpp" />
+    <ClCompile Include="..\codebase\RequirePreBuildStep\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="mixcppandcexe_vs2017_win64.bff" />
+    <None Include="requireprebuildstep_vs2017_win64.bff" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

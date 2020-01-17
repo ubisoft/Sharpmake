@@ -11,6 +11,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>HelloWorld</RootNamespace>
     <ProjectName>HelloWorld</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
     <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -89,7 +91,6 @@
       <ProgramDatabaseFileName>obj\win64\debug\helloworld_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ShowIncludes>false</ShowIncludes>
-      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
