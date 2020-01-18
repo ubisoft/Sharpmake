@@ -596,8 +596,12 @@ namespace Sharpmake.Generators.VisualStudio
 
                         if (FastBuildSettings.FastBuildNoStopOnError)
                             fastBuildCommandLineOptions.Add("-nostoponerror");
+
                         if (FastBuildSettings.FastBuildFastCancel)
                             fastBuildCommandLineOptions.Add("-fastcancel");
+
+                        if (FastBuildSettings.FastBuildNoUnity)
+                            fastBuildCommandLineOptions.Add("-nounity");
 
                         if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
                             fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
