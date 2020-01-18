@@ -117,8 +117,7 @@ namespace Sharpmake
       <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>[options.SuppressStartupBanner]</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>[options.IgnoreAllDefaultLibraries]</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]
-      </IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]</IgnoreSpecificDefaultLibraries>
       <AssemblyDebug>[options.AssemblyDebug]</AssemblyDebug>
       <HeapReserveSize>[options.HeapReserveSize]</HeapReserveSize>
       <HeapCommitSize>[options.HeapCommitSize]</HeapCommitSize>
