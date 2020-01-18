@@ -270,8 +270,7 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\debug_msbuild_vs2017\mixcppandcexe.map</MapFileName>
       <BaseAddress></BaseAddress>
@@ -357,8 +356,7 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\release_msbuild_vs2017\mixcppandcexe.map</MapFileName>
       <BaseAddress></BaseAddress>

@@ -209,8 +209,7 @@ del "output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.p
       <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\debug_msbuild_vs2017\spanmultiplesrcdirsfbnoblobexclude.map</MapFileName>
       <BaseAddress></BaseAddress>
@@ -297,8 +296,7 @@ del "output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.p
       <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\release_msbuild_vs2017\spanmultiplesrcdirsfbnoblobexclude.map</MapFileName>
       <BaseAddress></BaseAddress>
