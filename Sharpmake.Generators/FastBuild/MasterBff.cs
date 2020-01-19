@@ -316,12 +316,17 @@ namespace Sharpmake.Generators.FastBuild
                     if (FastBuildSettings.WriteAllConfigsSection && includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes)
                         masterBffInfo.AllConfigsSections.Add(Bff.GetShortProjectName(project, conf));
 
+                    bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
+                    bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
+                    bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
+                    bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("target", conf.Target))
                     using (fileGenerator.Declare("project", conf.Project))
                     {
                         var preBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
-                        if (conf.Output == Project.Configuration.OutputType.Exe || conf.ExecuteTargetCopy)
+                        if (isOutputTypeExeOrDll || conf.ExecuteTargetCopy)
                         {
                             var copies = ProjectOptionsGenerator.ConvertPostBuildCopiesToRelative(conf, masterBffDirectory);
                             foreach (var copy in copies)
@@ -360,20 +365,20 @@ namespace Sharpmake.Generators.FastBuild
                                     }
                                 }
                             }
-
-                            foreach (var eventPair in conf.EventPreBuildExecute)
-                            {
-                                preBuildEvents.Add(eventPair.Key, eventPair.Value);
-                            }
-
-                            foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
-                            {
-                                string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild);
-                                preBuildEvents.Add(eventKey, buildEvent);
-                            }
-
-                            WriteEvents(fileGenerator.Resolver, preBuildEvents, bffPreBuildSection, conf.Project.RootPath, masterBffDirectory);
                         }
+
+                        foreach (var eventPair in conf.EventPreBuildExecute)
+                        {
+                            preBuildEvents.Add(eventPair.Key, eventPair.Value);
+                        }
+
+                        foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
+                        {
+                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild);
+                            preBuildEvents.Add(eventKey, buildEvent);
+                        }
+
+                        WriteEvents(fileGenerator.Resolver, preBuildEvents, bffPreBuildSection, conf.Project.RootPath, masterBffDirectory);
 
                         var customPreBuildEvents = new Dictionary<string, Project.Configuration.BuildStepBase>();
                         foreach (var eventPair in conf.EventCustomPrebuildExecute)
