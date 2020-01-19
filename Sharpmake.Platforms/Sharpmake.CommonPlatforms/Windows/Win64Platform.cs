@@ -419,12 +419,7 @@ namespace Sharpmake
                                 generator.Write(Vcxproj.Template.Project.PlatformFolderOverride);
                         }
 
-                        if (ClangForWindows.Settings.OverridenLLVMInstallDir)
-                        {
-                            using (generator.Declare("custompropertyname", "LLVMInstallDir"))
-                            using (generator.Declare("custompropertyvalue", ClangForWindows.Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
-                                generator.Write(Vcxproj.Template.Project.CustomProperty);
-                        }
+                        ClangForWindows.WriteLLVMOverrides(context, generator);
                     }
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }

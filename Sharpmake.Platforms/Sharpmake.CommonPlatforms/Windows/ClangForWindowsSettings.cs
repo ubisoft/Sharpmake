@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System.IO;
+using System.Linq;
+using Sharpmake.Generators;
+using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake
 {
@@ -72,6 +75,21 @@ namespace Sharpmake
                     s_clangVersion = value;
                     if (!Util.DirectoryExists(Path.Combine(LLVMInstallDir, "lib", "clang", s_clangVersion)))
                         throw new Error($"Cannot find required files for Clang {s_clangVersion} in {LLVMInstallDir}");
+                }
+            }
+        }
+
+        public static void WriteLLVMOverrides(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+            if (Settings.OverridenLLVMInstallDir)
+            {
+                bool hasClangConfiguration = context.ProjectConfigurations.Any(conf => Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain());
+
+                if (hasClangConfiguration)
+                {
+                    using (generator.Declare("custompropertyname", "LLVMInstallDir"))
+                    using (generator.Declare("custompropertyvalue", Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                        generator.Write(Vcxproj.Template.Project.CustomProperty);
                 }
             }
         }

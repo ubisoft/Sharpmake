@@ -408,6 +408,10 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <_PlatformFolder>[platformFolder]</_PlatformFolder>
 ";
 
+                public const string AdditionalVCTargetsPath =
+                    @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
+";
+
                 internal static class Filers
                 {
                     public static string Begin =
