@@ -150,18 +150,18 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (Project.Configuration conf in configurations)
                 {
-                    var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target) + conf.Target.GetFragment<DevEnv>();
+                    var projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
 
                     Project.Configuration previousConf;
                     if (configurationNameMapping.TryGetValue(projectUniqueName, out previousConf))
                     {
                         throw new Error(
                             "Project '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
-                            ProjectFileName,
+                            Path.Combine(ProjectDirectoryCapitalized, ProjectFileName + ProjectExtension),
                             string.Join(
                                 Environment.NewLine + "- ",
                                 configurations.Select(
-                                    pc => pc.Name + Util.GetPlatformString(pc.Platform, pc.Project, pc.Target) + pc.Target.GetFragment<DevEnv>() + $"  => '{pc.Target.GetTargetString()}'"
+                                    pc => pc.Name + '|' + Util.GetPlatformString(pc.Platform, pc.Project, pc.Target) + $"  => '{pc.Target.GetTargetString()}'"
                                 ).OrderBy(name => name)
                             )
                         );

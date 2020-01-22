@@ -515,7 +515,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             configurationSectionNames.Sort();
 
-            VerifySectionNamesDuplicates(solutionFile, solutionConfigurations, configurationSectionNames);
+            VerifySectionNamesDuplicates(solutionFileInfo.FullName, solutionConfigurations, configurationSectionNames);
 
             foreach (string configurationSectionName in configurationSectionNames)
                 fileGenerator.Write(configurationSectionName);
