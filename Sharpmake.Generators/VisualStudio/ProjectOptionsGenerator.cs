@@ -891,27 +891,36 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.ShowIncludes.Enable, () => { context.Options["ShowIncludes"] = "true"; })
             );
 
-            //Options.Vc.Compiler.SupportJustMyCode.
-            //    Yes                                   SupportJustMyCode="true"                          /JMC
-            //    No
-            context.SelectOption
-            (
-            Options.Option(Options.Vc.Compiler.SupportJustMyCode.Default, () => { context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.Compiler.SupportJustMyCode.No, () =>
+            // '/JMC' and '/clr' command-line options are incompatible
+            if (!clrSupport)
             {
-                if (context.DevelopmentEnvironment >= DevEnv.vs2017)
+                //Options.Vc.Compiler.SupportJustMyCode.
+                //    Yes                                   SupportJustMyCode="true"                          /JMC
+                //    No
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.Compiler.SupportJustMyCode.Default, () => { context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.SupportJustMyCode.No, () =>
                 {
-                    context.Options["SupportJustMyCode"] = "false";
-                    context.CommandLineOptions["SupportJustMyCode"] = "/JMC-";
-                }
-                else
-                {
-                    context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
-                    context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
-                }
-            }),
-            Options.Option(Options.Vc.Compiler.SupportJustMyCode.Yes, () => { context.Options["SupportJustMyCode"] = "true"; context.CommandLineOptions["SupportJustMyCode"] = "/JMC"; })
-            );
+                    if (context.DevelopmentEnvironment >= DevEnv.vs2017)
+                    {
+                        context.Options["SupportJustMyCode"] = "false";
+                        context.CommandLineOptions["SupportJustMyCode"] = "/JMC-";
+                    }
+                    else
+                    {
+                        context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
+                        context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
+                    }
+                }),
+                Options.Option(Options.Vc.Compiler.SupportJustMyCode.Yes, () => { context.Options["SupportJustMyCode"] = "true"; context.CommandLineOptions["SupportJustMyCode"] = "/JMC"; })
+                );
+            }
+            else
+            {
+                context.Options["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
+            }
 
             //Options.Vc.Compiler.SpectreMitigation.
             //    Default
