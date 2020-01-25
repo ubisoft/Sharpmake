@@ -984,25 +984,40 @@ namespace Sharpmake.Generators.VisualStudio
             ITarget target = configurations[0].Target;
             var targetFramework = target.GetFragment<DotNetFramework>();
             var targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
+
             var devenv = target.GetFragment<DevEnv>();
-            using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))
-            using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
+            
+            if (targetFramework.IsDotNetCore())
             {
-                // xml begin header
-                switch (devenv)
+                string netCoreSdk = "Microsoft.NET.Sdk";
+                if (project.NetCoreSdkType != NetCoreSdkTypes.Default)
+                    netCoreSdk += "." + project.NetCoreSdkType.ToString();
+
+                using (resolver.NewScopedParameter("sdkVersion", netCoreSdk))
                 {
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
-                    case DevEnv.vs2015:
-                        Write(Template.Project.ProjectBegin, writer, resolver);
-                        break;
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                        Write(Template.Project.ProjectBeginVs2017, writer, resolver);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    Write(Template.Project.ProjectBeginNetCore, writer, resolver);
+                }
+            }
+            else
+            {
+                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
+                {
+                    // xml begin header
+                    switch (devenv)
+                    {
+                        case DevEnv.vs2010:
+                        case DevEnv.vs2012:
+                        case DevEnv.vs2013:
+                        case DevEnv.vs2015:
+                            Write(Template.Project.ProjectBegin, writer, resolver);
+                            break;
+                        case DevEnv.vs2017:
+                        case DevEnv.vs2019:
+                            Write(Template.Project.ProjectBeginVs2017, writer, resolver);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
             }
 
@@ -1022,17 +1037,31 @@ namespace Sharpmake.Generators.VisualStudio
                 _projectConfiguration = null;
                 options.Add(conf, option);
             }
+
+            string netCoreEnableDefaultItems = RemoveLineTag;
+            string targetFrameworkVersionString = "TargetFrameworkVersion";
+            string projectPropertyGuid = configurations[0].ProjectGuid;
+
+            if (targetFramework.IsDotNetCore())
+            {
+                netCoreEnableDefaultItems = "false";
+                targetFrameworkVersionString = "TargetFramework";
+                projectPropertyGuid = RemoveLineTag;
+            }
+
             using (resolver.NewScopedParameter("project", project))
-            using (resolver.NewScopedParameter("guid", configurations[0].ProjectGuid))
+            using (resolver.NewScopedParameter("guid", projectPropertyGuid))
             using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
             using (resolver.NewScopedParameter("sccLocalPath", sccLocalPath))
             using (resolver.NewScopedParameter("sccProvider", sccProvider))
             using (resolver.NewScopedParameter("options", options[_projectConfigurationList[0]]))
             using (resolver.NewScopedParameter("outputType", outputType))
             using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))
+            using (resolver.NewScopedParameter("targetFrameworkVersionString", targetFrameworkVersionString))
             using (resolver.NewScopedParameter("projectTypeGuids", projectTypeGuids))
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
+            using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }
@@ -1239,6 +1268,13 @@ namespace Sharpmake.Generators.VisualStudio
             writer.Write(itemGroups.Resolve(resolver));
 
             var importProjects = new List<ImportProject>(project.ImportProjects);
+
+            // For .NET Core the default import project is inferred instead of explicit.
+            if (targetFramework.IsDotNetCore())
+            {
+                importProjects.RemoveAll(i => i.Project == CSharpProject.DefaultImportProject);
+            }
+
 
             if (project.ProjectTypeGuids == CSharpProjectType.Vsix)
             {
@@ -1973,17 +2009,21 @@ namespace Sharpmake.Generators.VisualStudio
             #endregion
 
             #region References
+            bool netCoreFramework = configurations.Select(c => c.Target).All(t => t.GetFragment<DotNetFramework>().IsDotNetCore());
 
-            var referencesByName = new List<ItemGroups.Reference>();
-            configurations.ForEach(
-                conf => referencesByName.AddRange(
-                    conf.ReferencesByName.Select(
-                    str => new ItemGroups.Reference
-                    {
-                        Include = str,
-                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
-                    })));
-            itemGroups.References.AddRange(referencesByName);
+            if (!netCoreFramework)
+            {
+                var referencesByName = new List<ItemGroups.Reference>();
+                configurations.ForEach(
+                    conf => referencesByName.AddRange(
+                        conf.ReferencesByName.Select(
+                        str => new ItemGroups.Reference
+                        {
+                            Include = str,
+                            Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
+                        })));
+                itemGroups.References.AddRange(referencesByName);
+            }
 
             var referencesByNameExternal = new List<ItemGroups.Reference>();
             configurations.ForEach(
@@ -2023,11 +2063,14 @@ namespace Sharpmake.Generators.VisualStudio
 
             itemGroups.References.AddRange(referencesByPath);
 
-            var references = configurations.SelectMany(
-                conf => conf.DotNetReferences.Select(
-                    r => GetItemGroupsReference(r, project.DependenciesCopyLocal)));
+            if (!netCoreFramework)
+            {
+                var references = configurations.SelectMany(
+                    conf => conf.DotNetReferences.Select(
+                        r => GetItemGroupsReference(r, project.DependenciesCopyLocal)));
 
-            itemGroups.References.AddRange(references);
+                itemGroups.References.AddRange(references);
+            }
 
             if (Util.DirectoryExists(Path.Combine(project.SourceRootPath, "Web References")))
                 itemGroups.WebReferences.Add(new ItemGroups.WebReference { Include = @"Web References\" });

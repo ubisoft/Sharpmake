@@ -28,6 +28,9 @@ namespace Sharpmake.Generators.VisualStudio
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 ";
+                public static string ProjectBeginNetCore =
+@"<Project Sdk=""[sdkVersion]"">
+";
 
                 public static string ProjectEnd =
 @"</Project>";
@@ -47,7 +50,7 @@ namespace Sharpmake.Generators.VisualStudio
     <SccProjectName>[sccProjectName]</SccProjectName>
     <SccLocalPath>[sccLocalPath]</SccLocalPath>
     <SccProvider>[sccProvider]</SccProvider>
-    <TargetFrameworkVersion>[targetFramework]</TargetFrameworkVersion>
+    <[targetFrameworkVersionString]>[targetFramework]</[targetFrameworkVersionString]>
     <FileAlignment>[options.FileAlignment]</FileAlignment>
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
@@ -97,6 +100,7 @@ namespace Sharpmake.Generators.VisualStudio
     <ConcordSDKDir>[options.ConcordSDKDir]</ConcordSDKDir>
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
+    <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
   </PropertyGroup>
 ";
 

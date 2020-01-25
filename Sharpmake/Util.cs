@@ -1918,9 +1918,12 @@ namespace Sharpmake
         public static string GetDotNetTargetString(DotNetFramework framework)
         {
             string version = framework.ToVersionString();
-            return string.IsNullOrEmpty(version)
-                ? String.Empty
-                : String.Format("v{0}", version);
+            if (string.IsNullOrEmpty(version))
+                return string.Empty;
+
+            return framework.IsDotNetCore()
+                ? version
+                : string.Format("v{0}", version);
         }
 
         public static string GetToolVersionString(DevEnv env, DotNetFramework desiredFramework)

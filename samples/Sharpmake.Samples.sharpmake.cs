@@ -96,6 +96,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class NetCoreHelloWorldProject : SampleProject
+    {
+        public NetCoreHelloWorldProject()
+        {
+            Name = "NetCoreHelloWorld";
+        }
+    }
+
+    [Generate]
     public class FastBuildSimpleExecutable : SampleProject
     {
         public FastBuildSimpleExecutable()

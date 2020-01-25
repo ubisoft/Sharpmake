@@ -154,6 +154,17 @@ namespace Sharpmake
         v4_7 = 1 << 12,
         v4_7_1 = 1 << 13,
         v4_7_2 = 1 << 14,
+        netcore1_0 = 1 << 15,
+        netcore1_1 = 1 << 16,
+        netcore2_0 = 1 << 17,
+        netcore2_1 = 1 << 18,
+        netcore2_2 = 1 << 19,
+        netcore3_0 = 1 << 20,
+        netcore3_1 = 1 << 21,
+
+        [CompositeFragment]
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1
+     
     }
 
     // Optional

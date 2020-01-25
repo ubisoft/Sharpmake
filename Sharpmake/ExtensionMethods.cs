@@ -70,6 +70,20 @@ namespace Sharpmake
                     return "4.7.1";
                 case DotNetFramework.v4_7_2:
                     return "4.7.2";
+                case DotNetFramework.netcore1_0:
+                    return "netcoreapp1.0";
+                case DotNetFramework.netcore1_1:
+                    return "netcoreapp1.1";
+                case DotNetFramework.netcore2_0:
+                    return "netcoreapp2.0";
+                case DotNetFramework.netcore2_1:
+                    return "netcoreapp2.1";
+                case DotNetFramework.netcore2_2:
+                    return "netcoreapp2.2";
+                case DotNetFramework.netcore3_0:
+                    return "netcoreapp3.0";
+                case DotNetFramework.netcore3_1:
+                    return "netcoreapp3.1";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }
@@ -103,9 +117,28 @@ namespace Sharpmake
                     return "net471";
                 case DotNetFramework.v4_7_2:
                     return "net472";
+                case DotNetFramework.netcore1_0:
+                    return "netcoreapp1.0";
+                case DotNetFramework.netcore1_1:
+                    return "netcoreapp1.1";
+                case DotNetFramework.netcore2_0:
+                    return "netcoreapp2.0";
+                case DotNetFramework.netcore2_1:
+                    return "netcoreapp2.1";
+                case DotNetFramework.netcore2_2:
+                    return "netcoreapp2.2";
+                case DotNetFramework.netcore3_0:
+                    return "netcoreapp3.0";
+                case DotNetFramework.netcore3_1:
+                    return "netcoreapp3.1";
                 default:
                     throw new ArgumentOutOfRangeException("framework");
             }
+        }
+
+        public static bool IsDotNetCore(this DotNetFramework framework)
+        {
+            return (0 != (framework & DotNetFramework.all_netcore));
         }
 
         public static string GetVisualProjectToolsVersionString(this DevEnv visualVersion)
