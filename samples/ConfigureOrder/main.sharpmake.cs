@@ -22,7 +22,7 @@ using System.Text;
 
 namespace ConfigureOrdering
 {
-    internal class main
+    public class main
     {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
