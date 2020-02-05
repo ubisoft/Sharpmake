@@ -1242,8 +1242,19 @@ namespace Sharpmake.Generators.FastBuild
                                             // These are all pre-build steps, at least in principle, so insert them before the other build steps.
                                             fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
 
+                                            // Resolve node name of the prebuild dependency for PostBuildEvents.
+                                            string resolvedSectionNodeIdentifier;
+                                            if (beginSectionType == Template.ConfigurationFile.ObjectListBeginSection)
+                                            {
+                                                resolvedSectionNodeIdentifier = resolver.Resolve("[fastBuildOutputFileShortName]_objects");
+                                            }
+                                            else
+                                            {
+                                                resolvedSectionNodeIdentifier = resolver.Resolve("[fastBuildOutputFileShortName]_[fastBuildOutputType]");
+                                            }
+
                                             // Convert build steps to Bff resolvable objects
-                                            var resolvableBuildSteps = UtilityMethods.GetResolvablesFromBuildSteps(postBuildEvents);
+                                            var resolvableBuildSteps = UtilityMethods.GetBffNodesFromBuildSteps(postBuildEvents, new Strings(resolvedSectionNodeIdentifier));
                                             // Resolve objects using the current project path
                                             var resolvedBuildSteps = resolvableBuildSteps.Select(b => b.Resolve(project.RootPath, projectPath, resolver));
 

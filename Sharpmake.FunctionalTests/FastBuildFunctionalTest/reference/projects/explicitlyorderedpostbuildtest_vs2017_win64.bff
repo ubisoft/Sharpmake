@@ -1,17 +1,17 @@
 
 //=================================================================================================================
-// PostBuildExecuteTest FASTBuild config file
+// ExplicitlyOrderedPostBuildTest FASTBuild config file
 //=================================================================================================================
 #once
 
 
-Unity( 'PostBuildExecuteTest_FastBuildUnitys_unity' )
+Unity( 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity' )
 {
-    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildExecuteTest'
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\ExplicitlyOrderedPostBuildTest'
     .UnityInputIsolateWritableFiles     =  true
     .UnityInputIsolateWritableFilesLimit = 10
-    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\PostBuildExecuteTest'
-    .UnityOutputPattern                 = 'postbuildexecutetest_fastbuildunitys_unity*.cpp'
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\ExplicitlyOrderedPostBuildTest'
+    .UnityOutputPattern                 = 'explicitlyorderedpostbuildtest_fastbuildunitys_unity*.cpp'
     .UnityNumFiles                      =  1
 }
 
@@ -20,10 +20,10 @@ Unity( 'PostBuildExecuteTest_FastBuildUnitys_unity' )
 #if WIN64
 
 //=================================================================================================================
-ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
             // General options
@@ -63,7 +63,7 @@ ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -91,18 +91,18 @@ ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildExecuteTest\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\ExplicitlyOrderedPostBuildTest\main.cpp'
 
 }
 
 
 //=================================================================================================================
-Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
+Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\'
-    .Libraries              = 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -134,12 +134,12 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -164,30 +164,54 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_A636D165' )
+Copy( 'Copy_34B0F9F5' )
 {
-  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
-  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuild_exec_sentinel.txt'
-  .ExecUseStdOutAsOutput = true
-  .PreBuildDependencies = 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-Alias( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64' )
+Copy( 'Copy_37392535' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_6CD6B730' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
+                                              'Copy_34B0F9F5',
+                                              'Copy_37392535'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
-                   'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_A636D165'
+                   'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Copy_34B0F9F5',
+                   'Copy_37392535',
+                   'Copy_6CD6B730'
                }
 }
 
 
 //=================================================================================================================
-ObjectList( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_objects' )
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
             // General options
@@ -227,7 +251,7 @@ ObjectList( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -256,18 +280,18 @@ ObjectList( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildExecuteTest\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\ExplicitlyOrderedPostBuildTest\main.cpp'
 
 }
 
 
 //=================================================================================================================
-Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
+Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\'
-    .Libraries              = 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -299,12 +323,12 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executab
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -329,30 +353,54 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executab
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_2808DAF5' )
+Copy( 'Copy_F7CA1E35' )
 {
-  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
-  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuild_exec_sentinel.txt'
-  .ExecUseStdOutAsOutput = true
-  .PreBuildDependencies = 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-Alias( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64' )
+Copy( 'Copy_3974D935' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_F357A4F0' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
+                                              'Copy_F7CA1E35',
+                                              'Copy_3974D935'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
-                   'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_2808DAF5'
+                   'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Copy_F7CA1E35',
+                   'Copy_3974D935',
+                   'Copy_F357A4F0'
                }
 }
 
 
 //=================================================================================================================
-ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_objects' )
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
             // General options
@@ -392,7 +440,7 @@ ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -419,19 +467,19 @@ ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
-    .CompilerInputUnity       = 'PostBuildExecuteTest_FastBuildUnitys_unity'
+    .CompilerInputUnity       = 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity'
     .CompilerOutputPath       = '$Intermediate$'
 
 }
 
 
 //=================================================================================================================
-Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable' )
+Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\'
-    .Libraries              = 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -463,12 +511,12 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -493,30 +541,54 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_AC638B0A' )
+Copy( 'Copy_F58CCBF1' )
 {
-  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.exe'
-  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuild_exec_sentinel.txt'
-  .ExecUseStdOutAsOutput = true
-  .PreBuildDependencies = 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-Alias( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64' )
+Copy( 'Copy_AEAC65AD' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_05629562' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable',
+                                              'Copy_F58CCBF1',
+                                              'Copy_AEAC65AD'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
-                   'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_AC638B0A'
+                   'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable',
+                   'Copy_F58CCBF1',
+                   'Copy_AEAC65AD',
+                   'Copy_05629562'
                }
 }
 
 
 //=================================================================================================================
-ObjectList( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_objects' )
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
             // General options
@@ -556,7 +628,7 @@ ObjectList( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -584,19 +656,19 @@ ObjectList( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
-    .CompilerInputUnity       = 'PostBuildExecuteTest_FastBuildUnitys_unity'
+    .CompilerInputUnity       = 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity'
     .CompilerOutputPath       = '$Intermediate$'
 
 }
 
 
 //=================================================================================================================
-Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable' )
+Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\'
-    .Libraries              = 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -628,12 +700,12 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -658,21 +730,45 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_E2015A58' )
+Copy( 'Copy_9FDD2DF1' )
 {
-  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.exe'
-  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuild_exec_sentinel.txt'
-  .ExecUseStdOutAsOutput = true
-  .PreBuildDependencies = 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable'
 }
 
 
 //=================================================================================================================
-Alias( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64' )
+Copy( 'Copy_E2FFF7AD' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_DBD7CA22' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable',
+                                              'Copy_9FDD2DF1',
+                                              'Copy_E2FFF7AD'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
-                   'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_E2015A58'
+                   'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable',
+                   'Copy_9FDD2DF1',
+                   'Copy_E2FFF7AD',
+                   'Copy_DBD7CA22'
                }
 }
 
