@@ -295,15 +295,18 @@ namespace Sharpmake
                 using (fileGenerator.Declare("UCRTContentRoot", UCRTContentRoot))
                 using (fileGenerator.Declare("targetPlatformVersion", targetPlatformVersionString))
                 {
-                    fileGenerator.Write(_windowsSDKOverrides);
-                }
+                    fileGenerator.Write(_windowsSDKOverridesBegin);
 
-                // vs2015 specific, we need to set the UniversalCRTSdkDir to $(UniversalCRTSdkDir_10) because it is not done in the .props
-                if (devEnv == DevEnv.vs2015 && UniversalCRTSdkDir_10 != FileGeneratorUtilities.RemoveLineTag)
-                {
-                    using (fileGenerator.Declare("custompropertyname", "UniversalCRTSdkDir"))
-                    using (fileGenerator.Declare("custompropertyvalue", "$(UniversalCRTSdkDir_10)"))
-                        fileGenerator.Write(fileGenerator.Resolver.Resolve(Vcxproj.Template.Project.CustomProperty));
+                    // vs2015 specific, we need to set the UniversalCRTSdkDir to $(UniversalCRTSdkDir_10) because it is not done in the .props
+                    if (devEnv == DevEnv.vs2015 && !string.Equals(UniversalCRTSdkDir_10, FileGeneratorUtilities.RemoveLineTag, StringComparison.Ordinal))
+                    {
+                        using (fileGenerator.Declare("custompropertyname", "UniversalCRTSdkDir"))
+                        using (fileGenerator.Declare("custompropertyvalue", "$(UniversalCRTSdkDir_10)"))
+                        {
+                            fileGenerator.Write(fileGenerator.Resolver.Resolve(Vcxproj.Template.Project.CustomProperty));
+                        }
+                    }
+                    fileGenerator.Write(_windowsSDKOverridesEnd);
                 }
             }
         }

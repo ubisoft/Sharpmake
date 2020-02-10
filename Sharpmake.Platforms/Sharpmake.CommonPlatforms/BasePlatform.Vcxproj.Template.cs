@@ -212,14 +212,16 @@ namespace Sharpmake
   </PropertyGroup>
 ";
 
-        private const string _windowsSDKOverrides =
+        private const string _windowsSDKOverridesBegin =
             @"  <PropertyGroup Label=""Globals"">
     <UCRTContentRoot>[UCRTContentRoot]</UCRTContentRoot>
     <UniversalCRTSdkDir_10>[UniversalCRTSdkDir_10]</UniversalCRTSdkDir_10>
     <[windowsSdkDirKey]>[windowsSdkDirValue]</[windowsSdkDirKey]>
     <WindowsSdkDir>$([windowsSdkDirKey])</WindowsSdkDir>
     <WindowsTargetPlatformVersion>[targetPlatformVersion]</WindowsTargetPlatformVersion>
-  </PropertyGroup>
+";
+        private const string _windowsSDKOverridesEnd =
+            @"  </PropertyGroup>
 ";
 
         // Notes:
