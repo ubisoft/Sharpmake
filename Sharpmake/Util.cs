@@ -642,16 +642,18 @@ namespace Sharpmake
             DirectoryInfo dirInfo = fileInfo.Directory;
             GetProperDirectoryCapitalization(dirInfo, null, ref builder);
             string properFileName = fileInfo.Name;
-            foreach (var fsInfo in dirInfo.EnumerateFileSystemInfos())
+            if (dirInfo != null && dirInfo.Exists)
             {
-                if (((fsInfo.Attributes & FileAttributes.Directory) != FileAttributes.Directory)
-                    && string.Compare(fsInfo.Name, fileInfo.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                foreach (var fsInfo in dirInfo.EnumerateFileSystemInfos())
                 {
-                    properFileName = fsInfo.Name;
-                    break;
+                    if (((fsInfo.Attributes & FileAttributes.Directory) != FileAttributes.Directory)
+                        && string.Compare(fsInfo.Name, fileInfo.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        properFileName = fsInfo.Name;
+                        break;
+                    }
                 }
             }
-
             return Path.Combine(builder.ToString(), properFileName);
         }
 
