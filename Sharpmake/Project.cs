@@ -1482,7 +1482,7 @@ namespace Sharpmake
                 throw new Error(e, "Cannot create instances of type: {0}, make sure it's public", projectType.Name);
             }
 
-            project.Targets.AddFragmentMask(fragmentMasks.ToArray());
+            project.Targets.SetGlobalFragmentMask(fragmentMasks.ToArray());
             project.Targets.BuildTargets();
             return project;
         }

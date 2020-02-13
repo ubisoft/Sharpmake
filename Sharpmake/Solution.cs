@@ -151,7 +151,7 @@ namespace Sharpmake
                 throw new Error(e, "Cannot create instances of type: {0}, caught exception message {1}. Make sure default ctor is public", solutionType.Name, e.Message);
             }
 
-            solution.Targets.AddFragmentMask(fragmentMasks.ToArray());
+            solution.Targets.SetGlobalFragmentMask(fragmentMasks.ToArray());
             solution.Targets.BuildTargets();
             return solution;
         }

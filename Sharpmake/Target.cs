@@ -699,6 +699,34 @@ namespace Sharpmake
             }
         }
 
+        /// <summary>
+        /// The global fragment mask will add the mask or and it with previously existing masks
+        /// </summary>
+        /// <param name="masks"></param>
+        internal void SetGlobalFragmentMask(params object[] masks)
+        {
+            foreach (var mask in masks)
+            {
+                Type maskType = mask.GetType();
+                ITarget.ValidFragmentType(maskType);
+
+                List<int> maskValues;
+                if (_fragmentMasks == null || !_fragmentMasks.TryGetValue(maskType, out maskValues))
+                {
+                    if (_fragmentMasks == null)
+                        _fragmentMasks = new Dictionary<Type, List<int>>();
+
+                    maskValues = new List<int> { (int)mask };
+                    _fragmentMasks.Add(maskType, maskValues);
+                }
+                else
+                {
+                    for (int i = 0; i < maskValues.Count; ++i)
+                        maskValues[i] &= (int)mask;
+                }
+            }
+        }
+
         internal void ClearTargets()
         {
             _targetPossibilities.Clear();
