@@ -986,7 +986,7 @@ namespace Sharpmake.Generators.VisualStudio
             var targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
 
             var devenv = target.GetFragment<DevEnv>();
-            
+
             if (targetFramework.IsDotNetCore())
             {
                 string netCoreSdk = "Microsoft.NET.Sdk";

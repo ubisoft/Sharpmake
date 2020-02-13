@@ -164,7 +164,6 @@ namespace Sharpmake
 
         [CompositeFragment]
         all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1
-     
     }
 
     // Optional
