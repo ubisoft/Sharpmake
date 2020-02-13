@@ -1229,7 +1229,7 @@ namespace Sharpmake.Generators.VisualStudio
             var fileGenerator = new XmlFileGenerator(resolver);
             using (fileGenerator.Declare("toolsVersion", context.DevelopmentEnvironmentsRange.MinDevEnv.GetVisualProjectToolsVersionString()))
             {
-                fileGenerator.Write(Vcxproj.Template.Project.Filers.Begin);
+                fileGenerator.Write(Vcxproj.Template.Project.Filters.Begin);
             }
 
             HashSet<string> allFilters = new HashSet<string>();
@@ -1249,11 +1249,11 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 if (file.FilterPath.Length == 0)
                                 {
-                                    fileGenerator.Write(Vcxproj.Template.Project.Filers.FileNoFilter);
+                                    fileGenerator.Write(Vcxproj.Template.Project.Filters.FileNoFilter);
                                 }
                                 else
                                 {
-                                    fileGenerator.Write(Vcxproj.Template.Project.Filers.FileWithFilter);
+                                    fileGenerator.Write(Vcxproj.Template.Project.Filters.FileWithFilter);
                                     allFilters.Add(file.FilterPath);
                                 }
                             }
@@ -1269,7 +1269,7 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(Vcxproj.Template.Project.ItemGroupBegin);
                 using (fileGenerator.Declare("fileName", relativeCopyDependenciesFileName))
                 {
-                    fileGenerator.Write(Vcxproj.Template.Project.Filers.FileWithDependencyFilter);
+                    fileGenerator.Write(Vcxproj.Template.Project.Filters.FileWithDependencyFilter);
                 }
                 fileGenerator.Write(Vcxproj.Template.Project.ItemGroupEnd);
             }
@@ -1304,12 +1304,12 @@ namespace Sharpmake.Generators.VisualStudio
                     string guid = Util.BuildGuid(filter).ToString();
                     using (fileGenerator.Declare("name", filter))
                     using (fileGenerator.Declare("guid", guid))
-                        fileGenerator.Write(Vcxproj.Template.Project.Filers.Filter);
+                        fileGenerator.Write(Vcxproj.Template.Project.Filters.Filter);
                 }
                 fileGenerator.Write(Vcxproj.Template.Project.ItemGroupEnd);
             }
 
-            fileGenerator.Write(Vcxproj.Template.Project.Filers.ProjectFiltersEnd);
+            fileGenerator.Write(Vcxproj.Template.Project.Filters.ProjectFiltersEnd);
 
             // Write the project file
             FileInfo projectFiltersFileInfo = new FileInfo(filtersFileName);

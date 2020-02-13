@@ -412,7 +412,7 @@ namespace Sharpmake.Generators.VisualStudio
                     @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
 ";
 
-                internal static class Filers
+                internal static class Filters
                 {
                     public static string Begin =
 @"<?xml version=""1.0"" encoding=""utf-8""?>
