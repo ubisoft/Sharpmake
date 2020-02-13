@@ -353,6 +353,11 @@ namespace Sharpmake
         {
         }
 
+        public virtual IEnumerable<Tuple<string, List<Vcxproj.ProjectFile>>> GetPlatformFileLists(IVcxprojGenerationContext context)
+        {
+            yield break;
+        }
+
         public virtual void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
         {
             platformLibExtension = ".lib";

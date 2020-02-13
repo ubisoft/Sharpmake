@@ -1541,7 +1541,17 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             foreach (var platform in context.PresentPlatforms.Values)
+            {
                 platform.GeneratePlatformResourceFileList(context, fileGenerator, writtenPRIFiles, XResourcesReswFiles, XResourcesImgFiles);
+
+                var customPlatformFiles = platform.GetPlatformFileLists(context);
+                foreach (var tuple in customPlatformFiles)
+                {
+                    string type = tuple.Item1;
+                    List<ProjectFile> files = tuple.Item2;
+                    customSourceFiles.GetValueOrAdd(type, new List<ProjectFile>()).AddRange(files);
+                }
+            }
 
             fileGenerator.Write(Template.Project.ProjectFilesBegin);
 
@@ -1782,6 +1792,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
             }
+
             // Write files built with custom tools
             var typeNames = new List<string>(customSourceFiles.Keys);
             typeNames.Sort();

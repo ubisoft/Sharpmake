@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
 using System.Collections.Generic;
 
 namespace Sharpmake.Generators.VisualStudio
@@ -85,6 +87,9 @@ namespace Sharpmake.Generators.VisualStudio
         void GenerateProjectPlatformImportSheet(IVcxprojGenerationContext context, IFileGenerator generator);
         void GeneratePlatformResourceFileList(IVcxprojGenerationContext context, IFileGenerator generator, Strings alreadyWrittenPriFiles, IList<Vcxproj.ProjectFile> resourceFiles, IList<Vcxproj.ProjectFile> imageResourceFiles);
         void GeneratePlatformReferences(IVcxprojGenerationContext context, IFileGenerator generator);
+
+        // type -> files
+        IEnumerable<Tuple<string, List<Vcxproj.ProjectFile>>> GetPlatformFileLists(IVcxprojGenerationContext context);
 
         // TODO: Refactor this.
         void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension);
