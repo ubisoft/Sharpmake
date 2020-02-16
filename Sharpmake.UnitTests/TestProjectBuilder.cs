@@ -85,7 +85,7 @@ namespace Sharpmake.UnitTests
             {
                 case InitType.Cpp:
                     {
-                        // HACK: Explicitely reference something from CommonPlatforms to get
+                        // HACK: Explicitly reference something from CommonPlatforms to get
                         // visual studio to load the assembly
                         var platformWin64Type = typeof(Windows.Win64Platform);
                         PlatformRegistry.RegisterExtensionAssembly(platformWin64Type.Assembly);

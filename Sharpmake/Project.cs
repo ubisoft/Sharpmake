@@ -96,7 +96,7 @@ namespace Sharpmake
             set { SetProperty(ref _rootPath, value); }
         }
 
-        private DependenciesCopyLocalTypes _dependenciesCopyLocal = DependenciesCopyLocalTypes.Default; //used primarely for the .Net Framework
+        private DependenciesCopyLocalTypes _dependenciesCopyLocal = DependenciesCopyLocalTypes.Default; //used primarily for the .Net Framework
         public DependenciesCopyLocalTypes DependenciesCopyLocal
         {
             get { return _dependenciesCopyLocal; }
@@ -535,7 +535,7 @@ namespace Sharpmake
                         if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.AddMatchFiles, sourceFilesAbsoluteUnsorted[i]))
                             breakMatch = true;
 
-                        // Remove .. occurences from middle of the absolute path.
+                        // Remove .. occurrences from middle of the absolute path.
                         string simplifiedPath = Util.SimplifyPath(sourceFilesAbsoluteUnsorted[i]);
                         files.Add(simplifiedPath); // TODO: remove from sourceFilesRelative if match
                     }

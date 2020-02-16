@@ -282,7 +282,7 @@ namespace Sharpmake.Generators.VisualStudio
                 if (overrideCheck.HasValue)
                 {
                     if (vsDirOverriden != overrideCheck)
-                        throw new Error($"Some DevEnv are overriden and some are not in the vcxproj '{context.ProjectFileName}'. Please override all or none.");
+                        throw new Error($"Some DevEnv are overridden and some are not in the vcxproj '{context.ProjectFileName}'. Please override all or none.");
                 }
                 else
                 {

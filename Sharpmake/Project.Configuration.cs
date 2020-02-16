@@ -59,14 +59,14 @@ namespace Sharpmake
         Defines = 1 << 4,
 
         /// <summary>
-        /// The dependant project inherits the `using` paths of the dependency.
+        /// The dependent project inherits the `using` paths of the dependency.
         /// Valid only if the project is a C# project and uses Microsoft C++/CX extensions .
         /// </summary>
         AdditionalUsingDirectories = 1 << 5,
         ForceUsingAssembly = 1 << 6,
 
         /// <summary>
-        /// Specifies that the dependant project inherits the dependency's library files, library
+        /// Specifies that the dependent project inherits the dependency's library files, library
         /// paths, include paths and defined symbols.
         /// </summary>
         Default = LibraryFiles |
@@ -75,7 +75,7 @@ namespace Sharpmake
                   Defines,
 
         /// <summary>
-        /// Specifies that the dependant project inherits the dependency's include paths and
+        /// Specifies that the dependent project inherits the dependency's include paths and
         /// defined symbols, but not it's library files or library paths. Use this for header-only
         /// C++ libraries.
         /// </summary>
@@ -772,7 +772,7 @@ namespace Sharpmake
 
             /// <summary>
             /// Gets a list of include paths for compiling C and C++ libraries that are not
-            /// shared with dependant projects.
+            /// shared with dependent projects.
             /// </summary>
             public OrderableStrings IncludePrivatePaths = new OrderableStrings();
 
@@ -1057,7 +1057,7 @@ namespace Sharpmake
             /// Gets a list of the static libraries to link to.
             /// </summary>
             /// <remarks>
-            /// This should only be used for third party libaries that are not part of the compiled
+            /// This should only be used for third party libraries that are not part of the compiled
             /// source code. Libraries that are part of the compiled source code should be included
             /// by calling either
             /// <see cref="AddPublicDependency{TPROJECT}(ITarget, DependencySetting, string, int)"/>
@@ -2969,7 +2969,7 @@ namespace Sharpmake
 
                 // Will include to the project to act as a project bridge:
                 //  - lib: add Library paths and files to be able to link the executable
-                //  - dll: Copy dll to the ouput path
+                //  - dll: Copy dll to the output path
                 _resolvedPrivateDependencies = resolvedPrivateDependencies.ToList();
 
                 DotNetPublicDependencies = resolvedDotNetPublicDependencies.ToList();

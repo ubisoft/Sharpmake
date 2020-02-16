@@ -1216,7 +1216,7 @@ namespace Sharpmake.UnitTests
         ///     Verify these tests case:
         /// <returns>
         /// <list type="number">
-        ///     <item><description>if they are both refering to file edited by sharpmake user (.sharpmake): concatenation of both separated by a line return</description></item>
+        ///     <item><description>if they are both referring to file edited by sharpmake user (.sharpmake): concatenation of both separated by a line return</description></item>
         ///     <item><description>if only callerInfo2 refer to file edited by sharpmake user (.sharpmake): callerInfo2</description></item>
         ///     <item><description>otherwise: callerInfo1</description></item>
         /// </list>

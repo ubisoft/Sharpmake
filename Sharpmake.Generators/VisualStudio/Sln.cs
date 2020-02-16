@@ -426,7 +426,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             fileGenerator.Write(Template.Solution.GlobalBegin);
 
-            // Write source code control informations
+            // Write source code control information
             if (solution.PerforceRootPath != null)
             {
                 List<Solution.ResolvedProject> sccProjects = new List<Solution.ResolvedProject>();

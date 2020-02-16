@@ -252,7 +252,7 @@ namespace Sharpmake
             {
                 if (!ignoreVisualStudioPathOverride)
                 {
-                    // First check if the visual studio path is overriden from default value.
+                    // First check if the visual studio path is overridden from default value.
                     string pathOverride;
                     if (s_visualStudioDirOverrides.TryGetValue(visualVersion, out pathOverride))
                         return pathOverride;

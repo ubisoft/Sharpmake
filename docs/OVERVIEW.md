@@ -108,7 +108,7 @@ powerful language to use within the scripts. The scripts use the Sharpmake API
 directly, facilitating the override and expansion of the API, which is
 important for sharing Sharpmake across projects. The nature of C# makes it
 very easy to write everything once. Sharpmake's "include" system is also very
-scaleable.
+scalable.
 
 #### Accessible for Many Programmers
 The use of C#, including well-known concepts like C# attributes and C#

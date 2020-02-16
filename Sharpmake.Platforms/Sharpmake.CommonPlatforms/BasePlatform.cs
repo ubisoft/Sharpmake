@@ -280,7 +280,7 @@ namespace Sharpmake
                                 UniversalCRTSdkDir_10 = windowsSdkDirValue;
 
                                 // this variable is found in Windows Kits\10\DesignTime\CommonConfiguration\Neutral\uCRT.props
-                                // it is always read from the registry unless overriden, so we need to explicitely set it
+                                // it is always read from the registry unless overridden, so we need to explicitly set it
                                 UCRTContentRoot = windowsSdkDirValue;
                             }
                             break;

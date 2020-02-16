@@ -747,7 +747,7 @@ namespace Sharpmake
         private void DetermineUsedProjectConfigurations(List<Solution> solutions)
         {
             Trace.Assert(_usedProjectConfigurations == null);
-            Trace.Assert(_linked, "This method can only be called *after* the link has occured");
+            Trace.Assert(_linked, "This method can only be called *after* the link has occurred");
 
             // if this becomes too slow, we can move the creation of the list to the tasks per solution, and group them after
             var usedProjectConfigs = new HashSet<Project.Configuration>();
@@ -922,7 +922,7 @@ namespace Sharpmake
                         if (!generateProject)
                         {
                             if (_usedProjectConfigurations == null ||
-                                Arguments.TypesToGenerate.Contains(project.GetType()) || // generate the project if it was explicitely queried by the user-code
+                                Arguments.TypesToGenerate.Contains(project.GetType()) || // generate the project if it was explicitly queried by the user-code
                                 _usedProjectConfigurations.Contains(conf))
                             {
                                 generateProject = true;

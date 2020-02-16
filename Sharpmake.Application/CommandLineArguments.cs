@@ -166,7 +166,7 @@ namespace Sharpmake.Application
             }
 
             [CommandLine.Option("test", @"Validates .sharpmake input so it respect a minimal coding standard.
-Regression: tests if the dir provided in ouput is equal to the reference dir after a generation. returns -1 if different
+Regression: tests if the dir provided in output is equal to the reference dir after a generation. returns -1 if different
 QuickConfigure: tests if the configure methods are reversible. returns -1 if it is not reversible
 Configure: tests if the configure methods are reversible, track the problems. return -1 if it is not reversible
 (validates configure order): ex: /test(<""Regression""|""QuickConfigure""|""Configure"">)")]

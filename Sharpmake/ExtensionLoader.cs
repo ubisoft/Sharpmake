@@ -97,7 +97,7 @@ namespace Sharpmake
         /// <param name="assemblyPath">The path of the assembly to check whether it's an extension.</param>
         /// <returns>`true` if it is an extension, `false` otherwise.</returns>
         /// <remarks>
-        /// This method will instanciate a remote <see cref="AppDomain"/> if none was created.
+        /// This method will instantiate a remote <see cref="AppDomain"/> if none was created.
         /// </remarks>
         public bool IsExtension(string assemblyPath)
         {

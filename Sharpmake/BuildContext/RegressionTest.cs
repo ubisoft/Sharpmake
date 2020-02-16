@@ -91,7 +91,7 @@ namespace Sharpmake.BuildContext
             RemapRoot = remapRoot;
             FillReferenceMapRecursive(referenceDirectory);
 
-            // delete the ouput directory subfolders and files so all files are generated files
+            // delete the output directory subfolders and files so all files are generated files
             if (Output.Exists)
                 Output.Delete(true);
 

@@ -514,7 +514,7 @@ namespace Sharpmake.Generators.FastBuild
                             }
                             else if (conf.Output == Project.Configuration.OutputType.None && project.IsFastBuildAll)
                             {
-                                // filter to only get the configurations of projects that were explicitely added, not the dependencies
+                                // filter to only get the configurations of projects that were explicitly added, not the dependencies
                                 var minResolvedConf = conf.ResolvedPrivateDependencies.Where(x => conf.UnResolvedPrivateDependencies.ContainsKey(x.Project.GetType()));
                                 foreach (var dep in minResolvedConf)
                                     fastBuildTargetSubTargets.Add(GetShortProjectName(dep.Project, dep));

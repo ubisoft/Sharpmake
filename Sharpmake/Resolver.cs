@@ -485,7 +485,7 @@ namespace Sharpmake
             }
 
             string parameterName = names[0];
-            // get the paramters...
+            // get the parameters...
             if (!IsCaseSensitive)
                 parameterName = parameterName.ToLowerInvariant();
             RefCountedSymbol refCountedReference;

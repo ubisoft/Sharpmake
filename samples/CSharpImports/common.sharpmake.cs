@@ -115,7 +115,7 @@ namespace Common
 
             // Usually the obj folder created to link files
             // Note: Due to a Visual Studio known Bug
-            // The obj folder might still be created, but should be empty at the end of the build, if removed the rebuild project fonction won't work
+            // The obj folder might still be created, but should be empty at the end of the build, if removed the rebuild project function won't work
             conf.IntermediatePath = @"[project.SharpmakeCsPath]\..\[project.IntermediatePathName]\[project.Name]\[target.DevEnv]\[target.Framework]\[target.Platform]";
             // Visual Studio Default:
             //public static string IntermediatePath = string.Format(@"[conf.ProjectPath]\{0}", IntermediatePathName);

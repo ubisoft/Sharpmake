@@ -75,7 +75,7 @@ namespace Sharpmake.UnitTests
                     "CommonProject.Configure" + configuration.Target.GetOptimization(),
                 };
 
-                // in release, the configure is overriden, which will make it be called first
+                // in release, the configure is overridden, which will make it be called first
                 if (configuration.Target.GetOptimization() == Optimization.Release)
                 {
                     expectedCalls.InsertRange(

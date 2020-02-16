@@ -90,7 +90,7 @@ namespace Sharpmake
 
         public IAssemblyInfo BuildAssembly(IBuilderContext context, params string[] sourceFiles)
         {
-            // Alway compile to a physic dll to be able to debug
+            // Always compile to a physic dll to be able to debug
             string tmpFile = GetNextTmpAssemblyFilePath();
             return Build(context, tmpFile, sourceFiles);
         }
@@ -238,7 +238,7 @@ namespace Sharpmake
             Assembly assembly = assembler.Build(null, null, sourceTmpFile).Assembly;
             InternalError.Valid(assembly != null);
 
-            // Try to delete tmp file to prevent polution, but usefull while debugging
+            // Try to delete tmp file to prevent pollution, but useful while debugging
             //if (!System.Diagnostics.Debugger.IsAttached)
             Util.TryDeleteFile(sourceTmpFile);
 
@@ -684,7 +684,7 @@ namespace Sharpmake
         private static void CleanupTmpAssemblies()
         {
             // Erase any remaining file that has the prefix that will be used for temporary assemblies(dll, pdb, etc...)
-            // This avoids exceptions occuring when executing sharpmake several times in loops(for example when running stability tests)
+            // This avoids exceptions occurring when executing sharpmake several times in loops(for example when running stability tests)
             string[] oldTmpFiles = Directory.GetFiles(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + "*.*", SearchOption.TopDirectoryOnly);
             foreach (string f in oldTmpFiles)
             {

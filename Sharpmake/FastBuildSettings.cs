@@ -167,7 +167,7 @@ namespace Sharpmake
         /// <remarks>
         /// VS 2012 sometimes generates corrupted code when preprocessing an already preprocessed file when it encounters
         /// enum definitions.
-        /// Exemple:
+        /// Example:
         ///enum dateorder
         ///{
         ///    no_order, dmy, mdy, ymd, ydm

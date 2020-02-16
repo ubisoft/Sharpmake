@@ -582,7 +582,7 @@ namespace Sharpmake
 
                 for (int i = 0; i < enumFields.Length; ++i)
                 {
-                    // GetFields() does not gurantee order; filter out the enum's special name field
+                    // GetFields() does not guarantee order; filter out the enum's special name field
                     if (enumFields[i].Attributes.HasFlag(FieldAttributes.SpecialName))
                         continue;
 
@@ -604,7 +604,7 @@ namespace Sharpmake
                     {
                         for (int j = 0; j < enumFields.Length; ++j)
                         {
-                            // GetFields() does not gurantee order; filter out the enum's special name field
+                            // GetFields() does not guarantee order; filter out the enum's special name field
                             if (enumFields[j].Attributes.HasFlag(FieldAttributes.SpecialName))
                                 continue;
 
@@ -795,7 +795,7 @@ namespace Sharpmake
 
             foreach (FieldInfo enumField in enumFields)
             {
-                // GetFields() does not gurantee order; filter out the enum's special name field
+                // GetFields() does not guarantee order; filter out the enum's special name field
                 if (enumField.Attributes.HasFlag(FieldAttributes.SpecialName))
                     continue;
 

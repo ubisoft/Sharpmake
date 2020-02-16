@@ -338,7 +338,7 @@ namespace Sharpmake
 
                         Configuration.IncludedProjectInfo configurationProjectDependency = solutionConfiguration.GetProject(dependencyProjectType);
 
-                        // if that project was not explicitely added to the solution configuration, add it ourselves, as it is needed
+                        // if that project was not explicitly added to the solution configuration, add it ourselves, as it is needed
                         if (configurationProjectDependency == null)
                         {
                             configurationProjectDependency = new Configuration.IncludedProjectInfo

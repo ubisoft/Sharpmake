@@ -932,15 +932,15 @@ namespace Sharpmake
 
                 public class PreprocessorDefinitions : Strings
                 {
-                    public PreprocessorDefinitions(params string[] defintions)
-                        : base(defintions)
+                    public PreprocessorDefinitions(params string[] definitions)
+                        : base(definitions)
                     { }
                 }
 
                 public class UndefinePreprocessorDefinitions : Strings
                 {
-                    public UndefinePreprocessorDefinitions(params string[] defintions)
-                        : base(defintions)
+                    public UndefinePreprocessorDefinitions(params string[] definitions)
+                        : base(definitions)
                     { }
                 }
 

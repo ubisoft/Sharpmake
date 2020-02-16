@@ -79,7 +79,7 @@ namespace Sharpmake
         }
 
         /// <summary>
-        /// Finds the first occurence of directive and returns the 
+        /// Finds the first occurrence of directive and returns the 
         /// requested param value. Ex:
         /// GetTextTemplateDirectiveParam(ttPath, "output", "extension")
         /// will match:
@@ -282,7 +282,7 @@ namespace Sharpmake
                 }
 
                 // Important note: Must imcrement _bufferLength at the same time as writing into it as otherwise if
-                // you are stepping in the debugger and ToString() is implicitely called by the debugger this could truncate the string
+                // you are stepping in the debugger and ToString() is implicitly called by the debugger this could truncate the string
                 // before the increment takes place
                 _buffer[_bufferLength++] = value;
             }
@@ -301,7 +301,7 @@ namespace Sharpmake
                 for (int i = substStringIndex; i < endLoop; ++i)
                 {
                     // Important note: Must imcrement _bufferLength at the same time as writing into it as otherwise if
-                    // you are stepping in the debugger and ToString() is implicitely called by the debugger this could truncate the string
+                    // you are stepping in the debugger and ToString() is implicitly called by the debugger this could truncate the string
                     // before the increment takes place
                     char value = str[i];
                     _buffer[_bufferLength++] = value;
@@ -2152,7 +2152,7 @@ namespace Sharpmake
         /// <param name="callerInfo1"></param>
         /// <param name="callerInfo2"></param>
         /// <returns>
-        /// 1.if they are both refering to file edited by sharpmake user (.sharpmake): concatenation of both separated by a line return
+        /// 1.if they are both referring to file edited by sharpmake user (.sharpmake): concatenation of both separated by a line return
         /// 2.if only callerInfo2 refer to file edited by sharpmake user (.sharpmake): callerInfo2
         /// 3.otherwise: callerInfo1
         /// </returns>
