@@ -174,13 +174,13 @@ Multiple Configure functions can also be used, and Sharpmake is offering a featu
 
 ```csharp
 [Configure(Platform.win32 | Platform.win64)]
-void ConfigurePs4(Configuration conf, Target target)
+void ConfigureWindows(Configuration conf, Target target)
 {
     ...
 }
 
-[Configure(Platform.ps4)]
-void ConfigurePs4(Configuration conf, Target target)
+[Configure(Platform.orbis)]
+void ConfigureOrbis(Configuration conf, Target target)
 {
     ...
 }
