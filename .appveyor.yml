@@ -11,11 +11,21 @@ configuration:
 
 before_build:
 - cmd: bootstrap.bat
-- cmd: nuget restore Sharpmake.sln
 
-build:
-  project: Sharpmake.sln
-  verbosity: minimal
+for:
+  -
+    matrix:
+      only:
+        - configuration: Debug
+    build_script:
+      - CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
+
+  -
+    matrix:
+      only:
+        - configuration: Release
+    build_script:
+      - CompileSharpmake.bat Sharpmake.sln Release "Any CPU"
 
 after_test:
 - cmd: python regression_test.py
