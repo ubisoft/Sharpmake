@@ -38,7 +38,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
         public event Action<IGenerationContext, CompileCommand> CompileCommandGenerated;
 
-        public void Generate(Builder builder, Solution solution, string path, IEnumerable<Project.Configuration> projectConfigurations, CompileCommandFormat format, List<string> generatedFiles, List<string> skipFiles)
+        public void Generate(Builder builder, string path, IEnumerable<Project.Configuration> projectConfigurations, CompileCommandFormat format, List<string> generatedFiles, List<string> skipFiles)
         {
             var database = new List<IDictionary<string, object>>();
 
@@ -48,10 +48,10 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             }
 
             if (database.Count > 0)
-                WriteGeneratedFile(builder, solution.GetType(), path, database, generatedFiles, skipFiles);
+                WriteGeneratedFile(builder, path, database, generatedFiles, skipFiles);
         }
 
-        private void WriteGeneratedFile(Builder builder, Type type, string path, IEnumerable<IDictionary<string, object>> database, List<string> generatedFiles, List<string> skipFiles)
+        private void WriteGeneratedFile(Builder builder, string path, IEnumerable<IDictionary<string, object>> database, List<string> generatedFiles, List<string> skipFiles)
         {
             var file = new FileInfo(Path.Combine(path, FileName));
 
@@ -62,7 +62,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
                 serializer.Serialize(database);
                 serializer.Flush();
 
-                if (builder.Context.WriteGeneratedFile(type, file, stream))
+                if (builder.Context.WriteGeneratedFile(null, file, stream))
                 {
                     generatedFiles.Add(Path.Combine(file.DirectoryName, file.Name));
                 }
