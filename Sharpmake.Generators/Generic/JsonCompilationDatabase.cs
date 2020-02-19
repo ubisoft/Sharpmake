@@ -21,19 +21,19 @@ using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.JsonCompilationDatabase
 {
+    /// <summary>
+    /// Compile command format.
+    /// - Command: Compilation command specified as a shell command
+    /// - Arguments: Compilation command specified as a list of arguments
+    /// </summary>
+    public enum CompileCommandFormat
+    {
+        Command,
+        Arguments
+    }
+
     public class JsonCompilationDatabase
     {
-        /// <summary>
-        /// Compile command format.
-        /// - Command: Compilation command specified as a shell command
-        /// - Arguments: Compilation command specified as a list of arguments
-        /// </summary>
-        public enum CompileCommandFormat
-        {
-            Command,
-            Arguments
-        }
-
         public const string FileName = "compile_commands.json";
 
         public event Action<IGenerationContext, CompileCommand> CompileCommandGenerated;
