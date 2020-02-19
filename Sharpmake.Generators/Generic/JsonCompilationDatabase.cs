@@ -257,7 +257,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             return $@"{prefix}""{resolvedInclude}""";
         }
 
-        private static void FillIncludeDirectoriesOptions(CompileCommandGenerationContext context)
+        private void FillIncludeDirectoriesOptions(CompileCommandGenerationContext context)
         {
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
@@ -270,7 +270,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
 
-            string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I" : "/I";
+            string defaultCmdLineIncludePrefix = _flags[CompilerFlags.IncludePath];
 
             // Fill include dirs
             var dirs = new List<string>();
@@ -283,7 +283,10 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludePrefix)));
 
             if (dirs.Any())
+            {
                 context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join(" ", dirs);
+                _arguments.AddRange(dirs);
+            }
 
             // Fill resource include dirs
             var resourceDirs = new List<string>();
@@ -303,7 +306,10 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             }
 
             if (resourceDirs.Any())
+            {
                 context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join(" ", resourceDirs);
+               _arguments.AddRange(resourceDirs);
+            }
 
             // Fill using dirs
             Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
@@ -313,6 +319,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             {
                 var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => CmdLineConvertIncludePathsFunc(context, p, "/AI"));
                 context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join(" ", cmdAdditionalUsingDirectories);
+                _arguments.AddRange(cmdAdditionalUsingDirectories);
             }
         }
 
