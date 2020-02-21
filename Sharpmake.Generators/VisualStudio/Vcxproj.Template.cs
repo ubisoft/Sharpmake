@@ -109,6 +109,11 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectImportedProps =
 @"    <Import Project=""[importedPropsFile]"" />
 ";
+
+                public static string ProjectImportedMasmProps =
+@"    <Import Project=""$(VCTargetsPath)\BuildCustomizations\masm.props"" />
+";
+
                 public static string ProjectConfigurationImportedProps =
 @"    <Import Project=""[importedPropsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
@@ -143,6 +148,10 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectTargetsItem =
 @"    <Import Project=""[importedTargetsFile]"" />
+";
+
+                public static string ProjectMasmTargetsItem =
+@"    <Import Project=""$(VCTargetsPath)\BuildCustomizations\masm.targets"" />
 ";
 
                 public static string ProjectConfigurationImportedTargets =

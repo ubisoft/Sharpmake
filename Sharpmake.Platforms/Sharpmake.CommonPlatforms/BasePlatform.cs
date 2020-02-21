@@ -226,6 +226,10 @@ namespace Sharpmake
                 generator.Write(GetProjectLinkExecutableVcxprojTemplate());
         }
 
+        public virtual void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+        }
+   
         public virtual void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator)
         {
             generator.Write(_userFileConfigurationGeneralTemplate);

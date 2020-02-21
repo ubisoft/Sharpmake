@@ -500,6 +500,10 @@ namespace Sharpmake.Generators.VisualStudio
 
             // .props files
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
+            if (context.Project.ContainsASM)
+            {
+                fileGenerator.Write(Template.Project.ProjectImportedMasmProps);
+            }
             foreach (string propsFile in context.Project.CustomPropsFiles)
             {
                 string capitalizedFile = Project.GetCapitalizedFile(propsFile) ?? propsFile;
@@ -654,6 +658,9 @@ namespace Sharpmake.Generators.VisualStudio
                         platformVcxproj.GenerateProjectCompileVcxproj(context, fileGenerator);
                         platformVcxproj.GenerateProjectLinkVcxproj(context, fileGenerator);
 
+                        if (conf.Project.ContainsASM)
+                            platformVcxproj.GenerateProjectMasmVcxproj(context, fileGenerator);
+
                         if (conf.EventPreBuild.Count != 0)
                             fileGenerator.Write(Template.Project.ProjectConfigurationsPreBuildEvent);
 
@@ -695,7 +702,12 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateMakefileConfigurationVcxproj(context, fileGenerator);
 
+            // .targets files
             fileGenerator.Write(Template.Project.ProjectTargetsBegin);
+            if (context.Project.ContainsASM)
+            {
+                fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
+            }
             foreach (string targetsFiles in context.Project.CustomTargetsFiles)
             {
                 string capitalizedFile = Project.GetCapitalizedFile(targetsFiles) ?? targetsFiles;

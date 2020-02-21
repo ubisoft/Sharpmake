@@ -15,12 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake
 {
-    public abstract class BaseMicrosoftPlatform
+    public abstract partial class BaseMicrosoftPlatform
         : BasePlatform
         , Project.Configuration.IConfigurationTasks
         , IMicrosoftPlatformBff
@@ -127,6 +128,11 @@ namespace Sharpmake
             }
             else
                 throw new NotImplementedException("Unsupported runtime library value " + runtime);
+        }
+
+        public override void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+            generator.Write(_projectConfigurationsMasmTemplate);
         }
     }
 }
