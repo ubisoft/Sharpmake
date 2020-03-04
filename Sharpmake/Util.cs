@@ -1923,9 +1923,7 @@ namespace Sharpmake
             if (string.IsNullOrEmpty(version))
                 return string.Empty;
 
-            return framework.IsDotNetCore()
-                ? version
-                : string.Format("v{0}", version);
+            return string.Format("v{0}", version);
         }
 
         public static string GetToolVersionString(DevEnv env, DotNetFramework desiredFramework)

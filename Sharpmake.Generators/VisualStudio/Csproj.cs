@@ -983,12 +983,17 @@ namespace Sharpmake.Generators.VisualStudio
             //shouldn't be a problem since you can't have 2 different target frameworks or ToolsVersion in the same projectFile
             ITarget target = configurations[0].Target;
             var targetFramework = target.GetFragment<DotNetFramework>();
-            var targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
+            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore || 
+                                            ( project.ProjectSchema == CSharpProjectSchema.Default && 
+                                              target.GetFragment<DotNetFramework>().IsDotNetCore()
+                                            );
+            string targetFrameworkString = null;
 
             var devenv = target.GetFragment<DevEnv>();
 
-            if (targetFramework.IsDotNetCore())
+            if (isNetCoreProjectSchema)
             {
+                targetFrameworkString = targetFramework.ToFolderName();
                 string netCoreSdk = "Microsoft.NET.Sdk";
                 if (project.NetCoreSdkType != NetCoreSdkTypes.Default)
                     netCoreSdk += "." + project.NetCoreSdkType.ToString();
@@ -1000,6 +1005,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
+                targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
                 using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
                 {
                     // xml begin header
@@ -1042,7 +1048,7 @@ namespace Sharpmake.Generators.VisualStudio
             string targetFrameworkVersionString = "TargetFrameworkVersion";
             string projectPropertyGuid = configurations[0].ProjectGuid;
 
-            if (targetFramework.IsDotNetCore())
+            if (isNetCoreProjectSchema)
             {
                 netCoreEnableDefaultItems = "false";
                 targetFrameworkVersionString = "TargetFramework";
@@ -1270,7 +1276,7 @@ namespace Sharpmake.Generators.VisualStudio
             var importProjects = new List<ImportProject>(project.ImportProjects);
 
             // For .NET Core the default import project is inferred instead of explicit.
-            if (targetFramework.IsDotNetCore())
+            if (isNetCoreProjectSchema)
             {
                 importProjects.RemoveAll(i => i.Project == CSharpProject.DefaultImportProject);
             }
@@ -2009,9 +2015,11 @@ namespace Sharpmake.Generators.VisualStudio
             #endregion
 
             #region References
-            bool netCoreFramework = configurations.Select(c => c.Target).All(t => t.GetFragment<DotNetFramework>().IsDotNetCore());
+            bool netCoreProject = project.ProjectSchema == CSharpProjectSchema.NetCore ||
+                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
+                                              configurations.Select(c => c.Target).All(t => t.GetFragment<DotNetFramework>().IsDotNetCore()));
 
-            if (!netCoreFramework)
+            if (!netCoreProject)
             {
                 var referencesByName = new List<ItemGroups.Reference>();
                 configurations.ForEach(
@@ -2063,7 +2071,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             itemGroups.References.AddRange(referencesByPath);
 
-            if (!netCoreFramework)
+            if (!netCoreProject)
             {
                 var references = configurations.SelectMany(
                     conf => conf.DotNetReferences.Select(

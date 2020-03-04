@@ -96,15 +96,6 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
-    public class NetCoreHelloWorldProject : SampleProject
-    {
-        public NetCoreHelloWorldProject()
-        {
-            Name = "NetCoreHelloWorld";
-        }
-    }
-
-    [Generate]
     public class FastBuildSimpleExecutable : SampleProject
     {
         public FastBuildSimpleExecutable()
@@ -137,6 +128,26 @@ namespace SharpmakeGen.Samples
         public SimpleExeLibDependencyProject()
         {
             Name = "SimpleExeLibDependency";
+        }
+    }
+    
+    [Generate]
+    public class DotNetCoreFrameworkHelloWorldProject : SampleProject
+    {
+        public DotNetCoreFrameworkHelloWorldProject()
+        {
+            Name = "DotNetCoreFrameworkHelloWorld";
+            SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
+        }
+    }
+
+    [Generate]
+    public class DotNetFrameworkHelloWorldProject : SampleProject
+    {
+        public DotNetFrameworkHelloWorldProject()
+        {
+            Name = "DotNetFrameworkHelloWorld";
+            SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
         }
     }
 }

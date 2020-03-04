@@ -1950,6 +1950,13 @@ namespace Sharpmake
         Default
     }
 
+    public enum CSharpProjectSchema
+    {
+        NetCore,
+        NetFramework,
+        Default
+    }
+
     public enum NetCoreSdkTypes
     {
         Default,
@@ -2118,6 +2125,7 @@ namespace Sharpmake
         public Strings ContentExtension = new Strings();
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
+        public CSharpProjectSchema ProjectSchema = CSharpProjectSchema.Default;
         public NetCoreSdkTypes NetCoreSdkType = NetCoreSdkTypes.Default;
         public string ResourcesPath = null;
         public string ContentPath = null;
