@@ -324,7 +324,21 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             }
             else
             {
-                precompArgument = _usePrecompArgument;
+                string fileExtension = Path.GetExtension(inputFile);
+                bool isDontUsePrecomp = _config.PrecompSourceExclude.Contains(inputFile) ||
+                                        _config.PrecompSourceExcludeFolders.Any(folder => inputFile.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) ||
+                                        _config.PrecompSourceExcludeExtension.Contains(fileExtension) ||
+                                        string.Compare(fileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0;
+
+                if (isDontUsePrecomp == false)
+                {
+                    precompArgument = _usePrecompArgument;
+                }
+                else
+                {
+                    precompArgument = null;
+                }
+
                 outputFile = Path.ChangeExtension(Path.Combine(_outputDirectory, Path.GetFileName(inputFile)), _outputExtension);
             }
 
