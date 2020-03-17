@@ -461,9 +461,9 @@ namespace Sharpmake
                 foreach (CompilerError ce in cr.Errors)
                 {
                     if (ce.IsWarning)
-                        EventOutputWarning?.Invoke(ce + Environment.NewLine);
+                        EventOutputWarning?.Invoke("{0}" + Environment.NewLine, ce.ToString());
                     else
-                        EventOutputError?.Invoke(ce + Environment.NewLine);
+                        EventOutputError?.Invoke("{0}" + Environment.NewLine, ce.ToString());
 
                     errorMessage += ce + Environment.NewLine;
                 }
