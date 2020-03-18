@@ -150,4 +150,20 @@ namespace SharpmakeGen.Samples
             SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
         }
     }
+
+    [Generate]
+    public class CompileCommandDatabaseProject : SampleProject
+    {
+        public CompileCommandDatabaseProject()
+        {
+            Name = "CompileCommandDatabase";
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
 }
