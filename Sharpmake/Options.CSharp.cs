@@ -304,6 +304,29 @@ namespace Sharpmake
                 public SuppressWarning(params string[] warnings) : base(string.Join(",", warnings)) { }
             }
 
+            /// <summary>
+            /// Prevent specific warnings from being treated as errors when <see cref="TreatWarningsAsErrors"/> is enabled
+            /// </summary>
+            /// <remarks>
+            /// This option generates a `WarningsNotAsErrors` element in the C# project XML.
+            /// </remarks>
+            public class WarningsNotAsErrors : StringOption
+            {
+                public WarningsNotAsErrors(params int[] warnings) : base(string.Join(",", warnings.Select(w => w.ToString(System.Globalization.CultureInfo.InvariantCulture)))) { }
+
+                /// <summary>
+                /// Creates a new <see cref="WarningsNotAsErrors"/> instance from a list of warning
+                /// code labels.
+                /// </summary>
+                /// <param name="warnings">The list of warning code labels to avoid treating as errors. See remarks.</param>
+                /// <remarks>
+                /// If <paramref name="warnings"/> contains elements that are not C# compiler
+                /// warnings, those warning numbers *must* include the 2-letter prefix. For
+                /// example, NuGet warnings must be prefixed by `NU`. (ie: `NU1603`)
+                /// </remarks>
+                public WarningsNotAsErrors(params string[] warnings) : base(string.Join(",", warnings)) { }
+            }
+
             public class CopyVsixExtensionLocation : StringOption
             {
                 public CopyVsixExtensionLocation(string location) : base(location) { }

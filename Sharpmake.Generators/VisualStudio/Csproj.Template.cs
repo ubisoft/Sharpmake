@@ -121,6 +121,7 @@ namespace Sharpmake.Generators.VisualStudio
     <WarningLevel>[options.WarningLevel]</WarningLevel>
     <AllowUnsafeBlocks>[options.AllowUnsafeBlocks]</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>[options.TreatWarningsAsErrors]</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>[options.WarningsNotAsErrors]</WarningsNotAsErrors>
     <CreateVsixContainer>[options.CreateVsixContainer]</CreateVsixContainer>
     <DeployExtension>[options.DeployExtension]</DeployExtension>
     <Prefer32Bit>[options.Prefer32Bit]</Prefer32Bit>
