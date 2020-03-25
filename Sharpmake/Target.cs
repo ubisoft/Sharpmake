@@ -302,11 +302,13 @@ namespace Sharpmake
 
         public int CompareTo(ITarget other)
         {
-            if (GetType() != other.GetType())
+            var thisType = GetType();
+            var otherType = other.GetType();
+            if (thisType != otherType)
             {
-                int cmp = GetType().FullName.CompareTo(other.GetType().FullName);
+                int cmp = thisType.FullName.CompareTo(otherType.FullName);
                 if (cmp == 0)
-                    throw new Exception("Two different types cannot have same name: " + GetType().FullName);
+                    throw new Exception("Two different types cannot have same name: " + thisType.FullName);
                 return cmp;
             }
 
@@ -349,36 +351,39 @@ namespace Sharpmake
         public T GetFragment<T>()
         {
             FieldInfo[] fragments = GetType().GetFields();
+            var tType = typeof(T);
             foreach (FieldInfo fragment in fragments)
             {
-                if (fragment.FieldType == typeof(T))
+                if (tType.IsAssignableFrom(fragment.FieldType))
                 {
                     return (T)fragment.GetValue(this);
                 }
             }
-            throw new Exception("cannot find fragment value of type " + typeof(T).FullName + " in object " + GetType().FullName);
+            throw new Exception("cannot find fragment value of type " + tType.FullName + " in object " + GetType().FullName);
         }
 
         public void SetFragment<T>(T value)
         {
             FieldInfo[] fragments = GetType().GetFields();
+            var valueType = value.GetType();
             foreach (FieldInfo fragment in fragments)
             {
-                if (fragment.FieldType == typeof(T))
+                if (fragment.FieldType.IsAssignableFrom(valueType))
                 {
                     fragment.SetValue(this, value);
                     return;
                 }
             }
-            throw new Exception("cannot find fragment value of type " + typeof(T).FullName + " in object " + GetType().FullName);
+            throw new Exception("cannot find fragment value of type " + valueType.FullName + " in object " + GetType().FullName);
         }
 
         public bool TestFragment<T>(T value)
         {
             FieldInfo[] fragments = GetType().GetFields();
+            var valueType = value.GetType();
             foreach (FieldInfo fragment in fragments)
             {
-                if (fragment.FieldType == typeof(T))
+                if (valueType.IsAssignableFrom(fragment.FieldType))
                     return Util.FlagsTest<T>((T)fragment.GetValue(this), value);
             }
             return false;
@@ -387,12 +392,8 @@ namespace Sharpmake
         public bool HaveFragment<T>()
         {
             FieldInfo[] fragments = GetType().GetFields();
-            foreach (FieldInfo fragment in fragments)
-            {
-                if (fragment.FieldType == typeof(T))
-                    return true;
-            }
-            return false;
+            var tType = typeof(T);
+            return fragments.Any(fragment => fragment.FieldType == tType);
         }
 
         public void SetFragments(params object[] values)
@@ -421,9 +422,10 @@ namespace Sharpmake
         {
             FieldInfo[] fragmentFields = GetType().GetFields();
 
+            var fragmentMaskType = fragmentMask.GetType();
             foreach (FieldInfo fragmentField in fragmentFields)
             {
-                if (fragmentField.FieldType == fragmentMask.GetType())
+                if (fragmentMaskType.IsAssignableFrom(fragmentField.FieldType))
                 {
                     int targetValue = (int)fragmentField.GetValue(this);
                     int maskValue = (int)fragmentMask;

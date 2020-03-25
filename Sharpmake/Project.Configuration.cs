@@ -2897,13 +2897,21 @@ namespace Sharpmake
                                 _resolvedTargetDependsFiles.Add(Path.Combine(TargetPath, dependency.TargetFileFullName + ".dll"));
 
                                 // If this is not a .Net project, no .Net dependencies are needed
-                                // If the dependency is not a .Net project, it will not function properly when referenced by a .Net compilation process
-                                if (Util.IsDotNet(this) && Util.IsDotNet(dependency))
+                                if (Util.IsDotNet(this))
                                 {
-                                    if (hasPublicPathToRoot)
-                                        resolvedDotNetPublicDependencies.Add(new DotNetDependency(dependency));
+                                    // If the dependency is not a .Net project, it will not function properly when referenced by a .Net compilation process
+                                    if (Util.IsDotNet(dependency))
+                                    {
+                                        if (hasPublicPathToRoot)
+                                            resolvedDotNetPublicDependencies.Add(new DotNetDependency(dependency));
+                                        else if (isImmediate)
+                                            resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
+                                    }
+                                    // If the dependency is not a .Net project, it need anyway to be compiled before this one, so we add it as post dependency in the solution
                                     else if (isImmediate)
-                                        resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
+                                    {
+                                        GenericBuildDependencies.Add(dependency);
+                                    }
                                 }
                             }
                             break;
