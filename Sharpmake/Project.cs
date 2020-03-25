@@ -1170,6 +1170,12 @@ namespace Sharpmake
             return false;
         }
 
+        public virtual bool ResolveFilterPathForFile(string relativeFilePath, out string filterPath)
+        {
+            filterPath = null;
+            return false;
+        }
+
         protected virtual void ExcludeOutputFiles()
         {
         }

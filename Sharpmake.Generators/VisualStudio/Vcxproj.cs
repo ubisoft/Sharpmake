@@ -2011,7 +2011,8 @@ namespace Sharpmake.Generators.VisualStudio
                 string dirSourceRelative = lastPathSeparator == -1 ? "" : FileNameSourceRelative.Substring(0, lastPathSeparator);
 
                 string customFilterPath;
-                if (context.Project.CustomFilterMapping.TryGetValue(dirSourceRelative, out customFilterPath) ||
+                if (context.Project.ResolveFilterPathForFile(FileNameSourceRelative, out customFilterPath) ||
+                    context.Project.CustomFilterMapping.TryGetValue(dirSourceRelative, out customFilterPath) ||
                     context.Project.ResolveFilterPath(dirSourceRelative, out customFilterPath))
                 {
                     FilterPath = customFilterPath;
