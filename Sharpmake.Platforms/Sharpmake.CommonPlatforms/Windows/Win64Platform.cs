@@ -283,6 +283,9 @@ namespace Sharpmake
 
                                         if (toolsVersion >= new Version("14.22.27905"))
                                             extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
+
+                                        if (toolsVersion >= new Version("14.25.28610"))
+                                            extraFiles.Add(@"$ExecutableRootPath$\vcruntime140_1.dll");
                                     }
 
                                     try
