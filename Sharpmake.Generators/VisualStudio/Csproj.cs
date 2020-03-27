@@ -1027,6 +1027,10 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            var preImportCustomProperties = new Dictionary<string, string>(project.PreImportCustomProperties);
+            AddPreImportCustomProperties(preImportCustomProperties, project, projectPath);
+            WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
+
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
 
             CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
@@ -1107,7 +1111,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Write(Template.MSBuild14PropertyGroup, writer, resolver);
             }
 
-            WriteCustomProperties(project, writer, resolver);
+            WriteCustomProperties(project.CustomProperties, project, writer, resolver);
 
             if (project.ProjectTypeGuids == CSharpProjectType.Wcf)
             {
@@ -1350,6 +1354,15 @@ namespace Sharpmake.Generators.VisualStudio
             writer.Close();
         }
 
+        public void AddPreImportCustomProperties(Dictionary<string, string> properties, CSharpProject cSharpProject, string projectPath)
+        {
+            if (!string.IsNullOrEmpty(cSharpProject.BaseIntermediateOutputPath))
+            {
+                var baseIntermediateOutputPath = Util.PathGetAbsolute(projectPath, cSharpProject.BaseIntermediateOutputPath);
+                properties.Add(nameof(cSharpProject.BaseIntermediateOutputPath), baseIntermediateOutputPath);
+            }
+        }
+
         private static void WriteImportProjects(IEnumerable<ImportProject> importProjects, Project project, Project.Configuration conf, StreamWriter writer, Resolver resolver)
         {
             foreach (var import in importProjects)
@@ -1369,15 +1382,15 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        private static void WriteCustomProperties(Project project, StreamWriter writer, Resolver resolver)
+        private static void WriteCustomProperties(Dictionary<string, string> customProperties, Project project, StreamWriter writer, Resolver resolver)
         {
-            if (project.CustomProperties.Any())
+            if (customProperties.Any())
             {
                 Write(Template.CustomPropertiesStart, writer, resolver);
-                foreach (var key in project.CustomProperties.Keys)
+                foreach (var kvp in customProperties)
                 {
-                    resolver.SetParameter("custompropertyname", key);
-                    resolver.SetParameter("custompropertyvalue", project.CustomProperties[key]);
+                    resolver.SetParameter("custompropertyname", kvp.Key);
+                    resolver.SetParameter("custompropertyvalue", kvp.Value);
                     Write(Template.CustomProperty, writer, resolver);
                 }
                 Write(Template.CustomPropertiesEnd, writer, resolver);

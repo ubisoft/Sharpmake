@@ -235,6 +235,7 @@ namespace Sharpmake
 
         public Dictionary<string, string> ExtensionBuildTools = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);  // extension -> tool name
 
+        public Dictionary<string, string> PreImportCustomProperties = new Dictionary<string, string>();      // pre import properties are added before any imports to the project xml as <Key>Value</Key>
         public Dictionary<string, string> CustomProperties = new Dictionary<string, string>();      // custom properties are added to the project xml as <Key>Value</Key>
 
         public Dictionary<string, string> CustomFilterMapping = new Dictionary<string, string>();  /// maps relative source directory to a custom filter path for vcxproj.filter files
@@ -2135,6 +2136,7 @@ namespace Sharpmake
         public NetCoreSdkTypes NetCoreSdkType = NetCoreSdkTypes.Default;
         public string ResourcesPath = null;
         public string ContentPath = null;
+        public string BaseIntermediateOutputPath = string.Empty;
         public string ApplicationIcon = String.Empty;
         public string ApplicationManifest = "app.manifest";
         public string ApplicationSplashScreen = string.Empty;
@@ -2311,6 +2313,7 @@ namespace Sharpmake
                 importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
             }
         }
+
 
         public override bool IsValidConfigurationOutputType(Configuration.OutputType outputType)
         {
