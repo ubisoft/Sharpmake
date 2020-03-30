@@ -168,7 +168,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (!string.IsNullOrEmpty(context.Configuration.LayoutExtensionFilter))
                 context.Options["LayoutExtensionFilter"] = context.Configuration.LayoutExtensionFilter;
             else
-                context.Options["LayoutExtensionFilter"] = context.Configuration.IsFastBuild ? "*.pdb;*.ilk;*.exp;*.lib;*.winmd;*.appxrecipe;*.map;*.pl;*.bat;*.txt;*.log;*.pel2;*.zip;*.etl;*.vspx" : FileGeneratorUtilities.RemoveLineTag;
+                context.Options["LayoutExtensionFilter"] = FileGeneratorUtilities.RemoveLineTag;
 
             // This should normally be set with the KitsRootPaths class, but this allows the coder to force a platform version.
             var winTargetPlatformVersionOptionActions = new List<Options.OptionAction>();
