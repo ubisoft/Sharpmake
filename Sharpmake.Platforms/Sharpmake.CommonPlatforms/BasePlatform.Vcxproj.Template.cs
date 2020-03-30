@@ -18,6 +18,7 @@ namespace Sharpmake
         private const string _projectConfigurationsCompileTemplate =
             @"    <ClCompile>
       <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
+      <CompileAsWinRT>[options.CompileAsWinRT]</CompileAsWinRT>
       <WarningLevel>[options.WarningLevel]</WarningLevel>
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -127,6 +128,7 @@ namespace Sharpmake
       <MapFileName>[options.MapFileName]</MapFileName>
       <ImportLibrary>[options.ImportLibrary]</ImportLibrary>
       <FunctionOrder>[options.FunctionOrder]</FunctionOrder>
+      <ForceFileOutput>[options.ForceFileOutput]</ForceFileOutput>
       <ModuleDefinitionFile>[options.ModuleDefinitionFile]</ModuleDefinitionFile>
       <DelayLoadDLLs>[options.DelayLoadedDLLs]</DelayLoadDLLs>
       <BaseAddress>[options.BaseAddress]</BaseAddress>

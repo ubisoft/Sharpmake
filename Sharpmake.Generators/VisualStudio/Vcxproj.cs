@@ -794,7 +794,13 @@ namespace Sharpmake.Generators.VisualStudio
             Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
             additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
 
-            context.Options["AdditionalUsingDirectories"] = additionalUsingDirectories.Count > 0 ? string.Join(";", additionalUsingDirectories.Select(s => Util.PathGetRelative(context.ProjectDirectory, s))) : FileGeneratorUtilities.RemoveLineTag;
+            if (additionalUsingDirectories.Count > 0)
+            {
+                string additionalUsing = string.Join(";", additionalUsingDirectories.Select(s => Util.PathGetRelative(context.ProjectDirectory, s)));
+                if (context.Options["AdditionalUsingDirectories"] != FileGeneratorUtilities.RemoveLineTag)
+                    additionalUsing = additionalUsing + ";" + context.Options["AdditionalUsingDirectories"];
+                context.Options["AdditionalUsingDirectories"] = additionalUsing;
+            }
         }
 
         private static void FillLibrariesOptions(GenerationContext context)

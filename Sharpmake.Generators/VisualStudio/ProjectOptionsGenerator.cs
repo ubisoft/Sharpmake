@@ -360,27 +360,9 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["IncludePath"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["LibraryPath"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["ExcludePath"] = FileGeneratorUtilities.RemoveLineTag;
+            context.Options["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
 
             optionsContext.PlatformVcxproj.SetupSdkOptions(context);
-
-            // Options.Vc.Compiler.AdditionalUsingDirectories
-            {
-                Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
-                additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);
-
-                context.Options["AdditionalUsingDirectories"] = additionalUsingDirectories.Count > 0 ? string.Join(";", additionalUsingDirectories.Select(s => Util.PathGetRelative(context.ProjectDirectory, s))) : FileGeneratorUtilities.RemoveLineTag;
-
-                additionalUsingDirectories.AddRange(optionsContext.PlatformVcxproj.GetCxUsingPath(context));
-                if (additionalUsingDirectories.Count > 0 && optionsContext.Resolver != null)
-                {
-                    var cmdAdditionalUsingDirectories = additionalUsingDirectories.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, optionsContext.Resolver, p, "/AI"));
-                    context.CommandLineOptions["AdditionalUsingDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", cmdAdditionalUsingDirectories);
-                }
-                else
-                {
-                    context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
-                }
-            }
 
             bool writeResourceCompileTag = optionsContext.PlatformVcxproj.GetResourceIncludePaths(context).Any();
 
