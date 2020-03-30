@@ -1523,8 +1523,16 @@ namespace Sharpmake.Generators.VisualStudio
             );
 
             Options.Vc.Linker.BaseAddress baseAddress = Options.GetObject<Options.Vc.Linker.BaseAddress>(context.Configuration);
-            context.Options["BaseAddress"] = (baseAddress != null && baseAddress.Value.Length > 0) ? (baseAddress.Value) : "";
-            context.CommandLineOptions["BaseAddress"] = (baseAddress != null && baseAddress.Value.Length > 0) ? @"/BASE:""" + (baseAddress.Value) + @"""" : FileGeneratorUtilities.RemoveLineTag;
+            if (baseAddress != null && baseAddress.Value.Length > 0)
+            {
+                context.Options["BaseAddress"] = baseAddress.Value;
+                context.CommandLineOptions["BaseAddress"] = @"/BASE:""" + (baseAddress.Value) + @"""";
+            }
+            else
+            {
+                context.Options["BaseAddress"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["BaseAddress"] = FileGeneratorUtilities.RemoveLineTag;
+            }
 
             //Reference
             //    Default                                 OptimizeReferences="0"
