@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{913976F4-2FF2-07DC-D8E0-911ED6393F87}</ProjectGuid>
+    <ProjectGuid>{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>SpanMultipleSrcDirsFBUnityExclude</RootNamespace>
     <ProjectName>SpanMultipleSrcDirsFBUnityExclude</ProjectName>

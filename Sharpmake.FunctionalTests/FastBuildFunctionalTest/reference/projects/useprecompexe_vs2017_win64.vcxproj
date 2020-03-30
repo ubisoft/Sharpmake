@@ -27,7 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F9A17DAE-8E13-0A57-A569-73B8636C109B}</ProjectGuid>
+    <ProjectGuid>{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>UsePrecompExe</RootNamespace>
     <ProjectName>UsePrecompExe</ProjectName>
@@ -241,7 +241,6 @@ del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <PrecompiledHeaderOutputFile>build\debug_msbuild_vs2017\useprecompexe\UsePrecompExe.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>build\debug_msbuild_vs2017\useprecompexe\useprecompexe_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -275,7 +274,6 @@ del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\debug_msbuild_vs2017\useprecompexe.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
@@ -329,7 +327,6 @@ del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <PrecompiledHeaderOutputFile>build\release_msbuild_vs2017\useprecompexe\UsePrecompExe.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>build\release_msbuild_vs2017\useprecompexe\useprecompexe_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -363,7 +360,6 @@ del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\release_msbuild_vs2017\useprecompexe.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

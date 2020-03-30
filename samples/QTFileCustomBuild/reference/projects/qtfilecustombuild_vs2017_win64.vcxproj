@@ -133,7 +133,6 @@
       <PrecompiledHeaderOutputFile>obj\win64\debug\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win64\debug\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,7 +165,6 @@
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win64\debug\qtfilecustombuild.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -221,7 +219,6 @@
       <PrecompiledHeaderOutputFile>obj\win64\release\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win64\release\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -254,7 +251,6 @@
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win64\release\qtfilecustombuild.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
@@ -309,7 +305,6 @@
       <PrecompiledHeaderOutputFile>obj\win64\retail\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>obj\win64\retail\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -342,7 +337,6 @@
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\win64\retail\qtfilecustombuild.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

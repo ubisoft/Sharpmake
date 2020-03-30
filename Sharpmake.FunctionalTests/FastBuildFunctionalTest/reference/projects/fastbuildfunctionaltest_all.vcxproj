@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EF677716-81CF-5135-F114-CF023412BF82}</ProjectGuid>
+    <ProjectGuid>{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>FastBuildFunctionalTest_All</RootNamespace>
     <ProjectName>FastBuildFunctionalTest_All</ProjectName>

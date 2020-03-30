@@ -84,6 +84,7 @@ Compiler( 'Compiler-x64-vs2017' )
                                 'C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64\api-ms-win-crt-time-l1-1-0.dll',
                                 'C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64\api-ms-win-crt-utility-l1-1-0.dll'
                             }
+    .CompilerFamily         = 'msvc'
 }
 
 .win64Config =

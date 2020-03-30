@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2CE861C7-785F-5E49-6C3F-A780F023352E}</ProjectGuid>
+    <ProjectGuid>{51338055-3ACC-BA7F-9658-06DC5B06394E}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>SpanMultipleSrcDirsFBNoBlobExclude</RootNamespace>
     <ProjectName>SpanMultipleSrcDirsFBNoBlobExclude</ProjectName>
@@ -178,7 +178,6 @@ del "output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.p
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ProgramDatabaseFileName>build\debug_msbuild_vs2017\spanmultiplesrcdirsfbnoblobexclude\spanmultiplesrcdirsfbnoblobexclude_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -212,7 +211,6 @@ del "output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.p
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\debug_msbuild_vs2017\spanmultiplesrcdirsfbnoblobexclude.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
@@ -265,7 +263,6 @@ del "output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.p
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ProgramDatabaseFileName>build\release_msbuild_vs2017\spanmultiplesrcdirsfbnoblobexclude\spanmultiplesrcdirsfbnoblobexclude_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -299,7 +296,6 @@ del "output\release_fastbuild_noblob_vs2017\spanmultiplesrcdirsfbnoblobexclude.p
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\release_msbuild_vs2017\spanmultiplesrcdirsfbnoblobexclude.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -6,30 +6,42 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FastBuild", "FastBuild", "{
 		fastbuildfunctionaltest.bff = fastbuildfunctionaltest.bff
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixCppAndCExe", "mixcppandcexe_vs2017_win64.vcxproj", "{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixCppAndCExe", "mixcppandcexe_vs2017_win64.vcxproj", "{5A047CB1-D2C4-4765-6F6F-EDD60899737F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest_All", "fastbuildfunctionaltest_all.vcxproj", "{EF677716-81CF-5135-F114-CF023412BF82}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest_All", "fastbuildfunctionaltest_all.vcxproj", "{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}"
 	ProjectSection(ProjectDependencies) = postProject
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87} = {913976F4-2FF2-07DC-D8E0-911ED6393F87}
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051} = {12D3CEE7-6EE6-69EF-593D-14F2E4414051}
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D} = {390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B} = {F9A17DAE-8E13-0A57-A569-73B8636C109B}
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975} = {1FD9F7AD-E2C9-15DE-D338-6161DCB22975}
-		{2CE861C7-785F-5E49-6C3F-A780F023352E} = {2CE861C7-785F-5E49-6C3F-A780F023352E}
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8} = {5F078DB6-58B6-290F-2266-DDD3B128FCD8}
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9} = {7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3} = {4CB12B72-2C37-A067-2236-AC7AA2926DE3}
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48} = {311CFA15-731D-A99E-EDE1-41AB713BBE48}
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0} = {0E8AC270-BB93-42F0-4487-E85F2785FCF0}
+		{B0087514-0636-5209-BC43-4E8096928555} = {B0087514-0636-5209-BC43-4E8096928555}
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74} = {B1F3B803-C020-3A59-6346-D0E116BAAA74}
+		{B7852638-591E-EE12-6928-76038779B42A} = {B7852638-591E-EE12-6928-76038779B42A}
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB} = {099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F} = {5A047CB1-D2C4-4765-6F6F-EDD60899737F}
+		{51338055-3ACC-BA7F-9658-06DC5B06394E} = {51338055-3ACC-BA7F-9658-06DC5B06394E}
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47} = {573CBFD5-C93E-15F6-9BFE-132BA37EAE47}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RequirePreBuildStep", "requireprebuildstep_vs2017_win64.vcxproj", "{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildCopyDirTest", "postbuildcopydirtest_vs2017_win64.vcxproj", "{B0087514-0636-5209-BC43-4E8096928555}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobExclude", "spanmultiplesrcdirsfbnoblobexclude_vs2017_win64.vcxproj", "{2CE861C7-785F-5E49-6C3F-A780F023352E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildCopySingleFileTest", "postbuildcopysinglefiletest_vs2017_win64.vcxproj", "{B1F3B803-C020-3A59-6346-D0E116BAAA74}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobInclude", "spanmultiplesrcdirsfbnoblobinclude_vs2017_win64.vcxproj", "{5F078DB6-58B6-290F-2266-DDD3B128FCD8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildExecuteTest", "postbuildexecutetest_vs2017_win64.vcxproj", "{0E8AC270-BB93-42F0-4487-E85F2785FCF0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityExclude", "spanmultiplesrcdirsfbunityexclude_vs2017_win64.vcxproj", "{913976F4-2FF2-07DC-D8E0-911ED6393F87}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildTestExecution", "postbuildtestexecution_vs2017_win64.vcxproj", "{311CFA15-731D-A99E-EDE1-41AB713BBE48}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityInclude", "spanmultiplesrcdirsfbunityinclude_vs2017_win64.vcxproj", "{12D3CEE7-6EE6-69EF-593D-14F2E4414051}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RequirePreBuildStep", "requireprebuildstep_vs2017_win64.vcxproj", "{B7852638-591E-EE12-6928-76038779B42A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UsePrecompExe", "useprecompexe_vs2017_win64.vcxproj", "{F9A17DAE-8E13-0A57-A569-73B8636C109B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobExclude", "spanmultiplesrcdirsfbnoblobexclude_vs2017_win64.vcxproj", "{51338055-3ACC-BA7F-9658-06DC5B06394E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobInclude", "spanmultiplesrcdirsfbnoblobinclude_vs2017_win64.vcxproj", "{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityExclude", "spanmultiplesrcdirsfbunityexclude_vs2017_win64.vcxproj", "{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityInclude", "spanmultiplesrcdirsfbunityinclude_vs2017_win64.vcxproj", "{4CB12B72-2C37-A067-2236-AC7AA2926DE3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UsePrecompExe", "useprecompexe_vs2017_win64.vcxproj", "{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,69 +53,101 @@ Global
 		Release|MSBuild = Release|MSBuild
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
-		{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild.Build.0 = Debug_FastBuild_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|FastBuild_NoBlob.Build.0 = Debug_FastBuild_NoBlob_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild.Build.0 = Release_FastBuild_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Release|FastBuild_NoBlob.Build.0 = Release_FastBuild_NoBlob_vs2017|x64
-		{EF677716-81CF-5135-F114-CF023412BF82}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
-		{390C1BB7-E8FC-4EA9-DA0E-68FA687F208D}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
-		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Release|FastBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{2CE861C7-785F-5E49-6C3F-A780F023352E}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Release|FastBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{5F078DB6-58B6-290F-2266-DDD3B128FCD8}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2017|x64
-		{913976F4-2FF2-07DC-D8E0-911ED6393F87}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2017|x64
-		{12D3CEE7-6EE6-69EF-593D-14F2E4414051}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
-		{F9A17DAE-8E13-0A57-A569-73B8636C109B}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Debug|FastBuild.Build.0 = Debug_FastBuild_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Debug|FastBuild_NoBlob.Build.0 = Debug_FastBuild_NoBlob_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|FastBuild.Build.0 = Release_FastBuild_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|FastBuild_NoBlob.Build.0 = Release_FastBuild_NoBlob_vs2017|x64
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{B0087514-0636-5209-BC43-4E8096928555}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{B1F3B803-C020-3A59-6346-D0E116BAAA74}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{0E8AC270-BB93-42F0-4487-E85F2785FCF0}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{311CFA15-731D-A99E-EDE1-41AB713BBE48}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{B7852638-591E-EE12-6928-76038779B42A}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
+		{51338055-3ACC-BA7F-9658-06DC5B06394E}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{51338055-3ACC-BA7F-9658-06DC5B06394E}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{51338055-3ACC-BA7F-9658-06DC5B06394E}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{51338055-3ACC-BA7F-9658-06DC5B06394E}.Release|FastBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{51338055-3ACC-BA7F-9658-06DC5B06394E}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{51338055-3ACC-BA7F-9658-06DC5B06394E}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}.Release|FastBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2017|x64
+		{7D8A189A-C043-D9EA-2CD4-C5DA529D56F9}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2017|x64
+		{4CB12B72-2C37-A067-2236-AC7AA2926DE3}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{099CE96F-04EC-E083-89C0-CE8DDBD8A1BB}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{EF677716-81CF-5135-F114-CF023412BF82} = {DD960562-8A51-64E6-3C0C-70331C285B31}
+		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666} = {DD960562-8A51-64E6-3C0C-70331C285B31}
 	EndGlobalSection
 EndGlobal

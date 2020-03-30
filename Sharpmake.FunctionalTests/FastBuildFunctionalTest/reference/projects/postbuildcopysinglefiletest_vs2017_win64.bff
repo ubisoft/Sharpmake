@@ -1,17 +1,17 @@
 
 //=================================================================================================================
-// RequirePreBuildStep FASTBuild config file
+// PostBuildCopySingleFileTest FASTBuild config file
 //=================================================================================================================
 #once
 
 
-Unity( 'RequirePreBuildStep_FastBuildUnitys_unity' )
+Unity( 'PostBuildCopySingleFileTest_FastBuildUnitys_unity' )
 {
-    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\RequirePreBuildStep'
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildCopySingleFileTest'
     .UnityInputIsolateWritableFiles     =  true
     .UnityInputIsolateWritableFilesLimit = 10
-    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\RequirePreBuildStep'
-    .UnityOutputPattern                 = 'requireprebuildstep_fastbuildunitys_unity*.cpp'
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\PostBuildCopySingleFileTest'
+    .UnityOutputPattern                 = 'postbuildcopysinglefiletest_fastbuildunitys_unity*.cpp'
     .UnityNumFiles                      =  1
 }
 
@@ -20,15 +20,14 @@ Unity( 'RequirePreBuildStep_FastBuildUnitys_unity' )
 #if WIN64
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
+ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -64,7 +63,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -92,20 +91,18 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\RequirePreBuildStep\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildCopySingleFileTest\main.cpp'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
+Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\'
+    .Libraries              = 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -137,12 +134,12 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -167,22 +164,32 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64' )
+Copy( 'Copy_C42D7E42' )
 {
-    .Targets = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
 }
 
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' )
+Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Copy_C42D7E42'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -218,7 +225,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' 
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -247,20 +254,18 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' 
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\RequirePreBuildStep\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildCopySingleFileTest\main.cpp'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
+Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\'
+    .Libraries              = 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -292,12 +297,12 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executabl
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -322,22 +327,32 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executabl
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64' )
+Copy( 'Copy_BC80BD82' )
 {
-    .Targets = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
 }
 
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
+Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Copy_BC80BD82'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -373,7 +388,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -400,21 +415,19 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
-    .CompilerInputUnity       = 'RequirePreBuildStep_FastBuildUnitys_unity'
+    .CompilerInputUnity       = 'PostBuildCopySingleFileTest_FastBuildUnitys_unity'
     .CompilerOutputPath       = '$Intermediate$'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable' )
+Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildcopysinglefiletest\'
+    .Libraries              = 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildcopysinglefiletest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -446,12 +459,12 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildcopysinglefiletest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildcopysinglefiletest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -476,22 +489,32 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64' )
+Copy( 'Copy_7FAB9568' )
 {
-    .Targets = 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildcopysinglefiletest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
 }
 
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
+Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_Executable',
+                   'Copy_7FAB9568'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -527,7 +550,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -555,21 +578,19 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
-    .CompilerInputUnity       = 'RequirePreBuildStep_FastBuildUnitys_unity'
+    .CompilerInputUnity       = 'PostBuildCopySingleFileTest_FastBuildUnitys_unity'
     .CompilerOutputPath       = '$Intermediate$'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable' )
+Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildcopysinglefiletest\'
+    .Libraries              = 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildcopysinglefiletest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -601,12 +622,12 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildcopysinglefiletest\postbuildcopysinglefiletest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildcopysinglefiletest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildcopysinglefiletest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -631,9 +652,20 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64' )
+Copy( 'Copy_803944F8' )
 {
-    .Targets = 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable'
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildcopysinglefiletest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_Executable',
+                   'Copy_803944F8'
+               }
 }
 
 

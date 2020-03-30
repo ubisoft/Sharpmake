@@ -27,10 +27,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B7852638-591E-EE12-6928-76038779B42A}</ProjectGuid>
+    <ProjectGuid>{0E8AC270-BB93-42F0-4487-E85F2785FCF0}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <RootNamespace>RequirePreBuildStep</RootNamespace>
-    <ProjectName>RequirePreBuildStep</ProjectName>
+    <RootNamespace>PostBuildExecuteTest</RootNamespace>
+    <ProjectName>PostBuildExecuteTest</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
@@ -87,111 +87,107 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2017|x64'">
     <OutDir>output\debug_fastbuild_noblob_vs2017\</OutDir>
-    <IntDir>build\debug_fastbuild_noblob_vs2017\requireprebuildstep\</IntDir>
+    <IntDir>build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\*unity*.cpp" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\*.obj" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\*.a" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\*.lib" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.elf" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exp" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.ilk" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.lib" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
+    <TargetFileName>postbuildexecutetest.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2017|x64'">
     <OutDir>output\debug_fastbuild_vs2017\</OutDir>
-    <IntDir>build\debug_fastbuild_vs2017\requireprebuildstep\</IntDir>
+    <IntDir>build\debug_fastbuild_vs2017\postbuildexecutetest\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe PostBuildExecuteTest_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\requireprebuildstep.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\requireprebuildstep.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\requireprebuildstep.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\requireprebuildstep.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\debug_fastbuild_vs2017\requireprebuildstep.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean PostBuildExecuteTest_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2017\postbuildexecutetest\*unity*.cpp" >NUL 2>NUL
+del "build\debug_fastbuild_vs2017\postbuildexecutetest\*.obj" >NUL 2>NUL
+del "build\debug_fastbuild_vs2017\postbuildexecutetest\*.a" >NUL 2>NUL
+del "build\debug_fastbuild_vs2017\postbuildexecutetest\*.lib" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\postbuildexecutetest.exe" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\postbuildexecutetest.elf" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\postbuildexecutetest.exp" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\postbuildexecutetest.ilk" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\postbuildexecutetest.lib" >NUL 2>NUL
+del "output\debug_fastbuild_vs2017\postbuildexecutetest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_vs2017\postbuildexecutetest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
+    <TargetFileName>postbuildexecutetest.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2017|x64'">
-    <TargetName>requireprebuildstep</TargetName>
+    <TargetName>postbuildexecutetest</TargetName>
     <OutDir>output\debug_msbuild_vs2017\</OutDir>
-    <IntDir>build\debug_msbuild_vs2017\requireprebuildstep\</IntDir>
+    <IntDir>build\debug_msbuild_vs2017\postbuildexecutetest\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\debug_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
+    <OutputFile>output\debug_msbuild_vs2017\postbuildexecutetest.exe</OutputFile>
     <EmbedManifest>false</EmbedManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2017|x64'">
     <OutDir>output\release_fastbuild_noblob_vs2017\</OutDir>
-    <IntDir>build\release_fastbuild_noblob_vs2017\requireprebuildstep\</IntDir>
+    <IntDir>build\release_fastbuild_noblob_vs2017\postbuildexecutetest\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\release_fastbuild_noblob_vs2017\requireprebuildstep.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2017\postbuildexecutetest\*unity*.cpp" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2017\postbuildexecutetest\*.obj" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2017\postbuildexecutetest\*.a" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2017\postbuildexecutetest\*.lib" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\postbuildexecutetest.elf" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exp" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\postbuildexecutetest.ilk" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\postbuildexecutetest.lib" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2017\postbuildexecutetest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
+    <TargetFileName>postbuildexecutetest.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2017|x64'">
     <OutDir>output\release_fastbuild_vs2017\</OutDir>
-    <IntDir>build\release_fastbuild_vs2017\requireprebuildstep\</IntDir>
+    <IntDir>build\release_fastbuild_vs2017\postbuildexecutetest\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe RequirePreBuildStep_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe PostBuildExecuteTest_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean RequirePreBuildStep_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2017\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2017\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2017\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2017\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\requireprebuildstep.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\requireprebuildstep.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\requireprebuildstep.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\requireprebuildstep.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
-    <NMakeOutput>output\release_fastbuild_vs2017\requireprebuildstep.exe</NMakeOutput>
+$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean PostBuildExecuteTest_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2017\postbuildexecutetest\*unity*.cpp" >NUL 2>NUL
+del "build\release_fastbuild_vs2017\postbuildexecutetest\*.obj" >NUL 2>NUL
+del "build\release_fastbuild_vs2017\postbuildexecutetest\*.a" >NUL 2>NUL
+del "build\release_fastbuild_vs2017\postbuildexecutetest\*.lib" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\postbuildexecutetest.exe" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\postbuildexecutetest.elf" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\postbuildexecutetest.exp" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\postbuildexecutetest.ilk" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\postbuildexecutetest.lib" >NUL 2>NUL
+del "output\release_fastbuild_vs2017\postbuildexecutetest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_vs2017\postbuildexecutetest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
+    <TargetFileName>postbuildexecutetest.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
-    <TargetName>requireprebuildstep</TargetName>
+    <TargetName>postbuildexecutetest</TargetName>
     <OutDir>output\release_msbuild_vs2017\</OutDir>
-    <IntDir>build\release_msbuild_vs2017\requireprebuildstep\</IntDir>
+    <IntDir>build\release_msbuild_vs2017\postbuildexecutetest\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\release_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
+    <OutputFile>output\release_msbuild_vs2017\postbuildexecutetest.exe</OutputFile>
     <EmbedManifest>false</EmbedManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
@@ -201,7 +197,6 @@ del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>generated</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -242,16 +237,16 @@ del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>build\debug_msbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>build\debug_msbuild_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\debug_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
+      <OutputFile>output\debug_msbuild_vs2017\postbuildexecutetest.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ManifestFile>build\debug_msbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest</ManifestFile>
-      <ProgramDatabaseFile>output\debug_msbuild_vs2017\requireprebuildstep.pdb</ProgramDatabaseFile>
+      <ManifestFile>build\debug_msbuild_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\debug_msbuild_vs2017\postbuildexecutetest.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -276,7 +271,7 @@ del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\debug_msbuild_vs2017\requireprebuildstep.map</MapFileName>
+      <MapFileName>output\debug_msbuild_vs2017\postbuildexecutetest.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
@@ -285,7 +280,6 @@ del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
       <PreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>generated</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -327,16 +321,16 @@ del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>build\release_msbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>build\release_msbuild_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\release_msbuild_vs2017\requireprebuildstep.exe</OutputFile>
+      <OutputFile>output\release_msbuild_vs2017\postbuildexecutetest.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ManifestFile>build\release_msbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest</ManifestFile>
-      <ProgramDatabaseFile>output\release_msbuild_vs2017\requireprebuildstep.pdb</ProgramDatabaseFile>
+      <ManifestFile>build\release_msbuild_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\release_msbuild_vs2017\postbuildexecutetest.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -361,16 +355,16 @@ del "output\release_fastbuild_vs2017\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\release_msbuild_vs2017\requireprebuildstep.map</MapFileName>
+      <MapFileName>output\release_msbuild_vs2017\postbuildexecutetest.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\codebase\RequirePreBuildStep\main.cpp" />
+    <ClCompile Include="..\codebase\PostBuildExecuteTest\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="requireprebuildstep_vs2017_win64.bff" />
+    <None Include="postbuildexecutetest_vs2017_win64.bff" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

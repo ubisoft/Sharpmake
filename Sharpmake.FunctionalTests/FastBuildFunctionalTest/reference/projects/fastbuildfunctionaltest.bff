@@ -18,9 +18,9 @@
 //=================================================================================================================
 Exec( 'GenerateHeader' )
 {
-  .ExecExecutable       = '..\codebase\requireprebuildstep\execute.bat'
-  .ExecInput            = '..\codebase\requireprebuildstep\main.cpp'
-  .ExecOutput           = 'generated\header_generated_by_prebuild_step.h'
+  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\..\codebase\requireprebuildstep\execute.bat'
+  .ExecInput            = '.\$_CURRENT_BFF_DIR_$\..\codebase\requireprebuildstep\main.cpp'
+  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\generated\header_generated_by_prebuild_step.h'
   .ExecArguments        = 'echo #define PREBUILD_GENERATED_DEFINE() 0 > e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\generated\header_generated_by_prebuild_step.h'
 }
 
@@ -29,6 +29,10 @@ Exec( 'GenerateHeader' )
 // fastbuildfunctionaltest.bff .bff includes
 //=================================================================================================================
 #include ".\mixcppandcexe_vs2017_win64.bff"
+#include ".\postbuildcopydirtest_vs2017_win64.bff"
+#include ".\postbuildcopysinglefiletest_vs2017_win64.bff"
+#include ".\postbuildexecutetest_vs2017_win64.bff"
+#include ".\postbuildtestexecution_vs2017_win64.bff"
 #include ".\requireprebuildstep_vs2017_win64.bff"
 #include ".\spanmultiplesrcdirsfbunityexclude_vs2017_win64.bff"
 #include ".\spanmultiplesrcdirsfbunityinclude_vs2017_win64.bff"

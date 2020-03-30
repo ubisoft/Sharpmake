@@ -27,7 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1FD9F7AD-E2C9-15DE-D338-6161DCB22975}</ProjectGuid>
+    <ProjectGuid>{5A047CB1-D2C4-4765-6F6F-EDD60899737F}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>MixCppAndCExe</RootNamespace>
     <ProjectName>MixCppAndCExe</ProjectName>
@@ -239,7 +239,6 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ProgramDatabaseFileName>build\debug_msbuild_vs2017\mixcppandcexe\mixcppandcexe_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -273,7 +272,6 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\debug_msbuild_vs2017\mixcppandcexe.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
@@ -325,7 +323,6 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ProgramDatabaseFileName>build\release_msbuild_vs2017\mixcppandcexe\mixcppandcexe_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -359,7 +356,6 @@ del "output\release_fastbuild_vs2017\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <MapFileName>output\release_msbuild_vs2017\mixcppandcexe.map</MapFileName>
-      <BaseAddress></BaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

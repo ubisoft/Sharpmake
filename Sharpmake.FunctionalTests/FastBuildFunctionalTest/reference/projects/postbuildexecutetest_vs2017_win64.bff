@@ -1,17 +1,17 @@
 
 //=================================================================================================================
-// RequirePreBuildStep FASTBuild config file
+// PostBuildExecuteTest FASTBuild config file
 //=================================================================================================================
 #once
 
 
-Unity( 'RequirePreBuildStep_FastBuildUnitys_unity' )
+Unity( 'PostBuildExecuteTest_FastBuildUnitys_unity' )
 {
-    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\RequirePreBuildStep'
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildExecuteTest'
     .UnityInputIsolateWritableFiles     =  true
     .UnityInputIsolateWritableFilesLimit = 10
-    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\RequirePreBuildStep'
-    .UnityOutputPattern                 = 'requireprebuildstep_fastbuildunitys_unity*.cpp'
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\PostBuildExecuteTest'
+    .UnityOutputPattern                 = 'postbuildexecutetest_fastbuildunitys_unity*.cpp'
     .UnityNumFiles                      =  1
 }
 
@@ -20,15 +20,14 @@ Unity( 'RequirePreBuildStep_FastBuildUnitys_unity' )
 #if WIN64
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
+ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -64,7 +63,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -92,20 +91,18 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\RequirePreBuildStep\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildExecuteTest\main.cpp'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
+Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\'
+    .Libraries              = 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -137,12 +134,12 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -167,22 +164,33 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64' )
+Exec( 'Exec_postbuildexecutetest_exe_32D9274C' )
 {
-    .Targets = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
+  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuild_exec_sentinel.txt'
+  .ExecUseStdOutAsOutput = true
 }
 
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' )
+Alias( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Exec_postbuildexecutetest_exe_32D9274C'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -218,7 +226,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' 
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -247,20 +255,18 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' 
                             + ' $CompilerOptimizations$'
 
     .CompilerOutputPath       = '$Intermediate$'
-    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\RequirePreBuildStep\main.cpp'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildExecuteTest\main.cpp'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
+Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\'
+    .Libraries              = 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -292,12 +298,12 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executabl
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -322,22 +328,33 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executabl
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64' )
+Exec( 'Exec_postbuildexecutetest_exe_B1C1EB06' )
 {
-    .Targets = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
+  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuild_exec_sentinel.txt'
+  .ExecUseStdOutAsOutput = true
 }
 
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
+Alias( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Exec_postbuildexecutetest_exe_B1C1EB06'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -373,7 +390,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -400,21 +417,19 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
-    .CompilerInputUnity       = 'RequirePreBuildStep_FastBuildUnitys_unity'
+    .CompilerInputUnity       = 'PostBuildExecuteTest_FastBuildUnitys_unity'
     .CompilerOutputPath       = '$Intermediate$'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable' )
+Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\'
+    .Libraries              = 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -446,12 +461,12 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -476,22 +491,33 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64' )
+Exec( 'Exec_postbuildexecutetest_exe_F8EDE0EF' )
 {
-    .Targets = 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_Executable'
+  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.exe'
+  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuild_exec_sentinel.txt'
+  .ExecUseStdOutAsOutput = true
 }
 
 
 //=================================================================================================================
-ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
+Alias( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable',
+                   'Exec_postbuildexecutetest_exe_F8EDE0EF'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_objects' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
             + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
@@ -527,7 +553,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
             + ' /openmp-'
             // Output Files options
             // ---------------------------
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\requireprebuildstep_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest_compiler.pdb"'
             // Advanced options
             // ---------------------------
             + ' /Gd'
@@ -555,21 +581,19 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
-    .CompilerInputUnity       = 'RequirePreBuildStep_FastBuildUnitys_unity'
+    .CompilerInputUnity       = 'PostBuildExecuteTest_FastBuildUnitys_unity'
     .CompilerOutputPath       = '$Intermediate$'
 
-
-    .PreBuildDependencies = 'GenerateHeader'
 }
 
 
 //=================================================================================================================
-Executable( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable' )
+Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable' )
 {
      Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\'
-    .Libraries              = 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\requireprebuildstep.exe'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\'
+    .Libraries              = 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -601,12 +625,12 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable' )
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
-                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\requireprebuildstep\requireprebuildstep.intermediate.manifest"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\postbuildexecutetest\postbuildexecutetest.intermediate.manifest"'
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\requireprebuildstep.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\requireprebuildstep.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -631,9 +655,21 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Alias( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64' )
+Exec( 'Exec_postbuildexecutetest_exe_6EEA7B0B' )
 {
-    .Targets = 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_Executable'
+  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.exe'
+  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuild_exec_sentinel.txt'
+  .ExecUseStdOutAsOutput = true
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable',
+                   'Exec_postbuildexecutetest_exe_6EEA7B0B'
+               }
 }
 
 
