@@ -22,7 +22,6 @@ namespace Sharpmake
     /// </summary>
     public class MSBuildGlobalSettings
     {
-
         // cppPlatformFolders (pre-vs2019)
         private static readonly ConcurrentDictionary<Tuple<DevEnv, string>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, string>, string>();
 
@@ -121,7 +120,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static void SetAdditionalVCTargetsPath(DevEnv devEnv, string platform, string value)
         {
-            if (devEnv!= DevEnv.vs2019)
+            if (devEnv != DevEnv.vs2019)
                 throw new Error("Overriding AdditionalVCTargetsPath is not available before VS2019");
 
             var key = Tuple.Create(devEnv, platform);
@@ -168,6 +167,5 @@ namespace Sharpmake
                 return value;
             return null; // No override found
         }
-
     }
 }

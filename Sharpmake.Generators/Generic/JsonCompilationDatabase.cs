@@ -96,12 +96,12 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
                 if (format == CompileCommandFormat.Arguments)
                 {
-                   yield return new Dictionary<string, object>
-                   {
-                       { "directory", cc.Directory },
-                       { "arguments", cc.Arguments },
-                       { "file", cc.File },
-                   };
+                    yield return new Dictionary<string, object>
+                    {
+                        { "directory", cc.Directory },
+                        { "arguments", cc.Arguments },
+                        { "file", cc.File },
+                    };
                 }
                 else
                 {
@@ -308,7 +308,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             if (resourceDirs.Any())
             {
                 context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join(" ", resourceDirs);
-               _arguments.AddRange(resourceDirs);
+                _arguments.AddRange(resourceDirs);
             }
 
             // Fill using dirs

@@ -983,8 +983,8 @@ namespace Sharpmake.Generators.VisualStudio
             //shouldn't be a problem since you can't have 2 different target frameworks or ToolsVersion in the same projectFile
             ITarget target = configurations[0].Target;
             var targetFramework = target.GetFragment<DotNetFramework>();
-            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore || 
-                                            ( project.ProjectSchema == CSharpProjectSchema.Default && 
+            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore ||
+                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
                                               target.GetFragment<DotNetFramework>().IsDotNetCore()
                                             );
             string targetFrameworkString = null;
