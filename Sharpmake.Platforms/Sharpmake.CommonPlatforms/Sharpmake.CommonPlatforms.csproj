@@ -55,8 +55,8 @@
     <Compile Include="Android\AndroidPlatform.Vcxproj.Template.cs" />
     <Compile Include="Android\AndroidPlatform.cs" />
     <Compile Include="Apple\MacOsPlatform.cs" />
-    <Compile Include="BaseMicrosoftPlatform.cs" />
     <Compile Include="BaseMicrosoftPlatform.Vcxproj.Template.cs" />
+    <Compile Include="BaseMicrosoftPlatform.cs" />
     <Compile Include="BasePlatform.Vcxproj.Template.cs" />
     <Compile Include="BasePlatform.cs" />
     <Compile Include="DefaultPlatform.cs" />
