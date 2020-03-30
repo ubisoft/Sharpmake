@@ -71,6 +71,11 @@ namespace SharpmakeGen
 
                 conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
                 conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
+                conf.Options.Add(
+                    new Options.CSharp.WarningsNotAsErrors(
+                        618 // W1: CS0618: A class member was marked with the Obsolete attribute, such that a warning will be issued when the class member is referenced
+                    )
+                );
 
                 if (_generateXmlDoc)
                 {

@@ -31,6 +31,12 @@ namespace Sharpmake
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
 
+        [Obsolete("Implement IDebugProjectExtension instead to override sharpmake package version")]
+        public static string PackageVersion { get; set; }
+
+        [Obsolete("Implement IDebugProjectExtension instead to override sharpmake package version")]
+        public static string PackageName { get; set; }
+
         public interface IDebugProjectExtension
         {
             void AddSharpmakePackage(Project.Configuration config);
