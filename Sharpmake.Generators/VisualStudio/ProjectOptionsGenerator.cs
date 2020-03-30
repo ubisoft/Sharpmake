@@ -891,7 +891,7 @@ namespace Sharpmake.Generators.VisualStudio
             //    Enable                                ShowIncludes="true"                           /showIncludes
             context.SelectOption
             (
-            Options.Option(Options.Vc.Compiler.ShowIncludes.Disable, () => { context.Options["ShowIncludes"] = "false"; }),
+            Options.Option(Options.Vc.Compiler.ShowIncludes.Disable, () => { context.Options["ShowIncludes"] = FileGeneratorUtilities.RemoveLineTag; }),
             Options.Option(Options.Vc.Compiler.ShowIncludes.Enable, () => { context.Options["ShowIncludes"] = "true"; })
             );
 
