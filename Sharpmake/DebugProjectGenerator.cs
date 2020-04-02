@@ -106,8 +106,19 @@ namespace Sharpmake
         /// <param name="sources"></param>
         /// <param name="arguments"></param>
         /// <param name="startArguments"></param>
+        public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments)
+        {
+            GenerateDebugSolution(sources, arguments, startArguments, null);
+        }
+        
+        /// <summary>
+        /// Generates debug projects and solutions
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="arguments"></param>
+        /// <param name="startArguments"></param>
         /// <param name="defines"></param>
-        public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines = null)
+        public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
         {
             FindAllSources(sources, arguments, startArguments, defines);
             arguments.Generate<DebugSolution>();
