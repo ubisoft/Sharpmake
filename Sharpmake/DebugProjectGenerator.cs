@@ -107,7 +107,7 @@ namespace Sharpmake
         /// <param name="arguments"></param>
         /// <param name="startArguments"></param>
         /// <param name="defines"></param>
-        public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
+        public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines = null)
         {
             FindAllSources(sources, arguments, startArguments, defines);
             arguments.Generate<DebugSolution>();
@@ -198,7 +198,10 @@ namespace Sharpmake
                 project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, string.Empty, visited, defines));
             }
 
-            project.Defines.AddRange(defines);
+            if (defines != null)
+            {
+                project.Defines.AddRange(defines);
+            }
             
             visited[assemblyInfo.Id] = generatedProject;
 
