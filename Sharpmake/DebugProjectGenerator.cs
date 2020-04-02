@@ -106,9 +106,10 @@ namespace Sharpmake
         /// <param name="sources"></param>
         /// <param name="arguments"></param>
         /// <param name="startArguments"></param>
-        public static void GenerateDebugSolution(string[] sources, Sharpmake.Arguments arguments, string startArguments)
+        /// <param name="defines"></param>
+        public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
         {
-            FindAllSources(sources, arguments, startArguments);
+            FindAllSources(sources, arguments, startArguments, defines);
             arguments.Generate<DebugSolution>();
         }
 
@@ -122,13 +123,15 @@ namespace Sharpmake
             public readonly List<string> References = new List<string>();
             public readonly List<Type> ProjectReferences = new List<Type>();
 
+            public readonly List<string> Defines = new List<string>();
+            
             public bool IsSetupProject;
 
             public string StartArguments;
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
-        private static void FindAllSources(string[] sourcesArguments, Sharpmake.Arguments sharpmakeArguments, string startArguments)
+        private static void FindAllSources(string[] sourcesArguments, Sharpmake.Arguments sharpmakeArguments, string startArguments, string[] defines)
         {
             MainSources = sourcesArguments;
             RootPath = Path.GetDirectoryName(sourcesArguments[0]);
@@ -137,10 +140,10 @@ namespace Sharpmake
             assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
             IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 
-            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>());
+            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>(), defines);
         }
 
-        private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, string startArguments, IDictionary<string, Type> visited)
+        private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, string startArguments, IDictionary<string, Type> visited, string[] defines)
         {
             string displayName = assemblyInfo.DebugProjectName;
             if (string.IsNullOrEmpty(displayName))
@@ -192,9 +195,11 @@ namespace Sharpmake
 
             foreach (var refInfo in assemblyInfo.SourceReferences.Values)
             {
-                project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, string.Empty, visited));
+                project.ProjectReferences.Add(GenerateDebugProject(refInfo, false, string.Empty, visited, defines));
             }
 
+            project.Defines.AddRange(defines);
+            
             visited[assemblyInfo.Id] = generatedProject;
 
             return generatedProject;
@@ -319,6 +324,8 @@ namespace Sharpmake
 
             conf.Options.Add(Options.CSharp.LanguageVersion.CSharp5);
 
+            conf.Defines.Add(_projectInfo.Defines.ToArray());
+            
             foreach (var projectReference in _projectInfo.ProjectReferences)
             {
                 conf.AddPrivateDependency(target, projectReference);

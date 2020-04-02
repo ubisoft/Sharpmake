@@ -576,7 +576,7 @@ namespace Sharpmake.Application
                 // Generate debug solution
                 if (generateDebugSolution)
                 {
-                    DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments, parameters.DebugSolutionStartArguments);
+                    DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments, parameters.DebugSolutionStartArguments, parameters.Defines.ToArray());
                     builder.BuildProjectAndSolution();
                     return builder;
                 }
