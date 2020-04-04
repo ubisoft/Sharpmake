@@ -85,6 +85,11 @@ namespace Sharpmake
                     MoreWarnings,
                     Disable
                 }
+
+                public class MscVersion : StringOption
+                {
+                    public MscVersion(string option) : base(option) { }
+                }
             }
         }
     }

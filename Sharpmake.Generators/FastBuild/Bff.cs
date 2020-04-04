@@ -685,7 +685,22 @@ namespace Sharpmake.Generators.FastBuild
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->
                                         // TODO: figure out what version number to put there
                                         // maybe use the DevEnv value
-                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1910"; // -m$(PlatformArchitecture)
+                                        string mscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
+                                        if (string.IsNullOrEmpty(mscVer))
+                                        {
+                                            switch (context.DevelopmentEnvironment)
+                                            {
+                                                case DevEnv.vs2017:
+                                                    mscVer = "1910";
+                                                    break;
+                                                case DevEnv.vs2019:
+                                                    mscVer = "1920";
+                                                    break;
+                                                default:
+                                                    throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());
+                                            }
+                                        }
+                                        llvmClangCompilerOptions = string.Format("-m64 -fmsc-version={0}", mscVer); // -m$(PlatformArchitecture)
                                         fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
                                         break;
                                 }
