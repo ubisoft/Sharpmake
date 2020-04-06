@@ -87,7 +87,11 @@ namespace Sharpmake
                 }
                 else
                 {
-                    includeAbsolutePath = Util.GetCapitalizedPath(MatchIncludeInParentPath(includeFilename, sourceFilePath.DirectoryName, matchType));
+                    string matchIncludeInParentPath = MatchIncludeInParentPath(includeFilename, sourceFilePath.DirectoryName, matchType);
+                    if (matchIncludeInParentPath == null)
+                        throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found '{0}'[{1}]. Search started from '{2}'", includeFilename, matchType, sourceFilePath.DirectoryName);
+                    
+                    includeAbsolutePath = Util.GetCapitalizedPath(matchIncludeInParentPath);
                 }
 
                 if (!Util.FileExists(includeAbsolutePath))
