@@ -2842,7 +2842,7 @@ namespace Sharpmake
                                 }
 
                                 // If our no-output project is just a build-order dependency, update the build order accordingly
-                                if (!dependencyOutputLib && isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder)
+                                if (!dependencyOutputLib && isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder && !isExport)
                                     GenericBuildDependencies.Add(dependency);
                             }
                             break;
@@ -2908,7 +2908,7 @@ namespace Sharpmake
                                             resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
                                     }
                                     // If the dependency is not a .Net project, it need anyway to be compiled before this one, so we add it as post dependency in the solution
-                                    else if (isImmediate)
+                                    else if (isImmediate && !isExport)
                                     {
                                         GenericBuildDependencies.Add(dependency);
                                     }
