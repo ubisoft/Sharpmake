@@ -15,6 +15,9 @@ namespace SharpmakeGen
             Name = "Sharpmake.UnitTests";
 
             Services.Add("{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}"); // NUnit
+
+            // indicates where to find the nuget(s) we reference without needing nuget.config or global setting
+            CustomProperties.Add("RestoreAdditionalProjectSources", "https://api.nuget.org/v3/index.json");
         }
 
         public override void ConfigureAll(Configuration conf, Target target)

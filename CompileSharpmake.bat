@@ -41,7 +41,7 @@ goto end
 :BuildSharpmake
 echo Compiling %~1 in "%~2|%~3"...
 
-set MSBUILD_CMD=msbuild -t:build -restore "%~1" /nologo /verbosity:quiet /p:Configuration="%~2" /p:Platform="%~3" /p:RestoreConfigFile="nuget.config"
+set MSBUILD_CMD=msbuild -t:build -restore "%~1" /nologo /verbosity:quiet /p:Configuration="%~2" /p:Platform="%~3"
 echo %MSBUILD_CMD%
 %MSBUILD_CMD%
 if %errorlevel% NEQ 0 (
