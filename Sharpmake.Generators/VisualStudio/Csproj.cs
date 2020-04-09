@@ -1059,6 +1059,22 @@ namespace Sharpmake.Generators.VisualStudio
                 projectPropertyGuid = RemoveLineTag;
             }
 
+            string restoreProjectStyleString = RemoveLineTag;
+            if (project.ExplicitNugetRestoreProjectStyle != false && project.NuGetReferenceType != Project.NuGetPackageMode.VersionDefault)
+            {
+                switch (project.NuGetReferenceType)
+                {
+                    case Project.NuGetPackageMode.PackageReference:
+                        restoreProjectStyleString = "PackageReference";
+                        break;
+                    case Project.NuGetPackageMode.PackageConfig:
+                    case Project.NuGetPackageMode.ProjectJson:
+                        throw new Error($"Unsupported explicit NuGetReferenceType \"{project.NuGetReferenceType}\"");
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
             using (resolver.NewScopedParameter("project", project))
             using (resolver.NewScopedParameter("guid", projectPropertyGuid))
             using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
@@ -1072,6 +1088,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
+            using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }

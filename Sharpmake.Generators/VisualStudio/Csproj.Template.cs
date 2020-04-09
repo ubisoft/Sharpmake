@@ -101,6 +101,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
     <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <RestoreProjectStyle>[NugetRestoreProjectStyleString]</RestoreProjectStyle>
   </PropertyGroup>
 ";
 

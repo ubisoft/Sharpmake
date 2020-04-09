@@ -2174,6 +2174,11 @@ namespace Sharpmake
         public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
         public List<PublishFile> PublishFiles = new List<PublishFile>();
 
+        /// <summary>
+        /// If set to true. Will explicit the RestoreProjectStyle in the project file
+        /// </summary>
+        public bool ExplicitNugetRestoreProjectStyle = false;
+
         public bool IncludeResxAsResources = true;
         public string RootNamespace;
         public Platform? DefaultPlatform;
