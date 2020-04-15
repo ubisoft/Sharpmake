@@ -422,20 +422,46 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
-                string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
-                if (string.IsNullOrEmpty(platformFolder) || !ClangForWindows.Settings.OverridenLLVMInstallDir)
+                if (!ClangForWindows.Settings.OverridenLLVMInstallDir)
                     return;
+
+                if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                    throw new Error("Different vs versions not supported in the same vcxproj");
+
+                DevEnv uniqueDevEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
 
                 using (generator.Declare("platformName", SimplePlatformString))
                 {
                     generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
                     {
-                        if (!string.IsNullOrEmpty(platformFolder))
+                        switch (uniqueDevEnv)
                         {
-                            using (generator.Declare("platformFolder", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
-                                generator.Write(Vcxproj.Template.Project.PlatformFolderOverride);
-                        }
+                            case DevEnv.vs2017:
+                                {
+                                    string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
+                                    if (!string.IsNullOrEmpty(platformFolder))
+                                    {
+                                        using (generator.Declare("platformFolder", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
+                                            generator.Write(Vcxproj.Template.Project.PlatformFolderOverride);
+                                    }
+                                }
+                                break;
+                            case DevEnv.vs2019:
+                                {
+                                    // Note1: _PlatformFolder override is deprecated starting with vs2019, so we write AdditionalVCTargetsPath instead
+                                    // Note2: MSBuildGlobalSettings.SetCppPlatformFolder for vs2019 is no more the valid way to handle it. Older buildtools packages can anyway contain it, and need upgrade.
 
+                                    if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(uniqueDevEnv, Platform.win64)))
+                                        throw new Error("SetCppPlatformFolder is not supported by VS2019 correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
+                                    // vs2019 use AdditionalVCTargetsPath
+                                    string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(uniqueDevEnv, Platform.win64);
+                                    using (generator.Declare("additionalVCTargetsPath", Util.EnsureTrailingSeparator(additionalVCTargetsPath))) // the path shall end with a "\"
+                                        generator.Write(Vcxproj.Template.Project.AdditionalVCTargetsPath);
+                                }
+                                break;
+                            default:
+                                throw new Error(uniqueDevEnv + " is not supported.");
+                        }
                         ClangForWindows.WriteLLVMOverrides(context, generator);
                     }
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
