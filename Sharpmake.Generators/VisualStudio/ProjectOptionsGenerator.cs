@@ -1943,6 +1943,13 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.LLVM.UseLldLink.Enable, () => { context.Options["UseLldLink"] = "true"; }),
             Options.Option(Options.Vc.LLVM.UseLldLink.Disable, () => { context.Options["UseLldLink"] = "false"; })
             );
+
+            if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
+                Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
+            {
+                // This prevents clang-cl from auto-detecting the locally installed MSVC toolchain. Only paths on the command line will be considered.
+                context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
+            }
         }
 
         public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)

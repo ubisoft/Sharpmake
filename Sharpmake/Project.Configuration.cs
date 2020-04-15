@@ -776,6 +776,13 @@ namespace Sharpmake
             /// </summary>
             public OrderableStrings IncludePrivatePaths = new OrderableStrings();
 
+            /// <summary>
+            /// Gets a list of system include paths for compiling C and C++ projects. When possible, these paths are searched first when #include <> is used.
+            /// </summary>
+            public OrderableStrings IncludeSystemPaths = new OrderableStrings();
+
+            public OrderableStrings DependenciesIncludeSystemPaths { get; private set; } = new OrderableStrings();
+
             #region Resource Includes
             /// <summary>
             /// Include paths for resource compilation.
@@ -2801,6 +2808,7 @@ namespace Sharpmake
                         if (wantIncludePaths && dependencySetting.HasFlag(DependencySetting.IncludePaths))
                         {
                             DependenciesIncludePaths.AddRange(dependency.IncludePaths);
+                            DependenciesIncludeSystemPaths.AddRange(dependency.IncludeSystemPaths);
                             _dependenciesResourceIncludePaths.AddRange(dependency.ResourceIncludePaths);
 
                             // Is there a case where we want the defines but *not* the include paths?

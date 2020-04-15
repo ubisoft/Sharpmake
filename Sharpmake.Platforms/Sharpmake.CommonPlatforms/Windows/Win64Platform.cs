@@ -395,24 +395,29 @@ namespace Sharpmake
 
             protected override IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
             {
-                const string cmdLineIncludePrefix = "/I";
-                IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(context.DevelopmentEnvironment.GetWindowsIncludePath());
+                var includes = new List<IncludeWithPrefix>();
+                string includePrefix = "/I";
 
                 if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
-                    var includes = new List<IncludeWithPrefix>();
-
+                    includePrefix = "/clang:-isystem";
                     string clangIncludePath = ClangForWindows.GetWindowsClangIncludePath();
-                    includes.Add(new IncludeWithPrefix(cmdLineIncludePrefix, clangIncludePath));
-
-                    // when using clang-cl, mark MSVC includes, so they are properly recognized
-                    const string msvcCmdLineIncludePrefix = "/imsvc";
-                    includes.AddRange(msvcIncludePaths.Select(msvcIncludePath => new IncludeWithPrefix(msvcCmdLineIncludePrefix, msvcIncludePath)));
-
-                    return includes;
+                    includes.Add(new IncludeWithPrefix(includePrefix, clangIncludePath));
                 }
 
-                return msvcIncludePaths.Select(includePath => new IncludeWithPrefix(cmdLineIncludePrefix, includePath));
+                // when using clang-cl, mark MSVC includes, so they are properly recognized
+                IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(context.DevelopmentEnvironment.GetWindowsIncludePath());
+                includes.AddRange(msvcIncludePaths.Select(path => new IncludeWithPrefix(includePrefix, path)));
+
+                // Additional system includes
+                OrderableStrings SystemIncludes = new OrderableStrings(context.Configuration.DependenciesIncludeSystemPaths);
+                SystemIncludes.AddRange(context.Configuration.IncludeSystemPaths);
+                if (SystemIncludes.Count > 0)
+                {
+                    SystemIncludes.Sort();
+                    includes.AddRange(SystemIncludes.Select(path => new IncludeWithPrefix(includePrefix, path)));
+                }
+                return includes;
             }
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
