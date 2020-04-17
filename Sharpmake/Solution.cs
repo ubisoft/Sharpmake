@@ -486,7 +486,7 @@ namespace Sharpmake
             }
             else
             {
-                throw new InternalError("Cannot locate cs source for type: {}", GetType().FullName);
+                throw new InternalError("Cannot locate cs source for type: {0}", GetType().FullName);
             }
         }
 
