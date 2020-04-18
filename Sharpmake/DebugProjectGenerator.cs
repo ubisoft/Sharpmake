@@ -110,7 +110,7 @@ namespace Sharpmake
         {
             GenerateDebugSolution(sources, arguments, startArguments, null);
         }
-        
+
         /// <summary>
         /// Generates debug projects and solutions
         /// </summary>
@@ -135,7 +135,7 @@ namespace Sharpmake
             public readonly List<Type> ProjectReferences = new List<Type>();
 
             public readonly List<string> Defines = new List<string>();
-            
+
             public bool IsSetupProject;
 
             public string StartArguments;
@@ -213,7 +213,7 @@ namespace Sharpmake
             {
                 project.Defines.AddRange(defines);
             }
-            
+
             visited[assemblyInfo.Id] = generatedProject;
 
             return generatedProject;
@@ -339,7 +339,7 @@ namespace Sharpmake
             conf.Options.Add(Options.CSharp.LanguageVersion.CSharp5);
 
             conf.Defines.Add(_projectInfo.Defines.ToArray());
-            
+
             foreach (var projectReference in _projectInfo.ProjectReferences)
             {
                 conf.AddPrivateDependency(target, projectReference);
