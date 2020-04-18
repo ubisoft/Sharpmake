@@ -11,7 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.VisualStudio;
 
@@ -65,26 +68,7 @@ namespace Sharpmake
 
             public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
-                if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export)
-                {
-                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                        configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-
-                    // Clang and GCC have trouble finding "Additional Dependencies" through "Additional Library Directories" when compiling
-                    // for Android under VS. As a work around, we use rooted path for dependencies library files.
-                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetPath + "\\" + GetOutputFileNamePrefix(null, dependency.Output) + dependency.TargetFileFullName + "." + GetDefaultOutputExtension(dependency.Output), dependency.TargetFileOrderNumber);
-                }
-                else
-                {
-                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                        configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-
-                    // Clang and GCC have trouble finding "Additional Dependencies" through "Additional Library Directories" when compiling
-                    // for Android under VS. As a work around, we use rooted path for dependencies library files.
-                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetPath + "\\" + dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
-                }
+                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
             }
 
             public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
@@ -324,6 +308,13 @@ namespace Sharpmake
                     Options.Option(Options.Android.Linker.LibGroup.Enable, () => { options["LibsStartGroup"] = " -Wl,--start-group "; options["LibsEndGroup"] = " -Wl,--end-group "; }),
                     Options.Option(Options.Android.Linker.LibGroup.Disable, () => { options["LibsStartGroup"] = string.Empty; options["LibsEndGroup"] = string.Empty; })
                 );
+            }
+
+            public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
+            {
+                // the libs must be prefixed with -l: in the additional dependencies field in VS
+                var additionalDependencies = context.Options["AdditionalDependencies"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies.Select(d => "-l:" + d));
             }
 
             public override void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
