@@ -46,6 +46,12 @@ namespace Sharpmake
                 context.Options["TargetMachine"] = "MachineX86";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X86";
             }
+
+            public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
+            {
+                base.SelectPlatformAdditionalDependenciesOptions(context);
+                context.Options["AdditionalDependencies"] += ";%(AdditionalDependencies)";
+            }
             #endregion
         }
     }

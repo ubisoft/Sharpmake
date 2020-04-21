@@ -393,6 +393,12 @@ namespace Sharpmake
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
             }
 
+            public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
+            {
+                base.SelectPlatformAdditionalDependenciesOptions(context);
+                context.Options["AdditionalDependencies"] += ";%(AdditionalDependencies)";
+            }
+
             protected override IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
             {
                 var includes = new List<IncludeWithPrefix>();

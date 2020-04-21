@@ -115,7 +115,7 @@ namespace Sharpmake
       <CLRImageType>Default</CLRImageType>
       <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
       <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
-      <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>[options.AdditionalDependencies]</AdditionalDependencies>
       <SuppressStartupBanner>[options.SuppressStartupBanner]</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>[options.IgnoreAllDefaultLibraries]</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]</IgnoreSpecificDefaultLibraries>
@@ -156,7 +156,7 @@ namespace Sharpmake
       <TreatLibWarningAsErrors>[options.TreatLibWarningAsErrors]</TreatLibWarningAsErrors>
       <OutputFile>[options.OutputFile]</OutputFile>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
-      <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>[options.AdditionalDependencies]</AdditionalDependencies>
     </Lib>
 ";
 
