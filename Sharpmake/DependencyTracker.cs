@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Sharpmake
 {
-    public class DependencyTracker
+    internal class DependencyTracker
     {
         public static DependencyTracker Instance { get; private set; } = new DependencyTracker();
 
@@ -157,10 +157,10 @@ namespace Sharpmake
             return p.FindConfiguration(config);
         }
 
-        private TrackedConfiguration FindConfiguration(Type project, ITarget config)
+        private TrackedConfiguration FindConfiguration(Type project, ITarget target)
         {
             TrackedProject p = _projects[project.ToString()];
-            return p.FindConfiguration(config);
+            return p.FindConfiguration(target);
         }
 
         private delegate void ResetVisitDelegate();

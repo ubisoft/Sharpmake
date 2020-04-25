@@ -2698,7 +2698,7 @@ namespace Sharpmake
                 Trace.Assert(_linkState == LinkState.NotLinked);
                 _linkState = LinkState.Linking;
 
-                if (builder.DumpDependencyGraph)
+                if (builder.DumpDependencyGraph && !Project.IsFastBuildAll)
                 {
                     DependencyTracker.Instance.AddDependency(DependencyType.Public, Project, this, UnResolvedPublicDependencies, _dependenciesSetting);
                     DependencyTracker.Instance.AddDependency(DependencyType.Private, Project, this, UnResolvedPrivateDependencies, _dependenciesSetting);
