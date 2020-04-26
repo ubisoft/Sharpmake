@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
@@ -110,6 +109,35 @@ namespace Sharpmake
                 context.Options["RandomizedBaseAddress"] = "true";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
                 context.CommandLineOptions["RandomizedBaseAddress"] = "/DYNAMICBASE";
+            }
+
+            public override void SetupSdkOptions(IGenerationContext context)
+            {
+                //Copy Sources.
+                //    Enable                                  Copy Sources="Yes"
+                //    Disable                                 Copy Sources="No" default
+                context.SelectOption
+                (
+                    Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "Yes"; }),
+                    Sharpmake.Options.Option(Options.General.CopySources.Disable, () => { context.Options["CopySources"] = "No"; })
+                );
+
+                //Remote Tool.
+                context.SelectOption
+                (
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCppCompileToolExe"] = "g++"; }),
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteCppCompileToolExe"] = "clang++-3.8"; })
+                );
+                context.SelectOption
+                (
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCCompileToolExe"] = "g++"; }),
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteCCompileToolExe"] = "clang-3.8"; })
+                );
+                context.SelectOption
+                (
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteLdToolExe"] = "g++"; }),
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteLdToolExe"] = "clang-3.8"; })
+                );
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -261,6 +289,13 @@ namespace Sharpmake
                 Sharpmake.Options.Option(Options.Linker.UseThinArchives.Enable, () => { options["UseThinArchives"] = "true"; cmdLineOptions["UseThinArchives"] = "T"; }),
                 Sharpmake.Options.Option(Options.Linker.UseThinArchives.Disable, () => { options["UseThinArchives"] = "false"; cmdLineOptions["UseThinArchives"] = ""; })
                 );
+            }
+
+            public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
+            {
+                // the libs must be prefixed with -l: in the additional dependencies field in VS
+                var additionalDependencies = context.Options["AdditionalDependencies"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies.Select(d => "-l:" + d));
             }
 
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
