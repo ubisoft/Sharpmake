@@ -31,6 +31,11 @@ namespace Sharpmake
             All = Debug | Release
         }
 
+        /// <summary>
+        /// Used to hold an option that has a string value
+        /// A default value can be set by adding a `public static readonly string Default` field, ex:
+        ///     public static readonly string Default = "3.0";
+        /// </summary>
         public abstract class StringOption
         {
             public static string Get<T>(Project.Configuration conf)
@@ -39,7 +44,7 @@ namespace Sharpmake
                 var option = Options.GetObject<T>(conf);
                 if (option == null)
                 {
-                    var defaultValue = typeof(T).GetField("Default", BindingFlags.Static);
+                    var defaultValue = typeof(T).GetField("Default", BindingFlags.Public | BindingFlags.Static);
                     return defaultValue != null ? (defaultValue.GetValue(null) as string) : RemoveLineTag;
                 }
                 return option.Value;

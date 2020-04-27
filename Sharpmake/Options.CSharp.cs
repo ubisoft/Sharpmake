@@ -197,7 +197,6 @@ namespace Sharpmake
 
             public class ApplicationVersion : StringOption
             {
-                public static readonly string Default = "1.0.0.%2a";
                 public ApplicationVersion(string version) : base(version) { }
             }
 
