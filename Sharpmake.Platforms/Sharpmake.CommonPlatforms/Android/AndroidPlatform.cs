@@ -109,13 +109,11 @@ namespace Sharpmake
             {
                 generator.Write(_projectStartPlatformConditional);
 
-                string applicationTypeRevision = (context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2017 || context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2019) ? "3.0" : "2.0";
-
-                using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
-                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("antHome",     Options.GetOptionValue("antHome",     context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("javaHome",    Options.GetOptionValue("javaHome",    context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot",     Options.GetOptionValue("ndkRoot",     context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("applicationTypeRevision", Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("androidHome",             Options.GetOptionValue("androidHome",             context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("antHome",                 Options.GetOptionValue("antHome",                 context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("javaHome",                Options.GetOptionValue("javaHome",                context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("ndkRoot",                 Options.GetOptionValue("ndkRoot",                 context.ProjectConfigurationOptions.Values)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
@@ -220,6 +218,8 @@ namespace Sharpmake
                 options["antHome"]     = Options.PathOption.Get<Options.Android.General.AntHome>    (conf, GlobalSettings.AntHome     ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
                 options["javaHome"]    = Options.PathOption.Get<Options.Android.General.JavaHome>   (conf, GlobalSettings.JavaHome    ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
                 options["ndkRoot"]     = Options.PathOption.Get<Options.Android.General.NdkRoot>    (conf, GlobalSettings.NdkRoot     ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
+
+                options["applicationTypeRevision"] = Options.StringOption.Get<Options.Android.General.ApplicationTypeRevision>(conf);
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)

@@ -72,6 +72,18 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Application Type Revision
+                /// This must be a valid version string, of the form major.minor[.build[.revision]].
+                /// Examples: 1.0, 10.0.0.0
+                /// </summary>
+                public class ApplicationTypeRevision : StringOption
+                {
+                    public static readonly string Default = "3.0";
+                    public ApplicationTypeRevision(string revision)
+                        : base(revision) { }
+                }
+
+                /// <summary>
                 /// Verbosity of the tasks (vcxproj only)
                 /// At the time of this writing, this only control if on build env variables values are printed
                 /// </summary>
