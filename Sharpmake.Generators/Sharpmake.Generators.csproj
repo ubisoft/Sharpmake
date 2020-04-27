@@ -102,6 +102,9 @@
     <Compile Include="VisualStudio\UserFile.cs" />
     <Compile Include="VisualStudio\Vcxproj.Template.cs" />
     <Compile Include="VisualStudio\Vcxproj.cs" />
+    <Compile Include="VisualStudio\VsProjCommon.Template.cs" />
+    <Compile Include="VisualStudio\VsProjCommon.cs" />
+    <Compile Include="VisualStudio\VsUtil.cs" />
     <Compile Include="XmlFileGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

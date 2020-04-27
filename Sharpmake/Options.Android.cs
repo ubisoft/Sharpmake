@@ -14,27 +14,94 @@
 
 namespace Sharpmake
 {
-    using System;
-
     public static partial class Options
     {
-        public static class Android
+        public static class Android // TODO: move this to the CommonPlatforms module
         {
             public static class General
             {
+                /// <summary>
+                /// Android SDK path
+                /// If unset, will use Android.GlobalSettings.AndroidHome
+                /// </summary>
+                public class AndroidHome : PathOption
+                {
+                    public AndroidHome(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Android NDK path
+                /// If unset, will use Android.GlobalSettings.NdkRoot
+                /// </summary>
+                public class NdkRoot : PathOption
+                {
+                    public NdkRoot(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Java SE Development Kit path
+                /// If unset, will use Android.GlobalSettings.JavaHome
+                /// </summary>
+                public class JavaHome : PathOption
+                {
+                    public JavaHome(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Apache Ant path
+                /// If unset, will use Android.GlobalSettings.AntHome
+                /// </summary>
+                public class AntHome : PathOption
+                {
+                    public AntHome(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Path to the AndroidProj MSBuild files
+                /// Expected to contain the files found in MSBuild\Microsoft\MDD\Android\V150
+                /// If unset, line won't be written
+                /// </summary>
+                public class AndroidTargetsPath : PathOption
+                {
+                    public AndroidTargetsPath(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Verbosity of the tasks (vcxproj only)
+                /// At the time of this writing, this only control if on build env variables values are printed
+                /// </summary>
+                public enum ShowAndroidPathsVerbosity
+                {
+                    High,
+                    Normal,
+                    [Default]
+                    Low
+                }
+
                 public enum AndroidAPILevel
                 {
                     [Default]
                     Default,
-                    Android19,
-                    Android21,
-                    Android22,
-                    Android23,
-                    Android24,
-                    Android25,
-                    Android26,
-                    Android27,
-                    Android28,
+                    Android16, // Jelly Bean 4.1.x
+                    Android17, // Jelly Bean 4.2.x
+                    Android18, // Jelly Bean 4.3.x
+                    Android19, // KitKat 4.4 - 4.4.4
+                    Android20, // Does it really exist?
+                    Android21, // Lollipop 5.0 - 5.0.2
+                    Android22, // Lollipop 5.1
+                    Android23, // Marshmallow 6.0
+                    Android24, // Nougat 7.0
+                    Android25, // Nougat 7.1
+                    Android26, // Oreo 8.0.0
+                    Android27, // Oreo 8.1.0
+                    Android28, // Pie 9.0
+                    Android29, // Android 10
+                    Android30, // Android 11
                 }
 
                 public enum PlatformToolset

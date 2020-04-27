@@ -24,9 +24,8 @@ namespace Sharpmake.Generators
         string ProjectDirectory { get; }
         DevEnv DevelopmentEnvironment { get; }
 
-        // The setter on those two should not be there.
-        Options.ExplicitOptions Options { get; set; }
-        IDictionary<string, string> CommandLineOptions { get; set; }
+        Options.ExplicitOptions Options { get; }
+        IDictionary<string, string> CommandLineOptions { get; }
 
         string ProjectDirectoryCapitalized { get; }
         string ProjectSourceCapitalized { get; }

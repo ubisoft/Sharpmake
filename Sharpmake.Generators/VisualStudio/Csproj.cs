@@ -1399,6 +1399,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
+        // TODO: remove this and use Sharpmake.Generators.VisualStudio.VsProjCommon.WriteCustomProperties instead
         private static void WriteCustomProperties(Dictionary<string, string> customProperties, Project project, StreamWriter writer, Resolver resolver)
         {
             if (customProperties.Any())

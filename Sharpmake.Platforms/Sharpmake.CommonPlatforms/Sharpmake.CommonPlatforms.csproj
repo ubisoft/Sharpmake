@@ -56,6 +56,7 @@
     <Compile Include="Android\AndroidBuildTargets.cs" />
     <Compile Include="Android\AndroidPlatform.Vcxproj.Template.cs" />
     <Compile Include="Android\AndroidPlatform.cs" />
+    <Compile Include="Android\GlobalSettings.cs" />
     <Compile Include="Apple\MacOsPlatform.cs" />
     <Compile Include="BaseMicrosoftPlatform.Vcxproj.Template.cs" />
     <Compile Include="BaseMicrosoftPlatform.cs" />

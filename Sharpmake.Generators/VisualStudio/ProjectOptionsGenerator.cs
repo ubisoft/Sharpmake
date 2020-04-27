@@ -112,8 +112,6 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateGeneralOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            DevEnv visualVersion = context.Configuration.Target.GetFragment<DevEnv>();
-
             // Default defines, includes, libraries...
             context.Options.ExplicitDefines.AddRange(optionsContext.PlatformVcxproj.GetImplicitlyDefinedSymbols(context));
 

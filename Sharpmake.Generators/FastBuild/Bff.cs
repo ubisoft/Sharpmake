@@ -836,7 +836,7 @@ namespace Sharpmake.Generators.FastBuild
                             List<string> fastbuildEmbeddedResourceFilesList = new List<string>();
 
                             var sourceFiles = confSubConfigs[tuple];
-                            foreach (Vcxproj.ProjectFile sourceFile in sourceFiles)
+                            foreach (var sourceFile in sourceFiles)
                             {
                                 string sourceFileName = CurrentBffPathKeyCombine(sourceFile.FileNameProjectRelative);
 
@@ -1850,17 +1850,17 @@ namespace Sharpmake.Generators.FastBuild
             filesInNonDefaultSections = new List<Vcxproj.ProjectFile>();
 
             // Add source files
-            List<Vcxproj.ProjectFile> allFiles = new List<Vcxproj.ProjectFile>();
+            var allFiles = new List<Vcxproj.ProjectFile>();
             Strings projectFiles = context.Project.GetSourceFilesForConfigurations(configurations);
             foreach (string file in projectFiles)
             {
-                Vcxproj.ProjectFile projectFile = new Vcxproj.ProjectFile(context, file);
+                var projectFile = new Vcxproj.ProjectFile(context, file);
                 allFiles.Add(projectFile);
             }
             allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCulture));
 
-            List<Vcxproj.ProjectFile> sourceFiles = new List<Vcxproj.ProjectFile>();
-            foreach (Vcxproj.ProjectFile projectFile in allFiles)
+            var sourceFiles = new List<Vcxproj.ProjectFile>();
+            foreach (var projectFile in allFiles)
             {
                 if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
                     (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
@@ -1868,7 +1868,7 @@ namespace Sharpmake.Generators.FastBuild
                     sourceFiles.Add(projectFile);
             }
 
-            foreach (Vcxproj.ProjectFile file in sourceFiles)
+            foreach (var file in sourceFiles)
             {
                 foreach (Project.Configuration conf in configurations)
                 {

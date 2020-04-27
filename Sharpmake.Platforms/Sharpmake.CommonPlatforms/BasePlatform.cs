@@ -327,6 +327,10 @@ namespace Sharpmake
                 WriteWindowsKitsOverrides(context, generator);
         }
 
+        public virtual void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+        }
+
         public virtual void GenerateProjectConfigurationGeneral(IVcxprojGenerationContext context, IFileGenerator generator)
         {
             generator.Write(_projectConfigurationsGeneral);
