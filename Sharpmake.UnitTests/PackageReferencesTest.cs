@@ -106,7 +106,6 @@ namespace Sharpmake.UnitTests
         {
             public PrivateInheritedPackageReferencesProject() { }
 
-            [Configure()]
             public override void ConfigureAll(Configuration conf, Target target)
             {
                 base.ConfigureAll(conf, target);
@@ -120,7 +119,6 @@ namespace Sharpmake.UnitTests
         {
             public PublicInheritedPackageReferencesProject() { }
 
-            [Configure()]
             public override void ConfigureAll(Configuration conf, Target target)
             {
                 base.ConfigureAll(conf, target);
