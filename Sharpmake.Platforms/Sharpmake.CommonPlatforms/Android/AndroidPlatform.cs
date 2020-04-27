@@ -115,7 +115,7 @@ namespace Sharpmake
                 using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
                 using (generator.Declare("antHome",     Options.GetOptionValue("antHome",     context.ProjectConfigurationOptions.Values)))
                 using (generator.Declare("javaHome",    Options.GetOptionValue("javaHome",    context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot",     Options.GetOptionValue("javaHome",    context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("ndkRoot",     Options.GetOptionValue("ndkRoot",     context.ProjectConfigurationOptions.Values)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
