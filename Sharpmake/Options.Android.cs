@@ -121,11 +121,13 @@ namespace Sharpmake
                     [Default]
                     Default,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    Clang_3_8,
+                    Clang_3_6, // needs ApplicationTypeRevision 1.0
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    Clang_5_0,
+                    Clang_3_8, // needs ApplicationTypeRevision 2.0 or 3.0
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    Gcc_4_9
+                    Clang_5_0, // needs ApplicationTypeRevision 3.0
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    Gcc_4_9 // needs ApplicationTypeRevision 1.0 or 2.0 or 3.0
                 }
 
                 // This is applicable for arm architecture only

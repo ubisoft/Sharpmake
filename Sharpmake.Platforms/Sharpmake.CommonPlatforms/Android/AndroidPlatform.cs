@@ -261,6 +261,7 @@ namespace Sharpmake
                 context.SelectOption
                 (
                 Options.Option(Options.Android.General.PlatformToolset.Default, () => { options["PlatformToolset"] = RemoveLineTag; }),
+                Options.Option(Options.Android.General.PlatformToolset.Clang_3_6, () => { options["PlatformToolset"] = "Clang_3_6"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Clang_3_8, () => { options["PlatformToolset"] = "Clang_3_8"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Clang_5_0, () => { options["PlatformToolset"] = "Clang_5_0"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Gcc_4_9, () => { options["PlatformToolset"] = "Gcc_4_9"; })
