@@ -30,6 +30,10 @@ namespace Sharpmake
     <VS_NdkRoot>[ndkRoot]</VS_NdkRoot>
 ";
 
+            private const string _projectPlatformDefaultPropsPath =
+                @"    <_PlatformDefaultPropsPath>$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Platforms\$(Platform)\Platform.Default.props</_PlatformDefaultPropsPath>
+";
+
             private const string _projectImportAppTypeProps =
                 @"  <Import Project=""$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\Default.props"" />
   <Import Project=""$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Default.props"" />
@@ -38,6 +42,7 @@ namespace Sharpmake
             // Workaround for app type props not overridable Microsoft.Cpp.Default.props
             private const string _postImportAppTypeProps =
                 @"  <PropertyGroup>
+    <_PlatformFolder>[platformFolderOverride]</_PlatformFolder>
     <_ApplicationTypeDefaultPropsFound>true</_ApplicationTypeDefaultPropsFound>
     <_ApplicationTypeRevisionDefaultPropsFound>true</_ApplicationTypeRevisionDefaultPropsFound>
   </PropertyGroup>
