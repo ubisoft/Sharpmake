@@ -89,9 +89,10 @@ namespace Sharpmake
                 /// </summary>
                 public enum ShowAndroidPathsVerbosity
                 {
+                    [Default]
+                    Default,
                     High,
                     Normal,
-                    [Default]
                     Low
                 }
 
