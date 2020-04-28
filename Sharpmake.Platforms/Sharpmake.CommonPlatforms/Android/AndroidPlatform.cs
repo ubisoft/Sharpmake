@@ -157,7 +157,6 @@ namespace Sharpmake
                 generator.Write(Vcxproj.Template.Project.ProjectDescriptionEnd);
             }
 
-            private bool _importAppTypesOverrides = false;
             public override void GenerateProjectPlatformSdkDirectoryDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
                 base.GenerateProjectPlatformSdkDirectoryDescription(context, generator);
@@ -168,10 +167,7 @@ namespace Sharpmake
                 {
                     string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
                     if (!string.IsNullOrEmpty(additionalVCTargetsPath))
-                    {
-                        _importAppTypesOverrides = true;
                         generator.WriteVerbatim(_projectImportAppTypeProps);
-                    }
                 }
             }
 
@@ -179,8 +175,13 @@ namespace Sharpmake
             {
                 base.GeneratePostDefaultPropsImport(context, generator);
 
-                if (_importAppTypesOverrides)
-                    generator.WriteVerbatim(_postImportAppTypeProps);
+                // in case we've set an additional vc targets path, import the props from there instead
+                var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
+                if (context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2019)
+                {
+                    if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform)))
+                        generator.WriteVerbatim(_postImportAppTypeProps);
+                }
             }
 
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
