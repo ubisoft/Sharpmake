@@ -162,9 +162,10 @@ namespace Sharpmake
         /// <param name="dictionaries">The list of dictionaries to look into.</param>
         /// <param name="fallback">Optional: Fallback value to return in case none of the dictionaries have the key.</param>
         /// <returns></returns>
-        public static string GetOptionValue(string key, IEnumerable<IReadOnlyDictionary<string,string>> dictionaries, string fallback = RemoveLineTag)
+        public static string GetOptionValue(string key, IEnumerable<IReadOnlyDictionary<string, string>> dictionaries, string fallback = RemoveLineTag)
         {
-            var values = dictionaries.Select(dict => {
+            var values = dictionaries.Select(dict =>
+            {
                 string value;
                 return dict.TryGetValue(key, out value) ? value : fallback;
             }).Distinct().ToList();
