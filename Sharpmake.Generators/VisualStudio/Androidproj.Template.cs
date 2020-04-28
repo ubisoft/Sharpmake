@@ -65,6 +65,7 @@ namespace Sharpmake.Generators.VisualStudio
     <OutDir>$(ProjectDir)[options.OutputDirectory]\</OutDir>
     <IntDir>[options.IntermediateDirectory]\</IntDir>
     <TargetName>[options.OutputFile]</TargetName>
+    <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
   </PropertyGroup>
 ";
 
