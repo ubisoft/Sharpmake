@@ -109,14 +109,8 @@ namespace Sharpmake
             {
                 generator.Write(_projectStartPlatformConditional);
 
-                using (generator.Declare("applicationTypeRevision", Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("antHome", Options.GetOptionValue("antHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
-                {
-                    generator.Write(_projectDescriptionPlatformSpecific);
-                }
+                string applicationType = "Android";
+                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values);
 
                 string msBuildPathOverrides = string.Empty;
 
@@ -129,8 +123,8 @@ namespace Sharpmake
                         case DevEnv.vs2017:
                         case DevEnv.vs2019:
                             {
-                                // _PlatformFolder override is not enough for android, we need to write AdditionalVCTargetsPath instead
-                                // Note that AdditionalVCTargetsPath is not officially supported by vs2017, but we use it for convenience and consistency
+                                // _PlatformFolder override is not enough for android, we need to know the AdditionalVCTargetsPath
+                                // Note that AdditionalVCTargetsPath is not officially supported by vs2017, but we use the variable anyway for convenience and consistency
                                 if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, SharpmakePlatform)))
                                     throw new Error("SetCppPlatformFolder is not supported by AndroidPlatform correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
 
@@ -143,11 +137,30 @@ namespace Sharpmake
                                     // with vs2017, we need to set the _PlatformDefaultPropsPath property
                                     // otherwise the Microsoft.Cpp.Default.props won't be able to find the default platform props correctly
                                     if (devEnv == DevEnv.vs2017)
-                                        msBuildPathOverrides += _projectPlatformDefaultPropsPath;
+                                    {
+                                        using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
+                                            msBuildPathOverrides += generator.Resolver.Resolve(_projectPlatformDefaultPropsPath);
+
+                                        // application type and revisions need to be cleared otherwise
+                                        // the inclusion of the cpp default props will use the files from
+                                        // the local vs installation and not the redirected one..
+                                        applicationType = RemoveLineTag;
+                                        applicationTypeRevision = RemoveLineTag;
+                                    }
                                 }
                             }
                             break;
                     }
+                }
+
+                using (generator.Declare("applicationType", applicationType))
+                using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
+                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("antHome", Options.GetOptionValue("antHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
+                {
+                    generator.Write(_projectDescriptionPlatformSpecific);
                 }
 
                 if (!string.IsNullOrEmpty(msBuildPathOverrides))
@@ -166,14 +179,11 @@ namespace Sharpmake
                 base.GenerateProjectPlatformSdkDirectoryDescription(context, generator);
 
                 var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
-                if (devEnv == DevEnv.vs2017 || devEnv == DevEnv.vs2019)
+                if (devEnv == DevEnv.vs2019)
                 {
                     string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
                     if (!string.IsNullOrEmpty(additionalVCTargetsPath))
-                    {
-                        // in case we've written an additional vc targets path, we need to set a couple of properties to avoid a warning
                         generator.WriteVerbatim(_projectImportAppTypeProps);
-                    }
                 }
             }
 
@@ -181,21 +191,12 @@ namespace Sharpmake
             {
                 base.GeneratePostDefaultPropsImport(context, generator);
 
-                // in case we've set an additional vc targets path, we need to do some cleanups
                 var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
                 if (devEnv == DevEnv.vs2017 || devEnv == DevEnv.vs2019)
                 {
+                    // in case we've written an additional vc targets path, we need to set a couple of properties to avoid a warning
                     if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform)))
-                    {
-                        // with vs2017, we also need to set the _PlatformFolder correctly since it won't have
-                        // the correct value after the Microsoft.Cpp.Default.props import
-                        string platformFolderOverride = RemoveLineTag;
-                        if (devEnv == DevEnv.vs2017)
-                            platformFolderOverride = @"$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Platforms\$(Platform)\";
-
-                        using (generator.Declare("platformFolderOverride", platformFolderOverride))
-                            generator.Write(_postImportAppTypeProps);
-                    }
+                        generator.WriteVerbatim(_postImportAppTypeProps);
                 }
             }
 

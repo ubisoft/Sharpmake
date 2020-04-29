@@ -22,7 +22,7 @@ namespace Sharpmake
 ";
 
             private const string _projectDescriptionPlatformSpecific =
-@"    <ApplicationType>Android</ApplicationType>
+@"    <ApplicationType>[applicationType]</ApplicationType>
     <ApplicationTypeRevision>[applicationTypeRevision]</ApplicationTypeRevision>
     <VS_AndroidHome>[androidHome]</VS_AndroidHome>
     <VS_AntHome>[antHome]</VS_AntHome>
@@ -31,7 +31,9 @@ namespace Sharpmake
 ";
 
             private const string _projectPlatformDefaultPropsPath =
-                @"    <_PlatformDefaultPropsPath>$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Platforms\$(Platform)\Platform.Default.props</_PlatformDefaultPropsPath>
+                @"    <_PlatformFolder>$(AdditionalVCTargetsPath)Application Type\Android\[applicationTypeRevision]\Platforms\$(Platform)\</_PlatformFolder>
+    <_ApplicationTypeDefaultPropsPath>$(AdditionalVCTargetsPath)Application Type\Android\Default.props</_ApplicationTypeDefaultPropsPath>
+    <_ApplicationTypeRevisionDefaultPropsPath>$(AdditionalVCTargetsPath)Application Type\Android\[applicationTypeRevision]\Default.props</_ApplicationTypeRevisionDefaultPropsPath>
 ";
 
             private const string _projectImportAppTypeProps =
@@ -42,7 +44,6 @@ namespace Sharpmake
             // Workaround for app type props not overridable Microsoft.Cpp.Default.props
             private const string _postImportAppTypeProps =
                 @"  <PropertyGroup>
-    <_PlatformFolder>[platformFolderOverride]</_PlatformFolder>
     <_ApplicationTypeDefaultPropsFound>true</_ApplicationTypeDefaultPropsFound>
     <_ApplicationTypeRevisionDefaultPropsFound>true</_ApplicationTypeRevisionDefaultPropsFound>
   </PropertyGroup>
