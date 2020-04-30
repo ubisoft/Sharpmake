@@ -144,7 +144,6 @@ namespace Sharpmake
 
                 public enum UseOfStl
                 {
-                    [Default]
                     Default,
                     System,
                     GAbiPP_Static,
@@ -154,6 +153,7 @@ namespace Sharpmake
                     GnuStl_Static,
                     GnuStl_Shared,
                     LibCpp_Static,
+                    [Default]
                     LibCpp_Shared
                 }
 
