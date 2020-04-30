@@ -100,6 +100,7 @@ namespace Sharpmake
                 {
                     [Default]
                     Default,
+                    Latest, // sharpmake will try and auto-detect the latest installed, or fallback to default: note that the SDK/NDK paths are needed
                     Android16, // Jelly Bean 4.1.x
                     Android17, // Jelly Bean 4.2.x
                     Android18, // Jelly Bean 4.3.x

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.VisualStudio;
@@ -131,7 +132,7 @@ namespace Sharpmake
                                 string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
                                 if (!string.IsNullOrEmpty(additionalVCTargetsPath))
                                 {
-                                    using (generator.Declare("additionalVCTargetsPath", Util.EnsureTrailingSeparator(additionalVCTargetsPath)))
+                                    using (generator.Declare("additionalVCTargetsPath", Sharpmake.Util.EnsureTrailingSeparator(additionalVCTargetsPath)))
                                         msBuildPathOverrides += generator.Resolver.Resolve(Vcxproj.Template.Project.AdditionalVCTargetsPath);
 
                                     // with vs2017, we need to set the _PlatformDefaultPropsPath property
@@ -257,6 +258,28 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
+                Options.Option(Options.Android.General.AndroidAPILevel.Latest, () => {
+                    string lookupDirectory;
+                    if (context.Project is AndroidPackageProject)
+                    {
+                        // for the packaging projects, we look in the SDK
+                        lookupDirectory = options["androidHome"];
+                    }
+                    else
+                    {
+                        // otherwise, look in the NDK
+                        lookupDirectory = options["ndkRoot"];
+                    }
+
+                    string androidApiLevel = RemoveLineTag;
+                    if (lookupDirectory != RemoveLineTag)
+                    {
+                        string latestApiLevel = Util.FindLatestApiLevelInDirectory(Path.Combine(lookupDirectory, "platforms"));
+                        if (!string.IsNullOrEmpty(latestApiLevel))
+                            androidApiLevel = latestApiLevel;
+                    }
+                    options["AndroidAPILevel"] = androidApiLevel;
+                }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Default, () => { options["AndroidAPILevel"] = RemoveLineTag; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android16, () => { options["AndroidAPILevel"] = "android-16"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android17, () => { options["AndroidAPILevel"] = "android-17"; }),
