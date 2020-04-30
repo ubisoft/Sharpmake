@@ -1221,7 +1221,7 @@ namespace Sharpmake.Generators.VisualStudio
         }
 
         private void GenerateFilesSection(
-            IVcxprojGenerationContext context,
+            GenerationContext context,
             IFileGenerator fileGenerator,
             IList<string> generatedFiles,
             IList<string> skipFiles
@@ -1513,9 +1513,12 @@ namespace Sharpmake.Generators.VisualStudio
                         for (int i = 0; i < context.ProjectConfigurations.Count; ++i)
                         {
                             Project.Configuration conf = context.ProjectConfigurations[i];
+                            context.Configuration = conf;
+                            var platformVcxproj = context.PresentPlatforms[conf.Platform];
+
                             var compiledFiles = configurationCompiledFiles[i];
 
-                            bool hasPrecomp = !string.IsNullOrEmpty(conf.PrecompSource) && !string.IsNullOrEmpty(conf.PrecompHeader);
+                            bool hasPrecomp = platformVcxproj.HasPrecomp(context);
                             bool isPrecompSource = !string.IsNullOrEmpty(conf.PrecompSource) && file.FileName.EndsWith(conf.PrecompSource, StringComparison.OrdinalIgnoreCase);
                             bool isDontUsePrecomp = conf.PrecompSourceExclude.Contains(file.FileName) ||
                                                     conf.PrecompSourceExcludeFolders.Any(folder => file.FileName.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) ||
@@ -1534,7 +1537,6 @@ namespace Sharpmake.Generators.VisualStudio
                             bool objsInSubdirectories = conf.ObjectFileName != null && !isResource;
                             bool isExcludeFromGenerateXmlDocumentation = conf.ResolvedSourceFilesGenerateXmlDocumentationExclude.Contains(file.FileName);
 
-                            var platformVcxproj = context.PresentPlatforms[conf.Platform];
                             if (isPrecompSource && platformVcxproj.ExcludesPrecompiledHeadersFromBuild)
                                 isExcludeFromBuild = true;
                             if (!isExcludeFromBuild && !isResource)
@@ -1542,7 +1544,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                             if (isCompileAsCLRFile || consumeWinRTExtensions || excludeWinRTExtensions)
                                 isDontUsePrecomp = true;
-                            if (String.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
+                            if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
                                 isDontUsePrecomp = true;
 
                             string exceptionSetting = null;

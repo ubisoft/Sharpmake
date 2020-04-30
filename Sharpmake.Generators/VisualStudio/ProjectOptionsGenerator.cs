@@ -1137,7 +1137,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectPrecompiledHeaderOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            if (string.IsNullOrEmpty(context.Configuration.PrecompHeader) || string.IsNullOrEmpty(context.Configuration.PrecompSource))
+            if (!optionsContext.PlatformVcxproj.HasPrecomp(context))
             {
                 context.Options["UsePrecompiledHeader"] = "NotUsing";
                 context.Options["PrecompiledHeaderThrough"] = FileGeneratorUtilities.RemoveLineTag;

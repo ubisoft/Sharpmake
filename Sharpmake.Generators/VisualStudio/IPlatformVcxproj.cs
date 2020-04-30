@@ -71,6 +71,8 @@ namespace Sharpmake.Generators.VisualStudio
         void SelectApplicationFormatOptions(IGenerationContext context);
         void SelectBuildType(IGenerationContext context);
 
+        bool HasPrecomp(IGenerationContext context);
+
         void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateMakefileConfigurationVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);

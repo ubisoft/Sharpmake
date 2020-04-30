@@ -201,6 +201,12 @@ namespace Sharpmake
         {
         }
 
+        public virtual bool HasPrecomp(IGenerationContext context)
+        {
+            Project.Configuration conf = context.Configuration;
+            return !string.IsNullOrEmpty(conf.PrecompSource) && !string.IsNullOrEmpty(conf.PrecompHeader);
+        }
+
         public virtual void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
         }

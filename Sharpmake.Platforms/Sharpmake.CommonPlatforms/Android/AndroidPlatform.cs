@@ -507,6 +507,11 @@ namespace Sharpmake
                 return dirs;
             }
 
+            public override bool HasPrecomp(IGenerationContext context)
+            {
+                return !string.IsNullOrEmpty(context.Configuration.PrecompHeader);
+            }
+
             #endregion // IPlatformVcxproj implementation
         }
     }
