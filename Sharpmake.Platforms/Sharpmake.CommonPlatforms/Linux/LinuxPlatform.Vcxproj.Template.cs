@@ -76,6 +76,7 @@ namespace Sharpmake
           <EditAndContinue>[options.EditAndContinue]</EditAndContinue>
           <InfoStripping>[options.InfoStripping]</InfoStripping>
           <DataStripping>[options.DataStripping]</DataStripping>
+          <WholeArchiveBegin>[options.WholeArchive]</WholeArchiveBegin>
           <DuplicateStripping>[options.DuplicateStripping]</DuplicateStripping>
           <Addressing>[options.Addressing]</Addressing>
         </Link>
