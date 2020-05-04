@@ -2166,6 +2166,11 @@ namespace Sharpmake
 
             public Strings PRIFilesExtensions = new Strings();
 
+            /// <summary>
+            /// Generate relative paths in places where it would be otherwise beneficial to use absolute paths.
+            /// </summary>
+            public bool PreferRelativePaths = true;
+
             internal override void Construct(object owner, ITarget target)
             {
                 base.Construct(owner, target);
