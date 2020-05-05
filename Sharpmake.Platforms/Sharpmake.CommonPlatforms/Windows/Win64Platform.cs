@@ -459,10 +459,14 @@ namespace Sharpmake
 
                                     if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(uniqueDevEnv, Platform.win64)))
                                         throw new Error("SetCppPlatformFolder is not supported by VS2019 correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
+
                                     // vs2019 use AdditionalVCTargetsPath
                                     string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(uniqueDevEnv, Platform.win64);
-                                    using (generator.Declare("additionalVCTargetsPath", Util.EnsureTrailingSeparator(additionalVCTargetsPath))) // the path shall end with a "\"
-                                        generator.Write(Vcxproj.Template.Project.AdditionalVCTargetsPath);
+                                    if (!string.IsNullOrEmpty(additionalVCTargetsPath))
+                                    {
+                                        using (generator.Declare("additionalVCTargetsPath", Util.EnsureTrailingSeparator(additionalVCTargetsPath))) // the path shall end with a "\"
+                                            generator.Write(Vcxproj.Template.Project.AdditionalVCTargetsPath);
+                                    }
                                 }
                                 break;
                             default:
