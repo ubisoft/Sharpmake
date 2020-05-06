@@ -19,11 +19,11 @@ namespace Sharpmake
         [PlatformImplementation(SharpmakePlatform,
             typeof(IPlatformDescriptor),
             typeof(Project.Configuration.IConfigurationTasks))]
-        public sealed class MacOsPlatform : BaseApplePlatform
+        public sealed class iOsPlatform : BaseApplePlatform
         {
-            public const Platform SharpmakePlatform = Platform.mac;
+            public const Platform SharpmakePlatform = Platform.ios;
 
-            public override string SimplePlatformString => "Mac";
+            public override string SimplePlatformString => "iOS";
         }
     }
 }
