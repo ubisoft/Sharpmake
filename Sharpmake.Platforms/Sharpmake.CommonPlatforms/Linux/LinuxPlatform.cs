@@ -113,16 +113,12 @@ namespace Sharpmake
 
             public override void SetupSdkOptions(IGenerationContext context)
             {
-                //Copy Sources.
-                //    Enable                                  Copy Sources="Yes"
-                //    Disable                                 Copy Sources="No" default
                 context.SelectOption
                 (
-                    Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "Yes"; }),
-                    Sharpmake.Options.Option(Options.General.CopySources.Disable, () => { context.Options["CopySources"] = "No"; })
+                    Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "true"; }),
+                    Sharpmake.Options.Option(Options.General.CopySources.Disable, () => { context.Options["CopySources"] = "false"; })
                 );
 
-                //Remote Tool.
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCppCompileToolExe"] = "g++"; }),
