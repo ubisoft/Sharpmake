@@ -21,7 +21,7 @@ before_build:
 
 build_script:
   - cmd: CompileSharpmake.bat Sharpmake.sln "%CONFIGURATION%" "%PLATFORM%"
-  - sh: msbuild -t:build -restore Sharpmake.sln /p:Configuration=\"$CONFIGURATION\" /p:Platform=\"$PLATFORM\" /nologo /v:m
+  - sh: ./CompileSharpmake.sh Sharpmake.sln "${CONFIGURATION}" "${PLATFORM}"
 
 test:
   assemblies:
