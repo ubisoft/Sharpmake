@@ -138,6 +138,7 @@ namespace Sharpmake
         private readonly BuilderExtension _builderExt;
 
         private ConcurrentDictionary<Type, GenerationOutput> _generationReport = new ConcurrentDictionary<Type, GenerationOutput>();
+        private HashSet<Type> _buildScheduledType = new HashSet<Type>();
 
         private HashSet<Project.Configuration> _usedProjectConfigurations = null;
 
@@ -278,8 +279,7 @@ namespace Sharpmake
 
                         foreach (Type projectDependenciesType in projectDependenciesTypes)
                         {
-                            if (!Arguments.TypesToGenerate.Contains(projectDependenciesType))
-                                Arguments.TypesToGenerate.Add(projectDependenciesType);
+                            _buildScheduledType.Add(projectDependenciesType);
                         }
                     }
                 }
@@ -292,6 +292,8 @@ namespace Sharpmake
 
                     _tasks.Wait();
                 }
+
+                Arguments.TypesToGenerate.AddRange(_buildScheduledType);
             }
         }
 
@@ -319,15 +321,12 @@ namespace Sharpmake
                 throw new Error("error, class type not supported: {0}", type.FullName);
             }
 
-            lock (Arguments.TypesToGenerate)
+            lock (_buildScheduledType)
             {
                 foreach (Type projectDependenciesType in projectDependenciesTypes)
                 {
-                    if (!Arguments.TypesToGenerate.Contains(projectDependenciesType))
-                    {
-                        Arguments.TypesToGenerate.Add(projectDependenciesType);
+                    if (_buildScheduledType.Add(projectDependenciesType))
                         _tasks.AddTask(BuildProjectAndSolutionTask, projectDependenciesType, type.BaseType == typeof(Project) ? ThreadPool.Priority.Low : ThreadPool.Priority.High);
-                    }
                 }
             }
         }
