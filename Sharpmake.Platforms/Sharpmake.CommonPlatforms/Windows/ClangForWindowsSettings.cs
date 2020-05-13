@@ -81,17 +81,26 @@ namespace Sharpmake
 
         public static void WriteLLVMOverrides(IVcxprojGenerationContext context, IFileGenerator generator)
         {
+            string llvmOverrideSection = GetLLVMOverridesSection(context, generator.Resolver);
+            if (!string.IsNullOrEmpty(llvmOverrideSection))
+                generator.Write(llvmOverrideSection);
+        }
+
+        internal static string GetLLVMOverridesSection(IVcxprojGenerationContext context, Resolver resolver)
+        {
             if (Settings.OverridenLLVMInstallDir)
             {
                 bool hasClangConfiguration = context.ProjectConfigurations.Any(conf => Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain());
 
                 if (hasClangConfiguration)
                 {
-                    using (generator.Declare("custompropertyname", "LLVMInstallDir"))
-                    using (generator.Declare("custompropertyvalue", Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
-                        generator.Write(Vcxproj.Template.Project.CustomProperty);
+                    using (resolver.NewScopedParameter("custompropertyname", "LLVMInstallDir"))
+                    using (resolver.NewScopedParameter("custompropertyvalue", Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                        return resolver.Resolve(Vcxproj.Template.Project.CustomProperty);
                 }
             }
+
+            return null;
         }
     }
 }

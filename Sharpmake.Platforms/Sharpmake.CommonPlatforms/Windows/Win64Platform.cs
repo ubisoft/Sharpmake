@@ -428,53 +428,62 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
-                if (!ClangForWindows.Settings.OverridenLLVMInstallDir)
-                    return;
+                string propertyGroups = string.Empty;
 
-                if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
-                    throw new Error("Different vs versions not supported in the same vcxproj");
 
-                DevEnv uniqueDevEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
-
-                using (generator.Declare("platformName", SimplePlatformString))
+                // MSBuild override when mixing devenvs in the same vcxproj is not supported,
+                // but before throwing an exception check if we have some override
+                for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; devEnv = (DevEnv)((int)devEnv << 1))
                 {
-                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                    switch (devEnv)
                     {
-                        switch (uniqueDevEnv)
-                        {
-                            case DevEnv.vs2017:
+                        case DevEnv.vs2017:
+                            {
+                                string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
+                                if (!string.IsNullOrEmpty(platformFolder))
                                 {
-                                    string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
-                                    if (!string.IsNullOrEmpty(platformFolder))
-                                    {
-                                        using (generator.Declare("platformFolder", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
-                                            generator.Write(Vcxproj.Template.Project.PlatformFolderOverride);
-                                    }
+                                    using (generator.Declare("platformFolder", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
+                                        propertyGroups += generator.Resolver.Resolve(Vcxproj.Template.Project.PlatformFolderOverride);
                                 }
-                                break;
-                            case DevEnv.vs2019:
+                            }
+                            break;
+                        case DevEnv.vs2019:
+                            {
+                                // Note1: _PlatformFolder override is deprecated starting with vs2019, so we write AdditionalVCTargetsPath instead
+                                // Note2: MSBuildGlobalSettings.SetCppPlatformFolder for vs2019 is no more the valid way to handle it. Older buildtools packages can anyway contain it, and need upgrade.
+
+                                if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, Platform.win64)))
+                                    throw new Error("SetCppPlatformFolder is not supported by VS2019 correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
+
+                                // vs2019 use AdditionalVCTargetsPath
+                                string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, Platform.win64);
+                                if (!string.IsNullOrEmpty(additionalVCTargetsPath))
                                 {
-                                    // Note1: _PlatformFolder override is deprecated starting with vs2019, so we write AdditionalVCTargetsPath instead
-                                    // Note2: MSBuildGlobalSettings.SetCppPlatformFolder for vs2019 is no more the valid way to handle it. Older buildtools packages can anyway contain it, and need upgrade.
-
-                                    if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(uniqueDevEnv, Platform.win64)))
-                                        throw new Error("SetCppPlatformFolder is not supported by VS2019 correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
-
-                                    // vs2019 use AdditionalVCTargetsPath
-                                    string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(uniqueDevEnv, Platform.win64);
-                                    if (!string.IsNullOrEmpty(additionalVCTargetsPath))
-                                    {
-                                        using (generator.Declare("additionalVCTargetsPath", Util.EnsureTrailingSeparator(additionalVCTargetsPath))) // the path shall end with a "\"
-                                            generator.Write(Vcxproj.Template.Project.AdditionalVCTargetsPath);
-                                    }
+                                    using (generator.Declare("additionalVCTargetsPath", Util.EnsureTrailingSeparator(additionalVCTargetsPath))) // the path shall end with a "\"
+                                        propertyGroups += generator.Resolver.Resolve(Vcxproj.Template.Project.AdditionalVCTargetsPath);
                                 }
-                                break;
-                            default:
-                                throw new Error(uniqueDevEnv + " is not supported.");
-                        }
-                        ClangForWindows.WriteLLVMOverrides(context, generator);
+                            }
+                            break;
+                        default:
+                            throw new Error(devEnv + " is not supported.");
                     }
-                    generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
+                }
+
+                string llvmOverrideSection = ClangForWindows.GetLLVMOverridesSection(context, generator.Resolver);
+                if (!string.IsNullOrEmpty(llvmOverrideSection))
+                    propertyGroups += llvmOverrideSection;
+
+                if (!string.IsNullOrEmpty(propertyGroups))
+                {
+                    if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        throw new Error("Different vs versions not supported in the same vcxproj");
+
+                    using (generator.Declare("platformName", SimplePlatformString))
+                    {
+                        generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                        generator.WriteVerbatim(propertyGroups);
+                        generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
+                    }
                 }
             }
             #endregion
