@@ -2860,10 +2860,12 @@ namespace Sharpmake
                             break;
                         case OutputType.Dll:
                             {
+                                var configTasks = PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform);
+
                                 if (dependency.ExportDllSymbols && (isImmediate || hasPublicPathToRoot || !goesThroughDLL))
                                 {
                                     if (explicitDependenciesGlobal || !compile || (IsFastBuild && Util.IsDotNet(dependency)))
-                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupDynamicLibraryPaths(this, dependencySetting, dependency);
+                                        configTasks.SetupDynamicLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
@@ -2884,6 +2886,8 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
+                                string platformDllExtension = "." + configTasks.GetDefaultOutputExtension(OutputType.Dll);
+                                string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + platformDllExtension);
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
                                     && dependency.TargetPath != TargetPath)
@@ -2891,7 +2895,7 @@ namespace Sharpmake
                                     // If using OnlyBuildOrder, ExecuteTargetCopy must be set to enable the copy.
                                     if (dependencySetting != DependencySetting.OnlyBuildOrder || ExecuteTargetCopy)
                                     {
-                                        _resolvedTargetCopyFiles.Add(Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + ".dll"));
+                                        _resolvedTargetCopyFiles.Add(dependencyDllFullPath);
                                         // Add PDBs only if they exist and the dependency is not an [export] project
                                         if (!isExport && Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
                                         {
@@ -2906,7 +2910,7 @@ namespace Sharpmake
                                     _resolvedEventCustomPreBuildExe.AddRange(dependency.EventCustomPreBuildExe);
                                     _resolvedEventCustomPostBuildExe.AddRange(dependency.EventCustomPostBuildExe);
                                 }
-                                _resolvedTargetDependsFiles.Add(Path.Combine(TargetPath, dependency.TargetFileFullName + ".dll"));
+                                _resolvedTargetDependsFiles.Add(dependencyDllFullPath);
 
                                 // If this is not a .Net project, no .Net dependencies are needed
                                 if (Util.IsDotNet(this))
