@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -330,6 +330,49 @@ namespace Sharpmake
                         try
                         {
                             string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
+                            if (File.Exists(toolchainFile))
+                            {
+                                using (StreamReader file = new StreamReader(toolchainFile))
+                                    versionString = file.ReadLine().Trim();
+                            }
+                        }
+                        catch { }
+
+                        return new Version(versionString);
+                }
+                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+            });
+
+            return version;
+        }
+
+        private static string GetDefaultRedistVersion(this DevEnv visualVersion)
+        {
+            switch (visualVersion)
+            {
+                case DevEnv.vs2017:
+                    return "14.16.27012";
+                case DevEnv.vs2019:
+                    return "14.24.28127";
+                default:
+                    throw new Error("DevEnv " + visualVersion + " not recognized for default compiler version");
+            }
+        }
+
+        private static readonly ConcurrentDictionary<DevEnv, Version> s_visualStudioVCRedistVersionCache = new ConcurrentDictionary<DevEnv, Version>();
+        public static Version GetVisualStudioVCRedistVersion(this DevEnv visualVersion)
+        {
+            Version version = s_visualStudioVCRedistVersionCache.GetOrAdd(visualVersion, devEnv =>
+            {
+                string vsDir = visualVersion.GetVisualStudioDir();
+                switch (visualVersion)
+                {
+                    case DevEnv.vs2017:
+                    case DevEnv.vs2019:
+                        string versionString = visualVersion.GetDefaultRedistVersion(); // default fallback
+                        try
+                        {
+                            string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCRedistVersion.default.txt");
                             if (File.Exists(toolchainFile))
                             {
                                 using (StreamReader file = new StreamReader(toolchainFile))
