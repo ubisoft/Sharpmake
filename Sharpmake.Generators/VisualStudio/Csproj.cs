@@ -872,7 +872,7 @@ namespace Sharpmake.Generators.VisualStudio
         private string _projectPathCapitalized;
         private Builder _builder;
         public const string ProjectExtension = ".csproj";
-        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+        private const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
 
         private void SelectOption(params Options.OptionAction[] options)
