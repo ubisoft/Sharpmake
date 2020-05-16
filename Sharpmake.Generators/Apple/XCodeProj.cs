@@ -32,7 +32,7 @@ namespace Sharpmake.Generators.Apple
         private const int ProjectArchiveVersion = 1;
         private const int ProjectObjectVersion = 46;
 
-        public const string RemoveLineTag = "REMOVE_LINE_TAG";
+        public const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
         public static readonly char FolderSeparator;
 

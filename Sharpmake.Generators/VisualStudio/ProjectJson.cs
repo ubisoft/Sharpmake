@@ -33,7 +33,7 @@ namespace Sharpmake.Generators.VisualStudio
         public string ProjectJsonPath => Path.Combine(_projectPath, "project.json");
         public string ProjectJsonLockPath => Path.Combine(_projectPath, "project.lock.json");
 
-        public const string RemoveLineTag = "REMOVE_LINE_TAG";
+        public const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
         public void Generate(Builder builder, CSharpProject project, List<Project.Configuration> configurations, string projectPath, List<string> generatedFiles, List<string> skipFiles)
         {

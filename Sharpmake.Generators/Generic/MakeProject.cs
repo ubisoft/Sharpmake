@@ -20,7 +20,7 @@ namespace Sharpmake.Generators.Generic
     public partial class MakeProject : IProjectGenerator
     {
         private const string _makefileExtension = ".mk";
-        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+        private const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
         private Builder _builder;
 
