@@ -28,6 +28,12 @@ namespace Sharpmake
         public const string DoubleQuotes = @"""";
         public const string EscapedDoubleQuotes = @"\""";
 
+        public const char SpaceChar = ' ';
+        public const char SimpleQuoteChar = '\'';
+        public const char DoubleQuotesChar = '\"';
+        public const string Space = @" ";
+        public const string SimpleQuote = @"'";
+
         // A better type name (for generic classes)
         public static string ToNiceTypeName(this Type type)
         {
