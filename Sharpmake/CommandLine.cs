@@ -69,7 +69,7 @@ namespace Sharpmake
             if (commandLineArgs.Length > 1)
             {
                 string commandLine = Environment.CommandLine.Remove(0, commandLineArgs[0].Length + 1);
-                commandLine = commandLine.Trim(' ', '\"');
+                commandLine = commandLine.Trim(Util.SpaceChar, Util.DoubleQuotesChar);
                 return commandLine;
             }
 
