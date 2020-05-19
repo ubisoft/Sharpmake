@@ -18,7 +18,7 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public abstract class UserFileBase
     {
-        protected const string RemoveLineTag = "REMOVE_LINE_TAG";
+        protected const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
         protected const string UserFileExtension = ".user";
 
         private readonly string _userFilePath;

@@ -71,6 +71,8 @@ namespace Sharpmake.Generators.VisualStudio
         void SelectApplicationFormatOptions(IGenerationContext context);
         void SelectBuildType(IGenerationContext context);
 
+        bool HasPrecomp(IGenerationContext context);
+
         void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateMakefileConfigurationVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
@@ -81,6 +83,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectPlatformSdkDirectoryDescription(IVcxprojGenerationContext context, IFileGenerator generator);
+        void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectConfigurationGeneral(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator); // TODO: Merge with the above function and edit the reference projects.
         void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator);

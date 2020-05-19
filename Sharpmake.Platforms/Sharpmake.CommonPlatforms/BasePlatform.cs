@@ -201,6 +201,12 @@ namespace Sharpmake
         {
         }
 
+        public virtual bool HasPrecomp(IGenerationContext context)
+        {
+            Project.Configuration conf = context.Configuration;
+            return !string.IsNullOrEmpty(conf.PrecompSource) && !string.IsNullOrEmpty(conf.PrecompHeader);
+        }
+
         public virtual void GenerateSdkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
         {
         }
@@ -325,6 +331,10 @@ namespace Sharpmake
             bool hasNonFastBuildConfig = context.ProjectConfigurations.Any(c => !c.IsFastBuild);
             if (hasNonFastBuildConfig)
                 WriteWindowsKitsOverrides(context, generator);
+        }
+
+        public virtual void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
         }
 
         public virtual void GenerateProjectConfigurationGeneral(IVcxprojGenerationContext context, IFileGenerator generator)

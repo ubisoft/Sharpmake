@@ -112,8 +112,6 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateGeneralOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            DevEnv visualVersion = context.Configuration.Target.GetFragment<DevEnv>();
-
             // Default defines, includes, libraries...
             context.Options.ExplicitDefines.AddRange(optionsContext.PlatformVcxproj.GetImplicitlyDefinedSymbols(context));
 
@@ -1139,7 +1137,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectPrecompiledHeaderOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            if (string.IsNullOrEmpty(context.Configuration.PrecompHeader) || string.IsNullOrEmpty(context.Configuration.PrecompSource))
+            if (!optionsContext.PlatformVcxproj.HasPrecomp(context))
             {
                 context.Options["UsePrecompiledHeader"] = "NotUsing";
                 context.Options["PrecompiledHeaderThrough"] = FileGeneratorUtilities.RemoveLineTag;

@@ -20,6 +20,7 @@ namespace Sharpmake.Generators.VisualStudio
         string ProjectPath { get; }
         string ProjectFileName { get; }
         IReadOnlyList<Project.Configuration> ProjectConfigurations { get; }
+        IReadOnlyDictionary<Project.Configuration, Options.ExplicitOptions> ProjectConfigurationOptions { get; }
         DevEnvRange DevelopmentEnvironmentsRange { get; }
         IReadOnlyDictionary<Platform, IPlatformVcxproj> PresentPlatforms { get; }
 

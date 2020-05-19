@@ -48,8 +48,11 @@ namespace Sharpmake.Generators.VisualStudio
     <MinimumVisualStudioVersion>[toolsVersion]</MinimumVisualStudioVersion>
     <ProjectVersion>1.0</ProjectVersion>
     <ProjectName>[projectName]</ProjectName>
-  </PropertyGroup>
-  <Import Project=""$(AndroidTargetsPath)\Android.Default.props"" />
+    <AndroidTargetsPath>[androidTargetsPath]</AndroidTargetsPath>
+";
+
+                public const string ImportAndroidDefaultProps =
+@"  <Import Project=""$(AndroidTargetsPath)\Android.Default.props"" />
 ";
 
                 // The output directory is converted to a rooted path by prefixing it with $(ProjectDir) to work around
@@ -62,17 +65,19 @@ namespace Sharpmake.Generators.VisualStudio
     <OutDir>$(ProjectDir)[options.OutputDirectory]\</OutDir>
     <IntDir>[options.IntermediateDirectory]\</IntDir>
     <TargetName>[options.OutputFile]</TargetName>
+    <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
   </PropertyGroup>
 ";
 
                 public const string ProjectAfterConfigurationsGeneral =
 @"  <Import Project=""$(AndroidTargetsPath)\Android.props"" />
-  <ImportGroup Label=""ExtensionSettings"" />
-    <ImportGroup Label=""Shared"" />
+  <ImportGroup Label=""ExtensionSettings"">
 ";
 
                 public const string ProjectAfterImportedProps =
-@"  <PropertyGroup Label=""UserMacros"" />
+@"  </ImportGroup>
+    <ImportGroup Label=""Shared"" />
+  <PropertyGroup Label=""UserMacros"" />
 ";
 
                 public const string ProjectConfigurationBeginItemDefinition =

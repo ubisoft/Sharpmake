@@ -1,6 +1,12 @@
 # Sharpmake AppVeyor CI configuration
 
-image: Visual Studio 2017
+image:
+- Visual Studio 2017
+- macOS
+
+skip_commits:
+  files:
+    - docs/*
 
 platform:
 - Any CPU
@@ -11,22 +17,15 @@ configuration:
 
 before_build:
 - cmd: bootstrap.bat
+- sh: ./bootstrap.sh
 
-for:
-  -
-    matrix:
-      only:
-        - configuration: Debug
-    build_script:
-      - CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
+build_script:
+  - cmd: CompileSharpmake.bat Sharpmake.sln "%CONFIGURATION%" "%PLATFORM%"
+  - sh: ./CompileSharpmake.sh Sharpmake.sln "${CONFIGURATION}" "${PLATFORM}"
 
-  -
-    matrix:
-      only:
-        - configuration: Release
-    build_script:
-      - CompileSharpmake.bat Sharpmake.sln Release "Any CPU"
+test:
+  assemblies:
+    - 'Sharpmake.UnitTests\bin\*\Sharpmake.UnitTests.dll'
 
 after_test:
 - cmd: python regression_test.py
-

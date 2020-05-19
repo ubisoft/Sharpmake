@@ -90,7 +90,7 @@ namespace Sharpmake
 
         public string GetConfigName()
         {
-            return _config?.Target?.ToString() ?? _configOutputType.ToString();
+            return _config?.Target?.GetTargetString() ?? _configOutputType.ToString();
         }
 
         public bool IsNodeVisited()

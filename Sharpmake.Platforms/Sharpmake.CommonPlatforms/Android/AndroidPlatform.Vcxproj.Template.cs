@@ -22,8 +22,31 @@ namespace Sharpmake
 ";
 
             private const string _projectDescriptionPlatformSpecific =
-@"    <ApplicationType>Android</ApplicationType>
+@"    <ApplicationType>[applicationType]</ApplicationType>
     <ApplicationTypeRevision>[applicationTypeRevision]</ApplicationTypeRevision>
+    <VS_AndroidHome>[androidHome]</VS_AndroidHome>
+    <VS_AntHome>[antHome]</VS_AntHome>
+    <VS_JavaHome>[javaHome]</VS_JavaHome>
+    <VS_NdkRoot>[ndkRoot]</VS_NdkRoot>
+";
+
+            private const string _projectPlatformDefaultPropsPath =
+                @"    <_PlatformFolder>$(AdditionalVCTargetsPath)Application Type\Android\[applicationTypeRevision]\Platforms\$(Platform)\</_PlatformFolder>
+    <_ApplicationTypeDefaultPropsPath>$(AdditionalVCTargetsPath)Application Type\Android\Default.props</_ApplicationTypeDefaultPropsPath>
+    <_ApplicationTypeRevisionDefaultPropsPath>$(AdditionalVCTargetsPath)Application Type\Android\[applicationTypeRevision]\Default.props</_ApplicationTypeRevisionDefaultPropsPath>
+";
+
+            private const string _projectImportAppTypeProps =
+                @"  <Import Project=""$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\Default.props"" />
+  <Import Project=""$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Default.props"" />
+";
+
+            // Workaround for app type props not overridable Microsoft.Cpp.Default.props
+            private const string _postImportAppTypeProps =
+                @"  <PropertyGroup>
+    <_ApplicationTypeDefaultPropsFound>true</_ApplicationTypeDefaultPropsFound>
+    <_ApplicationTypeRevisionDefaultPropsFound>true</_ApplicationTypeRevisionDefaultPropsFound>
+  </PropertyGroup>
 ";
 
             private const string _projectConfigurationsGeneralTemplate =
@@ -34,6 +57,7 @@ namespace Sharpmake
     <UseOfStl>[options.UseOfStl]</UseOfStl>
     <ThumbMode>[options.ThumbMode]</ThumbMode>
     <AndroidAPILevel>[options.AndroidAPILevel]</AndroidAPILevel>
+    <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
   </PropertyGroup>
 ";
 

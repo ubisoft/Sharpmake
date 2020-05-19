@@ -14,27 +14,108 @@
 
 namespace Sharpmake
 {
-    using System;
-
     public static partial class Options
     {
-        public static class Android
+        public static class Android // TODO: move this to the CommonPlatforms module
         {
             public static class General
             {
+                /// <summary>
+                /// Android SDK path
+                /// If unset, will use Android.GlobalSettings.AndroidHome
+                /// </summary>
+                public class AndroidHome : PathOption
+                {
+                    public AndroidHome(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Android NDK path
+                /// If unset, will use Android.GlobalSettings.NdkRoot
+                /// </summary>
+                public class NdkRoot : PathOption
+                {
+                    public NdkRoot(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Java SE Development Kit path
+                /// If unset, will use Android.GlobalSettings.JavaHome
+                /// </summary>
+                public class JavaHome : PathOption
+                {
+                    public JavaHome(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Apache Ant path
+                /// If unset, will use Android.GlobalSettings.AntHome
+                /// </summary>
+                public class AntHome : PathOption
+                {
+                    public AntHome(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Path to the AndroidProj MSBuild files
+                /// Expected to contain the files found in MSBuild\Microsoft\MDD\Android\V150
+                /// If unset, line won't be written
+                /// </summary>
+                public class AndroidTargetsPath : PathOption
+                {
+                    public AndroidTargetsPath(string path)
+                        : base(path) { }
+                }
+
+                /// <summary>
+                /// Application Type Revision
+                /// This must be a valid version string, of the form major.minor[.build[.revision]].
+                /// Examples: 1.0, 10.0.0.0
+                /// </summary>
+                public class ApplicationTypeRevision : StringOption
+                {
+                    public static readonly string Default = "3.0";
+                    public ApplicationTypeRevision(string revision)
+                        : base(revision) { }
+                }
+
+                /// <summary>
+                /// Verbosity of the tasks (vcxproj only)
+                /// At the time of this writing, this only control if on build env variables values are printed
+                /// </summary>
+                public enum ShowAndroidPathsVerbosity
+                {
+                    [Default]
+                    Default,
+                    High,
+                    Normal,
+                    Low
+                }
+
                 public enum AndroidAPILevel
                 {
                     [Default]
                     Default,
-                    Android19,
-                    Android21,
-                    Android22,
-                    Android23,
-                    Android24,
-                    Android25,
-                    Android26,
-                    Android27,
-                    Android28,
+                    Latest, // sharpmake will try and auto-detect the latest installed, or fallback to default: note that the SDK/NDK paths are needed
+                    Android16, // Jelly Bean 4.1.x
+                    Android17, // Jelly Bean 4.2.x
+                    Android18, // Jelly Bean 4.3.x
+                    Android19, // KitKat 4.4 - 4.4.4
+                    Android20, // Does it really exist?
+                    Android21, // Lollipop 5.0 - 5.0.2
+                    Android22, // Lollipop 5.1
+                    Android23, // Marshmallow 6.0
+                    Android24, // Nougat 7.0
+                    Android25, // Nougat 7.1
+                    Android26, // Oreo 8.0.0
+                    Android27, // Oreo 8.1.0
+                    Android28, // Pie 9.0
+                    Android29, // Android 10
+                    Android30, // Android 11
                 }
 
                 public enum PlatformToolset
@@ -42,11 +123,13 @@ namespace Sharpmake
                     [Default]
                     Default,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    Clang_3_8,
+                    Clang_3_6, // needs ApplicationTypeRevision 1.0
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    Clang_5_0,
+                    Clang_3_8, // needs ApplicationTypeRevision 2.0 or 3.0
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
-                    Gcc_4_9
+                    Clang_5_0, // needs ApplicationTypeRevision 3.0
+                    [DevEnvVersion(minimum = DevEnv.vs2015)]
+                    Gcc_4_9 // needs ApplicationTypeRevision 1.0 or 2.0 or 3.0
                 }
 
                 // This is applicable for arm architecture only
@@ -61,7 +144,6 @@ namespace Sharpmake
 
                 public enum UseOfStl
                 {
-                    [Default]
                     Default,
                     System,
                     GAbiPP_Static,
@@ -71,6 +153,7 @@ namespace Sharpmake
                     GnuStl_Static,
                     GnuStl_Shared,
                     LibCpp_Static,
+                    [Default]
                     LibCpp_Shared
                 }
 

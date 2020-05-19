@@ -30,7 +30,6 @@ goto end
 :error
 COLOR 4F
 echo Bootstrap failed^!
-pause
 set ERROR_CODE=1
 goto end
 

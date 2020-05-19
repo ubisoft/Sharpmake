@@ -19,7 +19,11 @@ namespace Sharpmake
         public sealed partial class LinuxPlatform
         {
             public const string _linkerOptionsTemplate = @"
-    .LinkerOptions          = '-o ""%2"" ""%1""[sharedOption]'
+    .LinkerOptions          = '-o ""%2""'
+                            + ' [cmdLineOptions.WholeArchiveBegin]'
+                            + ' ""%1""'
+                            + ' [cmdLineOptions.WholeArchiveEnd]'
+                            + ' [sharedOption]'
                             // Library Search Path
                             // ---------------------------
                             + ' [cmdLineOptions.AdditionalLibraryDirectories]'

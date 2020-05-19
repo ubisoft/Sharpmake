@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.VisualStudio;
@@ -22,7 +23,9 @@ namespace Sharpmake
 {
     public static partial class Android
     {
-        [PlatformImplementation(Platform.android,
+        public const Platform SharpmakePlatform = Platform.android;
+
+        [PlatformImplementation(SharpmakePlatform,
             typeof(IPlatformDescriptor),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
@@ -107,14 +110,95 @@ namespace Sharpmake
             {
                 generator.Write(_projectStartPlatformConditional);
 
-                string applicationTypeRevision = (context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2017 || context.DevelopmentEnvironmentsRange.MinDevEnv == DevEnv.vs2019) ? "3.0" : "2.0";
+                string applicationType = "Android";
+                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values);
 
+                string msBuildPathOverrides = string.Empty;
+
+                // MSBuild override when mixing devenvs in the same vcxproj is not supported,
+                // but before throwing an exception check if we have some override
+                for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; devEnv = (DevEnv)((int)devEnv << 1))
+                {
+                    switch (devEnv)
+                    {
+                        case DevEnv.vs2017:
+                        case DevEnv.vs2019:
+                            {
+                                // _PlatformFolder override is not enough for android, we need to know the AdditionalVCTargetsPath
+                                // Note that AdditionalVCTargetsPath is not officially supported by vs2017, but we use the variable anyway for convenience and consistency
+                                if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, SharpmakePlatform)))
+                                    throw new Error("SetCppPlatformFolder is not supported by AndroidPlatform correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
+
+                                string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
+                                if (!string.IsNullOrEmpty(additionalVCTargetsPath))
+                                {
+                                    using (generator.Declare("additionalVCTargetsPath", Sharpmake.Util.EnsureTrailingSeparator(additionalVCTargetsPath)))
+                                        msBuildPathOverrides += generator.Resolver.Resolve(Vcxproj.Template.Project.AdditionalVCTargetsPath);
+
+                                    // with vs2017, we need to set the _PlatformDefaultPropsPath property
+                                    // otherwise the Microsoft.Cpp.Default.props won't be able to find the default platform props correctly
+                                    if (devEnv == DevEnv.vs2017)
+                                    {
+                                        using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
+                                            msBuildPathOverrides += generator.Resolver.Resolve(_projectPlatformDefaultPropsPath);
+
+                                        // application type and revisions need to be cleared otherwise
+                                        // the inclusion of the cpp default props will use the files from
+                                        // the local vs installation and not the redirected one..
+                                        applicationType = RemoveLineTag;
+                                        applicationTypeRevision = RemoveLineTag;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                using (generator.Declare("applicationType", applicationType))
                 using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
+                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("antHome", Options.GetOptionValue("antHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
 
+                if (!string.IsNullOrEmpty(msBuildPathOverrides))
+                {
+                    if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                        throw new Error("Different vs versions not supported in the same vcxproj");
+
+                    generator.WriteVerbatim(msBuildPathOverrides);
+                }
+
                 generator.Write(Vcxproj.Template.Project.ProjectDescriptionEnd);
+            }
+
+            public override void GenerateProjectPlatformSdkDirectoryDescription(IVcxprojGenerationContext context, IFileGenerator generator)
+            {
+                base.GenerateProjectPlatformSdkDirectoryDescription(context, generator);
+
+                var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
+                if (devEnv == DevEnv.vs2019)
+                {
+                    string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
+                    if (!string.IsNullOrEmpty(additionalVCTargetsPath))
+                        generator.WriteVerbatim(_projectImportAppTypeProps);
+                }
+            }
+
+            public override void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator)
+            {
+                base.GeneratePostDefaultPropsImport(context, generator);
+
+                var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
+                if (devEnv == DevEnv.vs2017 || devEnv == DevEnv.vs2019)
+                {
+                    // in case we've written an additional vc targets path, we need to set a couple of properties to avoid a warning
+                    if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform)))
+                        generator.WriteVerbatim(_postImportAppTypeProps);
+                }
             }
 
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
@@ -142,6 +226,20 @@ namespace Sharpmake
                 return _projectConfigurationsStaticLinkTemplate;
             }
 
+            public override void SetupSdkOptions(IGenerationContext context)
+            {
+                base.SetupSdkOptions(context);
+                var conf = context.Configuration;
+                var options = context.Options;
+
+                options["androidHome"] = Options.PathOption.Get<Options.Android.General.AndroidHome>(conf, GlobalSettings.AndroidHome ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
+                options["antHome"] = Options.PathOption.Get<Options.Android.General.AntHome>(conf, GlobalSettings.AntHome ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
+                options["javaHome"] = Options.PathOption.Get<Options.Android.General.JavaHome>(conf, GlobalSettings.JavaHome ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
+                options["ndkRoot"] = Options.PathOption.Get<Options.Android.General.NdkRoot>(conf, GlobalSettings.NdkRoot ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
+
+                options["applicationTypeRevision"] = Options.StringOption.Get<Options.Android.General.ApplicationTypeRevision>(conf);
+            }
+
             public override void SelectCompilerOptions(IGenerationContext context)
             {
                 var options = context.Options;
@@ -152,8 +250,43 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
+                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.Default, () => { options["ShowAndroidPathsVerbosity"] = RemoveLineTag; }),
+                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.High, () => { options["ShowAndroidPathsVerbosity"] = "High"; }),
+                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.Normal, () => { options["ShowAndroidPathsVerbosity"] = "Normal"; }),
+                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.Low, () => { options["ShowAndroidPathsVerbosity"] = "Low"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Android.General.AndroidAPILevel.Latest, () =>
+                {
+                    string lookupDirectory;
+                    if (context.Project is AndroidPackageProject)
+                    {
+                        // for the packaging projects, we look in the SDK
+                        lookupDirectory = options["androidHome"];
+                    }
+                    else
+                    {
+                        // otherwise, look in the NDK
+                        lookupDirectory = options["ndkRoot"];
+                    }
+
+                    string androidApiLevel = RemoveLineTag;
+                    if (lookupDirectory != RemoveLineTag)
+                    {
+                        string latestApiLevel = Util.FindLatestApiLevelInDirectory(Path.Combine(lookupDirectory, "platforms"));
+                        if (!string.IsNullOrEmpty(latestApiLevel))
+                            androidApiLevel = latestApiLevel;
+                    }
+                    options["AndroidAPILevel"] = androidApiLevel;
+                }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Default, () => { options["AndroidAPILevel"] = RemoveLineTag; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android16, () => { options["AndroidAPILevel"] = "android-16"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android17, () => { options["AndroidAPILevel"] = "android-17"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android18, () => { options["AndroidAPILevel"] = "android-18"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android19, () => { options["AndroidAPILevel"] = "android-19"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android20, () => { options["AndroidAPILevel"] = "android-20"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android21, () => { options["AndroidAPILevel"] = "android-21"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android22, () => { options["AndroidAPILevel"] = "android-22"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android23, () => { options["AndroidAPILevel"] = "android-23"; }),
@@ -161,12 +294,15 @@ namespace Sharpmake
                 Options.Option(Options.Android.General.AndroidAPILevel.Android25, () => { options["AndroidAPILevel"] = "android-25"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android26, () => { options["AndroidAPILevel"] = "android-26"; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android27, () => { options["AndroidAPILevel"] = "android-27"; }),
-                Options.Option(Options.Android.General.AndroidAPILevel.Android28, () => { options["AndroidAPILevel"] = "android-28"; })
+                Options.Option(Options.Android.General.AndroidAPILevel.Android28, () => { options["AndroidAPILevel"] = "android-28"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android29, () => { options["AndroidAPILevel"] = "android-29"; }),
+                Options.Option(Options.Android.General.AndroidAPILevel.Android30, () => { options["AndroidAPILevel"] = "android-30"; })
                 );
 
                 context.SelectOption
                 (
                 Options.Option(Options.Android.General.PlatformToolset.Default, () => { options["PlatformToolset"] = RemoveLineTag; }),
+                Options.Option(Options.Android.General.PlatformToolset.Clang_3_6, () => { options["PlatformToolset"] = "Clang_3_6"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Clang_3_8, () => { options["PlatformToolset"] = "Clang_3_8"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Clang_5_0, () => { options["PlatformToolset"] = "Clang_5_0"; }),
                 Options.Option(Options.Android.General.PlatformToolset.Gcc_4_9, () => { options["PlatformToolset"] = "Gcc_4_9"; })
@@ -370,6 +506,11 @@ namespace Sharpmake
                 dirs.AddRange(base.GetLibraryPaths(context));
 
                 return dirs;
+            }
+
+            public override bool HasPrecomp(IGenerationContext context)
+            {
+                return !string.IsNullOrEmpty(context.Configuration.PrecompHeader);
             }
 
             #endregion // IPlatformVcxproj implementation

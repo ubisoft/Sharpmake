@@ -377,6 +377,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         string fastBuildOutputFileShortName = GetShortProjectName(project, conf);
                         var fastBuildProjectDependencies = new List<string>();
+                        var fastBuildBuildOnlyDependencies = new List<string>();
                         var fastBuildProjectExeUtilityDependencyList = new List<string>();
 
                         bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig && isOutputTypeLib;
@@ -407,6 +408,23 @@ namespace Sharpmake.Generators.FastBuild
                                 else
                                 {
                                     fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                }
+                            }
+
+                            orderedProjectDeps = UtilityMethods.GetOrderedFlattenedBuildOnlyDependencies(conf);
+                            foreach (var depProjConfig in orderedProjectDeps)
+                            {
+                                if (depProjConfig.Project == project)
+                                    throw new Error("Sharpmake-FastBuild : Project dependencies refers to itself.");
+
+                                bool isExport = depProjConfig.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export;
+                                if (isExport)
+                                    continue;
+
+                                if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
+                                    depProjConfig.Output != Project.Configuration.OutputType.Utility)
+                                {
+                                    fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
                             }
                         }
@@ -836,7 +854,7 @@ namespace Sharpmake.Generators.FastBuild
                             List<string> fastbuildEmbeddedResourceFilesList = new List<string>();
 
                             var sourceFiles = confSubConfigs[tuple];
-                            foreach (Vcxproj.ProjectFile sourceFile in sourceFiles)
+                            foreach (var sourceFile in sourceFiles)
                             {
                                 string sourceFileName = CurrentBffPathKeyCombine(sourceFile.FileNameProjectRelative);
 
@@ -936,6 +954,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildEmbeddedResources", fastBuildEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
                                     using (bffGenerator.Declare("fastBuildProjectDependencies", UtilityMethods.FBuildFormatList(fastBuildProjectDependencies, 30)))
+                                    using (bffGenerator.Declare("fastBuildBuildOnlyDependencies", UtilityMethods.FBuildFormatList(fastBuildBuildOnlyDependencies, 30)))
                                     using (bffGenerator.Declare("fastBuildPreBuildTargets", UtilityMethods.FBuildFormatList(fastBuildPreBuildDependencies.ToList(), 28)))
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
@@ -1850,17 +1869,17 @@ namespace Sharpmake.Generators.FastBuild
             filesInNonDefaultSections = new List<Vcxproj.ProjectFile>();
 
             // Add source files
-            List<Vcxproj.ProjectFile> allFiles = new List<Vcxproj.ProjectFile>();
+            var allFiles = new List<Vcxproj.ProjectFile>();
             Strings projectFiles = context.Project.GetSourceFilesForConfigurations(configurations);
             foreach (string file in projectFiles)
             {
-                Vcxproj.ProjectFile projectFile = new Vcxproj.ProjectFile(context, file);
+                var projectFile = new Vcxproj.ProjectFile(context, file);
                 allFiles.Add(projectFile);
             }
             allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCulture));
 
-            List<Vcxproj.ProjectFile> sourceFiles = new List<Vcxproj.ProjectFile>();
-            foreach (Vcxproj.ProjectFile projectFile in allFiles)
+            var sourceFiles = new List<Vcxproj.ProjectFile>();
+            foreach (var projectFile in allFiles)
             {
                 if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
                     (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
@@ -1868,7 +1887,7 @@ namespace Sharpmake.Generators.FastBuild
                     sourceFiles.Add(projectFile);
             }
 
-            foreach (Vcxproj.ProjectFile file in sourceFiles)
+            foreach (var file in sourceFiles)
             {
                 foreach (Project.Configuration conf in configurations)
                 {

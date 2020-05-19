@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -1473,10 +1474,14 @@ namespace Sharpmake
                 return sb.ToString();
             }
 
-            private static bool IsNumber(object o)
+            private static bool IsFloat(object o)
             {
-                return o is float || o is double || o is decimal ||
-                       o is sbyte || o is short || o is int || o is long ||
+                return o is float || o is double || o is decimal;
+            }
+
+            private static bool IsInteger(object o)
+            {
+                return o is sbyte || o is short || o is int || o is long ||
                        o is byte || o is ushort || o is uint || o is ulong;
             }
 
@@ -1522,7 +1527,16 @@ namespace Sharpmake
                 {
                     SerializeArray((IEnumerable)value);
                 }
-                else if (value is bool || IsNumber(value))
+                else if (value is bool)
+                {
+                    _writer.Write(value.ToString().ToLower());
+                }
+                else if (IsFloat(value))
+                {
+                    // This *should* be safe without Escaping
+                    _writer.Write(Convert.ToDouble(value).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (IsInteger(value))
                 {
                     // This *should* be safe without Escaping
                     _writer.Write(EscapeJson(value.ToString().ToLower()));
@@ -1961,7 +1975,19 @@ namespace Sharpmake
             }
         }
 
+        public enum FileCopyDestReadOnlyPolicy : byte
+        {
+            Preserve,
+            SetReadOnly,
+            UnsetReadOnly
+        }
+
         public static void ForceCopy(string source, string destination)
+        {
+            ForceCopy(source, destination, FileCopyDestReadOnlyPolicy.Preserve);
+        }
+
+        public static void ForceCopy(string source, string destination, FileCopyDestReadOnlyPolicy destinationReadOnlyPolicy)
         {
             if (File.Exists(destination))
             {
@@ -1971,6 +1997,20 @@ namespace Sharpmake
             }
 
             File.Copy(source, destination, true);
+
+            if (destinationReadOnlyPolicy != FileCopyDestReadOnlyPolicy.Preserve)
+            {
+                FileAttributes attributes = File.GetAttributes(destination);
+                if (destinationReadOnlyPolicy == FileCopyDestReadOnlyPolicy.SetReadOnly)
+                {
+                    attributes |= FileAttributes.ReadOnly;
+                }
+                else
+                {
+                    attributes &= ~FileAttributes.ReadOnly;
+                }
+                File.SetAttributes(destination, attributes);
+            }
         }
 
         public static bool IsDotNet(Project.Configuration conf)

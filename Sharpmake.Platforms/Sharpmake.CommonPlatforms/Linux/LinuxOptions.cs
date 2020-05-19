@@ -20,6 +20,22 @@ namespace Sharpmake
     {
         public static class Options
         {
+            public static class General
+            {
+                public enum CopySources
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+                public enum PlatformRemoteTool
+                {
+                    Gpp, //g++
+                    [Default]
+                    Clang38
+                }
+            }
+
             public static class Compiler
             {
                 public enum GenerateDebugInformation
@@ -184,6 +200,13 @@ namespace Sharpmake
                 }
 
                 public enum UseThinArchives
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum WholeArchive
                 {
                     Enable,
                     [Default]

@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -302,7 +303,23 @@ namespace Sharpmake
 
                     if (isValidMember && !isEscaped)
                     {
-                        string resolveResult = GetMemberStringValue(str.Substring(memberStartIndex, endMatch - memberStartIndex), fallbackValue == null) ?? fallbackValue?.ToString();
+                        bool throwIfNotFound = fallbackValue == null;
+
+                        string resolveResult;
+                        try
+                        {
+                            resolveResult = GetMemberStringValue(str.Substring(memberStartIndex, endMatch - memberStartIndex), throwIfNotFound) ?? fallbackValue?.ToString();
+                        }
+                        catch (NotFoundException e)
+                        {
+                            throw new Error(
+                                "Error: {0} in '{1}'\n{2}",
+                                e.Message,
+                                str,
+                                e.Arguments
+                            );
+                        }
+
                         if (resolveResult == null)
                         {
                             // Resolve failed.
@@ -473,6 +490,31 @@ namespace Sharpmake
             propertyInfo = value.Value;
         }
 
+        [Serializable]
+        private class NotFoundException : Exception
+        {
+            private IEnumerable<string> _arguments;
+            public string Arguments
+            {
+                get
+                {
+                    if (_arguments == null)
+                        return string.Empty;
+
+                    if (!_arguments.Any())
+                        return "The list of arguments that can be used is *Empty*";
+
+                    return "The list of arguments that can be used is:\n- " + string.Join("\n- ", _arguments.OrderBy(x => x, StringComparer.InvariantCultureIgnoreCase));
+                }
+            }
+
+            public NotFoundException(string message, IEnumerable<string> arguments = null)
+                : base(message)
+            {
+                _arguments = arguments;
+            }
+        }
+
         private string GetMemberStringValue(string memberPath, bool throwIfNotFound)
         {
             string[] names = memberPath.Split(new[] { _pathSeparator }, StringSplitOptions.RemoveEmptyEntries);
@@ -480,7 +522,7 @@ namespace Sharpmake
             if (names.Length == 0)
             {
                 if (throwIfNotFound)
-                    throw new Exception("Cannot find unnamed parameter");
+                    throw new NotFoundException("Cannot find unnamed parameter");
                 return null;
             }
 
@@ -492,7 +534,8 @@ namespace Sharpmake
             if (!_parameters.TryGetValue(parameterName, out refCountedReference))
             {
                 if (throwIfNotFound)
-                    throw new Exception("Cannot resolve parameter " + names[0]);
+                    throw new NotFoundException($"Cannot resolve parameter '{parameterName}'.", _parameters.Keys);
+
                 return null;
             }
             object parameter = refCountedReference.Value;
@@ -502,41 +545,64 @@ namespace Sharpmake
             {
                 bool found = false;
 
+                string nameChunk = names[i];
 
                 FieldInfo fieldInfo;
                 PropertyInfo propertyInfo;
-                GetFieldInfoOrPropertyInfo(parameter.GetType(), names[i], out fieldInfo, out propertyInfo);
+                Type parameterType = parameter.GetType();
+                GetFieldInfoOrPropertyInfo(parameterType, nameChunk, out fieldInfo, out propertyInfo);
 
                 if (fieldInfo != null)
                 {
                     parameter = fieldInfo.GetValue(parameter);
                     found = true;
                 }
-                else
+                else if (propertyInfo != null)
                 {
-                    if (propertyInfo != null)
-                    {
-                        parameter = propertyInfo.GetValue(parameter, null);
-                        found = true;
-                    }
+                    parameter = propertyInfo.GetValue(parameter, null);
+                    found = true;
                 }
 
-                // IDictionary support 
+                // IDictionary support
                 if (!found && i == names.Length - 1 && parameter is IDictionary)
                 {
-                    IDictionary dictionaty = parameter as IDictionary;
-                    if (dictionaty.Contains(names[i]))
-                        return dictionaty[names[i]].ToString();
+                    var dictionary = parameter as IDictionary;
+                    if (dictionary.Contains(nameChunk))
+                        return dictionary[nameChunk].ToString();
                 }
-
-                name += _pathSeparator + names[i];
 
                 if (!found)
                 {
                     if (throwIfNotFound)
-                        throw new Exception("Cannot find path: " + name + " in parameter path " + memberPath);
+                    {
+                        string currentPath = parameterName + _pathSeparator;
+                        if (!string.IsNullOrWhiteSpace(name))
+                            currentPath += name + _pathSeparator;
+
+                        // get all public fields
+                        var possibleArguments = parameterType.GetFields().Select(f => currentPath + f.Name);
+
+                        // all public properties
+                        possibleArguments = possibleArguments.Concat(parameterType.GetProperties().Select(p => currentPath + p.Name));
+
+                        // and dictionary keys, if they are strings
+                        var dictionary = parameter as IDictionary;
+                        if (dictionary != null)
+                        {
+                            var keysAsStrings = ((IDictionary)parameter).Keys as IEnumerable<string>;
+                            if (keysAsStrings != null)
+                                possibleArguments = possibleArguments.Concat(keysAsStrings.Select(k => currentPath + k));
+                        }
+
+                        throw new NotFoundException(
+                            $"Cannot find path '{nameChunk}' in parameter path '{memberPath}'.",
+                            possibleArguments
+                        );
+                    }
                     return null;
                 }
+
+                name += _pathSeparator + nameChunk;
             }
 
             return parameter == null ? "null" : parameter.ToString();

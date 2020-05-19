@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using NUnit.Framework;
+using System.Globalization;
 
 namespace Sharpmake.UnitTests
 {
@@ -103,6 +104,18 @@ namespace Sharpmake.UnitTests
         [Test]
         public void SerializeNegativeDouble()
         {
+            _serializer.Serialize(-13.37);
+            Assert.That(_writer.ToString(), Is.EqualTo("-13.37"));
+        }
+
+        [Test]
+        public void FloatSerializationIsNotCultureDependent()
+        {
+            // Change culture to a non-json compatible format
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("da-DK");
+            // As illustration
+            Assert.That((-13.37).ToString(), Is.EqualTo("-13,37"));
+
             _serializer.Serialize(-13.37);
             Assert.That(_writer.ToString(), Is.EqualTo("-13.37"));
         }

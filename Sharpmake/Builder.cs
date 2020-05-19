@@ -279,15 +279,12 @@ namespace Sharpmake
 
                         foreach (Type projectDependenciesType in projectDependenciesTypes)
                         {
-                            if (!Arguments.TypesToGenerate.Contains(projectDependenciesType))
-                                Arguments.TypesToGenerate.Add(projectDependenciesType);
+                            _buildScheduledType.Add(projectDependenciesType);
                         }
                     }
                 }
                 else
                 {
-                    _buildScheduledType.UnionWith(Arguments.TypesToGenerate);
-
                     foreach (Type type in Arguments.TypesToGenerate)
                     {
                         _tasks.AddTask(BuildProjectAndSolutionTask, type, type.BaseType == typeof(Project) ? ThreadPool.Priority.Low : ThreadPool.Priority.High);
@@ -295,6 +292,8 @@ namespace Sharpmake
 
                     _tasks.Wait();
                 }
+
+                Arguments.TypesToGenerate.AddRange(_buildScheduledType);
             }
         }
 
