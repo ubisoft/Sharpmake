@@ -1975,7 +1975,19 @@ namespace Sharpmake
             }
         }
 
+        public enum FileCopyDestReadOnlyPolicy : byte
+        {
+            Preserve,
+            SetReadOnly,
+            UnsetReadOnly
+        }
+
         public static void ForceCopy(string source, string destination)
+        {
+            ForceCopy(source, destination, FileCopyDestReadOnlyPolicy.Preserve);
+        }
+
+        public static void ForceCopy(string source, string destination, FileCopyDestReadOnlyPolicy destinationReadOnlyPolicy)
         {
             if (File.Exists(destination))
             {
@@ -1985,6 +1997,20 @@ namespace Sharpmake
             }
 
             File.Copy(source, destination, true);
+
+            if (destinationReadOnlyPolicy != FileCopyDestReadOnlyPolicy.Preserve)
+            {
+                FileAttributes attributes = File.GetAttributes(destination);
+                if (destinationReadOnlyPolicy == FileCopyDestReadOnlyPolicy.SetReadOnly)
+                {
+                    attributes |= FileAttributes.ReadOnly;
+                }
+                else
+                {
+                    attributes &= ~FileAttributes.ReadOnly;
+                }
+                File.SetAttributes(destination, attributes);
+            }
         }
 
         public static bool IsDotNet(Project.Configuration conf)
