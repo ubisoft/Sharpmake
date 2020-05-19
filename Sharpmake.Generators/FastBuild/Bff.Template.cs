@@ -61,6 +61,7 @@ namespace Sharpmake.Generators.FastBuild
 //=================================================================================================================
 Settings
 {
+#if __WINDOWS__
     #import TMP
     #import TEMP
     #import USERPROFILE
@@ -72,6 +73,15 @@ Settings
         ""SystemRoot=[fastBuildSystemRoot]""
         ""PATH=[fastBuildPATH]""
     }
+#else if __OSX__
+    #import TMPDIR
+    .Environment =
+    {
+        ""TMPDIR=$TMPDIR$"",
+        ""PATH=[fastBuildPATH]""
+    }
+#endif
+
 
     [CachePluginDLL]
     [CachePath]
