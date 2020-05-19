@@ -176,7 +176,7 @@ namespace Sharpmake.Application
                 Version version = sharpmakeAssembly.GetName().Version;
                 string versionString = string.Join(".", version.Major, version.Minor, version.Build);
                 string informationalVersion = sharpmakeAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-                if (version.Revision != 0 || (informationalVersion != null && informationalVersion.IndexOf("+Branch.") != -1))
+                if (version.Revision != 0 || (informationalVersion != null && informationalVersion.IndexOf("+Branch.") == -1))
                 {
                     versionString += " (non-official)";
                     if (DebugEnable && informationalVersion != null)
