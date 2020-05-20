@@ -437,6 +437,7 @@ namespace Sharpmake
                 {
                     switch (devEnv)
                     {
+                        case DevEnv.vs2015:
                         case DevEnv.vs2017:
                             {
                                 string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
@@ -464,8 +465,6 @@ namespace Sharpmake
                                 }
                             }
                             break;
-                        default:
-                            throw new Error(devEnv + " is not supported.");
                     }
                 }
 
