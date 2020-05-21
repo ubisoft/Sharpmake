@@ -89,6 +89,11 @@ namespace Sharpmake
                 return string.Compare(string.Join(",", GetFormatedAssetsDependency(PrivateAssets)), string.Join(",", GetFormatedAssetsDependency(other.PrivateAssets)), StringComparison.OrdinalIgnoreCase);
             }
 
+            public override string ToString()
+            {
+                return $"{Name} {Version}";
+            }
+
             internal static IEnumerable<string> GetFormatedAssetsDependency(AssetsDependency dependency)
             {
                 if (dependency == AssetsDependency.None)
@@ -152,6 +157,11 @@ namespace Sharpmake
         public IEnumerator<PackageReference> GetEnumerator()
         {
             return _packageReferences.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return string.Join(",", SortedValues);
         }
 
         public List<PackageReference> SortedValues => _packageReferences.SortedValues;

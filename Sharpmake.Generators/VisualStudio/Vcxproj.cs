@@ -608,6 +608,9 @@ namespace Sharpmake.Generators.VisualStudio
             // Generate and add reference to packages.config file for project
             if (firstConf.ReferencesByNuGetPackage.Count > 0)
             {
+                if (hasFastBuildConfig)
+                    throw new NotSupportedException("ReferencesByNuGetPackage is not supported in fastbuild projects.");
+
                 var packagesConfig = new PackagesConfig();
                 packagesConfig.Generate(context.Builder, firstConf, "native", context.ProjectDirectory, generatedFiles, skipFiles);
                 if (packagesConfig.IsGenerated)
@@ -659,7 +662,7 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
             
-            // add imports to nuget packages
+            // add imports to nuget packages, needs to be in ProjectTargets block
             foreach (var package in firstConf.ReferencesByNuGetPackage)
             {
                 fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceImport));
@@ -880,10 +883,13 @@ namespace Sharpmake.Generators.VisualStudio
                     // check consistency
                     foreach (var conf in context.ProjectConfigurations)
                     {
-                        if (firstConf.ReferencesByName.SortedValues.ToString() != conf.ReferencesByName.SortedValues.ToString())
+                        if (firstConf.ReferencesByName.ToString() != conf.ReferencesByName.ToString())
                             throw new Error("ReferencesByName in " + FileName + ProjectExtension + " are different between configurations. Please fix, or split the vcxproj.");
 
-                        if (firstConf.ReferencesByPath.SortedValues.ToString() != conf.ReferencesByPath.SortedValues.ToString())
+                        if (firstConf.ReferencesByNuGetPackage.ToString() != conf.ReferencesByNuGetPackage.ToString())
+                            throw new Error("ReferencesByNuGetPackage in " + FileName + ProjectExtension + " are different between configurations. Please fix, or split the vcxproj.");
+
+                        if (firstConf.ReferencesByPath.ToString() != conf.ReferencesByPath.ToString())
                             throw new Error("ReferencesByPath in " + FileName + ProjectExtension + " are different between configurations. Please fix, or split the vcxproj.");
                     }
                 }

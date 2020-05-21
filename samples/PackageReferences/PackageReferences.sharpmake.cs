@@ -112,10 +112,7 @@ namespace PackageReference
         [Configure()]
         public void ConfigureAll(Configuration conf, Target target)
         {
-            conf.SolutionFileName = String.Format("{0}.{1}.{2}",
-                                                  Name,
-                                                  "[target.DevEnv]",
-                                                  "[target.Framework]");
+            conf.SolutionFileName = "[solution.Name].[target.DevEnv].[target.Framework]";
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";
 
             if (target.Platform == Platform.anycpu)
