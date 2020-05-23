@@ -244,7 +244,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             string resolvedInclude = context.EnvironmentVariableResolver.Resolve(include);
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
                 resolvedInclude = Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true);
-            return $@"{prefix}""{resolvedInclude}""";
+            return $@"{prefix}{Util.DoubleQuotes}{resolvedInclude}{Util.DoubleQuotes}";
         }
 
         private void SelectPreprocessorDefinitions(CompileCommandGenerationContext context, string platformDefineSwitch)

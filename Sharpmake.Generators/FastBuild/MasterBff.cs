@@ -450,7 +450,7 @@ namespace Sharpmake.Generators.FastBuild
             GenerateMasterBffGlobalSettingsFile(builder, globalConfigFullPath, masterBffInfo);
 
             using (fileGenerator.Declare("fastBuildProjectName", masterBffFileName))
-            using (fileGenerator.Declare("fastBuildGlobalConfigurationInclude", $"#include \"{globalConfigFileName}\""))
+            using (fileGenerator.Declare("fastBuildGlobalConfigurationInclude", $"#include {Util.DoubleQuotes}{globalConfigFileName}{Util.DoubleQuotes}"))
             {
                 fileGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
                 foreach (Platform platform in platformBffCache.Keys) // kind of cheating to use that cache instead of the masterBffInfo.CompilerSettings, but it works :)

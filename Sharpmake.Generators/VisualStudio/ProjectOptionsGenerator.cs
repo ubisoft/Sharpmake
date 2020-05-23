@@ -188,7 +188,7 @@ namespace Sharpmake.Generators.VisualStudio
                             throw new Error($"Current platform {context.Configuration.Platform} doesn't support shared lib output type: Project {context.Project.GetType()} conf {context.Configuration.Target}");
                         }
                         context.Options["ConfigurationType"] = context.Configuration.IsFastBuild ? "Makefile" : "DynamicLibrary";
-                        context.CommandLineOptions["ConfigurationType"] = @"/D""_WINDLL""";
+                        context.CommandLineOptions["ConfigurationType"] = $@"/D{Util.DoubleQuotes}_WINDLL{Util.DoubleQuotes}";
                     }
                     break;
                 case Project.Configuration.OutputType.Lib:
@@ -259,7 +259,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 StringBuilder result = new StringBuilder();
                 foreach (var forcedInclude in forcedIncludes)
-                    result.Append(@"/FI""" + forcedInclude + @""" ");
+                    result.Append($@"/FI{Util.DoubleQuotes}{forcedInclude}{Util.DoubleQuotes}{Util.Space}");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["ForcedIncludeFiles"] = result.ToString();
             }
@@ -323,8 +323,8 @@ namespace Sharpmake.Generators.VisualStudio
                 context.SelectOption
                 (
                 Options.Option(Options.Vc.General.CharacterSet.Default, () => { context.Options["CharacterSet"] = "NotSet"; context.CommandLineOptions["CharacterSet"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Options.Option(Options.Vc.General.CharacterSet.Unicode, () => { context.Options["CharacterSet"] = "Unicode"; context.CommandLineOptions["CharacterSet"] = @"/D""_UNICODE"" /D""UNICODE"""; }),
-                Options.Option(Options.Vc.General.CharacterSet.MultiByte, () => { context.Options["CharacterSet"] = "MultiByte"; context.CommandLineOptions["CharacterSet"] = @"/D""_MBCS"""; })
+                Options.Option(Options.Vc.General.CharacterSet.Unicode, () => { context.Options["CharacterSet"] = "Unicode"; context.CommandLineOptions["CharacterSet"] = $@"/D{Util.DoubleQuotes}_UNICODE{Util.DoubleQuotes} /D{Util.DoubleQuotes}UNICODE{Util.DoubleQuotes}"; }),
+                Options.Option(Options.Vc.General.CharacterSet.MultiByte, () => { context.Options["CharacterSet"] = "MultiByte"; context.CommandLineOptions["CharacterSet"] = $@"/D{Util.DoubleQuotes}_MBCS{Util.DoubleQuotes}"; })
                 );
 
                 //Options.Vc.Compiler.CppLanguageStandard.
@@ -502,7 +502,7 @@ namespace Sharpmake.Generators.VisualStudio
             Strings resourcedefines = Options.GetStrings<Options.Vc.ResourceCompiler.PreprocessorDefinitions>(context.Configuration);
             if (resourcedefines.Any())
             {
-                context.Options["ResourcePreprocessorDefinitions"] = resourcedefines.JoinStrings(";").Replace(@"""", GetPlatformStringResourceDefineQuote(context.Configuration.Platform));
+                context.Options["ResourcePreprocessorDefinitions"] = resourcedefines.JoinStrings(";").Replace(Util.DoubleQuotes, GetPlatformStringResourceDefineQuote(context.Configuration.Platform));
                 writeResourceCompileTag = true;
             }
             else
@@ -979,7 +979,7 @@ namespace Sharpmake.Generators.VisualStudio
             context.SelectOption
             (
             Options.Option(Options.Vc.Compiler.GenerateXMLDocumentation.Disable, () => { context.Options["GenerateXMLDocumentation"] = "false"; context.CommandLineOptions["GenerateXMLDocumentation"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.Compiler.GenerateXMLDocumentation.Enable, () => { context.Options["GenerateXMLDocumentation"] = "true"; context.CommandLineOptions["GenerateXMLDocumentation"] = @"/doc""[project.RootPath]"""; })
+            Options.Option(Options.Vc.Compiler.GenerateXMLDocumentation.Enable, () => { context.Options["GenerateXMLDocumentation"] = "true"; context.CommandLineOptions["GenerateXMLDocumentation"] = $@"/doc{Util.DoubleQuotes}[project.RootPath]{Util.DoubleQuotes}"; })
             );
 
             //Options.Vc.Compiler.PrecompiledHeader
@@ -1080,7 +1080,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 StringBuilder result = new StringBuilder();
                 foreach (string disableWarning in disableWarnings.SortedValues)
-                    result.Append(@"/wd""" + disableWarning + @""" ");
+                    result.Append($@"/wd{Util.DoubleQuotes}{disableWarning}{Util.DoubleQuotes}{Util.Space}");
                 result.Remove(result.Length - 1, 1);
                 context.Options["DisableSpecificWarnings"] = disableWarnings.JoinStrings(";");
                 context.CommandLineOptions["DisableSpecificWarnings"] = result.ToString();
@@ -1099,7 +1099,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 StringBuilder result = new StringBuilder();
                 foreach (string undefine in undefinePreprocessors)
-                    result.Append(@"/U""" + undefine + @""" ");
+                    result.Append($@"/U{Util.DoubleQuotes}{undefine}{Util.DoubleQuotes}{Util.Space}");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["UndefinePreprocessorDefinitions"] = result.ToString();
             }
@@ -1497,7 +1497,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 StringBuilder result = new StringBuilder();
                 foreach (string delayedDLL in delayedDLLs)
-                    result.Append(@"/DELAYLOAD:""" + delayedDLL + @""" ");
+                    result.Append($@"/DELAYLOAD:{Util.DoubleQuotes}{delayedDLL}{Util.DoubleQuotes}{Util.Space}");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["DelayLoadedDLLs"] = result.ToString();
             }
@@ -1644,7 +1644,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (baseAddress != null && baseAddress.Value.Length > 0)
             {
                 context.Options["BaseAddress"] = baseAddress.Value;
-                context.CommandLineOptions["BaseAddress"] = @"/BASE:""" + (baseAddress.Value) + @"""";
+                context.CommandLineOptions["BaseAddress"] = $@"/BASE:{Util.DoubleQuotes}{baseAddress.Value}{Util.DoubleQuotes}";
             }
             else
             {
@@ -1702,7 +1702,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string windowsMetadataFile = @"$(OutDir)\$(RootNamespace).winmd";
                 context.Options["WindowsMetadataFile"] = windowsMetadataFile;
                 context.CommandLineOptions["GenerateWindowsMetadata"] = "/WINMD";
-                context.CommandLineOptions["WindowsMetadataFile"] = @"/WINMDFILE:""" + windowsMetadataFile + @"""";
+                context.CommandLineOptions["WindowsMetadataFile"] = $@"/WINMDFILE:{Util.DoubleQuotes}{windowsMetadataFile}{Util.DoubleQuotes}";
             }),
             Options.Option(Options.Vc.Linker.GenerateWindowsMetadata.Disable, () =>
             {
@@ -1751,7 +1751,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 string profileGuidedDatabase = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullName + ".pgd";
                 context.Options["ProfileGuidedDatabase"] = profileGuidedDatabase;
-                context.CommandLineOptions["ProfileGuidedDatabase"] = @"/PGD:""" + profileGuidedDatabase + @"""";
+                context.CommandLineOptions["ProfileGuidedDatabase"] = $@"/PGD:{Util.DoubleQuotes}{profileGuidedDatabase}{Util.DoubleQuotes}";
             }
             else
             {
@@ -1763,7 +1763,7 @@ namespace Sharpmake.Generators.VisualStudio
             // FunctionOrder="@..\path_to\order.txt"             /ORDER:"@..\path_to\order.txt"
             Options.Vc.Linker.FunctionOrder fctOrder = Options.GetObject<Options.Vc.Linker.FunctionOrder>(context.Configuration);
             context.Options["FunctionOrder"] = (fctOrder != null) ? fctOrder.Order : FileGeneratorUtilities.RemoveLineTag;
-            context.CommandLineOptions["FunctionOrder"] = (fctOrder != null) ? @"/ORDER:@""" + fctOrder.Order + @"""" : FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["FunctionOrder"] = (fctOrder != null) ? $@"/ORDER:@{Util.DoubleQuotes}{fctOrder.Order}{Util.DoubleQuotes}" : FileGeneratorUtilities.RemoveLineTag;
 
             context.SelectOption
             (
@@ -1883,7 +1883,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
-                context.Options["PreBuildEvent"] = (context.Configuration.EventPreBuild.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
+                context.Options["PreBuildEvent"] = (context.Configuration.EventPreBuild.JoinStrings(eventSeparator) + eventSeparator).Replace(Util.DoubleQuotes, @"&quot;");
                 context.Options["PreBuildEventDescription"] = context.Configuration.EventPreBuildDescription != string.Empty ? context.Configuration.EventPreBuildDescription : FileGeneratorUtilities.RemoveLineTag;
                 context.Options["PreBuildEventEnable"] = context.Configuration.EventPreBuildExcludedFromBuild ? "false" : "true";
             }
@@ -1896,7 +1896,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
-                context.Options["PreLinkEvent"] = (context.Configuration.EventPreLink.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
+                context.Options["PreLinkEvent"] = (context.Configuration.EventPreLink.JoinStrings(eventSeparator) + eventSeparator).Replace(Util.DoubleQuotes, @"&quot;");
                 context.Options["PreLinkEventDescription"] = context.Configuration.EventPreLinkDescription != string.Empty ? context.Configuration.EventPreLinkDescription : FileGeneratorUtilities.RemoveLineTag;
                 context.Options["PreLinkEventEnable"] = context.Configuration.EventPreLinkExcludedFromBuild ? "false" : "true";
             }
@@ -1909,7 +1909,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
-                context.Options["PrePostLinkEvent"] = (context.Configuration.EventPrePostLink.JoinStrings(eventSeparator) + eventSeparator).Replace(@"""", @"&quot;");
+                context.Options["PrePostLinkEvent"] = (context.Configuration.EventPrePostLink.JoinStrings(eventSeparator) + eventSeparator).Replace(Util.DoubleQuotes, @"&quot;");
                 context.Options["PrePostLinkEventDescription"] = context.Configuration.EventPrePostLinkDescription != string.Empty ? context.Configuration.EventPrePostLinkDescription : FileGeneratorUtilities.RemoveLineTag;
                 context.Options["PrePostLinkEventEnable"] = context.Configuration.EventPrePostLinkExcludedFromBuild ? "false" : "true";
             }
@@ -2171,7 +2171,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (optionsContext.PlatformVcxproj.HasUserAccountControlSupport)
                 {
-                    context.CommandLineOptions["GenerateManifest"] = string.Format(@"/MANIFEST /MANIFESTUAC:""level=^'{0}^' uiAccess=^'false^'""", context.Configuration.ApplicationPermissions);
+                    context.CommandLineOptions["GenerateManifest"] = $@"/MANIFEST /MANIFESTUAC:{Util.DoubleQuotes}level=^'{context.Configuration.ApplicationPermissions}^' uiAccess=^'false^'{Util.DoubleQuotes}";
 
                     switch (context.Configuration.ApplicationPermissions)
                     {
@@ -2194,7 +2194,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     string manifestFile = optionsContext.IntermediateDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullName + context.Configuration.ManifestFileSuffix;
                     context.Options["ManifestFile"] = manifestFile;
-                    context.CommandLineOptions["ManifestFile"] = @"/ManifestFile:""" + FormatCommandLineOptionPath(context, manifestFile) + @"""";
+                    context.CommandLineOptions["ManifestFile"] = $@"/ManifestFile:{Util.DoubleQuotes}{FormatCommandLineOptionPath(context, manifestFile)}{Util.DoubleQuotes}";
                 }
                 else
                 {
@@ -2286,14 +2286,14 @@ namespace Sharpmake.Generators.VisualStudio
                 // %2 is converted by FastBuild
                 // Output name of object being compiled, as specified by CompilerOutputPath and the name of discovered objects depending on the Compiler input options (extension is also replace with CompilerOutputExtension).
                 if (FastBuildSettings.EnableFastLinkPDBSupport && isFastLink)
-                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = @"/Fd""%2.pdb""";
+                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = $@"/Fd{Util.DoubleQuotes}%2.pdb{Util.DoubleQuotes}";
                 else if (!string.IsNullOrEmpty(cmdLineOptionsCompilerProgramDatabaseFile))
-                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = $@"/Fd""{cmdLineOptionsCompilerProgramDatabaseFile}""";
+                    context.CommandLineOptions["CompilerProgramDatabaseFile"] = $@"/Fd{Util.DoubleQuotes}{cmdLineOptionsCompilerProgramDatabaseFile}{Util.DoubleQuotes}";
                 else
                     context.CommandLineOptions["CompilerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
 
                 if (!string.IsNullOrEmpty(cmdLineOptionsLinkerProgramDatabaseFile))
-                    context.CommandLineOptions["LinkerProgramDatabaseFile"] = $@"/PDB:""{cmdLineOptionsLinkerProgramDatabaseFile}""";
+                    context.CommandLineOptions["LinkerProgramDatabaseFile"] = $@"/PDB:{Util.DoubleQuotes}{cmdLineOptionsLinkerProgramDatabaseFile}{Util.DoubleQuotes}";
                 else
                     context.CommandLineOptions["LinkerProgramDatabaseFile"] = FileGeneratorUtilities.RemoveLineTag;
             };
@@ -2333,11 +2333,11 @@ namespace Sharpmake.Generators.VisualStudio
                 string mapFileBffRelative = FormatCommandLineOptionPath(context, mapFile);
                 if (platform.IsUsingClang())
                 {
-                    context.CommandLineOptions["GenerateMapFile"] = $@"{platform.GetLinkerOptionPrefix()}-Map=""" + mapFileBffRelative + @"""";
+                    context.CommandLineOptions["GenerateMapFile"] = $@"{platform.GetLinkerOptionPrefix()}-Map={Util.DoubleQuotes}{mapFileBffRelative}{Util.DoubleQuotes}";
                 }
                 else
                 {
-                    context.CommandLineOptions["GenerateMapFile"] = @"/MAP"":" + mapFileBffRelative + @"""";
+                    context.CommandLineOptions["GenerateMapFile"] = $@"/MAP{Util.DoubleQuotes}:{mapFileBffRelative}{Util.DoubleQuotes}";
                 }
             };
 

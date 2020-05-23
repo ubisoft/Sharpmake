@@ -1261,7 +1261,7 @@ namespace Sharpmake.Generators.Apple
                 switch (_extension)
                 {
                     case "":
-                        return "\"compiled.mach-o.executable\"";
+                        return "{Util.DoubleQuotes}compiled.mach-o.executable{Util.DoubleQuotes}";
                     case ".c":
                         return "sourcecode.c.c";
                     case ".cpp":
@@ -1286,11 +1286,11 @@ namespace Sharpmake.Generators.Apple
                         return "sourcecode.metal";
 
                     case ".xcodeproj":
-                        return "\"wrapper.pb-project\"";
+                        return "{Util.DoubleQuotes}wrapper.pb-project{Util.DoubleQuotes}";
                     case ".framework":
                         return "wrapper.framework";
                     case ".bundle":
-                        return "\"wrapper.plug-in\"";
+                        return "{Util.DoubleQuotes}wrapper.plug-in{Util.DoubleQuotes}";
                     case ".nib":
                         return "wrapper.nib";
                     case ".app":
@@ -1298,7 +1298,7 @@ namespace Sharpmake.Generators.Apple
                     case ".xctest":
                         return "wrapper.cfbundle";
                     case ".dylib":
-                        return "\"compiled.mach-o.dylib\"";
+                        return "{Util.DoubleQuotes}compiled.mach-o.dylib{Util.DoubleQuotes}";
 
                     case ".txt":
                         return "text";
@@ -1340,7 +1340,7 @@ namespace Sharpmake.Generators.Apple
                         return "folder.assetcatalog";
                 }
 
-                return "\"?\"";
+                return $"{Util.DoubleQuotes}?{Util.DoubleQuotes}";
             }
 
             public override string Extension { get { return _extension; } }

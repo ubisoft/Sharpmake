@@ -475,8 +475,7 @@ namespace Sharpmake.Generators.VisualStudio
                 // set the compile command line 
                 if (File.Exists(visualStudioExe))
                 {
-                    solutionConfiguration.CompileCommandLine = string.Format(@"""{0}"" ""{1}"" /build ""{2}|{3}""",
-                        visualStudioExe, solutionFileInfo.FullName, configurationName, category);
+                    solutionConfiguration.CompileCommandLine = $@"{Util.DoubleQuotes}{visualStudioExe}{Util.DoubleQuotes} {Util.DoubleQuotes}{solutionFileInfo.FullName}{Util.DoubleQuotes} /build {Util.DoubleQuotes}{configurationName}|{category}{Util.DoubleQuotes}";
                 }
             }
 

@@ -720,7 +720,7 @@ namespace Sharpmake.Generators.FastBuild
                                 if (ShouldMakePathRelative(refByPath, context.Project))
                                     refByPathCopy = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, refByPath));
 
-                                fastBuildAdditionalCompilerOptionsFromCode += "/FU\"" + refByPathCopy + "\" ";
+                                fastBuildAdditionalCompilerOptionsFromCode += $"/FU{Util.DoubleQuotes}{refByPathCopy}{Util.DoubleQuotes} ";
                             }
                         }
 
@@ -1006,7 +1006,7 @@ namespace Sharpmake.Generators.FastBuild
                         if (projectHasEmbeddedResources)
                         {
                             embeddedResourceFilesSections.Add(fastBuildOutputFileShortName + "_embedded");
-                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "EmbedResources", "/ASSEMBLYRESOURCE:\"%3\""));
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "EmbedResources", $"/ASSEMBLYRESOURCE:{Util.DoubleQuotes}%3{Util.DoubleQuotes}"));
                         }
                         else
                         {

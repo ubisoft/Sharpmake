@@ -14,7 +14,7 @@ namespace Sharpmake.Generators.Apple
 ";
             public static string Footer = "</Workspace>";
 
-            public static string ProjectReference = "\t<FileRef\n\t\tlocation = \"group:[projectName].xcodeproj\">\n\t</FileRef>\n";
+            public static string ProjectReference = $"\t<FileRef\n\t\tlocation = {Util.DoubleQuotes}group:[projectName].xcodeproj{Util.DoubleQuotes}>\n\t</FileRef>\n";
 
             public static string ProjectReferenceAbsolute =
 @"[indent]    <FileRef

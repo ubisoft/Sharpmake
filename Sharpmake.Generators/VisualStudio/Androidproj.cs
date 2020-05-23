@@ -419,13 +419,13 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     // The lib name to first load from an AndroidActivity must be a dynamic library.
                     if (appLibConf.Output != Project.Configuration.OutputType.Dll)
-                        throw new Error("Cannot use configuration \"{0}\" as app lib for package configuration \"{1}\". Output type must be set to dynamic library.", appLibConf, conf);
+                        throw new Error($"Cannot use configuration {Util.DoubleQuotes}{appLibConf}{Util.DoubleQuotes} as app lib for package configuration {Util.DoubleQuotes}{conf}{Util.DoubleQuotes}. Output type must be set to dynamic library.");
 
                     options["AndroidAppLibName"] = appLibConf.TargetFilePrefix + appLibConf.TargetFileName + appLibConf.TargetFileSuffix;
                 }
                 else
                 {
-                    throw new Error("Missing dependency of type \"{0}\" in configuration \"{1}\" dependencies.", context.AndroidPackageProject.AppLibType.ToNiceTypeName(), conf);
+                    throw new Error($"Missing dependency of type {Util.DoubleQuotes}{context.AndroidPackageProject.AppLibType.ToNiceTypeName()}{Util.DoubleQuotes} in configuration {Util.DoubleQuotes}{conf}{Util.DoubleQuotes} dependencies.");
                 }
             }
             //OutputDirectory

@@ -346,7 +346,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
-                writer.WriteLine(prefix + "<Folder Include=\"" + GetProperRelativePathToSourcePath(directory.Path) + "\" />");
+                writer.WriteLine(prefix + $"<Folder Include={Util.DoubleQuotes}{GetProperRelativePathToSourcePath(directory.Path)}{Util.DoubleQuotes} />");
             }
 
             foreach (ProjectDirectory subDirectory in directory.Directories)
@@ -358,7 +358,7 @@ namespace Sharpmake.Generators.VisualStudio
         private void WriteProjectFile(StreamWriter writer, string filename, string prefix)
         {
             string fileTag = (Path.GetExtension(filename) == ".py") ? "Compile" : "Content";
-            writer.WriteLine(prefix + "<" + fileTag + " Include=\"" + GetProperRelativePathToSourcePath(filename) + "\" />");
+            writer.WriteLine(prefix + $"<{fileTag} Include={Util.DoubleQuotes}{GetProperRelativePathToSourcePath(filename)}{Util.DoubleQuotes} />");
         }
 
         private string GetProperRelativePathToSourcePath(string path)
