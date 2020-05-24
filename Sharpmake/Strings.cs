@@ -147,7 +147,7 @@ namespace Sharpmake
                 if (OrderNumber != obj.OrderNumber)
                 {
                     if (OrderNumber != 0 && obj.OrderNumber != 0 && StringValue == obj.StringValue)
-                        throw new Error("Cannot specify to different non-zero order values for same value \"" + StringValue + "\"");
+                        throw new Error($"Cannot specify to different non-zero order values for same value {Util.DoubleQuotes}{StringValue}{Util.DoubleQuotes}");
 
                     return OrderNumber.CompareTo(obj.OrderNumber);
                 }
@@ -259,9 +259,7 @@ namespace Sharpmake
                             _list[i] = new StringEntry(item, orderNumber);
                         else if (_list[i].OrderNumber != orderNumber)
                         {
-                            throw new Error(
-                                "Cannot specify 2 different non-zero order number for \"" +
-                                item + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            throw new Error($"Cannot specify 2 different non-zero order number for {Util.DoubleQuotes}{item}{Util.DoubleQuotes}: {_list[i].OrderNumber} and {orderNumber}");
                         }
                     }
                 }
@@ -300,9 +298,7 @@ namespace Sharpmake
                             _list[i] = new StringEntry(_list[i].StringValue, orderNumber);
                         else if (_list[i].OrderNumber != orderNumber)
                         {
-                            throw new Error(
-                                "Cannot specify 2 different non-zero order number for \"" +
-                                _list[i].StringValue + "\": " + _list[i].OrderNumber + " and " + orderNumber);
+                            throw new Error($"Cannot specify 2 different non-zero order number for {Util.DoubleQuotes}{_list[i].StringValue}{Util.DoubleQuotes}: {_list[i].OrderNumber} and {orderNumber}");
                         }
                     }
                 }

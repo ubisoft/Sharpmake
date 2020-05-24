@@ -528,7 +528,7 @@ namespace Sharpmake
             public delegate string TargetCopyCommandCreator(string relativeSourcePath, string relativeTargetPath, string workingPath);
 
             public TargetCopyCommandCreator CreateTargetCopyCommand =
-                (source, target, workingPath) => string.Format(@"xcopy /d /F /R /H /V /Y ""{0}"" ""{1}"" >nul", source, target);
+                (source, target, workingPath) => string.Format($@"xcopy /d /F /R /H /V /Y {Util.DoubleQuotes}{source}{Util.DoubleQuotes} {Util.DoubleQuotes}{target}{Util.DoubleQuotes} >nul");
 
             /// <summary>
             /// Setting this boolean to true forces Sharpmake to fill in the AD fields in the current static
@@ -1653,9 +1653,9 @@ namespace Sharpmake
                         "/nfl", // /NFL :: No File List - don't log file names.
 
                         // parameters
-                        "\"" + sourceRelativePath + "\"",
-                        "\"" + destinationRelativePath + "\"",
-                        "\"" + CopyPattern + "\"",
+                        $"{Util.DoubleQuotes}{sourceRelativePath}{Util.DoubleQuotes}",
+                        $"{Util.DoubleQuotes}{destinationRelativePath}{Util.DoubleQuotes}",
+                        $"{Util.DoubleQuotes}{CopyPattern}{Util.DoubleQuotes}",
 
                         "> nul", // direct all remaining stdout to nul
 

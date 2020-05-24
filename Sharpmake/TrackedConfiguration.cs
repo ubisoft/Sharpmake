@@ -204,17 +204,17 @@ namespace Sharpmake
                 {
                     case DependencyType.Public:
                         color = "color=" + DependencyTracker.ColorPublicDep;
-                        label = "label=\"Public\"";
+                        label = $"label={Util.DoubleQuotes}Public{Util.DoubleQuotes}";
                         break;
                     case DependencyType.Private:
                         color = "color=" + DependencyTracker.ColorPrivateDep;
-                        label = "label=\"Private\"";
+                        label = $"label={Util.DoubleQuotes}Private{Util.DoubleQuotes}";
                         break;
                 }
 
                 string setting = string.Empty;
                 if (dep.Value.Item2 != DependencySetting.Default)
-                    setting = ", label=\"  " + dep.Value.Item2.ToString() + "\", fontsize=8, fontcolor=\"white\", fontname=\"sans-serif\"";
+                    setting = $", label={Util.DoubleQuotes}  {dep.Value.Item2.ToString()}{Util.DoubleQuotes}, fontsize=8, fontcolor={Util.DoubleQuotes}white{Util.DoubleQuotes}, fontname={Util.DoubleQuotes}sans-serif{Util.DoubleQuotes}";
 
                 if (verbose)
                     stream.WriteLine("[" + color + "," + width + ", " + label + "]");

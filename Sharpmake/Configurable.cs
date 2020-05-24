@@ -221,7 +221,7 @@ namespace Sharpmake
                 {
                     ITarget otherTarget = usedTargetNames[targetString];
                     string diffString = Util.MakeDifferenceString(target, otherTarget);
-                    throw new Error("Target string \"" + target + "\" is present twice; difference is: " + diffString);
+                    throw new Error($"Target string {Util.DoubleQuotes}{target}{Util.DoubleQuotes} is present twice; difference is: {diffString}");
                 }
                 usedTargetNames.Add(targetString, target);
 

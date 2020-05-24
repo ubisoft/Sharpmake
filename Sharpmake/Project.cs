@@ -1317,7 +1317,7 @@ namespace Sharpmake
 
             // include precomp if needed
             if (configurationPrecomp != null)
-                writer.Write("#include \"{0}\"" + Environment.NewLine + Environment.NewLine, configurationPrecomp.PrecompHeader.Replace(Util.WindowsSeparator, Util.UnixSeparator));
+                writer.Write($"#include {Util.DoubleQuotes}{configurationPrecomp.PrecompHeader.Replace(Util.WindowsSeparator, Util.UnixSeparator)}{Util.DoubleQuotes}{Environment.NewLine}{Environment.NewLine}");
 
             if (header != null)
                 writer.WriteLine(header + Environment.NewLine);
@@ -1345,7 +1345,7 @@ namespace Sharpmake
                 {
                     writer.Write("#pragma message(\"{0} - {1}\")" + Environment.NewLine, blobFileInfo.Name, sourceFileDisplay);
                 }
-                writer.Write("#include \"{0}\"" + Environment.NewLine + Environment.NewLine, sourceFileRelative);
+                writer.Write($"#include {Util.DoubleQuotes}{sourceFileRelative}{Util.DoubleQuotes}{Environment.NewLine}{Environment.NewLine}");
             }
 
             if (footer != null)
@@ -2178,8 +2178,8 @@ namespace Sharpmake
             aspNetProject.CustomTargets.Add(new CSharpProject.CustomTargetElement()
             {
                 Name = "MvcBuildViews",
-                TargetParameters = @"AfterTargets=""AfterBuild"" Condition=""'$(MvcBuildViews)' == 'true'""",
-                CustomTasks = @"<AspNetCompiler VirtualPath=""temp"" PhysicalPath=""$(WebProjectOutputDir)"" />"
+                TargetParameters = $@"AfterTargets={Util.DoubleQuotes}AfterBuild{Util.DoubleQuotes} Condition={Util.DoubleQuotes}{Util.SimpleQuote}$(MvcBuildViews){Util.SimpleQuote} == {Util.SimpleQuote}true{Util.SimpleQuote}{Util.DoubleQuotes}",
+                CustomTasks = $@"<AspNetCompiler VirtualPath={Util.DoubleQuotes}temp{Util.DoubleQuotes} PhysicalPath={Util.DoubleQuotes}$(WebProjectOutputDir){Util.DoubleQuotes} />"
             });
 
             aspNetProject.DependenciesCopyLocal = Project.DependenciesCopyLocalTypes.Default;
