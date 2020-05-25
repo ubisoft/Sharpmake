@@ -2891,7 +2891,7 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
-                                string platformDllExtension = "." + configTasks.GetDefaultOutputExtension(OutputType.Dll);
+                                string platformDllExtension = "." + dependency.OutputExtension;
                                 string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + platformDllExtension);
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
