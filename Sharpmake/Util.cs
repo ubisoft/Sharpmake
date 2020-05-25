@@ -2286,6 +2286,11 @@ namespace Sharpmake
             return modifiedPath;
         }
 
+        public static uint Rotl32(uint x, int r)
+        {
+            return (x << r) | (x >> (32 - r));
+        }
+
         public static Object ReadRegistryValue(string key, string value, Object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);

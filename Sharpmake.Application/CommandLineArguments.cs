@@ -50,6 +50,9 @@ namespace Sharpmake.Application
             public bool BlobOnly = false;
             public bool CleanBlobsOnly = false;
             public bool Multithreaded = true;
+            public bool RegexMatchCacheEnabled = true;
+            // Default capacity based on a big project numbers
+            public int  RegexMatchCacheInitialCapacity = (1 << 20) + 1;
             public bool SkipInvalidPath = false;
             public bool DebugLog = false;
             public bool Debug = false;
@@ -121,6 +124,18 @@ namespace Sharpmake.Application
             public void CommandLineMultithreaded(bool value)
             {
                 Multithreaded = value;
+            }
+
+            [CommandLine.Option("regexMatchCache", @"Enables/disables regex match cache optimization. Might improve performance on large projects. Enabled by default. ex: /regexMatchCache(false)")]
+            public void CommandLineRegexMatchCacheEnabled(bool value)
+            {
+                RegexMatchCacheEnabled = value;
+            }
+
+            [CommandLine.Option("regexMatchCacheInitialCapacity", @"Initial capacity of regex match cache. Should be set to a value higher or equal to the size which the cache is expected to reach over a run, otherwise performance might suffer. ex: /regexMatchCacheInitialCapacity(1048577)")]
+            public void CommandLineRegexMatchCacheInitialCapacity(int value)
+            {
+                RegexMatchCacheInitialCapacity = value;
             }
 
             [CommandLine.Option("DumpDependency", @"Dump projects dependencies in dot format: ex: /DumpDependency")]
