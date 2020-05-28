@@ -991,7 +991,10 @@ namespace Sharpmake.Generators.VisualStudio
                 var dependencies = new UniqueList<ProjectDependencyInfo>();
                 foreach (var configuration in context.ProjectConfigurations)
                 {
-                    foreach (var configurationDependency in configuration.ConfigurationDependencies)
+                    var configDeps = new UniqueList<Project.Configuration>();
+                    configDeps.AddRange(configuration.ConfigurationDependencies);
+                    configDeps.AddRange(configuration.BuildOrderDependencies);
+                    foreach (var configurationDependency in configDeps)
                     {
                         // Ignore projects marked as Export
                         if (configurationDependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)

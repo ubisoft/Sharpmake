@@ -872,7 +872,7 @@ namespace Sharpmake.Generators.VisualStudio
         private string _projectPathCapitalized;
         private Builder _builder;
         public const string ProjectExtension = ".csproj";
-        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+        private const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
 
         private void SelectOption(params Options.OptionAction[] options)
@@ -2856,13 +2856,13 @@ namespace Sharpmake.Generators.VisualStudio
                     break;
             }
 
-            string outputDirectoryRelative = Util.PathGetRelative(_projectPath, conf.TargetPath);
-            string outputLibDirectoryRelative = Util.PathGetRelative(_projectPath, conf.TargetLibraryPath);
+            string outputDirectoryRelative = conf.PreferRelativePaths ? Util.PathGetRelative(_projectPath, conf.TargetPath) : Util.PathGetAbsolute(_projectPath, conf.TargetPath);
+            string outputLibDirectoryRelative = conf.PreferRelativePaths ? Util.PathGetRelative(_projectPath, conf.TargetLibraryPath) : Util.PathGetAbsolute(_projectPath, conf.TargetLibraryPath);
 
             options["OutputDirectory"] = conf.Output == Project.Configuration.OutputType.Lib ? outputLibDirectoryRelative : outputDirectoryRelative;
 
             //IntermediateDirectory
-            string intermediateDirectory = Util.PathGetRelative(_projectPath, conf.IntermediatePath);
+            string intermediateDirectory = conf.PreferRelativePaths ? Util.PathGetRelative(_projectPath, conf.IntermediatePath) : Util.PathGetAbsolute(_projectPath, conf.IntermediatePath);
             options["IntermediateDirectory"] = intermediateDirectory;
 
             //BaseIntermediateOutputPath

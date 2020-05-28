@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -346,6 +346,49 @@ namespace Sharpmake
             return version;
         }
 
+        private static string GetDefaultRedistVersion(this DevEnv visualVersion)
+        {
+            switch (visualVersion)
+            {
+                case DevEnv.vs2017:
+                    return "14.16.27012";
+                case DevEnv.vs2019:
+                    return "14.24.28127";
+                default:
+                    throw new Error("DevEnv " + visualVersion + " not recognized for default compiler version");
+            }
+        }
+
+        private static readonly ConcurrentDictionary<DevEnv, Version> s_visualStudioVCRedistVersionCache = new ConcurrentDictionary<DevEnv, Version>();
+        public static Version GetVisualStudioVCRedistVersion(this DevEnv visualVersion)
+        {
+            Version version = s_visualStudioVCRedistVersionCache.GetOrAdd(visualVersion, devEnv =>
+            {
+                string vsDir = visualVersion.GetVisualStudioDir();
+                switch (visualVersion)
+                {
+                    case DevEnv.vs2017:
+                    case DevEnv.vs2019:
+                        string versionString = visualVersion.GetDefaultRedistVersion(); // default fallback
+                        try
+                        {
+                            string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCRedistVersion.default.txt");
+                            if (File.Exists(toolchainFile))
+                            {
+                                using (StreamReader file = new StreamReader(toolchainFile))
+                                    versionString = file.ReadLine().Trim();
+                            }
+                        }
+                        catch { }
+
+                        return new Version(versionString);
+                }
+                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+            });
+
+            return version;
+        }
+
         public static string GetVisualStudioBinPath(this DevEnv visualVersion, Platform platform)
         {
             switch (visualVersion)
@@ -610,6 +653,7 @@ namespace Sharpmake
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0: return "10.0.17134.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0: return "10.0.17763.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_18362_0: return "10.0.18362.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0: return "10.0.19041.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.Latest: return "$(LatestTargetPlatformVersion)";
                 default:
                     throw new ArgumentOutOfRangeException(windowsTargetPlatformVersion.ToString());

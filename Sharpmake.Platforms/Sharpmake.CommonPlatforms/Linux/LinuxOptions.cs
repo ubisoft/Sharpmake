@@ -205,6 +205,13 @@ namespace Sharpmake
                     [Default]
                     Disable
                 }
+
+                public enum WholeArchive
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
             }
         }
     }

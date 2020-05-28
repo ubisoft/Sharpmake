@@ -258,7 +258,8 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.General.AndroidAPILevel.Latest, () => {
+                Options.Option(Options.Android.General.AndroidAPILevel.Latest, () =>
+                {
                     string lookupDirectory;
                     if (context.Project is AndroidPackageProject)
                     {

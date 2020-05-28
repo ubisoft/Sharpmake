@@ -113,16 +113,12 @@ namespace Sharpmake
 
             public override void SetupSdkOptions(IGenerationContext context)
             {
-                //Copy Sources.
-                //    Enable                                  Copy Sources="Yes"
-                //    Disable                                 Copy Sources="No" default
                 context.SelectOption
                 (
-                    Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "Yes"; }),
-                    Sharpmake.Options.Option(Options.General.CopySources.Disable, () => { context.Options["CopySources"] = "No"; })
+                    Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "true"; }),
+                    Sharpmake.Options.Option(Options.General.CopySources.Disable, () => { context.Options["CopySources"] = "false"; })
                 );
 
-                //Remote Tool.
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCppCompileToolExe"] = "g++"; }),
@@ -288,6 +284,12 @@ namespace Sharpmake
                 (
                 Sharpmake.Options.Option(Options.Linker.UseThinArchives.Enable, () => { options["UseThinArchives"] = "true"; cmdLineOptions["UseThinArchives"] = "T"; }),
                 Sharpmake.Options.Option(Options.Linker.UseThinArchives.Disable, () => { options["UseThinArchives"] = "false"; cmdLineOptions["UseThinArchives"] = ""; })
+                );
+
+                context.SelectOption
+                (
+                Sharpmake.Options.Option(Options.Linker.WholeArchive.Enable, () => { options["WholeArchive"] = "true"; cmdLineOptions["WholeArchiveBegin"] = "--whole-archive"; cmdLineOptions["WholeArchiveEnd"] = "--no-whole-archive"; }),
+                Sharpmake.Options.Option(Options.Linker.WholeArchive.Disable, () => { options["WholeArchive"] = "false"; cmdLineOptions["WholeArchiveBegin"] = FileGeneratorUtilities.RemoveLineTag; cmdLineOptions["WholeArchiveEnd"] = FileGeneratorUtilities.RemoveLineTag; })
                 );
             }
 
