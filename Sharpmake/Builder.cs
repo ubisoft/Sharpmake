@@ -281,6 +281,8 @@ namespace Sharpmake
                         {
                             _buildScheduledType.Add(projectDependenciesType);
                         }
+
+                        Arguments.TypesToGenerate.AddRange(_buildScheduledType);
                     }
                 }
                 else
@@ -291,9 +293,9 @@ namespace Sharpmake
                     }
 
                     _tasks.Wait();
+                    
+                    Arguments.TypesToGenerate.AddRange(_buildScheduledType);
                 }
-
-                Arguments.TypesToGenerate.AddRange(_buildScheduledType);
             }
         }
 
