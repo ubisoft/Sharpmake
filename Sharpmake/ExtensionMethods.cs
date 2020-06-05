@@ -713,6 +713,37 @@ namespace Sharpmake
             }
         }
 
+        public static DevEnv? GetDefaultDevEnvForToolset(this Options.Vc.General.PlatformToolset platformToolset)
+        {
+            switch (platformToolset)
+            {
+                case Options.Vc.General.PlatformToolset.Default:
+                    return null;
+                case Options.Vc.General.PlatformToolset.v100:
+                    return DevEnv.vs2010;
+                case Options.Vc.General.PlatformToolset.v110:
+                case Options.Vc.General.PlatformToolset.v110_xp:
+                    return DevEnv.vs2012;
+                case Options.Vc.General.PlatformToolset.v120:
+                case Options.Vc.General.PlatformToolset.v120_xp:
+                    return DevEnv.vs2013;
+                case Options.Vc.General.PlatformToolset.v140:
+                case Options.Vc.General.PlatformToolset.v140_xp:
+                    return DevEnv.vs2015;
+                case Options.Vc.General.PlatformToolset.v141:
+                case Options.Vc.General.PlatformToolset.v141_xp:
+                    return DevEnv.vs2017;
+                case Options.Vc.General.PlatformToolset.v142:
+                    return DevEnv.vs2019;
+                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
+                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
+                case Options.Vc.General.PlatformToolset.LLVM:
+                    return null;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(platformToolset), platformToolset, null);
+            }
+        }
+
         public static bool IsLLVMToolchain(this Options.Vc.General.PlatformToolset platformToolset)
         {
             switch (platformToolset)
