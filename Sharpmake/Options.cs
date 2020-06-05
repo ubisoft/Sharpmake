@@ -103,6 +103,35 @@ namespace Sharpmake
             public int Value { get; }
         }
 
+        /// <summary>
+        /// Used to hold an option that has an untyped argument, could be another option
+        /// </summary>
+        public abstract class WithArgOption<T>
+        {
+            public static bool Get<U>(Configuration conf, ref T option)
+                where U : WithArgOption<T>
+            {
+                var optionObject = Options.GetObject<U>(conf);
+                if (optionObject == null)
+                {
+                    var defaultValue = typeof(U).GetField("Default", BindingFlags.Static);
+                    if (defaultValue != null)
+                        option = (T)defaultValue.GetValue(null);
+                    return false;
+                }
+
+                option = optionObject.Argument;
+                return true;
+            }
+
+            protected WithArgOption(T argument)
+            {
+                Argument = argument;
+            }
+
+            public T Argument { get; }
+        }
+
         internal class ScopedOption : IDisposable
         {
             private Dictionary<string, string> _options;
