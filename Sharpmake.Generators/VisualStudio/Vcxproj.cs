@@ -25,7 +25,7 @@ namespace Sharpmake.Generators.VisualStudio
         // sharpmake dev options for now, use with care!
         // this will disable visual studio registry lookups
         private const bool _enableRegistryUse = true;
-        private const bool _enableInstalledVCTargetsUse = true;
+        private const bool _enableInstalledVCTargetsUse = false;
 
         public enum BuildStep
         {

@@ -423,6 +423,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public const string AdditionalVCTargetsPath =
                     @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
+    <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForToolset>
 ";
 
                 internal static class Filters
