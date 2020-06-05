@@ -430,7 +430,6 @@ namespace Sharpmake
             {
                 string propertyGroups = string.Empty;
 
-
                 // MSBuild override when mixing devenvs in the same vcxproj is not supported,
                 // but before throwing an exception check if we have some override
                 for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; devEnv = (DevEnv)((int)devEnv << 1))
@@ -440,7 +439,7 @@ namespace Sharpmake
                         case DevEnv.vs2015:
                         case DevEnv.vs2017:
                             {
-                                string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(context.DevelopmentEnvironmentsRange.MinDevEnv, Platform.win64);
+                                string platformFolder = MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, Platform.win64);
                                 if (!string.IsNullOrEmpty(platformFolder))
                                 {
                                     using (generator.Declare("platformFolder", Util.EnsureTrailingSeparator(platformFolder))) // _PlatformFolder require the path to end with a "\"
