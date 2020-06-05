@@ -346,6 +346,29 @@ namespace Sharpmake
             return version;
         }
 
+        public static string GetVCTargetsPath(this DevEnv visualVersion)
+        {
+            if (!visualVersion.IsVisualStudio())
+                return null;
+
+            switch (visualVersion)
+            {
+                case DevEnv.vs2010:
+                    return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Microsoft.Cpp\v4.0"));
+                case DevEnv.vs2012:
+                case DevEnv.vs2013:
+                case DevEnv.vs2015:
+                    string versionSubfolder = visualVersion.GetDefaultPlatformToolset().ToUpperInvariant(); // this is enough for now but we could make a specific method to retrieve this value
+                    return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Microsoft.Cpp\v4.0", versionSubfolder));
+                case DevEnv.vs2017:
+                    return Path.Combine(visualVersion.GetVisualStudioDir(), @"Common7\IDE\VC\VCTargets");
+                case DevEnv.vs2019:
+                    return Path.Combine(visualVersion.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\v160");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(visualVersion), visualVersion, null);
+            }
+        }
+
         private static string GetDefaultRedistVersion(this DevEnv visualVersion)
         {
             switch (visualVersion)
