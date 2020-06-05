@@ -78,6 +78,7 @@ namespace Sharpmake
 
         public static bool FastBuildReport = false;
         public static bool FastBuildSummary = true;
+        public static bool FastBuildNoSummaryOnError = false;
         public static bool FastBuildVerbose = false;
         public static bool FastBuildDistribution = false;
         public static bool FastBuildWait = false;

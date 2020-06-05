@@ -470,6 +470,9 @@ namespace Sharpmake.Generators.VisualStudio
                         if (FastBuildSettings.FastBuildReport)
                             fastBuildCommandLineOptions.Add("-report");
 
+                        if (FastBuildSettings.FastBuildNoSummaryOnError)
+                            fastBuildCommandLineOptions.Add("-nosummaryonerror");
+
                         if (FastBuildSettings.FastBuildSummary)
                             fastBuildCommandLineOptions.Add("-summary");
 
