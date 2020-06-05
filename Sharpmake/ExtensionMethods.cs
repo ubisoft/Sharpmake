@@ -744,6 +744,35 @@ namespace Sharpmake
             }
         }
 
+        public static void GetVcPathKeysFromDevEnv(this DevEnv devEnv, out string vcTargetsPathKey, out string vcRootPathKey)
+        {
+            switch (devEnv)
+            {
+                case DevEnv.vs2012:
+                    vcTargetsPathKey = "VCTargetsPath11";
+                    vcRootPathKey = "VCInstallDir_110";
+                    break;
+                case DevEnv.vs2013:
+                    vcTargetsPathKey = "VCTargetsPath12";
+                    vcRootPathKey = "VCInstallDir_120";
+                    break;
+                case DevEnv.vs2015:
+                    vcTargetsPathKey = "VCTargetsPath14";
+                    vcRootPathKey = "VCInstallDir_140";
+                    break;
+                case DevEnv.vs2017:
+                    vcTargetsPathKey = "VCTargetsPath15";
+                    vcRootPathKey = "VCInstallDir_150";
+                    break;
+                case DevEnv.vs2019:
+                    vcTargetsPathKey = "VCTargetsPath16";
+                    vcRootPathKey = "VCInstallDir_160";
+                    break;
+                default:
+                    throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
+            }
+        }
+
         public static bool IsLLVMToolchain(this Options.Vc.General.PlatformToolset platformToolset)
         {
             switch (platformToolset)
