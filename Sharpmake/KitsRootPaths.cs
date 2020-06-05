@@ -79,6 +79,11 @@ namespace Sharpmake
             s_kitsRoots[kitsRoot] = kitsRootPath;
         }
 
+        public static bool IsKitsRootForDevEnvOverriden(DevEnv devEnv)
+        {
+            return s_useKitsRootForDevEnv.ContainsKey(devEnv);
+        }
+
         public static KitsRootEnum GetUseKitsRootForDevEnv(DevEnv devEnv)
         {
             if (s_useKitsRootForDevEnv.ContainsKey(devEnv))
