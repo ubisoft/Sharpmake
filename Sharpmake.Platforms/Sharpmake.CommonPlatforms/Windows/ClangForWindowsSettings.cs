@@ -86,7 +86,7 @@ namespace Sharpmake
                 generator.Write(llvmOverrideSection);
         }
 
-        internal static string GetLLVMOverridesSection(IVcxprojGenerationContext context, Resolver resolver)
+        public static string GetLLVMOverridesSection(IVcxprojGenerationContext context, Resolver resolver)
         {
             if (Settings.OverridenLLVMInstallDir)
             {
