@@ -706,16 +706,37 @@ namespace Sharpmake.Generators.FastBuild
                                         string mscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
                                         if (string.IsNullOrEmpty(mscVer))
                                         {
-                                            switch (context.DevelopmentEnvironment)
+                                            Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                                            if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset)
+                                                && overridenPlatformToolset != Options.Vc.General.PlatformToolset.Default
+                                                && !overridenPlatformToolset.IsDefaultToolsetForDevEnv(context.DevelopmentEnvironment))
                                             {
-                                                case DevEnv.vs2017:
-                                                    mscVer = "1910";
-                                                    break;
-                                                case DevEnv.vs2019:
-                                                    mscVer = "1920";
-                                                    break;
-                                                default:
-                                                    throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());
+                                                switch (overridenPlatformToolset)
+                                                {
+                                                    case Options.Vc.General.PlatformToolset.v141:
+                                                    case Options.Vc.General.PlatformToolset.v141_xp:
+                                                        mscVer = "1910";
+                                                        break;
+                                                    case Options.Vc.General.PlatformToolset.v142:
+                                                        mscVer = "1920";
+                                                        break;
+                                                    default:
+                                                        throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                switch (context.DevelopmentEnvironment)
+                                                {
+                                                    case DevEnv.vs2017:
+                                                        mscVer = "1910";
+                                                        break;
+                                                    case DevEnv.vs2019:
+                                                        mscVer = "1920";
+                                                        break;
+                                                    default:
+                                                        throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());
+                                                }
                                             }
                                         }
                                         llvmClangCompilerOptions = string.Format("-m64 -fmsc-version={0}", mscVer); // -m$(PlatformArchitecture)

@@ -22,9 +22,10 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Vcxproj : IProjectGenerator
     {
-        // dev option for now, this will disable visual studio registry lookups
-        // use with care!
+        // sharpmake dev options for now, use with care!
+        // this will disable visual studio registry lookups
         private const bool _enableRegistryUse = true;
+        private const bool _enableInstalledVCTargetsUse = true;
 
         public enum BuildStep
         {
@@ -234,9 +235,16 @@ namespace Sharpmake.Generators.VisualStudio
         private void WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
             bool registrySettingWritten = false;
+            bool disableInstalledVcTargetsUseWritten = false;
+            bool msBuildExtensionsPathWritten = false;
+
+            var platformToolsets = context.ProjectConfigurations.Select(Options.GetObject<Options.Vc.General.PlatformToolset>);
+            var devEnvForToolsets = platformToolsets.Select(pts => pts.GetDefaultDevEnvForToolset()).Where(pts => pts != null).Select(d => d.Value);
+            var regularRange = EnumUtils.EnumerateValues<DevEnv>().Where(d => d >= context.DevelopmentEnvironmentsRange.MinDevEnv && d <= context.DevelopmentEnvironmentsRange.MaxDevEnv);
 
             bool? overrideCheck = null;
-            for (DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv; devEnv <= context.DevelopmentEnvironmentsRange.MaxDevEnv; devEnv = (DevEnv)((int)devEnv << 1))
+            var allDevEnvs = devEnvForToolsets.Union(regularRange).Distinct().OrderBy(d => d).ToArray();
+            foreach (DevEnv devEnv in allDevEnvs)
             {
                 bool vsDirOverriden = devEnv.OverridenVisualStudioDir();
                 if (overrideCheck.HasValue)
@@ -261,41 +269,27 @@ namespace Sharpmake.Generators.VisualStudio
                     registrySettingWritten = true;
                 }
 
-                string vcRootPathKey;
-                switch (devEnv)
+                if (!_enableInstalledVCTargetsUse && !disableInstalledVcTargetsUseWritten)
                 {
-                    case DevEnv.vs2012:
-                        vcRootPathKey = "VCInstallDir_110";
-                        break;
-                    case DevEnv.vs2013:
-                        vcRootPathKey = "VCInstallDir_120";
-                        break;
-                    case DevEnv.vs2015:
-                        vcRootPathKey = "VCInstallDir_140";
-                        break;
-                    case DevEnv.vs2017:
-                        vcRootPathKey = "VCInstallDir_150";
-                        break;
-                    case DevEnv.vs2019:
-                        vcRootPathKey = "VCInstallDir_160";
-                        break;
-                    default:
-                        throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
+                    fileGenerator.Write(Template.Project.DisableInstalledVcTargetsUse);
+                    disableInstalledVcTargetsUseWritten = true;
                 }
+
+                string vcRootPathKey;
+                string vcTargetsPathKey;
+                devEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
 
                 using (fileGenerator.Declare("vcInstallDirKey", vcRootPathKey))
                 using (fileGenerator.Declare("vcInstallDirValue", Util.EnsureTrailingSeparator(Path.Combine(devEnv.GetVisualStudioDir(), @"VC\"))))
-                using (fileGenerator.Declare("msBuildExtensionsPath", Util.EnsureTrailingSeparator(GetMSBuildExtensionsPathOverride(devEnv))))
+                using (fileGenerator.Declare("msBuildExtensionsPath", msBuildExtensionsPathWritten ? FileGeneratorUtilities.RemoveLineTag : Util.EnsureTrailingSeparator(GetMSBuildExtensionsPathOverride(devEnv))))
                 using (fileGenerator.Declare("vsVersion", devEnv.GetVisualProjectToolsVersionString()))
+                using (fileGenerator.Declare("vcTargetsPathKey", vcTargetsPathKey))
                 using (fileGenerator.Declare("vcTargetsPath", Util.EnsureTrailingSeparator(GetVCTargetsPathOverride(devEnv))))
                 {
-                    fileGenerator.Write(Template.Project.VCOverridesProperties);
+                    msBuildExtensionsPathWritten = true;
 
-                    // only write the conditional on vs version if we need to
-                    if (context.DevelopmentEnvironmentsRange.MinDevEnv == context.DevelopmentEnvironmentsRange.MaxDevEnv)
-                        fileGenerator.Write(Template.Project.VCTargetsPathOverride);
-                    else
-                        fileGenerator.Write(Template.Project.VCTargetsPathOverrideConditional);
+                    fileGenerator.Write(Template.Project.VCOverridesProperties);
+                    fileGenerator.Write(Template.Project.VCTargetsPathOverride);
                 }
             }
         }

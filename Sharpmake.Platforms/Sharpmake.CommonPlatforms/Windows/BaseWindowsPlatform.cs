@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sharpmake.Generators;
@@ -99,8 +101,15 @@ namespace Sharpmake
                     }
                 }
 
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain())
+                Options.Vc.General.PlatformToolset platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                if (platformToolset.IsLLVMToolchain())
                 {
+                    Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                    if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset))
+                        platformToolset = overridenPlatformToolset;
+
+                    devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? devEnv;
+
                     context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + devEnv.GetWindowsExecutablePath(conf.Platform);
                     if (Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable)
                     {

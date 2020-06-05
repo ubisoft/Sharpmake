@@ -56,6 +56,10 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <DisableRegistryUse>true</DisableRegistryUse>
 ";
 
+                internal const string DisableInstalledVcTargetsUse =
+@"    <DisableInstalledVCTargetsUse>true</DisableInstalledVCTargetsUse>
+";
+
                 public static string ProjectDescriptionStartPlatformConditional =
     @"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='[platformName]'"">
 ";
@@ -81,16 +85,16 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string VCOverridesProperties =
-@"    <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
-    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
+@"    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
+    <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
 ";
 
                 public static string VCTargetsPathOverride =
-@"    <VCTargetsPath>[vcTargetsPath]</VCTargetsPath>
+@"    <[vcTargetsPathKey]>[vcTargetsPath]</[vcTargetsPathKey]>
 ";
 
                 public static string VCTargetsPathOverrideConditional =
-@"    <VCTargetsPath Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</VCTargetsPath>
+@"    <[vcTargetsPathKey] Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</[vcTargetsPathKey]>
 ";
 
                 public static string ProjectEnd =

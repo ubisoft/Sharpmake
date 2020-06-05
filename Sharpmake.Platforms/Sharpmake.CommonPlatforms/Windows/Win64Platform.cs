@@ -48,10 +48,9 @@ namespace Sharpmake
 
             public override string CConfigName(Configuration conf)
             {
-                var devEnv = conf.Target.GetFragment<DevEnv>();
-                string platformToolsetString = string.Empty;
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
-                if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
+                string platformToolsetString = string.Empty;
+                if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(conf.Target.GetFragment<DevEnv>()))
                     platformToolsetString = $"_{platformToolset}";
 
                 string lldString = string.Empty;
@@ -60,6 +59,13 @@ namespace Sharpmake
                    (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset == Options.Vc.General.PlatformToolset.LLVM))
                 {
                     lldString = "_LLD";
+                }
+
+                if (platformToolset.IsLLVMToolchain())
+                {
+                    Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                    if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset))
+                        platformToolsetString += $"_{overridenPlatformToolset}";
                 }
 
                 return $".win64{platformToolsetString}{lldString}Config";
@@ -86,9 +92,15 @@ namespace Sharpmake
                 {
                     var useClangCl = Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf);
 
-                    // Use default platformToolset to get MS compiler instead of Clang, when ClanCl is disabled
+                    // Use default platformToolset to get MS compiler instead of Clang, when ClangCl is disabled
                     if (useClangCl == Options.Vc.LLVM.UseClangCl.Disable)
-                        platformToolset = Options.Vc.General.PlatformToolset.Default;
+                    {
+                        Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                        if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset))
+                            platformToolset = overridenPlatformToolset;
+                        else
+                            platformToolset = Options.Vc.General.PlatformToolset.Default;
+                    }
                 }
 
                 if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
@@ -198,7 +210,7 @@ namespace Sharpmake
                             @"$ExecutableRootPath$\1033\clui.dll"
                         );
 
-                        switch (devEnv)
+                        switch (compilerDevEnv)
                         {
                             case DevEnv.vs2012:
                                 {
@@ -235,7 +247,7 @@ namespace Sharpmake
                                     string systemDllPath = FastBuildSettings.SystemDllRoot;
                                     if (systemDllPath == null)
                                     {
-                                        var windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(devEnv);
+                                        var windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(compilerDevEnv.Value);
                                         string redistDirectory;
                                         if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0)
                                             redistDirectory = @"Redist\ucrt\DLLs\x64\";
@@ -254,7 +266,7 @@ namespace Sharpmake
                                         @"$ExecutableRootPath$\mspdb140.dll"
                                     );
 
-                                    if (devEnv == DevEnv.vs2015)
+                                    if (compilerDevEnv.Value == DevEnv.vs2015)
                                     {
                                         extraFiles.Add(
                                             @"$ExecutableRootPath$\vcvars64.bat",
@@ -277,9 +289,9 @@ namespace Sharpmake
                                         );
                                     }
 
-                                    if (devEnv == DevEnv.vs2019)
+                                    if (compilerDevEnv.Value == DevEnv.vs2019)
                                     {
-                                        Version toolsVersion = devEnv.GetVisualStudioVCToolsVersion();
+                                        Version toolsVersion = compilerDevEnv.Value.GetVisualStudioVCToolsVersion();
 
                                         if (toolsVersion >= new Version("14.22.27905"))
                                             extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
@@ -297,7 +309,7 @@ namespace Sharpmake
                                 }
                                 break;
                             default:
-                                throw new NotImplementedException("This devEnv (" + devEnv + ") is not supported!");
+                                throw new NotImplementedException("This devEnv (" + compilerDevEnv.Value + ") is not supported!");
                         }
                     }
 
@@ -318,61 +330,61 @@ namespace Sharpmake
                 DevEnv devEnv,
                 bool useCCompiler)
             {
+                if (configurations.ContainsKey(configName))
+                    return;
+
                 string linkerPathOverride = null;
                 string linkerExeOverride = null;
                 string librarianExeOverride = null;
                 GetLinkerExecutableInfo(conf, out linkerPathOverride, out linkerExeOverride, out librarianExeOverride);
 
-                if (!configurations.ContainsKey(configName))
-                {
-                    var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
-                    string binPath;
-                    if (!fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out binPath))
-                        binPath = devEnv.GetVisualStudioBinPath(Platform.win64);
+                var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
+                string binPath;
+                if (!fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out binPath))
+                    binPath = devEnv.GetVisualStudioBinPath(Platform.win64);
 
-                    string linkerPath;
-                    if (!string.IsNullOrEmpty(linkerPathOverride))
-                        linkerPath = linkerPathOverride;
-                    else if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
-                        linkerPath = binPath;
+                string linkerPath;
+                if (!string.IsNullOrEmpty(linkerPathOverride))
+                    linkerPath = linkerPathOverride;
+                else if (!fastBuildCompilerSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
+                    linkerPath = binPath;
 
-                    string linkerExe;
-                    if (!string.IsNullOrEmpty(linkerExeOverride))
-                        linkerExe = linkerExeOverride;
-                    else if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
-                        linkerExe = "link.exe";
+                string linkerExe;
+                if (!string.IsNullOrEmpty(linkerExeOverride))
+                    linkerExe = linkerExeOverride;
+                else if (!fastBuildCompilerSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
+                    linkerExe = "link.exe";
 
-                    string librarianExe;
-                    if (!string.IsNullOrEmpty(librarianExeOverride))
-                        librarianExe = librarianExeOverride;
-                    else if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
-                        librarianExe = "lib.exe";
+                string librarianExe;
+                if (!string.IsNullOrEmpty(librarianExeOverride))
+                    librarianExe = librarianExeOverride;
+                else if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
+                    librarianExe = "lib.exe";
 
-                    string resCompiler;
-                    if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
-                        resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
+                string resCompiler;
+                if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
+                    resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
 
-                    configurations.Add(
-                        configName,
-                        new CompilerSettings.Configuration(
-                            Platform.win64,
-                            binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath)),
-                            linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
-                            resourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resCompiler)),
-                            librarian: Path.Combine(@"$LinkerPath$", librarianExe),
-                            linker: Path.Combine(@"$LinkerPath$", linkerExe)
-                        )
-                    );
+                configurations.Add(
+                    configName,
+                    new CompilerSettings.Configuration(
+                        Platform.win64,
+                        binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath)),
+                        linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
+                        resourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resCompiler)),
+                        librarian: Path.Combine(@"$LinkerPath$", librarianExe),
+                        linker: Path.Combine(@"$LinkerPath$", linkerExe)
+                    )
+                );
 
-                    configurations.Add(
-                        configName + "Masm",
-                        new CompilerSettings.Configuration(
-                            Platform.win64,
-                            compiler: @"$BinPath$\ml64.exe",
-                            usingOtherConfiguration: configName
-                        )
-                    );
-                }
+                configurations.Add(
+                    configName + "Masm",
+                    new CompilerSettings.Configuration(
+                        Platform.win64,
+                        compiler: @"$BinPath$\ml64.exe",
+                        usingOtherConfiguration: configName
+                    )
+                );
             }
             #endregion
 
@@ -404,15 +416,22 @@ namespace Sharpmake
                 var includes = new List<IncludeWithPrefix>();
                 string includePrefix = "/I";
 
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
+                var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration);
+                if (platformToolset.IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
                     includePrefix = "/clang:-isystem";
                     string clangIncludePath = ClangForWindows.GetWindowsClangIncludePath();
                     includes.Add(new IncludeWithPrefix(includePrefix, clangIncludePath));
+
+                    Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                    if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(context.Configuration, ref overridenPlatformToolset))
+                        platformToolset = overridenPlatformToolset;
                 }
 
+                DevEnv devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? context.DevelopmentEnvironment;
+
                 // when using clang-cl, mark MSVC includes, so they are properly recognized
-                IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(context.DevelopmentEnvironment.GetWindowsIncludePath());
+                IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(devEnv.GetWindowsIncludePath());
                 includes.AddRange(msvcIncludePaths.Select(path => new IncludeWithPrefix(includePrefix, path)));
 
                 // Additional system includes
