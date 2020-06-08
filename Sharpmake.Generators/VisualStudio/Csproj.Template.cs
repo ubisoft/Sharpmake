@@ -105,9 +105,11 @@ namespace Sharpmake.Generators.VisualStudio
   </PropertyGroup>
 ";
 
+                public const string DefaultProjectConfigurationCondition = "'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'";
+                public const string MultiFrameworkProjectConfigurationCondition = "'$(Configuration)|$(Platform)|$(TargetFramework)'=='[conf.Name]|[platformName]|[targetFramework]'";
 
                 public static string ProjectConfigurationsGeneral =
-@"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+@"  <PropertyGroup Condition=""[projectConfigurationCondition]"">
     <PlatformTarget>[platformName]</PlatformTarget>
     <DebugSymbols>[options.DebugSymbols]</DebugSymbols>
     <DebugType>[options.DebugType]</DebugType>

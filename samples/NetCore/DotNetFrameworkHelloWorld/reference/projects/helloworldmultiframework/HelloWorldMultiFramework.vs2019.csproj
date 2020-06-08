@@ -5,13 +5,13 @@
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorld</RootNamespace>
+    <RootNamespace>HelloWorldMultiFramework</RootNamespace>
     <AssemblyName>the other name</AssemblyName>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <TargetFrameworks>net461;net462</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
     <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net461'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -23,7 +23,31 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net462'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>output\anycpu\debug</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net461'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>output\anycpu\release</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net462'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
@@ -36,7 +60,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\codebase\HelloWorld\Program.cs">
+    <Compile Include="..\..\codebase\HelloWorldMultiFramework\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
   </ItemGroup>
