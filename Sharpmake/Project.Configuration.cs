@@ -2936,6 +2936,7 @@ namespace Sharpmake
                                 }
                             }
                             break;
+                        case OutputType.IosApp:
                         case OutputType.Exe:
                             {
                                 if (Output != OutputType.Utility && Output != OutputType.Exe && Output != OutputType.None)
