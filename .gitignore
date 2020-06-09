@@ -62,3 +62,6 @@ project.lock.json
 Sharpmake.VC.db
 
 .idea
+
+# Desktop Services Store on MacOS
+**/.DS_Store
