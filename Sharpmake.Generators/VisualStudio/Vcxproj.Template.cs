@@ -69,7 +69,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ImportCppDefaultProps =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.Default.props"" />
 ";
 
                 public static string PropertyGroupStart =
@@ -101,7 +101,7 @@ namespace Sharpmake.Generators.VisualStudio
                 @"</Project>";
 
                 public static string ProjectAfterConfigurationsGeneral =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
   <ImportGroup Label=""ExtensionSettings"">
 ";
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
@@ -115,7 +115,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectImportedMasmProps =
-@"    <Import Project=""$(VCTargetsPath)\BuildCustomizations\masm.props"" />
+@"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.props"" />
 ";
 
                 public static string ProjectConfigurationImportedProps =
@@ -146,7 +146,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectTargetsBegin =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.targets"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
   <ImportGroup Label=""ExtensionTargets"">
 ";
 
@@ -155,7 +155,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectMasmTargetsItem =
-@"    <Import Project=""$(VCTargetsPath)\BuildCustomizations\masm.targets"" />
+@"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.targets"" />
 ";
 
                 public static string ProjectConfigurationImportedTargets =

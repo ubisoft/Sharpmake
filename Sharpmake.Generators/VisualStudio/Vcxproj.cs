@@ -232,8 +232,10 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        private void WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
+        private bool WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
+            bool overridesActive = false;
+
             bool registrySettingWritten = false;
             bool disableInstalledVcTargetsUseWritten = false;
             bool msBuildExtensionsPathWritten = false;
@@ -262,6 +264,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (!devEnv.IsVisualStudio())
                     throw new Error(devEnv + " is not recognized as being visual studio");
+
+                overridesActive = true;
 
                 if (!_enableRegistryUse && !registrySettingWritten)
                 {
@@ -292,6 +296,8 @@ namespace Sharpmake.Generators.VisualStudio
                     fileGenerator.Write(Template.Project.VCTargetsPathOverride);
                 }
             }
+
+            return overridesActive;
         }
 
         private void GenerateConfOptions(GenerationContext context)
@@ -391,7 +397,18 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(Template.Project.ProjectDescription);
             }
 
-            WriteVcOverrides(context, fileGenerator);
+            string vcTargetsPath = "$(VCTargetsPath)";
+            if (WriteVcOverrides(context, fileGenerator))
+            {
+                string vcRootPathKey;
+                string vcTargetsPathKey;
+                // we use the targets path from the most recent devenv supported in this vcxproj,
+                // since it will know how to redirect to older toolsets
+                context.DevelopmentEnvironmentsRange.MaxDevEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
+                vcTargetsPath = $"$({vcTargetsPathKey})";
+            }
+
+            var vcTargetsPathScopeVar = fileGenerator.Declare("vcTargetsPath", vcTargetsPath);
 
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
             // xml end header
@@ -664,6 +681,8 @@ namespace Sharpmake.Generators.VisualStudio
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
             MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream();
+
+            vcTargetsPathScopeVar.Dispose();
 
             FileInfo projectFileInfo = new FileInfo(context.ProjectPath + ProjectExtension);
             if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, cleanMemoryStream))
