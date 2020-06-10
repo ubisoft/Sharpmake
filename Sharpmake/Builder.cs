@@ -253,11 +253,14 @@ namespace Sharpmake
             LogWriteLine("  building projects and solutions configurations{0}...", _multithreaded ? $" using {_tasks.NumTasks()} tasks" : " single-threaded");
             using (new Util.StopwatchProfiler(ms => { LogWriteLine("    build done in {0:0.0} sec", ms / 1000.0f); }))
             {
+                _buildScheduledType.UnionWith(Arguments.TypesToGenerate);
+
                 if (!_multithreaded)
                 {
-                    for (int i = 0; i < Arguments.TypesToGenerate.Count; ++i)
+                    var typesToGenerate = new List<Type>(Arguments.TypesToGenerate);
+                    for (int i = 0; i < typesToGenerate.Count; ++i)
                     {
-                        Type type = Arguments.TypesToGenerate[i];
+                        Type type = typesToGenerate[i];
 
                         HashSet<Type> projectDependenciesTypes;
                         if (type.IsSubclassOf(typeof(Project)))
@@ -279,7 +282,8 @@ namespace Sharpmake
 
                         foreach (Type projectDependenciesType in projectDependenciesTypes)
                         {
-                            _buildScheduledType.Add(projectDependenciesType);
+                            if (_buildScheduledType.Add(projectDependenciesType))
+                                typesToGenerate.Add(projectDependenciesType);
                         }
                     }
                 }
@@ -292,8 +296,6 @@ namespace Sharpmake
 
                     _tasks.Wait();
                 }
-
-                Arguments.TypesToGenerate.AddRange(_buildScheduledType);
             }
         }
 
