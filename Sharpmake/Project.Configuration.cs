@@ -2798,7 +2798,6 @@ namespace Sharpmake
                         _resolvedEventCustomPreBuildExe.AddRange(dependency.EventCustomPreBuildExe);
                         _resolvedEventCustomPostBuildExe.AddRange(dependency.EventCustomPostBuildExe);
                         _resolvedTargetCopyFiles.AddRange(dependency.TargetCopyFiles);
-                        _resolvedTargetDependsFiles.AddRange(dependency.TargetCopyFiles);
                         _resolvedTargetDependsFiles.AddRange(dependency.TargetDependsFiles);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
