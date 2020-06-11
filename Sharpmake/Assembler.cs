@@ -616,6 +616,9 @@ namespace Sharpmake
                 {
                     ++lineNumber;
 
+                    if (!string.IsNullOrEmpty(line) && line.StartsWith("namespace", StringComparison.Ordinal))
+                        break;
+
                     // First, update the parsing flow with the current line
                     foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
                     {
@@ -629,9 +632,6 @@ namespace Sharpmake
                     }
 
                     line = reader.ReadLine()?.TrimStart();
-
-                    if (!string.IsNullOrEmpty(line) && line.StartsWith("namespace", StringComparison.Ordinal))
-                        break;
                 }
 
                 foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
