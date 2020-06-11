@@ -483,6 +483,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             var configurationSectionNames = new List<string>();
 
+            bool containsMultiDotNetFramework = solutionConfigurations.All(sc => sc.Target.HaveFragment<DotNetFramework>()) &&
+                                                solutionConfigurations.Select(sc => sc.Target.GetFragment<DotNetFramework>()).Distinct().Count() > 1;
+
+            var multiDotNetFrameworkConfigurationNames = new HashSet<string>();
+
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationBegin);
             foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
             {
@@ -497,6 +502,14 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     configurationName = solutionConfiguration.Name;
                     category = solutionConfiguration.PlatformName;
+                }
+
+                if (containsMultiDotNetFramework)
+                {
+                    if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
+                        continue;
+
+                    multiDotNetFrameworkConfigurationNames.Add(configurationName);
                 }
 
                 using (fileGenerator.Declare("configurationName", configurationName))
@@ -521,6 +534,9 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(configurationSectionName);
 
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationEnd);
+
+            if (containsMultiDotNetFramework)
+                multiDotNetFrameworkConfigurationNames.Clear();
 
             // write all project target and match then to a solution target
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBegin);
@@ -595,6 +611,14 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         configurationName = solutionConfiguration.Name;
                         category = solutionConfiguration.PlatformName;
+                    }
+
+                    if (containsMultiDotNetFramework)
+                    {
+                        if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
+                            continue;
+
+                        multiDotNetFrameworkConfigurationNames.Add(configurationName);
                     }
 
                     using (fileGenerator.Declare("solutionConf", solutionConfiguration))

@@ -980,20 +980,20 @@ namespace Sharpmake.Generators.VisualStudio
             var memoryStream = new MemoryStream();
             var writer = new StreamWriter(memoryStream);
 
-            //shouldn't be a problem since you can't have 2 different target frameworks or ToolsVersion in the same projectFile
-            ITarget target = configurations[0].Target;
-            var targetFramework = target.GetFragment<DotNetFramework>();
-            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore ||
-                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
-                                              target.GetFragment<DotNetFramework>().IsDotNetCore()
+            string targetFrameworkString;
+            DevEnv devenv = configurations.Select(
+                    conf => ((ITarget)conf.Target).GetFragment<DevEnv>()).Distinct().Single();
+            List< DotNetFramework> projectFrameworks = configurations.Select(
+                    conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
+
+            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore || 
+                                            ( project.ProjectSchema == CSharpProjectSchema.Default &&
+                                              (projectFrameworks.Any(x => x.IsDotNetCore()) || projectFrameworks.Count > 1)
                                             );
-            string targetFrameworkString = null;
-
-            var devenv = target.GetFragment<DevEnv>();
-
             if (isNetCoreProjectSchema)
             {
-                targetFrameworkString = targetFramework.ToFolderName();
+                targetFrameworkString = String.Join(";", projectFrameworks.Select(conf => conf.ToFolderName()));
+
                 string netCoreSdk = "Microsoft.NET.Sdk";
                 if (project.NetCoreSdkType != NetCoreSdkTypes.Default)
                     netCoreSdk += "." + project.NetCoreSdkType.ToString();
@@ -1005,8 +1005,8 @@ namespace Sharpmake.Generators.VisualStudio
             }
             else
             {
-                targetFrameworkString = Util.GetDotNetTargetString(targetFramework);
-                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, targetFramework)))
+                targetFrameworkString = Util.GetDotNetTargetString(projectFrameworks.Single());
+                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, projectFrameworks.Single())))
                 {
                     // xml begin header
                     switch (devenv)
@@ -1032,8 +1032,10 @@ namespace Sharpmake.Generators.VisualStudio
             WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
 
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
-
-            CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
+            if(!isNetCoreProjectSchema)
+            { 
+                CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
+            }
 
             WriteImportProjects(preImportProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
 
@@ -1051,12 +1053,17 @@ namespace Sharpmake.Generators.VisualStudio
             string netCoreEnableDefaultItems = RemoveLineTag;
             string targetFrameworkVersionString = "TargetFrameworkVersion";
             string projectPropertyGuid = configurations[0].ProjectGuid;
-
+            string projectConfigurationCondition = Template.Project.DefaultProjectConfigurationCondition;
             if (isNetCoreProjectSchema)
             {
                 netCoreEnableDefaultItems = "false";
                 targetFrameworkVersionString = "TargetFramework";
                 projectPropertyGuid = RemoveLineTag;
+                if (projectFrameworks.Count() > 1)
+                {
+                    projectConfigurationCondition = Template.Project.MultiFrameworkProjectConfigurationCondition;
+                    targetFrameworkVersionString = "TargetFrameworks";
+                }
             }
 
             string restoreProjectStyleString = RemoveLineTag;
@@ -1183,6 +1190,8 @@ namespace Sharpmake.Generators.VisualStudio
                 using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 using (resolver.NewScopedParameter("project", project))
+                using (resolver.NewScopedParameter("targetFramework", conf.Target.GetFragment<DotNetFramework>().ToFolderName()))
+                using (resolver.NewScopedParameter("projectConfigurationCondition", projectConfigurationCondition))
                 using (resolver.NewScopedParameter("target", conf.Target))
                 using (resolver.NewScopedParameter("options", options[conf]))
                 {
@@ -2046,10 +2055,14 @@ namespace Sharpmake.Generators.VisualStudio
             #endregion
 
             #region References
-            bool netCoreProject = project.ProjectSchema == CSharpProjectSchema.NetCore ||
-                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
-                                              configurations.Select(c => c.Target).All(t => t.GetFragment<DotNetFramework>().IsDotNetCore()));
 
+            List<DotNetFramework> projectFrameworks = configurations.Select(
+                    conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
+            
+            bool netCoreProject = project.ProjectSchema == CSharpProjectSchema.NetCore ||
+                                           (project.ProjectSchema == CSharpProjectSchema.Default &&
+                                             projectFrameworks.Any(x => x.IsDotNetCore())
+                                           );
             if (!netCoreProject)
             {
                 var referencesByName = new List<ItemGroups.Reference>();

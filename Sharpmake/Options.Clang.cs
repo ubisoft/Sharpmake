@@ -90,6 +90,16 @@ namespace Sharpmake
                 {
                     public MscVersion(string option) : base(option) { }
                 }
+
+                /// <summary>
+                /// Foce a platform toolset different from the devenv when using LLVM platform toolset
+                /// </summary>
+                /// The platform toolset option used to enable the LLVM toolchain doesn't allow choosing
+                /// the version of the toolset we want to mimic. By
+                public class LLVMVcPlatformToolset : WithArgOption<Vc.General.PlatformToolset>
+                {
+                    public LLVMVcPlatformToolset(Vc.General.PlatformToolset vcPlatformToolset) : base(vcPlatformToolset) { }
+                }
             }
         }
     }

@@ -2798,7 +2798,6 @@ namespace Sharpmake
                         _resolvedEventCustomPreBuildExe.AddRange(dependency.EventCustomPreBuildExe);
                         _resolvedEventCustomPostBuildExe.AddRange(dependency.EventCustomPostBuildExe);
                         _resolvedTargetCopyFiles.AddRange(dependency.TargetCopyFiles);
-                        _resolvedTargetDependsFiles.AddRange(dependency.TargetCopyFiles);
                         _resolvedTargetDependsFiles.AddRange(dependency.TargetDependsFiles);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
@@ -2891,7 +2890,7 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
-                                string platformDllExtension = "." + configTasks.GetDefaultOutputExtension(OutputType.Dll);
+                                string platformDllExtension = "." + dependency.OutputExtension;
                                 string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + platformDllExtension);
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
@@ -2936,6 +2935,7 @@ namespace Sharpmake
                                 }
                             }
                             break;
+                        case OutputType.IosApp:
                         case OutputType.Exe:
                             {
                                 if (Output != OutputType.Utility && Output != OutputType.Exe && Output != OutputType.None)

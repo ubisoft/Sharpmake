@@ -346,6 +346,29 @@ namespace Sharpmake
             return version;
         }
 
+        public static string GetVCTargetsPath(this DevEnv visualVersion)
+        {
+            if (!visualVersion.IsVisualStudio())
+                return null;
+
+            switch (visualVersion)
+            {
+                case DevEnv.vs2010:
+                    return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Microsoft.Cpp\v4.0"));
+                case DevEnv.vs2012:
+                case DevEnv.vs2013:
+                case DevEnv.vs2015:
+                    string versionSubfolder = visualVersion.GetDefaultPlatformToolset().ToUpperInvariant(); // this is enough for now but we could make a specific method to retrieve this value
+                    return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Microsoft.Cpp\v4.0", versionSubfolder));
+                case DevEnv.vs2017:
+                    return Path.Combine(visualVersion.GetVisualStudioDir(), @"Common7\IDE\VC\VCTargets");
+                case DevEnv.vs2019:
+                    return Path.Combine(visualVersion.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\v160");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(visualVersion), visualVersion, null);
+            }
+        }
+
         private static string GetDefaultRedistVersion(this DevEnv visualVersion)
         {
             switch (visualVersion)
@@ -687,6 +710,66 @@ namespace Sharpmake
                     return false;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(platformToolset), platformToolset, null);
+            }
+        }
+
+        public static DevEnv? GetDefaultDevEnvForToolset(this Options.Vc.General.PlatformToolset platformToolset)
+        {
+            switch (platformToolset)
+            {
+                case Options.Vc.General.PlatformToolset.Default:
+                    return null;
+                case Options.Vc.General.PlatformToolset.v100:
+                    return DevEnv.vs2010;
+                case Options.Vc.General.PlatformToolset.v110:
+                case Options.Vc.General.PlatformToolset.v110_xp:
+                    return DevEnv.vs2012;
+                case Options.Vc.General.PlatformToolset.v120:
+                case Options.Vc.General.PlatformToolset.v120_xp:
+                    return DevEnv.vs2013;
+                case Options.Vc.General.PlatformToolset.v140:
+                case Options.Vc.General.PlatformToolset.v140_xp:
+                    return DevEnv.vs2015;
+                case Options.Vc.General.PlatformToolset.v141:
+                case Options.Vc.General.PlatformToolset.v141_xp:
+                    return DevEnv.vs2017;
+                case Options.Vc.General.PlatformToolset.v142:
+                    return DevEnv.vs2019;
+                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
+                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
+                case Options.Vc.General.PlatformToolset.LLVM:
+                    return null;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(platformToolset), platformToolset, null);
+            }
+        }
+
+        public static void GetVcPathKeysFromDevEnv(this DevEnv devEnv, out string vcTargetsPathKey, out string vcRootPathKey)
+        {
+            switch (devEnv)
+            {
+                case DevEnv.vs2012:
+                    vcTargetsPathKey = "VCTargetsPath11";
+                    vcRootPathKey = "VCInstallDir_110";
+                    break;
+                case DevEnv.vs2013:
+                    vcTargetsPathKey = "VCTargetsPath12";
+                    vcRootPathKey = "VCInstallDir_120";
+                    break;
+                case DevEnv.vs2015:
+                    vcTargetsPathKey = "VCTargetsPath14";
+                    vcRootPathKey = "VCInstallDir_140";
+                    break;
+                case DevEnv.vs2017:
+                    vcTargetsPathKey = "VCTargetsPath15";
+                    vcRootPathKey = "VCInstallDir_150";
+                    break;
+                case DevEnv.vs2019:
+                    vcTargetsPathKey = "VCTargetsPath16";
+                    vcRootPathKey = "VCInstallDir_160";
+                    break;
+                default:
+                    throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
             }
         }
 

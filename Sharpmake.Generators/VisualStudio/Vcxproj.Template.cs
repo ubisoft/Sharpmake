@@ -56,6 +56,10 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <DisableRegistryUse>true</DisableRegistryUse>
 ";
 
+                internal const string DisableInstalledVcTargetsUse =
+@"    <DisableInstalledVCTargetsUse>true</DisableInstalledVCTargetsUse>
+";
+
                 public static string ProjectDescriptionStartPlatformConditional =
     @"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='[platformName]'"">
 ";
@@ -65,7 +69,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ImportCppDefaultProps =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.Default.props"" />
 ";
 
                 public static string PropertyGroupStart =
@@ -81,23 +85,23 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string VCOverridesProperties =
-@"    <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
-    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
+@"    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
+    <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
 ";
 
                 public static string VCTargetsPathOverride =
-@"    <VCTargetsPath>[vcTargetsPath]</VCTargetsPath>
+@"    <[vcTargetsPathKey]>[vcTargetsPath]</[vcTargetsPathKey]>
 ";
 
                 public static string VCTargetsPathOverrideConditional =
-@"    <VCTargetsPath Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</VCTargetsPath>
+@"    <[vcTargetsPathKey] Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</[vcTargetsPathKey]>
 ";
 
                 public static string ProjectEnd =
                 @"</Project>";
 
                 public static string ProjectAfterConfigurationsGeneral =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
   <ImportGroup Label=""ExtensionSettings"">
 ";
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
@@ -111,7 +115,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectImportedMasmProps =
-@"    <Import Project=""$(VCTargetsPath)\BuildCustomizations\masm.props"" />
+@"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.props"" />
 ";
 
                 public static string ProjectConfigurationImportedProps =
@@ -142,7 +146,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectTargetsBegin =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.targets"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
   <ImportGroup Label=""ExtensionTargets"">
 ";
 
@@ -151,7 +155,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectMasmTargetsItem =
-@"    <Import Project=""$(VCTargetsPath)\BuildCustomizations\masm.targets"" />
+@"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.targets"" />
 ";
 
                 public static string ProjectConfigurationImportedTargets =
@@ -419,6 +423,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public const string AdditionalVCTargetsPath =
                     @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
+    <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForToolset>
 ";
 
                 internal static class Filters

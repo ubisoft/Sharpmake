@@ -69,7 +69,18 @@ namespace Sharpmake
         {
             var dirs = new List<string>();
             var dotnet = Util.IsDotNet(configuration) ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
-            string platformDirsStr = configuration.Target.GetFragment<DevEnv>().GetWindowsLibraryPath(configuration.Target.GetPlatform(), dotnet);
+
+            var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(configuration);
+            if (platformToolset.IsLLVMToolchain())
+            {
+                Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(configuration, ref overridenPlatformToolset))
+                    platformToolset = overridenPlatformToolset;
+            }
+
+            var devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? configuration.Target.GetFragment<DevEnv>();
+
+            string platformDirsStr = devEnv.GetWindowsLibraryPath(configuration.Target.GetPlatform(), dotnet);
             dirs.AddRange(EnumerateSemiColonSeparatedString(platformDirsStr));
 
             return dirs;
