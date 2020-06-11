@@ -118,12 +118,15 @@ namespace Sharpmake
                     }
                 }
 
-                OrderableStrings SystemIncludes = new OrderableStrings(conf.DependenciesIncludeSystemPaths);
-                SystemIncludes.AddRange(conf.IncludeSystemPaths);
-                if (SystemIncludes.Count > 0)
+                var systemIncludes = new OrderableStrings(conf.DependenciesIncludeSystemPaths);
+                systemIncludes.AddRange(conf.IncludeSystemPaths);
+                if (systemIncludes.Count > 0)
                 {
-                    SystemIncludes.Sort();
-                    context.Options["IncludePath"] += ";" + SystemIncludes.JoinStrings(";");
+                    systemIncludes.Sort();
+                    if (context.Options["IncludePath"] == FileGeneratorUtilities.RemoveLineTag)
+                        context.Options["IncludePath"] = systemIncludes.JoinStrings(";");
+                    else
+                        context.Options["IncludePath"] += ";" + systemIncludes.JoinStrings(";");
                 }
             }
             #endregion
