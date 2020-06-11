@@ -105,10 +105,10 @@ namespace Sharpmake.Application
                 BlobOnly = true;
             }
 
-            [CommandLine.Option("waitfordebugger", @"Trigger a debugger break")]
-            public void CommandLineWaitForDebugger()
+            [CommandLine.Option("breakintodebugger", @"Trigger a debugger break at the beginning of the program.")]
+            public void CommandLineBreakIntoDebugger()
             {
-                System.Diagnostics.Debugger.Break();
+                // Validated in the main for priority
             }
 
             [CommandLine.Option("cleanblobsonly", @"Only clean blob and work blob files: ex: /cleanblobsonly")]
