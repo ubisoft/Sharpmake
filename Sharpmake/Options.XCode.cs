@@ -227,8 +227,8 @@ namespace Sharpmake
 
                 public enum LibraryStandard
                 {
-                    [Default]
                     CppStandard,
+                    [Default]
                     LibCxx
                 }
 
