@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Sharpmake
 {
@@ -145,6 +146,8 @@ namespace Sharpmake
         public HashSet<string> Defines { get; }
 
         private readonly List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
+
+        private static readonly Lazy<Regex> _defineValidationRegex = new Lazy<Regex>(() => new Regex(@"^\w+$", RegexOptions.Compiled));
 
         public Builder(
             BuildContext.BaseBuildContext context,
@@ -541,6 +544,17 @@ namespace Sharpmake
                 solution.Resolve();
 
                 return solution;
+            }
+        }
+
+        public void AddDefine(string define)
+        {
+            if (!_defineValidationRegex.Value.IsMatch(define))
+                throw new Error("error: invalid define '{0}', a define must be a single word", define);
+
+            if (Defines.Add(define))
+            {
+                DebugWriteLine("Added define: {0}", define);
             }
         }
 
@@ -1030,6 +1044,11 @@ namespace Sharpmake
                     var assembly = extensionLoader.LoadExtension(file, false);
                     return new LoadInfo(assembly, _builder._attributeParsers.Skip(parserCount));
                 }
+            }
+
+            public void AddDefine(string define)
+            {
+                _builder.AddDefine(define);
             }
         }
 
