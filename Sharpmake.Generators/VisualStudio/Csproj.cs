@@ -1082,6 +1082,8 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            GeneratedAssemblyConfigTemplate generatedAssemblyConfigTemplate = new GeneratedAssemblyConfigTemplate(project.GeneratedAssemblyConfig, isNetCoreProjectSchema, RemoveLineTag);
+
             using (resolver.NewScopedParameter("project", project))
             using (resolver.NewScopedParameter("guid", projectPropertyGuid))
             using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
@@ -1095,6 +1097,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
+            using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
