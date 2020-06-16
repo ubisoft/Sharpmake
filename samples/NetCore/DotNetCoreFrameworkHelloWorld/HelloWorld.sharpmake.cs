@@ -43,6 +43,7 @@ namespace NetCore
 
             public HelloWorld()
             {
+                GeneratedAssemblyConfig.GenerateAssemblyInfo = true;
                 ClearTargets();
                 AddTargets(SampleTargets);
 
