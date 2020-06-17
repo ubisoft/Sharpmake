@@ -709,11 +709,11 @@ namespace Sharpmake.Generators.Apple
             options["Archs"] = "\"$(ARCHS_STANDARD_32_64_BIT)\"";
             options["CodeSignEntitlements"] = RemoveLineTag;
             options["DevelopmentTeam"] = RemoveLineTag;
-            options["ProvisioningStyle"] = "Automatic";
             options["InfoPListFile"] = RemoveLineTag;
             options["IPhoneOSDeploymentTarget"] = RemoveLineTag;
             options["MacOSDeploymentTarget"] = RemoveLineTag;
             options["ProvisioningProfile"] = RemoveLineTag;
+            options["ProvisioningStyle"] = "Automatic";
             options["RemoveLibraryPaths"] = "";
             options["RemoveSpecificDeviceLibraryPaths"] = "";
             options["RemoveSpecificSimulatorLibraryPaths"] = "";
