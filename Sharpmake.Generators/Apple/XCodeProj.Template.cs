@@ -412,19 +412,19 @@ namespace Sharpmake.Generators.Apple
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      buildConfiguration = ""[optimization]""
       selectedDebuggerIdentifier = ""Xcode.DebuggerFoundation.Debugger.LLDB""
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
-      shouldUseLaunchSchemeArgsEnv = ""YES""
-      buildConfiguration = ""Debug"">
+      shouldUseLaunchSchemeArgsEnv = ""YES"">
       <Testables>[testableElements]
       </Testables>
    </TestAction>
    <LaunchAction
+      buildConfiguration = ""[optimization]""
       selectedDebuggerIdentifier = ""Xcode.DebuggerFoundation.Debugger.LLDB""
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
       launchStyle = ""0""
       useCustomWorkingDirectory = ""NO""
-      buildConfiguration = ""Debug""
       ignoresPersistentStateOnLaunch = ""NO""
       debugDocumentVersioning = ""YES""
       allowLocationSimulation = ""YES"">
@@ -441,17 +441,17 @@ namespace Sharpmake.Generators.Apple
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
+      buildConfiguration = ""[optimization]""
       shouldUseLaunchSchemeArgsEnv = ""YES""
       savedToolIdentifier = """"
       useCustomWorkingDirectory = ""NO""
-      buildConfiguration = ""Debug""
       debugDocumentVersioning = ""YES"">
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = ""Debug"">
+      buildConfiguration = ""[optimization]"">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = ""Debug""
+      buildConfiguration = ""[optimization]""
       revealArchiveInOrganizer = ""YES"">
    </ArchiveAction>
 </Scheme>
