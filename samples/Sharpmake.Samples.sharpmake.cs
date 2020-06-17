@@ -33,6 +33,22 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class CompileCommandDatabaseProject : SampleProject
+    {
+        public CompileCommandDatabaseProject()
+        {
+            Name = "CompileCommandDatabase";
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
     public class ConfigureOrderProject : SampleProject
     {
         public ConfigureOrderProject()
@@ -60,6 +76,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class CSharpImportsProject : SampleProject
+    {
+        public CSharpImportsProject()
+        {
+            Name = "CSharpImports";
+        }
+    }
+
+    [Generate]
     public class CSharpVsixProject : SampleProject
     {
         public CSharpVsixProject()
@@ -77,60 +102,6 @@ namespace SharpmakeGen.Samples
         }
     }
 
-    [Generate]
-    public class CSharpImportsProject : SampleProject
-    {
-        public CSharpImportsProject()
-        {
-            Name = "CSharpImports";
-        }
-    }
-
-    [Generate]
-    public class HelloWorldProject : SampleProject
-    {
-        public HelloWorldProject()
-        {
-            Name = "HelloWorld";
-        }
-    }
-
-    [Generate]
-    public class FastBuildSimpleExecutable : SampleProject
-    {
-        public FastBuildSimpleExecutable()
-        {
-            Name = "FastBuildSimpleExecutable";
-        }
-    }
-
-    [Generate]
-    public class QTFileCustomBuildProject : SampleProject
-    {
-        public QTFileCustomBuildProject()
-        {
-            Name = "QTFileCustomBuild";
-        }
-    }
-
-    [Generate]
-    public class PackageReferencesProject : SampleProject
-    {
-        public PackageReferencesProject()
-        {
-            Name = "PackageReferences";
-        }
-    }
-
-    [Generate]
-    public class SimpleExeLibDependencyProject : SampleProject
-    {
-        public SimpleExeLibDependencyProject()
-        {
-            Name = "SimpleExeLibDependency";
-        }
-    }
-    
     [Generate]
     public class DotNetCoreFrameworkHelloWorldProject : SampleProject
     {
@@ -152,18 +123,47 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
-    public class CompileCommandDatabaseProject : SampleProject
+    public class FastBuildSimpleExecutable : SampleProject
     {
-        public CompileCommandDatabaseProject()
+        public FastBuildSimpleExecutable()
         {
-            Name = "CompileCommandDatabase";
+            Name = "FastBuildSimpleExecutable";
         }
+    }
 
-        public override void ConfigureAll(Configuration conf, Target target)
+    [Generate]
+    public class HelloWorldProject : SampleProject
+    {
+        public HelloWorldProject()
         {
-            base.ConfigureAll(conf, target);
+            Name = "HelloWorld";
+        }
+    }
 
-            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+    [Generate]
+    public class PackageReferencesProject : SampleProject
+    {
+        public PackageReferencesProject()
+        {
+            Name = "PackageReferences";
+        }
+    }
+
+    [Generate]
+    public class QTFileCustomBuildProject : SampleProject
+    {
+        public QTFileCustomBuildProject()
+        {
+            Name = "QTFileCustomBuild";
+        }
+    }
+
+    [Generate]
+    public class SimpleExeLibDependencyProject : SampleProject
+    {
+        public SimpleExeLibDependencyProject()
+        {
+            Name = "SimpleExeLibDependency";
         }
     }
 }
