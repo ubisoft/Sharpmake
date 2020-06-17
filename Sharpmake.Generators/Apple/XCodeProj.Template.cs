@@ -52,14 +52,11 @@ namespace Sharpmake.Generators.Apple
 				},
 ";
             public static string ProjectTargetAttribute =
-@"					[item.Uid] /* [item.Identifier] */ =
-					{
+@"					[item.Uid] /* [item.Identifier] */ = {
 						DevelopmentTeam = [project.DevelopmentTeam];
 						ProvisioningStyle = [project.ProvisioningStyle];
-						SystemCapabilities =
-						{
-							com.apple.iCloud =
-							{
+						SystemCapabilities = {
+							com.apple.iCloud = {
 								enabled = [project.ICloudSupport];
 							};
 						};
@@ -69,16 +66,14 @@ namespace Sharpmake.Generators.Apple
             public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
             {
                 { ItemSection.PBXBuildFile,
-@"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ =
-		{
+@"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
 			isa = PBXBuildFile;
 			fileRef = [item.File.Uid] /* [item.File.Name] */;
 		};
 "               },
 
                 { ItemSection.PBXContainerItemProxy,
-@"		[item.Uid] /* PBXContainerItemProxy */ =
-		{
+@"		[item.Uid] /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = [item.ProjectReference.Uid];
 			proxyType = [item.ProxyType];
@@ -88,8 +83,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXFileReference,
-@"		[item.Uid] /* [item.Name] */ =
-		{
+@"		[item.Uid] /* [item.Name] */ = {
 			isa = PBXFileReference;
 			explicitFileType = [item.ExplicitFileType];
 			lastKnownFileType = [item.FileType];
@@ -101,8 +95,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXFrameworksBuildPhase,
-@"		[item.Uid] /* Frameworks */ =
-		{
+@"		[item.Uid] /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
@@ -113,8 +106,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXGroup,
-@"		[item.Uid] /* [item.Identifier] */ =
-		{
+@"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
 			children = (
 [itemChildren]
@@ -126,12 +118,10 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXNativeTarget,
-@"		[item.Uid] /* [item.Identifier] */ =
-		{
+@"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
-			buildPhases =
-			(
+			buildPhases = (
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
 				[item.SourcesBuildPhase.Uid] /* Sources */,
 				[item.FrameworksBuildPhase.Uid] /* Frameworks */,
@@ -150,13 +140,10 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXProject,
-@"		[item.Uid] /* Project object */ =
-		{
+@"		[item.Uid] /* Project object */ = {
 			isa = PBXProject;
-			attributes =
-			{
-				TargetAttributes =
-				{
+			attributes = {
+				TargetAttributes = {
 [itemTargetAttributes]
 				};
 			};
@@ -180,8 +167,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXReferenceProxy,
-@"		[item.Uid] /* [item.OutputFile.Name] */ =
-		{
+@"		[item.Uid] /* [item.OutputFile.Name] */ = {
 			isa = PBXReferenceProxy;
 			fileType = [item.FileType];
 			path = [item.OutputFile.Name];
@@ -191,8 +177,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXResourcesBuildPhase,
-@"		[item.Uid] /* Resources */ =
-		{
+@"		[item.Uid] /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
@@ -219,8 +204,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXTargetDependency,
-@"		[item.Uid] /* PBXTargetDependency */ =
-		{
+@"		[item.Uid] /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = [item.ProjectReference.Name];
 			targetProxy = [item.Proxy.Uid];
@@ -229,11 +213,9 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCBuildConfiguration_NativeTarget,
-@"		[item.Uid] /* [item.Optimization] */ =
-		{
+@"		[item.Uid] /* [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
-			buildSettings =
-			{
+			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
@@ -272,11 +254,9 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCBuildConfiguration_UnitTestTarget,
-@"		[item.Uid] /* [item.Optimization] */ =
-		{
+@"		[item.Uid] /* [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
-			buildSettings =
-			{
+			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
 				BUNDLE_LOADER = ""[testHost]"";
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
@@ -299,11 +279,9 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCBuildConfiguration_Project,
-@"		[item.Uid] /* [item.Optimization] */ =
-		{
+@"		[item.Uid] /* [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
-			buildSettings =
-			{
+			buildSettings = {
 				ARCHS = [item.Options.Archs];
 				SYMROOT = ""[item.Options.BuildDirectory]"";
 				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
@@ -361,8 +339,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCConfigurationList,
-@"		[item.Uid] /* Build configuration list for [item.ConfigurationType] ""[item.RelatedItem.Identifier]"" */ =
-		{
+@"		[item.Uid] /* Build configuration list for [item.ConfigurationType] ""[item.RelatedItem.Identifier]"" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 [itemChildren]
