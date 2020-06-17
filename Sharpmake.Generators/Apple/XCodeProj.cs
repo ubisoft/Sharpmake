@@ -883,6 +883,11 @@ namespace Sharpmake.Generators.Apple
                 case Project.Configuration.OutputType.Lib:
                     options["MachOType"] = "staticlib";
                     break;
+                case Project.Configuration.OutputType.Dll:
+                    options["MachOType"] = "mh_dylib";
+                    break;
+                default:
+                    throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
             }
 
             Options.XCode.Compiler.ProvisioningProfile provisioningProfile = Options.GetObject<Options.XCode.Compiler.ProvisioningProfile>(conf);
