@@ -240,6 +240,7 @@ namespace Sharpmake.Generators.Apple
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
+				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
 				);
@@ -281,6 +282,7 @@ namespace Sharpmake.Generators.Apple
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
+				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
 				);
