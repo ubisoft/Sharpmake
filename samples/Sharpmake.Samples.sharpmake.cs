@@ -141,6 +141,25 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class HelloXCodeProject : SampleProject
+    {
+        public HelloXCodeProject()
+        {
+            Name = "HelloXCode";
+
+            // This one is special, we have .sharpmake.cs files in the codebase
+            SourceFilesExcludeRegex.Remove(@"\\codebase\\");
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
     public class PackageReferencesProject : SampleProject
     {
         public PackageReferencesProject()
