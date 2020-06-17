@@ -738,7 +738,7 @@ namespace Sharpmake.Generators.Apple
         {
             XCodeOptions options = new XCodeOptions();
 
-            options["Archs"] = "\"$(ARCHS_STANDARD_32_64_BIT)\"";
+            options["Archs"] = "\"$(ARCHS_STANDARD_64_BIT)\"";
             options["CodeSignEntitlements"] = RemoveLineTag;
             options["DevelopmentTeam"] = RemoveLineTag;
             options["ExcludedSourceFileNames"] = XCodeFormatList(conf.ResolvedSourceFilesBuildExclude, 4);
