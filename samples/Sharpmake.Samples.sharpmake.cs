@@ -7,6 +7,8 @@ namespace SharpmakeGen.Samples
 {
     public abstract class SampleProject : Common.SharpmakeBaseProject
     {
+        public string SharpmakeMainFile = "[project.Name].sharmake.cs";
+
         protected SampleProject()
             : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
         {
@@ -29,6 +31,15 @@ namespace SharpmakeGen.Samples
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
+
+            conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
+            {
+                StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
+                StartProgram = @"[conf.TargetPath]\Sharpmake.Application.exe",
+                StartArguments = "/sources(\"[project.SharpmakeMainFile]\")",
+                WorkingDirectory = "[project.SourceRootPath]",
+                OverwriteExistingFile = false
+            };
         }
     }
 
@@ -54,6 +65,7 @@ namespace SharpmakeGen.Samples
         public ConfigureOrderProject()
         {
             Name = "ConfigureOrder";
+            SharpmakeMainFile = "main.sharpmake.cs";
         }
     }
 
@@ -63,6 +75,7 @@ namespace SharpmakeGen.Samples
         public CPPCLIProject()
         {
             Name = "CPPCLI";
+            SharpmakeMainFile = "CLRTest.sharpmake.cs";
         }
     }
 
@@ -72,6 +85,7 @@ namespace SharpmakeGen.Samples
         public CSharpHelloWorldProject()
         {
             Name = "CSharpHelloWorld";
+            SharpmakeMainFile = "HelloWorld.sharpmake.cs";
         }
     }
 
@@ -108,6 +122,7 @@ namespace SharpmakeGen.Samples
         public DotNetCoreFrameworkHelloWorldProject()
         {
             Name = "DotNetCoreFrameworkHelloWorld";
+            SharpmakeMainFile = "HelloWorld.sharpmake.cs";
             SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
         }
     }
@@ -118,6 +133,7 @@ namespace SharpmakeGen.Samples
         public DotNetFrameworkHelloWorldProject()
         {
             Name = "DotNetFrameworkHelloWorld";
+            SharpmakeMainFile = "HelloWorld.sharpmake.cs";
             SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
         }
     }
@@ -146,6 +162,7 @@ namespace SharpmakeGen.Samples
         public HelloXCodeProject()
         {
             Name = "HelloXCode";
+            SharpmakeMainFile = "HelloXCode.Main.sharpmake.cs";
 
             // This one is special, we have .sharpmake.cs files in the codebase
             SourceFilesExcludeRegex.Remove(@"\\codebase\\");
