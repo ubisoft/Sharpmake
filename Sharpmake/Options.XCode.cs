@@ -136,10 +136,10 @@ namespace Sharpmake
 
                 public enum Exceptions
                 {
+                    [Default]
                     Disable,
                     Enable,
                     EnableCpp,
-                    [Default]
                     EnableObjC,
                 }
 
