@@ -411,6 +411,38 @@ namespace Sharpmake.Generators.Apple
             return configurations.Find(element => (element.Output == Project.Configuration.OutputType.IosApp));
         }
 
+        public static string XCodeFormatSingleListItem(string item)
+        {
+            if (item.Contains(' '))
+                return $@"""{item}""";
+            return $"{item}";
+        }
+
+        public static string XCodeFormatList(Strings items, int nbIndent)
+        {
+            if (items.Count == 0)
+                return FileGeneratorUtilities.RemoveLineTag;
+
+            if (items.Count == 1)
+                return XCodeFormatSingleListItem(items.First());
+
+            // Write all selected items.
+            var strBuilder = new StringBuilder(1024 * 16);
+
+            string indent = new string('\t', nbIndent);
+
+            strBuilder.Append("(");
+            strBuilder.AppendLine();
+
+            foreach (string item in items)
+            {
+                strBuilder.AppendFormat("{0}\t{1},{2}", indent, XCodeFormatSingleListItem(item), Util.UnixSeparator);
+            }
+            strBuilder.AppendFormat("{0})", indent);
+
+            return strBuilder.ToString();
+        }
+
         //Key is the default config of a Native Target, Value is the list of configs per native target with different optimization (Debug, Release,...)
         private Dictionary<Project.Configuration, List<Project.Configuration>> GetProjectConfigurationsPerNativeTarget(List<Project.Configuration> configurations)
         {
