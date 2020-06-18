@@ -1488,6 +1488,8 @@ namespace Sharpmake.Generators.Apple
             {
                 switch (conf.Output)
                 {
+                    case Project.Configuration.OutputType.Dll:
+                        return ".dylib";
                     case Project.Configuration.OutputType.Lib:
                         return ".a";
                     case Project.Configuration.OutputType.Exe:
@@ -1497,7 +1499,7 @@ namespace Sharpmake.Generators.Apple
                     case Project.Configuration.OutputType.IosTestBundle:
                         return ".xctest";
                     default:
-                        return "";
+                        throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
                 }
             }
 
