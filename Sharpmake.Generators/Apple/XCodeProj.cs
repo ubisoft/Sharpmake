@@ -1797,6 +1797,10 @@ namespace Sharpmake.Generators.Apple
                 Dependencies = dependencies;
                 switch (OutputFile.OutputType)
                 {
+                    case Project.Configuration.OutputType.Dll:
+                        ProductType = "com.apple.product-type.library.dynamic";
+                        ProductInstallPath = RemoveLineTag;
+                        break;
                     case Project.Configuration.OutputType.Lib:
                         ProductType = "com.apple.product-type.library.static";
                         ProductInstallPath = RemoveLineTag;
@@ -1805,14 +1809,13 @@ namespace Sharpmake.Generators.Apple
                         ProductType = "com.apple.product-type.bundle.unit-test";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
+                    case Project.Configuration.OutputType.Exe:
                     case Project.Configuration.OutputType.IosApp:
                         ProductType = "com.apple.product-type.application";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
                     default:
-                        ProductType = "com.apple.product-type.tool";
-                        ProductInstallPath = RemoveLineTag;
-                        break;
+                        throw new NotSupportedException($"XCode generator doesn't handle {OutputFile.OutputType}");
                 }
             }
 
