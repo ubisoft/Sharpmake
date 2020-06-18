@@ -239,7 +239,7 @@ namespace Sharpmake.Generators.Apple
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
-				CONFIGURATION_BUILD_DIR = ""[item.Configuration.TargetPath]"";
+				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
 				);
@@ -280,7 +280,7 @@ namespace Sharpmake.Generators.Apple
 				BUNDLE_LOADER = ""[testHost]"";
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
-				CONFIGURATION_BUILD_DIR = ""[item.Configuration.TargetPath]"";
+				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
 				);
@@ -303,7 +303,7 @@ namespace Sharpmake.Generators.Apple
 			buildSettings =
 			{
 				ARCHS = [item.Options.Archs];
-				SYMROOT = ""[item.Configuration.TargetPath]"";
+				SYMROOT = ""[item.Options.BuildDirectory]"";
 				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
 				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
 				CLANG_CXX_LANGUAGE_STANDARD = ""[item.Options.CppStandard]"";
