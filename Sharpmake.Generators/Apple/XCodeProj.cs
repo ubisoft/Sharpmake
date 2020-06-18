@@ -1453,24 +1453,20 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectReference : ProjectFile
         {
-            private string _projectName;
-
             public ProjectReference(string fullPath)
                 : base(fullPath)
             {
-                _projectName = Name.Substring(0, Name.LastIndexOf('.'));
+                ProjectName = Name.Substring(0, Name.LastIndexOf('.'));
             }
-
-
 
             public ProjectReference(ItemSection itemSection, string identifier)
                 : base(ItemSection.PBXProject, identifier)
             {
-                _projectName = identifier;
+                ProjectName = identifier;
             }
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.SOURCE_ROOT; } }
-            public string ProjectName { get { return _projectName; } }
+            public string ProjectName { get; }
         }
 
         private class ProjectOutputFile : ProjectFile
@@ -1623,28 +1619,22 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectBuildFile : ProjectItem
         {
-            private ProjectFileBase _file;
-
             public ProjectBuildFile(ProjectFileBase file) : base(ItemSection.PBXBuildFile, file.Name)
             {
-                _file = file;
+                File = file;
             }
 
-            public ProjectFileBase File { get { return _file; } }
+            public ProjectFileBase File { get; }
         }
 
         private abstract class ProjectBuildPhase : ProjectItem
         {
-            private readonly List<ProjectBuildFile> _files;
-            private uint _buildActionMask = 0;
-            private int _runOnlyForDeploymentPostprocessing;
-
             public ProjectBuildPhase(ItemSection section, string phaseName, uint buildActionMask)
                 : base(section, phaseName)
             {
-                _files = new List<ProjectBuildFile>();
-                _buildActionMask = buildActionMask;
-                _runOnlyForDeploymentPostprocessing = 0;
+                Files = new List<ProjectBuildFile>();
+                BuildActionMask = buildActionMask;
+                RunOnlyForDeploymentPostprocessing = 0;
             }
 
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
@@ -1662,9 +1652,9 @@ namespace Sharpmake.Generators.Apple
                 resolverParameters.Add("itemChildren", childrenList);
             }
 
-            public List<ProjectBuildFile> Files { get { return _files; } }
-            public uint BuildActionMask { get { return _buildActionMask; } }
-            public int RunOnlyForDeploymentPostprocessing { get { return _runOnlyForDeploymentPostprocessing; } }
+            public List<ProjectBuildFile> Files { get; }
+            public uint BuildActionMask { get; } = 0;
+            public int RunOnlyForDeploymentPostprocessing { get; }
         }
 
         private class ProjectResourcesBuildPhase : ProjectBuildPhase
@@ -1849,32 +1839,27 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectBuildConfiguration : ProjectItem
         {
-            private Project.Configuration _configuration;
-            private XCodeOptions _options;
-
             public ProjectBuildConfiguration(ItemSection section, string configurationName, Project.Configuration configuration, XCodeOptions options)
                 : base(section, configurationName)
             {
-                _configuration = configuration;
-                _options = options;
+                Configuration = configuration;
+                Options = options;
             }
 
-            public XCodeOptions Options { get { return _options; } }
-            public Project.Configuration Configuration { get { return _configuration; } }
-            public string Optimization { get { return _configuration.Target.Name; } }
+            public XCodeOptions Options { get; }
+            public Project.Configuration Configuration { get; }
+            public string Optimization { get { return Configuration.Target.Name; } }
         }
 
         private class ProjectBuildConfigurationForTarget : ProjectBuildConfiguration
         {
-            private ProjectNativeTarget _nativeTarget;
-
             public ProjectBuildConfigurationForTarget(ItemSection section, Project.Configuration configuration, ProjectNativeTarget nativeTarget, XCodeOptions options)
                 : base(section, configuration.Target.Name, configuration, options)
             {
-                _nativeTarget = nativeTarget;
+                NativeTarget = nativeTarget;
             }
 
-            public ProjectNativeTarget NativeTarget { get { return _nativeTarget; } }
+            public ProjectNativeTarget NativeTarget { get; }
         }
 
         private class ProjectBuildConfigurationForNativeTarget : ProjectBuildConfigurationForTarget
