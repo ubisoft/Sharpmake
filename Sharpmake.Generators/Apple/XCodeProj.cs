@@ -723,6 +723,7 @@ namespace Sharpmake.Generators.Apple
             options["UsePrecompiledHeader"] = "NO";
             options["PrecompiledHeader"] = RemoveLineTag;
             options["ValidArchs"] = RemoveLineTag;
+            options["BuildDirectory"] = (conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath;
 
             Options.SelectOption(conf,
                 Options.Option(Options.XCode.Compiler.AlwaysSearchUserPaths.Disable, () => options["AlwaysSearchUserPaths"] = "NO"),
@@ -1009,7 +1010,7 @@ namespace Sharpmake.Generators.Apple
             options["IncludePaths"] = includePaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
 
             OrderableStrings libraryPaths = conf.LibraryPaths;
-            libraryPaths.AddRange(conf.ResolvedDependencies.Select(libPaths => libPaths.TargetPath));
+            libraryPaths.AddRange(conf.ResolvedDependencies.Select(libPaths => { return (libPaths.Output == Project.Configuration.OutputType.Lib) ? libPaths.TargetLibraryPath : libPaths.TargetPath; }));
             if (libraryPaths.Count == 0)
             {
                 options["LibraryPaths"] = RemoveLineTag;
@@ -1443,7 +1444,7 @@ namespace Sharpmake.Generators.Apple
             }
 
             public ProjectOutputFile(Project.Configuration conf)
-                : this(conf.TargetPath + System.IO.Path.DirectorySeparatorChar + conf.TargetFilePrefix + conf.TargetFileName + GetFileExtension(conf))
+                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + System.IO.Path.DirectorySeparatorChar + conf.TargetFilePrefix + conf.TargetFileName + GetFileExtension(conf))
             {
                 _conf = conf;
             }
