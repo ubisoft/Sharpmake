@@ -1775,59 +1775,50 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectNativeTarget : ProjectItem
         {
-            private ProjectConfigurationList _configurationList;
-            private ProjectOutputFile _outputFile;
-            private string _productType;
-            private ProjectResourcesBuildPhase _resourcesBuildPhase;
-            private ProjectSourcesBuildPhase _sourcesBuildPhase;
-            private ProjectFrameworksBuildPhase _frameworksBuildPhase;
-            private string _productInstallPath;
-            private List<ProjectTargetDependency> _dependencies;
-
             public ProjectNativeTarget(string identifier)
                 : base(ItemSection.PBXNativeTarget, identifier)
             {
                 // Only for Uid computation.
-                _outputFile = null;
+                OutputFile = null;
             }
 
             public ProjectNativeTarget(Project project)
                 : base(ItemSection.PBXNativeTarget, project.Name)
             {
                 // Only for Uid computation.
-                _outputFile = null;
+                OutputFile = null;
             }
 
             public ProjectNativeTarget(string identifier, ProjectOutputFile outputFile, ProjectConfigurationList configurationList, List<ProjectTargetDependency> dependencies)
                 : base(ItemSection.PBXNativeTarget, identifier)
             {
-                _configurationList = configurationList;
-                _outputFile = outputFile;
-                _dependencies = dependencies;
-                switch (_outputFile.OutputType)
+                ConfigurationList = configurationList;
+                OutputFile = outputFile;
+                Dependencies = dependencies;
+                switch (OutputFile.OutputType)
                 {
                     case Project.Configuration.OutputType.Lib:
-                        _productType = "com.apple.product-type.library.static";
-                        _productInstallPath = RemoveLineTag;
+                        ProductType = "com.apple.product-type.library.static";
+                        ProductInstallPath = RemoveLineTag;
                         break;
                     case Project.Configuration.OutputType.IosTestBundle:
-                        _productType = "com.apple.product-type.bundle.unit-test";
-                        _productInstallPath = "$(HOME)/Applications";
+                        ProductType = "com.apple.product-type.bundle.unit-test";
+                        ProductInstallPath = "$(HOME)/Applications";
                         break;
                     case Project.Configuration.OutputType.IosApp:
-                        _productType = "com.apple.product-type.application";
-                        _productInstallPath = "$(HOME)/Applications";
+                        ProductType = "com.apple.product-type.application";
+                        ProductInstallPath = "$(HOME)/Applications";
                         break;
                     default:
-                        _productType = "com.apple.product-type.tool";
-                        _productInstallPath = RemoveLineTag;
+                        ProductType = "com.apple.product-type.tool";
+                        ProductInstallPath = RemoveLineTag;
                         break;
                 }
             }
 
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
-                if (null == _outputFile)
+                if (null == OutputFile)
                     throw new Error("Trying to compute dependencies on incomplete native target. ");
 
                 ProjectNativeTarget folderItem = (ProjectNativeTarget)item;
@@ -1843,14 +1834,14 @@ namespace Sharpmake.Generators.Apple
                 resolverParameters.Add("itemChildren", childrenList);
             }
 
-            public ProjectResourcesBuildPhase ResourcesBuildPhase { get { return _resourcesBuildPhase; } set { _resourcesBuildPhase = value; } }
-            public ProjectSourcesBuildPhase SourcesBuildPhase { get { return _sourcesBuildPhase; } set { _sourcesBuildPhase = value; } }
-            public ProjectFrameworksBuildPhase FrameworksBuildPhase { get { return _frameworksBuildPhase; } set { _frameworksBuildPhase = value; } }
-            public ProjectOutputFile OutputFile { get { return _outputFile; } }
-            public string ProductType { get { return _productType; } }
-            public ProjectConfigurationList ConfigurationList { get { return _configurationList; } }
-            public string ProductInstallPath { get { return _productInstallPath; } }
-            public List<ProjectTargetDependency> Dependencies { get { return _dependencies; } }
+            public ProjectResourcesBuildPhase ResourcesBuildPhase { get; set; }
+            public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
+            public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
+            public ProjectOutputFile OutputFile { get; }
+            public string ProductType { get; }
+            public ProjectConfigurationList ConfigurationList { get; }
+            public string ProductInstallPath { get; }
+            public List<ProjectTargetDependency> Dependencies { get; }
         }
 
         private class ProjectBuildConfiguration : ProjectItem
