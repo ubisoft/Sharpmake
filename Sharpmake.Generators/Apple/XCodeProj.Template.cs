@@ -297,6 +297,7 @@ namespace Sharpmake.Generators.Apple
 				CLANG_WARN_INT_CONVERSION = [item.Options.WarningIntConversion];
 				CLANG_WARN_OBJC_ROOT_CLASS = [item.Options.WarningRootClass];
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = [item.Options.WarningDuplicateMethodMatch];
+				EXECUTABLE_PREFIX = [item.Options.ExecutablePrefix];
 				GCC_C_LANGUAGE_STANDARD = ""[item.Options.CStandard]"";
 				GCC_PRECOMPILE_PREFIX_HEADER = [item.Options.UsePrecompiledHeader];
 				GCC_PREFIX_HEADER = ""[item.Options.PrecompiledHeader]"";

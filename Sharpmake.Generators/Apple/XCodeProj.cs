@@ -1048,8 +1048,10 @@ namespace Sharpmake.Generators.Apple
             includePaths.AddRange(conf.DependenciesIncludePaths);
             options["IncludePaths"] = includePaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
 
-            OrderableStrings libraryPaths = conf.LibraryPaths;
-            libraryPaths.AddRange(conf.ResolvedDependencies.Select(libPaths => { return (libPaths.Output == Project.Configuration.OutputType.Lib) ? libPaths.TargetLibraryPath : libPaths.TargetPath; }));
+            var libraryPaths = new OrderableStrings(conf.LibraryPaths);
+            libraryPaths.AddRange(conf.DependenciesOtherLibraryPaths);
+            libraryPaths.AddRange(conf.DependenciesBuiltTargetsLibraryPaths);
+
             if (libraryPaths.Count == 0)
             {
                 options["LibraryPaths"] = RemoveLineTag;
@@ -1057,7 +1059,8 @@ namespace Sharpmake.Generators.Apple
             }
             else
             {
-                options["LibraryPaths"] = conf.LibraryPaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
+                libraryPaths.Sort();
+                options["LibraryPaths"] = libraryPaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
             }
 
             Strings specificDeviceLibraryPaths = Options.GetStrings<Options.XCode.Compiler.SpecificDeviceLibraryPaths>(conf);
@@ -1087,10 +1090,24 @@ namespace Sharpmake.Generators.Apple
             options["LinkerOptions"] = RemoveLineTag;
             options["WarningOptions"] = RemoveLineTag;
 
+            var libFiles = new OrderableStrings(conf.LibraryFiles);
+            libFiles.AddRange(conf.DependenciesBuiltTargetsLibraryFiles);
+            libFiles.AddRange(conf.DependenciesOtherLibraryFiles);
+            libFiles.Sort();
+
             Strings linkerOptions = new Strings(conf.AdditionalLinkerOptions);
+
+            // TODO: make this an option
             linkerOptions.Add("-ObjC");
-            linkerOptions.AddRange(conf.LibraryFiles.Select(library => "-l" + library));
-            linkerOptions.AddRange(conf.ResolvedDependencies.Where(library => library.Output != Project.Configuration.OutputType.None).Select(library => "-l" + library.TargetFileFullName));
+
+            // TODO: fix this to use proper lib prefixing
+            linkerOptions.AddRange(libFiles.Select(library => "-l" + library));
+
+            // TODO: when the above is fixed, we won't need this anymore
+            if (conf.Output == Project.Configuration.OutputType.Dll)
+                options["ExecutablePrefix"] = "lib";
+            else
+                options["ExecutablePrefix"] = RemoveLineTag;
 
             if (conf.DefaultOption == Options.DefaultTarget.Debug)
                 conf.Defines.Add("_DEBUG");
