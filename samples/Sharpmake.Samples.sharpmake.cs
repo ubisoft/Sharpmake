@@ -195,6 +195,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class RustHelloWorldProject : SampleProject
+    {
+        public RustHelloWorldProject()
+        {
+            Name = "RustHelloWorld";
+        }
+    }
+
+    [Generate]
     public class SimpleExeLibDependencyProject : SampleProject
     {
         public SimpleExeLibDependencyProject()

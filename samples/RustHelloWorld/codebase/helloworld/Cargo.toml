@@ -1,0 +1,10 @@
+[package]
+name = "helloworld"
+version = "0.1.0"
+authors = ["Ubisoft"]
+edition = "2018"
+
+[lib]
+crate_type = ["staticlib"]
+
+[dependencies]

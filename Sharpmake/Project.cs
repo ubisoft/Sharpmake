@@ -2545,4 +2545,98 @@ namespace Sharpmake
         {
         }
     }
+
+    /// <summary>
+    /// A Rust project.
+    /// 
+    /// Requires the cargo build tools and cbindgen to be installed.
+    /// </summary>
+    public abstract class RustProject : Project
+    {
+        /// <summary>
+        /// Location of where all generated artifacts are placed, relative to the current working directory.
+        /// </summary>
+        protected string CargoTargetDir = @"target/debug/";
+
+        /// <summary>
+        /// Location of generated C++ header files.
+        /// </summary>
+        protected string IncludeDirectory = @"[project.SourceRootPath]\ffi\include";
+
+        /// <summary>
+        /// Name of the generated static library.
+        /// </summary>
+        protected string LibName = "[project.Name]";
+
+        protected RustProject(Type targetType)
+            : base(targetType)
+        {
+            SourceFilesExtensions = new Strings(".toml", ".rs", ".h");
+            NoneExtensions.Add(".lock");
+            SourceFilesExcludeRegex.Add(@"\btarget\\");
+        }
+
+        protected void ConfigureRustBuildStep(Configuration conf, Platform platform)
+        {
+            conf.ProjectFileName = "[project.Name]";
+
+            conf.IncludePaths.Add(IncludeDirectory);
+
+            conf.Output = Project.Configuration.OutputType.Lib;
+
+            // Link required Windows libraries
+            if (platform == Platform.win64)
+            {
+                conf.LibraryFiles.Add("userenv");
+                conf.LibraryFiles.Add("ws2_32");
+            }
+
+            conf.CustomFileBuildSteps.Add(
+                new CargoBuildStep("build", CargoTargetDir + @"/" + LibName + ".lib", @"[project.SourceRootPath]\Cargo.toml")
+            );
+
+            var outputPath = IncludeDirectory + @"\" + Name + ".h";
+            conf.EventPreBuildExe.Add(
+                new Configuration.BuildStepExecutable(
+                    "cbindgen",
+                    "",
+                    "",
+                    "[project.SourceRootPath] -o " + outputPath,
+                    "",
+                    false,
+                    true
+                )
+            );
+        }
+
+        public class CargoBuildStep : Project.Configuration.CustomFileBuildStep
+        {
+            public CargoBuildStep(string subcommand, string outputPath, string manifestPath)
+            {
+                ExecutableArguments = subcommand + " --manifest-path " + manifestPath;
+                KeyInput = "Cargo.toml";
+                Output = outputPath;
+            }
+
+            public override Project.Configuration.CustomFileBuildStepData MakePathRelative(Resolver resolver, Func<string, bool, string> MakeRelativeTool)
+            {
+                var relativeData = new Project.Configuration.CustomFileBuildStepData();
+                relativeData.Executable = "cargo";
+                relativeData.KeyInput = MakeRelativeTool(KeyInput, true);
+                relativeData.Output = MakeRelativeTool(Output, true);
+                using (resolver.NewScopedParameter("input", relativeData.KeyInput))
+                using (resolver.NewScopedParameter("output", relativeData.Output))
+                {
+                    relativeData.ExecutableArguments = resolver.Resolve(ExecutableArguments);
+                }
+                relativeData.Description = Description;
+                foreach (var input in AdditionalInputs.Values)
+                {
+                    relativeData.AdditionalInputs.Add(MakeRelativeTool(input, true));
+                }
+                relativeData.Filter = Filter;
+                return relativeData;
+            }
+        }
+    }
 }
