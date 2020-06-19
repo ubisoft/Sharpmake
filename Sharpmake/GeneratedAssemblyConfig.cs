@@ -1,10 +1,24 @@
-﻿namespace Sharpmake
+﻿// Copyright (c) 2017 Ubisoft Entertainment
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace Sharpmake
 {
     // https://johnkoerner.com/csharp/dealing-with-duplicate-attribute-errors-in-net-core/
     public class GeneratedAssemblyConfig
     {
         public bool GenerateAssemblyInfo { get; set; } = false;
-        
+
         private bool _generateAssemblyConfigurationAttribute = true;
         public bool GenerateAssemblyConfigurationAttribute
         {
@@ -18,7 +32,7 @@
             get { return GenerateAssemblyInfo && _generateAssemblyDescriptionAttribute; }
             set { _generateAssemblyDescriptionAttribute = value; }
         }
-        
+
         private bool _generateAssemblyProductAttribute = true;
         public bool GenerateAssemblyProductAttribute
         {
@@ -46,14 +60,14 @@
             get { return GenerateAssemblyInfo && _generateAssemblyFileVersionAttribute; }
             set { _generateAssemblyFileVersionAttribute = value; }
         }
-        
+
         private bool _generateAssemblyVersionAttribute = true;
         public bool GenerateAssemblyVersionAttribute
         {
             get { return GenerateAssemblyInfo && _generateAssemblyVersionAttribute; }
             set { _generateAssemblyVersionAttribute = value; }
         }
-        
+
         private bool _generateAssemblyInformationalVersionAttribute = true;
         public bool GenerateAssemblyInformationalVersionAttribute
         {
@@ -67,7 +81,7 @@
         private readonly GeneratedAssemblyConfig _config;
         private readonly bool _isNetCoreProjectSchema;
         private readonly string _removeLineTag;
-        
+
         public GeneratedAssemblyConfigTemplate(GeneratedAssemblyConfig config, bool isNetCoreProjectSchema, string removeLineTag)
         {
             _config = config;
@@ -85,5 +99,4 @@
         public string GenerateAssemblyVersionAttribute { get { return (!_isNetCoreProjectSchema || !_config.GenerateAssemblyInfo || _config.GenerateAssemblyVersionAttribute) ? _removeLineTag : "false"; } }
         public string GenerateAssemblyInformationalVersionAttribute { get { return (!_isNetCoreProjectSchema || !_config.GenerateAssemblyInfo || _config.GenerateAssemblyInformationalVersionAttribute) ? _removeLineTag : "false"; } }
     }
-
 }

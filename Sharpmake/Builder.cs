@@ -147,7 +147,7 @@ namespace Sharpmake
 
         private readonly List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
 
-        private static readonly Lazy<Regex> _defineValidationRegex = new Lazy<Regex>(() => new Regex(@"^\w+$", RegexOptions.Compiled));
+        private static readonly Lazy<Regex> s_defineValidationRegex = new Lazy<Regex>(() => new Regex(@"^\w+$", RegexOptions.Compiled));
 
         public Builder(
             BuildContext.BaseBuildContext context,
@@ -549,7 +549,7 @@ namespace Sharpmake
 
         public void AddDefine(string define)
         {
-            if (!_defineValidationRegex.Value.IsMatch(define))
+            if (!s_defineValidationRegex.Value.IsMatch(define))
                 throw new Error("error: invalid define '{0}', a define must be a single word", define);
 
             if (Defines.Add(define))

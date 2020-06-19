@@ -210,7 +210,7 @@ namespace Sharpmake
             {
                 return GetProject(typeof(TPROJECTTYPE));
             }
-            
+
             private void AddProjectInternal(Type projectType, ITarget projectTarget, bool inactiveProject, string solutionFolder, string callerInfo)
             {
                 IncludedProjectInfo includedProjectInfo = GetProject(projectType);

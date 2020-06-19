@@ -983,11 +983,11 @@ namespace Sharpmake.Generators.VisualStudio
             string targetFrameworkString;
             DevEnv devenv = configurations.Select(
                     conf => ((ITarget)conf.Target).GetFragment<DevEnv>()).Distinct().Single();
-            List< DotNetFramework> projectFrameworks = configurations.Select(
+            List<DotNetFramework> projectFrameworks = configurations.Select(
                     conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
 
-            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore || 
-                                            ( project.ProjectSchema == CSharpProjectSchema.Default &&
+            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore ||
+                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
                                               (projectFrameworks.Any(x => x.IsDotNetCore()) || projectFrameworks.Count > 1)
                                             );
             if (isNetCoreProjectSchema)
@@ -1032,8 +1032,8 @@ namespace Sharpmake.Generators.VisualStudio
             WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
 
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
-            if(!isNetCoreProjectSchema)
-            { 
+            if (!isNetCoreProjectSchema)
+            {
                 CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
             }
 
@@ -2061,7 +2061,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             List<DotNetFramework> projectFrameworks = configurations.Select(
                     conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
-            
+
             bool netCoreProject = project.ProjectSchema == CSharpProjectSchema.NetCore ||
                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
                                              projectFrameworks.Any(x => x.IsDotNetCore())
