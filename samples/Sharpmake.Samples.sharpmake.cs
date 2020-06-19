@@ -7,7 +7,7 @@ namespace SharpmakeGen.Samples
 {
     public abstract class SampleProject : Common.SharpmakeBaseProject
     {
-        public string SharpmakeMainFile = "[project.Name].sharmake.cs";
+        public string SharpmakeMainFile = "[project.Name].sharpmake.cs";
 
         protected SampleProject()
             : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
