@@ -123,7 +123,7 @@ namespace Sharpmake.Generators.Apple
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
 			buildPhases = (
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
-				[item.SourcesBuildPhase.Uid] /* Sources */,
+				[item.SourceBuildPhaseUID] /* Sources */,
 				[item.FrameworksBuildPhase.Uid] /* Frameworks */,
 			);
 			buildRules = (
