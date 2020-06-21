@@ -227,10 +227,13 @@ namespace Sharpmake.Generators.Apple
                 _projectItems.Add(projectOutputBuildFile);
                 _projectOutputFiles.Add(projectOutputFile);
 
-                ProjectSourcesBuildPhase sourcesBuildPhase = new ProjectSourcesBuildPhase(conf.TargetFileName, 2147483647);
-                _projectItems.Add(sourcesBuildPhase);
-                _sourcesBuildPhases.Add(conf, sourcesBuildPhase);
-                PrepareSourceFiles(projectFiles, project, conf, workspacePath);
+                if (!conf.IsFastBuild)
+                {
+                    ProjectSourcesBuildPhase sourcesBuildPhase = new ProjectSourcesBuildPhase(conf.TargetFileName, 2147483647);
+                    _projectItems.Add(sourcesBuildPhase);
+                    _sourcesBuildPhases.Add(conf, sourcesBuildPhase);
+                    PrepareSourceFiles(projectFiles, project, conf, workspacePath);
+                }
 
                 ProjectResourcesBuildPhase resourceBuildPhase = new ProjectResourcesBuildPhase(conf.TargetFileName, 2147483647);
                 _projectItems.Add(resourceBuildPhase);
@@ -322,8 +325,12 @@ namespace Sharpmake.Generators.Apple
 
                 ProjectNativeTarget target = new ProjectNativeTarget(conf.TargetFileName, projectOutputFile, configurationListForNativeTarget, _targetDependencies[conf]);
                 target.ResourcesBuildPhase = _resourcesBuildPhases[conf];
-                target.SourcesBuildPhase = _sourcesBuildPhases[conf];
+                if (_sourcesBuildPhases.ContainsKey(conf))
+                {
+                    target.SourcesBuildPhase = _sourcesBuildPhases[conf];
+                }
                 target.FrameworksBuildPhase = _frameworksBuildPhases[conf];
+
                 configurationListForNativeTarget.RelatedItem = target;
                 _projectItems.Add(target);
                 _nativeTargets.Add(conf, target);
@@ -1501,7 +1508,7 @@ namespace Sharpmake.Generators.Apple
                 _conf = conf;
             }
 
-            static public string GetFileExtension(Project.Configuration conf)
+            public static string GetFileExtension(Project.Configuration conf)
             {
                 switch (conf.Output)
                 {
@@ -1848,6 +1855,7 @@ namespace Sharpmake.Generators.Apple
 
             public ProjectResourcesBuildPhase ResourcesBuildPhase { get; set; }
             public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
+            public String SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
             public ProjectOutputFile OutputFile { get; }
             public string ProductType { get; }
