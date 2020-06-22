@@ -249,7 +249,7 @@ namespace Sharpmake.Generators.Apple
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
 			};
-			name = [item.Optimization];
+			name = [item.Options.TargetName];
 		};
 "               },
 
@@ -274,7 +274,7 @@ namespace Sharpmake.Generators.Apple
 				TEST_HOST = ""[testHost]"";
 				WRAPPER_EXTENSION = xctest;
 			};
-			name = [item.Optimization];
+			name = [item.Options.TargetName];
 		};
 "               },
 
@@ -335,7 +335,7 @@ namespace Sharpmake.Generators.Apple
 [item.Options.LinkerOptions]
 				);
 			};
-			name = [item.Optimization];
+			name = [item.Options.TargetName];
 		};
 "               },
 
