@@ -180,7 +180,7 @@ namespace Sharpmake.Generators.VisualStudio
                         string[] venv_config = File.ReadAllLines(venv_config_file);
                         foreach (string line in venv_config)
                         {
-                            if (string.Compare(line, "version", true) > 0)
+                            if (line.StartsWith("version", StringComparison.CurrentCultureIgnoreCase))
                             {
                                 string[] config = line.Split('=');
                                 string venv_version_value = config[1].Trim();
