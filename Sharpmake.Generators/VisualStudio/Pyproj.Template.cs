@@ -48,14 +48,12 @@ namespace Sharpmake.Generators.VisualStudio
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>[interpreterId]</InterpreterId>
-    <InterpreterVersion>[interpreterVersion]</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=""'$(Configuration)' == 'Debug'"" />
   <PropertyGroup>
     <VisualStudioVersion Condition="" '$(VisualStudioVersion)' == '' "">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
+  <Import Project=""$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets"" />
 ";
 
                 public static string Interpreter =
@@ -73,15 +71,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string VirtualEnvironmentInterpreter =
 @"    <Interpreter Include=""[basePath]"">
-      <Id>{[guid]}</Id>
-      <BaseInterpreter>[baseGuid]</BaseInterpreter>
+      <Id>[name]</Id>
       <Version>[version]</Version>
-      <Description>[name]</Description>
+      <Description>[name] (Python [version] (64-bit))</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-      <Architecture>X86</Architecture>
+      <Architecture>X64</Architecture>
     </Interpreter>
 ";
 

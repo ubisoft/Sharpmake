@@ -161,6 +161,7 @@ namespace Sharpmake.Generators.VisualStudio
                             currentInterpreterVersion = (string)Registry.GetValue(baseInterpreterRegisterKeyName, "Version", currentInterpreterVersion);
                         }
                     }
+                    
                 }
 
                 using (resolver.NewScopedParameter("interpreterId", currentInterpreterId))
@@ -173,6 +174,20 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (PythonVirtualEnvironment virtualEnvironment in _project.VirtualEnvironments)
                 {
+                    string venv_config_file = Path.GetFullPath(Path.Combine(projectPath, virtualEnvironment.Path, "pyvenv.cfg"));
+                    if (File.Exists(venv_config_file))
+                    {
+                        string[] venv_config = File.ReadAllLines(venv_config_file);
+                        foreach (string line in venv_config)
+                        {
+                            if (string.Compare(line, "version", true) > 0)
+                            {
+                                string[] config = line.Split('=');
+                                string venv_version_value = config[1].Trim();
+                                currentInterpreterVersion = venv_version_value.Substring(0, 3);
+                            }
+                        }
+                    }
                     Write(Template.Project.ProjectItemGroupBegin, writer, resolver);
                     using (resolver.NewScopedParameter("name", virtualEnvironment.Name))
                     using (resolver.NewScopedParameter("version", currentInterpreterVersion))
@@ -199,22 +214,22 @@ namespace Sharpmake.Generators.VisualStudio
                         if (interpreterDescription != string.Empty)
                         {
                             string interpreterVersion = (string)Registry.GetValue(interpreterRegisterKeyName, "Version", currentInterpreterVersion);
-                            using (resolver.NewScopedParameter("guid", $"{{{pyEnvironment.Guid}}}"))
-                            using (resolver.NewScopedParameter("version", interpreterVersion))
-                            {
-                                Write(Template.Project.InterpreterReference, writer, resolver);
-                            }
+                            // using (resolver.NewScopedParameter("guid", $"{{{pyEnvironment.Guid}}}"))
+                            // using (resolver.NewScopedParameter("version", interpreterVersion))
+                            // {
+                            //     Write(Template.Project.InterpreterReference, writer, resolver);
+                            // }
                         }
                     }
                 }
-                else if (_project.VirtualEnvironments.Count == 0) // Set the default interpreter
-                {
-                    using (resolver.NewScopedParameter("guid", currentInterpreterId))
-                    using (resolver.NewScopedParameter("version", currentInterpreterVersion))
-                    {
-                        Write(Template.Project.InterpreterReference, writer, resolver);
-                    }
-                }
+                // else if (_project.VirtualEnvironments.Count == 0) // Set the default interpreter
+                // {
+                    // using (resolver.NewScopedParameter("guid", currentInterpreterId))
+                    // using (resolver.NewScopedParameter("version", currentInterpreterVersion))
+                    // {
+                        //  Write(Template.Project.InterpreterReference, writer, resolver);
+                    // }
+                // }
                 Write(Template.Project.ProjectItemGroupEnd, writer, resolver);
 
                 // configuration general
