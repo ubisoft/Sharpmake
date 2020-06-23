@@ -113,6 +113,12 @@ namespace Sharpmake.Generators.VisualStudio
                 _projectConfigurationList = configurations;
 
                 DevEnvRange devEnvRange = new DevEnvRange(unsortedConfigurations);
+                bool needsPypatching = devEnvRange.MinDevEnv >= DevEnv.vs2017;
+
+                if (!needsPypatching && (devEnvRange.MinDevEnv != devEnvRange.MaxDevEnv))
+                {
+                    Builder.Instance.LogWarningLine("There are mixed devEnvs for one project. VS2017 or higher Visual Studio solutions will require manual updates.");
+                }
 
                 MemoryStream memoryStream = new MemoryStream();
                 StreamWriter writer = new StreamWriter(memoryStream);
@@ -128,7 +134,9 @@ namespace Sharpmake.Generators.VisualStudio
 
                 string currentInterpreterId = defaultInterpreter;
                 string currentInterpreterVersion = defaultInterpreterVersion;
+                string ptvsTargetsFile = $@"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets";
 
+                // environments
                 foreach (PythonEnvironment pyEnvironment in _project.Environments)
                 {
                     if (pyEnvironment.IsActivated)
@@ -146,6 +154,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
+                // virtual environments
                 foreach (PythonVirtualEnvironment virtualEnvironment in _project.VirtualEnvironments)
                 {
                     if (virtualEnvironment.IsDefault)
@@ -163,21 +172,33 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
+                // Project description
+                if (needsPypatching)
+                {
+                    currentInterpreterId = $"MSBuild|debug|$(MSBuildProjectFullPath)";
+                    ptvsTargetsFile = FileGeneratorUtilities.RemoveLineTag;
+                }
+
                 using (resolver.NewScopedParameter("interpreterId", currentInterpreterId))
                 using (resolver.NewScopedParameter("interpreterVersion", currentInterpreterVersion))
+                using (resolver.NewScopedParameter("ptvsTargetsFile", ptvsTargetsFile))
                 {
                     Write(Template.Project.ProjectDescription, writer, resolver);
                 }
 
                 GenerateItems(writer, resolver);
 
+                string baseGuid = FileGeneratorUtilities.RemoveLineTag;
+
                 foreach (PythonVirtualEnvironment virtualEnvironment in _project.VirtualEnvironments)
                 {
+                    baseGuid = needsPypatching ? baseGuid : virtualEnvironment.BaseInterpreterGuid.ToString();
+
                     Write(Template.Project.ProjectItemGroupBegin, writer, resolver);
                     using (resolver.NewScopedParameter("name", virtualEnvironment.Name))
                     using (resolver.NewScopedParameter("version", currentInterpreterVersion))
                     using (resolver.NewScopedParameter("basePath", virtualEnvironment.Path))
-                    using (resolver.NewScopedParameter("baseGuid", virtualEnvironment.BaseInterpreterGuid))
+                    using (resolver.NewScopedParameter("baseGuid", baseGuid))
                     using (resolver.NewScopedParameter("guid", virtualEnvironment.Guid))
                     {
                         Write(Template.Project.VirtualEnvironmentInterpreter, writer, resolver);
@@ -186,6 +207,7 @@ namespace Sharpmake.Generators.VisualStudio
                 }
 
                 Write(Template.Project.ProjectItemGroupBegin, writer, resolver);
+
                 if (_project.Environments.Count > 0)
                 {
                     foreach (PythonEnvironment pyEnvironment in _project.Environments)
@@ -241,6 +263,12 @@ namespace Sharpmake.Generators.VisualStudio
 
                 GenerateFolders(writer, resolver);
 
+                // Import native Python Tools project
+                if (needsPypatching)
+                {
+                    Write(Template.Project.ImportPythonTools, writer, resolver);
+                }
+
                 writer.Write(itemGroups.Resolve(resolver));
 
                 Write(Template.Project.ProjectEnd, writer, resolver);
@@ -249,6 +277,7 @@ namespace Sharpmake.Generators.VisualStudio
                 writer.Flush();
 
                 // remove all line that contain RemoveLineTag
+                memoryStream = Util.RemoveLineTags(memoryStream, FileGeneratorUtilities.RemoveLineTag);
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
                 FileInfo projectFileInfo = new FileInfo(projectPath + @"\" + projectFile + ProjectExtension);
