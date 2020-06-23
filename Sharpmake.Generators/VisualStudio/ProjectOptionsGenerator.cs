@@ -436,11 +436,15 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.DiagnosticsFormat.ColumnInfo, () => { context.Options["DiagnosticsFormat"] = "Column"; context.CommandLineOptions["DiagnosticsFormat"] = "/diagnostics:column"; })
             );
 
-            SelectPreferredToolArchitecture(context);
 
             context.Options["TrackFileAccess"] = FileGeneratorUtilities.RemoveLineTag;
 
-            SelectPlatformToolsetOption(context, optionsContext);
+            if (context.DevelopmentEnvironment.IsVisualStudio())
+            {
+                SelectPreferredToolArchitecture(context);
+                SelectPlatformToolsetOption(context, optionsContext);
+            }
+
 
             // Compiler.SuppressStartupBanner
             context.CommandLineOptions["SuppressStartupBanner"] = "/nologo";

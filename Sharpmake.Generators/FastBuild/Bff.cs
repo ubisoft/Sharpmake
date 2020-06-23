@@ -1340,7 +1340,12 @@ namespace Sharpmake.Generators.FastBuild
         )
         {
             // resolve targetPlatformVersion as it may be used in includes
-            string targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
+            string targetPlatformVersionString = "";
+            if (context.Configuration.Compiler.IsVisualStudio())
+            {
+
+                targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
+            }
 
             var resolverParams = new[] {
                     new VariableAssignment("project", context.Project),
