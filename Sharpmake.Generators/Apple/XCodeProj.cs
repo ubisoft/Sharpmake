@@ -987,6 +987,8 @@ namespace Sharpmake.Generators.Apple
             else
                 options["TargetedDeviceFamily"] = RemoveLineTag;
 
+            options["TargetName"] = XCodeFormatSingleListItem(conf.Target.Name);
+
             Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);
             if (validArchs != null)
                 options["ValidArchs"] = validArchs.Archs;
