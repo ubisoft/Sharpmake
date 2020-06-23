@@ -444,7 +444,7 @@ namespace Sharpmake.Generators.Apple
 
             foreach (string item in items)
             {
-                strBuilder.AppendFormat("{0}\t{1},{2}", indent, XCodeFormatSingleListItem(item), Util.UnixSeparator);
+                strBuilder.AppendFormat("{0}\t{1},{2}", indent, XCodeFormatSingleListItem(item), Environment.NewLine);
             }
             strBuilder.AppendFormat("{0})", indent);
 
