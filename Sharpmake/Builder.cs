@@ -467,6 +467,20 @@ namespace Sharpmake
             if (_references.TryGetValue(args.Name, out explicitReferencesFullPath))
                 return Assembly.LoadFrom(explicitReferencesFullPath);
 
+            // Default binding redirect for old versions of an assembly to the implicitly/explicitly referenced one
+            var requestedAssemblyName = new AssemblyName(args.Name);
+            var referencedAssemblyHighestVersion = _references.Keys
+                .Where(assemblyFullName => assemblyFullName.StartsWith(requestedAssemblyName.Name, StringComparison.OrdinalIgnoreCase))
+                .Select(assemblyFullName => new AssemblyName(assemblyFullName))
+                .OrderBy(assemblyName => assemblyName.Version)
+                .LastOrDefault()? // In case the assembly args.Name is referenced with multiple version, take the highest one
+                .FullName;
+
+            if (referencedAssemblyHighestVersion != null)
+            {
+                return Assembly.LoadFrom(_references[referencedAssemblyHighestVersion]);
+            }
+
             return null;
         }
 
