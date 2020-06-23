@@ -105,6 +105,23 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
+                {ItemSection.PBXShellScriptBuildPhase,
+@"		[item.Uid] /* Scripts */ =
+		{
+	        isa = PBXShellScriptBuildPhase;
+	        buildActionMask = 2147483647;
+	        files = ();
+	        inputFileListPaths = ();
+	        inputPaths = ();
+	        outputFileListPaths = ();
+	        outputPaths = ();
+	        runOnlyForDeploymentPostprocessing = 0;
+	        shellPath = /bin/sh;
+	        shellScript = ""[item.script]"";
+        };
+"
+                },
+
                 { ItemSection.PBXGroup,
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
@@ -122,9 +139,11 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXNativeTarget;
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
 			buildPhases = (
+                [item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts */,
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
 				[item.SourceBuildPhaseUID] /* Sources */,
 				[item.FrameworksBuildPhase.Uid] /* Frameworks */,
+                [item.ShellScriptPostBuildPhaseUIDs] /* ShellScripts */,
 			);
 			buildRules = (
 			);

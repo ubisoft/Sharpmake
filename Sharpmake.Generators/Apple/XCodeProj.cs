@@ -49,6 +49,8 @@ namespace Sharpmake.Generators.Apple
         private Dictionary<Project.Configuration, ProjectResourcesBuildPhase> _resourcesBuildPhases = null;
         private Dictionary<Project.Configuration, ProjectSourcesBuildPhase> _sourcesBuildPhases = null;
         private Dictionary<Project.Configuration, ProjectFrameworksBuildPhase> _frameworksBuildPhases = null;
+        private Dictionary<Project.Configuration, List<ProjectShellScriptBuildPhase>> _shellScriptPreBuildPhases = null;
+        private Dictionary<Project.Configuration, List<ProjectShellScriptBuildPhase>> _shellScriptPostBuildPhases = null;
 
         private List<ProjectOutputFile> _projectOutputFiles = null;
         private Dictionary<Project.Configuration, List<ProjectTargetDependency>> _targetDependencies = null;
@@ -122,6 +124,7 @@ namespace Sharpmake.Generators.Apple
             WriteSection<ProjectTargetDependency>(configurations[0], fileGenerator);
             WriteSection<ProjectBuildConfiguration>(configurations[0], fileGenerator);
             WriteSection<ProjectConfigurationList>(configurations[0], fileGenerator);
+            WriteSection<ProjectShellScriptBuildPhase>(configurations[0], fileGenerator);
 
             // Footer.
             using (fileGenerator.Declare("RootObject", _projectMain))
@@ -211,6 +214,8 @@ namespace Sharpmake.Generators.Apple
             _sourcesBuildPhases = new Dictionary<Project.Configuration, ProjectSourcesBuildPhase>();
             _resourcesBuildPhases = new Dictionary<Project.Configuration, ProjectResourcesBuildPhase>();
             _frameworksBuildPhases = new Dictionary<Project.Configuration, ProjectFrameworksBuildPhase>();
+            _shellScriptPreBuildPhases = new Dictionary<Project.Configuration, List<ProjectShellScriptBuildPhase>>();
+            _shellScriptPostBuildPhases = new Dictionary<Project.Configuration, List<ProjectShellScriptBuildPhase>>();
 
             //Loop on default configs for each target
             foreach (Project.Configuration conf in configsList.Keys)
@@ -244,6 +249,9 @@ namespace Sharpmake.Generators.Apple
                 ProjectFrameworksBuildPhase frameworkBuildPhase = new ProjectFrameworksBuildPhase(conf.TargetFileName, 2147483647);
                 _projectItems.Add(frameworkBuildPhase);
                 _frameworksBuildPhases.Add(conf, frameworkBuildPhase);
+
+                RegisterScriptBuildPhase(conf, _shellScriptPreBuildPhases, conf.EventPreBuild.GetEnumerator());
+                RegisterScriptBuildPhase(conf, _shellScriptPostBuildPhases, conf.EventPostBuild.GetEnumerator());
 
                 List<ProjectTargetDependency> targetDependencies = new List<ProjectTargetDependency>();
                 _targetDependencies.Add(conf, targetDependencies);
@@ -330,6 +338,14 @@ namespace Sharpmake.Generators.Apple
                     target.SourcesBuildPhase = _sourcesBuildPhases[conf];
                 }
                 target.FrameworksBuildPhase = _frameworksBuildPhases[conf];
+                if (_shellScriptPreBuildPhases.ContainsKey(conf))
+                {
+                    target.ShellScriptPreBuildPhases = _shellScriptPreBuildPhases[conf];
+                }
+                if (_shellScriptPostBuildPhases.ContainsKey(conf))
+                {
+                    target.ShellScriptPostBuildPhases = _shellScriptPostBuildPhases[conf];
+                }
 
                 configurationListForNativeTarget.RelatedItem = target;
                 _projectItems.Add(target);
@@ -466,6 +482,27 @@ namespace Sharpmake.Generators.Apple
                     configsPerNativeTarget.Add(configs.First(), configs);
             }
             return configsPerNativeTarget;
+        }
+
+        private void RegisterScriptBuildPhase(Project.Configuration conf, Dictionary<Project.Configuration, List<ProjectShellScriptBuildPhase>> shellScriptPhases, IEnumerator<string> eventsInConf)
+        {
+            while (eventsInConf.MoveNext())
+            {
+                var buildEvent = eventsInConf.Current;
+                var shellScriptBuildPhase = new ProjectShellScriptBuildPhase(buildEvent, 2147483647)
+                {
+                    script = buildEvent
+                };
+                _projectItems.Add(shellScriptBuildPhase);
+                if (!shellScriptPhases.ContainsKey(conf))
+                {
+                    shellScriptPhases.Add(conf, new List<ProjectShellScriptBuildPhase>() { shellScriptBuildPhase });
+                }
+                else
+                {
+                    shellScriptPhases[conf].Add(shellScriptBuildPhase);
+                }
+            }
         }
 
         private bool IsBuildExcludedForAllConfigurations(List<Project.Configuration> configurations, string fullPath)
@@ -1206,6 +1243,7 @@ namespace Sharpmake.Generators.Apple
             XCBuildConfiguration_UnitTestTarget,
             XCBuildConfiguration_Project,
             XCConfigurationList,
+            PBXShellScriptBuildPhase
         }
 
         public abstract class ProjectItem : IEquatable<ProjectItem>, IComparable<ProjectItem>
@@ -1722,6 +1760,21 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
+        private class ProjectShellScriptBuildPhase : ProjectBuildPhase
+        {
+            public String script;
+
+            public ProjectShellScriptBuildPhase(uint buildActionMask)
+                : base(ItemSection.PBXShellScriptBuildPhase, "ShellScrips", buildActionMask)
+            {
+            }
+
+            public ProjectShellScriptBuildPhase(string name, uint buildActionMask)
+                : base(ItemSection.PBXShellScriptBuildPhase, name, buildActionMask)
+            {
+            }
+        }
+
         private class ProjectVariantGroup : ProjectItem
         {
             public ProjectVariantGroup() : base(ItemSection.PBXVariantGroup, "") { }
@@ -1857,6 +1910,27 @@ namespace Sharpmake.Generators.Apple
             public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
             public String SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
+            public List<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
+            public List<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
+            public String ShellScriptPreBuildPhaseUIDs {
+                get
+                {
+                    if (ShellScriptPreBuildPhases != null && ShellScriptPreBuildPhases.Any())
+                    { return string.Join(",", ShellScriptPreBuildPhases.Select(buildEvent => buildEvent.Uid)); }
+                    else
+                    { return RemoveLineTag; }
+                }
+            }
+            public String ShellScriptPostBuildPhaseUIDs
+            {
+                get
+                {
+                    if (ShellScriptPostBuildPhases != null && ShellScriptPostBuildPhases.Any())
+                    { return string.Join(",", ShellScriptPostBuildPhases.Select(buildEvent => buildEvent.Uid)); }
+                    else
+                    { return RemoveLineTag; }
+                }
+            }
             public ProjectOutputFile OutputFile { get; }
             public string ProductType { get; }
             public ProjectConfigurationList ConfigurationList { get; }
