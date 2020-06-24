@@ -39,6 +39,9 @@ namespace Sharpmake
 
         public static readonly char OtherSeparator = UsesUnixSeparator ? Util.WindowsSeparator : Util.UnixSeparator;
 
+        public const string DoubleQuotes = @"""";
+        public const string EscapedDoubleQuotes = @"\""";
+
         // A better type name (for generic classes)
         public static string ToNiceTypeName(this Type type)
         {
