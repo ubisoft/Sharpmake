@@ -67,7 +67,16 @@ namespace Sharpmake
         public abstract string CConfigName(Configuration conf);
         public abstract string CppConfigName(Configuration conf);
 
-        public abstract void SetupClangOptions(IFileGenerator generator);
+        public void SetupClangOptions(IFileGenerator generator)
+        {
+            WriteCompilerExtraOptionsGeneral(generator);
+            generator.Write(_compilerOptimizationOptions);
+        }
+
+        protected virtual void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
+        {
+            generator.Write(_compilerExtraOptionsGeneral);
+        }
 
         public bool AddLibPrefix(Configuration conf) => true;
 
@@ -76,7 +85,10 @@ namespace Sharpmake
         {
         }
 
-        public abstract void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile);
+        public void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
+        {
+            fileGenerator.Write(_linkerOptionsTemplate);
+        }
 
         public IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
         {

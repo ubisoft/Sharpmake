@@ -41,20 +41,16 @@ namespace Sharpmake
             {
                 return ".iosConfig";
             }
+
             public override string CppConfigName(Configuration conf)
             {
                 return ".iosppConfig";
             }
 
-            public override void SetupClangOptions(IFileGenerator generator)
+            protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {
-                generator.Write(_compilerExtraOptions);
-                generator.Write(_compilerOptimizationOptions);
-            }
-
-            public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
-            {
-                fileGenerator.Write(_linkerOptionsTemplate);
+                base.WriteCompilerExtraOptionsGeneral(generator);
+                generator.Write(_compilerExtraOptionsGeneral);
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)

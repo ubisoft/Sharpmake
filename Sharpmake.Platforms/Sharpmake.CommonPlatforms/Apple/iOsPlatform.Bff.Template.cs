@@ -18,49 +18,9 @@ namespace Sharpmake
     {
         public sealed partial class iOsPlatform
         {
-            public const string _linkerOptionsTemplate = @"
-    .LinkerOptions          = '-o ""%2"" ""%1""'
-                            // Library Search Path
-                            // ---------------------------
-                            + ' [cmdLineOptions.AdditionalLibraryDirectories]'
-                            // Libraries
-                            // ---------------------------
-                            + ' [cmdLineOptions.AdditionalDependencies]'
-                            // Options
-                            //--------
-                            + ' [cmdLineOptions.EditAndContinue]'
-                            + ' [cmdLineOptions.InfoStripping]'
-                            + ' [cmdLineOptions.DataStripping]'
-                            + ' [cmdLineOptions.DuplicateStripping]'
-                            + ' [cmdLineOptions.Addressing]'
-                            + ' [cmdLineOptions.GenerateMapFile]'
-                            // Additional linker options
-                            //--------------------------
-                            + ' [options.AdditionalLinkerOptions]'
-";
-
-            public const string _compilerExtraOptions = @"
-    .CompilerExtraOptions   = ''
-            // General options
-            // -------------------------
-            + ' [cmdLineOptions.AdditionalIncludeDirectories]'
-            + ' [cmdLineOptions.AdditionalUsingDirectories]'
-            + ' [cmdLineOptions.PreprocessorDefinitions]'
-            + ' [cmdLineOptions.LibraryStandard]'
+            public const string _compilerExtraOptionsGeneral = @"
             + ' [cmdLineOptions.SDKRoot]'
             + ' [cmdLineOptions.IPhoneOSDeploymentTarget]'
-            + ' [options.ClangCppLanguageStandard]'
-            // Additional compiler options
-            //--------------------------
-            + ' [options.AdditionalCompilerOptions]'
-";
-
-            public const string _compilerOptimizationOptions =
-                @"
-    // Optimizations options
-    // ---------------------
-    .CompilerOptimizations = ''
-            + ' [cmdLineOptions.OptimizationLevel]'
 ";
         }
     }

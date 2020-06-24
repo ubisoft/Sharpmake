@@ -39,17 +39,10 @@ namespace Sharpmake
             {
                 return ".osxConfig";
             }
+
             public override string CppConfigName(Configuration conf)
             {
                 return ".osxppConfig";
-            }
-
-            public override void SetupClangOptions(IFileGenerator generator)
-            {
-            }
-
-            public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
-            {
             }
         }
     }
