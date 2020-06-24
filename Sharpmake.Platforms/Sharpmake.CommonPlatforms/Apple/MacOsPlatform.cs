@@ -12,18 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Sharpmake.Generators;
+using Sharpmake.Generators.FastBuild;
+using Sharpmake.Generators.VisualStudio;
+
 namespace Sharpmake
 {
     public static partial class Apple
     {
-        [PlatformImplementation(SharpmakePlatform,
+        [PlatformImplementation(Platform.mac,
             typeof(IPlatformDescriptor),
+            typeof(IFastBuildCompilerSettings),
+            typeof(IPlatformBff),
+            typeof(IClangPlatformBff),
+            typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed class MacOsPlatform : BaseApplePlatform
         {
-            public const Platform SharpmakePlatform = Platform.mac;
+            public override Platform SharpmakePlatform => Platform.mac;
 
             public override string SimplePlatformString => "Mac";
+
+            public override string BffPlatformDefine => "APPLE_OSX";
+
+            public override string CConfigName(Configuration conf)
+            {
+                return ".osxConfig";
+            }
+            public override string CppConfigName(Configuration conf)
+            {
+                return ".osxppConfig";
+            }
+
+            public override void SetupClangOptions(IFileGenerator generator)
+            {
+            }
+
+            public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
+            {
+            }
         }
     }
 }
