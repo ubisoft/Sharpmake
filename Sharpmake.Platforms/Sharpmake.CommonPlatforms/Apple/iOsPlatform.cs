@@ -33,7 +33,6 @@ namespace Sharpmake
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed partial class iOsPlatform : BaseApplePlatform, IFastBuildCompilerSettings, IClangPlatformBff, IPlatformVcxproj
         {
-
             public const string XCodeDevelopperFolder = "/Applications/Xcode.app/Contents/Developer";
 
             public const Platform SharpmakePlatform = Platform.ios;

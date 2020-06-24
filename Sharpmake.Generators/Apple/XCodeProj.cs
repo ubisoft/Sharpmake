@@ -1914,7 +1914,8 @@ namespace Sharpmake.Generators.Apple
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
             public List<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
             public List<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
-            public String ShellScriptPreBuildPhaseUIDs {
+            public String ShellScriptPreBuildPhaseUIDs
+            {
                 get
                 {
                     if (ShellScriptPreBuildPhases != null && ShellScriptPreBuildPhases.Any())

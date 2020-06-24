@@ -1343,7 +1343,6 @@ namespace Sharpmake.Generators.FastBuild
             string targetPlatformVersionString = "";
             if (context.Configuration.Compiler.IsVisualStudio())
             {
-
                 targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
             }
 
