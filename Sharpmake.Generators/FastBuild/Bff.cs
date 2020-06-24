@@ -1330,7 +1330,7 @@ namespace Sharpmake.Generators.FastBuild
             string resolvedInclude = resolver.Resolve(include);
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
                 resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
-            return $@"{prefix}""{resolvedInclude}""";
+            return $"{Util.DoubleQuotes}{prefix}{resolvedInclude}{Util.DoubleQuotes}";
         }
 
         private static void GenerateBffOptions(
@@ -1379,7 +1379,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (string.IsNullOrWhiteSpace(resourceDefine))
                         continue;
 
-                    fastBuildDefines.Add(string.Format(@"{0}""{1}""", platformDefineSwitch, resourceDefine.Replace(@"""", @"\""")));
+                    fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, resourceDefine.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
                 }
                 context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
             }
