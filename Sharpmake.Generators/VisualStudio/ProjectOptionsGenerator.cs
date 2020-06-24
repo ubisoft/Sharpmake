@@ -1700,6 +1700,9 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateManifestToolOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
+            if (!context.DevelopmentEnvironment.IsVisualStudio()) // TODO: ideally this option generator should be split between VS / non-VS
+                return;
+
             Strings manifestInputs = new Strings();
 
             string vsManifestFilesPath = Util.SimplifyPath(Path.Combine(context.DevelopmentEnvironment.GetVisualStudioVCRootPath(), "Include", "Manifest"));
