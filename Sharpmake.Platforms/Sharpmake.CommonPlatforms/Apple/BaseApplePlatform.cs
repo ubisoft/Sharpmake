@@ -391,6 +391,15 @@ namespace Sharpmake
             var cmdLineOptions = context.CommandLineOptions;
             var conf = context.Configuration;
 
+            if (context.Options["GenerateMapFile"] == "true")
+            {
+                string mapFileArg = context.CommandLineOptions["GenerateMapFile"];
+                if (!mapFileArg.StartsWith("-Wl,-Map=", StringComparison.Ordinal))
+                    throw new Error("Map file argument was supposed to start with -Wl,-Map= but it changed! Please update this module!");
+                // since we directly invoke ld and not clang as a linker, we need to remove -Wl,-Map= and pass -map
+                context.CommandLineOptions["GenerateMapFile"] = "-map " + context.CommandLineOptions["GenerateMapFile"].Substring(9);
+            }
+
             // TODO: implement me
             cmdLineOptions["UseThinArchives"] = "";
         }
