@@ -357,12 +357,6 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.OptimizationLevel.Aggressive, () => { cmdLineOptions["OptimizationLevel"] = "-Ofast"; })
             );
 
-            context.SelectOption
-            (
-                Options.Option(Linux.Options.Linker.UseThinArchives.Enable, () => { options["UseThinArchives"] = "true"; cmdLineOptions["UseThinArchives"] = "T"; }),
-                Options.Option(Linux.Options.Linker.UseThinArchives.Disable, () => { options["UseThinArchives"] = "false"; cmdLineOptions["UseThinArchives"] = ""; })
-            );
-
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => { options["LibraryStandard"] = "libstdc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libstdc++"; }),
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["LibraryStandard"] = "libc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libc++"; })
@@ -374,6 +368,9 @@ namespace Sharpmake
             var options = context.Options;
             var cmdLineOptions = context.CommandLineOptions;
             var conf = context.Configuration;
+
+            // TODO: implement me
+            cmdLineOptions["UseThinArchives"] = "";
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
