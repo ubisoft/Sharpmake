@@ -19,7 +19,6 @@ namespace Sharpmake
         public sealed partial class iOsPlatform
         {
             public const string _compilerExtraOptionsGeneral = @"
-            + ' [cmdLineOptions.SDKRoot]'
             + ' [cmdLineOptions.IPhoneOSDeploymentTarget]'
 ";
         }

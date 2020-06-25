@@ -44,6 +44,25 @@ namespace Sharpmake
             {
                 return ".osxppConfig";
             }
+
+            public override void SelectCompilerOptions(IGenerationContext context)
+            {
+                base.SelectCompilerOptions(context);
+
+                var options = context.Options;
+                var cmdLineOptions = context.CommandLineOptions;
+                var conf = context.Configuration;
+
+                // Sysroot
+                options["SDKRoot"] = "macosx";
+                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk";
+                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+                if (customSdkRoot != null)
+                {
+                    options["SDKRoot"] = customSdkRoot.Value;
+                    cmdLineOptions["SDKRoot"] = $"-isysroot {customSdkRoot.Value}";
+                }
+            }
         }
     }
 }
