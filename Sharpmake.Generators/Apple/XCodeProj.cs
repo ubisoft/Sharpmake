@@ -964,6 +964,9 @@ namespace Sharpmake.Generators.Apple
                 case Project.Configuration.OutputType.Dll:
                     options["MachOType"] = "mh_dylib";
                     break;
+                case Project.Configuration.OutputType.None:
+                    // do nothing
+                    break;
                 default:
                     throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
             }
@@ -1562,6 +1565,8 @@ namespace Sharpmake.Generators.Apple
                         return ".app";
                     case Project.Configuration.OutputType.IosTestBundle:
                         return ".xctest";
+                    case Project.Configuration.OutputType.None:
+                        return "";
                     default:
                         throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
                 }
@@ -1884,6 +1889,11 @@ namespace Sharpmake.Generators.Apple
                     case Project.Configuration.OutputType.IosApp:
                         ProductType = "com.apple.product-type.application";
                         ProductInstallPath = "$(HOME)/Applications";
+                        break;
+                    case Project.Configuration.OutputType.None:
+                    case Project.Configuration.OutputType.Utility:
+                        ProductType = "com.apple.product-type.tool";
+                        ProductInstallPath = RemoveLineTag;
                         break;
                     default:
                         throw new NotSupportedException($"XCode generator doesn't handle {OutputFile.OutputType}");
