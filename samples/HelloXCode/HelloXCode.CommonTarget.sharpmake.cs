@@ -136,7 +136,7 @@ namespace HelloXCode
                 BuildSystem.FastBuild
             );
 
-            return new[] { defaultTarget/*, fastBuildTarget*/ };
+            return new[] { defaultTarget, fastBuildTarget };
         }
     }
 }

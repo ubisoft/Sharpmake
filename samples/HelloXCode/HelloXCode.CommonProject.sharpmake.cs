@@ -114,10 +114,7 @@ namespace HelloXCode
             conf.IsBlobbed = false;
 
             if (conf.IsFastBuild)
-            {
                 conf.ProjectName += "_NoBlob";
-                conf.ProjectFileName += ".noblob";
-            }
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////
@@ -129,9 +126,7 @@ namespace HelloXCode
         public virtual void ConfigureFastBuild(Configuration conf, CommonTarget target)
         {
             conf.SolutionFolder = "FastBuild/" + conf.SolutionFolder;
-
             conf.ProjectName += "_FastBuild";
-            conf.ProjectFileName += ".FastBuild";
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////
