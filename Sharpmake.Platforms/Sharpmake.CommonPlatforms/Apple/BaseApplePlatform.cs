@@ -87,7 +87,29 @@ namespace Sharpmake
 
         public void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
         {
-            fileGenerator.Write(_linkerOptionsTemplate);
+            string outputTypeArgument;
+            switch (configuration.Output)
+            {
+                case Project.Configuration.OutputType.Dll:
+                    outputTypeArgument = " -dylib";
+                    break;
+                case Project.Configuration.OutputType.Exe:
+                    outputTypeArgument = " -execute";
+                    break;
+                case Project.Configuration.OutputType.Lib:
+                case Project.Configuration.OutputType.Utility:
+                case Project.Configuration.OutputType.DotNetConsoleApp:
+                case Project.Configuration.OutputType.DotNetClassLibrary:
+                case Project.Configuration.OutputType.DotNetWindowsApp:
+                case Project.Configuration.OutputType.None:
+                    outputTypeArgument = "";
+                    break;
+                default:
+                    throw new Error($"{configuration.Output} is not supported as an output by the linker");
+            }
+
+            using (fileGenerator.Resolver.NewScopedParameter("outputTypeArgument", outputTypeArgument))
+                fileGenerator.Write(_linkerOptionsTemplate);
         }
 
         public IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
@@ -210,7 +232,7 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Lib:
                     return "a";
                 case Project.Configuration.OutputType.Dll:
-                    return "so";
+                    return "dylib";
 
                 // .NET remains the same on all platforms. (Mono loads .exe and .dll regardless
                 // of platforms, and I assume the same about .NET Core.)
@@ -262,7 +284,7 @@ namespace Sharpmake
         #region IPlatformVcxproj implementation
         public string ExecutableFileExtension => string.Empty;
         public string PackageFileExtension => ExecutableFileExtension;
-        public string SharedLibraryFileExtension => "so";
+        public string SharedLibraryFileExtension => "dylib";
         public string ProgramDatabaseFileExtension => string.Empty;
         public string StaticLibraryFileExtension => "a";
         public string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;

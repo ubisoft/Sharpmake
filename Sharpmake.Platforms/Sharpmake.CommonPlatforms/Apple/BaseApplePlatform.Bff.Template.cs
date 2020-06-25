@@ -17,7 +17,7 @@ namespace Sharpmake
     public abstract partial class BaseApplePlatform
     {
         private const string _linkerOptionsTemplate = @"
-    .LinkerOptions          = '-o ""%2"" ""%1""'
+    .LinkerOptions          = '-o ""%2"" ""%1""[outputTypeArgument]'
                             // Library Search Path
                             // ---------------------------
                             + ' [cmdLineOptions.AdditionalLibraryDirectories]'
