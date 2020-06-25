@@ -241,6 +241,7 @@ namespace Sharpmake.Generators.Apple
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
+                ENABLE_BITCODE = [item.Options.EnableBitcode];
 				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
