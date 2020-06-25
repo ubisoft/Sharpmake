@@ -309,7 +309,13 @@ namespace Sharpmake
 
         public IEnumerable<string> GetPlatformLibraryFiles(IGenerationContext context)
         {
-            yield break;
+            var cmdLineOptions = context.CommandLineOptions;
+            string libStd = cmdLineOptions["LibraryStandard"];
+            if (!libStd.StartsWith("-stdlib=lib"))
+                throw new Error("Stdlib argument doesn't match the expected format");
+
+            yield return "-l" + libStd.Substring(11);
+            yield return "-lSystem";
         }
 
         // IncludePaths should contain only the project's own includes, and PlatformIncludePaths
