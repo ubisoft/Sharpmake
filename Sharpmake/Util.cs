@@ -2403,5 +2403,40 @@ namespace Sharpmake
         // http://www.mono-project.com/docs/faq/technical/#how-can-i-detect-if-am-running-in-mono
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
+
+        public static Platform GetExecutingPlatform() => s_executingPlatform;
+
+        private static readonly Platform s_executingPlatform = DetectExecutingPlatform();
+        private static Platform DetectExecutingPlatform()
+        {
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32Windows:
+                    return Platform.win64;
+                case PlatformID.MacOSX:
+                    return Platform.mac;
+                case PlatformID.Unix: // could be mac or linux
+                    {
+                        bool isMacOs = false;
+                        try
+                        {
+                            var p = new System.Diagnostics.Process();
+                            p.StartInfo.UseShellExecute = false;
+                            p.StartInfo.RedirectStandardOutput = true;
+                            p.StartInfo.FileName = "uname";
+                            p.Start();
+                            string output = p.StandardOutput.ReadToEnd().Trim();
+                            p.WaitForExit();
+
+                            isMacOs = string.CompareOrdinal(output, "Darwin") == 0;
+                        }
+                        catch { }
+
+                        return isMacOs ? Platform.mac : Platform.linux;
+                    }
+            }
+            LogWrite("Warning: Couldn't determine running platform");
+            return Platform.win64; // arbitrary
+        }
     }
 }
