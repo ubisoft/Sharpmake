@@ -438,7 +438,7 @@ namespace Sharpmake.Generators.Apple
         public static string XCodeFormatSingleListItem(string item)
         {
             if (item.Contains(' '))
-                return $@"""{item}""";
+                return $"{Util.DoubleQuotes}{Util.EscapedDoubleQuotes}{item}{Util.EscapedDoubleQuotes}{Util.DoubleQuotes}";
             return $"{item}";
         }
 
