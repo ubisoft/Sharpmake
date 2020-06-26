@@ -108,16 +108,16 @@ namespace Sharpmake.Generators.Apple
                 {ItemSection.PBXShellScriptBuildPhase,
 @"		[item.Uid] /* Scripts */ =
 		{
-	        isa = PBXShellScriptBuildPhase;
-	        buildActionMask = 2147483647;
-	        files = ();
-	        inputFileListPaths = ();
-	        inputPaths = ();
-	        outputFileListPaths = ();
-	        outputPaths = ();
-	        runOnlyForDeploymentPostprocessing = 0;
-	        shellPath = /bin/sh;
-	        shellScript = ""[item.script]"";
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputFileListPaths = ();
+			inputPaths = ();
+			outputFileListPaths = ();
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ""[item.script]"";
         };
 "
                 },
@@ -139,11 +139,11 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXNativeTarget;
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
 			buildPhases = (
-                [item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts */,
+				[item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts */,
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
 				[item.SourceBuildPhaseUID] /* Sources */,
 				[item.FrameworksBuildPhase.Uid] /* Frameworks */,
-                [item.ShellScriptPostBuildPhaseUIDs] /* ShellScripts */,
+				[item.ShellScriptPostBuildPhaseUIDs] /* ShellScripts */,
 			);
 			buildRules = (
 			);
@@ -241,7 +241,7 @@ namespace Sharpmake.Generators.Apple
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
-                ENABLE_BITCODE = [item.Options.EnableBitcode];
+				ENABLE_BITCODE = [item.Options.EnableBitcode];
 				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
