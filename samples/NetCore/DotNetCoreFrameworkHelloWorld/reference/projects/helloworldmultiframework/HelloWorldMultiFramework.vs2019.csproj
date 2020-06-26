@@ -10,6 +10,7 @@
     <TargetFrameworks>netcoreapp1.0;netcoreapp2.0</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
     <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|netcoreapp1.0'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,8 +61,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\codebase\HelloWorldMultiframework\Program.cs">
+    <Compile Include="..\..\codebase\HelloWorldMultiframework\Program.cs">
       <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\..\codebase\HelloWorldMultiframework\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>
