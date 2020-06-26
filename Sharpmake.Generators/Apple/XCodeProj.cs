@@ -1890,11 +1890,11 @@ namespace Sharpmake.Generators.Apple
                         ProductType = "com.apple.product-type.bundle.unit-test";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
-                    case Project.Configuration.OutputType.Exe:
                     case Project.Configuration.OutputType.IosApp:
                         ProductType = "com.apple.product-type.application";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
+                    case Project.Configuration.OutputType.Exe:
                     case Project.Configuration.OutputType.None:
                     case Project.Configuration.OutputType.Utility:
                         ProductType = "com.apple.product-type.tool";
