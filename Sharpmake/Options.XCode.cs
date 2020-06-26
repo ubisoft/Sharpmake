@@ -134,6 +134,13 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum EnableBitcode
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Exceptions
                 {
                     [Default]

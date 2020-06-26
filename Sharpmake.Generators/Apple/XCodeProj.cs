@@ -864,6 +864,11 @@ namespace Sharpmake.Generators.Apple
                 );
 
             Options.SelectOption(conf,
+                Options.Option(Options.XCode.Compiler.EnableBitcode.Disable, () => { options["EnableBitcode"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.EnableBitcode.Enable, () => { options["EnableBitcode"] = "YES"; })
+            );
+
+            Options.SelectOption(conf,
                 Options.Option(Options.XCode.Compiler.Exceptions.Disable, () => { options["CppExceptionHandling"] = "NO"; options["ObjCExceptionHandling"] = "NO"; }),
                 Options.Option(Options.XCode.Compiler.Exceptions.Enable, () => { options["CppExceptionHandling"] = "YES"; options["ObjCExceptionHandling"] = "YES"; }),
                 Options.Option(Options.XCode.Compiler.Exceptions.EnableCpp, () => { options["CppExceptionHandling"] = "YES"; options["ObjCExceptionHandling"] = "NO"; }),
