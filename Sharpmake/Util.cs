@@ -2412,7 +2412,7 @@ namespace Sharpmake
             switch (Environment.OSVersion.Platform)
             {
                 case PlatformID.Win32Windows:
-                    return Platform.win64;
+                    return (Environment.Is64BitOperatingSystem) ? Platform.win64 : Platform.win32;
                 case PlatformID.MacOSX:
                     return Platform.mac;
                 case PlatformID.Unix: // could be mac or linux
