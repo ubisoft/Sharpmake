@@ -1581,7 +1581,13 @@ namespace Sharpmake.Generators.Apple
 
             public Project.Configuration.OutputType OutputType { get { return _conf.Output; } }
 
-            public string BuildableName { get { return (OutputType == Project.Configuration.OutputType.Lib ? "lib" : "") + Name; } }
+            public string BuildableName
+            {
+                get
+                {
+                    return (OutputType.HasAnyFlag(Project.Configuration.OutputType.Lib | Project.Configuration.OutputType.Dll) ? "lib" : "") + Name;
+                }
+            }
         }
 
         private abstract class ProjectFrameworkFile : ProjectFile
