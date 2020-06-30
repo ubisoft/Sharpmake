@@ -575,12 +575,22 @@ namespace Sharpmake
             return resultPath;
         }
 
+        public static void ResolvePath(string root, ref IEnumerable<string> paths)
+        {
+            paths = paths.Select(path => ResolvePath(root, path));
+        }
+
+        internal static void ResolvePathAndFixCase(string root, ref IEnumerable<string> paths)
+        {
+            paths = paths.Select(path => ResolvePathAndFixCase(root, path));
+        }
+
         public static void ResolvePath(string root, ref Strings paths)
         {
             List<string> sortedPaths = paths.Values;
             foreach (string path in sortedPaths)
             {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+                string resolvedPath = ResolvePath(root, path);
                 paths.UpdateValue(path, resolvedPath);
             }
         }
@@ -590,8 +600,7 @@ namespace Sharpmake
             List<string> sortedPaths = paths.Values;
             foreach (string path in sortedPaths)
             {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
-                string fixedCase = GetProperFilePathCapitalization(resolvedPath);
+                string fixedCase = ResolvePathAndFixCase(root, path);
                 paths.UpdateValue(path, fixedCase);
             }
         }
@@ -600,16 +609,43 @@ namespace Sharpmake
         {
             for (int i = 0; i < paths.Count; ++i)
             {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(paths[i]));
+                string resolvedPath = ResolvePath(root, paths[i]);
                 i = paths.SetOrRemoveAtIndex(i, resolvedPath);
             }
             paths.Sort();
         }
 
-        public static void ResolvePath(string root, ref String path)
+        internal static void ResolvePathAndFixCase(string root, ref OrderableStrings paths)
         {
-            path = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+            for (int i = 0; i < paths.Count; ++i)
+            {
+                string fixedCase = ResolvePathAndFixCase(root, paths[i]);
+                i = paths.SetOrRemoveAtIndex(i, fixedCase);
+            }
+            paths.Sort();
         }
+
+        public static void ResolvePath(string root, ref string path)
+        {
+            path = ResolvePath(root, path);
+        }
+
+        internal static void ResolvePathAndFixCase(string root, ref string path)
+        {
+            path = ResolvePathAndFixCase(root, path);
+        }
+
+        public static string ResolvePath(string root, string path)
+        {
+            return Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+        }
+
+        internal static string ResolvePathAndFixCase(string root, string path)
+        {
+            string resolvedPath = ResolvePath(root, path);
+            return GetProperFilePathCapitalization(resolvedPath);
+        }
+
 
         /// <summary>
         /// Gets the absolute path up to the intersection of two specified absolute paths.
