@@ -1551,9 +1551,14 @@ namespace Sharpmake.Generators.Apple
             }
 
             public ProjectOutputFile(Project.Configuration conf)
-                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + System.IO.Path.DirectorySeparatorChar + conf.TargetFilePrefix + conf.TargetFileName + GetFileExtension(conf))
+                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + GetFilePrefix(conf.Output) + conf.TargetFileFullName + GetFileExtension(conf))
             {
                 _conf = conf;
+            }
+
+            private static string GetFilePrefix(Project.Configuration.OutputType outputType)
+            {
+                return outputType.HasAnyFlag(Project.Configuration.OutputType.Lib | Project.Configuration.OutputType.Dll) ? "lib" : "";
             }
 
             public static string GetFileExtension(Project.Configuration conf)
@@ -1581,13 +1586,7 @@ namespace Sharpmake.Generators.Apple
 
             public Project.Configuration.OutputType OutputType { get { return _conf.Output; } }
 
-            public string BuildableName
-            {
-                get
-                {
-                    return (OutputType.HasAnyFlag(Project.Configuration.OutputType.Lib | Project.Configuration.OutputType.Dll) ? "lib" : "") + Name;
-                }
-            }
+            public string BuildableName => Name;
         }
 
         private abstract class ProjectFrameworkFile : ProjectFile
