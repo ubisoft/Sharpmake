@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Script arguments:
 # $1: Project/Solution to build
 # $2: Target(Normally should be Debug or Release)
