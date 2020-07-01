@@ -52,7 +52,6 @@ namespace Sharpmake.Generators.Apple
         private Dictionary<string, List<ProjectShellScriptBuildPhase>> _shellScriptPostBuildPhases = null;
         private Dictionary<string, List<ProjectTargetDependency>> _targetDependencies = null;
 
-        private List<ProjectOutputFile> _projectOutputFiles = null;
         private Dictionary<ProjectFolder, ProjectReference> _projectReferencesGroups = null;
         private ProjectMain _projectMain = null;
 
@@ -207,7 +206,6 @@ namespace Sharpmake.Generators.Apple
             }
 
             _projectReferencesGroups = new Dictionary<ProjectFolder, ProjectReference>();
-            _projectOutputFiles = new List<ProjectOutputFile>();
 
             _nativeTargets = new Dictionary<string, ProjectNativeTarget>();
             _targetDependencies = new Dictionary<string, List<ProjectTargetDependency>>();
@@ -247,21 +245,8 @@ namespace Sharpmake.Generators.Apple
                 var targetDependencies = new List<ProjectTargetDependency>();
                 _targetDependencies.Add(xCodeTargetName, targetDependencies);
 
-                ProjectOutputFile firstConfOutputFile = null;
-
                 foreach (var conf in targetConfigurations)
                 {
-                    var projectOutputFile = new ProjectOutputFile(conf);
-                    if (firstConfOutputFile == null)
-                        firstConfOutputFile = projectOutputFile;
-                    _projectItems.Add(projectOutputFile);
-
-                    _projectOutputFiles.Add(projectOutputFile);
-
-                    // LCTODO: check if the following is needed?
-                    var projectOutputBuildFile = new ProjectBuildFile(projectOutputFile);
-                    _projectItems.Add(projectOutputBuildFile);
-
                     if (!conf.IsFastBuild)
                         PrepareSourceFiles(xCodeTargetName, projectFiles, project, conf, workspacePath);
                     PrepareResourceFiles(xCodeTargetName, project.ResourceFiles, project, conf);
@@ -307,9 +292,16 @@ namespace Sharpmake.Generators.Apple
                     }
                 }
 
-                // LCTODO: replace firstConfOutputFile if need be, or verify that it's always the same
-                _productsGroup.Children.Add(firstConfOutputFile);
-                var target = new ProjectNativeTarget(xCodeTargetName, firstConfOutputFile, configurationListForNativeTarget, _targetDependencies[xCodeTargetName]);
+                // use the first conf as file, but the target name
+                var targetOutputFile = new ProjectOutputFile(firstConf, xCodeTargetName);
+                _productsGroup.Children.Add(targetOutputFile);
+
+                _projectItems.Add(targetOutputFile);
+
+                var projectOutputBuildFile = new ProjectBuildFile(targetOutputFile);
+                _projectItems.Add(projectOutputBuildFile);
+
+                var target = new ProjectNativeTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, _targetDependencies[xCodeTargetName]);
                 target.ResourcesBuildPhase = _resourcesBuildPhases[xCodeTargetName];
                 if (_sourcesBuildPhases.ContainsKey(xCodeTargetName))
                     target.SourcesBuildPhase = _sourcesBuildPhases[xCodeTargetName];
@@ -1534,10 +1526,10 @@ namespace Sharpmake.Generators.Apple
             {
             }
 
-            public ProjectOutputFile(Project.Configuration conf)
+            public ProjectOutputFile(Project.Configuration conf, string name = null)
                 : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + GetFilePrefix(conf.Output) + conf.TargetFileFullName + GetFileExtension(conf))
             {
-                Name = conf.Project.Name + " " + conf.Name;
+                Name = name ?? conf.Project.Name + " " + conf.Name;
                 BuildableName = System.IO.Path.GetFileName(FullPath);
                 _conf = conf;
             }
