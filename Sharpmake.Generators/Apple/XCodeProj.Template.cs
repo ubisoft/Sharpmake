@@ -189,7 +189,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.OutputFile.Name] */ = {
 			isa = PBXReferenceProxy;
 			fileType = [item.FileType];
-			path = [item.OutputFile.Name];
+			path = [item.OutputFile.FileName];
 			remoteRef = [item.Proxy.Uid] /* [item.Proxy.Identifier] */;
 			sourceTree = [item.SourceTree];
 		};
