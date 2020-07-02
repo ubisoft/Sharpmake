@@ -2009,6 +2009,23 @@ namespace Sharpmake
             /// </summary>
             public bool IsFastBuild = false;
 
+            /// <summary>
+            /// List of the MasterBff files this project appears in.
+            /// This is populated from the solution generator
+            /// </summary>
+            [Resolver.SkipResolveOnMember]
+            public IEnumerable<string> FastBuildMasterBffList { get { return _fastBuildMasterBffList; } }
+
+            internal void AddMasterBff(string masterBff)
+            {
+                lock (_fastBuildMasterBffListLock)
+                    _fastBuildMasterBffList.Add(masterBff + FastBuildSettings.FastBuildConfigFileExtension); // for some reason we don't get the extension...
+            }
+
+            [Resolver.SkipResolveOnMember]
+            private readonly Strings _fastBuildMasterBffList = new Strings();
+            private readonly object _fastBuildMasterBffListLock = new object();
+
             [Obsolete("Sharpmake will determine the projects to build.")]
             public bool IsMainProject = false;
 

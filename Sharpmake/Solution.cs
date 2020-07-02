@@ -308,6 +308,8 @@ namespace Sharpmake
                         throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
 
                     hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
+                    if (projectConfiguration.IsFastBuild)
+                        projectConfiguration.AddMasterBff(solutionConfiguration.MasterBffFilePath);
 
                     bool build = !projectConfiguration.IsExcludedFromBuild && !configurationProject.InactiveProject;
                     if (build && solutionConfiguration.IncludeOnlyFilterProject && (configurationProject.Project.SourceFilesFiltersCount == 0 || configurationProject.Project.SkipProjectWhenFiltersActive))
@@ -334,7 +336,10 @@ namespace Sharpmake
 
                         Type dependencyProjectType = dependencyProject.GetType();
                         ITarget dependencyProjectTarget = dependencyConfiguration.Target;
+
                         hasFastBuildProjectConf |= dependencyConfiguration.IsFastBuild;
+                        if (dependencyConfiguration.IsFastBuild)
+                            dependencyConfiguration.AddMasterBff(solutionConfiguration.MasterBffFilePath);
 
                         Configuration.IncludedProjectInfo configurationProjectDependency = solutionConfiguration.GetProject(dependencyProjectType);
 
@@ -586,6 +591,8 @@ namespace Sharpmake
                     }
 
                     projectConf.IsFastBuild = true;
+
+                    projectConf.AddMasterBff(solutionConf.MasterBffFilePath);
 
                     // output the project in the same folder as the solution, and the same name
                     projectConf.ProjectPath = solutionConf.SolutionPath;
