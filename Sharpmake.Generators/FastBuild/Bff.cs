@@ -136,8 +136,6 @@ namespace Sharpmake.Generators.FastBuild
 
         public static void InitializeBuilder(Builder builder)
         {
-            if (FastBuildSettings.MakeCommandGenerator == null)
-                FastBuildSettings.MakeCommandGenerator = new FastBuildDefaultMakeCommandGenerator();
         }
 
         private static ConcurrentDictionary<DevEnv, string> s_LatestTargetPlatformVersions = new ConcurrentDictionary<DevEnv, string>();
