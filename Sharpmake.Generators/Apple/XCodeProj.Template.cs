@@ -63,16 +63,16 @@ namespace Sharpmake.Generators.Apple
 					};
 ";
 
-            public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
-            {
-                { ItemSection.PBXBuildFile,
+			public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
+			{
+				{ ItemSection.PBXBuildFile,
 @"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
 			isa = PBXBuildFile;
 			fileRef = [item.File.Uid] /* [item.File.Name] */;
 		};
 "               },
 
-                { ItemSection.PBXContainerItemProxy,
+				{ ItemSection.PBXContainerItemProxy,
 @"		[item.Uid] /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = [item.ProjectReference.Uid];
@@ -82,7 +82,7 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-                { ItemSection.PBXFileReference,
+				{ ItemSection.PBXFileReference,
 @"		[item.Uid] /* [item.Name] */ = {
 			isa = PBXFileReference;
 			explicitFileType = [item.ExplicitFileType];
@@ -94,7 +94,7 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-                { ItemSection.PBXFrameworksBuildPhase,
+				{ ItemSection.PBXFrameworksBuildPhase,
 @"		[item.Uid] /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = [item.BuildActionMask];
@@ -105,7 +105,7 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-                {ItemSection.PBXShellScriptBuildPhase,
+				{ItemSection.PBXShellScriptBuildPhase,
 @"		[item.Uid] /* Scripts */ =
 		{
 			isa = PBXShellScriptBuildPhase;
@@ -118,11 +118,11 @@ namespace Sharpmake.Generators.Apple
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = ""[item.script]"";
-        };
+		};
 "
-                },
+				},
 
-                { ItemSection.PBXGroup,
+				{ ItemSection.PBXGroup,
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +154,24 @@ namespace Sharpmake.Generators.Apple
 			productInstallPath = ""[item.ProductInstallPath]"";
 			productName = ""[item.Identifier]"";
 			productReference = [item.OutputFile.Uid] /* [item.OutputFile.Name] */;
+			productType = ""[item.ProductType]"";
+		};
+"               },
+
+                { ItemSection.PBXLegacyTarget,
+@"		[item.Uid] /* [item.Identifier] */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = ""[item.BuildArgumentsString]"";
+			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
+			buildPhases = (
+			);
+			buildToolPath = ""[item.BuildToolPath]"";
+			buildWorkingDirectory = ""[item.BuildWorkingDirectory]"";
+			dependencies = (
+			);
+			name = ""[item.Identifier]"";
+			passBuildSettingsInEnvironment = 1;
+			productName = ""[item.Identifier]"";
 			productType = ""[item.ProductType]"";
 		};
 "               },
@@ -232,11 +250,13 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCBuildConfiguration_NativeTarget,
-@"		[item.Uid] /* [item.Optimization] */ = {
+@"		[item.Uid] /* Native Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
+				SYMROOT = ""[item.Options.BuildDirectory]"";
+				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
+				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
@@ -261,23 +281,45 @@ namespace Sharpmake.Generators.Apple
 				GCC_MODEL_TUNING = [item.Options.ModelTuning];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
 				CODE_SIGN_ENTITLEMENTS = ""[item.Options.CodeSignEntitlements]"";
-				INSTALL_PATH = ""[item.NativeTarget.ProductInstallPath]"";
+				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
+				OBJROOT = ""[item.Configuration.IntermediatePath]"";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
 				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
 				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
 				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
+				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
+				LIBRARY_SEARCH_PATHS = ( [item.Options.RemoveLibraryPaths]
+[item.Options.LibraryPaths]
+				); [item.Options.RemoveLibraryPaths]
+				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = ( [item.Options.RemoveSpecificDeviceLibraryPaths]
+[item.Options.SpecificDeviceLibraryPaths]
+				); [item.Options.RemoveSpecificDeviceLibraryPaths]
+				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = ( [item.Options.RemoveSpecificSimulatorLibraryPaths]
+[item.Options.SpecificSimulatorLibraryPaths]
+				); [item.Options.RemoveSpecificSimulatorLibraryPaths]
+			};
+			name = [item.Options.TargetName];
+		};
+"               },
+
+                { ItemSection.XCBuildConfiguration_LegacyTarget,
+@"		[item.Uid] /* Legacy Target - [item.Optimization] */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				MACH_O_TYPE = ""[item.Options.MachOType]"";
+				FASTBUILD_TARGET = ""[item.Options.FastBuildTarget]"";
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = [item.Options.TargetName];
 		};
 "               },
 
                 { ItemSection.XCBuildConfiguration_UnitTestTarget,
-@"		[item.Uid] /* [item.Optimization] */ = {
+@"		[item.Uid] /* UnitTest Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
 				BUNDLE_LOADER = ""[testHost]"";
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
@@ -299,13 +341,11 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCBuildConfiguration_Project,
-@"		[item.Uid] /* [item.Optimization] */ = {
+@"		[item.Uid] /* Project - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
 				ARCHS = [item.Options.Archs];
-				SYMROOT = ""[item.Options.BuildDirectory]"";
-				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
-				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
 				CLANG_CXX_LANGUAGE_STANDARD = ""[item.Options.CppStandard]"";
 				CLANG_CXX_LIBRARY = ""[item.Options.LibraryStandard]"";
 				CLANG_ENABLE_OBJC_ARC = [item.Options.AutomaticReferenceCounting];
@@ -328,24 +368,10 @@ namespace Sharpmake.Generators.Apple
 				GCC_WARN_64_TO_32_BIT_CONVERSION = [item.Options.Warning64To32BitConversion];
 				GCC_WARN_ABOUT_RETURN_TYPE = [item.Options.WarningReturnType];
 				GCC_WARN_UNDECLARED_SELECTOR = [item.Options.WarningUndeclaredSelector];
-
 				GCC_WARN_UNINITIALIZED_AUTOS = [item.Options.WarningUniniatializedAutos];
 				GCC_WARN_UNUSED_FUNCTION = [item.Options.WarningUnusedFunction];
 				GCC_WARN_UNUSED_VARIABLE = [item.Options.WarningUnusedVariable];
 				GCC_TREAT_WARNINGS_AS_ERRORS = [item.Options.TreatWarningsAsErrors];
-				HEADER_SEARCH_PATHS = (
-[item.Options.IncludePaths]
-				);
-				LIBRARY_SEARCH_PATHS = ( [item.Options.RemoveLibraryPaths]
-[item.Options.LibraryPaths]
-				); [item.Options.RemoveLibraryPaths]
-				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = ( [item.Options.RemoveSpecificDeviceLibraryPaths]
-[item.Options.SpecificDeviceLibraryPaths]
-				); [item.Options.RemoveSpecificDeviceLibraryPaths]
-				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = ( [item.Options.RemoveSpecificSimulatorLibraryPaths]
-[item.Options.SpecificSimulatorLibraryPaths]
-				); [item.Options.RemoveSpecificSimulatorLibraryPaths]
-				OBJROOT = ""[item.Configuration.IntermediatePath]"";
 				SDKROOT = ""[item.Options.SDKRoot]"";
 				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
 				OTHER_CPLUSPLUSFLAGS = (
