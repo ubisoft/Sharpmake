@@ -68,7 +68,20 @@ namespace HelloXCode
             FastBuildSettings.FastBuildDistribution = false;
             FastBuildSettings.FastBuildMonitor = true;
             FastBuildSettings.FastBuildAllowDBMigration = true;
-            FastBuildSettings.FastBuildMakeCommand = Path.Combine(Globals.RootDirectory, @"extern\FastBuild\FBuild.exe");
+
+            // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
+            string sharpmakeFastBuildDir = Util.PathGetAbsolute(Globals.RootDirectory, @"..\..\..\tools\FastBuild");
+            switch (Util.GetExecutingPlatform())
+            {
+                case Platform.mac:
+                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "FBuild");
+                    break;
+                case Platform.win64:
+                default:
+                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "FBuild.exe");
+                    break;
+            }
+
             Bff.UnityResolver = new Bff.FragmentUnityResolver();
 
             foreach (Type solutionType in Assembly.GetExecutingAssembly().GetTypes().Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(CommonSolution))))

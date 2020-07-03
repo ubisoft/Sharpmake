@@ -11,11 +11,19 @@ int UtilDll1::ComputeSum(const std::vector<int>& someInts)
         acc += item;
 
 #if _DEBUG
-    std::cout << "- Dll1 is built in Debug!" << std::endl;
+    std::cout << "- Dll1 is built in Debug"
+#  if USES_FASTBUILD
+        " with FastBuild"
+#  endif
+        "!" << std::endl;
 #endif
 
 #if NDEBUG
-    std::cout << "- Dll1 is built in Release!" << std::endl;
+    std::cout << "- Dll1 is built in Release"
+#  if USES_FASTBUILD
+        " with FastBuild"
+#  endif
+        "!" << std::endl;
 #endif
 
     acc += static_lib1_utils::GetRandomPosition();

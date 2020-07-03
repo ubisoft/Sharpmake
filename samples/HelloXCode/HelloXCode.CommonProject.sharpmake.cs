@@ -127,6 +127,8 @@ namespace HelloXCode
         {
             conf.SolutionFolder = "FastBuild/" + conf.SolutionFolder;
             conf.ProjectName += "_FastBuild";
+
+            conf.Defines.Add("USES_FASTBUILD");
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////

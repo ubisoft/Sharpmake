@@ -7,12 +7,22 @@ int main(int, char**)
     std::cout << "Hello XCode World!" << std::endl;
     
 #if _DEBUG
-    std::cout << "- Exe is built in Debug!" << std::endl;
+    std::cout << "- Exe is built in Debug"
+#  if USES_FASTBUILD
+        " with FastBuild"
+#  endif
+        "!" << std::endl;
 #endif
 
 #if NDEBUG
-    std::cout << "- Exe is built in Release!" << std::endl;
+    std::cout << "- Exe is built in Release"
+#  if USES_FASTBUILD
+        " with FastBuild"
+#  endif
+        "!" << std::endl;
 #endif
+
+
 
     std::vector<int> someArray(5, 6);
 

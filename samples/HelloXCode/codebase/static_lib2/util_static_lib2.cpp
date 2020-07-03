@@ -10,11 +10,19 @@ Util2::~Util2()
 void Util2::DoSomethingUseful() const
 {
 #if _DEBUG
-    std::cout << "- StaticLib2 is built in Debug!" << std::endl;
+    std::cout << "- StaticLib2 is built in Debug"
+#  if USES_FASTBUILD
+        " with FastBuild"
+#  endif
+        "!" << std::endl;
 #endif
 
 #if NDEBUG
-    std::cout << "- StaticLib2 is built in Release!" << std::endl;
+    std::cout << "- StaticLib2 is built in Release"
+#  if USES_FASTBUILD
+        " with FastBuild"
+#  endif
+        "!" << std::endl;
 #endif
 
     return DoSomethingInternal("Yeah right...");
