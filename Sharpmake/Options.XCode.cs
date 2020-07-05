@@ -462,6 +462,16 @@ namespace Sharpmake
                     Disable
                 }
             }
+
+            public static class Linker
+            {
+                public enum StripLinkedProduct
+                {
+                    Disable,
+                    [Default]
+                    Enable
+                }
+            }
         }
     }
 }
