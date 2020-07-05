@@ -1111,6 +1111,11 @@ namespace Sharpmake.Generators.Apple
                 Options.Option(Options.XCode.Compiler.TreatWarningsAsErrors.Enable, () => options["TreatWarningsAsErrors"] = "YES")
             );
 
+            Options.SelectOption(conf,
+                Options.Option(Options.XCode.Linker.StripLinkedProduct.Disable, () => options["StripLinkedProduct"] = "NO"),
+                Options.Option(Options.XCode.Linker.StripLinkedProduct.Enable, () => options["StripLinkedProduct"] = "YES")
+            );
+
             if (conf.PrecompHeader != null)
             {
                 options["UsePrecompiledHeader"] = "YES";
