@@ -87,6 +87,7 @@ namespace Sharpmake
         <LocalDebuggerCommandArguments>[conf.VcxprojUserFile.LocalDebuggerCommandArguments]</LocalDebuggerCommandArguments>
         <LocalDebuggerWorkingDirectory>[conf.VcxprojUserFile.LocalDebuggerWorkingDirectory]</LocalDebuggerWorkingDirectory>
         <RemoteDebuggerCommand>[conf.VcxprojUserFile.RemoteDebuggerCommand]</RemoteDebuggerCommand>
+        <RemoteDebuggerCommandArguments>[conf.VcxprojUserFile.RemoteDebuggerCommandArguments]</RemoteDebuggerCommandArguments>
         <RemoteDebuggingMode>[conf.VcxprojUserFile.RemoteDebuggingMode]</RemoteDebuggingMode>
         <RemoteDebuggerWorkingDirectory>[conf.VcxprojUserFile.RemoteDebuggerWorkingDirectory]</RemoteDebuggerWorkingDirectory>
         <AdditionalDebuggerCommands>[conf.AdditionalDebuggerCommands]</AdditionalDebuggerCommands>
@@ -120,6 +121,7 @@ namespace Sharpmake
 
             private const string _projectConfigurationsFastBuildMakefile =
             @"    <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+<TargetName>[options.OutputFileName]</TargetName>
 <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
 <RemoteRootDir></RemoteRootDir>
 <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>

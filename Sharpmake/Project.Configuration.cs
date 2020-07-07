@@ -2626,6 +2626,7 @@ namespace Sharpmake
                 public string LocalDebuggerEnvironment = RemoveLineTag;
                 public string LocalDebuggerWorkingDirectory = RemoveLineTag;
                 public string RemoteDebuggerCommand = RemoveLineTag;
+                public string RemoteDebuggerCommandArguments = RemoveLineTag;
                 public string RemoteDebuggingMode = RemoveLineTag;
                 public string RemoteDebuggerWorkingDirectory = RemoveLineTag;
                 public bool OverwriteExistingFile = true;
