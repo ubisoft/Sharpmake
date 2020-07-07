@@ -28,6 +28,26 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum ClangEnableModules
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum OnlyActiveArch 
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+                public enum ClangAnalyzerLocalizabilityNonlocalized
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+                
                 public class Archs
                 {
                     public string Value;
@@ -79,7 +99,16 @@ namespace Sharpmake
                 {
                     public ProductBundleIdentifier(string value) : base(value) { }
                 }
-
+                
+                public enum EnableGpuFrameCaptureMode
+                {
+                    [Default]
+                    AutomaticallyEnable,
+                    MetalOnly,
+                    OpenGLOnly,
+                    Disable
+                }
+                
                 public enum CppLanguageStandard
                 {
                     CPP98,
@@ -156,7 +185,14 @@ namespace Sharpmake
                         : base(paths)
                     { }
                 }
-
+                
+                public class AssetCatalog : Strings
+                {
+                    public AssetCatalog(params string[] paths)
+                        : base(paths)
+                    { }
+                }
+                
                 public class ExternalResourceFiles : Strings
                 {
                     public ExternalResourceFiles(params string[] paths)
@@ -257,6 +293,13 @@ namespace Sharpmake
                     G5,
                 }
 
+                public enum GccNoCommonBlocks
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 // Optimization
                 public enum OptimizationLevel
                 {
@@ -330,6 +373,13 @@ namespace Sharpmake
                     { }
                 }
 
+                public enum StrictObjCMsgSend
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum StripDebugSymbolsDuringCopy
                 {
                     [Default]
@@ -345,6 +395,20 @@ namespace Sharpmake
                         Value = value;
                     }
                 }
+                
+                public class AssetCatalogCompilerAppIconName : StringOption
+                {
+                    public AssetCatalogCompilerAppIconName(string value) : base(value)
+                    {
+                    }
+                }
+                
+                public enum Testability
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
 
                 public class ValidArchs
                 {
@@ -355,10 +419,24 @@ namespace Sharpmake
                     }
                 }
 
+                public enum ObjCWeakReferences
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Warning64To32BitConversion
                 {
                     Enable,
                     [Default]
+                    Disable
+                }
+
+                public enum WarningBlockCaptureAutoReleasing
+                {
+                    [Default]
+                    Enable,
                     Disable
                 }
 
@@ -369,7 +447,21 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningComma
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum WarningConstantConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningDeprecatedObjCImplementations
                 {
                     [Default]
                     Enable,
@@ -405,6 +497,13 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningInfiniteRecursion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum WarningIntConversion
                 {
                     [Default]
@@ -412,6 +511,34 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningNonLiteralNullConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningObjCImplicitRetainSelf
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningObjCLiteralConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningRangeLoopAnalysis
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+                
                 public enum WarningReturnType
                 {
                     Enable,
@@ -427,6 +554,20 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningStrictPrototypes
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningSuspiciousMove
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum WarningUndeclaredSelector
                 {
                     Enable,
@@ -438,6 +579,13 @@ namespace Sharpmake
                 {
                     Enable,
                     [Default]
+                    Disable
+                }
+
+                public enum WarningUnreachableCode
+                {
+                    [Default]
+                    Enable,
                     Disable
                 }
 
