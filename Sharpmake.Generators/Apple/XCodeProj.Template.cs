@@ -63,16 +63,16 @@ namespace Sharpmake.Generators.Apple
 					};
 ";
 
-			public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
-			{
-				{ ItemSection.PBXBuildFile,
+            public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
+            {
+                { ItemSection.PBXBuildFile,
 @"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
 			isa = PBXBuildFile;
 			fileRef = [item.File.Uid] /* [item.File.Name] */;
 		};
 "               },
 
-				{ ItemSection.PBXContainerItemProxy,
+                { ItemSection.PBXContainerItemProxy,
 @"		[item.Uid] /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = [item.ProjectReference.Uid];
@@ -82,7 +82,7 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-				{ ItemSection.PBXFileReference,
+                { ItemSection.PBXFileReference,
 @"		[item.Uid] /* [item.Name] */ = {
 			isa = PBXFileReference;
 			explicitFileType = [item.ExplicitFileType];
@@ -94,7 +94,7 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-				{ ItemSection.PBXFrameworksBuildPhase,
+                { ItemSection.PBXFrameworksBuildPhase,
 @"		[item.Uid] /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = [item.BuildActionMask];
@@ -105,7 +105,7 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-				{ItemSection.PBXShellScriptBuildPhase,
+                {ItemSection.PBXShellScriptBuildPhase,
 @"		[item.Uid] /* Scripts */ =
 		{
 			isa = PBXShellScriptBuildPhase;
@@ -120,9 +120,9 @@ namespace Sharpmake.Generators.Apple
 			shellScript = ""[item.script]"";
 		};
 "
-				},
+                },
 
-				{ ItemSection.PBXGroup,
+                { ItemSection.PBXGroup,
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
 			children = (

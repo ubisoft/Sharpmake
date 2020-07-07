@@ -52,7 +52,7 @@ namespace Sharpmake.Application
             public bool Multithreaded = true;
             public bool RegexMatchCacheEnabled = true;
             // Default capacity based on a big project numbers
-            public int  RegexMatchCacheInitialCapacity = (1 << 20) + 1;
+            public int RegexMatchCacheInitialCapacity = (1 << 20) + 1;
             public bool SkipInvalidPath = false;
             public bool DebugLog = false;
             public bool Debug = false;
