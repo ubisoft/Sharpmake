@@ -393,6 +393,18 @@ namespace Sharpmake
             throw new Error("Not default value found for options: " + optionType.Name + " Default Options is " + options);
         }
 
+        public static bool HasOption<T>(Configuration conf)
+        {
+            List<object> options = conf.Options;
+            for (int i = options.Count - 1; i >= 0; --i)
+            {
+                if (options[i] is T)
+                    return true;
+            }
+
+            return false;
+        }
+
         public static IEnumerable<T> GetObjects<T>(Configuration conf)
         {
             for (int i = conf.Options.Count - 1; i >= 0; --i)
