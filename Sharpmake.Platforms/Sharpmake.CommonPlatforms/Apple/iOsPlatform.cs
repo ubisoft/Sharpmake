@@ -72,13 +72,18 @@ namespace Sharpmake
                 }
 
                 // Target
-                options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                cmdLineOptions["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+
                 Options.XCode.Compiler.IPhoneOSDeploymentTarget iosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.IPhoneOSDeploymentTarget>(conf);
                 if (iosDeploymentTarget != null)
                 {
                     options["IPhoneOSDeploymentTarget"] = iosDeploymentTarget.MinimumVersion;
                     cmdLineOptions["IPhoneOSDeploymentTarget"] = $"-target arm64-apple-ios{iosDeploymentTarget.MinimumVersion}";
+                }
+                else
+                {
+                    options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
         }

@@ -62,6 +62,21 @@ namespace Sharpmake
                     options["SDKRoot"] = customSdkRoot.Value;
                     cmdLineOptions["SDKRoot"] = $"-isysroot {customSdkRoot.Value}";
                 }
+
+                // Target
+                options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+
+                var macOsDeploymentTarget = Options.GetObject<Options.XCode.Compiler.MacOSDeploymentTarget>(conf);
+                if (macOsDeploymentTarget != null)
+                {
+                    options["MacOSDeploymentTarget"] = macOsDeploymentTarget.MinimumVersion;
+                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag; // TODO: find what to write here
+                }
+                else
+                {
+                    options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                }
             }
         }
     }

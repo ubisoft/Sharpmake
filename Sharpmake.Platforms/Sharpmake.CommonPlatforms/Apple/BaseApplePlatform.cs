@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
+using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
@@ -374,6 +375,152 @@ namespace Sharpmake
             var options = context.Options;
             var cmdLineOptions = context.CommandLineOptions;
             var conf = context.Configuration;
+            var project = context.Project;
+
+            options["ExcludedSourceFileNames"] = XCodeUtil.XCodeFormatList(conf.ResolvedSourceFilesBuildExclude, 4);
+            options["SpecificLibraryPaths"] = FileGeneratorUtilities.RemoveLineTag;
+            options["TargetedDeviceFamily"] = "1,2";
+            options["BuildDirectory"] = (conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath;
+
+            SelectPrecompiledHeaderOptions(context);
+
+            if (conf.IsFastBuild)
+            {
+                options["FastBuildTarget"] = Bff.GetShortProjectName(project, conf);
+            }
+            else
+            {
+                options["FastBuildTarget"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.AlwaysSearchUserPaths.Disable, () => options["AlwaysSearchUserPaths"] = "NO"),
+                Options.Option(Options.XCode.Compiler.AlwaysSearchUserPaths.Enable, () => options["AlwaysSearchUserPaths"] = "YES")
+            );
+
+            Options.XCode.Compiler.Archs archs = Options.GetObject<Options.XCode.Compiler.Archs>(conf);
+            if (archs != null)
+                options["Archs"] = archs.Value;
+            else
+                options["Archs"] = "\"$(ARCHS_STANDARD_64_BIT)\"";
+
+            Options.XCode.Compiler.AssetCatalogCompilerAppIconName assetcatalogCompilerAppiconName = Options.GetObject<Options.XCode.Compiler.AssetCatalogCompilerAppIconName>(conf);
+            if (assetcatalogCompilerAppiconName != null)
+                options["AssetCatalogCompilerAppIconName"] = assetcatalogCompilerAppiconName.Value;
+            else
+                options["AssetCatalogCompilerAppIconName"] = FileGeneratorUtilities.RemoveLineTag;
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Disable, () => options["AutomaticReferenceCounting"] = "NO"),
+                Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Enable, () => options["AutomaticReferenceCounting"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.ClangAnalyzerLocalizabilityNonlocalized.Disable, () => options["ClangAnalyzerLocalizabilityNonlocalized"] = "NO"),
+                Options.Option(Options.XCode.Compiler.ClangAnalyzerLocalizabilityNonlocalized.Enable, () => options["ClangAnalyzerLocalizabilityNonlocalized"] = "YES")
+            );
+
+            context.SelectOption(
+               Options.Option(Options.XCode.Compiler.ClangEnableModules.Disable, () => options["ClangEnableModules"] = "NO"),
+               Options.Option(Options.XCode.Compiler.ClangEnableModules.Enable, () => options["ClangEnableModules"] = "YES")
+            );
+
+            Options.XCode.Compiler.CodeSignEntitlements codeSignEntitlements = Options.GetObject<Options.XCode.Compiler.CodeSignEntitlements>(conf);
+            if (codeSignEntitlements != null)
+                options["CodeSignEntitlements"] = XCodeUtil.ResolveProjectPaths(project, codeSignEntitlements.Value);
+            else
+                options["CodeSignEntitlements"] = FileGeneratorUtilities.RemoveLineTag;
+
+            Options.XCode.Compiler.CodeSigningIdentity codeSigningIdentity = Options.GetObject<Options.XCode.Compiler.CodeSigningIdentity>(conf);
+            if (codeSigningIdentity != null)
+                options["CodeSigningIdentity"] = codeSigningIdentity.Value;
+            else if (conf.Platform == Platform.ios)
+                options["CodeSigningIdentity"] = "iPhone Developer"; //Previous Default value in the template
+            else
+                options["CodeSigningIdentity"] = FileGeneratorUtilities.RemoveLineTag;
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.OnlyActiveArch.Disable, () => options["OnlyActiveArch"] = "NO"),
+                Options.Option(Options.XCode.Compiler.OnlyActiveArch.Enable, () => options["OnlyActiveArch"] = "YES")
+            );
+
+            options["ProductBundleIdentifier"] = Options.StringOption.Get<Options.XCode.Compiler.ProductBundleIdentifier>(conf);
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP98, () => options["CppStandard"] = "c++98"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP11, () => options["CppStandard"] = "c++11"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP14, () => options["CppStandard"] = "c++14"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP17, () => options["CppStandard"] = "c++17"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU98, () => options["CppStandard"] = "gnu++98"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU11, () => options["CppStandard"] = "gnu++11"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU14, () => options["CppStandard"] = "gnu++14"),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU17, () => options["CppStandard"] = "gnu++17")
+            );
+
+            Options.XCode.Compiler.DevelopmentTeam developmentTeam = Options.GetObject<Options.XCode.Compiler.DevelopmentTeam>(conf);
+            if (developmentTeam != null)
+                options["DevelopmentTeam"] = developmentTeam.Value;
+            else
+                options["DevelopmentTeam"] = FileGeneratorUtilities.RemoveLineTag;
+
+            Options.XCode.Compiler.ProvisioningStyle provisioningStyle = Options.GetObject<Options.XCode.Compiler.ProvisioningStyle>(conf);
+            if (provisioningStyle != null)
+                options["ProvisioningStyle"] = provisioningStyle.Value;
+            else
+                options["ProvisioningStyle"] = "Automatic";
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.DebugInformationFormat.Dwarf, () => options["DebugInformationFormat"] = "dwarf"),
+                Options.Option(Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym, () => options["DebugInformationFormat"] = "\"dwarf-with-dsym\""),
+                Options.Option(Options.XCode.Compiler.DebugInformationFormat.Stabs, () => options["DebugInformationFormat"] = "stabs")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.DynamicNoPic.Disable, () => options["DynamicNoPic"] = "NO"),
+                Options.Option(Options.XCode.Compiler.DynamicNoPic.Enable, () => options["DynamicNoPic"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.EnableBitcode.Disable, () => { options["EnableBitcode"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.EnableBitcode.Enable, () => { options["EnableBitcode"] = "YES"; })
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.Exceptions.Disable, () => { options["CppExceptionHandling"] = "NO"; options["ObjCExceptionHandling"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.Exceptions.Enable, () => { options["CppExceptionHandling"] = "YES"; options["ObjCExceptionHandling"] = "YES"; }),
+                Options.Option(Options.XCode.Compiler.Exceptions.EnableCpp, () => { options["CppExceptionHandling"] = "YES"; options["ObjCExceptionHandling"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.Exceptions.EnableObjC, () => { options["CppExceptionHandling"] = "NO"; options["ObjCExceptionHandling"] = "YES"; })
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.GccNoCommonBlocks.Disable, () => options["GccNoCommonBlocks"] = "NO"),
+                Options.Option(Options.XCode.Compiler.GccNoCommonBlocks.Enable, () => options["GccNoCommonBlocks"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.ANSI, () => options["CStandard"] = "ansi"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.C89, () => options["CStandard"] = "c89"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU89, () => options["CStandard"] = "gnu89"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.C99, () => options["CStandard"] = "c99"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU99, () => options["CStandard"] = "gnu99"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.C11, () => options["CStandard"] = "c11"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU11, () => options["CStandard"] = "gnu11"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.CompilerDefault, () => options["CStandard"] = FileGeneratorUtilities.RemoveLineTag)
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.ObjCWeakReferences.Disable, () => options["ObjCWeakReferences"] = "NO"),
+                Options.Option(Options.XCode.Compiler.ObjCWeakReferences.Enable, () => options["ObjCWeakReferences"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.OptimizationLevel.Disable, () => { options["OptimizationLevel"] = "0"; }),
+                Options.Option(Options.XCode.Compiler.OptimizationLevel.Fast, () => { options["OptimizationLevel"] = "1"; }),
+                Options.Option(Options.XCode.Compiler.OptimizationLevel.Faster, () => { options["OptimizationLevel"] = "2"; }),
+                Options.Option(Options.XCode.Compiler.OptimizationLevel.Fastest, () => { options["OptimizationLevel"] = "3"; }),
+                Options.Option(Options.XCode.Compiler.OptimizationLevel.Smallest, () => { options["OptimizationLevel"] = "s"; }),
+                Options.Option(Options.XCode.Compiler.OptimizationLevel.Aggressive, () => { options["OptimizationLevel"] = "fast"; })
+            );
 
             context.SelectOption
             (
@@ -386,9 +533,319 @@ namespace Sharpmake
             );
 
             context.SelectOption(
+                Options.Option(Options.XCode.Compiler.DeadStrip.Disable, () => { options["DeadStripping"] = "NO"; options["PrivateInlines"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.DeadStrip.Code, () => { options["DeadStripping"] = "YES"; options["PrivateInlines"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.DeadStrip.Inline, () => { options["DeadStripping"] = "NO"; options["PrivateInlines"] = "YES"; }),
+                Options.Option(Options.XCode.Compiler.DeadStrip.All, () => { options["DeadStripping"] = "YES"; options["PrivateInlines"] = "YES"; })
+                );
+
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.PreserveDeadCodeInitsAndTerms.Disable, () => { options["PreserveDeadCodeInitsAndTerms"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.PreserveDeadCodeInitsAndTerms.Enable, () => { options["PreserveDeadCodeInitsAndTerms"] = "YES"; })
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.PrivateSymbols.Disable, () => { options["PrivateSymbols"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.PrivateSymbols.Enable, () => { options["PrivateSymbols"] = "YES"; })
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.RTTI.Disable, () => { options["RuntimeTypeInfo"] = "NO"; }),
+                Options.Option(Options.XCode.Compiler.RTTI.Enable, () => { options["RuntimeTypeInfo"] = "YES"; })
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.StrictObjCMsgSend.Disable, () => options["StrictObjCMsgSend"] = "NO"),
+                Options.Option(Options.XCode.Compiler.StrictObjCMsgSend.Enable, () => options["StrictObjCMsgSend"] = "YES")
+            );
+
+            context.SelectOption(
+               Options.Option(Options.XCode.Compiler.Testability.Disable, () => options["Testability"] = "NO"),
+               Options.Option(Options.XCode.Compiler.Testability.Enable, () => options["Testability"] = "YES")
+            );
+
+            context.SelectOption(
                 Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => { options["LibraryStandard"] = "libstdc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libstdc++"; }),
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["LibraryStandard"] = "libc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libc++"; })
             );
+
+            Strings frameworkPaths = Options.GetStrings<Options.XCode.Compiler.FrameworkPaths>(conf);
+            XCodeUtil.ResolveProjectPaths(project, frameworkPaths);
+            options["FrameworkPaths"] = XCodeUtil.XCodeFormatList(frameworkPaths, 4);
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Disable, () => options["GenerateDebuggingSymbols"] = "NO"),
+                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.DeadStrip, () => options["GenerateDebuggingSymbols"] = "YES"),
+                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Enable, () => options["GenerateDebuggingSymbols"] = "YES")
+            );
+
+            Options.XCode.Compiler.InfoPListFile infoPListFile = Options.GetObject<Options.XCode.Compiler.InfoPListFile>(conf);
+            if (infoPListFile != null)
+                options["InfoPListFile"] = XCodeUtil.ResolveProjectPaths(project, infoPListFile.Value);
+            else
+                options["InfoPListFile"] = FileGeneratorUtilities.RemoveLineTag;
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.ICloud.Disable, () => options["iCloud"] = "0"),
+                Options.Option(Options.XCode.Compiler.ICloud.Enable, () => options["iCloud"] = "1")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => options["LibraryStandard"] = "libstdc++"),
+                Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => options["LibraryStandard"] = "libc++")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.ModelTuning.None, () => options["ModelTuning"] = FileGeneratorUtilities.RemoveLineTag),
+                Options.Option(Options.XCode.Compiler.ModelTuning.G3, () => options["ModelTuning"] = "G3"),
+                Options.Option(Options.XCode.Compiler.ModelTuning.G4, () => options["ModelTuning"] = "G4"),
+                Options.Option(Options.XCode.Compiler.ModelTuning.G5, () => options["ModelTuning"] = "G5")
+            );
+
+            options["MachOType"] = FileGeneratorUtilities.RemoveLineTag;
+            switch (conf.Output)
+            {
+                case Project.Configuration.OutputType.Exe:
+                case Project.Configuration.OutputType.IosApp:
+                    options["MachOType"] = "mh_execute";
+                    break;
+                case Project.Configuration.OutputType.Lib:
+                    options["MachOType"] = "staticlib";
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    options["MachOType"] = "mh_dylib";
+                    break;
+                case Project.Configuration.OutputType.None:
+                    // do nothing
+                    break;
+                default:
+                    throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
+            }
+
+            Options.XCode.Compiler.ProvisioningProfile provisioningProfile = Options.GetObject<Options.XCode.Compiler.ProvisioningProfile>(conf);
+            if (provisioningProfile != null)
+                options["ProvisioningProfile"] = provisioningProfile.ProfileName;
+            else
+                options["ProvisioningProfile"] = FileGeneratorUtilities.RemoveLineTag;
+
+            Options.XCode.Compiler.SDKRoot sdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+            if (sdkRoot != null)
+                options["SDKRoot"] = sdkRoot.Value;
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.SkipInstall.Disable, () => options["SkipInstall"] = "NO"),
+                Options.Option(Options.XCode.Compiler.SkipInstall.Enable, () => options["SkipInstall"] = "YES")
+            );
+
+            Options.XCode.Compiler.TargetedDeviceFamily targetedDeviceFamily = Options.GetObject<Options.XCode.Compiler.TargetedDeviceFamily>(conf);
+            if (targetedDeviceFamily != null)
+                options["TargetedDeviceFamily"] = targetedDeviceFamily.Value;
+            else
+                options["TargetedDeviceFamily"] = FileGeneratorUtilities.RemoveLineTag;
+
+
+            Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);
+            if (validArchs != null)
+                options["ValidArchs"] = validArchs.Archs;
+            else
+                options["ValidArchs"] = FileGeneratorUtilities.RemoveLineTag;
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.Warning64To32BitConversion.Disable, () => options["Warning64To32BitConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.Warning64To32BitConversion.Enable, () => options["Warning64To32BitConversion"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningBlockCaptureAutoReleasing.Disable, () => options["WarningBlockCaptureAutoReleasing"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningBlockCaptureAutoReleasing.Enable, () => options["WarningBlockCaptureAutoReleasing"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningBooleanConversion.Disable, () => options["WarningBooleanConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningBooleanConversion.Enable, () => options["WarningBooleanConversion"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningComma.Disable, () => options["WarningComma"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningComma.Enable, () => options["WarningComma"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningConstantConversion.Disable, () => options["WarningConstantConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningConstantConversion.Enable, () => options["WarningConstantConversion"] = "YES")
+                );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningDeprecatedObjCImplementations.Disable, () => options["WarningDeprecatedObjCImplementations"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningDeprecatedObjCImplementations.Enable, () => options["WarningDeprecatedObjCImplementations"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningDuplicateMethodMatch.Disable, () => options["WarningDuplicateMethodMatch"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningDuplicateMethodMatch.Enable, () => options["WarningDuplicateMethodMatch"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningEmptyBody.Disable, () => options["WarningEmptyBody"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningEmptyBody.Enable, () => options["WarningEmptyBody"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningEnumConversion.Disable, () => options["WarningEnumConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningEnumConversion.Enable, () => options["WarningEnumConversion"] = "YES")
+                );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningDirectIsaUsage.Disable, () => options["WarningDirectIsaUsage"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningDirectIsaUsage.Enable, () => options["WarningDirectIsaUsage"] = "YES"),
+                Options.Option(Options.XCode.Compiler.WarningDirectIsaUsage.EnableAndError, () => options["WarningDirectIsaUsage"] = "YES_ERROR")
+            );
+
+            context.SelectOption(
+               Options.Option(Options.XCode.Compiler.WarningInfiniteRecursion.Disable, () => options["WarningInfiniteRecursion"] = "NO"),
+               Options.Option(Options.XCode.Compiler.WarningInfiniteRecursion.Enable, () => options["WarningInfiniteRecursion"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningIntConversion.Disable, () => options["WarningIntConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningIntConversion.Enable, () => options["WarningIntConversion"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningNonLiteralNullConversion.Disable, () => options["WarningNonLiteralNullConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningNonLiteralNullConversion.Enable, () => options["WarningNonLiteralNullConversion"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningObjCImplicitRetainSelf.Disable, () => options["WarningObjCImplicitRetainSelf"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningObjCImplicitRetainSelf.Enable, () => options["WarningObjCImplicitRetainSelf"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningObjCLiteralConversion.Disable, () => options["WarningObjCLiteralConversion"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningObjCLiteralConversion.Enable, () => options["WarningObjCLiteralConversion"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningRangeLoopAnalysis.Disable, () => options["WarningRangeLoopAnalysis"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningRangeLoopAnalysis.Enable, () => options["WarningRangeLoopAnalysis"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningReturnType.Disable, () => options["WarningReturnType"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningReturnType.Enable, () => options["WarningReturnType"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningRootClass.Disable, () => options["WarningRootClass"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningRootClass.Enable, () => options["WarningRootClass"] = "YES"),
+                Options.Option(Options.XCode.Compiler.WarningRootClass.EnableAndError, () => options["WarningRootClass"] = "YES_ERROR")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningStrictPrototypes.Disable, () => options["WarningStrictPrototypes"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningStrictPrototypes.Enable, () => options["WarningStrictPrototypes"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningSuspiciousMove.Disable, () => options["WarningSuspiciousMove"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningSuspiciousMove.Enable, () => options["WarningSuspiciousMove"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningUndeclaredSelector.Disable, () => options["WarningUndeclaredSelector"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningUndeclaredSelector.Enable, () => options["WarningUndeclaredSelector"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningUniniatializedAutos.Disable, () => options["WarningUniniatializedAutos"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningUniniatializedAutos.Enable, () => options["WarningUniniatializedAutos"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningUnreachableCode.Disable, () => options["WarningUnreachableCode"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningUnreachableCode.Enable, () => options["WarningUnreachableCode"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningUnusedFunction.Disable, () => options["WarningUnusedFunction"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningUnusedFunction.Enable, () => options["WarningUnusedFunction"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.WarningUnusedVariable.Disable, () => options["WarningUnusedVariable"] = "NO"),
+                Options.Option(Options.XCode.Compiler.WarningUnusedVariable.Enable, () => options["WarningUnusedVariable"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.DeploymentPostProcessing.Disable, () => options["DeploymentPostProcessing"] = "NO"),
+                Options.Option(Options.XCode.Compiler.DeploymentPostProcessing.Enable, () => options["DeploymentPostProcessing"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.StripDebugSymbolsDuringCopy.Disable, () => options["StripDebugSymbolsDuringCopy"] = "NO"),
+                Options.Option(Options.XCode.Compiler.StripDebugSymbolsDuringCopy.Enable, () => options["StripDebugSymbolsDuringCopy"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.TreatWarningsAsErrors.Disable, () => options["TreatWarningsAsErrors"] = "NO"),
+                Options.Option(Options.XCode.Compiler.TreatWarningsAsErrors.Enable, () => options["TreatWarningsAsErrors"] = "YES")
+            );
+
+            Strings specificDeviceLibraryPaths = Options.GetStrings<Options.XCode.Compiler.SpecificDeviceLibraryPaths>(conf);
+            XCodeUtil.ResolveProjectPaths(project, specificDeviceLibraryPaths);
+            options["SpecificDeviceLibraryPaths"] = XCodeUtil.XCodeFormatList(specificDeviceLibraryPaths, 4);
+
+            Strings specificSimulatorLibraryPaths = Options.GetStrings<Options.XCode.Compiler.SpecificSimulatorLibraryPaths>(conf);
+            XCodeUtil.ResolveProjectPaths(project, specificSimulatorLibraryPaths);
+            options["SpecificSimulatorLibraryPaths"] = XCodeUtil.XCodeFormatList(specificSimulatorLibraryPaths, 4);
+
+            options["WarningOptions"] = FileGeneratorUtilities.RemoveLineTag;
+        }
+
+        private void SelectPrecompiledHeaderOptions(IGenerationContext context)
+        {
+            var options = context.Options;
+            var cmdLineOptions = context.CommandLineOptions;
+            var conf = context.Configuration;
+
+            if (!HasPrecomp(context))
+            {
+                options["UsePrecompiledHeader"] = "NO";
+                options["PrecompiledHeader"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                options["UsePrecompiledHeader"] = "YES";
+
+                Strings pathsToConsider = new Strings(context.ProjectSourceCapitalized);
+                pathsToConsider.AddRange(context.Project.AdditionalSourceRootPaths);
+                pathsToConsider.AddRange(GetIncludePaths(context));
+
+                string pchFileSourceRelative = null;
+                if (!options.TryGetValue("PrecompiledHeaderThrough", out pchFileSourceRelative))
+                    pchFileSourceRelative = conf.PrecompHeader;
+
+                string pchFileXCodeRelative = null;
+                bool foundPchInclude = false;
+
+                foreach (var includePath in pathsToConsider)
+                {
+                    var pchFile = Util.PathGetAbsolute(includePath, pchFileSourceRelative);
+                    if (Util.FileExists(pchFile))
+                    {
+                        pchFileXCodeRelative = Util.PathGetRelative(context.ProjectDirectory, pchFile, true);
+                        foundPchInclude = true;
+                        break;
+                    }
+                }
+
+                if (!foundPchInclude)
+                    throw new Error($"Sharpmake couldn't locate the PCH '{pchFileSourceRelative}' in {conf}");
+
+                options["PrecompiledHeader"] = pchFileXCodeRelative;
+            }
         }
 
         public void SelectLinkerOptions(IGenerationContext context)
@@ -408,6 +865,11 @@ namespace Sharpmake
 
             // TODO: implement me
             cmdLineOptions["UseThinArchives"] = "";
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Linker.StripLinkedProduct.Disable, () => options["StripLinkedProduct"] = "NO"),
+                Options.Option(Options.XCode.Linker.StripLinkedProduct.Enable, () => options["StripLinkedProduct"] = "YES")
+            );
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
