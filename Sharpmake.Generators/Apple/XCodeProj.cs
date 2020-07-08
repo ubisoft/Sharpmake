@@ -919,11 +919,11 @@ namespace Sharpmake.Generators.Apple
             else // Release
                 conf.Defines.Add("NDEBUG");
 
-            options["PreprocessorDefinitions"] = XCodeUtil.XCodeFormatList(conf.Defines, 4);
-            options["CompilerOptions"] = XCodeUtil.XCodeFormatList(conf.AdditionalCompilerOptions, 4);
+            options["PreprocessorDefinitions"] = XCodeUtil.XCodeFormatList(conf.Defines, 4, forceQuotes: true);
+            options["CompilerOptions"] = XCodeUtil.XCodeFormatList(conf.AdditionalCompilerOptions, 4, forceQuotes: true);
             if (conf.AdditionalLibrarianOptions.Any())
                 throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with XCode generator");
-            options["LinkerOptions"] = XCodeUtil.XCodeFormatList(linkerOptions, 4);
+            options["LinkerOptions"] = XCodeUtil.XCodeFormatList(linkerOptions, 4, forceQuotes: true);
             return options;
         }
 

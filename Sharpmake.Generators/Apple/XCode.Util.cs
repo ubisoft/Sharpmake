@@ -21,21 +21,21 @@ namespace Sharpmake.Generators.Apple
 {
     public static class XCodeUtil
     {
-        public static string XCodeFormatSingleItem(string item)
+        public static string XCodeFormatSingleItem(string item, bool forceQuotes = false)
         {
-            if (item.Contains(' '))
+            if (forceQuotes || item.Contains(' '))
                 return $"{Util.DoubleQuotes}{Util.EscapedDoubleQuotes}{item}{Util.EscapedDoubleQuotes}{Util.DoubleQuotes}";
             return $"{item}";
         }
 
-        public static string XCodeFormatList(IEnumerable<string> items, int nbIndent)
+        public static string XCodeFormatList(IEnumerable<string> items, int nbIndent, bool forceQuotes = false)
         {
             int nbItems = items.Count();
             if (nbItems == 0)
-                return FileGeneratorUtilities.RemoveLineTag;
+                return forceQuotes ? XCodeFormatSingleItem(string.Empty, true) : FileGeneratorUtilities.RemoveLineTag;
 
             if (nbItems == 1)
-                return XCodeFormatSingleItem(items.First());
+                return XCodeFormatSingleItem(items.First(), forceQuotes);
 
             // Write all selected items.
             var strBuilder = new StringBuilder(1024 * 16);
@@ -47,7 +47,7 @@ namespace Sharpmake.Generators.Apple
 
             foreach (string item in items)
             {
-                strBuilder.AppendFormat("{0}\t{1},{2}", indent, XCodeFormatSingleItem(item), Environment.NewLine);
+                strBuilder.AppendFormat("{0}\t{1},{2}", indent, XCodeFormatSingleItem(item, forceQuotes), Environment.NewLine);
             }
 
             strBuilder.AppendFormat("{0})", indent);
