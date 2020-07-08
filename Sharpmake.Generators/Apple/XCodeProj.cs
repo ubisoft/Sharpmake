@@ -176,6 +176,7 @@ namespace Sharpmake.Generators.Apple
             );
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
+            using (fileGenerator.Declare("options", options))
             using (fileGenerator.Declare("testableElements", testableElements))
             using (fileGenerator.Declare("optimization", configurations[0].Target.Name))
             {
