@@ -263,9 +263,7 @@ namespace Sharpmake.Generators.Apple
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
 				ENABLE_BITCODE = [item.Options.EnableBitcode];
 				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
-				FRAMEWORK_SEARCH_PATHS = (
-[item.Options.FrameworkPaths]
-				);
+				FRAMEWORK_SEARCH_PATHS = [item.Options.FrameworkPaths];
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
 				MACH_O_TYPE = ""[item.Options.MachOType]"";
 				COPY_PHASE_STRIP = [item.Options.StripDebugSymbolsDuringCopy];
@@ -291,15 +289,9 @@ namespace Sharpmake.Generators.Apple
 				SKIP_INSTALL = [item.Options.SkipInstall];
 				STRIP_INSTALLED_PRODUCT = [item.Options.StripLinkedProduct];
 				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
-				LIBRARY_SEARCH_PATHS = ( [item.Options.RemoveLibraryPaths]
-[item.Options.LibraryPaths]
-				); [item.Options.RemoveLibraryPaths]
-				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = ( [item.Options.RemoveSpecificDeviceLibraryPaths]
-[item.Options.SpecificDeviceLibraryPaths]
-				); [item.Options.RemoveSpecificDeviceLibraryPaths]
-				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = ( [item.Options.RemoveSpecificSimulatorLibraryPaths]
-[item.Options.SpecificSimulatorLibraryPaths]
-				); [item.Options.RemoveSpecificSimulatorLibraryPaths]
+				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
+				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
+				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = [item.Options.SpecificSimulatorLibraryPaths];
 			};
 			name = [item.Options.TargetName];
 		};
@@ -381,9 +373,7 @@ namespace Sharpmake.Generators.Apple
 				GCC_PRECOMPILE_PREFIX_HEADER = [item.Options.UsePrecompiledHeader];
 				GCC_PREFIX_HEADER = ""[item.Options.PrecompiledHeader]"";
 				GCC_OPTIMIZATION_LEVEL = [item.Options.OptimizationLevel];
-				GCC_PREPROCESSOR_DEFINITIONS = (
-[item.Options.PreprocessorDefinitions]
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = [item.Options.PreprocessorDefinitions];
 				GCC_WARN_64_TO_32_BIT_CONVERSION = [item.Options.Warning64To32BitConversion];
 				GCC_WARN_ABOUT_RETURN_TYPE = [item.Options.WarningReturnType];
 				GCC_WARN_UNDECLARED_SELECTOR = [item.Options.WarningUndeclaredSelector];
@@ -394,12 +384,8 @@ namespace Sharpmake.Generators.Apple
 				SDKROOT = ""[item.Options.SDKRoot]"";
 				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
                 ONLY_ACTIVE_ARCH = [item.Options.OnlyActiveArch];
-				OTHER_CPLUSPLUSFLAGS = (
-[item.Options.CompilerOptions]
-				);
-				OTHER_LDFLAGS = (
-[item.Options.LinkerOptions]
-				);
+				OTHER_CPLUSPLUSFLAGS = [item.Options.CompilerOptions];
+				OTHER_LDFLAGS = [item.Options.LinkerOptions];
 			};
 			name = [item.Options.TargetName];
 		};

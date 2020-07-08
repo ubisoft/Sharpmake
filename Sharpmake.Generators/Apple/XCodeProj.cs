@@ -999,7 +999,8 @@ namespace Sharpmake.Generators.Apple
             );
 
             Strings frameworkPaths = Options.GetStrings<Options.XCode.Compiler.FrameworkPaths>(conf);
-            options["FrameworkPaths"] = XCodeOptions.ResolveProjectPaths(project, frameworkPaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n'));
+            XCodeOptions.ResolveProjectPaths(project, frameworkPaths);
+            options["FrameworkPaths"] = XCodeFormatList(frameworkPaths, 4);
 
             Options.SelectOption(conf,
                 Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Disable, () => options["GenerateDebuggingSymbols"] = "NO"),
@@ -1246,42 +1247,17 @@ namespace Sharpmake.Generators.Apple
             libraryPaths.AddRange(conf.DependenciesOtherLibraryPaths);
             libraryPaths.AddRange(conf.DependenciesBuiltTargetsLibraryPaths);
 
-            if (libraryPaths.Count == 0)
-            {
-                options["LibraryPaths"] = RemoveLineTag;
-                options["RemoveLibraryPaths"] = RemoveLineTag;
-            }
-            else
-            {
-                libraryPaths.Sort();
-                options["LibraryPaths"] = libraryPaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n');
-            }
+            libraryPaths.Sort();
+            options["LibraryPaths"] = XCodeFormatList(libraryPaths, 4);
 
             Strings specificDeviceLibraryPaths = Options.GetStrings<Options.XCode.Compiler.SpecificDeviceLibraryPaths>(conf);
-            if (specificDeviceLibraryPaths.Count == 0)
-            {
-                options["SpecificDeviceLibraryPaths"] = RemoveLineTag;
-                options["RemoveSpecificDeviceLibraryPaths"] = RemoveLineTag;
-            }
-            else
-            {
-                options["SpecificDeviceLibraryPaths"] = XCodeOptions.ResolveProjectPaths(project, specificDeviceLibraryPaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n'));
-            }
+            XCodeOptions.ResolveProjectPaths(project, specificDeviceLibraryPaths);
+            options["SpecificDeviceLibraryPaths"] = XCodeFormatList(specificDeviceLibraryPaths, 4);
 
             Strings specificSimulatorLibraryPaths = Options.GetStrings<Options.XCode.Compiler.SpecificSimulatorLibraryPaths>(conf);
-            if (specificSimulatorLibraryPaths.Count == 0)
-            {
-                options["SpecificSimulatorLibraryPaths"] = RemoveLineTag;
-                options["RemoveSpecificSimulatorLibraryPaths"] = RemoveLineTag;
-            }
-            else
-            {
-                options["SpecificSimulatorLibraryPaths"] = XCodeOptions.ResolveProjectPaths(project, specificSimulatorLibraryPaths.JoinStrings(",\n", "\t\t\t\t\t\"", "\"").TrimEnd('\n'));
-            }
+            XCodeOptions.ResolveProjectPaths(project, specificSimulatorLibraryPaths);
+            options["SpecificSimulatorLibraryPaths"] = XCodeFormatList(specificSimulatorLibraryPaths, 4);
 
-            options["PreprocessorDefinitions"] = RemoveLineTag;
-            options["CompilerOptions"] = RemoveLineTag;
-            options["LinkerOptions"] = RemoveLineTag;
             options["WarningOptions"] = RemoveLineTag;
 
             var libFiles = new OrderableStrings(conf.LibraryFiles);
@@ -1308,14 +1284,11 @@ namespace Sharpmake.Generators.Apple
             else // Release
                 conf.Defines.Add("NDEBUG");
 
-            if (conf.Defines.Any())
-                options["PreprocessorDefinitions"] = conf.Defines.Select(item => "\t\t\t\t\t\"" + item.Replace("\"", "") + "\"").Aggregate((first, next) => first + ",\n" + next).TrimEnd('\n', '\t');
-            if (conf.AdditionalCompilerOptions.Any())
-                options["CompilerOptions"] = conf.AdditionalCompilerOptions.Select(item => "\t\t\t\t\t\"" + item.Replace("\"", "") + "\"").Aggregate((first, next) => first + ",\n" + next).TrimEnd('\n', '\t');
+            options["PreprocessorDefinitions"] = XCodeFormatList(conf.Defines, 4);
+            options["CompilerOptions"] = XCodeFormatList(conf.AdditionalCompilerOptions, 4);
             if (conf.AdditionalLibrarianOptions.Any())
                 throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with XCode generator");
-            if (linkerOptions.Any())
-                options["LinkerOptions"] = linkerOptions.Select(item => "\t\t\t\t\t\"" + item.Replace("\"", "") + "\"").Aggregate((first, next) => first + ",\n" + next).TrimEnd('\n', '\t');
+            options["LinkerOptions"] = XCodeFormatList(linkerOptions, 4);
             return options;
         }
 
