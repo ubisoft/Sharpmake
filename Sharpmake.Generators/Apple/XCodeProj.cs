@@ -166,7 +166,7 @@ namespace Sharpmake.Generators.Apple
 
             // Write the scheme file
             var defaultTarget = _nativeOrLegacyTargets.Values.Where(target => target.OutputFile.OutputType != Project.Configuration.OutputType.IosTestBundle).FirstOrDefault();
-            
+
             XCodeOptions options = new XCodeOptions();
             Options.SelectOption(configurations[0],
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.AutomaticallyEnable, () => options["EnableGpuFrameCaptureMode"] = RemoveLineTag),
@@ -213,7 +213,7 @@ namespace Sharpmake.Generators.Apple
             foreach (Project.Configuration configuration in configurations)
             {
                 _optionMapping[configuration] = GenerateOptions(project, configuration);
-                
+
                 Strings assetCatalog = Options.GetStrings<Options.XCode.Compiler.AssetCatalog>(configuration);
                 XCodeOptions.ResolveProjectPaths(project, assetCatalog);
                 foreach (string asset in assetCatalog)

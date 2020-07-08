@@ -35,7 +35,7 @@ namespace Sharpmake
                     Disable
                 }
 
-                public enum OnlyActiveArch 
+                public enum OnlyActiveArch
                 {
                     Enable,
                     [Default]
@@ -47,7 +47,7 @@ namespace Sharpmake
                     Enable,
                     Disable
                 }
-                
+
                 public class Archs
                 {
                     public string Value;
@@ -99,7 +99,7 @@ namespace Sharpmake
                 {
                     public ProductBundleIdentifier(string value) : base(value) { }
                 }
-                
+
                 public enum EnableGpuFrameCaptureMode
                 {
                     [Default]
@@ -108,7 +108,7 @@ namespace Sharpmake
                     OpenGLOnly,
                     Disable
                 }
-                
+
                 public enum CppLanguageStandard
                 {
                     CPP98,
@@ -185,14 +185,14 @@ namespace Sharpmake
                         : base(paths)
                     { }
                 }
-                
+
                 public class AssetCatalog : Strings
                 {
                     public AssetCatalog(params string[] paths)
                         : base(paths)
                     { }
                 }
-                
+
                 public class ExternalResourceFiles : Strings
                 {
                     public ExternalResourceFiles(params string[] paths)
@@ -395,14 +395,14 @@ namespace Sharpmake
                         Value = value;
                     }
                 }
-                
+
                 public class AssetCatalogCompilerAppIconName : StringOption
                 {
                     public AssetCatalogCompilerAppIconName(string value) : base(value)
                     {
                     }
                 }
-                
+
                 public enum Testability
                 {
                     [Default]
@@ -538,7 +538,7 @@ namespace Sharpmake
                     Enable,
                     Disable
                 }
-                
+
                 public enum WarningReturnType
                 {
                     Enable,
