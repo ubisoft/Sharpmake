@@ -4,7 +4,7 @@
 
 int main(int, char**)
 {
-    std::cout << "Hello XCode World!" << std::endl;
+    std::cout << "Hello XCode World, from " CREATION_DATE "!" << std::endl;
     
 #if _DEBUG
     std::cout << "- Exe is built in Debug"
@@ -21,8 +21,6 @@ int main(int, char**)
 #  endif
         "!" << std::endl;
 #endif
-
-
 
     std::vector<int> someArray(5, 6);
 

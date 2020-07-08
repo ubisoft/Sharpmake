@@ -36,6 +36,8 @@ namespace HelloXCode
 
             conf.AddPrivateDependency<Dll1Project>(target);
             conf.AddPrivateDependency<StaticLib2Project>(target);
+
+            conf.Defines.Add("CREATION_DATE=\"July 2020\"");
         }
     }
 }
