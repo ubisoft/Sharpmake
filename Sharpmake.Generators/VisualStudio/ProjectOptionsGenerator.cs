@@ -994,7 +994,7 @@ namespace Sharpmake.Generators.VisualStudio
                     if (string.IsNullOrWhiteSpace(define))
                         continue;
 
-                    fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                    fastBuildDefines.Add(string.Concat(platformDefineSwitch, define));
                 }
                 context.CommandLineOptions["PreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildDefines);
             }

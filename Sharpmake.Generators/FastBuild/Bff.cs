@@ -1377,7 +1377,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (string.IsNullOrWhiteSpace(resourceDefine))
                         continue;
 
-                    fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, resourceDefine.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                    fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
                 }
                 context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
             }
