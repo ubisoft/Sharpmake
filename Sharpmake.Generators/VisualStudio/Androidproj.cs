@@ -383,7 +383,11 @@ namespace Sharpmake.Generators.VisualStudio
             var options = context.Options;
             var conf = context.Configuration;
 
-            options["OutputFile"] = FileGeneratorUtilities.RemoveLineTag;
+            //OutputFile ( APK File )
+            options["OutputFile"] = conf.TargetFileFullName;
+
+            //AndroidAppLibName Native Library Packaged into the APK
+            options["AndroidAppLibName"] = FileGeneratorUtilities.RemoveLineTag;
             if (context.AndroidPackageProject.AppLibType != null)
             {
                 Project.Configuration appLibConf = conf.ConfigurationDependencies.FirstOrDefault(confDep => (confDep.Project.GetType() == context.AndroidPackageProject.AppLibType));
@@ -393,7 +397,7 @@ namespace Sharpmake.Generators.VisualStudio
                     if (appLibConf.Output != Project.Configuration.OutputType.Dll)
                         throw new Error("Cannot use configuration \"{0}\" as app lib for package configuration \"{1}\". Output type must be set to dynamic library.", appLibConf, conf);
 
-                    options["OutputFile"] = appLibConf.TargetFileFullName;
+                    options["AndroidAppLibName"] = appLibConf.TargetFileFullName;
                 }
                 else
                 {
