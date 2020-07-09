@@ -404,12 +404,14 @@ namespace Sharpmake.Generators.VisualStudio
             string vcTargetsPath = "$(VCTargetsPath)";
             if (WriteVcOverrides(context, fileGenerator))
             {
-                string vcRootPathKey;
-                string vcTargetsPathKey;
-                // we use the targets path from the most recent devenv supported in this vcxproj,
-                // since it will know how to redirect to older toolsets
-                context.DevelopmentEnvironmentsRange.MaxDevEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
-                vcTargetsPath = $"$({vcTargetsPathKey})";
+                // Disabling this, since it prevents opening old projects in recent visual studio versions
+                // TODO: find a way to make it work
+                //string vcRootPathKey;
+                //string vcTargetsPathKey;
+                //// we use the targets path from the most recent devenv supported in this vcxproj,
+                //// since it will know how to redirect to older toolsets
+                //context.DevelopmentEnvironmentsRange.MaxDevEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
+                //vcTargetsPath = $"$({vcTargetsPathKey})";
             }
 
             var vcTargetsPathScopeVar = fileGenerator.Declare("vcTargetsPath", vcTargetsPath);
