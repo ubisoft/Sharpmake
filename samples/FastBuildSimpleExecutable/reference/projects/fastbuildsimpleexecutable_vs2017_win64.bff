@@ -32,9 +32,9 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' "/DWIN64"'
-            + ' "/D_CONSOLE"'
-            + ' "/D_DEBUG"'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
+            + ' /D_DEBUG'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -183,9 +183,9 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' "/DNDEBUG"'
-            + ' "/DWIN64"'
-            + ' "/D_CONSOLE"'
+            + ' /DNDEBUG'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
             // Code Generation options
             // ---------------------------
             + ' /GF'
