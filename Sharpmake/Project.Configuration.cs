@@ -1511,19 +1511,6 @@ namespace Sharpmake
                         "& if %ERRORLEVEL% GEQ 8 (echo Copy failed & exit 1) else (type nul>nul)"
                     );
                 }
-
-                internal override void Resolve(Resolver resolver)
-                {
-                    base.Resolve(resolver);
-
-                    // TODO: that test is very dodgy. Please remove this, and have the user set the property instead, or even create a new BuildStepCopyDir type
-                    int index = DestinationPath.LastIndexOf(@"\", StringComparison.Ordinal);
-                    var destinationFolder = index < 0 ? DestinationPath : DestinationPath.Substring(index);
-                    var destinationIsFolder = !destinationFolder.Contains(".");
-                    bool isFolderCopy = destinationIsFolder || (Util.DirectoryExists(SourcePath) && Util.DirectoryExists(DestinationPath));
-                    if (isFolderCopy)
-                        IsFileCopy = false;
-                }
             }
 
             public abstract class BuildStepBase : IComparable
