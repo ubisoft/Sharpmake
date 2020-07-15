@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 function success {
 	echo Bootstrap succeeded \!
@@ -13,9 +13,7 @@ function error {
 # fail immediately if anything goes wrong
 set -e
 
-pushd $(dirname $0) > /dev/null
-CURRENT_DIR=$(pwd)
-popd > /dev/null
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 which msbuild > /dev/null
 MSBUILD_FOUND=$?
@@ -29,7 +27,7 @@ TERM=xterm
 
 SHARPMAKE_EXECUTABLE=$CURRENT_DIR/bin/debug/Sharpmake.Application.exe
 
-$CURRENT_DIR/CompileSharpmake.sh Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
+$CURRENT_DIR/CompileSharpmake.sh $CURRENT_DIR/Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
 if [ $? -ne 0 ]; then
     echo "The build has failed."
     if [ -f $SHARPMAKE_EXECUTABLE ]; then

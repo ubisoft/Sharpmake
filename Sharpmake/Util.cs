@@ -39,6 +39,9 @@ namespace Sharpmake
 
         public static readonly char OtherSeparator = UsesUnixSeparator ? Util.WindowsSeparator : Util.UnixSeparator;
 
+        public const string DoubleQuotes = @"""";
+        public const string EscapedDoubleQuotes = @"\""";
+
         // A better type name (for generic classes)
         public static string ToNiceTypeName(this Type type)
         {
@@ -572,12 +575,22 @@ namespace Sharpmake
             return resultPath;
         }
 
+        public static void ResolvePath(string root, ref IEnumerable<string> paths)
+        {
+            paths = paths.Select(path => ResolvePath(root, path));
+        }
+
+        internal static void ResolvePathAndFixCase(string root, ref IEnumerable<string> paths)
+        {
+            paths = paths.Select(path => ResolvePathAndFixCase(root, path));
+        }
+
         public static void ResolvePath(string root, ref Strings paths)
         {
             List<string> sortedPaths = paths.Values;
             foreach (string path in sortedPaths)
             {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+                string resolvedPath = ResolvePath(root, path);
                 paths.UpdateValue(path, resolvedPath);
             }
         }
@@ -587,8 +600,7 @@ namespace Sharpmake
             List<string> sortedPaths = paths.Values;
             foreach (string path in sortedPaths)
             {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
-                string fixedCase = GetProperFilePathCapitalization(resolvedPath);
+                string fixedCase = ResolvePathAndFixCase(root, path);
                 paths.UpdateValue(path, fixedCase);
             }
         }
@@ -597,16 +609,43 @@ namespace Sharpmake
         {
             for (int i = 0; i < paths.Count; ++i)
             {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(paths[i]));
+                string resolvedPath = ResolvePath(root, paths[i]);
                 i = paths.SetOrRemoveAtIndex(i, resolvedPath);
             }
             paths.Sort();
         }
 
-        public static void ResolvePath(string root, ref String path)
+        internal static void ResolvePathAndFixCase(string root, ref OrderableStrings paths)
         {
-            path = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+            for (int i = 0; i < paths.Count; ++i)
+            {
+                string fixedCase = ResolvePathAndFixCase(root, paths[i]);
+                i = paths.SetOrRemoveAtIndex(i, fixedCase);
+            }
+            paths.Sort();
         }
+
+        public static void ResolvePath(string root, ref string path)
+        {
+            path = ResolvePath(root, path);
+        }
+
+        internal static void ResolvePathAndFixCase(string root, ref string path)
+        {
+            path = ResolvePathAndFixCase(root, path);
+        }
+
+        public static string ResolvePath(string root, string path)
+        {
+            return Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
+        }
+
+        internal static string ResolvePathAndFixCase(string root, string path)
+        {
+            string resolvedPath = ResolvePath(root, path);
+            return GetProperFilePathCapitalization(resolvedPath);
+        }
+
 
         /// <summary>
         /// Gets the absolute path up to the intersection of two specified absolute paths.
@@ -2283,6 +2322,11 @@ namespace Sharpmake
             return modifiedPath;
         }
 
+        public static uint Rotl32(uint x, int r)
+        {
+            return (x << r) | (x >> (32 - r));
+        }
+
         public static Object ReadRegistryValue(string key, string value, Object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
@@ -2395,5 +2439,41 @@ namespace Sharpmake
         // http://www.mono-project.com/docs/faq/technical/#how-can-i-detect-if-am-running-in-mono
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
+
+        public static Platform GetExecutingPlatform() => s_executingPlatform;
+
+        private static readonly Platform s_executingPlatform = DetectExecutingPlatform();
+        private static Platform DetectExecutingPlatform()
+        {
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32Windows:
+                case PlatformID.Win32NT:
+                    return (Environment.Is64BitOperatingSystem) ? Platform.win64 : Platform.win32;
+                case PlatformID.MacOSX:
+                    return Platform.mac;
+                case PlatformID.Unix: // could be mac or linux
+                    {
+                        bool isMacOs = false;
+                        try
+                        {
+                            var p = new System.Diagnostics.Process();
+                            p.StartInfo.UseShellExecute = false;
+                            p.StartInfo.RedirectStandardOutput = true;
+                            p.StartInfo.FileName = "uname";
+                            p.Start();
+                            string output = p.StandardOutput.ReadToEnd().Trim();
+                            p.WaitForExit();
+
+                            isMacOs = string.CompareOrdinal(output, "Darwin") == 0;
+                        }
+                        catch { }
+
+                        return isMacOs ? Platform.mac : Platform.linux;
+                    }
+            }
+            LogWrite("Warning: Couldn't determine running platform");
+            return Platform.win64; // arbitrary
+        }
     }
 }

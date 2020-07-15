@@ -129,6 +129,16 @@ namespace Sharpmake.Application
                 Trace.Write(msg);
         }
 
+        public static void WarningWriteLine(string format, params object[] args)
+        {
+            WarningWriteLine(string.Format(format, args));
+        }
+
+        public static void WarningWriteLine(string msg)
+        {
+            WarningWrite(msg + Environment.NewLine);
+        }
+
         public static void ErrorWrite(string format, params object[] args)
         {
             ErrorWrite(string.Format(format, args));
@@ -144,7 +154,7 @@ namespace Sharpmake.Application
 
         public static void ErrorWriteLine(string format, params object[] args)
         {
-            ErrorWrite(string.Format(format, args));
+            ErrorWriteLine(string.Format(format, args));
         }
 
         public static void ErrorWriteLine(string msg)
@@ -257,6 +267,11 @@ namespace Sharpmake.Application
                     }
                 }
 
+                if (parameters.RegexMatchCacheEnabled)
+                {
+                    GlobalRegexMatchCache.Init(parameters.RegexMatchCacheInitialCapacity);
+                }
+
                 switch (parameters.TestOption)
                 {
                     case TestOptions.Regression:
@@ -317,6 +332,18 @@ namespace Sharpmake.Application
 
                 if (CSproj.AllCsProjSubTypesInfos.Any())
                     Util.SerializeAllCsprojSubTypes(CSproj.AllCsProjSubTypesInfos);
+
+                if (parameters.RegexMatchCacheEnabled)
+                {
+                    int regexMatchCacheInitialCapacity = parameters.RegexMatchCacheInitialCapacity;
+                    int regexMatchCacheSize = GlobalRegexMatchCache.Count;
+                    if (regexMatchCacheInitialCapacity < regexMatchCacheSize)
+                    {
+                        WarningWriteLine("Warning (perf): Consider increasing regex match cache initial capacity from {0} to at least {1} ( /regexMatchCacheInitialCapacity({1}) ).", regexMatchCacheInitialCapacity, regexMatchCacheSize);
+                    }
+
+                    GlobalRegexMatchCache.UnInit();
+                }
             }
             catch (Error e)
             {

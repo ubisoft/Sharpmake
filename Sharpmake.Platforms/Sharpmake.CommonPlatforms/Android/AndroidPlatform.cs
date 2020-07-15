@@ -238,6 +238,9 @@ namespace Sharpmake
                 options["ndkRoot"] = Options.PathOption.Get<Options.Android.General.NdkRoot>(conf, GlobalSettings.NdkRoot ?? RemoveLineTag, context.ProjectDirectoryCapitalized);
 
                 options["applicationTypeRevision"] = Options.StringOption.Get<Options.Android.General.ApplicationTypeRevision>(conf);
+
+                var sdkIncludePaths = GetSdkIncludePaths(context);
+                options["IncludePath"] = sdkIncludePaths.JoinStrings(";");
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -344,12 +347,14 @@ namespace Sharpmake
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp1y, () => { options["CppLanguageStandard"] = "c++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1y"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "c++14"; cmdLineOptions["CppLanguageStandard"] = "-std=c++14"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "c++17"; cmdLineOptions["CppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp1z, () => { options["CppLanguageStandard"] = "c++1z"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1z"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp2a, () => { options["CppLanguageStandard"] = "c++2a"; cmdLineOptions["CppLanguageStandard"] = "-std=c++2a"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp98, () => { options["CppLanguageStandard"] = "gnu++98"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++98"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp11, () => { options["CppLanguageStandard"] = "gnu++11"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++11"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1y, () => { options["CppLanguageStandard"] = "gnu++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1y"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp14, () => { options["CppLanguageStandard"] = "gnu++14"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++14"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp17, () => { options["CppLanguageStandard"] = "gnu++17"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++17"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1z, () => { options["CppLanguageStandard"] = "gnu++1z"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1z"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp2a, () => { options["CppLanguageStandard"] = "gnu++2a"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++2a"; })
                 );
 
@@ -462,6 +467,25 @@ namespace Sharpmake
 
             protected override IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)
             {
+                return base.GetIncludePathsImpl(context);
+            }
+
+            public override IEnumerable<string> GetLibraryPaths(IGenerationContext context)
+            {
+                var dirs = new List<string>();
+                dirs.Add(@"$(StlLibraryPath)");
+                dirs.AddRange(base.GetLibraryPaths(context));
+
+                return dirs;
+            }
+
+            public override bool HasPrecomp(IGenerationContext context)
+            {
+                return !string.IsNullOrEmpty(context.Configuration.PrecompHeader);
+            }
+
+            private Strings GetSdkIncludePaths(IGenerationContext context)
+            {
                 var conf = context.Configuration;
                 var buildTarget = conf.Target.HaveFragment<AndroidBuildTargets>() ? conf.Target.GetFragment<AndroidBuildTargets>() : AndroidBuildTargets.arm64_v8a;
                 string archIncludePath = "";
@@ -484,7 +508,7 @@ namespace Sharpmake
                         throw new System.Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
                 }
 
-                var androidIncludePaths = new List<string>();
+                var androidIncludePaths = new Strings();
 
                 androidIncludePaths.Add(@"$(VS_NdkRoot)\sources\android");
                 androidIncludePaths.Add(@"$(StlIncludeDirectories)");
@@ -494,23 +518,7 @@ namespace Sharpmake
                 androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include");
                 androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include\" + archIncludePath);
 
-                androidIncludePaths.AddRange(base.GetIncludePathsImpl(context));
-
                 return androidIncludePaths;
-            }
-
-            public override IEnumerable<string> GetLibraryPaths(IGenerationContext context)
-            {
-                var dirs = new List<string>();
-                dirs.Add(@"$(StlLibraryPath)");
-                dirs.AddRange(base.GetLibraryPaths(context));
-
-                return dirs;
-            }
-
-            public override bool HasPrecomp(IGenerationContext context)
-            {
-                return !string.IsNullOrEmpty(context.Configuration.PrecompHeader);
             }
 
             #endregion // IPlatformVcxproj implementation

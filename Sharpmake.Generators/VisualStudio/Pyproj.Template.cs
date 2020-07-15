@@ -54,7 +54,7 @@ namespace Sharpmake.Generators.VisualStudio
   <PropertyGroup Condition=""'$(Configuration)' == 'Debug'"" />
   <PropertyGroup>
     <VisualStudioVersion Condition="" '$(VisualStudioVersion)' == '' "">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+    <PtvsTargetsFile>[ptvsTargetsFile]</PtvsTargetsFile>
   </PropertyGroup>
 ";
 
@@ -83,6 +83,10 @@ namespace Sharpmake.Generators.VisualStudio
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X86</Architecture>
     </Interpreter>
+";
+
+                public static string ImportPythonTools =
+@"  <Import Project=""$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets"" />
 ";
 
                 public static string InterpreterReference =

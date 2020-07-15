@@ -34,6 +34,7 @@ namespace Sharpmake
     {
         ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, IEnumerable<IParsingFlowParser> flowParsers, params string[] files);
         ILoadInfo LoadExtension(string file);
+        void AddDefine(string define);
         BuilderCompileErrorBehavior CompileErrorBehavior { get; }
     }
 
@@ -45,6 +46,7 @@ namespace Sharpmake
         void AddSourceAttributeParser(ISourceAttributeParser parser);
         IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files);
         void SetDebugProjectName(string name);
+        void AddDefine(string define);
     }
 
     public interface IAssemblyInfo

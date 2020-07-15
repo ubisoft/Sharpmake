@@ -575,9 +575,7 @@ namespace Sharpmake
                 {
                     if (throwIfNotFound)
                     {
-                        string currentPath = parameterName + _pathSeparator;
-                        if (!string.IsNullOrWhiteSpace(name))
-                            currentPath += name + _pathSeparator;
+                        string currentPath = parameterName + name + _pathSeparator;
 
                         // get all public fields
                         var possibleArguments = parameterType.GetFields().Select(f => currentPath + f.Name);

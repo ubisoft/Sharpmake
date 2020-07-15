@@ -18,8 +18,6 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-
 
 namespace Sharpmake
 {
@@ -45,8 +43,6 @@ namespace Sharpmake
 
         public class DefaultDebugProjectExtension : IDebugProjectExtension
         {
-            private static readonly Regex s_assemblyVersionRegex = new Regex(@"([^\s]+)(?:\s*\((.+)\))?", RegexOptions.Compiled);
-
             public virtual void AddSharpmakePackage(Project.Configuration conf)
             {
                 if (!ShouldUseLocalSharpmakeDll())
@@ -77,24 +73,9 @@ namespace Sharpmake
                 }
             }
 
-            protected bool ShouldUseLocalSharpmakeDll()
+            public virtual bool ShouldUseLocalSharpmakeDll()
             {
-                Assembly sharpmakeAssembly = Assembly.GetExecutingAssembly();
-                string assemblyProductVersion = FileVersionInfo.GetVersionInfo(sharpmakeAssembly.Location).ProductVersion;
-
-                var match = s_assemblyVersionRegex.Match(assemblyProductVersion);
-                if (match == null || match.Groups.Count < 3)
-                    throw new AssemblyVersionException($"Sharpmake assembly version '{assemblyProductVersion}' is not valid.\nFormat should be '1.2.3.4 [(variationName)]'.");
-
-                string assemblyProductVariation = match.Groups[2].Value;
-
-                if (assemblyProductVariation == "LocalBuild")
-                {
-                    // debug solution generated from local build
-                    return true;
-                }
-
-                return false;
+                return true;
             }
         }
 

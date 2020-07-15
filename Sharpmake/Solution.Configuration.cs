@@ -206,6 +206,11 @@ namespace Sharpmake
                 return null;
             }
 
+            public IncludedProjectInfo GetProject<TPROJECTTYPE>()
+            {
+                return GetProject(typeof(TPROJECTTYPE));
+            }
+
             private void AddProjectInternal(Type projectType, ITarget projectTarget, bool inactiveProject, string solutionFolder, string callerInfo)
             {
                 IncludedProjectInfo includedProjectInfo = GetProject(projectType);

@@ -1511,19 +1511,6 @@ namespace Sharpmake
                         "& if %ERRORLEVEL% GEQ 8 (echo Copy failed & exit 1) else (type nul>nul)"
                     );
                 }
-
-                internal override void Resolve(Resolver resolver)
-                {
-                    base.Resolve(resolver);
-
-                    // TODO: that test is very dodgy. Please remove this, and have the user set the property instead, or even create a new BuildStepCopyDir type
-                    int index = DestinationPath.LastIndexOf(@"\", StringComparison.Ordinal);
-                    var destinationFolder = index < 0 ? DestinationPath : DestinationPath.Substring(index);
-                    var destinationIsFolder = !destinationFolder.Contains(".");
-                    bool isFolderCopy = destinationIsFolder || (Util.DirectoryExists(SourcePath) && Util.DirectoryExists(DestinationPath));
-                    if (isFolderCopy)
-                        IsFileCopy = false;
-                }
             }
 
             public abstract class BuildStepBase : IComparable
@@ -2008,6 +1995,23 @@ namespace Sharpmake
             /// Gets or sets whether FASTBuild will be used to build the project.
             /// </summary>
             public bool IsFastBuild = false;
+
+            /// <summary>
+            /// List of the MasterBff files this project appears in.
+            /// This is populated from the solution generator
+            /// </summary>
+            [Resolver.SkipResolveOnMember]
+            public IEnumerable<string> FastBuildMasterBffList { get { return _fastBuildMasterBffList; } }
+
+            internal void AddMasterBff(string masterBff)
+            {
+                lock (_fastBuildMasterBffListLock)
+                    _fastBuildMasterBffList.Add(masterBff + FastBuildSettings.FastBuildConfigFileExtension); // for some reason we don't get the extension...
+            }
+
+            [Resolver.SkipResolveOnMember]
+            private readonly Strings _fastBuildMasterBffList = new Strings();
+            private readonly object _fastBuildMasterBffListLock = new object();
 
             [Obsolete("Sharpmake will determine the projects to build.")]
             public bool IsMainProject = false;
@@ -2626,6 +2630,7 @@ namespace Sharpmake
                 public string LocalDebuggerEnvironment = RemoveLineTag;
                 public string LocalDebuggerWorkingDirectory = RemoveLineTag;
                 public string RemoteDebuggerCommand = RemoveLineTag;
+                public string RemoteDebuggerCommandArguments = RemoveLineTag;
                 public string RemoteDebuggingMode = RemoveLineTag;
                 public string RemoteDebuggerWorkingDirectory = RemoveLineTag;
                 public bool OverwriteExistingFile = true;

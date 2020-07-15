@@ -77,6 +77,11 @@ namespace Sharpmake.UnitTests
             {
                 throw new NotImplementedException();
             }
+
+            public void AddDefine(string define)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [Test]

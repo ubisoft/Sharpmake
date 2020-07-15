@@ -983,11 +983,11 @@ namespace Sharpmake.Generators.VisualStudio
             string targetFrameworkString;
             DevEnv devenv = configurations.Select(
                     conf => ((ITarget)conf.Target).GetFragment<DevEnv>()).Distinct().Single();
-            List< DotNetFramework> projectFrameworks = configurations.Select(
+            List<DotNetFramework> projectFrameworks = configurations.Select(
                     conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
 
-            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore || 
-                                            ( project.ProjectSchema == CSharpProjectSchema.Default &&
+            bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore ||
+                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
                                               (projectFrameworks.Any(x => x.IsDotNetCore()) || projectFrameworks.Count > 1)
                                             );
             if (isNetCoreProjectSchema)
@@ -1032,8 +1032,8 @@ namespace Sharpmake.Generators.VisualStudio
             WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
 
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
-            if(!isNetCoreProjectSchema)
-            { 
+            if (!isNetCoreProjectSchema)
+            {
                 CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
             }
 
@@ -1082,6 +1082,8 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            GeneratedAssemblyConfigTemplate generatedAssemblyConfigTemplate = new GeneratedAssemblyConfigTemplate(project.GeneratedAssemblyConfig, isNetCoreProjectSchema, RemoveLineTag);
+
             using (resolver.NewScopedParameter("project", project))
             using (resolver.NewScopedParameter("guid", projectPropertyGuid))
             using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
@@ -1095,6 +1097,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
+            using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
@@ -2058,7 +2061,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             List<DotNetFramework> projectFrameworks = configurations.Select(
                     conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
-            
+
             bool netCoreProject = project.ProjectSchema == CSharpProjectSchema.NetCore ||
                                            (project.ProjectSchema == CSharpProjectSchema.Default &&
                                              projectFrameworks.Any(x => x.IsDotNetCore())

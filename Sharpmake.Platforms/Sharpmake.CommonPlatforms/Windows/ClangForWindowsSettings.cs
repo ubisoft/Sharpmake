@@ -50,7 +50,7 @@ namespace Sharpmake
 
                 set
                 {
-                    s_llvmInstallDir = value;
+                    s_llvmInstallDir = Util.PathMakeStandard(value);
                     OverridenLLVMInstallDir = true;
                 }
             }

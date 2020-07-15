@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Script arguments:
 # $1: Project/Solution to build
 # $2: Target(Normally should be Debug or Release)
@@ -22,9 +22,7 @@ function BuildSharpmake {
 # fail immediately if anything goes wrong
 set -e
 
-pushd $(dirname $0) > /dev/null
-CURRENT_DIR=$(pwd)
-popd > /dev/null
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 which msbuild > /dev/null
 MSBUILD_FOUND=$?

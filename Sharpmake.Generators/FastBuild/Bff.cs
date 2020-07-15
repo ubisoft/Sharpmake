@@ -136,8 +136,6 @@ namespace Sharpmake.Generators.FastBuild
 
         public static void InitializeBuilder(Builder builder)
         {
-            if (FastBuildSettings.MakeCommandGenerator == null)
-                FastBuildSettings.MakeCommandGenerator = new FastBuildDefaultMakeCommandGenerator();
         }
 
         private static ConcurrentDictionary<DevEnv, string> s_LatestTargetPlatformVersions = new ConcurrentDictionary<DevEnv, string>();
@@ -1330,7 +1328,7 @@ namespace Sharpmake.Generators.FastBuild
             string resolvedInclude = resolver.Resolve(include);
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
                 resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
-            return $@"{prefix}""{resolvedInclude}""";
+            return $"{Util.DoubleQuotes}{prefix}{resolvedInclude}{Util.DoubleQuotes}";
         }
 
         private static void GenerateBffOptions(
@@ -1340,7 +1338,11 @@ namespace Sharpmake.Generators.FastBuild
         )
         {
             // resolve targetPlatformVersion as it may be used in includes
-            string targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
+            string targetPlatformVersionString = "";
+            if (context.Configuration.Compiler.IsVisualStudio())
+            {
+                targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
+            }
 
             var resolverParams = new[] {
                     new VariableAssignment("project", context.Project),
@@ -1375,7 +1377,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (string.IsNullOrWhiteSpace(resourceDefine))
                         continue;
 
-                    fastBuildDefines.Add(string.Format(@"{0}""{1}""", platformDefineSwitch, resourceDefine.Replace(@"""", @"\""")));
+                    fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
                 }
                 context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
             }

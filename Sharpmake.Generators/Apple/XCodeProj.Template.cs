@@ -52,14 +52,11 @@ namespace Sharpmake.Generators.Apple
 				},
 ";
             public static string ProjectTargetAttribute =
-@"					[item.Uid] /* [item.Identifier] */ =
-					{
+@"					[item.Uid] /* [item.Identifier] */ = {
 						DevelopmentTeam = [project.DevelopmentTeam];
 						ProvisioningStyle = [project.ProvisioningStyle];
-						SystemCapabilities =
-						{
-							com.apple.iCloud =
-							{
+						SystemCapabilities = {
+							com.apple.iCloud = {
 								enabled = [project.ICloudSupport];
 							};
 						};
@@ -69,16 +66,14 @@ namespace Sharpmake.Generators.Apple
             public static Dictionary<ItemSection, string> Section = new Dictionary<ItemSection, string>
             {
                 { ItemSection.PBXBuildFile,
-@"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ =
-		{
+@"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
 			isa = PBXBuildFile;
 			fileRef = [item.File.Uid] /* [item.File.Name] */;
 		};
 "               },
 
                 { ItemSection.PBXContainerItemProxy,
-@"		[item.Uid] /* PBXContainerItemProxy */ =
-		{
+@"		[item.Uid] /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = [item.ProjectReference.Uid];
 			proxyType = [item.ProxyType];
@@ -88,8 +83,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXFileReference,
-@"		[item.Uid] /* [item.Name] */ =
-		{
+@"		[item.Uid] /* [item.Name] */ = {
 			isa = PBXFileReference;
 			explicitFileType = [item.ExplicitFileType];
 			lastKnownFileType = [item.FileType];
@@ -101,8 +95,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXFrameworksBuildPhase,
-@"		[item.Uid] /* Frameworks */ =
-		{
+@"		[item.Uid] /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
@@ -112,9 +105,25 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
-                { ItemSection.PBXGroup,
-@"		[item.Uid] /* [item.Identifier] */ =
+                {ItemSection.PBXShellScriptBuildPhase,
+@"		[item.Uid] /* Scripts */ =
 		{
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputFileListPaths = ();
+			inputPaths = ();
+			outputFileListPaths = ();
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ""[item.script]"";
+		};
+"
+                },
+
+                { ItemSection.PBXGroup,
+@"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
 			children = (
 [itemChildren]
@@ -126,15 +135,15 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXNativeTarget,
-@"		[item.Uid] /* [item.Identifier] */ =
-		{
+@"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
-			buildPhases =
-			(
+			buildPhases = (
+				[item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts */,
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
-				[item.SourcesBuildPhase.Uid] /* Sources */,
+				[item.SourceBuildPhaseUID] /* Sources */,
 				[item.FrameworksBuildPhase.Uid] /* Frameworks */,
+				[item.ShellScriptPostBuildPhaseUIDs] /* ShellScripts */,
 			);
 			buildRules = (
 			);
@@ -149,14 +158,29 @@ namespace Sharpmake.Generators.Apple
 		};
 "               },
 
+                { ItemSection.PBXLegacyTarget,
+@"		[item.Uid] /* [item.Identifier] */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = ""[item.BuildArgumentsString]"";
+			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
+			buildPhases = (
+			);
+			buildToolPath = ""[item.BuildToolPath]"";
+			buildWorkingDirectory = ""[item.BuildWorkingDirectory]"";
+			dependencies = (
+			);
+			name = ""[item.Identifier]"";
+			passBuildSettingsInEnvironment = 1;
+			productName = ""[item.Identifier]"";
+			productType = ""[item.ProductType]"";
+		};
+"               },
+
                 { ItemSection.PBXProject,
-@"		[item.Uid] /* Project object */ =
-		{
+@"		[item.Uid] /* Project object */ = {
 			isa = PBXProject;
-			attributes =
-			{
-				TargetAttributes =
-				{
+			attributes = {
+				TargetAttributes = {
 [itemTargetAttributes]
 				};
 			};
@@ -180,19 +204,17 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXReferenceProxy,
-@"		[item.Uid] /* [item.OutputFile.Name] */ =
-		{
+@"		[item.Uid] /* [item.OutputFile.Name] */ = {
 			isa = PBXReferenceProxy;
 			fileType = [item.FileType];
-			path = [item.OutputFile.Name];
+			path = [item.OutputFile.FileName];
 			remoteRef = [item.Proxy.Uid] /* [item.Proxy.Identifier] */;
 			sourceTree = [item.SourceTree];
 		};
 "               },
 
                 { ItemSection.PBXResourcesBuildPhase,
-@"		[item.Uid] /* Resources */ =
-		{
+@"		[item.Uid] /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
@@ -219,8 +241,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXTargetDependency,
-@"		[item.Uid] /* PBXTargetDependency */ =
-		{
+@"		[item.Uid] /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = [item.ProjectReference.Name];
 			targetProxy = [item.Proxy.Uid];
@@ -229,20 +250,20 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.XCBuildConfiguration_NativeTarget,
-@"		[item.Uid] /* [item.Optimization] */ =
-		{
+@"		[item.Uid] /* Native Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
-			buildSettings =
-			{
-				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
+			buildSettings = {
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
+				SYMROOT = ""[item.Options.BuildDirectory]"";
+				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
+				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
-				CONFIGURATION_BUILD_DIR = ""[item.Configuration.TargetPath]"";
-				FRAMEWORK_SEARCH_PATHS = (
-[item.Options.FrameworkPaths]
-				);
+				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
+				ENABLE_BITCODE = [item.Options.EnableBitcode];
+				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
+				FRAMEWORK_SEARCH_PATHS = [item.Options.FrameworkPaths];
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
 				MACH_O_TYPE = ""[item.Options.MachOType]"";
 				COPY_PHASE_STRIP = [item.Options.StripDebugSymbolsDuringCopy];
@@ -258,29 +279,45 @@ namespace Sharpmake.Generators.Apple
 				GCC_MODEL_TUNING = [item.Options.ModelTuning];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
 				CODE_SIGN_ENTITLEMENTS = ""[item.Options.CodeSignEntitlements]"";
-				INSTALL_PATH = ""[item.NativeTarget.ProductInstallPath]"";
+				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
+				OBJROOT = ""[item.Configuration.IntermediatePath]"";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
 				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
 				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
 				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
+				STRIP_INSTALLED_PRODUCT = [item.Options.StripLinkedProduct];
+				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
+				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
+				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
+				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = [item.Options.SpecificSimulatorLibraryPaths];
 			};
-			name = [item.Optimization];
+			name = [item.Options.TargetName];
+		};
+"               },
+
+                { ItemSection.XCBuildConfiguration_LegacyTarget,
+@"		[item.Uid] /* Legacy Target - [item.Optimization] */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				MACH_O_TYPE = ""[item.Options.MachOType]"";
+				FASTBUILD_TARGET = ""[item.Options.FastBuildTarget]"";
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = [item.Options.TargetName];
 		};
 "               },
 
                 { ItemSection.XCBuildConfiguration_UnitTestTarget,
-@"		[item.Uid] /* [item.Optimization] */ =
-		{
+@"		[item.Uid] /* UnitTest Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
-			buildSettings =
-			{
-				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
+			buildSettings = {
 				BUNDLE_LOADER = ""[testHost]"";
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
-				CONFIGURATION_BUILD_DIR = ""[item.Configuration.TargetPath]"";
+				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
+				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = (
 [item.Options.FrameworkPaths]
 				);
@@ -292,75 +329,70 @@ namespace Sharpmake.Generators.Apple
 				TEST_HOST = ""[testHost]"";
 				WRAPPER_EXTENSION = xctest;
 			};
-			name = [item.Optimization];
+			name = [item.Options.TargetName];
 		};
 "               },
 
                 { ItemSection.XCBuildConfiguration_Project,
-@"		[item.Uid] /* [item.Optimization] */ =
-		{
+@"		[item.Uid] /* Project - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
-			buildSettings =
-			{
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = [item.Options.AlwaysSearchUserPaths];
 				ARCHS = [item.Options.Archs];
-				SYMROOT = ""[item.Configuration.TargetPath]"";
-				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
-				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
+                ASSETCATALOG_COMPILER_APPICON_NAME = [item.Options.AssetCatalogCompilerAppIconName];
+                CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = [item.Options.ClangAnalyzerLocalizabilityNonlocalized];
 				CLANG_CXX_LANGUAGE_STANDARD = ""[item.Options.CppStandard]"";
 				CLANG_CXX_LIBRARY = ""[item.Options.LibraryStandard]"";
 				CLANG_ENABLE_OBJC_ARC = [item.Options.AutomaticReferenceCounting];
+                CLANG_ENABLE_OBJC_WEAK = [item.Options.ObjCWeakReferences];
+                CLANG_ENABLE_MODULES = [item.Options.ClangEnableModules];
+                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = [item.Options.WarningBlockCaptureAutoReleasing];
 				CLANG_WARN_BOOL_CONVERSION = [item.Options.WarningBooleanConversion];
+                CLANG_WARN_COMMA = [item.Options.WarningComma];
 				CLANG_WARN_CONSTANT_CONVERSION = [item.Options.WarningConstantConversion];
+                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = [item.Options.WarningDeprecatedObjCImplementations];
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = [item.Options.WarningDirectIsaUsage];
 				CLANG_WARN_EMPTY_BODY = [item.Options.WarningEmptyBody];
 				CLANG_WARN_ENUM_CONVERSION = [item.Options.WarningEnumConversion];
+                CLANG_WARN_INFINITE_RECURSION = [item.Options.WarningInfiniteRecursion];
 				CLANG_WARN_INT_CONVERSION = [item.Options.WarningIntConversion];
+                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = [item.Options.WarningNonLiteralNullConversion];
+                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = [item.Options.WarningObjCImplicitRetainSelf];
+                CLANG_WARN_OBJC_LITERAL_CONVERSION = [item.Options.WarningObjCLiteralConversion];
 				CLANG_WARN_OBJC_ROOT_CLASS = [item.Options.WarningRootClass];
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = [item.Options.WarningDuplicateMethodMatch];
+                CLANG_WARN_RANGE_LOOP_ANALYSIS = [item.Options.WarningRangeLoopAnalysis];
+                CLANG_WARN_STRICT_PROTOTYPES = [item.Options.WarningStrictPrototypes];
+                CLANG_WARN_SUSPICIOUS_MOVE = [item.Options.WarningSuspiciousMove];
+                CLANG_WARN_UNREACHABLE_CODE = [item.Options.WarningUnreachableCode];
+                ENABLE_STRICT_OBJC_MSGSEND = [item.Options.StrictObjCMsgSend];
+                ENABLE_TESTABILITY = [item.Options.Testability];
+				EXECUTABLE_PREFIX = [item.Options.ExecutablePrefix];
 				GCC_C_LANGUAGE_STANDARD = ""[item.Options.CStandard]"";
+                GCC_NO_COMMON_BLOCKS = [item.Options.GccNoCommonBlocks];
 				GCC_PRECOMPILE_PREFIX_HEADER = [item.Options.UsePrecompiledHeader];
 				GCC_PREFIX_HEADER = ""[item.Options.PrecompiledHeader]"";
 				GCC_OPTIMIZATION_LEVEL = [item.Options.OptimizationLevel];
-				GCC_PREPROCESSOR_DEFINITIONS = (
-[item.Options.PreprocessorDefinitions]
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = [item.Options.PreprocessorDefinitions];
 				GCC_WARN_64_TO_32_BIT_CONVERSION = [item.Options.Warning64To32BitConversion];
 				GCC_WARN_ABOUT_RETURN_TYPE = [item.Options.WarningReturnType];
 				GCC_WARN_UNDECLARED_SELECTOR = [item.Options.WarningUndeclaredSelector];
-
 				GCC_WARN_UNINITIALIZED_AUTOS = [item.Options.WarningUniniatializedAutos];
 				GCC_WARN_UNUSED_FUNCTION = [item.Options.WarningUnusedFunction];
 				GCC_WARN_UNUSED_VARIABLE = [item.Options.WarningUnusedVariable];
 				GCC_TREAT_WARNINGS_AS_ERRORS = [item.Options.TreatWarningsAsErrors];
-				HEADER_SEARCH_PATHS = (
-[item.Options.IncludePaths]
-				);
-				LIBRARY_SEARCH_PATHS = ( [item.Options.RemoveLibraryPaths]
-[item.Options.LibraryPaths]
-				); [item.Options.RemoveLibraryPaths]
-				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = ( [item.Options.RemoveSpecificDeviceLibraryPaths]
-[item.Options.SpecificDeviceLibraryPaths]
-				); [item.Options.RemoveSpecificDeviceLibraryPaths]
-				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = ( [item.Options.RemoveSpecificSimulatorLibraryPaths]
-[item.Options.SpecificSimulatorLibraryPaths]
-				); [item.Options.RemoveSpecificSimulatorLibraryPaths]
-				OBJROOT = ""[item.Configuration.IntermediatePath]"";
 				SDKROOT = ""[item.Options.SDKRoot]"";
 				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
-				OTHER_CPLUSPLUSFLAGS = (
-[item.Options.CompilerOptions]
-				);
-				OTHER_LDFLAGS = (
-[item.Options.LinkerOptions]
-				);
+                ONLY_ACTIVE_ARCH = [item.Options.OnlyActiveArch];
+				OTHER_CPLUSPLUSFLAGS = [item.Options.CompilerOptions];
+				OTHER_LDFLAGS = [item.Options.LinkerOptions];
 			};
-			name = [item.Optimization];
+			name = [item.Options.TargetName];
 		};
 "               },
 
                 { ItemSection.XCConfigurationList,
-@"		[item.Uid] /* Build configuration list for [item.ConfigurationType] ""[item.RelatedItem.Identifier]"" */ =
-		{
+@"		[item.Uid] /* Build configuration list for [item.ConfigurationType] ""[item.RelatedItem.Identifier]"" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 [itemChildren]
@@ -410,21 +442,22 @@ namespace Sharpmake.Generators.Apple
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      buildConfiguration = ""[optimization]""
       selectedDebuggerIdentifier = ""Xcode.DebuggerFoundation.Debugger.LLDB""
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
-      shouldUseLaunchSchemeArgsEnv = ""YES""
-      buildConfiguration = ""Debug"">
+      shouldUseLaunchSchemeArgsEnv = ""YES"">
       <Testables>[testableElements]
       </Testables>
    </TestAction>
    <LaunchAction
+      buildConfiguration = ""[optimization]""
       selectedDebuggerIdentifier = ""Xcode.DebuggerFoundation.Debugger.LLDB""
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
       launchStyle = ""0""
       useCustomWorkingDirectory = ""NO""
-      buildConfiguration = ""Debug""
       ignoresPersistentStateOnLaunch = ""NO""
       debugDocumentVersioning = ""YES""
+      enableGPUFrameCaptureMode = ""[options.EnableGpuFrameCaptureMode]""
       allowLocationSimulation = ""YES"">
       <BuildableProductRunnable>
           <BuildableReference
@@ -439,17 +472,17 @@ namespace Sharpmake.Generators.Apple
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
+      buildConfiguration = ""[optimization]""
       shouldUseLaunchSchemeArgsEnv = ""YES""
       savedToolIdentifier = """"
       useCustomWorkingDirectory = ""NO""
-      buildConfiguration = ""Debug""
       debugDocumentVersioning = ""YES"">
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = ""Debug"">
+      buildConfiguration = ""[optimization]"">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = ""Debug""
+      buildConfiguration = ""[optimization]""
       revealArchiveInOrganizer = ""YES"">
    </ArchiveAction>
 </Scheme>

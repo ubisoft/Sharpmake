@@ -222,7 +222,7 @@ namespace Sharpmake
             s_netFxToolsDir.TryAdd(dotNetFramework, netFxToolsDir);
             return netFxToolsDir;
         }
-        
+
         public static bool IsWindowsTargetPlatformVersionInstalled(Options.Vc.General.WindowsTargetPlatformVersion version)
         {
             bool isInstalled = false;

@@ -45,7 +45,7 @@ namespace Sharpmake.Generators.Apple
         private string Generate(Solution solution, List<Solution.Configuration> configurations, string solutionPath, string solutionFile, out bool updated)
         {
             // Create the target folder (solutions and projects are folders in XCode).
-            string solutionFolder = Util.GetCapitalizedPath(Util.GetCapitalizedPath(solutionPath + Path.DirectorySeparatorChar + solutionFile + SolutionExtension));
+            string solutionFolder = Util.GetCapitalizedPath(solutionPath + Path.DirectorySeparatorChar + solutionFile + SolutionExtension);
             Directory.CreateDirectory(solutionFolder);
 
             // Main solution file.

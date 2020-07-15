@@ -28,12 +28,12 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64_0_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -42,9 +42,9 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64_0_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
-            + ' /D"_DEBUG"'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
+            + ' /D_DEBUG'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -105,12 +105,12 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -119,9 +119,9 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
-            + ' /D"_DEBUG"'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
+            + ' /D_DEBUG'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -190,10 +190,10 @@ Executable( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -259,12 +259,12 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64_0_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -273,9 +273,9 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64_0_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"NDEBUG"'
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
+            + ' /DNDEBUG'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -337,12 +337,12 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -351,9 +351,9 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"NDEBUG"'
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
+            + ' /DNDEBUG'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -423,10 +423,10 @@ Executable( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -492,12 +492,12 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2017_win64_0_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -506,9 +506,9 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2017_win64_0_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
-            + ' /D"_DEBUG"'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
+            + ' /D_DEBUG'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -569,12 +569,12 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2017_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -583,9 +583,9 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
-            + ' /D"_DEBUG"'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
+            + ' /D_DEBUG'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -654,10 +654,10 @@ Executable( 'MixCppAndCExe_Debug_FastBuild_vs2017_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -723,12 +723,12 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2017_win64_0_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -737,9 +737,9 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2017_win64_0_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"NDEBUG"'
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
+            + ' /DNDEBUG'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -801,12 +801,12 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2017_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' "/IC:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' "/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -815,9 +815,9 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /D"NDEBUG"'
-            + ' /D"WIN64"'
-            + ' /D"_CONSOLE"'
+            + ' /DNDEBUG'
+            + ' /DWIN64'
+            + ' /D_CONSOLE'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -887,10 +887,10 @@ Executable( 'MixCppAndCExe_Release_FastBuild_vs2017_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'

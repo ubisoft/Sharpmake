@@ -91,7 +91,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public const string AntPackage =
 @"    <AntPackage>
       <WorkingDirectory>[androidPackageDirectory]</WorkingDirectory>
-      <AndroidAppLibName>[options.OutputFile]</AndroidAppLibName>
+      <AndroidAppLibName>[options.AndroidAppLibName]</AndroidAppLibName>
     </AntPackage>
 ";
 

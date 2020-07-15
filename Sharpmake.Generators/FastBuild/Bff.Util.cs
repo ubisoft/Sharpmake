@@ -246,8 +246,8 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        // This makefile command generator is for supporting legacy code without any client code change.
-        internal class FastBuildDefaultMakeCommandGenerator : FastBuildMakeCommandGenerator
+        // This NMake command generator is for supporting legacy code without any client code change.
+        internal class FastBuildDefaultNMakeCommandGenerator : FastBuildMakeCommandGenerator
         {
             public override string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
             {

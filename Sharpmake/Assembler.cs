@@ -373,6 +373,11 @@ namespace Sharpmake
             {
                 _assemblyInfo.DebugProjectName = name;
             }
+
+            public void AddDefine(string define)
+            {
+                _builderContext.AddDefine(define);
+            }
         }
 
         private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)

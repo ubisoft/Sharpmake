@@ -112,6 +112,7 @@ namespace Sharpmake.Generators
                     case DevEnv.xcode4ios:
                         {
                             XCodeProjectGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
+                            BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
                     default:
@@ -132,6 +133,10 @@ namespace Sharpmake.Generators
             if (configurations[0].Platform == Platform.ios || configurations[0].Platform == Platform.mac)
             {
                 XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                if (UtilityMethods.HasFastBuildConfig(configurations))
+                {
+                    MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                }
             }
             else
             {

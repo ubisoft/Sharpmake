@@ -107,6 +107,8 @@ namespace Sharpmake.Generators.VisualStudio
             }
             public IReadOnlyDictionary<Platform, IPlatformVcxproj> PresentPlatforms { get; }
 
+            public FastBuildMakeCommandGenerator FastBuildMakeCommandGenerator { get; }
+
             public GenerationContext(Builder builder, string projectPath, Project project, IEnumerable<Project.Configuration> projectConfigurations)
             {
                 Builder = builder;
@@ -124,6 +126,8 @@ namespace Sharpmake.Generators.VisualStudio
                 DevelopmentEnvironmentsRange = new DevEnvRange(ProjectConfigurations);
 
                 PresentPlatforms = ProjectConfigurations.Select(conf => conf.Platform).Distinct().ToDictionary(p => p, p => PlatformRegistry.Get<IPlatformVcxproj>(p));
+
+                FastBuildMakeCommandGenerator = FastBuildSettings.MakeCommandGenerator ?? new Bff.FastBuildDefaultNMakeCommandGenerator();
             }
 
             public void Reset()
@@ -400,12 +404,14 @@ namespace Sharpmake.Generators.VisualStudio
             string vcTargetsPath = "$(VCTargetsPath)";
             if (WriteVcOverrides(context, fileGenerator))
             {
-                string vcRootPathKey;
-                string vcTargetsPathKey;
-                // we use the targets path from the most recent devenv supported in this vcxproj,
-                // since it will know how to redirect to older toolsets
-                context.DevelopmentEnvironmentsRange.MaxDevEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
-                vcTargetsPath = $"$({vcTargetsPathKey})";
+                // Disabling this, since it prevents opening old projects in recent visual studio versions
+                // TODO: find a way to make it work
+                //string vcRootPathKey;
+                //string vcTargetsPathKey;
+                //// we use the targets path from the most recent devenv supported in this vcxproj,
+                //// since it will know how to redirect to older toolsets
+                //context.DevelopmentEnvironmentsRange.MaxDevEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
+                //vcTargetsPath = $"$({vcTargetsPathKey})";
             }
 
             var vcTargetsPathScopeVar = fileGenerator.Declare("vcTargetsPath", vcTargetsPath);
@@ -542,8 +548,8 @@ namespace Sharpmake.Generators.VisualStudio
                         commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
 
                         using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
-                        using (fileGenerator.Declare("fastBuildMakeCommandBuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
-                        using (fileGenerator.Declare("fastBuildMakeCommandRebuild", FastBuildSettings.MakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
+                        using (fileGenerator.Declare("fastBuildMakeCommandBuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
+                        using (fileGenerator.Declare("fastBuildMakeCommandRebuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
                         {
                             platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                         }

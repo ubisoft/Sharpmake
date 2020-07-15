@@ -583,6 +583,25 @@ namespace Sharpmake.Generators.FastBuild
                     throw new Error("Multiple conflicting resource compilers found in PATH! Please verify your ResourceCompiler settings.");
             }
 
+            var allDevEnv = masterBffInfo.CompilerSettings.Values.Select(s => s.DevEnv).Distinct().ToList();
+
+            string envRemoveGuards = FileGeneratorUtilities.RemoveLineTag;
+            string fastBuildEnvironments = string.Empty;
+            if (allDevEnv.Contains(DevEnv.xcode4ios))
+            {
+                // we'll keep the #if guards if we have other devenv in the file
+                if (allDevEnv.Count > 1)
+                {
+                    envRemoveGuards = string.Empty;
+                    fastBuildEnvironments += Bff.Template.ConfigurationFile.WinEnvironment;
+                }
+                fastBuildEnvironments += Bff.Template.ConfigurationFile.OsxEnvironment;
+            }
+            else
+            {
+                fastBuildEnvironments += Bff.Template.ConfigurationFile.WinEnvironment;
+            }
+
             using (masterBffGenerator.Declare("fastBuildProjectName", "Master"))
             using (masterBffGenerator.Declare("CachePath", cachePath))
             using (masterBffGenerator.Declare("CachePluginDLL", cachePluginDLL))
@@ -590,6 +609,8 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
             using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))
             using (masterBffGenerator.Declare("fastBuildAllowDBMigration", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
+            using (masterBffGenerator.Declare("fastBuildEnvironments", fastBuildEnvironments))
+            using (masterBffGenerator.Declare("envRemoveGuards", envRemoveGuards))
             {
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.GlobalSettings);

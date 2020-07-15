@@ -350,16 +350,26 @@ namespace Sharpmake
 
         public T GetFragment<T>()
         {
+            T value;
+            if (TryGetFragment(out value))
+                return value;
+            throw new Exception("cannot find fragment value of type " + typeof(T).FullName + " in object " + GetType().FullName);
+        }
+
+        public bool TryGetFragment<T>(out T value)
+        {
             FieldInfo[] fragments = GetType().GetFields();
             var tType = typeof(T);
             foreach (FieldInfo fragment in fragments)
             {
                 if (tType.IsAssignableFrom(fragment.FieldType))
                 {
-                    return (T)fragment.GetValue(this);
+                    value = (T)fragment.GetValue(this);
+                    return true;
                 }
             }
-            throw new Exception("cannot find fragment value of type " + tType.FullName + " in object " + GetType().FullName);
+            value = default(T);
+            return false;
         }
 
         public void SetFragment<T>(T value)

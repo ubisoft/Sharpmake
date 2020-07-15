@@ -101,6 +101,15 @@ namespace Sharpmake.Generators.VisualStudio
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
     <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <GenerateAssemblyInfo>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInfo]</GenerateAssemblyInfo>
+    <GenerateAssemblyConfigurationAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyConfigurationAttribute]</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyDescriptionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyDescriptionAttribute]</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyProductAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyProductAttribute]</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyTitleAttribute]</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyCompanyAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyCompanyAttribute]</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyFileVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyFileVersionAttribute]</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyVersionAttribute]</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInformationalVersionAttribute]</GenerateAssemblyInformationalVersionAttribute>
     <RestoreProjectStyle>[NugetRestoreProjectStyleString]</RestoreProjectStyle>
   </PropertyGroup>
 ";

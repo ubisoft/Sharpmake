@@ -61,6 +61,16 @@ namespace Sharpmake.Generators.FastBuild
 //=================================================================================================================
 Settings
 {
+[fastBuildEnvironments]
+    [CachePluginDLL]
+    [CachePath]
+    [WorkerConnectionLimit]
+    .AllowDBMigration_Experimental = [fastBuildAllowDBMigration]
+}
+";
+
+                public const string WinEnvironment =
+@"#if __WINDOWS__[envRemoveGuards]
     #import TMP
     #import TEMP
     #import USERPROFILE
@@ -72,13 +82,20 @@ Settings
         ""SystemRoot=[fastBuildSystemRoot]""
         ""PATH=[fastBuildPATH]""
     }
-
-    [CachePluginDLL]
-    [CachePath]
-    [WorkerConnectionLimit]
-    .AllowDBMigration_Experimental = [fastBuildAllowDBMigration]
-}
+#endif[envRemoveGuards]
 ";
+
+                public const string OsxEnvironment =
+@"#if __OSX__[envRemoveGuards]
+    #import TMPDIR
+    .Environment =
+    {
+        ""TMPDIR=$TMPDIR$"",
+        ""PATH=[fastBuildPATH]""
+    }
+#endif[envRemoveGuards]
+";
+
                 public static string MasmConfigNameSuffix = "Masm";
                 public static string Win64ConfigName = ".win64Config";
 
