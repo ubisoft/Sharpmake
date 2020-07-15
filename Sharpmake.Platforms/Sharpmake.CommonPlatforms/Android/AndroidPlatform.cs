@@ -354,6 +354,7 @@ namespace Sharpmake
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1y, () => { options["CppLanguageStandard"] = "gnu++1y"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1y"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp14, () => { options["CppLanguageStandard"] = "gnu++14"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++14"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp17, () => { options["CppLanguageStandard"] = "gnu++17"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++17"; }),
+                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1z, () => { options["CppLanguageStandard"] = "gnu++1z"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1z"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp2a, () => { options["CppLanguageStandard"] = "gnu++2a"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++2a"; })
                 );
 
