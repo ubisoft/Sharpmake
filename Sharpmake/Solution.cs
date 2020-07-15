@@ -41,6 +41,13 @@ namespace Sharpmake
         public string SharpmakeCsPath { get; private set; }                 // Path of the CsFileName, ex: "c:\dev\MyProject"
 
         // FastBuild specific
+
+        /// <summary>
+        /// Allow to multi-thread the build of the executables when doing a Build Solution (Ctrl+Shift+B).
+        /// However, it will not be possible to build each executable individually.
+        /// </summary>
+        public bool GenerateFastBuildAllProject = true;
+
         public string FastBuildAllProjectName = "[solution.Name]_All";
         public string FastBuildAllProjectFileSuffix = "_All"; // the fastbuild all project will be named after the solution, but the suffix can be custom. Warning: this cannot be empty!
 
@@ -394,18 +401,21 @@ namespace Sharpmake
                                 throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
                         }
 
-                        // If we're finding a fastbuild dependency of an MSBuild project, we know that it'll need re-linking
-                        bool depBuild = !dependencyConfiguration.IsExcludedFromBuild
-                            && !projectIsInactive
-                            && !configurationProjectDependency.InactiveProject
-                            && !(dependencyConfiguration.IsFastBuild && !configurationProject.Configuration.IsFastBuild);
-
-                        if (depBuild && solutionConfiguration.IncludeOnlyFilterProject && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive))
-                            depBuild = false;
-
                         if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
                         {
-                            if (depBuild)
+                            // If we're finding a Fastbuild dependency of an MSBuild project, we know that it'll need re-linking if the All project is generated.
+                            var needsFastbuildRelink = (dependencyConfiguration.IsFastBuild && !configurationProject.Configuration.IsFastBuild && GenerateFastBuildAllProject);
+
+                            var isExcludedSinceNoFilter = solutionConfiguration.IncludeOnlyFilterProject
+                                                      && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive);
+
+                            var skipBuild = dependencyConfiguration.IsExcludedFromBuild
+                                         || projectIsInactive
+                                         || configurationProjectDependency.InactiveProject
+                                         || needsFastbuildRelink
+                                         || isExcludedSinceNoFilter;
+
+                            if (!skipBuild)
                             {
                                 if (projectConfiguration.Output == Project.Configuration.OutputType.Dll || projectConfiguration.Output == Project.Configuration.OutputType.Exe)
                                     configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
@@ -497,6 +507,11 @@ namespace Sharpmake
 
         private void MakeFastBuildAllProjectIfNeeded(Builder builder, Dictionary<Solution.Configuration, List<Project.Configuration>> unlinkedConfigurations)
         {
+            if (!GenerateFastBuildAllProject)
+            {
+                return;
+            }
+
             foreach (var solutionFile in SolutionFilesMapping)
             {
                 var solutionConfigurations = solutionFile.Value;

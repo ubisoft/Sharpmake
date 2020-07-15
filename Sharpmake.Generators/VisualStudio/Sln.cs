@@ -665,7 +665,7 @@ namespace Sharpmake.Generators.VisualStudio
                 var solutionConfiguration = fb.Key;
                 if (fb.Value.Count == 0)
                     Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has no FastBuild projects to build.");
-                else if (fb.Value.Count > 1)
+                else if (solution.GenerateFastBuildAllProject && fb.Value.Count > 1)
                     Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({string.Join(";", fb.Value)}).");
             }
 

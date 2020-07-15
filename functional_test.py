@@ -10,6 +10,7 @@ import sys
 if os.name != "nt":
     import select
 
+
 class FunctionalTest:
     def __init__(self, directory, script_name, project_root = ""):
         self.directory = directory
@@ -66,6 +67,8 @@ class FunctionalTest:
 
 
 class FastBuildFunctionalTest(FunctionalTest):
+    def __init__(self):
+        super(FastBuildFunctionalTest, self).__init__("FastBuildFunctionalTest", "FastBuildFunctionalTest.sharpmake.cs")
 
     def verifyCustomBuildEventsInTargetDir(self, targetDir):
         #verify copied files exist
@@ -104,27 +107,40 @@ class FastBuildFunctionalTest(FunctionalTest):
         return 0
 
     def build(self, projectDir):
-        entry_path = os.getcwd()
-        fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", "FBuild.exe");
-        if not os.path.isfile(fastBuildPath):
-            return -1
-
-        cmd_line = fastBuildPath + " All-Configs -monitor -nosummaryonerror -clean -config " + self.directory + ".bff"
-        working_dir = os.path.join(projectDir, self.directory, "projects")
-
-        os.chdir(working_dir)
-        write_line(cmd_line)
-        write_line("Working dir: " + working_dir)
-        build_result = os.system(cmd_line)
-
+        build_result = build_with_fastbuild(projectDir, self.directory)
         if build_result != 0:
             return build_result
 
         return self.verifyCustomBuildEvents(projectDir)
 
+
+class NoAllFastBuildProjectFunctionalTest(FunctionalTest):
+    def __init__(self):
+        super(NoAllFastBuildProjectFunctionalTest, self).__init__("NoAllFastBuildProjectFunctionalTest", "NoAllFastBuildProjectFunctionalTest.sharpmake.cs")
+
+    def build(self, projectDir):
+        return build_with_fastbuild(projectDir, self.directory)
+
+
 funcTests = [
-    FastBuildFunctionalTest("FastBuildFunctionalTest", "FastBuildFunctionalTest.sharpmake.cs")
+    FastBuildFunctionalTest(),
+    NoAllFastBuildProjectFunctionalTest()
 ]
+
+
+def build_with_fastbuild(root_dir, test_dir):
+    entry_path = os.getcwd()
+    fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", "FBuild.exe");
+    if not os.path.isfile(fastBuildPath):
+        return -1
+
+    cmd_line = fastBuildPath + " All-Configs -monitor -nosummaryonerror -clean -config " + test_dir + ".bff"
+    working_dir = os.path.join(root_dir, test_dir, "projects")
+
+    os.chdir(working_dir)
+    write_line(cmd_line)
+    write_line("Working dir: " + working_dir)
+    return os.system(cmd_line)
 
 def find_target_path(directory, target):
     optim_tokens = ["debug", "release"]
