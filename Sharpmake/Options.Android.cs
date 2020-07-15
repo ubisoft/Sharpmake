@@ -183,6 +183,7 @@ namespace Sharpmake
                     GNU_Cpp1y,
                     GNU_Cpp14,
                     GNU_Cpp17,
+                    GNU_Cpp1z,
                     GNU_Cpp2a
                 }
 
