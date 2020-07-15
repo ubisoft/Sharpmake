@@ -85,8 +85,8 @@ namespace Sharpmake.Generators.Apple
         private Dictionary<string, ProjectResourcesBuildPhase> _resourcesBuildPhases = null;
         private Dictionary<string, ProjectSourcesBuildPhase> _sourcesBuildPhases = null;
         private Dictionary<string, ProjectFrameworksBuildPhase> _frameworksBuildPhases = null;
-        private Dictionary<string, List<ProjectShellScriptBuildPhase>> _shellScriptPreBuildPhases = null;
-        private Dictionary<string, List<ProjectShellScriptBuildPhase>> _shellScriptPostBuildPhases = null;
+        private Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>> _shellScriptPreBuildPhases = null;
+        private Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>> _shellScriptPostBuildPhases = null;
         private Dictionary<string, List<ProjectTargetDependency>> _targetDependencies = null;
 
         private Dictionary<ProjectFolder, ProjectReference> _projectReferencesGroups = null;
@@ -302,8 +302,8 @@ namespace Sharpmake.Generators.Apple
             _sourcesBuildPhases = new Dictionary<string, ProjectSourcesBuildPhase>();
             _resourcesBuildPhases = new Dictionary<string, ProjectResourcesBuildPhase>();
             _frameworksBuildPhases = new Dictionary<string, ProjectFrameworksBuildPhase>();
-            _shellScriptPreBuildPhases = new Dictionary<string, List<ProjectShellScriptBuildPhase>>();
-            _shellScriptPostBuildPhases = new Dictionary<string, List<ProjectShellScriptBuildPhase>>();
+            _shellScriptPreBuildPhases = new Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>>();
+            _shellScriptPostBuildPhases = new Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>>();
 
             //Loop on each targets
             foreach (var projectTarget in projectTargetsList)
@@ -546,7 +546,7 @@ namespace Sharpmake.Generators.Apple
             return configsPerTarget;
         }
 
-        private void RegisterScriptBuildPhase(string xCodeTargetName, Dictionary<string, List<ProjectShellScriptBuildPhase>> shellScriptPhases, IEnumerator<string> eventsInConf)
+        private void RegisterScriptBuildPhase(string xCodeTargetName, Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>> shellScriptPhases, IEnumerator<string> eventsInConf)
         {
             while (eventsInConf.MoveNext())
             {
@@ -558,7 +558,7 @@ namespace Sharpmake.Generators.Apple
                 _projectItems.Add(shellScriptBuildPhase);
                 if (!shellScriptPhases.ContainsKey(xCodeTargetName))
                 {
-                    shellScriptPhases.Add(xCodeTargetName, new List<ProjectShellScriptBuildPhase>() { shellScriptBuildPhase });
+                    shellScriptPhases.Add(xCodeTargetName, new UniqueList<ProjectShellScriptBuildPhase>(new ProjectShellScriptBuildPhase.EqualityComparer()) { shellScriptBuildPhase });
                 }
                 else
                 {
@@ -1511,6 +1511,19 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectShellScriptBuildPhase : ProjectBuildPhase
         {
+            public class EqualityComparer : IEqualityComparer<ProjectShellScriptBuildPhase>
+            {
+                public bool Equals(ProjectShellScriptBuildPhase x, ProjectShellScriptBuildPhase y)
+                {
+                    return x.script == y.script;
+                }
+
+                public int GetHashCode(ProjectShellScriptBuildPhase obj)
+                {
+                    return obj.script.GetHashCode();
+                }
+            }
+
             public String script;
 
             public ProjectShellScriptBuildPhase(uint buildActionMask)
@@ -1645,8 +1658,8 @@ namespace Sharpmake.Generators.Apple
             public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
             public String SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
-            public List<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
-            public List<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
+            public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
+            public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
             public String ShellScriptPreBuildPhaseUIDs
             {
                 get
