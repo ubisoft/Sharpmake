@@ -43,9 +43,9 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
-            + ' /D_DEBUG'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/D_DEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -197,9 +197,9 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2017_win64_objects' 
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DNDEBUG'
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/DNDEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -352,9 +352,9 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
-            + ' /D_DEBUG'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/D_DEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -506,9 +506,9 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2017_win64_objects' )
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DNDEBUG'
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/DNDEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'

@@ -81,6 +81,50 @@ namespace Sharpmake
 
         public bool AddLibPrefix(Configuration conf) => true;
 
+        public virtual void SelectPreprocessorDefinitionsBff(IBffGenerationContext context)
+        {
+            var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
+            string platformDefineSwitch = platformDescriptor.IsUsingClang ? "-D" : "/D";
+
+            // concat defines, don't add options.Defines since they are automatically added by VS
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            if (defines.Count > 0)
+            {
+                var fastBuildDefines = new List<string>();
+
+                foreach (string define in defines)
+                {
+                    if (!string.IsNullOrWhiteSpace(define))
+                        fastBuildDefines.Add(string.Concat(platformDefineSwitch, define));
+                }
+                context.CommandLineOptions["PreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["PreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            Strings resourceDefines = Options.GetStrings<Options.Vc.ResourceCompiler.PreprocessorDefinitions>(context.Configuration);
+            if (resourceDefines.Any())
+            {
+                var fastBuildDefines = new List<string>();
+
+                foreach (string resourceDefine in resourceDefines)
+                {
+                    if (!string.IsNullOrWhiteSpace(resourceDefine))
+                        fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
+                }
+                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+        }
+
         [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf", error: true)]
         public void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
         {
@@ -883,6 +927,11 @@ namespace Sharpmake
 
         public void SelectBuildType(IGenerationContext context)
         {
+        }
+
+        public virtual void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
+        {
+            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public bool HasPrecomp(IGenerationContext context)

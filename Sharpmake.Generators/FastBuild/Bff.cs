@@ -25,7 +25,7 @@ namespace Sharpmake.Generators.FastBuild
 {
     public partial class Bff : IProjectGenerator
     {
-        private class BffGenerationContext : IGenerationContext
+        private class BffGenerationContext : IBffGenerationContext
         {
             private Resolver _envVarResolver;
 
@@ -34,6 +34,8 @@ namespace Sharpmake.Generators.FastBuild
             public Project Project { get; }
 
             public Project.Configuration Configuration { get; set; }
+
+            public IReadOnlyList<Project.Configuration> ProjectConfigurations { get; }
 
             public string ProjectDirectory { get; }
 
@@ -62,13 +64,17 @@ namespace Sharpmake.Generators.FastBuild
                 }
             }
 
-            public BffGenerationContext(Builder builder, Project project, string projectDir)
+            public IReadOnlyDictionary<Platform, IPlatformBff> PresentPlatforms { get; }
+
+            public BffGenerationContext(Builder builder, Project project, string projectDir, IEnumerable<Project.Configuration> projectConfigurations)
             {
                 Builder = builder;
                 Project = project;
                 ProjectDirectory = projectDir;
                 ProjectDirectoryCapitalized = Util.GetCapitalizedPath(projectDir);
                 ProjectSourceCapitalized = Util.GetCapitalizedPath(project.SourceRootPath);
+                ProjectConfigurations = projectConfigurations as IReadOnlyList<Project.Configuration>;
+                PresentPlatforms = ProjectConfigurations.Select(conf => conf.Platform).Distinct().ToDictionary(p => p, PlatformRegistry.Get<IPlatformBff>);
             }
 
             public void SelectOption(params Options.OptionAction[] options)
@@ -196,7 +202,7 @@ namespace Sharpmake.Generators.FastBuild
             Project.Configuration firstConf = configurations.First();
             string projectName = firstConf.ProjectName;
             string projectPath = new FileInfo(projectFile).Directory.FullName;
-            var context = new BffGenerationContext(builder, project, projectPath);
+            var context = new BffGenerationContext(builder, project, projectPath, configurations);
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
             string fastBuildClrSupport = Util.IsDotNet(firstConf) ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
@@ -1344,6 +1350,8 @@ namespace Sharpmake.Generators.FastBuild
                 targetPlatformVersionString = GetLatestTargetPlatformVersion(context.Configuration.Compiler);
             }
 
+            var platformBff = context.PresentPlatforms[context.Configuration.Platform];
+
             var resolverParams = new[] {
                     new VariableAssignment("project", context.Project),
                     new VariableAssignment("target", context.Configuration.Target),
@@ -1353,8 +1361,7 @@ namespace Sharpmake.Generators.FastBuild
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
             context.EnvironmentVariableResolver = platformDescriptor.GetPlatformEnvironmentResolver(resolverParams);
             projectOptionsGen.GenerateOptions(context);
-
-            GenerateResourceCompilerOptions(context, platformDescriptor);
+            platformBff.SelectPreprocessorDefinitionsBff(context);
 
             FillIncludeDirectoriesOptions(context);
 
@@ -1362,29 +1369,6 @@ namespace Sharpmake.Generators.FastBuild
 
             OrderableStrings additionalDependencies = FillLibrariesOptions(context);
             additionalDependenciesPerConf.Add(context.Configuration, additionalDependencies);
-        }
-
-        private static void GenerateResourceCompilerOptions(BffGenerationContext context, IPlatformDescriptor platformDescriptor)
-        {
-            Strings resourceDefines = Options.GetStrings<Options.Vc.ResourceCompiler.PreprocessorDefinitions>(context.Configuration);
-            if (resourceDefines.Any())
-            {
-                var fastBuildDefines = new List<string>();
-                string platformDefineSwitch = platformDescriptor.IsUsingClang ? "-D" : "/D";
-
-                foreach (string resourceDefine in resourceDefines)
-                {
-                    if (string.IsNullOrWhiteSpace(resourceDefine))
-                        continue;
-
-                    fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
-                }
-                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
-            }
-            else
-            {
-                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
-            }
         }
 
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)

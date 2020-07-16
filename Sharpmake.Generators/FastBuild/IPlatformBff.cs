@@ -60,6 +60,8 @@ namespace Sharpmake.Generators.FastBuild
         /// <returns>`true` if a prefix is required, `false` otherwise.</returns>
         bool AddLibPrefix(Configuration conf);
 
+        void SelectPreprocessorDefinitionsBff(IBffGenerationContext context);
+
         /// <summary>
         /// Setups extra linker settings for linking with that platform.
         /// </summary>

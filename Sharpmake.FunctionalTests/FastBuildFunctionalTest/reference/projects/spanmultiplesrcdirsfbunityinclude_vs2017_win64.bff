@@ -52,9 +52,9 @@ ObjectList( 'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2017_win64_obje
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
-            + ' /D_DEBUG'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/D_DEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -205,9 +205,9 @@ ObjectList( 'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2017_win64_ob
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DNDEBUG'
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/DNDEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'

@@ -103,7 +103,7 @@ del "output\debug_fastbuild_noblob_vs2017\useprecompexe.ilk" >NUL 2>NUL
 del "output\debug_fastbuild_noblob_vs2017\useprecompexe.lib" >NUL 2>NUL
 del "output\debug_fastbuild_noblob_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2017\useprecompexe.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2017|x64'">
@@ -124,7 +124,7 @@ del "output\debug_fastbuild_vs2017\useprecompexe.ilk" >NUL 2>NUL
 del "output\debug_fastbuild_vs2017\useprecompexe.lib" >NUL 2>NUL
 del "output\debug_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2017\useprecompexe.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2017|x64'">
@@ -156,7 +156,7 @@ del "output\release_fastbuild_noblob_vs2017\useprecompexe.ilk" >NUL 2>NUL
 del "output\release_fastbuild_noblob_vs2017\useprecompexe.lib" >NUL 2>NUL
 del "output\release_fastbuild_noblob_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2017\useprecompexe.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2017|x64'">
@@ -177,7 +177,7 @@ del "output\release_fastbuild_vs2017\useprecompexe.ilk" >NUL 2>NUL
 del "output\release_fastbuild_vs2017\useprecompexe.lib" >NUL 2>NUL
 del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2017\useprecompexe.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2017|x64'">
@@ -196,7 +196,7 @@ del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -281,7 +281,7 @@ del "output\release_fastbuild_vs2017\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
