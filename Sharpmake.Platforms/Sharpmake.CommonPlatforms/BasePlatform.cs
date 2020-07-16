@@ -66,6 +66,49 @@ namespace Sharpmake
             return false;
         }
 
+        public virtual void SelectPreprocessorDefinitionsBff(IBffGenerationContext context)
+        {
+            var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
+            string platformDefineSwitch = platformDescriptor.IsUsingClang ? "-D" : "/D";
+
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            if (defines.Count > 0)
+            {
+                var fastBuildDefines = new List<string>();
+
+                foreach (string define in defines)
+                {
+                    if (!string.IsNullOrWhiteSpace(define))
+                        fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                }
+                context.CommandLineOptions["PreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["PreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            Strings resourceDefines = Options.GetStrings<Options.Vc.ResourceCompiler.PreprocessorDefinitions>(context.Configuration);
+            if (resourceDefines.Any())
+            {
+                var fastBuildDefines = new List<string>();
+
+                foreach (string resourceDefine in resourceDefines)
+                {
+                    if (!string.IsNullOrWhiteSpace(resourceDefine))
+                        fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, resourceDefine.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                }
+                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["ResourcePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+        }
+
         [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf")]
         public virtual void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
         {
@@ -199,6 +242,16 @@ namespace Sharpmake
 
         public virtual void SelectBuildType(IGenerationContext context)
         {
+        }
+
+        public virtual void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
+        {
+            // concat defines, don't add options.Defines since they are automatically added by VS
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
         }
 
         public virtual bool HasPrecomp(IGenerationContext context)

@@ -11,7 +11,7 @@ if os.name != "nt":
     import select
 
 
-class FunctionalTest:
+class FunctionalTest(object):
     def __init__(self, directory, script_name, project_root = ""):
         self.directory = directory
         self.script_name = script_name

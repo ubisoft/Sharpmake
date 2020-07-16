@@ -302,6 +302,8 @@ namespace SharpmakeGen.FunctionalTests
 
             conf.PrecompSourceExclude.Add("noprecomp_util.cpp");
             conf.PrecompSourceExcludeExtension.Add(".ceepeepee");
+
+            conf.Defines.Add("SOME_UTILITY_STRING=\"UTIL FUNC\"");
         }
     }
 

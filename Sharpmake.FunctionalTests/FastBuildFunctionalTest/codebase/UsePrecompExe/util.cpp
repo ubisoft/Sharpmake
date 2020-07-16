@@ -9,5 +9,5 @@
 
 void Util::StaticUtilityMethod()
 {
-    printf("%s\n", __func__);
+    printf(SOME_UTILITY_STRING " => %s\n", __func__);
 }

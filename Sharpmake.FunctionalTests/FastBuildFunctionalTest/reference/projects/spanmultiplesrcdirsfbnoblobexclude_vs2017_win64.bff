@@ -34,9 +34,9 @@ ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2017_wi
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
-            + ' /D_DEBUG'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/D_DEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'
@@ -198,9 +198,9 @@ ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2017_
             // + ' /MP'
             // Preprocessor options
             // ---------------------------
-            + ' /DNDEBUG'
-            + ' /DWIN64'
-            + ' /D_CONSOLE'
+            + ' "/D_CONSOLE"'
+            + ' "/DWIN64"'
+            + ' "/DNDEBUG"'
             // Code Generation options
             // ---------------------------
             + ' /GF'

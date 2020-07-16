@@ -68,6 +68,7 @@
     <Compile Include="FastBuild\Bff.Template.cs" />
     <Compile Include="FastBuild\Bff.Util.cs" />
     <Compile Include="FastBuild\Bff.cs" />
+    <Compile Include="FastBuild\IBffGenerationContext.cs" />
     <Compile Include="FastBuild\IClangPlatformBff.cs" />
     <Compile Include="FastBuild\IMicrosoftPlatformBff.cs" />
     <Compile Include="FastBuild\IPlatformBff.cs" />

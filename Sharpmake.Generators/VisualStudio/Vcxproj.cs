@@ -327,6 +327,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
 
                 projectOptionsGen.GenerateOptions(context);
+                platformVcxproj.SelectPreprocessorDefinitionsVcxproj(context);
                 FillIncludeDirectoriesOptions(context);
                 FillLibrariesOptions(context);
 

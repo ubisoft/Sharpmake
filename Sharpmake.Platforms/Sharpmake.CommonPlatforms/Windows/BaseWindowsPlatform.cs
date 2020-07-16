@@ -124,7 +124,7 @@ namespace Sharpmake
                 {
                     systemIncludes.Sort();
                     if (context.Options["IncludePath"] == FileGeneratorUtilities.RemoveLineTag)
-                        context.Options["IncludePath"] = systemIncludes.JoinStrings(";");
+                        context.Options["IncludePath"] = "$(VC_IncludePath);$(WindowsSDK_IncludePath);" + systemIncludes.JoinStrings(";");
                     else
                         context.Options["IncludePath"] += ";" + systemIncludes.JoinStrings(";");
                 }
