@@ -95,7 +95,7 @@ namespace Sharpmake
             {
                 var fastBuildDefines = new List<string>();
 
-                foreach (string define in defines)
+                foreach (string define in defines.SortedValues)
                 {
                     if (!string.IsNullOrWhiteSpace(define))
                         fastBuildDefines.Add(string.Concat(platformDefineSwitch, define));
@@ -112,7 +112,7 @@ namespace Sharpmake
             {
                 var fastBuildDefines = new List<string>();
 
-                foreach (string resourceDefine in resourceDefines)
+                foreach (string resourceDefine in resourceDefines.SortedValues)
                 {
                     if (!string.IsNullOrWhiteSpace(resourceDefine))
                         fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
