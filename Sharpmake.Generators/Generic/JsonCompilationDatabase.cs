@@ -141,7 +141,6 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
         private static readonly string[] s_multilineArgumentKeys = new[] {
             "AdditionalLibraryDirectories",
-            "PreprocessorDefinitions",
             "ManifestInputs"
         };
 
@@ -229,16 +228,17 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
                 .Where(IsValidOption)
                 .ToDictionary(kvp => kvp.Key, FlattenMultilineArgument);
 
+            var platformDefineSwitch = isClang ? "-D" : "/D";
             if (isMicrosoft)
             {
                 // Required to avoid errors in VC headers.
-                var flag = isClang ? "-D" : "/D";
                 var value = validOptions.ContainsKey("ExceptionHandling") ? 1 : 0;
-                _arguments.Add($"{flag}_HAS_EXCEPTIONS={value}");
+                _arguments.Add($"{platformDefineSwitch}_HAS_EXCEPTIONS={value}");
             }
 
             _arguments.AddRange(validOptions.Values.SelectMany(x => x));
 
+            SelectPreprocessorDefinitions(context, platformDefineSwitch);
             FillIncludeDirectoriesOptions(context);
         }
 
@@ -255,6 +255,19 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
                 resolvedInclude = Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true);
             return $@"{prefix}""{resolvedInclude}""";
+        }
+
+        private void SelectPreprocessorDefinitions(CompileCommandGenerationContext context, string platformDefineSwitch)
+        {
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            foreach (string define in defines.SortedValues)
+            {
+                if (!string.IsNullOrWhiteSpace(define))
+                    _arguments.Add(string.Format(@"{0}{1}{2}{1}", platformDefineSwitch, Util.DoubleQuotes, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+            }
         }
 
         private void FillIncludeDirectoriesOptions(CompileCommandGenerationContext context)
