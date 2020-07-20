@@ -1334,7 +1334,7 @@ namespace Sharpmake.Generators.FastBuild
             string resolvedInclude = resolver.Resolve(include);
             if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
                 resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
-            return $"{Util.DoubleQuotes}{prefix}{resolvedInclude}{Util.DoubleQuotes}";
+            return $@"{prefix}{Util.DoubleQuotes}{resolvedInclude}{Util.DoubleQuotes}";
         }
 
         private static void GenerateBffOptions(
@@ -1385,7 +1385,7 @@ namespace Sharpmake.Generators.FastBuild
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
             if (context.EnvironmentVariableResolver != null)
             {
-                string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I" : "/I";
+                string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I " : "/I";
 
                 // Fill include dirs
                 var dirs = new List<string>();
@@ -1528,7 +1528,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (!PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
                         linkOption = @"/LIBPATH:";
                     else
-                        linkOption = @"-L";
+                        linkOption = @"-L ";
 
                     var cmdAdditionalLibDirectories = libDirs.Select(p => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, linkOption));
 

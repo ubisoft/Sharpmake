@@ -79,10 +79,10 @@ namespace Sharpmake
             {
                 var fastBuildDefines = new List<string>();
 
-                foreach (string define in defines)
+                foreach (string define in defines.SortedValues)
                 {
                     if (!string.IsNullOrWhiteSpace(define))
-                        fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                        fastBuildDefines.Add(string.Format(@"{0}{1}{2}{1}", platformDefineSwitch, Util.DoubleQuotes, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
                 }
                 context.CommandLineOptions["PreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildDefines);
             }
@@ -96,7 +96,7 @@ namespace Sharpmake
             {
                 var fastBuildDefines = new List<string>();
 
-                foreach (string resourceDefine in resourceDefines)
+                foreach (string resourceDefine in resourceDefines.SortedValues)
                 {
                     if (!string.IsNullOrWhiteSpace(resourceDefine))
                         fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, resourceDefine.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));

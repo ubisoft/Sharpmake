@@ -340,7 +340,7 @@ namespace Sharpmake.Generators.Apple
                 foreach (var conf in targetConfigurations)
                 {
                     if (!conf.IsFastBuild)
-                        PrepareSourceFiles(xCodeTargetName, projectFiles, project, conf, workspacePath);
+                        PrepareSourceFiles(xCodeTargetName, projectFiles.Where(file => { return !project.ResourceFiles.Contains(file); }), project, conf, workspacePath);
                     PrepareResourceFiles(xCodeTargetName, project.ResourceFiles, project, conf);
                     PrepareExternalResourceFiles(xCodeTargetName, project, conf);
 
@@ -606,7 +606,7 @@ namespace Sharpmake.Generators.Apple
             return true;
         }
 
-        private void PrepareSourceFiles(string xCodeTargetName, Strings sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
+        private void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
         {
             foreach (string file in sourceFiles)
             {
@@ -643,9 +643,9 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private void PrepareResourceFiles(string xCodeTargetName, Strings sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
+        private void PrepareResourceFiles(string xCodeTargetName, IEnumerable<string> resourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
         {
-            foreach (string file in sourceFiles)
+            foreach (string file in resourceFiles)
             {
                 bool alreadyPresent;
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath);
