@@ -28,15 +28,23 @@ namespace Sharpmake.Generators.Apple
             public static string ProjectReference = "\t<FileRef\n\t\tlocation = \"group:[projectName].xcodeproj\">\n\t</FileRef>\n";
 
             public static string ProjectReferenceAbsolute =
-@"   <FileRef
-      location = ""absolute:[projectPath]"">
-   </FileRef>
+@"[indent]    <FileRef
+[indent]        location = ""absolute:[projectPath]"">
+[indent]    </FileRef>
 ";
 
             public static string ProjectReferenceRelative =
-@"   <FileRef
-      location = ""group:[projectName].xcodeproj"">
-   </FileRef>
+@"[indent]    <FileRef
+[indent]        location = ""group:[projectName].xcodeproj"">
+[indent]    </FileRef>
+";
+            public static string GroupBegin =
+@"[indent]    <Group
+[indent]        location = ""container:""
+[indent]        name = ""[folderName]"">
+";
+            public static string GroupEnd =
+@"[indent]    </Group>
 ";
         }
     }
