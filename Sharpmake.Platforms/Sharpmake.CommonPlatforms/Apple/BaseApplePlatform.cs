@@ -423,7 +423,6 @@ namespace Sharpmake
 
             options["ExcludedSourceFileNames"] = XCodeUtil.XCodeFormatList(conf.ResolvedSourceFilesBuildExclude, 4);
             options["SpecificLibraryPaths"] = FileGeneratorUtilities.RemoveLineTag;
-            options["TargetedDeviceFamily"] = "1,2";
             options["BuildDirectory"] = (conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath;
 
             SelectPrecompiledHeaderOptions(context);
@@ -682,12 +681,11 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.SkipInstall.Enable, () => options["SkipInstall"] = "YES")
             );
 
-            Options.XCode.Compiler.TargetedDeviceFamily targetedDeviceFamily = Options.GetObject<Options.XCode.Compiler.TargetedDeviceFamily>(conf);
-            if (targetedDeviceFamily != null)
-                options["TargetedDeviceFamily"] = targetedDeviceFamily.Value;
-            else
-                options["TargetedDeviceFamily"] = FileGeneratorUtilities.RemoveLineTag;
-
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad, () => options["TargetedDeviceFamily"] = "1,2"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ios, () => options["TargetedDeviceFamily"] = "1"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2")
+            );
 
             Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);
             if (validArchs != null)
