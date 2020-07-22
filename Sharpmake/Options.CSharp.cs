@@ -331,6 +331,11 @@ namespace Sharpmake
                 public CopyVsixExtensionLocation(string location) : base(location) { }
             }
 
+            public class ProductVersion : StringOption
+            {
+                public ProductVersion(string versionString) : base(versionString) { }
+            }
+
             public enum MapFileExtensions
             {
                 Enabled,
