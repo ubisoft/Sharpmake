@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("0.15.0.0")]
+[assembly: AssemblyVersion("0.15.0.*")]
 #pragma warning disable CS7035
-[assembly: AssemblyFileVersion("0.15.0.0 (LocalBuild)")]
+[assembly: AssemblyFileVersion("0.15.0.* (LocalBuild)")]
 #pragma warning restore
 
 [assembly: InternalsVisibleTo("Sharpmake.Application")]
