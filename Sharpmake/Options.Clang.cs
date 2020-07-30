@@ -53,9 +53,28 @@ namespace Sharpmake
                     Cpp11,
                     Cpp14,
                     Cpp17,
+                    Cpp2a,
                     GnuCpp98,
                     GnuCpp11,
-                    GnuCpp14
+                    GnuCpp14,
+                    GnuCpp17,
+                    GnuCpp2a
+                }
+
+                public enum CLanguageStandard
+                {
+                    [Default]
+                    Default,
+                    C89,
+                    C90,
+                    C99,
+                    C11,
+                    C17,
+                    GnuC89,
+                    GnuC90,
+                    GnuC99,
+                    GnuC11,
+                    GnuC17,
                 }
 
                 public enum Exceptions
