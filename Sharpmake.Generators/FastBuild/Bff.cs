@@ -704,6 +704,7 @@ namespace Sharpmake.Generators.FastBuild
                                         fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
                                         break;
                                     case Options.Vc.General.PlatformToolset.LLVM:
+                                    case Options.Vc.General.PlatformToolset.ClangCL:
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->
                                         // TODO: figure out what version number to put there
                                         // maybe use the DevEnv value

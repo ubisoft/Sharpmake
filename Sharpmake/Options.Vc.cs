@@ -51,6 +51,8 @@ namespace Sharpmake
                     LLVM_vs2014, // LLVM from Visual Studio 2015
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     LLVM, // LLVM from Visual Studio 2017
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    ClangCL, // LLVM as of Visual Studio 2019 official extension
                 }
 
                 public enum WindowsTargetPlatformVersion

@@ -706,6 +706,7 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                 case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.ClangCL:
                 case Options.Vc.General.PlatformToolset.Default:
                     return false;
                 default:
@@ -738,6 +739,7 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                 case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.ClangCL:
                     return null;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(platformToolset), platformToolset, null);
@@ -780,6 +782,7 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                 case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.ClangCL:
                     return true;
             }
             return false;
