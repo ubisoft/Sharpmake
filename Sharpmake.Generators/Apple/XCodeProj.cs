@@ -75,8 +75,6 @@ namespace Sharpmake.Generators.Apple
 
         private readonly HashSet<ProjectItem> _projectItems = new HashSet<ProjectItem>();
 
-        //Source files that are potentially removable. Need to check if they are excluded from build in all configs.
-        private HashSet<ProjectFileSystemItem> _removableItems = new HashSet<ProjectFileSystemItem>();
         private ProjectFolder _mainGroup = null;
         private ProjectFolder _productsGroup = null;
         private ProjectFolder _frameworksFolder = null;
@@ -485,15 +483,6 @@ namespace Sharpmake.Generators.Apple
                 }
             }
 
-            foreach (ProjectFileSystemItem item in _removableItems)
-            {
-                // Excluded from build in all configs: remove them from the solution.
-                if (IsBuildExcludedForAllConfigurations(configurations, item.Path))
-                {
-                    RemoveFromFileSystem(item);
-                }
-            }
-
             HashSet<ProjectBuildConfiguration> configurationsForProject = new HashSet<ProjectBuildConfiguration>();
             ProjectConfigurationList configurationListForProject = new ProjectConfigurationList(configurationsForProject, "configurationListForProject");
             _projectItems.Add(configurationListForProject);
@@ -626,10 +615,6 @@ namespace Sharpmake.Generators.Apple
                         ProjectBuildFile buildFileItem = new ProjectBuildFile(fileItem);
                         _projectItems.Add(buildFileItem);
                         _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
-                    }
-                    else
-                    {
-                        _removableItems.Add(item);
                     }
                 }
                 else
