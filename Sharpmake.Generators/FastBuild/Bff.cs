@@ -612,7 +612,7 @@ namespace Sharpmake.Generators.FastBuild
                         if (isCompileAsCFile)
                         {
                             fastBuildUsingPlatformConfig = platformBff.CConfigName(conf);
-                            // Do not take cpp Language conformance into account while compiling in C
+                            // Do not take Cpp Language conformance into account while compiling in C
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
                             if (clangPlatformBff != null)
@@ -621,6 +621,10 @@ namespace Sharpmake.Generators.FastBuild
                         }
                         else
                         {
+                            // Do not take C Language conformance into account while compiling in Cpp
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+
                             fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
                         }
