@@ -164,7 +164,7 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_
 
 
 //=================================================================================================================
-Copy( 'Copy_34B0F9F5' )
+Copy( 'Copy_21E34A2D' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
@@ -173,7 +173,7 @@ Copy( 'Copy_34B0F9F5' )
 
 
 //=================================================================================================================
-Copy( 'Copy_37392535' )
+Copy( 'Copy_BC977AE9' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
@@ -182,7 +182,7 @@ Copy( 'Copy_37392535' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_6CD6B730' )
+CopyDir( 'Copy_2784F0C2' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
     .SourcePathsPattern                 = '*.*'
@@ -190,8 +190,8 @@ CopyDir( 'Copy_6CD6B730' )
     .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\file_copy_destination\'
     .PreBuildDependencies               = {
                                               'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                                              'Copy_34B0F9F5',
-                                              'Copy_37392535'
+                                              'Copy_21E34A2D',
+                                              'Copy_BC977AE9'
                                           }
 }
 
@@ -200,9 +200,9 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Copy_34B0F9F5',
-                   'Copy_37392535',
-                   'Copy_6CD6B730'
+                   'Copy_21E34A2D',
+                   'Copy_BC977AE9',
+                   'Copy_2784F0C2'
                }
 }
 
@@ -353,7 +353,7 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win6
 
 
 //=================================================================================================================
-Copy( 'Copy_F7CA1E35' )
+Copy( 'Copy_2DCB92CD' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
@@ -362,7 +362,7 @@ Copy( 'Copy_F7CA1E35' )
 
 
 //=================================================================================================================
-Copy( 'Copy_3974D935' )
+Copy( 'Copy_3BAA3409' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
@@ -371,7 +371,7 @@ Copy( 'Copy_3974D935' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_F357A4F0' )
+CopyDir( 'Copy_6007A422' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
     .SourcePathsPattern                 = '*.*'
@@ -379,8 +379,8 @@ CopyDir( 'Copy_F357A4F0' )
     .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\file_copy_destination\'
     .PreBuildDependencies               = {
                                               'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                                              'Copy_F7CA1E35',
-                                              'Copy_3974D935'
+                                              'Copy_2DCB92CD',
+                                              'Copy_3BAA3409'
                                           }
 }
 
@@ -389,9 +389,9 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Copy_F7CA1E35',
-                   'Copy_3974D935',
-                   'Copy_F357A4F0'
+                   'Copy_2DCB92CD',
+                   'Copy_3BAA3409',
+                   'Copy_6007A422'
                }
 }
 
@@ -541,7 +541,7 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executa
 
 
 //=================================================================================================================
-Copy( 'Copy_F58CCBF1' )
+Copy( 'Copy_82284415' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
@@ -550,7 +550,7 @@ Copy( 'Copy_F58CCBF1' )
 
 
 //=================================================================================================================
-Copy( 'Copy_AEAC65AD' )
+Copy( 'Copy_60A01E55' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
@@ -559,7 +559,7 @@ Copy( 'Copy_AEAC65AD' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_05629562' )
+CopyDir( 'Copy_4F4A088A' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
     .SourcePathsPattern                 = '*.*'
@@ -567,8 +567,8 @@ CopyDir( 'Copy_05629562' )
     .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\file_copy_destination\'
     .PreBuildDependencies               = {
                                               'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable',
-                                              'Copy_F58CCBF1',
-                                              'Copy_AEAC65AD'
+                                              'Copy_82284415',
+                                              'Copy_60A01E55'
                                           }
 }
 
@@ -577,9 +577,9 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable',
-                   'Copy_F58CCBF1',
-                   'Copy_AEAC65AD',
-                   'Copy_05629562'
+                   'Copy_82284415',
+                   'Copy_60A01E55',
+                   'Copy_4F4A088A'
                }
 }
 
@@ -730,7 +730,7 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Execu
 
 
 //=================================================================================================================
-Copy( 'Copy_9FDD2DF1' )
+Copy( 'Copy_B2476EF5' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
@@ -739,7 +739,7 @@ Copy( 'Copy_9FDD2DF1' )
 
 
 //=================================================================================================================
-Copy( 'Copy_E2FFF7AD' )
+Copy( 'Copy_FE930175' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
@@ -748,7 +748,7 @@ Copy( 'Copy_E2FFF7AD' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_DBD7CA22' )
+CopyDir( 'Copy_4AFE99AA' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
     .SourcePathsPattern                 = '*.*'
@@ -756,8 +756,8 @@ CopyDir( 'Copy_DBD7CA22' )
     .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\file_copy_destination\'
     .PreBuildDependencies               = {
                                               'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable',
-                                              'Copy_9FDD2DF1',
-                                              'Copy_E2FFF7AD'
+                                              'Copy_B2476EF5',
+                                              'Copy_FE930175'
                                           }
 }
 
@@ -766,9 +766,9 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable',
-                   'Copy_9FDD2DF1',
-                   'Copy_E2FFF7AD',
-                   'Copy_DBD7CA22'
+                   'Copy_B2476EF5',
+                   'Copy_FE930175',
+                   'Copy_4AFE99AA'
                }
 }
 

@@ -164,7 +164,7 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable
 
 
 //=================================================================================================================
-CopyDir( 'Copy_81994E31' )
+CopyDir( 'Copy_95F387B3' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -178,7 +178,7 @@ Alias( 'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Copy_81994E31'
+                   'Copy_95F387B3'
                }
 }
 
@@ -329,7 +329,7 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2017_win64_Executab
 
 
 //=================================================================================================================
-CopyDir( 'Copy_35B00B11' )
+CopyDir( 'Copy_54B15627' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -343,7 +343,7 @@ Alias( 'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Copy_35B00B11'
+                   'Copy_54B15627'
                }
 }
 
@@ -493,7 +493,7 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_BE1FED98' )
+CopyDir( 'Copy_CF70E156' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -507,7 +507,7 @@ Alias( 'PostBuildCopyDirTest_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Debug_FastBuild_vs2017_win64_Executable',
-                   'Copy_BE1FED98'
+                   'Copy_CF70E156'
                }
 }
 
@@ -658,7 +658,7 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_78B11962' )
+CopyDir( 'Copy_C20D120C' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -672,7 +672,7 @@ Alias( 'PostBuildCopyDirTest_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Release_FastBuild_vs2017_win64_Executable',
-                   'Copy_78B11962'
+                   'Copy_C20D120C'
                }
 }
 

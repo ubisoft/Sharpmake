@@ -339,19 +339,21 @@ namespace SharpmakeGen.FunctionalTests
         {
             base.ConfigureAll(conf, target);
 
-            string tempGeneratedPath = @"[project.SharpmakeCsPath]\projects\generated";
-            string generatedHeaderFile = Path.Combine(tempGeneratedPath, "header_generated_by_prebuild_step.h");
+            string generatedHeaderFilename = "header_generated_by_prebuild_step.h";
+            string relativeGeneratedHeaderFilePath = Path.Combine("generated", generatedHeaderFilename);
+            string absoluteGeneratedHeaderPath = Path.Combine("[conf.ProjectPath]", "generated");
+            string absoluteGeneratedHeaderFilePath = Path.Combine(absoluteGeneratedHeaderPath, generatedHeaderFilename);
 
             // Create a PreBuild step that creates a header file that is required for compilation
             var preBuildStep = new Configuration.BuildStepExecutable(
                 @"[project.SourceRootPath]\execute.bat",
                 @"[project.SourceRootPath]\main.cpp",
-                generatedHeaderFile,
-                "echo #define PREBUILD_GENERATED_DEFINE() 0 > " + generatedHeaderFile);
+                absoluteGeneratedHeaderFilePath,
+                "echo #define PREBUILD_GENERATED_DEFINE() 0 > " + relativeGeneratedHeaderFilePath);
 
             conf.EventCustomPrebuildExecute.Add("GenerateHeader", preBuildStep);
 
-            conf.IncludePrivatePaths.Add(tempGeneratedPath);
+            conf.IncludePrivatePaths.Add(absoluteGeneratedHeaderPath);
         }
     }
 

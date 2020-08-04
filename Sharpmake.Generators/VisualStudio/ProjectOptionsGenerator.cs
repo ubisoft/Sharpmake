@@ -1990,7 +1990,7 @@ namespace Sharpmake.Generators.VisualStudio
             );
         }
 
-        public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)
+        public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep, string projectRootPath, string projectPath)
         {
             if (!eventBuildStep.IsResolved)
                 throw new Error("Event hasn't been resolved!");
@@ -2002,11 +2002,12 @@ namespace Sharpmake.Generators.VisualStudio
             if (eventBuildStep is Project.Configuration.BuildStepExecutable)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepExecutable;
+                string normalizedConfTargetPath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, conf.TargetPath);
                 string execName;
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    execName = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
+                    execName = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (normalizedConfTargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
                 }
                 else
                 {
@@ -2019,15 +2020,17 @@ namespace Sharpmake.Generators.VisualStudio
             else if (eventBuildStep is Project.Configuration.BuildStepCopy)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepCopy;
+                string sourcePath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, cEvent.SourcePath);
+                string destinationPath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, cEvent.DestinationPath);
                 string copyName;
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    copyName = "Copy_" + (conf.TargetFileFullName + cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (conf.TargetFileFullName + sourcePath + destinationPath).GetHashCode().ToString("X8");
                 }
                 else
                 {
-                    copyName = "Copy_" + (cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (sourcePath + destinationPath).GetHashCode().ToString("X8");
                 }
 
                 return copyName;
@@ -2035,16 +2038,17 @@ namespace Sharpmake.Generators.VisualStudio
             else if (eventBuildStep is Project.Configuration.BuildStepTest)
             {
                 var tEvent = eventBuildStep as Project.Configuration.BuildStepTest;
+                string normalizedConfTargetPath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, conf.TargetPath);
                 string testName;
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
+                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (tEvent.TestArguments + normalizedConfTargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
                 }
                 else
                 {
                     testName = "Test_" + extractName(tEvent.TestExecutable);
-                    testName += "_" + (testName).GetHashCode().ToString("X8");
+                    testName += "_" + (testName + tEvent.TestArguments).GetHashCode().ToString("X8");
                 }
 
                 return testName;

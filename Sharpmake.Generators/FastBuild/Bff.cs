@@ -522,10 +522,10 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 // the pre-steps are written in the master bff, we only need to refer their aliases
                                 preBuildTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
-                                preBuildTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
+                                preBuildTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild, project.RootPath, projectPath)));
 
                                 preBuildTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
-                                preBuildTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
+                                preBuildTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction, project.RootPath, projectPath)));
                             }
 
                             fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
@@ -557,7 +557,7 @@ namespace Sharpmake.Generators.FastBuild
                                 var extraPlatformEvents = platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; });
                                 foreach (var buildEvent in extraPlatformEvents.Concat(conf.ResolvedEventPostBuildExe))
                                 {
-                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild);
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild, project.RootPath, projectPath);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, buildEvent);
                                 }
@@ -570,14 +570,14 @@ namespace Sharpmake.Generators.FastBuild
 
                                 foreach (var buildEvent in conf.ResolvedEventCustomPostBuildExe)
                                 {
-                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction);
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction, project.RootPath, projectPath);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, buildEvent);
                                 }
 
                                 if (conf.PostBuildStepTest != null)
                                 {
-                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, conf.PostBuildStepTest, Vcxproj.BuildStep.PostBuildCustomAction);
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, conf.PostBuildStepTest, Vcxproj.BuildStep.PostBuildCustomAction, project.RootPath, projectPath);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, conf.PostBuildStepTest);
                                 }
