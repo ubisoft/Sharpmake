@@ -1129,7 +1129,8 @@ namespace Sharpmake.Generators.VisualStudio
             // Add FastBuild bff file to Project
             if (FastBuildSettings.IncludeBFFInProjects)
             {
-                string fastBuildFile = Bff.GetBffFileName(".", context.Configuration.BffFileName);
+                string relativeBffFilePath = Util.PathGetRelative(context.Configuration.ProjectPath, context.Configuration.BffFullFileName);
+                string fastBuildFile = Bff.GetBffFileName(".", relativeBffFilePath);
                 fastBuildFile = Util.SimplifyPath(fastBuildFile);
 
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
