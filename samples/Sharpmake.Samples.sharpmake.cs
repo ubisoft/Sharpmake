@@ -139,6 +139,17 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class DotNetMultiFrameworksHelloWorldProject : SampleProject
+    {
+        public DotNetMultiFrameworksHelloWorldProject()
+        {
+            Name = "DotNetMultiFrameworksHelloWorld";
+            SharpmakeMainFile = "HelloWorld.sharpmake.cs";
+            SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
+        }
+    }
+
+    [Generate]
     public class FastBuildSimpleExecutable : SampleProject
     {
         public FastBuildSimpleExecutable()

@@ -84,6 +84,24 @@ namespace Sharpmake
                     return "netcoreapp3.0";
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
+                case DotNetFramework.netstandard1_0:
+                    return "netstandard1.0";
+                case DotNetFramework.netstandard1_1:
+                    return "netstandard1.1";
+                case DotNetFramework.netstandard1_2:
+                    return "netstandard1.2";
+                case DotNetFramework.netstandard1_3:
+                    return "netstandard1.3";
+                case DotNetFramework.netstandard1_4:
+                    return "netstandard1.4";
+                case DotNetFramework.netstandard1_5:
+                    return "netstandard1.5";
+                case DotNetFramework.netstandard1_6:
+                    return "netstandard1.6";
+                case DotNetFramework.netstandard2_0:
+                    return "netstandard2.0";
+                case DotNetFramework.netstandard2_1:
+                    return "netstandard2.1";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(framework));
             }
@@ -91,6 +109,7 @@ namespace Sharpmake
 
         public static string ToFolderName(this DotNetFramework framework)
         {
+            //https://docs.microsoft.com/en-us/dotnet/standard/frameworks
             switch (framework)
             {
                 case DotNetFramework.v2:
@@ -131,14 +150,42 @@ namespace Sharpmake
                     return "netcoreapp3.0";
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
+                case DotNetFramework.netstandard1_0:
+                    return "netstandard1.0";
+                case DotNetFramework.netstandard1_1:
+                    return "netstandard1.1";
+                case DotNetFramework.netstandard1_2:
+                    return "netstandard1.2";
+                case DotNetFramework.netstandard1_3:
+                    return "netstandard1.3";
+                case DotNetFramework.netstandard1_4:
+                    return "netstandard1.4";
+                case DotNetFramework.netstandard1_5:
+                    return "netstandard1.5";
+                case DotNetFramework.netstandard1_6:
+                    return "netstandard1.6";
+                case DotNetFramework.netstandard2_0:
+                    return "netstandard2.0";
+                case DotNetFramework.netstandard2_1:
+                    return "netstandard2.1";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(framework));
             }
         }
 
+        public static bool IsDotNetFramework(this DotNetFramework framework)
+        {
+            return (0 != (framework & DotNetFramework.all_netframework));
+        }
+
         public static bool IsDotNetCore(this DotNetFramework framework)
         {
             return (0 != (framework & DotNetFramework.all_netcore));
+        }
+
+        public static bool IsDotNetStandard(this DotNetFramework framework)
+        {
+            return (0 != (framework & DotNetFramework.all_netstandard));
         }
 
         public static string GetVisualProjectToolsVersionString(this DevEnv visualVersion)
