@@ -341,6 +341,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.WarningLevel]'
             + ' [cmdLineOptions.TreatWarningAsError]'
             + ' [cmdLineOptions.DiagnosticsFormat]'
+            + ' [cmdLineOptions.EnableASAN]'
             + ' [fastBuildCompileAsC]'
             // Multi-threaded build is already handled by FASTBuild
             // + ' [cmdLineOptions.MultiProcessorCompilation]'

@@ -600,6 +600,18 @@ namespace Sharpmake
                     Enabled,
                     Disabled
                 }
+
+                /// <summary>
+                /// Enable Address Sanitizer
+                /// Compiles and links program with AddressSanitizer.
+                /// </summary>
+                public enum EnableAsan
+                {
+                    [Default]
+                    Disable,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Enable
+                }
             }
 
             public static class CodeAnalysis

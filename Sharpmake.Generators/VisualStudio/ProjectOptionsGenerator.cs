@@ -985,6 +985,12 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.SpectreMitigation.Disabled, () => { context.Options["SpectreMitigation"] = "false"; context.CommandLineOptions["SpectreMitigation"] = FileGeneratorUtilities.RemoveLineTag; })
             );
 
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.EnableAsan.Disable, () => { context.Options["EnableASAN"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["EnableASAN"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Compiler.EnableAsan.Enable, () => { context.Options["EnableASAN"] = "true"; context.CommandLineOptions["EnableASAN"] = "/fsanitize=address"; })
+            );
+
             if (context.DevelopmentEnvironment == DevEnv.vs2017 || context.DevelopmentEnvironment == DevEnv.vs2019)
             {
                 //Options.Vc.Compiler.DefineCPlusPlus. See: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
