@@ -345,7 +345,7 @@ namespace Sharpmake.Generators.FastBuild
                                     string previous;
                                     if (verificationPostBuildCopies.TryGetValue(key, out previous))
                                     {
-                                        if (previous != currentSourceFullPath)
+                                        if (FileSystemStringComparer.StaticCompare(previous, currentSourceFullPath) != 0)
                                             builder.LogErrorLine("A post-build copy to the destination '{0}' already exist but from different sources: '{1}' and '{2}'!", Util.PathGetAbsolute(masterBffDirectory, destinationFolder), previous, currentSourceFullPath);
                                     }
                                     else
