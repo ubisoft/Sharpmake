@@ -48,13 +48,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EnvDTE">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="EnvDTE100">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="EnvDTE80">
       <Private>False</Private>
     </Reference>
     <Reference Include="EnvDTE90">
@@ -63,10 +57,19 @@
     <Reference Include="Extensibility">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp">
+    <Reference Include="stdole">
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.CommandBars">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="EnvDTE">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="EnvDTE80">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop">
@@ -81,9 +84,6 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop">
       <Private>False</Private>
     </Reference>
@@ -91,9 +91,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0">
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0">
@@ -114,10 +111,10 @@
     <Reference Include="System.Core">
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Design">
+    <Reference Include="System.Drawing">
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Drawing">
+    <Reference Include="System.Design">
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Forms">
@@ -132,7 +129,10 @@
     <Reference Include="WindowsBase">
       <Private>False</Private>
     </Reference>
-    <Reference Include="stdole">
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0">
       <Private>False</Private>
     </Reference>
   </ItemGroup>
