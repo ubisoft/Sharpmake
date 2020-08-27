@@ -371,6 +371,12 @@ namespace Sharpmake.Generators.VisualStudio
 @"  <ItemGroup>
 ";
 
+                public static string ItemGroupConditionalBegin =
+@"  <ItemGroup Condition=""[itemGroupCondition]"">
+";
+
+                public static string ItemGroupTargetFrameworkCondition = "'$(TargetFramework)'=='[targetFramework]'";
+
                 public static string ItemGroupEnd =
 @"  </ItemGroup>
 ";
