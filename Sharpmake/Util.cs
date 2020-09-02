@@ -1775,7 +1775,7 @@ namespace Sharpmake
                 Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty
             );
 
-            return GetRegistryLocalMachineSubKeyValue(registryKeyString, null, @"C:\Program Files\LLVM"); // null to get default
+            return GetRegistryLocalMachineSubKeyValue(registryKeyString, null, @"$(LLVMInstallDir)"); // null to get default
         }
 
         public static string GetClangVersionFromLLVMInstallDir(string llvmInstallDir)
