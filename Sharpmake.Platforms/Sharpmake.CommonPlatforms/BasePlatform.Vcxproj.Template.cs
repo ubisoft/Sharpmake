@@ -211,6 +211,10 @@ namespace Sharpmake
     <EnableManagedIncrementalBuild>[options.EnableManagedIncrementalBuild]</EnableManagedIncrementalBuild>
     <UseClangCl>[options.UseClangCl]</UseClangCl>
     <UseLldLink>[options.UseLldLink]</UseLldLink>
+    <CopyLocalDeploymentContent>[options.CopyLocalDeploymentContent]</CopyLocalDeploymentContent>
+    <CopyLocalProjectReference>[options.CopyLocalProjectReference]</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>[options.CopyLocalDebugSymbols]</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>[options.CopyCppRuntimeToOutputDir]</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
 ";
 

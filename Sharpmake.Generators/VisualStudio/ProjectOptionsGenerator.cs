@@ -92,6 +92,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             GenerateGeneralOptions(context, optionsContext);
 
+            GenerateAdvancedOptions(context, optionsContext);
+
             if (level >= ProjectOptionGenerationLevel.Compiler)
                 GenerateCompilerOptions(context, optionsContext);
 
@@ -219,6 +221,33 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Options["ConfigurationType"] = context.Configuration.IsFastBuild || context.Configuration.CustomBuildSettings != null ? "Makefile" : FileGeneratorUtilities.RemoveLineTag;
                     break;
             }
+        }
+
+        private void GenerateAdvancedOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
+        {
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyLocalDeploymentContent.Enable, () => { context.Options["CopyLocalDeploymentContent"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyLocalDeploymentContent.Disable, () => { context.Options["CopyLocalDeploymentContent"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyLocalProjectReference.Enable, () => { context.Options["CopyLocalProjectReference"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyLocalProjectReference.Disable, () => { context.Options["CopyLocalProjectReference"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyLocalDebugSymbols.Enable, () => { context.Options["CopyLocalDebugSymbols"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyLocalDebugSymbols.Disable, () => { context.Options["CopyLocalDebugSymbols"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyCppRuntimeToOutputDir.Enable, () => { context.Options["CopyCppRuntimeToOutputDir"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyCppRuntimeToOutputDir.Disable, () => { context.Options["CopyCppRuntimeToOutputDir"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
         }
 
         private void GenerateCompilerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
