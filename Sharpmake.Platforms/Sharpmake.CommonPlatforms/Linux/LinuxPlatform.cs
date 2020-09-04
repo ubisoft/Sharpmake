@@ -122,16 +122,19 @@ namespace Sharpmake
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCppCompileToolExe"] = "g++"; }),
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteCppCompileToolExe"] = "clang++"; }), 
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteCppCompileToolExe"] = "clang++-3.8"; })
                 );
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCCompileToolExe"] = "g++"; }),
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteCCompileToolExe"] = "clang"; }),
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteCCompileToolExe"] = "clang-3.8"; })
                 );
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteLdToolExe"] = "g++"; }),
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteLdToolExe"] = "clang"; }),
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteLdToolExe"] = "clang-3.8"; })
                 );
             }
