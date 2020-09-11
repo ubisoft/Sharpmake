@@ -1650,14 +1650,17 @@ namespace Sharpmake.Generators.FastBuild
         private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles)
         {
             var conf = context.Configuration;
-            var unityTuple = GetDefaultTupleConfig();
-            var confSubConfigs = confSourceFiles[conf];
-            var sourceFiles = confSubConfigs[unityTuple];
-            var project = context.Project;
-
             // Only add unity build to non blobbed projects -> which they will be blobbed by FBuild
             if (!conf.FastBuildBlobbed)
                 return;
+
+            if (!confSourceFiles.ContainsKey(conf)) // no source files, so no unity section
+                return;
+
+            var confSubConfigs = confSourceFiles[conf];
+            var unityTuple = GetDefaultTupleConfig();
+            var sourceFiles = confSubConfigs[unityTuple];
+            var project = context.Project;
 
             const int spaceLength = 42;
 
