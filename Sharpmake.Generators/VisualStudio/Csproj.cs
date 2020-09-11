@@ -102,6 +102,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     if (Count <= 0)
                         return string.Empty;
+
                     var writer = new StringWriter();
                     writer.Write(Template.ItemGroups.ItemGroupBegin);
                     var sortedValues = SortedValues;
@@ -122,6 +123,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     if (Count <= 0)
                         return string.Empty;
+
                     var conditionalItemGroups = new Dictionary<string, List<string>>();
                     foreach (T elem in Values)
                     {
@@ -132,23 +134,32 @@ namespace Sharpmake.Generators.VisualStudio
                         else
                             conditionalItemGroups.Add(resolvedElemCondition, new List<string> { resolvedElem });
                     }
+
                     // No ItemGroup, skip
                     if (!conditionalItemGroups.Any())
                         return string.Empty;
+
                     var writer = new StringWriter();
                     var resolvedAlwaysTrueCondition = AlwaysTrueElement?.ResolveCondition(resolver);
-                    foreach (var conditionalItemGroup in conditionalItemGroups)
+                    foreach (var conditionalItemGroup in conditionalItemGroups.OrderBy(k => k.Key, StringComparer.InvariantCultureIgnoreCase))
                     {
                         // No element for this ItemGroup, skip
                         if (!conditionalItemGroup.Value.Any())
                             continue;
+
                         if (resolvedAlwaysTrueCondition != null && resolvedAlwaysTrueCondition == conditionalItemGroup.Key)
+                        {
                             writer.Write(Template.ItemGroups.ItemGroupBegin);
+                        }
                         else
+                        {
                             using (resolver.NewScopedParameter("itemGroupCondition", conditionalItemGroup.Key))
                                 writer.Write(resolver.Resolve(Template.ItemGroups.ItemGroupConditionalBegin));
-                        foreach (var elem in conditionalItemGroup.Value)
+                        }
+
+                        foreach (var elem in conditionalItemGroup.Value.OrderBy(v => v, StringComparer.InvariantCultureIgnoreCase))
                             writer.Write(elem);
+
                         writer.Write(Template.ItemGroups.ItemGroupEnd);
                     }
                     return writer.ToString();

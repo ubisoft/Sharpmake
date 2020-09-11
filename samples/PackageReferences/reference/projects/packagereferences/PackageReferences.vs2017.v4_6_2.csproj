@@ -46,14 +46,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.6.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="Mono.Cecil" Version="0.9.6.4">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MySql.Data" Version="6.10.6">
         <PrivateAssets>compile;build</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="NUnit" Version="3.6.0" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
