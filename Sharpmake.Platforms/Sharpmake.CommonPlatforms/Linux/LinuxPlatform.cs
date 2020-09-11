@@ -311,28 +311,12 @@ namespace Sharpmake
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
                 using (generator.Declare("platformName", SimplePlatformString))
+                using (generator.Declare("applicationType", "Linux"))
+                using (generator.Declare("applicationTypeRevision", "1.0"))
+                using (generator.Declare("targetLinuxPlatform", "Generic"))
                 {
                     generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
-                    {
-                        string applicationTypeRevision;
-                        bool hasFastBuildConfig = context.ProjectConfigurations.Any(conf => conf.IsFastBuild);
-                        bool hasNonFastBuildConfig = context.ProjectConfigurations.Any(conf => !conf.IsFastBuild);
-                        if (hasFastBuildConfig && hasNonFastBuildConfig)
-                        {
-                            applicationTypeRevision = "1.0";
-                        }
-                        else
-                        {
-                            applicationTypeRevision = hasFastBuildConfig ? FileGeneratorUtilities.RemoveLineTag : "1.0";
-                        }
-
-                        using (generator.Declare("applicationType", "Linux"))
-                        using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
-                        using (generator.Declare("targetLinuxPlatform", "Generic"))
-                        {
-                            generator.Write(_projectDescriptionPlatformSpecific);
-                        }
-                    }
+                    generator.Write(_projectDescriptionPlatformSpecific);
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
             }
