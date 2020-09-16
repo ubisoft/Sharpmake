@@ -1692,9 +1692,13 @@ namespace Sharpmake.Generators.VisualStudio
 
                                         if (objsInSubdirectories)
                                         {
-                                            using (fileGenerator.Declare("ObjectFileName", conf.ObjectFileName(file.FileNameSourceRelative)))
+                                            string objectFileName = conf.ObjectFileName(file.FileNameSourceRelative);
+                                            if (!string.IsNullOrEmpty(objectFileName))
                                             {
-                                                fileGenerator.Write(Template.Project.ProjectFilesSourceObjectFileName);
+                                                using (fileGenerator.Declare("ObjectFileName", objectFileName))
+                                                {
+                                                    fileGenerator.Write(Template.Project.ProjectFilesSourceObjectFileName);
+                                                }
                                             }
                                         }
 
