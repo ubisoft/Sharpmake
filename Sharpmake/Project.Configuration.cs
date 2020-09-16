@@ -1568,11 +1568,13 @@ namespace Sharpmake
 
 
             /// <summary>
-            /// If specified, every obj will be output to intermediate directories corresponding to the source hierarchy.
+            /// Specifies a function with a relative source file path as input and an object file path as output.
             /// </summary>
             /// <remarks>
             /// <note type="warning">
-            /// This will slow down your project's compile time!
+            /// This will slow down your project's compile time! Overwrite the object file output path
+            /// only for the files that absolutely require it. Let the function return null or empty string
+            /// to skip the overwrite for the given source file.
             /// <externalLink>
             /// <linkText>See a discussion of this in StackOverflow</linkText>
             /// <linkUri>http://stackoverflow.com/a/1999344</linkUri>
