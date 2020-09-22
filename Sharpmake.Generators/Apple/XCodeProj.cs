@@ -1274,7 +1274,7 @@ namespace Sharpmake.Generators.Apple
 
             private static string GetFilePrefix(Project.Configuration.OutputType outputType)
             {
-                return outputType.HasAnyFlag(Project.Configuration.OutputType.Lib | Project.Configuration.OutputType.Dll) ? "lib" : "";
+                return (outputType == Project.Configuration.OutputType.Lib || outputType == Project.Configuration.OutputType.Dll) ? "lib" : "";
             }
 
             public static string GetFileExtension(Project.Configuration conf)
