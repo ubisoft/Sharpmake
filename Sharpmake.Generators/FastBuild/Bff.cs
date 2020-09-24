@@ -1439,11 +1439,43 @@ namespace Sharpmake.Generators.FastBuild
             FillEmbeddedNatvisOptions(context);
         }
 
+        private static Strings CollectNatvisFiles(BffGenerationContext context)
+        {
+            Project.Configuration projectConfig = context.Configuration;
+            if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe)
+            {
+                Strings natvisFiles = new Strings(projectConfig.Project.NatvisFiles);
+                HashSet<Project> visitedProjects = new HashSet<Project>();
+                foreach (Project.Configuration resolvedDepConfig in projectConfig.ResolvedDependencies)
+                {
+                    if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe)
+                    {
+                        if (!visitedProjects.Contains(resolvedDepConfig.Project))
+                        {
+                            visitedProjects.Add(resolvedDepConfig.Project);
+                            foreach (string natvisFile in resolvedDepConfig.Project.NatvisFiles)
+                            {
+                                natvisFiles.Add(natvisFile);
+                            }
+                        }
+                    }
+                }
+
+                return natvisFiles;
+            }
+            else
+            {
+                return projectConfig.Project.NatvisFiles;
+            }
+        }
+
         private static void FillEmbeddedNatvisOptions(BffGenerationContext context)
         {
-            if (context.Configuration.Project.NatvisFiles.Count > 0)
+            Strings natvisFiles = CollectNatvisFiles(context);
+
+            if (natvisFiles.Count > 0)
             {
-                var cmdNatvisFiles = context.Configuration.Project.NatvisFiles.Select(n => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, n, "/NATVIS:"));
+                var cmdNatvisFiles = natvisFiles.SortedValues.Select(n => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, n, "/NATVIS:"));
                 string linkerNatvis = string.Join($"'{Environment.NewLine}                            + ' ", cmdNatvisFiles);
 
                 context.CommandLineOptions["LinkerNatvisFiles"] = linkerNatvis;
