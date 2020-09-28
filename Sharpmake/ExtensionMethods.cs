@@ -40,8 +40,6 @@ namespace Sharpmake
         {
             switch (framework)
             {
-                case DotNetFramework.v2:
-                    return "2.0";
                 case DotNetFramework.v3:
                     return "3.0";
                 case DotNetFramework.v3_5:
@@ -70,6 +68,8 @@ namespace Sharpmake
                     return "4.7.1";
                 case DotNetFramework.v4_7_2:
                     return "4.7.2";
+                case DotNetFramework.v4_8:
+                    return "4.8";
                 case DotNetFramework.netcore1_0:
                     return "netcoreapp1.0";
                 case DotNetFramework.netcore1_1:
@@ -112,8 +112,6 @@ namespace Sharpmake
             //https://docs.microsoft.com/en-us/dotnet/standard/frameworks
             switch (framework)
             {
-                case DotNetFramework.v2:
-                    return "net20";
                 case DotNetFramework.v3_5:
                     return "net35";
                 case DotNetFramework.v4_0:
@@ -136,6 +134,8 @@ namespace Sharpmake
                     return "net471";
                 case DotNetFramework.v4_7_2:
                     return "net472";
+                case DotNetFramework.v4_8:
+                    return "net48";
                 case DotNetFramework.netcore1_0:
                     return "netcoreapp1.0";
                 case DotNetFramework.netcore1_1:

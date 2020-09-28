@@ -139,21 +139,24 @@ namespace Sharpmake
     [Fragment, Flags]
     public enum DotNetFramework
     {
-        v2 = 1 << 0,
-        v3 = 1 << 1,
-        v3_5 = 1 << 2,
-        v3_5clientprofile = 1 << 3,
-        v4_0 = 1 << 4,
-        v4_5 = 1 << 5,
-        v4_5_1 = 1 << 6,
-        v4_5_2 = 1 << 7,
-        v4_5clientprofile = 1 << 8,
-        v4_6 = 1 << 9,
-        v4_6_1 = 1 << 10,
-        v4_6_2 = 1 << 11,
-        v4_7 = 1 << 12,
-        v4_7_1 = 1 << 13,
-        v4_7_2 = 1 << 14,
+        [Obsolete("Please use at least .net framework 3.0.", error: false)]
+        v2 = v3,
+
+        v3 = 1 << 0,
+        v3_5 = 1 << 1,
+        v3_5clientprofile = 1 << 2,
+        v4_0 = 1 << 3,
+        v4_5 = 1 << 4,
+        v4_5_1 = 1 << 5,
+        v4_5_2 = 1 << 6,
+        v4_5clientprofile = 1 << 7,
+        v4_6 = 1 << 8,
+        v4_6_1 = 1 << 9,
+        v4_6_2 = 1 << 10,
+        v4_7 = 1 << 11,
+        v4_7_1 = 1 << 12,
+        v4_7_2 = 1 << 13,
+        v4_8 = 1 << 14,
         netcore1_0 = 1 << 15,
         netcore1_1 = 1 << 16,
         netcore2_0 = 1 << 17,
@@ -172,7 +175,7 @@ namespace Sharpmake
         netstandard2_1 = 1 << 30,
 
         [CompositeFragment]
-        all_netframework = v2 | v3 | v3_5 | v3_5clientprofile | v4_0 | v4_5 | v4_5_1 | v4_5_2 | v4_5clientprofile | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2,
+        all_netframework = v3 | v3_5 | v3_5clientprofile | v4_0 | v4_5 | v4_5_1 | v4_5_2 | v4_5clientprofile | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
         [CompositeFragment]
         all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1,
         [CompositeFragment]
