@@ -1430,7 +1430,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectBuildPhase(ItemSection section, string phaseName, uint buildActionMask)
                 : base(section, phaseName)
             {
-                Files = new List<ProjectBuildFile>();
+                Files = new UniqueList<ProjectBuildFile>();
                 BuildActionMask = buildActionMask;
                 RunOnlyForDeploymentPostprocessing = 0;
             }
@@ -1439,7 +1439,7 @@ namespace Sharpmake.Generators.Apple
             {
                 ProjectBuildPhase folderItem = (ProjectBuildPhase)item;
                 string childrenList = "";
-                foreach (ProjectBuildFile childItem in folderItem.Files)
+                foreach (ProjectBuildFile childItem in folderItem.Files.SortedValues)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
@@ -1450,7 +1450,7 @@ namespace Sharpmake.Generators.Apple
                 resolverParameters.Add("itemChildren", childrenList);
             }
 
-            public List<ProjectBuildFile> Files { get; }
+            public UniqueList<ProjectBuildFile> Files { get; }
             public uint BuildActionMask { get; } = 0;
             public int RunOnlyForDeploymentPostprocessing { get; }
         }
