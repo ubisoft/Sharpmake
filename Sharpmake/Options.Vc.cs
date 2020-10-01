@@ -192,6 +192,41 @@ namespace Sharpmake
                 }
             }
 
+            public static class Advanced
+            {
+                public enum CopyLocalDeploymentContent
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2019)] // Introduced in Visual Studio 2019 version 16.7.
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum CopyLocalProjectReference
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2019)] // Introduced in Visual Studio 2019 version 16.7.
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum CopyLocalDebugSymbols
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2019)] // Introduced in Visual Studio 2019 version 16.7.
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum CopyCppRuntimeToOutputDir
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2019)] // Introduced in Visual Studio 2019 version 16.7.
+                    Enable,
+                    [Default]
+                    Disable
+                }
+            }
+
             public static class Compiler
             {
                 public enum MultiProcessorCompilation
