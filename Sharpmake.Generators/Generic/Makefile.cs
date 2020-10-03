@@ -407,7 +407,12 @@ namespace Sharpmake.Generators.Generic
             #region Compiler
 
             // Defines
-            Strings defines = new Strings();
+            var defines = new Strings();
+            if (conf.DefaultOption == Options.DefaultTarget.Debug)
+                defines.Add("_DEBUG");
+            else // Release
+                defines.Add("NDEBUG");
+
             defines.AddRange(conf.Defines);
             defines.InsertPrefix("-D");
             options["Defines"] = defines.JoinStrings(" ");
