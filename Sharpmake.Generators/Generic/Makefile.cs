@@ -639,7 +639,7 @@ namespace Sharpmake.Generators.Generic
         private static string FormatOutputFileName(Project.Configuration conf)
         {
             string outputExtension = !string.IsNullOrEmpty(conf.OutputExtension) ? "." + conf.OutputExtension : "";
-            string targetNamePrefix = (conf.Output == Project.Configuration.OutputType.Lib) ? "lib" : "";
+            string targetNamePrefix = (conf.Output == Project.Configuration.OutputType.Lib || conf.Output == Project.Configuration.OutputType.Dll) ? "lib" : "";
             return (targetNamePrefix + conf.TargetFileFullName + outputExtension);
         }
 
