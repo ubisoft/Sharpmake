@@ -72,7 +72,22 @@ namespace Sharpmake
 
             public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
-                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+                // There's no implib on linux platforms, the so does both
+                if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export &&
+                    !(configuration.IsFastBuild && !dependency.IsFastBuild))
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                }
+                else
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                }
             }
 
             public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)

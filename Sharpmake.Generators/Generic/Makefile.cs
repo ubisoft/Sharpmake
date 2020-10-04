@@ -291,7 +291,7 @@ namespace Sharpmake.Generators.Generic
                         var pchFile = PathMakeUnix(conf.PrecompHeader);
                         // Don't make additional subfolder in temp directory
                         var pchObj = Path.GetFileName(conf.PrecompHeader);
-                        var fileName = Path.Combine(Util.GetCapitalizedPath(project.SourceRootPath), pchFile);
+                        var fileName = Path.Combine(PathMakeUnix(project.SourceRootPath), pchFile);
                         precompHeader = PathMakeUnix(Util.PathGetRelative(projectFileInfo.DirectoryName, fileName, true));
                         precompHeaderOut = $"$(OBJDIR)/{pchObj}";
                         precompIntermediate = $"$(OBJDIR)/{pchObj}.gch";
@@ -518,7 +518,7 @@ namespace Sharpmake.Generators.Generic
                     Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp17,  () => { cxxflags.Append("-std=gnu++17 "); }),
                     Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp2a,  () => { cxxflags.Append("-std=gnu++2a "); })
                     );
-                    
+
                 // Exceptions
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.Exceptions.Enable, () => { cxxflags.Append("-fexceptions "); }),
@@ -586,6 +586,10 @@ namespace Sharpmake.Generators.Generic
             if (conf.Output == Project.Configuration.OutputType.Lib)
             {
                 options["LinkCommand"] = Template.Project.LinkCommandLib;
+            }
+            else if (conf.Output == Project.Configuration.OutputType.Dll)
+            {
+                options["LinkCommand"] = Template.Project.LinkCommandDll;
             }
             else
             {
