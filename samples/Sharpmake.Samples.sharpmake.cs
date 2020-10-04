@@ -159,6 +159,26 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class HelloLinuxProject : SampleProject
+    {
+        public HelloLinuxProject()
+        {
+            Name = "HelloLinux";
+            SharpmakeMainFile = "HelloLinux.Main.sharpmake.cs";
+
+            // This one is special, we have .sharpmake.cs files in the codebase
+            SourceFilesExcludeRegex.Remove(@"\\codebase\\");
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
     public class HelloWorldProject : SampleProject
     {
         public HelloWorldProject()
