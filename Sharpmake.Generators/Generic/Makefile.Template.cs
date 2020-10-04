@@ -45,11 +45,11 @@ export config
 
                 public static string ProjectRuleEnd =
                     "\n\t@echo \" ==== Building [projectName] ($(config)) ====\"" +
-                    "\n\t@${MAKE} --no-print-directory -C [projectFileDirectory] -f [projectFileName]\n\n";
+                    "\n\t@${MAKE} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\"\n\n";
 
                 public static string CleanRuleBegin = "clean:\n";
 
-                public static string CleanRuleProject = "\t@${MAKE} --no-print-directory -C [projectFileDirectory] -f [projectFileName] clean\n";
+                public static string CleanRuleProject = "\t@${MAKE} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\" clean\n";
 
                 public static string CleanRuleEnd = "\n";
 

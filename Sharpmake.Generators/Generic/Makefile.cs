@@ -149,7 +149,7 @@ namespace Sharpmake.Generators.Generic
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
                 using (fileGenerator.Declare("projectName", resolvedProject.ProjectName))
-                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName), false)))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.ProjectRuleBegin);
@@ -169,7 +169,7 @@ namespace Sharpmake.Generators.Generic
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
-                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName), false)))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.CleanRuleProject);
@@ -539,7 +539,7 @@ namespace Sharpmake.Generators.Generic
             #region Linker
 
             // OutputFile
-            options["OutputFile"] = FormatOutputFileName(conf);
+            options["OutputFile"] = FormatOutputFileName(conf).Replace(" ", @"\ ");
 
             // DependenciesLibraryFiles
             OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
@@ -569,10 +569,10 @@ namespace Sharpmake.Generators.Generic
                 {
                     case Project.Configuration.OutputType.None: continue;
                     case Project.Configuration.OutputType.Lib:
-                    case Project.Configuration.OutputType.Dll:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
                         deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
                         break;
+                    case Project.Configuration.OutputType.Dll:
                     default:
                         deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
                         break;
@@ -682,9 +682,13 @@ namespace Sharpmake.Generators.Generic
 
         #region Utils
 
-        private static string PathMakeUnix(string path)
+        private static string PathMakeUnix(string path, bool escapeSpaces = true)
         {
-            return path.Replace(Util.WindowsSeparator, Util.UnixSeparator).TrimEnd(Util.UnixSeparator);
+            string clean = path.Replace(Util.WindowsSeparator, Util.UnixSeparator).TrimEnd(Util.UnixSeparator);
+            if (escapeSpaces)
+                return clean.Replace(" ", @"\ ");
+
+            return clean;
         }
 
         private static void PathMakeUnix(IList<string> paths)
