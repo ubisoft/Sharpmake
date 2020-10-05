@@ -2294,18 +2294,6 @@ namespace Sharpmake
             InitCSharpSpecifics();
         }
 
-        public static void AddCSharpSpecificPreImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
-        {
-            if (devEnv >= DevEnv.vs2017)
-            {
-                importProjects.Add(new ImportProject
-                {
-                    Project = @"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props",
-                    Condition = @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"
-                });
-            }
-        }
-
         public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
         {
             if (ProjectTypeGuids == CSharpProjectType.Vsix)

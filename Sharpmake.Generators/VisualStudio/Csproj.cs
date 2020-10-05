@@ -1159,11 +1159,6 @@ namespace Sharpmake.Generators.VisualStudio
             WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
 
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
-            if (!isNetCoreProjectSchema)
-            {
-                CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
-            }
-
             WriteImportProjects(preImportProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
 
             // generate all configuration options onces...
