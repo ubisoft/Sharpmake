@@ -22,8 +22,8 @@
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\Debug\Sharpmake.xml</DocumentationFile>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake</BaseIntermediateOutputPath>
+    <DocumentationFile>..\bin\debug\sharpmake.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -40,8 +40,8 @@
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\Release\Sharpmake.xml</DocumentationFile>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake</BaseIntermediateOutputPath>
+    <DocumentationFile>..\bin\release\sharpmake.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

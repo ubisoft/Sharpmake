@@ -23,7 +23,8 @@
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake.Application</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</BaseIntermediateOutputPath>
+    <DocumentationFile>.</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -38,7 +39,8 @@
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake.application</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake.Application</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.application</BaseIntermediateOutputPath>
+    <DocumentationFile>.</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
