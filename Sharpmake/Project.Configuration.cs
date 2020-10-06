@@ -2209,7 +2209,8 @@ namespace Sharpmake
                 if (DebugBreaks.ShouldBreakOnProjectPath(DebugBreaks.Context.Resolving, Path.Combine(ProjectPath, ProjectFileName) + (Project is CSharpProject ? ".csproj" : ".vcxproj"), this))
                     System.Diagnostics.Debugger.Break();
                 Util.ResolvePath(Project.SharpmakeCsPath, ref IntermediatePath);
-                Util.ResolvePath(Project.SharpmakeCsPath, ref BaseIntermediateOutputPath);
+                if (!string.IsNullOrEmpty(BaseIntermediateOutputPath))
+                    Util.ResolvePath(Project.SharpmakeCsPath, ref BaseIntermediateOutputPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref LibraryPaths);
                 Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, ref TargetCopyFiles);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetDependsFiles);
@@ -2244,7 +2245,8 @@ namespace Sharpmake
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesExceptionsEnabledWithExternC);
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesExceptionsEnabledWithSEH);
                 Util.ResolvePath(Project.SourceRootPath, ref AdditionalManifestFiles);
-                Util.ResolvePath(Project.SourceRootPath, ref XmlDocumentationFile);
+                if (!string.IsNullOrEmpty(XmlDocumentationFile))
+                    Util.ResolvePath(Project.SourceRootPath, ref XmlDocumentationFile);
 
                 if (ModuleDefinitionFile != null)
                 {
