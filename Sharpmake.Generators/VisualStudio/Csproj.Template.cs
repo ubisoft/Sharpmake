@@ -145,6 +145,7 @@ namespace Sharpmake.Generators.VisualStudio
     <LangVersion>[options.LanguageVersion]</LangVersion>
     <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
+    <ProduceReferenceAssembly>[options.ProduceReferenceAssembly]</ProduceReferenceAssembly>
   </PropertyGroup>
 ";
 

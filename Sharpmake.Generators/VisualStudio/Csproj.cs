@@ -3324,6 +3324,12 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.SonarQubeExclude.Enabled, () => { options["SonarQubeExclude"] = "True"; })
             );
 
+            SelectOption
+            (
+            Options.Option(Options.CSharp.ProduceReferenceAssembly.Enabled, () => { options["ProduceReferenceAssembly"] = "True"; }),
+            Options.Option(Options.CSharp.ProduceReferenceAssembly.Disabled, () => { options["ProduceReferenceAssembly"] = RemoveLineTag; })
+            );
+
             options["AssemblyOriginatorKeyFile"] = Options.PathOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf, RemoveLineTag, _projectPath);
             options["MinimumVisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.MinimumVisualStudioVersion>(conf);
             options["OldToolsVersion"] = Options.StringOption.Get<Options.CSharp.OldToolsVersion>(conf);
