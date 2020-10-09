@@ -164,10 +164,11 @@ Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_Exe
 
 
 //=================================================================================================================
-Copy( 'Copy_C42D7E42' )
+Copy( 'Copy_AD05B900' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
+    .PreBuildDependencies = 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
@@ -176,7 +177,7 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Copy_C42D7E42'
+                   'Copy_AD05B900'
                }
 }
 
@@ -327,10 +328,11 @@ Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_E
 
 
 //=================================================================================================================
-Copy( 'Copy_BC80BD82' )
+Copy( 'Copy_14255650' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildcopysinglefiletest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
+    .PreBuildDependencies = 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
@@ -339,7 +341,7 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Copy_BC80BD82'
+                   'Copy_14255650'
                }
 }
 
@@ -489,10 +491,11 @@ Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_Executable
 
 
 //=================================================================================================================
-Copy( 'Copy_7FAB9568' )
+Copy( 'Copy_8DFB12C2' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildcopysinglefiletest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
+    .PreBuildDependencies = 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_Executable'
 }
 
 
@@ -501,7 +504,7 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64_Executable',
-                   'Copy_7FAB9568'
+                   'Copy_8DFB12C2'
                }
 }
 
@@ -652,10 +655,11 @@ Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_Executab
 
 
 //=================================================================================================================
-Copy( 'Copy_803944F8' )
+Copy( 'Copy_A093EAC2' )
 {
     .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildcopysinglefiletest.exe'
     .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\file_copy_destination\postbuildcopysinglefiletest.exe'
+    .PreBuildDependencies = 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_Executable'
 }
 
 
@@ -664,7 +668,7 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64_Executable',
-                   'Copy_803944F8'
+                   'Copy_A093EAC2'
                }
 }
 

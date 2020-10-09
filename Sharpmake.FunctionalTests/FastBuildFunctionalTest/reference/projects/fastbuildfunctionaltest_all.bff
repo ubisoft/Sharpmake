@@ -13,6 +13,7 @@
 Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64',
                    'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2017_win64',
                    'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2017_win64',
                    'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2017_win64',
@@ -30,6 +31,7 @@ Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2017_win64' )
 Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64',
                    'MixCppAndCExe_Release_FastBuild_NoBlob_vs2017_win64',
                    'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2017_win64',
                    'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2017_win64',
@@ -47,6 +49,7 @@ Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2017_win64' )
 Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64',
                    'MixCppAndCExe_Debug_FastBuild_vs2017_win64',
                    'PostBuildCopyDirTest_Debug_FastBuild_vs2017_win64',
                    'PostBuildCopySingleFileTest_Debug_FastBuild_vs2017_win64',
@@ -64,6 +67,7 @@ Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2017_win64' )
 Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64',
                    'MixCppAndCExe_Release_FastBuild_vs2017_win64',
                    'PostBuildCopyDirTest_Release_FastBuild_vs2017_win64',
                    'PostBuildCopySingleFileTest_Release_FastBuild_vs2017_win64',

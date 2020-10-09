@@ -72,7 +72,7 @@ class FastBuildFunctionalTest(FunctionalTest):
 
     def verifyCustomBuildEventsInTargetDir(self, targetDir):
         #verify copied files exist
-        expected_copied_files = ["dummyfile_to_be_copied_to_buildoutput.txt", "main.cpp", "postbuildcopysinglefiletest.exe"]
+        expected_copied_files = ["dummyfile_to_be_copied_to_buildoutput.txt", "main.cpp", "postbuildcopysinglefiletest.exe", "explicitlyorderedpostbuildtest.exe", "explicitlyorderedpostbuildtest.pdb"]
         for expected_file in expected_copied_files:
             expected_file = os.path.join(targetDir, "file_copy_destination", expected_file)
             if not os.path.isfile(expected_file):

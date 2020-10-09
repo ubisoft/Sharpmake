@@ -164,11 +164,12 @@ Executable( 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2017_win64_Executab
 
 
 //=================================================================================================================
-Test( 'Test_postbuildtestexecution_exe_107D34DF' )
+Test( 'Test_postbuildtestexecution_exe_DE8F53E6' )
 {
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
+  .PreBuildDependencies  = 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
@@ -177,7 +178,7 @@ Alias( 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Test_postbuildtestexecution_exe_107D34DF'
+                   'Test_postbuildtestexecution_exe_DE8F53E6'
                }
 }
 
@@ -328,11 +329,12 @@ Executable( 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2017_win64_Execut
 
 
 //=================================================================================================================
-Test( 'Test_postbuildtestexecution_exe_1AB2D9BB' )
+Test( 'Test_postbuildtestexecution_exe_50C8798C' )
 {
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
+  .PreBuildDependencies  = 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
@@ -341,7 +343,7 @@ Alias( 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Test_postbuildtestexecution_exe_1AB2D9BB'
+                   'Test_postbuildtestexecution_exe_50C8798C'
                }
 }
 
@@ -491,11 +493,12 @@ Executable( 'PostBuildTestExecution_Debug_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Test( 'Test_postbuildtestexecution_exe_7CC5FB7E' )
+Test( 'Test_postbuildtestexecution_exe_3DDB6E2D' )
 {
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
+  .PreBuildDependencies  = 'PostBuildTestExecution_Debug_FastBuild_vs2017_win64_Executable'
 }
 
 
@@ -504,7 +507,7 @@ Alias( 'PostBuildTestExecution_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildTestExecution_Debug_FastBuild_vs2017_win64_Executable',
-                   'Test_postbuildtestexecution_exe_7CC5FB7E'
+                   'Test_postbuildtestexecution_exe_3DDB6E2D'
                }
 }
 
@@ -655,11 +658,12 @@ Executable( 'PostBuildTestExecution_Release_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Test( 'Test_postbuildtestexecution_exe_276F8194' )
+Test( 'Test_postbuildtestexecution_exe_9EA672AD' )
 {
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
+  .PreBuildDependencies  = 'PostBuildTestExecution_Release_FastBuild_vs2017_win64_Executable'
 }
 
 
@@ -668,7 +672,7 @@ Alias( 'PostBuildTestExecution_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildTestExecution_Release_FastBuild_vs2017_win64_Executable',
-                   'Test_postbuildtestexecution_exe_276F8194'
+                   'Test_postbuildtestexecution_exe_9EA672AD'
                }
 }
 

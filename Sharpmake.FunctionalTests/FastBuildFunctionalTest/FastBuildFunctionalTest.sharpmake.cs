@@ -113,6 +113,27 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    public class SortableBuildStepCopy : Sharpmake.Project.Configuration.BuildStepCopy
+    {
+        public int Order;
+
+        public SortableBuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*", bool fileCopy = true) :
+            base(sourcePath, destinationPath, isNameSpecific, copyPattern, fileCopy)
+        {
+        }
+
+        public override int CompareTo(object obj)
+        {
+            if (obj == null)
+                return 1;
+
+            if (obj is SortableBuildStepCopy)
+                return Order.CompareTo((obj as SortableBuildStepCopy).Order);
+
+            return 0;
+        }
+    }
+
     public abstract class CommonProject : Project
     {
         public CommonProject()
@@ -382,6 +403,45 @@ namespace SharpmakeGen.FunctionalTests
     }
 
     [Generate]
+    public class ExplicitlyOrderedPostBuildTest : CommonExeProject
+    {
+        public ExplicitlyOrderedPostBuildTest()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // Copy executable (build output) to another folder. This does not need explicit prebuild dependencies
+            // in FastBuild, since the source path is a file node that is defined by the Executable() function (the linker step).
+            // Therefore linking the executable is implicitly a prebuild dependency of this copy step.
+            var copyExeFileBuildStep = new SortableBuildStepCopy(
+            @"[conf.TargetPath]\[conf.TargetFileName].exe",
+            @"[conf.TargetPath]\explicitly_ordered_postbuild_test\temp_copy\[conf.TargetFileName].exe");
+            conf.EventCustomPostBuildExe.Add(copyExeFileBuildStep);
+
+            // Copy the PDB to another folder. FastBuild has no knowledge about the source of this pdb file.
+            // Since we add the BuildStepCopy object to the PostBuildExe list, Sharpmake should create a PreBuildDependency
+            // for the linker step automatically, to make sure the copy is executed only after the linking, which creates the pdb.
+            var copyPdbFileBuildStep = new SortableBuildStepCopy(
+            @"[conf.TargetPath]\[conf.TargetFileName].pdb",
+            @"[conf.TargetPath]\explicitly_ordered_postbuild_test\temp_copy\[conf.TargetFileName].pdb");
+            conf.EventCustomPostBuildExe.Add(copyPdbFileBuildStep);
+
+            // Copy both .exe & .pdb to another location. This needs explicit ordering to ensure that the folder is only copied
+            // after the folder is filled with the two previous copy steps.
+            var copyDirBuildStep = new SortableBuildStepCopy(
+                @"[conf.TargetPath]\explicitly_ordered_postbuild_test\temp_copy",
+                @"[conf.TargetPath]\file_copy_destination");
+            copyDirBuildStep.IsFileCopy = false;
+            copyDirBuildStep.CopyPattern = "*.*";
+            copyDirBuildStep.Order = 1;
+            conf.EventCustomPostBuildExe.Add(copyDirBuildStep);
+        }
+    }
+
+    [Generate]
     public class PostBuildExecuteTest : CommonExeProject
     {
         public PostBuildExecuteTest()
@@ -454,6 +514,7 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<PostBuildCopyDirTest>(target);
             conf.AddProject<PostBuildExecuteTest>(target);
             conf.AddProject<PostBuildTestExecution>(target);
+            conf.AddProject<ExplicitlyOrderedPostBuildTest>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {

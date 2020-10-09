@@ -28,6 +28,7 @@ Exec( 'GenerateHeader' )
 //=================================================================================================================
 // fastbuildfunctionaltest.bff .bff includes
 //=================================================================================================================
+#include ".\explicitlyorderedpostbuildtest_vs2017_win64.bff"
 #include ".\mixcppandcexe_vs2017_win64.bff"
 #include ".\postbuildcopydirtest_vs2017_win64.bff"
 #include ".\postbuildcopysinglefiletest_vs2017_win64.bff"
