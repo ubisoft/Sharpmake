@@ -21,7 +21,7 @@ namespace Sharpmake.UnitTests
         [Test]
         public void Test_NETFXKitsDir_throws_for_old_frameworks()
         {
-            Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v3));
+            Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v3_5));
             Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_0));
             Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_5));
         }

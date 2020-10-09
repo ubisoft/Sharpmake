@@ -975,12 +975,12 @@ namespace Sharpmake.UnitTests
         [Test]
         public void MakeDifferenceString()
         {
-            ITarget target1 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v3);
-            ITarget target2 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v3);
+            ITarget target1 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v3_5);
+            ITarget target2 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v3_5);
             ITarget target3 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v4_5);
 
             Assert.True(Util.MakeDifferenceString(target1, target2).Length == 0);
-            Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"net30\" and \"net45\""));
+            Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"net35\" and \"net45\""));
             Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"Release\" and \"Debug\""));
         }
 

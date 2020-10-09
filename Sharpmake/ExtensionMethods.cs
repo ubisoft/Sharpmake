@@ -40,8 +40,6 @@ namespace Sharpmake
         {
             switch (framework)
             {
-                case DotNetFramework.v3:
-                    return "3.0";
                 case DotNetFramework.v3_5:
                     return "3.5";
                 case DotNetFramework.v3_5clientprofile:
