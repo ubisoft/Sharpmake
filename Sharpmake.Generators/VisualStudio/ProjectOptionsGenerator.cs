@@ -254,11 +254,14 @@ namespace Sharpmake.Generators.VisualStudio
         {
             var forcedIncludes = new Strings();
 
+            bool useClangCl = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
+                              Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable;
+
+
             if (!context.Configuration.IsFastBuild)
             {
                 // support of PCH requires them to be set as ForceIncludes with ClangCl
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
-                    Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
+                if (useClangCl)
                 {
                     forcedIncludes.Add(context.Configuration.PrecompHeader);
                 }
@@ -977,8 +980,7 @@ namespace Sharpmake.Generators.VisualStudio
                 //Options.Vc.Compiler.DefineCPlusPlus. See: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
                 //    Disable                                 /Zc:__cplusplus-
                 //    Enable                                  /Zc:__cplusplus
-                if (!Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() ||
-                        Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) != Options.Vc.LLVM.UseClangCl.Enable)
+                if (!useClangCl)
                 {
                     if (!context.Configuration.Platform.IsUsingClang())
                     {
@@ -1032,6 +1034,13 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Default defines...
             optionsContext.PlatformVcxproj.SelectCompilerOptions(context);
+
+            if (useClangCl && context.Configuration.IsFastBuild)
+            {
+                // This prevents clang-cl from auto-detecting the locally installed MSVC toolchain. Only paths on the command line will be considered.
+                // It doesn't apply on MSVC build, where the toolchain is provided through environment variables.
+                context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
+            }
 
             // Options.Vc.Compiler.AdditionalOptions
             if (context.Configuration.AdditionalCompilerOptions.Any())
@@ -1979,13 +1988,6 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.LLVM.UseLldLink.Enable, () => { context.Options["UseLldLink"] = "true"; }),
             Options.Option(Options.Vc.LLVM.UseLldLink.Disable, () => { context.Options["UseLldLink"] = "false"; })
             );
-
-            if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
-                Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
-            {
-                // This prevents clang-cl from auto-detecting the locally installed MSVC toolchain. Only paths on the command line will be considered.
-                context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
-            }
         }
 
         public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)
