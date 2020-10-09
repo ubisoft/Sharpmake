@@ -140,7 +140,7 @@ namespace Sharpmake
     public enum DotNetFramework
     {
         [Obsolete("Please use at least .net framework 3.0.", error: false)]
-        v2 = v3,
+        v2 = -1,
 
         v3 = 1 << 0,
         v3_5 = 1 << 1,
@@ -612,6 +612,9 @@ namespace Sharpmake
                 {
                     // GetFields() does not guarantee order; filter out the enum's special name field
                     if (enumFields[i].Attributes.HasFlag(FieldAttributes.SpecialName))
+                        continue;
+
+                    if (enumFields[i].GetCustomAttribute<ObsoleteAttribute>() != null)
                         continue;
 
                     // combinations of fragments are not actual fragments so skip them
