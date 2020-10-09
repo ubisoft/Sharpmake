@@ -122,7 +122,7 @@ namespace Sharpmake
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteCppCompileToolExe"] = "g++"; }),
-                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteCppCompileToolExe"] = "clang++"; }), 
+                    Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteCppCompileToolExe"] = "clang++"; }),
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteCppCompileToolExe"] = "clang++-3.8"; })
                 );
                 context.SelectOption
