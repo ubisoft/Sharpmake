@@ -140,9 +140,9 @@ namespace Sharpmake
     public enum DotNetFramework
     {
         [Obsolete("Please use at least .net framework 3.5.", error: false)]
-        v2 = -1,
+        v2 = v3_5,
         [Obsolete("Please use at least .net framework 3.5.", error: false)]
-        v3 = -1,
+        v3 = v3_5,
 
         v3_5              = 1 << 0,
         v3_5clientprofile = 1 << 1,
@@ -640,13 +640,16 @@ namespace Sharpmake
                             if (enumFields[j].Attributes.HasFlag(FieldAttributes.SpecialName))
                                 continue;
 
+                            if (enumFields[j].GetCustomAttribute<ObsoleteAttribute>() != null)
+                                continue;
+
                             if (i != j)
                             {
                                 int jEnumFieldValue = (int)enumFields[j].GetRawConstantValue();
 
                                 if (enumFieldValue == jEnumFieldValue)
                                 {
-                                    throw new Error("2 enum field with he same value found in {0} fragment: {1}={2} and {3}={4}",
+                                    throw new Error("2 enum fields with the same value found in {0} fragment: {1}={2} and {3}={4}",
                                                         enumType.FullName,
                                                         enumFields[i].Name,
                                                         enumFieldValue,
