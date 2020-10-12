@@ -1710,14 +1710,14 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Include = linkedCsFile,
                                 DependentUpon = Path.GetFileName(xaml),
-                                LinkFolder = GetProjectLinkedFolder(linkedCsFile, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(linkedCsFile, _projectPathCapitalized, project)
                             });
 
                             itemGroups.Pages.Add(new ItemGroups.Page
                             {
                                 Include = xaml,
                                 IsApplicationDefinition = project.ApplicationDefinitionFilenames.Any(f => f.Equals(Path.GetFileName(xaml), StringComparison.InvariantCultureIgnoreCase)),
-                                LinkFolder = GetProjectLinkedFolder(xaml, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(xaml, _projectPathCapitalized, project)
                             });
                             remainingSourcesFiles.Remove(xaml);
                             remainingSourcesFiles.Remove(linkedCsFile);
@@ -1731,7 +1731,7 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Include = designerFile,
                                 DependentUpon = Path.GetFileName(csFile),
-                                LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project)
                             });
                             remainingSourcesFiles.Remove(designerFile);
                             string resXFile = fileAssociation.GetFilenameWithExtension(".resx");
@@ -1741,7 +1741,7 @@ namespace Sharpmake.Generators.VisualStudio
                                 {
                                     Include = resXFile,
                                     DependUpon = Path.GetFileName(csFile),
-                                    LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath)
+                                    LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project)
                                 });
                                 remainingEmbeddedResourcesFiles.Remove(resXFile);
                                 remainingResourcesFiles.Remove(resXFile);
@@ -1758,21 +1758,21 @@ namespace Sharpmake.Generators.VisualStudio
                                 Include = mainAddinCode,
                                 SubType = "Code",
                                 LinkFolder =
-                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project.SourceRootPath)
+                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project)
                             });
                             itemGroups.Compiles.Add(new ItemGroups.Compile
                             {
                                 Include = designerCode,
                                 DependentUpon = designerXml,
                                 LinkFolder =
-                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project.SourceRootPath)
+                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project)
                             });
                             itemGroups.Nones.Add(new ItemGroups.None
                             {
                                 Include = designerXml,
                                 DependentUpon = mainAddinCode,
                                 LinkFolder =
-                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project.SourceRootPath)
+                                    GetProjectLinkedFolder(mainAddinCode, _projectPathCapitalized, project)
                             });
                             remainingSourcesFiles.Remove(mainAddinCode);
                             remainingSourcesFiles.Remove(designerCode);
@@ -1786,14 +1786,14 @@ namespace Sharpmake.Generators.VisualStudio
                             itemGroups.Compiles.Add(new ItemGroups.Compile
                             {
                                 Include = csFile,
-                                LinkFolder = GetProjectLinkedFolder(csFile, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(csFile, _projectPathCapitalized, project)
                             });
                             itemGroups.EmbeddedResources.Add(new ItemGroups.EmbeddedResource
                             {
                                 Include = xmlFile,
                                 SubType = "Designer",
                                 Generator = RemoveLineTag,
-                                LinkFolder = GetProjectLinkedFolder(csFile, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(csFile, _projectPathCapitalized, project)
                             });
                             remainingEmbeddedResourcesFiles.Remove(xmlFile);
                             remainingNoneFiles.Remove(xmlFile);
@@ -1807,7 +1807,7 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Include = resXFile,
                                 DependUpon = Path.GetFileName(csFile),
-                                LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project)
                             });
                             remainingEmbeddedResourcesFiles.Remove(resXFile);
                             remainingResourcesFiles.Remove(resXFile);
@@ -1822,7 +1822,7 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Include = designerFile,
                                 DependentUpon = Path.GetFileName(resXFile),
-                                LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project.SourceRootPath),
+                                LinkFolder = GetProjectLinkedFolder(designerFile, _projectPathCapitalized, project),
                                 AutoGen = true,
                                 DesignTime = publicAccessModifiers ? (bool?)true : null
                             });
@@ -1832,7 +1832,7 @@ namespace Sharpmake.Generators.VisualStudio
                                 Generator = publicAccessModifiers ? "PublicResXFileCodeGenerator" : "ResXFileCodeGenerator",
                                 MergeWithCto = resXFile.EndsWith("VSPackage.resx", StringComparison.InvariantCultureIgnoreCase) ? "true" : null,
                                 LastGenOutput = Path.GetFileName(designerFile),
-                                LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project.SourceRootPath),
+                                LinkFolder = GetProjectLinkedFolder(resXFile, _projectPathCapitalized, project),
                                 SubType = "Designer"
                             });
                             remainingSourcesFiles.Remove(designerFile);
@@ -1979,7 +1979,7 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 Include = linkedCsFile,
                                 DependentUpon = Path.GetFileName(asax),
-                                LinkFolder = GetProjectLinkedFolder(linkedCsFile, _projectPathCapitalized, project.SourceRootPath)
+                                LinkFolder = GetProjectLinkedFolder(linkedCsFile, _projectPathCapitalized, project)
                             });
 
                             itemGroups.Contents.Add(new ItemGroups.Content
@@ -2123,7 +2123,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     Include = xaml,
                     IsApplicationDefinition = project.ApplicationDefinitionFilenames.Any(f => f.Equals(xaml, StringComparison.InvariantCultureIgnoreCase)),
-                    LinkFolder = GetProjectLinkedFolder(xaml, _projectPathCapitalized, project.SourceRootPath)
+                    LinkFolder = GetProjectLinkedFolder(xaml, _projectPathCapitalized, project)
                 });
                 remainingSourcesFiles.Remove(xaml);
             }
@@ -2144,7 +2144,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     Include = remainingSourcesFile,
                     SubType = csProjSubTypesInfos?.SubTypeInfos.Find(s => string.Equals(s.FileName, remainingSourcesFile))?.SubType,
-                    LinkFolder = GetProjectLinkedFolder(remainingSourcesFile, _projectPathCapitalized, project.SourceRootPath)
+                    LinkFolder = GetProjectLinkedFolder(remainingSourcesFile, _projectPathCapitalized, project)
                 });
             }
 
@@ -2157,7 +2157,7 @@ namespace Sharpmake.Generators.VisualStudio
                     itemGroups.Resources.Add(new ItemGroups.Resource
                     {
                         Include = file,
-                        LinkFolder = GetProjectLinkedFolder(file, _projectPathCapitalized, project.SourceRootPath)
+                        LinkFolder = GetProjectLinkedFolder(file, _projectPathCapitalized, project)
                     });
                 }
             }
@@ -2449,14 +2449,14 @@ namespace Sharpmake.Generators.VisualStudio
                 Include = file,
                 Generator = generator,
                 LastGenOutput = Path.GetFileName(generatedFile),
-                LinkFolder = GetProjectLinkedFolder(file, projectPath, project.SourceRootPath)
+                LinkFolder = GetProjectLinkedFolder(file, projectPath, project)
             });
             var compile = new ItemGroups.Compile
             {
                 Include = generatedFile,
                 AutoGen = true,
                 DependentUpon = Path.GetFileName(file),
-                LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project.SourceRootPath)
+                LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project)
             };
             if (designTimeSharedInput)
                 compile.DesignTimeSharedInput = true;
@@ -2487,7 +2487,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Include = templateFile,
                 Generator = generator,
                 LastGenOutput = Path.GetFileName(generatedFile),
-                LinkFolder = GetProjectLinkedFolder(templateFile, projectPath, project.SourceRootPath)
+                LinkFolder = GetProjectLinkedFolder(templateFile, projectPath, project)
             });
 
             if (!addGeneratedFile)
@@ -2505,7 +2505,7 @@ namespace Sharpmake.Generators.VisualStudio
                             Include = generatedFile,
                             AutoGen = true,
                             DependentUpon = Path.GetFileName(templateFile),
-                            LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project.SourceRootPath)
+                            LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project)
                         };
                         if (designTimeSharedInput)
                             compile.DesignTimeSharedInput = true;
@@ -2521,7 +2521,7 @@ namespace Sharpmake.Generators.VisualStudio
                             Include = generatedFile,
                             AutoGen = true,
                             DependentUpon = Path.GetFileName(templateFile),
-                            LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project.SourceRootPath),
+                            LinkFolder = GetProjectLinkedFolder(generatedFile, projectPath, project),
                         });
                         break;
                     }
@@ -2633,7 +2633,7 @@ namespace Sharpmake.Generators.VisualStudio
             return FileAssociationType.Unknown;
         }
 
-        private static string GetProjectLinkedFolder(string sourceFile, string projectPath, string sourceRootPath)
+        private static string GetProjectLinkedFolder(string sourceFile, string projectPath, Project project)
         {
             // Exit out early if the file is not a relative path.
             if (!sourceFile.StartsWith("..", StringComparison.Ordinal))
@@ -2642,8 +2642,11 @@ namespace Sharpmake.Generators.VisualStudio
             string absoluteFile = Util.PathGetAbsolute(projectPath, sourceFile);
 
             var directoryName = Path.GetDirectoryName(absoluteFile);
-            if (directoryName.StartsWith(sourceRootPath, StringComparison.OrdinalIgnoreCase))
-                return directoryName.Substring(sourceRootPath.Length).Trim(Util._pathSeparators);
+            if (directoryName.StartsWith(project.SourceRootPath, StringComparison.OrdinalIgnoreCase))
+                return directoryName.Substring(project.SourceRootPath.Length).Trim(Util._pathSeparators);
+
+            if (directoryName.StartsWith(project.RootPath))
+                return directoryName.Substring(project.RootPath.Length).Trim(Util._pathSeparators);
 
             return Path.GetFileName(directoryName);
         }
