@@ -1,0 +1,777 @@
+
+//=================================================================================================================
+// ExplicitlyOrderedPostBuildTest FASTBuild config file
+//=================================================================================================================
+#once
+
+
+Unity( 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity' )
+{
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\ExplicitlyOrderedPostBuildTest'
+    .UnityInputIsolateWritableFiles     =  true
+    .UnityInputIsolateWritableFilesLimit = 10
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\ExplicitlyOrderedPostBuildTest'
+    .UnityOutputPattern                 = 'explicitlyorderedpostbuildtest_fastbuildunitys_unity*.cpp'
+    .UnityNumFiles                      =  1
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\ExplicitlyOrderedPostBuildTest\main.cpp'
+
+}
+
+
+//=================================================================================================================
+Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_21E34A2D' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_BC977AE9' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_2784F0C2' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
+                                              'Copy_21E34A2D',
+                                              'Copy_BC977AE9'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Copy_21E34A2D',
+                   'Copy_BC977AE9',
+                   'Copy_2784F0C2'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\ExplicitlyOrderedPostBuildTest\main.cpp'
+
+}
+
+
+//=================================================================================================================
+Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_2DCB92CD' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_3BAA3409' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_6007A422' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
+                                              'Copy_2DCB92CD',
+                                              'Copy_3BAA3409'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64' )
+{
+    .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
+                   'Copy_2DCB92CD',
+                   'Copy_3BAA3409',
+                   'Copy_6007A422'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_82284415' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_60A01E55' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_4F4A088A' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable',
+                                              'Copy_82284415',
+                                              'Copy_60A01E55'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2017_win64_Executable',
+                   'Copy_82284415',
+                   'Copy_60A01E55',
+                   'Copy_4F4A088A'
+               }
+}
+
+
+//=================================================================================================================
+ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_objects' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
+
+    .CompilerExtraOptions   = ''
+            // General options
+            // ---------------------------
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10586.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            // Multi-threaded build is already handled by FASTBuild
+            // + ' /MP'
+            // Preprocessor options
+            // ---------------------------
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            // Code Generation options
+            // ---------------------------
+            + ' /GF'
+            + ' /Gm-'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            // Language options
+            // ---------------------------
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            // Output Files options
+            // ---------------------------
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest_compiler.pdb"'
+            // Advanced options
+            // ---------------------------
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            // Character Set
+            // ---------------------------
+            + ' /D"_MBCS"'
+            // Additional compiler options
+            //--------------------------
+            + ' /FS /Zc:__cplusplus'
+
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable' )
+{
+     Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\'
+    .Libraries              = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.16.27023\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10586.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2017\explicitlyorderedpostbuildtest\explicitlyorderedpostbuildtest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_B2476EF5' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.exe'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.exe'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+Copy( 'Copy_FE930175' )
+{
+    .Source = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitlyorderedpostbuildtest.pdb'
+    .Dest = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\explicitlyorderedpostbuildtest.pdb'
+    .PreBuildDependencies = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable'
+}
+
+
+//=================================================================================================================
+CopyDir( 'Copy_4AFE99AA' )
+{
+    .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\explicitly_ordered_postbuild_test\temp_copy\'
+    .SourcePathsPattern                 = '*.*'
+    .SourcePathsRecurse                 = true
+    .Dest                               = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\file_copy_destination\'
+    .PreBuildDependencies               = {
+                                              'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable',
+                                              'Copy_B2476EF5',
+                                              'Copy_FE930175'
+                                          }
+}
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64' )
+{
+    .Targets = {
+                   'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2017_win64_Executable',
+                   'Copy_B2476EF5',
+                   'Copy_FE930175',
+                   'Copy_4AFE99AA'
+               }
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////

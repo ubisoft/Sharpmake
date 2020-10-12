@@ -463,6 +463,7 @@ Copy( '[fastBuildCopyAlias]' )
 {
     .Source = '[fastBuildCopySource]'
     .Dest = '[fastBuildCopyDest]'
+    .PreBuildDependencies = [fastBuildCopyDependencies]
 }
 
 ";
@@ -517,6 +518,7 @@ Exec( '[fastBuildPreBuildName]' )
   .ExecWorkingDir       = '[fastBuildPrebuildWorkingPath]'
   .ExecUseStdOutAsOutput = [fastBuildPrebuildUseStdOutAsOutput]
   .ExecAlwaysShowOutput =  [fastBuildPrebuildAlwaysShowOutput]
+  .PreBuildDependencies = [fastBuildExecPreBuildDependencies]
 }
 
 ";
@@ -533,6 +535,7 @@ Test( '[fastBuildTest]' )
   .TestWorkingDir        = '[fastBuildTestWorkingDir]'
   .TestTimeOut           =  [fastBuildTestTimeOut]
   .TestAlwaysShowOutput  =  [fastBuildTestAlwaysShowOutput]
+  .PreBuildDependencies  = [fastBuildTestPreBuildDependencies]
 }
 
 ";
@@ -563,12 +566,14 @@ Unity( '[unityFile.UnityName]' )
 ";
 
                 public static string CopyDirSection = @"
+//=================================================================================================================
 CopyDir( '[fastBuildCopyDirName]' )
 {
     .SourcePaths                        = '[fastBuildCopyDirSourcePath]'
     .SourcePathsPattern                 = [fastBuildCopyDirPattern]
     .SourcePathsRecurse                 = [fastBuildCopyDirRecurse]
     .Dest                               = '[fastBuildCopyDirDestinationPath]'
+    .PreBuildDependencies               = [fastBuildCopyDirDependencies]
 }
 ";
                 // All config sections. For now this section is used for submit assistant(when there is a source file filter)

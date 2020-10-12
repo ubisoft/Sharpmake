@@ -92,6 +92,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             GenerateGeneralOptions(context, optionsContext);
 
+            GenerateAdvancedOptions(context, optionsContext);
+
             if (level >= ProjectOptionGenerationLevel.Compiler)
                 GenerateCompilerOptions(context, optionsContext);
 
@@ -221,15 +223,45 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
+        private void GenerateAdvancedOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
+        {
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyLocalDeploymentContent.Enable, () => { context.Options["CopyLocalDeploymentContent"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyLocalDeploymentContent.Disable, () => { context.Options["CopyLocalDeploymentContent"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyLocalProjectReference.Enable, () => { context.Options["CopyLocalProjectReference"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyLocalProjectReference.Disable, () => { context.Options["CopyLocalProjectReference"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyLocalDebugSymbols.Enable, () => { context.Options["CopyLocalDebugSymbols"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyLocalDebugSymbols.Disable, () => { context.Options["CopyLocalDebugSymbols"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Advanced.CopyCppRuntimeToOutputDir.Enable, () => { context.Options["CopyCppRuntimeToOutputDir"] = "true"; }),
+            Options.Option(Options.Vc.Advanced.CopyCppRuntimeToOutputDir.Disable, () => { context.Options["CopyCppRuntimeToOutputDir"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+        }
+
         private void GenerateCompilerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             var forcedIncludes = new Strings();
 
+            bool useClangCl = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
+                              Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable;
+
+
             if (!context.Configuration.IsFastBuild)
             {
                 // support of PCH requires them to be set as ForceIncludes with ClangCl
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
-                    Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
+                if (useClangCl)
                 {
                     forcedIncludes.Add(context.Configuration.PrecompHeader);
                 }
@@ -265,6 +297,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
 
+                //https://clang.llvm.org/docs/CommandGuide/clang.html
                 context.SelectOption
                 (
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Default, () => { context.Options["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
@@ -272,10 +305,31 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++11"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++14"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp17, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.Cpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++2a"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp98, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++98"; }),
                 Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++11"; }),
-                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++14"; })
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++14"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp17, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++17"; }),
+                Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++2a"; })
                 );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.Default, () => { context.Options["ClangCLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.C89, () => { context.Options["ClangCLanguageStandard"] = "-std=c89"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.C90, () => { context.Options["ClangCLanguageStandard"] = "-std=c90"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.C99, () => { context.Options["ClangCLanguageStandard"] = "-std=c99"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.C11, () => { context.Options["ClangCLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.C17, () => { context.Options["ClangCLanguageStandard"] = "-std=c17"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.GnuC89, () => { context.Options["ClangCLanguageStandard"] = "-std=gnu89"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.GnuC90, () => { context.Options["ClangCLanguageStandard"] = "-std=gnu90"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.GnuC99, () => { context.Options["ClangCLanguageStandard"] = "-std=gnu99"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.GnuC11, () => { context.Options["ClangCLanguageStandard"] = "-std=gnu11"; }),
+                Options.Option(Options.Clang.Compiler.CLanguageStandard.GnuC17, () => { context.Options["ClangCLanguageStandard"] = "-std=gnu17"; })
+                );
+
+                context.CommandLineOptions["CppLanguageStd"] = context.Options["ClangCppLanguageStandard"];
+                context.CommandLineOptions["CLanguageStd"] = context.Options["ClangCLanguageStandard"];
             }
             else
             {
@@ -926,8 +980,7 @@ namespace Sharpmake.Generators.VisualStudio
                 //Options.Vc.Compiler.DefineCPlusPlus. See: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
                 //    Disable                                 /Zc:__cplusplus-
                 //    Enable                                  /Zc:__cplusplus
-                if (!Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() ||
-                        Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) != Options.Vc.LLVM.UseClangCl.Enable)
+                if (!useClangCl)
                 {
                     if (!context.Configuration.Platform.IsUsingClang())
                     {
@@ -981,6 +1034,13 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Default defines...
             optionsContext.PlatformVcxproj.SelectCompilerOptions(context);
+
+            if (useClangCl && context.Configuration.IsFastBuild)
+            {
+                // This prevents clang-cl from auto-detecting the locally installed MSVC toolchain. Only paths on the command line will be considered.
+                // It doesn't apply on MSVC build, where the toolchain is provided through environment variables.
+                context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
+            }
 
             // Options.Vc.Compiler.AdditionalOptions
             if (context.Configuration.AdditionalCompilerOptions.Any())
@@ -1111,7 +1171,8 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.PlatformToolset.v142, () => { context.Options["PlatformToolset"] = "v142"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2012, () => { context.Options["PlatformToolset"] = "LLVM-vs2012"; context.Options["TrackFileAccess"] = "false"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.LLVM_vs2014, () => { context.Options["PlatformToolset"] = "LLVM-vs2014"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.LLVM, () => { context.Options["PlatformToolset"] = "llvm"; })
+                Options.Option(Options.Vc.General.PlatformToolset.LLVM, () => { context.Options["PlatformToolset"] = "llvm"; }),
+                Options.Option(Options.Vc.General.PlatformToolset.ClangCL, () => { context.Options["PlatformToolset"] = "ClangCL"; })
             );
             optionsContext.PlatformVcxproj.SetupPlatformToolsetOptions(context);
         }
@@ -1927,16 +1988,15 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.LLVM.UseLldLink.Enable, () => { context.Options["UseLldLink"] = "true"; }),
             Options.Option(Options.Vc.LLVM.UseLldLink.Disable, () => { context.Options["UseLldLink"] = "false"; })
             );
-
-            if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
-                Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
-            {
-                // This prevents clang-cl from auto-detecting the locally installed MSVC toolchain. Only paths on the command line will be considered.
-                context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
-            }
         }
 
+        [Obsolete("Use MakeBuildStepName taking the 2 extra arguments projectRootPath and rootPath", error: true)]
         public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)
+        {
+            return null;
+        }
+
+        public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep, string projectRootPath, string projectPath)
         {
             if (!eventBuildStep.IsResolved)
                 throw new Error("Event hasn't been resolved!");
@@ -1948,11 +2008,12 @@ namespace Sharpmake.Generators.VisualStudio
             if (eventBuildStep is Project.Configuration.BuildStepExecutable)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepExecutable;
+                string normalizedConfTargetPath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, conf.TargetPath);
                 string execName;
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    execName = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (conf.TargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
+                    execName = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (normalizedConfTargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
                 }
                 else
                 {
@@ -1965,15 +2026,17 @@ namespace Sharpmake.Generators.VisualStudio
             else if (eventBuildStep is Project.Configuration.BuildStepCopy)
             {
                 var cEvent = eventBuildStep as Project.Configuration.BuildStepCopy;
+                string sourcePath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, cEvent.SourcePath);
+                string destinationPath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, cEvent.DestinationPath);
                 string copyName;
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    copyName = "Copy_" + (conf.TargetFileFullName + cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (conf.TargetFileFullName + sourcePath + destinationPath).GetHashCode().ToString("X8");
                 }
                 else
                 {
-                    copyName = "Copy_" + (cEvent.SourcePath + cEvent.DestinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (sourcePath + destinationPath).GetHashCode().ToString("X8");
                 }
 
                 return copyName;
@@ -1981,16 +2044,17 @@ namespace Sharpmake.Generators.VisualStudio
             else if (eventBuildStep is Project.Configuration.BuildStepTest)
             {
                 var tEvent = eventBuildStep as Project.Configuration.BuildStepTest;
+                string normalizedConfTargetPath = UtilityMethods.GetNormalizedPathForBuildStep(projectRootPath, projectPath, conf.TargetPath);
                 string testName;
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (conf.TargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
+                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (tEvent.TestArguments + normalizedConfTargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
                 }
                 else
                 {
                     testName = "Test_" + extractName(tEvent.TestExecutable);
-                    testName += "_" + (testName).GetHashCode().ToString("X8");
+                    testName += "_" + (testName + tEvent.TestArguments).GetHashCode().ToString("X8");
                 }
 
                 return testName;

@@ -479,6 +479,16 @@ namespace Sharpmake
                 return dirs;
             }
 
+            public override void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
+            {
+                // concat defines, don't add options.Defines since they are automatically added by VS
+                var defines = new Strings();
+                defines.AddRange(context.Options.ExplicitDefines);
+                defines.AddRange(context.Configuration.Defines);
+
+                context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";").Replace(@"""", "");
+            }
+
             public override bool HasPrecomp(IGenerationContext context)
             {
                 return !string.IsNullOrEmpty(context.Configuration.PrecompHeader);

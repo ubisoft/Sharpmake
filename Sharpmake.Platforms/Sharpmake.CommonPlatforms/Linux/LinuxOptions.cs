@@ -31,6 +31,7 @@ namespace Sharpmake
                 public enum PlatformRemoteTool
                 {
                     Gpp, //g++
+                    Clang, // Alpine 
                     [Default]
                     Clang38
                 }

@@ -49,7 +49,7 @@ namespace Sharpmake
 
         internal static Configure GetConfigureAttribute(MethodInfo configure, bool inherit)
         {
-            return s_cachedMethodInfoToConfigureAttributes.GetOrAdd(Tuple.Create(configure, inherit), configure.GetCustomAttribute(typeof(Configure), inherit) as Configure);
+            return s_cachedMethodInfoToConfigureAttributes.GetOrAdd(Tuple.Create(configure, inherit), t => configure.GetCustomAttribute(typeof(Configure), inherit) as Configure);
         }
 
         private readonly IEnumerable<MethodInfo> _orderedConfigureCollection;

@@ -522,10 +522,10 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 // the pre-steps are written in the master bff, we only need to refer their aliases
                                 preBuildTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
-                                preBuildTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild)));
+                                preBuildTargets.AddRange(conf.ResolvedEventPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuild, project.RootPath, projectPath)));
 
                                 preBuildTargets.AddRange(conf.EventCustomPrebuildExecute.Select(e => e.Key));
-                                preBuildTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction)));
+                                preBuildTargets.AddRange(conf.ResolvedEventCustomPreBuildExe.Select(e => ProjectOptionsGenerator.MakeBuildStepName(conf, e, Vcxproj.BuildStep.PreBuildCustomAction, project.RootPath, projectPath)));
                             }
 
                             fastBuildTargetSubTargets.AddRange(fastBuildProjectExeUtilityDependencyList);
@@ -557,7 +557,7 @@ namespace Sharpmake.Generators.FastBuild
                                 var extraPlatformEvents = platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; });
                                 foreach (var buildEvent in extraPlatformEvents.Concat(conf.ResolvedEventPostBuildExe))
                                 {
-                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild);
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild, project.RootPath, projectPath);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, buildEvent);
                                 }
@@ -570,14 +570,14 @@ namespace Sharpmake.Generators.FastBuild
 
                                 foreach (var buildEvent in conf.ResolvedEventCustomPostBuildExe)
                                 {
-                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction);
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuildCustomAction, project.RootPath, projectPath);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, buildEvent);
                                 }
 
                                 if (conf.PostBuildStepTest != null)
                                 {
-                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, conf.PostBuildStepTest, Vcxproj.BuildStep.PostBuildCustomAction);
+                                    string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, conf.PostBuildStepTest, Vcxproj.BuildStep.PostBuildCustomAction, project.RootPath, projectPath);
                                     fastBuildTargetSubTargets.Add(eventKey);
                                     postBuildEvents.Add(eventKey, conf.PostBuildStepTest);
                                 }
@@ -612,7 +612,7 @@ namespace Sharpmake.Generators.FastBuild
                         if (isCompileAsCFile)
                         {
                             fastBuildUsingPlatformConfig = platformBff.CConfigName(conf);
-                            // Do not take cpp Language conformance into account while compiling in C
+                            // Do not take Cpp Language conformance into account while compiling in C
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
                             if (clangPlatformBff != null)
@@ -621,6 +621,10 @@ namespace Sharpmake.Generators.FastBuild
                         }
                         else
                         {
+                            // Do not take C Language conformance into account while compiling in Cpp
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+
                             fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
                         }
@@ -704,6 +708,7 @@ namespace Sharpmake.Generators.FastBuild
                                         fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
                                         break;
                                     case Options.Vc.General.PlatformToolset.LLVM:
+                                    case Options.Vc.General.PlatformToolset.ClangCL:
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->
                                         // TODO: figure out what version number to put there
                                         // maybe use the DevEnv value
@@ -1242,8 +1247,19 @@ namespace Sharpmake.Generators.FastBuild
                                             // These are all pre-build steps, at least in principle, so insert them before the other build steps.
                                             fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
 
+                                            // Resolve node name of the prebuild dependency for PostBuildEvents.
+                                            string resolvedSectionNodeIdentifier;
+                                            if (beginSectionType == Template.ConfigurationFile.ObjectListBeginSection)
+                                            {
+                                                resolvedSectionNodeIdentifier = resolver.Resolve("[fastBuildOutputFileShortName]_objects");
+                                            }
+                                            else
+                                            {
+                                                resolvedSectionNodeIdentifier = resolver.Resolve("[fastBuildOutputFileShortName]_[fastBuildOutputType]");
+                                            }
+
                                             // Convert build steps to Bff resolvable objects
-                                            var resolvableBuildSteps = UtilityMethods.GetResolvablesFromBuildSteps(postBuildEvents);
+                                            var resolvableBuildSteps = UtilityMethods.GetBffNodesFromBuildSteps(postBuildEvents, new Strings(resolvedSectionNodeIdentifier));
                                             // Resolve objects using the current project path
                                             var resolvedBuildSteps = resolvableBuildSteps.Select(b => b.Resolve(project.RootPath, projectPath, resolver));
 
@@ -1434,11 +1450,43 @@ namespace Sharpmake.Generators.FastBuild
             FillEmbeddedNatvisOptions(context);
         }
 
+        private static Strings CollectNatvisFiles(BffGenerationContext context)
+        {
+            Project.Configuration projectConfig = context.Configuration;
+            if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe)
+            {
+                Strings natvisFiles = new Strings(projectConfig.Project.NatvisFiles);
+                HashSet<Project> visitedProjects = new HashSet<Project>();
+                foreach (Project.Configuration resolvedDepConfig in projectConfig.ResolvedDependencies)
+                {
+                    if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe)
+                    {
+                        if (!visitedProjects.Contains(resolvedDepConfig.Project))
+                        {
+                            visitedProjects.Add(resolvedDepConfig.Project);
+                            foreach (string natvisFile in resolvedDepConfig.Project.NatvisFiles)
+                            {
+                                natvisFiles.Add(natvisFile);
+                            }
+                        }
+                    }
+                }
+
+                return natvisFiles;
+            }
+            else
+            {
+                return projectConfig.Project.NatvisFiles;
+            }
+        }
+
         private static void FillEmbeddedNatvisOptions(BffGenerationContext context)
         {
-            if (context.Configuration.Project.NatvisFiles.Count > 0)
+            Strings natvisFiles = CollectNatvisFiles(context);
+
+            if (natvisFiles.Count > 0)
             {
-                var cmdNatvisFiles = context.Configuration.Project.NatvisFiles.Select(n => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, n, "/NATVIS:"));
+                var cmdNatvisFiles = natvisFiles.SortedValues.Select(n => Bff.CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, n, "/NATVIS:"));
                 string linkerNatvis = string.Join($"'{Environment.NewLine}                            + ' ", cmdNatvisFiles);
 
                 context.CommandLineOptions["LinkerNatvisFiles"] = linkerNatvis;
@@ -1645,14 +1693,17 @@ namespace Sharpmake.Generators.FastBuild
         private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles)
         {
             var conf = context.Configuration;
-            var unityTuple = GetDefaultTupleConfig();
-            var confSubConfigs = confSourceFiles[conf];
-            var sourceFiles = confSubConfigs[unityTuple];
-            var project = context.Project;
-
             // Only add unity build to non blobbed projects -> which they will be blobbed by FBuild
             if (!conf.FastBuildBlobbed)
                 return;
+
+            if (!confSourceFiles.ContainsKey(conf)) // no source files, so no unity section
+                return;
+
+            var confSubConfigs = confSourceFiles[conf];
+            var unityTuple = GetDefaultTupleConfig();
+            var sourceFiles = confSubConfigs[unityTuple];
+            var project = context.Project;
 
             const int spaceLength = 42;
 

@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -24,7 +23,7 @@
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake.Application</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -39,7 +38,7 @@
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake.application</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake.Application</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.application</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

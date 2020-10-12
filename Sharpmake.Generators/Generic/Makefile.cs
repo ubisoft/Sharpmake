@@ -407,7 +407,12 @@ namespace Sharpmake.Generators.Generic
             #region Compiler
 
             // Defines
-            Strings defines = new Strings();
+            var defines = new Strings();
+            if (conf.DefaultOption == Options.DefaultTarget.Debug)
+                defines.Add("_DEBUG");
+            else // Release
+                defines.Add("NDEBUG");
+
             defines.AddRange(conf.Defines);
             defines.InsertPrefix("-D");
             options["Defines"] = defines.JoinStrings(" ");
@@ -639,7 +644,7 @@ namespace Sharpmake.Generators.Generic
         private static string FormatOutputFileName(Project.Configuration conf)
         {
             string outputExtension = !string.IsNullOrEmpty(conf.OutputExtension) ? "." + conf.OutputExtension : "";
-            string targetNamePrefix = (conf.Output == Project.Configuration.OutputType.Lib) ? "lib" : "";
+            string targetNamePrefix = (conf.Output == Project.Configuration.OutputType.Lib || conf.Output == Project.Configuration.OutputType.Dll) ? "lib" : "";
             return (targetNamePrefix + conf.TargetFileFullName + outputExtension);
         }
 

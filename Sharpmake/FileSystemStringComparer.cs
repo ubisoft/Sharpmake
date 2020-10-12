@@ -70,5 +70,11 @@ namespace Sharpmake
         {
             return ((IEqualityComparer<string>)_comparer).GetHashCode(obj);
         }
+
+        private static FileSystemStringComparer s_instance = new FileSystemStringComparer();
+        public static int StaticCompare(string x, string y)
+        {
+            return s_instance.Compare(x, y);
+        }
     }
 }

@@ -345,7 +345,7 @@ namespace Sharpmake.Generators.FastBuild
                                     string previous;
                                     if (verificationPostBuildCopies.TryGetValue(key, out previous))
                                     {
-                                        if (previous != currentSourceFullPath)
+                                        if (FileSystemStringComparer.StaticCompare(previous, currentSourceFullPath) != 0)
                                             builder.LogErrorLine("A post-build copy to the destination '{0}' already exist but from different sources: '{1}' and '{2}'!", Util.PathGetAbsolute(masterBffDirectory, destinationFolder), previous, currentSourceFullPath);
                                     }
                                     else
@@ -359,6 +359,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (fileGenerator.Declare("fastBuildCopyAlias", fastBuildCopyAlias))
                                     using (fileGenerator.Declare("fastBuildCopySource", Bff.CurrentBffPathKeyCombine(sourceFile)))
                                     using (fileGenerator.Declare("fastBuildCopyDest", Bff.CurrentBffPathKeyCombine(destinationFile)))
+                                    using (fileGenerator.Declare("fastBuildCopyDependencies", FileGeneratorUtilities.RemoveLineTag))
                                     {
                                         if (!bffMasterSection.ContainsKey(fastBuildCopyAlias))
                                             bffMasterSection.Add(fastBuildCopyAlias, fileGenerator.Resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection));
@@ -374,7 +375,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
                         {
-                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild);
+                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild, project.RootPath, masterBffDirectory);
                             preBuildEvents.Add(eventKey, buildEvent);
                         }
 
@@ -386,7 +387,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         foreach (var buildEvent in conf.ResolvedEventCustomPreBuildExe)
                         {
-                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuildCustomAction);
+                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuildCustomAction, project.RootPath, masterBffDirectory);
                             customPreBuildEvents.Add(eventKey, buildEvent);
                         }
 
@@ -472,17 +473,16 @@ namespace Sharpmake.Generators.FastBuild
             string relativeTo
         )
         {
-            foreach (var buildEvent in buildEvents)
-            {
-                string eventKey = resolver.Resolve(buildEvent.Key);
+            List<Bff.BffNodeBase> bffNodes = UtilityMethods.GetBffNodesFromBuildSteps(buildEvents, new Strings());
 
-                if (bffSection.ContainsKey(eventKey))
+            foreach (var bffNode in bffNodes)
+            {
+                string nodeIdentifier = resolver.Resolve(bffNode.Identifier);
+
+                if (bffSection.ContainsKey(nodeIdentifier))
                     continue;
 
-                var resolveableBuildStep = UtilityMethods.GetResolveableFromBuildStep(buildEvent.Key, buildEvent.Value);
-                var resolvedBuildStep = resolveableBuildStep.Resolve(projectRoot, relativeTo, resolver);
-
-                bffSection.Add(eventKey, resolvedBuildStep);
+                bffSection.Add(nodeIdentifier, bffNode.Resolve(projectRoot, relativeTo, resolver));
             }
         }
 

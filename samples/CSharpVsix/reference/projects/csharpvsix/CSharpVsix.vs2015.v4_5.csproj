@@ -108,6 +108,9 @@
     <Reference Include="PresentationFramework">
       <Private>False</Private>
     </Reference>
+    <Reference Include="stdole">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -130,9 +133,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="WindowsBase">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="stdole">
       <Private>False</Private>
     </Reference>
   </ItemGroup>

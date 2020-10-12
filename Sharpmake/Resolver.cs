@@ -103,6 +103,77 @@ namespace Sharpmake
     /// </summary>
     public class Resolver
     {
+        private class TypeWrapper
+        {
+            public List<MemberInfo> MemberInfos;
+
+            public TypeWrapper(Type type)
+            {
+                if (!type.IsDefined(typeof(Resolvable), true))
+                    return;
+
+                MemberInfo[] memberInfos = type.GetMembers();
+
+                foreach (MemberInfo memberInfo in memberInfos)
+                {
+                    if (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property)
+                        continue;
+
+                    if (memberInfo.IsDefined(typeof(SkipResolveOnMember), false))
+                        continue;
+
+                    Type memberType = null;
+                    if (memberInfo.MemberType == MemberTypes.Field)
+                    {
+                        FieldInfo fieldInfo = memberInfo as FieldInfo;
+                        Type fieldType = fieldInfo.FieldType;
+                        if (fieldType.IsClass ||
+                            (CanWriteFieldValue(fieldInfo) &&
+                             (fieldType == typeof(string) ||
+                              fieldType == typeof(Strings) ||
+                              fieldType.IsAssignableFrom(typeof(IList<string>)))))
+                        {
+                            memberType = fieldInfo.FieldType;
+                        }
+                    }
+                    else if (memberInfo.MemberType == MemberTypes.Property)
+                    {
+                        PropertyInfo propertyInfo = memberInfo as PropertyInfo;
+                        Type propertyType = propertyInfo.PropertyType;
+                        if (propertyInfo.CanRead &&
+                            (propertyType.IsClass ||
+                             propertyType == typeof(Strings) ||
+                             (propertyType == typeof(string) && propertyInfo.CanWrite) ||
+                             propertyType.IsAssignableFrom(typeof(IList<string>))))
+                        {
+                            memberType = propertyType;
+                        }
+                    }
+                    if (memberType != null)
+                    {
+                        if (MemberInfos == null)
+                        {
+                            MemberInfos = new List<MemberInfo>(memberInfos.Length);
+                        }
+                        MemberInfos.Add(memberInfo);
+                    }
+                }
+            }
+        }
+
+        static private ConcurrentDictionary<Type, TypeWrapper> s_typeWrappers = new ConcurrentDictionary<Type, TypeWrapper>();
+
+        private TypeWrapper GetTypeWrapper(Type type)
+        {
+            return s_typeWrappers.GetOrAdd(type, (key) =>
+            {
+                var wrapper = new TypeWrapper(type);
+                if (wrapper.MemberInfos == null || wrapper.MemberInfos.Count == 0)
+                    return null;
+                return wrapper;
+            });
+        }
+
         [System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
         public class Resolvable : Attribute
         {
@@ -224,14 +295,26 @@ namespace Sharpmake
             ResolveObject(null, obj, fallbackValue);
         }
 
+        public void Resolve(ref Strings strs)
+        {
+        }
+
         public virtual string Resolve(string str)
         {
             return Resolve(str, null);
         }
 
-        // Note: The method doesn't use regex as this was slower with regexes(mainly due to MT contention)
         public string Resolve(string str, object fallbackValue = null)
         {
+            bool wasChanged;
+            return Resolve(str, fallbackValue, out wasChanged);
+        }
+
+        // Note: The method doesn't use regex as this was slower with regexes(mainly due to MT contention)
+        public string Resolve(string str, object fallbackValue, out bool wasChanged)
+        {
+            wasChanged = false;
+
             // Early out
             if (str == null)
                 return str;
@@ -344,6 +427,7 @@ namespace Sharpmake
 
                 builder.Append(str, currentSearchIndex, strLength - currentSearchIndex);
                 str = builder.ToString();
+                wasChanged = true;
                 builder.Clear();
 
                 if (nbrReplacements == 0)
@@ -359,6 +443,7 @@ namespace Sharpmake
                 if (beginStr.Length != 1)
                     continue;
                 string escapedStr = beginStr + beginStr;
+                wasChanged = true;
                 str = str.Replace(escapedStr, beginStr);
             }
 
@@ -366,6 +451,7 @@ namespace Sharpmake
             {
                 string endStr = string.Empty + endChar;
                 string escapedStr = endStr + endStr;
+                wasChanged = true;
                 str = str.Replace(escapedStr, endStr);
             }
 
@@ -472,22 +558,21 @@ namespace Sharpmake
             return _resolveStatusFields.TryGetValue(pathName, out status) ? status : ResolveStatus.UnResolved;
         }
 
-        private static ConcurrentDictionary<string, KeyValuePair<FieldInfo, PropertyInfo>> s_typeFieldPropertyCache = new ConcurrentDictionary<string, KeyValuePair<FieldInfo, PropertyInfo>>();
+        private static ConcurrentDictionary<Tuple<Type, string>, Tuple<FieldInfo, PropertyInfo>> s_typeFieldPropertyCache = new ConcurrentDictionary<Tuple<Type, string>, Tuple<FieldInfo, PropertyInfo>>();
 
         private static void GetFieldInfoOrPropertyInfo(Type type, string name, out FieldInfo fieldInfo, out PropertyInfo propertyInfo)
         {
-            // build a unique name
-            string uniqueName = type.FullName + name;
+            var key = new Tuple<Type, string>(type, name);
 
-            var value = s_typeFieldPropertyCache.GetOrAdd(uniqueName, keyname =>
+            var value = s_typeFieldPropertyCache.GetOrAdd(key, keyArg =>
             {
                 FieldInfo field = type.GetField(name);
                 PropertyInfo property = (field == null) ? type.GetProperty(name) : null;
-                return new KeyValuePair<FieldInfo, PropertyInfo>(field, property);
+                return new Tuple<FieldInfo, PropertyInfo>(field, property);
             });
 
-            fieldInfo = value.Key;
-            propertyInfo = value.Value;
+            fieldInfo = value.Item1;
+            propertyInfo = value.Item2;
         }
 
         [Serializable]
@@ -547,9 +632,9 @@ namespace Sharpmake
 
                 string nameChunk = names[i];
 
+                Type parameterType = parameter.GetType();
                 FieldInfo fieldInfo;
                 PropertyInfo propertyInfo;
-                Type parameterType = parameter.GetType();
                 GetFieldInfoOrPropertyInfo(parameterType, nameChunk, out fieldInfo, out propertyInfo);
 
                 if (fieldInfo != null)
@@ -615,9 +700,6 @@ namespace Sharpmake
 
         private void ResolveMember(string objectPath, object obj, MemberInfo memberInfo, object fallbackValue)
         {
-            if (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property)
-                return;
-
             string memberPath;
             if (objectPath != null)
                 memberPath = objectPath + _pathSeparator + memberInfo.Name;
@@ -625,9 +707,6 @@ namespace Sharpmake
                 memberPath = memberInfo.Name;
 
             if (GetResolveStatus(memberPath) == ResolveStatus.Resolved)
-                return;
-
-            if (memberInfo.IsDefined(typeof(SkipResolveOnMember), false))
                 return;
 
             if (memberInfo.MemberType == MemberTypes.Field)
@@ -643,7 +722,10 @@ namespace Sharpmake
                         {
                             SetResolving(memberPath);
                             string value = fieldValue as string;
-                            fieldInfo.SetValue(obj, Resolve(value, fallbackValue));
+                            bool wasChanged;
+                            value = Resolve(value, fallbackValue, out wasChanged);
+                            if (wasChanged)
+                                fieldInfo.SetValue(obj, value);
                             SetResolved(memberPath);
                         }
                     }
@@ -658,8 +740,10 @@ namespace Sharpmake
                             {
                                 foreach (string value in values.Values)
                                 {
-                                    string newValue = Resolve(value, fallbackValue);
-                                    values.UpdateValue(value, newValue);
+                                    bool wasChanged;
+                                    string newValue = Resolve(value, fallbackValue, out wasChanged);
+                                    if (wasChanged)
+                                        values.UpdateValue(value, newValue);
                                 }
                             }
 
@@ -674,7 +758,12 @@ namespace Sharpmake
                             IList<string> values = fieldValue as IList<string>;
 
                             for (int i = 0; i < values.Count; ++i)
-                                values[i] = Resolve(values[i], fallbackValue);
+                            {
+                                bool wasChanged;
+                                string value = Resolve(values[i], fallbackValue, out wasChanged);
+                                if (wasChanged)
+                                    values[i] = value;
+                            }
 
                             SetResolved(memberPath);
                         }
@@ -743,8 +832,7 @@ namespace Sharpmake
             if (_resolvedObject.Add(obj) == false)
                 return;
 
-            if (!obj.GetType().IsDefined(typeof(Resolvable), true))
-                return;
+            var typeWrapper = GetTypeWrapper(obj.GetType());
 
             if (objectPath != null)
             {
@@ -754,15 +842,13 @@ namespace Sharpmake
                 SetResolving(objectPath);
             }
 
-            MemberInfo[] memberInfos = obj.GetType().GetMembers();
+            if (typeWrapper == null)
+                return;
 
-            foreach (MemberInfo memberInfo in memberInfos)
+            foreach (MemberInfo memberInfo in typeWrapper.MemberInfos)
             {
                 ResolveMember(objectPath, obj, memberInfo, fallbackValue);
             }
-
-            if (objectPath != null)
-                SetResolved(objectPath);
         }
 
         #endregion

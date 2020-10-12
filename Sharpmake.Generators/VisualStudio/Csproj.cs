@@ -33,9 +33,14 @@ namespace Sharpmake.Generators.VisualStudio
             string Resolve(Resolver resolver);
         }
 
+        internal interface IResolvableCondition : IResolvable
+        {
+            string ResolveCondition(Resolver resolver);
+        }
+
         internal class ItemGroups
         {
-            internal ItemGroup<Reference> References = new ItemGroup<Reference>();
+            internal ItemGroupConditional<TargetFrameworksCondition<Reference>> References = new ItemGroupConditional<TargetFrameworksCondition<Reference>>();
             internal ItemGroup<Service> Services = new ItemGroup<Service>();
             internal ItemGroup<Compile> Compiles = new ItemGroup<Compile>();
             internal ItemGroup<ProjectReference> ProjectReferences = new ItemGroup<ProjectReference>();
@@ -55,7 +60,7 @@ namespace Sharpmake.Generators.VisualStudio
             internal ItemGroup<EntityDeploy> EntityDeploys = new ItemGroup<EntityDeploy>();
             internal ItemGroup<WCFMetadataStorage> WCFMetadataStorages = new ItemGroup<WCFMetadataStorage>();
             internal ItemGroup<SplashScreen> AppSplashScreen = new ItemGroup<SplashScreen>();
-            internal ItemGroup<ItemTemplate> PackageReferences = new ItemGroup<ItemTemplate>();
+            internal ItemGroupConditional<TargetFrameworksCondition<ItemTemplate>> PackageReferences = new ItemGroupConditional<TargetFrameworksCondition<ItemTemplate>>();
             internal ItemGroup<Analyzer> Analyzers = new ItemGroup<Analyzer>();
             internal ItemGroup<VSIXSourceItem> VSIXSourceItems = new ItemGroup<VSIXSourceItem>();
             internal ItemGroup<FolderInclude> FolderIncludes = new ItemGroup<FolderInclude>();
@@ -97,6 +102,7 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     if (Count <= 0)
                         return string.Empty;
+
                     var writer = new StringWriter();
                     writer.Write(Template.ItemGroups.ItemGroupBegin);
                     var sortedValues = SortedValues;
@@ -105,6 +111,83 @@ namespace Sharpmake.Generators.VisualStudio
                         writer.Write(elem.Resolve(resolver));
                     }
                     writer.Write(Template.ItemGroups.ItemGroupEnd);
+                    return writer.ToString();
+                }
+            }
+
+            internal class ItemGroupConditional<T> : UniqueList<T>, IResolvable where T : IResolvableCondition
+            {
+                public T AlwaysTrueElement;
+
+                public string Resolve(Resolver resolver)
+                {
+                    if (Count <= 0)
+                        return string.Empty;
+
+                    var conditionalItemGroups = new Dictionary<string, List<string>>();
+                    foreach (T elem in Values)
+                    {
+                        var resolvedElemCondition = elem.ResolveCondition(resolver);
+                        var resolvedElem = elem.Resolve(resolver);
+                        if (conditionalItemGroups.ContainsKey(resolvedElemCondition))
+                            conditionalItemGroups[resolvedElemCondition].Add(resolvedElem);
+                        else
+                            conditionalItemGroups.Add(resolvedElemCondition, new List<string> { resolvedElem });
+                    }
+
+                    // No ItemGroup, skip
+                    if (!conditionalItemGroups.Any())
+                        return string.Empty;
+
+                    var writer = new StringWriter();
+                    var resolvedAlwaysTrueCondition = AlwaysTrueElement?.ResolveCondition(resolver);
+                    foreach (var conditionalItemGroup in conditionalItemGroups.OrderBy(k => k.Key, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        // No element for this ItemGroup, skip
+                        if (!conditionalItemGroup.Value.Any())
+                            continue;
+
+                        if (resolvedAlwaysTrueCondition != null && resolvedAlwaysTrueCondition == conditionalItemGroup.Key)
+                        {
+                            writer.Write(Template.ItemGroups.ItemGroupBegin);
+                        }
+                        else
+                        {
+                            using (resolver.NewScopedParameter("itemGroupCondition", conditionalItemGroup.Key))
+                                writer.Write(resolver.Resolve(Template.ItemGroups.ItemGroupConditionalBegin));
+                        }
+
+                        foreach (var elem in conditionalItemGroup.Value.OrderBy(v => v, StringComparer.InvariantCultureIgnoreCase))
+                            writer.Write(elem);
+
+                        writer.Write(Template.ItemGroups.ItemGroupEnd);
+                    }
+                    return writer.ToString();
+                }
+            }
+
+            internal class TargetFrameworksCondition<T> : UniqueList<T>, IResolvableCondition where T : IResolvable
+            {
+                public List<DotNetFramework> TargetFrameworks;
+
+                public string ResolveCondition(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("targetFramework", string.Join(";", TargetFrameworks.Select(conf => conf.ToFolderName()))))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.ItemGroupTargetFrameworkCondition);
+                    }
+                }
+
+                public string Resolve(Resolver resolver)
+                {
+                    if (Count <= 0)
+                        return string.Empty;
+                    var writer = new StringWriter();
+                    var sortedValues = SortedValues;
+                    foreach (T elem in sortedValues)
+                    {
+                        writer.Write(elem.Resolve(resolver));
+                    }
                     return writer.ToString();
                 }
             }
@@ -810,6 +893,48 @@ namespace Sharpmake.Generators.VisualStudio
                         return resolver.Resolve(Template.ItemGroups.VSIXSourceItem);
                 }
             }
+
+            private static void AddTargetFrameworksCondition<T>(ItemGroupConditional<TargetFrameworksCondition<T>> itemGroupConditional, DotNetFramework dotNetFramework, T elem) where T : IResolvable
+            {
+                if (itemGroupConditional.Any(it => it.Contains(elem)))
+                {
+                    foreach (var itemGroup in itemGroupConditional.Where(it => it.Contains(elem) && !it.TargetFrameworks.Contains(dotNetFramework)))
+                    {
+                        itemGroup.TargetFrameworks.Add(dotNetFramework);
+                    }
+                }
+                else
+                {
+                    var newItemGroup = new TargetFrameworksCondition<T>
+                    {
+                        TargetFrameworks = new List<DotNetFramework> { dotNetFramework },
+                    };
+                    newItemGroup.Add(elem);
+                    itemGroupConditional.Add(newItemGroup);
+                }
+            }
+
+            public void SetTargetFrameworks(List<DotNetFramework> projectFrameworks)
+            {
+                References.AlwaysTrueElement = new TargetFrameworksCondition<Reference>
+                {
+                    TargetFrameworks = projectFrameworks
+                };
+                PackageReferences.AlwaysTrueElement = new TargetFrameworksCondition<ItemTemplate>
+                {
+                    TargetFrameworks = projectFrameworks
+                };
+            }
+
+            public void AddReference(DotNetFramework dotNetFramework, Reference reference)
+            {
+                AddTargetFrameworksCondition(References, dotNetFramework, reference);
+            }
+
+            public void AddPackageReference(DotNetFramework dotNetFramework, ItemTemplate itemTemplate)
+            {
+                AddTargetFrameworksCondition(PackageReferences, dotNetFramework, itemTemplate);
+            }
         }
 
         internal class Choose : IResolvable
@@ -909,6 +1034,10 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
+            List<DotNetFramework> projectFrameworks = configurations.Select(
+                conf => conf.Target.GetFragment<DotNetFramework>()).Distinct().ToList();
+            itemGroups.SetTargetFrameworks(projectFrameworks);
+
             // valid that 2 conf name in the same project don't have the same name
             var configurationNameMapping = new Dictionary<string, Project.Configuration>();
             string assemblyName = null;
@@ -982,13 +1111,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             string targetFrameworkString;
             DevEnv devenv = configurations.Select(
-                    conf => ((ITarget)conf.Target).GetFragment<DevEnv>()).Distinct().Single();
-            List<DotNetFramework> projectFrameworks = configurations.Select(
-                    conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
+                    conf => conf.Target.GetFragment<DevEnv>()).Distinct().Single();
 
             bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore ||
                                             (project.ProjectSchema == CSharpProjectSchema.Default &&
-                                              (projectFrameworks.Any(x => x.IsDotNetCore()) || projectFrameworks.Count > 1)
+                                              (projectFrameworks.Any(x => x.IsDotNetCore() || x.IsDotNetStandard()) || projectFrameworks.Count > 1)
                                             );
             if (isNetCoreProjectSchema)
             {
@@ -1032,11 +1159,6 @@ namespace Sharpmake.Generators.VisualStudio
             WriteCustomProperties(preImportCustomProperties, project, writer, resolver);
 
             var preImportProjects = new List<ImportProject>(project.PreImportProjects);
-            if (!isNetCoreProjectSchema)
-            {
-                CSharpProject.AddCSharpSpecificPreImportProjects(preImportProjects, devenv);
-            }
-
             WriteImportProjects(preImportProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
 
             // generate all configuration options onces...
@@ -2059,72 +2181,76 @@ namespace Sharpmake.Generators.VisualStudio
 
             #region References
 
-            List<DotNetFramework> projectFrameworks = configurations.Select(
-                    conf => ((ITarget)conf.Target).GetFragment<DotNetFramework>()).Distinct().ToList();
-
-            bool netCoreProject = project.ProjectSchema == CSharpProjectSchema.NetCore ||
-                                           (project.ProjectSchema == CSharpProjectSchema.Default &&
-                                             projectFrameworks.Any(x => x.IsDotNetCore())
-                                           );
-            if (!netCoreProject)
+            foreach (var conf in configurations)
             {
-                var referencesByName = new List<ItemGroups.Reference>();
-                configurations.ForEach(
-                    conf => referencesByName.AddRange(
-                        conf.ReferencesByName.Select(
-                        str => new ItemGroups.Reference
+                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                if (dotNetFramework.IsDotNetFramework())
+                {
+                    foreach (var str in conf.ReferencesByName)
+                    {
+                        var referencesByName = new ItemGroups.Reference
                         {
                             Include = str,
                             Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
-                        })));
-                itemGroups.References.AddRange(referencesByName);
+                        };
+                        itemGroups.AddReference(dotNetFramework, referencesByName);
+                    }
+                }
             }
-
-            var referencesByNameExternal = new List<ItemGroups.Reference>();
-            configurations.ForEach(
-                conf => referencesByNameExternal.AddRange(
-                    conf.ReferencesByNameExternal.Select(
-                    str => new ItemGroups.Reference
-                    {
-                        Include = str,
-                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
-                    })));
-            itemGroups.References.AddRange(referencesByNameExternal);
-
-            var referencesByPath = new List<ItemGroups.Reference>();
 
             foreach (var conf in configurations)
             {
-                referencesByPath.AddRange(
-                    conf.ReferencesByPath.Select(Util.GetCapitalizedPath)
-                    .Select(str => new ItemGroups.Reference
+                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                foreach (var str in conf.ReferencesByNameExternal)
+                {
+                    var referencesByNameExternal = new ItemGroups.Reference
+                    {
+                        Include = str,
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByNameExternal);
+                }
+            }
+
+            foreach (var conf in configurations)
+            {
+                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                foreach (var str in conf.ReferencesByPath.Select(Util.GetCapitalizedPath))
+                {
+                    var referencesByPath = new ItemGroups.Reference
                     {
                         Include = Path.GetFileNameWithoutExtension(str),
                         SpecificVersion = false,
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
-                    }));
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByPath);
+                }
 
-                referencesByPath.AddRange(
-                    project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath)
-                    .Select(str => new ItemGroups.Reference
+                foreach (var str in project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath))
+                {
+                    var referencesByPath = new ItemGroups.Reference
                     {
                         Include = Path.GetFileNameWithoutExtension(str),
                         SpecificVersion = false,
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
                         Private = false
-                    }));
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByPath);
+                }
             }
 
-            itemGroups.References.AddRange(referencesByPath);
-
-            if (!netCoreProject)
+            foreach (var conf in configurations)
             {
-                var references = configurations.SelectMany(
-                    conf => conf.DotNetReferences.Select(
-                        r => GetItemGroupsReference(r, project.DependenciesCopyLocal)));
-
-                itemGroups.References.AddRange(references);
+                var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                if (dotNetFramework.IsDotNetFramework())
+                {
+                    foreach (var r in conf.DotNetReferences)
+                    {
+                        var references = GetItemGroupsReference(r, project.DependenciesCopyLocal);
+                        itemGroups.AddReference(dotNetFramework, references);
+                    }
+                }
             }
 
             if (Util.DirectoryExists(Path.Combine(project.SourceRootPath, "Web References")))
@@ -2256,58 +2382,61 @@ namespace Sharpmake.Generators.VisualStudio
             List<string> skipFiles
         )
         {
-            Project.Configuration configuration = configurations[0];
-            var devenv = configuration.Target.GetFragment<DevEnv>();
-            // package reference: Default in vs2017+
-            if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageReference
-                || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv >= DevEnv.vs2017))
+            foreach (var configuration in configurations)
             {
-                if (devenv < DevEnv.vs2017)
-                    throw new Error("Package references are not supported on Visual Studio versions below vs2017");
+                var devenv = configuration.Target.GetFragment<DevEnv>();
+                var dotNetFramework = configuration.Target.GetFragment<DotNetFramework>();
+                // package reference: Default in vs2017+
+                if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageReference
+                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv >= DevEnv.vs2017))
+                {
+                    if (devenv < DevEnv.vs2017)
+                        throw new Error("Package references are not supported on Visual Studio versions below vs2017");
 
-                var resolver = new Resolver();
-                foreach (var packageReference in configuration.ReferencesByNuGetPackage)
-                {
-                    itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
-                }
-            }
-            // project.json: Default in vs2015
-            else if (project.NuGetReferenceType == Project.NuGetPackageMode.ProjectJson
-                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv == DevEnv.vs2015))
-            {
-                if (devenv < DevEnv.vs2015)
-                    throw new Error("Project.json files are not supported on Visual Studio versions below vs2015");
-
-                var projectJson = new ProjectJson();
-                projectJson.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
-                if (projectJson.IsGenerated)
-                {
-                    string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(projectJson.ProjectJsonPath));
-                    itemGroups.Nones.Add(new ItemGroups.None { Include = include });
-                }
-            }
-            // packages.config: Default in vs2013, vs2012, and vs2010
-            else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
-                    || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv <= DevEnv.vs2013))
-            {
-                var packagesConfig = new PackagesConfig();
-                packagesConfig.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
-                if (packagesConfig.IsGenerated)
-                {
-                    string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(packagesConfig.PackagesConfigPath));
-                    itemGroups.Nones.Add(new ItemGroups.None { Include = include });
-                }
-                foreach (var references in configuration.ReferencesByNuGetPackage)
-                {
-                    string dotNetHint = references.DotNetHint;
-                    if (string.IsNullOrWhiteSpace(dotNetHint))
+                    var resolver = new Resolver();
+                    foreach (var packageReference in configuration.ReferencesByNuGetPackage)
                     {
-                        var frameworkFlags = project.Targets.TargetPossibilities.Select(f => f.GetFragment<DotNetFramework>()).Aggregate((x, y) => x | y);
-                        DotNetFramework dnfs = ((DotNetFramework[])Enum.GetValues(typeof(DotNetFramework))).First(f => frameworkFlags.HasFlag(f));
-                        dotNetHint = dnfs.ToFolderName();
+                        itemGroups.AddPackageReference(dotNetFramework, new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
                     }
-                    string hintPath = Path.Combine("$(SolutionDir)packages", references.Name + "." + references.Version, "lib", dotNetHint, references.Name + ".dll");
-                    itemGroups.References.Add(new ItemGroups.Reference { Include = references.Name, HintPath = hintPath });
+                }
+                // project.json: Default in vs2015
+                else if (project.NuGetReferenceType == Project.NuGetPackageMode.ProjectJson
+                        || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv == DevEnv.vs2015))
+                {
+                    if (devenv < DevEnv.vs2015)
+                        throw new Error("Project.json files are not supported on Visual Studio versions below vs2015");
+
+                    var projectJson = new ProjectJson();
+                    projectJson.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
+                    if (projectJson.IsGenerated)
+                    {
+                        string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(projectJson.ProjectJsonPath));
+                        itemGroups.Nones.Add(new ItemGroups.None { Include = include });
+                    }
+                }
+                // packages.config: Default in vs2013, vs2012, and vs2010
+                else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
+                        || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv <= DevEnv.vs2013))
+                {
+                    var packagesConfig = new PackagesConfig();
+                    packagesConfig.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
+                    if (packagesConfig.IsGenerated)
+                    {
+                        string include = Util.PathGetRelative(_projectPathCapitalized, Util.SimplifyPath(packagesConfig.PackagesConfigPath));
+                        itemGroups.Nones.Add(new ItemGroups.None { Include = include });
+                    }
+                    foreach (var references in configuration.ReferencesByNuGetPackage)
+                    {
+                        string dotNetHint = references.DotNetHint;
+                        if (string.IsNullOrWhiteSpace(dotNetHint))
+                        {
+                            var frameworkFlags = project.Targets.TargetPossibilities.Select(f => f.GetFragment<DotNetFramework>()).Aggregate((x, y) => x | y);
+                            DotNetFramework dnfs = ((DotNetFramework[])Enum.GetValues(typeof(DotNetFramework))).First(f => frameworkFlags.HasFlag(f));
+                            dotNetHint = dnfs.ToFolderName();
+                        }
+                        string hintPath = Path.Combine("$(SolutionDir)packages", references.Name + "." + references.Version, "lib", dotNetHint, references.Name + ".dll");
+                        itemGroups.AddReference(dotNetFramework, new ItemGroups.Reference { Include = references.Name, HintPath = hintPath });
+                    }
                 }
             }
         }

@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -20,8 +19,8 @@
     <Optimize>false</Optimize>
     <OutputPath>..\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake.Generators</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\Debug\Sharpmake.Generators.xml</DocumentationFile>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</BaseIntermediateOutputPath>
+    <DocumentationFile>..\bin\debug\sharpmake.generators.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -37,8 +36,8 @@
     <Optimize>true</Optimize>
     <OutputPath>..\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake.Generators</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\Release\Sharpmake.Generators.xml</DocumentationFile>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</BaseIntermediateOutputPath>
+    <DocumentationFile>..\bin\release\sharpmake.generators.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

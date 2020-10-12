@@ -21,13 +21,14 @@ Exec( 'GenerateHeader' )
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\..\codebase\requireprebuildstep\execute.bat'
   .ExecInput            = '.\$_CURRENT_BFF_DIR_$\..\codebase\requireprebuildstep\main.cpp'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\generated\header_generated_by_prebuild_step.h'
-  .ExecArguments        = 'echo #define PREBUILD_GENERATED_DEFINE() 0 > e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\generated\header_generated_by_prebuild_step.h'
+  .ExecArguments        = 'echo #define PREBUILD_GENERATED_DEFINE() 0 > generated\header_generated_by_prebuild_step.h'
 }
 
 
 //=================================================================================================================
 // fastbuildfunctionaltest.bff .bff includes
 //=================================================================================================================
+#include ".\explicitlyorderedpostbuildtest_vs2017_win64.bff"
 #include ".\mixcppandcexe_vs2017_win64.bff"
 #include ".\postbuildcopydirtest_vs2017_win64.bff"
 #include ".\postbuildcopysinglefiletest_vs2017_win64.bff"

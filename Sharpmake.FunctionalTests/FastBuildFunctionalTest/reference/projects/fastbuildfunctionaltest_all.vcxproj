@@ -89,7 +89,7 @@ $(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_
     <NMakePreprocessorDefinitions>NDEBUG;WIN64</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\fastbuildfunctionaltest_all.bff" />
+    <None Include="fastbuildfunctionaltest_all.bff" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

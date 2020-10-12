@@ -164,11 +164,12 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_32D9274C' )
+Exec( 'Exec_postbuildexecutetest_exe_6F670091' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2017\postbuild_exec_sentinel.txt'
   .ExecUseStdOutAsOutput = true
+  .PreBuildDependencies = 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
@@ -177,7 +178,7 @@ Alias( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_32D9274C'
+                   'Exec_postbuildexecutetest_exe_6F670091'
                }
 }
 
@@ -328,11 +329,12 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executab
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_B1C1EB06' )
+Exec( 'Exec_postbuildexecutetest_exe_CAF85FE1' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2017\postbuild_exec_sentinel.txt'
   .ExecUseStdOutAsOutput = true
+  .PreBuildDependencies = 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable'
 }
 
 
@@ -341,7 +343,7 @@ Alias( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_B1C1EB06'
+                   'Exec_postbuildexecutetest_exe_CAF85FE1'
                }
 }
 
@@ -491,11 +493,12 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_F8EDE0EF' )
+Exec( 'Exec_postbuildexecutetest_exe_980FD418' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2017\postbuild_exec_sentinel.txt'
   .ExecUseStdOutAsOutput = true
+  .PreBuildDependencies = 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable'
 }
 
 
@@ -504,7 +507,7 @@ Alias( 'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Debug_FastBuild_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_F8EDE0EF'
+                   'Exec_postbuildexecutetest_exe_980FD418'
                }
 }
 
@@ -655,11 +658,12 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable' )
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_6EEA7B0B' )
+Exec( 'Exec_postbuildexecutetest_exe_205BA032' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2017\postbuild_exec_sentinel.txt'
   .ExecUseStdOutAsOutput = true
+  .PreBuildDependencies = 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable'
 }
 
 
@@ -668,7 +672,7 @@ Alias( 'PostBuildExecuteTest_Release_FastBuild_vs2017_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Release_FastBuild_vs2017_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_6EEA7B0B'
+                   'Exec_postbuildexecutetest_exe_205BA032'
                }
 }
 

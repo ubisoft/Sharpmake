@@ -56,7 +56,7 @@ namespace Sharpmake
                 string lldString = string.Empty;
                 var useLldLink = Options.GetObject<Options.Vc.LLVM.UseLldLink>(conf);
                 if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable ||
-                   (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset == Options.Vc.General.PlatformToolset.LLVM))
+                   (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset.IsLLVMToolchain()))
                 {
                     lldString = "_LLD";
                 }
@@ -88,7 +88,7 @@ namespace Sharpmake
                 string compilerName = "Compiler-" + Util.GetSimplePlatformString(platform);
 
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
-                if (platformToolset == Options.Vc.General.PlatformToolset.LLVM)
+                if (platformToolset.IsLLVMToolchain())
                 {
                     var useClangCl = Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf);
 
@@ -167,6 +167,7 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                         case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                         case Options.Vc.General.PlatformToolset.LLVM:
+                        case Options.Vc.General.PlatformToolset.ClangCL:
 
                             platformToolSetPath = ClangForWindows.Settings.LLVMInstallDir;
                             pathToCompiler = Path.Combine(platformToolSetPath, "bin");

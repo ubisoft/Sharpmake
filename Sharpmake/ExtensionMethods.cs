@@ -40,10 +40,6 @@ namespace Sharpmake
         {
             switch (framework)
             {
-                case DotNetFramework.v2:
-                    return "2.0";
-                case DotNetFramework.v3:
-                    return "3.0";
                 case DotNetFramework.v3_5:
                     return "3.5";
                 case DotNetFramework.v3_5clientprofile:
@@ -70,6 +66,8 @@ namespace Sharpmake
                     return "4.7.1";
                 case DotNetFramework.v4_7_2:
                     return "4.7.2";
+                case DotNetFramework.v4_8:
+                    return "4.8";
                 case DotNetFramework.netcore1_0:
                     return "netcoreapp1.0";
                 case DotNetFramework.netcore1_1:
@@ -84,6 +82,24 @@ namespace Sharpmake
                     return "netcoreapp3.0";
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
+                case DotNetFramework.netstandard1_0:
+                    return "netstandard1.0";
+                case DotNetFramework.netstandard1_1:
+                    return "netstandard1.1";
+                case DotNetFramework.netstandard1_2:
+                    return "netstandard1.2";
+                case DotNetFramework.netstandard1_3:
+                    return "netstandard1.3";
+                case DotNetFramework.netstandard1_4:
+                    return "netstandard1.4";
+                case DotNetFramework.netstandard1_5:
+                    return "netstandard1.5";
+                case DotNetFramework.netstandard1_6:
+                    return "netstandard1.6";
+                case DotNetFramework.netstandard2_0:
+                    return "netstandard2.0";
+                case DotNetFramework.netstandard2_1:
+                    return "netstandard2.1";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(framework));
             }
@@ -91,10 +107,9 @@ namespace Sharpmake
 
         public static string ToFolderName(this DotNetFramework framework)
         {
+            //https://docs.microsoft.com/en-us/dotnet/standard/frameworks
             switch (framework)
             {
-                case DotNetFramework.v2:
-                    return "net20";
                 case DotNetFramework.v3_5:
                     return "net35";
                 case DotNetFramework.v4_0:
@@ -117,6 +132,8 @@ namespace Sharpmake
                     return "net471";
                 case DotNetFramework.v4_7_2:
                     return "net472";
+                case DotNetFramework.v4_8:
+                    return "net48";
                 case DotNetFramework.netcore1_0:
                     return "netcoreapp1.0";
                 case DotNetFramework.netcore1_1:
@@ -131,14 +148,42 @@ namespace Sharpmake
                     return "netcoreapp3.0";
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
+                case DotNetFramework.netstandard1_0:
+                    return "netstandard1.0";
+                case DotNetFramework.netstandard1_1:
+                    return "netstandard1.1";
+                case DotNetFramework.netstandard1_2:
+                    return "netstandard1.2";
+                case DotNetFramework.netstandard1_3:
+                    return "netstandard1.3";
+                case DotNetFramework.netstandard1_4:
+                    return "netstandard1.4";
+                case DotNetFramework.netstandard1_5:
+                    return "netstandard1.5";
+                case DotNetFramework.netstandard1_6:
+                    return "netstandard1.6";
+                case DotNetFramework.netstandard2_0:
+                    return "netstandard2.0";
+                case DotNetFramework.netstandard2_1:
+                    return "netstandard2.1";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(framework));
             }
         }
 
+        public static bool IsDotNetFramework(this DotNetFramework framework)
+        {
+            return (0 != (framework & DotNetFramework.all_netframework));
+        }
+
         public static bool IsDotNetCore(this DotNetFramework framework)
         {
             return (0 != (framework & DotNetFramework.all_netcore));
+        }
+
+        public static bool IsDotNetStandard(this DotNetFramework framework)
+        {
+            return (0 != (framework & DotNetFramework.all_netstandard));
         }
 
         public static string GetVisualProjectToolsVersionString(this DevEnv visualVersion)
@@ -706,6 +751,7 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                 case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.ClangCL:
                 case Options.Vc.General.PlatformToolset.Default:
                     return false;
                 default:
@@ -738,6 +784,7 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                 case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.ClangCL:
                     return null;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(platformToolset), platformToolset, null);
@@ -780,6 +827,7 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.LLVM_vs2012:
                 case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
+                case Options.Vc.General.PlatformToolset.ClangCL:
                     return true;
             }
             return false;

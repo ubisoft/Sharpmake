@@ -102,9 +102,20 @@ namespace Sharpmake.Generators.FastBuild
             string Resolve(string rootPath, string bffFilePath, Resolver resolver);
         }
 
-        internal class ExecNode : IResolvable
+        internal abstract class BffNodeBase : IResolvable
         {
-            public string BuildStepKey;
+            public string Identifier;
+
+            public abstract string Resolve(string rootPath, string bffFilePath, Resolver resolver);
+        }
+
+        internal abstract class BffDependentNode : BffNodeBase
+        {
+            public Strings Dependencies = new Strings();
+        }
+
+        internal class ExecNode : BffDependentNode
+        {
             public string ExecutableFile;
             public Strings InputFiles;
             public string OutputFile;
@@ -115,7 +126,7 @@ namespace Sharpmake.Generators.FastBuild
 
             public ExecNode(string buildStepKey, Project.Configuration.BuildStepExecutable buildStep)
             {
-                BuildStepKey = buildStepKey;
+                Identifier = buildStepKey;
                 ExecutableFile = buildStep.ExecutableFile;
 
                 IEnumerable<string> inputFiles = buildStep.FastBuildExecutableInputFiles.Count > 0 ? buildStep.FastBuildExecutableInputFiles : Enumerable.Repeat(buildStep.ExecutableInputFileArgumentOption, 1);
@@ -128,11 +139,11 @@ namespace Sharpmake.Generators.FastBuild
                 AlwaysShowOutput = buildStep.FastBuildAlwaysShowOutput;
             }
 
-            public string Resolve(string rootPath, string bffFilePath, Resolver resolver)
+            public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
             {
                 var inputFiles = InputFiles.Select(f => UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, f));
 
-                using (resolver.NewScopedParameter("fastBuildPreBuildName", BuildStepKey))
+                using (resolver.NewScopedParameter("fastBuildPreBuildName", Identifier))
                 using (resolver.NewScopedParameter("fastBuildPrebuildExeFile", UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, ExecutableFile)))
                 using (resolver.NewScopedParameter("fastBuildPreBuildInputFiles", UtilityMethods.FBuildFormatList(inputFiles.ToList(), 26)))
                 using (resolver.NewScopedParameter("fastBuildPreBuildOutputFile", UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, OutputFile)))
@@ -140,42 +151,42 @@ namespace Sharpmake.Generators.FastBuild
                 using (resolver.NewScopedParameter("fastBuildPrebuildWorkingPath", UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, WorkingPath)))
                 using (resolver.NewScopedParameter("fastBuildPrebuildUseStdOutAsOutput", UseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildPrebuildAlwaysShowOutput", AlwaysShowOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
+                using (resolver.NewScopedParameter("fastBuildExecPreBuildDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 26) : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.GenericExecutableSection);
                 }
             }
         }
 
-        internal class CopyNode : IResolvable
+        internal class CopyNode : BffDependentNode
         {
-            public string BuildStepKey;
             public string Source;
             public string Destination;
 
             public CopyNode(string buildStepKey, Project.Configuration.BuildStepCopy buildStep)
             {
-                BuildStepKey = buildStepKey;
+                Identifier = buildStepKey;
                 Source = buildStep.SourcePath;
                 Destination = buildStep.DestinationPath;
             }
 
-            public string Resolve(string rootPath, string bffFilePath, Resolver resolver)
+            public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
             {
                 var normalizedSource = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, Source);
                 var normalizedDestination = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, Destination);
 
-                using (resolver.NewScopedParameter("fastBuildCopyAlias", BuildStepKey))
+                using (resolver.NewScopedParameter("fastBuildCopyAlias", Identifier))
                 using (resolver.NewScopedParameter("fastBuildCopySource", normalizedSource))
                 using (resolver.NewScopedParameter("fastBuildCopyDest", normalizedDestination))
+                using (resolver.NewScopedParameter("fastBuildCopyDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 28) : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.CopyFileSection);
                 }
             }
         }
 
-        internal class CopyDirNode : IResolvable
+        internal class CopyDirNode : BffDependentNode
         {
-            public string BuildStepKey;
             public string Source;
             public string Destination;
             public bool Recurse;
@@ -183,32 +194,32 @@ namespace Sharpmake.Generators.FastBuild
 
             public CopyDirNode(string buildStepKey, Project.Configuration.BuildStepCopy buildStep)
             {
-                BuildStepKey = buildStepKey;
+                Identifier = buildStepKey;
                 Source = buildStep.SourcePath;
                 Destination = buildStep.DestinationPath;
                 Recurse = buildStep.IsRecurse;
                 FilePattern = buildStep.CopyPattern;
             }
 
-            public string Resolve(string rootPath, string bffFilePath, Resolver resolver)
+            public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
             {
                 var normalizedSource = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, Source);
                 var normalizedDestination = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, Destination);
 
-                using (resolver.NewScopedParameter("fastBuildCopyDirName", BuildStepKey))
+                using (resolver.NewScopedParameter("fastBuildCopyDirName", Identifier))
                 using (resolver.NewScopedParameter("fastBuildCopyDirSourcePath", Util.EnsureTrailingSeparator(normalizedSource)))
                 using (resolver.NewScopedParameter("fastBuildCopyDirDestinationPath", Util.EnsureTrailingSeparator(normalizedDestination)))
                 using (resolver.NewScopedParameter("fastBuildCopyDirRecurse", Recurse.ToString().ToLower()))
                 using (resolver.NewScopedParameter("fastBuildCopyDirPattern", UtilityMethods.GetBffFileCopyPattern(FilePattern)))
+                using (resolver.NewScopedParameter("fastBuildCopyDirDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 42) : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.CopyDirSection);
                 }
             }
         }
 
-        internal class TestNode : IResolvable
+        internal class TestNode : BffDependentNode
         {
-            public string BuildStepKey;
             public string Executable;
             public string WorkingDir;
             public string Output;
@@ -218,7 +229,7 @@ namespace Sharpmake.Generators.FastBuild
 
             public TestNode(string buildStepKey, Project.Configuration.BuildStepTest buildStep)
             {
-                BuildStepKey = buildStepKey;
+                Identifier = buildStepKey;
                 Executable = buildStep.TestExecutable;
                 WorkingDir = buildStep.TestWorkingDir;
                 Output = buildStep.TestOutput;
@@ -227,19 +238,20 @@ namespace Sharpmake.Generators.FastBuild
                 AlwaysShowOutput = buildStep.TestAlwaysShowOutput;
             }
 
-            public string Resolve(string rootPath, string bffFilePath, Resolver resolver)
+            public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
             {
                 var normalizedExecutable = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, Executable);
                 var normalizedWorkingDir = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, WorkingDir);
                 var normalizedOutput = UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, Output);
 
-                using (resolver.NewScopedParameter("fastBuildTest", BuildStepKey))
+                using (resolver.NewScopedParameter("fastBuildTest", Identifier))
                 using (resolver.NewScopedParameter("fastBuildTestExecutable", normalizedExecutable))
                 using (resolver.NewScopedParameter("fastBuildTestWorkingDir", normalizedWorkingDir))
                 using (resolver.NewScopedParameter("fastBuildTestOutput", normalizedOutput))
                 using (resolver.NewScopedParameter("fastBuildTestArguments", string.IsNullOrWhiteSpace(Arguments) ? FileGeneratorUtilities.RemoveLineTag : Arguments))
                 using (resolver.NewScopedParameter("fastBuildTestTimeOut", TimeOutInSeconds == 0 ? FileGeneratorUtilities.RemoveLineTag : TimeOutInSeconds.ToString()))
                 using (resolver.NewScopedParameter("fastBuildTestAlwaysShowOutput", AlwaysShowOutput.ToString().ToLower()))
+                using (resolver.NewScopedParameter("fastBuildTestPreBuildDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 27) : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.TestSection);
                 }
@@ -687,11 +699,13 @@ namespace Sharpmake.Generators.FastBuild
             return path;
         }
 
-        public static Bff.IResolvable GetResolveableFromBuildStep(string buildStepKey, Project.Configuration.BuildStepBase buildStep)
+        private static Bff.BffNodeBase GetBffNodesFromBuildStep(string buildStepKey, Project.Configuration.BuildStepBase buildStep, Strings dependencies)
         {
+            Bff.BffDependentNode node = null;
+
             if (buildStep is Project.Configuration.BuildStepExecutable)
             {
-                return new Bff.ExecNode(buildStepKey, buildStep as Project.Configuration.BuildStepExecutable);
+                node = new Bff.ExecNode(buildStepKey, buildStep as Project.Configuration.BuildStepExecutable);
             }
 
             if (buildStep is Project.Configuration.BuildStepCopy)
@@ -700,23 +714,45 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (copyStep.IsFileCopy)
                 {
-                    return new Bff.CopyNode(buildStepKey, copyStep);
+                    node = new Bff.CopyNode(buildStepKey, copyStep);
                 }
-
-                return new Bff.CopyDirNode(buildStepKey, copyStep);
+                else
+                {
+                    node = new Bff.CopyDirNode(buildStepKey, copyStep);
+                }
             }
 
             if (buildStep is Project.Configuration.BuildStepTest)
             {
-                return new Bff.TestNode(buildStepKey, buildStep as Project.Configuration.BuildStepTest);
+                node = new Bff.TestNode(buildStepKey, buildStep as Project.Configuration.BuildStepTest);
             }
 
-            throw new Error("error, BuildStep not supported: {0}", buildStep.GetType().FullName);
+            if (node == null)
+            {
+                throw new Error("BuildStep not supported: {0}", buildStep.GetType().FullName);
+            }
+
+            node.Dependencies.AddRange(dependencies);
+
+            return node;
         }
 
-        public static List<Bff.IResolvable> GetResolvablesFromBuildSteps(Dictionary<string, Project.Configuration.BuildStepBase> buildSteps)
+        public static List<Bff.BffNodeBase> GetBffNodesFromBuildSteps(Dictionary<string, Project.Configuration.BuildStepBase> buildSteps, Strings preBuildDependencies)
         {
-            return buildSteps.Select(e => GetResolveableFromBuildStep(e.Key, e.Value)).ToList();
+            var result = new List<Bff.BffNodeBase>();
+
+            foreach (var buildStep in buildSteps.OrderBy(kvp => kvp.Value))
+            {
+                // If CompareTo between two BuildSteps does not return 0, we create an explicit dependency to enforce execution order.
+                var dependencySteps = buildSteps.Where(kvp => kvp.Value.CompareTo(buildStep.Value) < 0).Select(kvp => kvp.Key);
+
+                Strings nodePreBuildDependencies = new Strings(preBuildDependencies);
+                nodePreBuildDependencies.AddRange(dependencySteps);
+
+                result.Add(GetBffNodesFromBuildStep(buildStep.Key, buildStep.Value, nodePreBuildDependencies));
+            }
+
+            return result;
         }
     }
 }
