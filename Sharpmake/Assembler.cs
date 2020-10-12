@@ -456,7 +456,7 @@ namespace Sharpmake
             using (var dllStream = new MemoryStream())
             using (var pdbStream = new MemoryStream())
             {
-                EmitResult result = compilation.Emit(dllStream, pdbStream, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.Pdb));
+                EmitResult result = compilation.Emit(dllStream, pdbStream, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb));
 
                 if (result.Success)
                 {
