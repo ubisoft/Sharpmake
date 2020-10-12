@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Build.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Sharpmake
 {
@@ -235,7 +241,7 @@ namespace Sharpmake
             }
 
             // build in memory
-            Assembly assembly = assembler.Build(null, null, sourceTmpFile).Assembly;
+            Assembly assembly = assembler.Build(builderContext: null, libraryFile: null, sources: sourceTmpFile).Assembly;
             InternalError.Valid(assembly != null);
 
             // Try to delete tmp file to prevent pollution, but useful while debugging
@@ -383,14 +389,16 @@ namespace Sharpmake
         private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
         {
             var assemblyInfo = LoadAssemblyInfo(builderContext, sources);
+            HashSet<string> references = GetReferences();
 
+            assemblyInfo.Assembly = Compile(builderContext, assemblyInfo.SourceFiles.ToArray(), libraryFile, references);
+            assemblyInfo.Id = assemblyInfo.Assembly.Location;
+            return assemblyInfo;
+        }
+
+        private HashSet<string> GetReferences()
+        {
             HashSet<string> references = new HashSet<string>();
-
-            Dictionary<string, string> providerOptions = new Dictionary<string, string>();
-            providerOptions.Add("CompilerVersion", "v4.0");
-            CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider(providerOptions);
-
-            CompilerParameters cp = new CompilerParameters();
 
             if (UseDefaultReferences)
             {
@@ -407,83 +415,90 @@ namespace Sharpmake
                     references.Add(assembly.Location);
             }
 
-            cp.ReferencedAssemblies.AddRange(references.ToArray());
+            return references;
+        }
 
-            // Generate an library
-            cp.GenerateExecutable = false;
+        private SourceText ReadSourceCode(string path)
+        {
+            using (var stream = File.OpenRead(path))
+                return SourceText.From(stream, Encoding.Default);
+        }
 
-            // Set the level at which the compiler
-            // should start displaying warnings.
-            cp.WarningLevel = 4;
+        private Assembly Compile(IBuilderContext builderContext, string[] files, string libraryFile, HashSet<string> references)
+        {
+            // Parse all files
+            var syntaxTrees = new ConcurrentBag<SyntaxTree>();
+            var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp7, DocumentationMode.None, preprocessorSymbols: _defines);
+            Parallel.ForEach(files, f => syntaxTrees.Add(CSharpSyntaxTree.ParseText(ReadSourceCode(f), parseOptions, path: f)));
 
-            // Set whether to treat all warnings as errors.
-            cp.TreatWarningsAsErrors = false;
+            return Compile(builderContext, syntaxTrees.ToArray(), libraryFile, references);
+        }
 
-            // Set compiler argument to optimize output.
-            // TODO : figure out why it does not work when uncommenting the following line
-            // cp.CompilerOptions = "/optimize";
+        private Assembly Compile(IBuilderContext builderContext, SyntaxTree[] syntaxTrees, string libraryFile, HashSet<string> references)
+        {
+            // Add references
+            var portableExecutableReferences = new List<PortableExecutableReference>();
 
-            // If any defines are specified, pass them to the CSC.
-            if (_defines.Any())
+            foreach (var reference in references.Where(r => !string.IsNullOrEmpty(r)))
             {
-                cp.CompilerOptions = "-DEFINE:" + string.Join(",", _defines);
+                portableExecutableReferences.Add(MetadataReference.CreateFromFile(reference));
             }
 
-            // Specify the assembly file name to generate
-            if (libraryFile == null)
+            // Compile
+            var compilationOptions = new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary,
+                optimizationLevel: OptimizationLevel.Release,
+                warningLevel: 4
+            );
+            var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
+            var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, portableExecutableReferences, compilationOptions);
+
+            using (var dllStream = new MemoryStream())
+            using (var pdbStream = new MemoryStream())
             {
-                cp.GenerateInMemory = true;
-                cp.IncludeDebugInformation = false;
-            }
-            else
-            {
-                cp.GenerateInMemory = false;
-                cp.IncludeDebugInformation = true;
-                cp.OutputAssembly = libraryFile;
-            }
+                EmitResult result = compilation.Emit(dllStream, pdbStream, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.Pdb));
 
-            // Notes:
-            // Avoid getting spoiled by environment variables. 
-            // C# will give compilation errors if a LIB variable contains non-existing directories.
-            Environment.SetEnvironmentVariable("LIB", null);
-
-            // Configure Temp file collection to avoid deleting its temp file. We will delete them ourselves after the compilation
-            // For some reasons, this seems to add just enough delays to avoid the following first chance exception(probably caused by some handles in csc.exe)
-            // System.IO.IOException: 'The process cannot access the file 'C:\Users\xxx\AppData\Local\Temp\sa205152\sa205152.out' because it is being used by another process.'            
-            // That exception wasn't causing real problems but was really annoying when debugging!
-            // Executed several times sharpmake and this first chance exception no longer occurs when KeepFiles is true.
-            cp.TempFiles.KeepFiles = true;
-
-            // Invoke compilation of the source file.
-            CompilerResults cr = provider.CompileAssemblyFromFile(cp, assemblyInfo.SourceFiles.ToArray());
-
-            // Manually delete the files in the temp files collection.
-            cp.TempFiles.Delete();
-
-            if (cr.Errors.HasErrors || cr.Errors.HasWarnings)
-            {
-                string errorMessage = "";
-                foreach (CompilerError ce in cr.Errors)
+                if (result.Success)
                 {
-                    if (ce.IsWarning)
-                        EventOutputWarning?.Invoke("{0}" + Environment.NewLine, ce.ToString());
-                    else
-                        EventOutputError?.Invoke("{0}" + Environment.NewLine, ce.ToString());
+                    if (libraryFile != null)
+                    {
+                        dllStream.Seek(0, SeekOrigin.Begin);
+                        using (var fileStream = new FileStream(libraryFile, FileMode.Create))
+                            dllStream.CopyTo(fileStream);
 
-                    errorMessage += ce + Environment.NewLine;
+                        pdbStream.Seek(0, SeekOrigin.Begin);
+                        using (var pdbFileStream = new FileStream(Path.ChangeExtension(libraryFile, ".pdb"), FileMode.Create))
+                            pdbStream.CopyTo(pdbFileStream);
+
+                        return Assembly.LoadFrom(libraryFile);
+                    }
+
+                    return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
 
-                if (cr.Errors.HasErrors)
-                {
-                    if (builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
-                        throw new Error(errorMessage);
-                    return assemblyInfo;
-                }
+                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
+                LogCompilationResult(result, throwErrorException);
             }
 
-            assemblyInfo.Assembly = cr.CompiledAssembly;
-            assemblyInfo.Id = assemblyInfo.Assembly.Location;
-            return assemblyInfo;
+            return null;
+        }
+
+        private void LogCompilationResult(EmitResult result, bool throwErrorException)
+        {
+            string errorMessage = "";
+
+            foreach (var diagnostic in result.Diagnostics)
+            {
+                if (diagnostic.Severity == DiagnosticSeverity.Error)
+                    EventOutputError?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+                else // catch everything else as warning
+                    EventOutputWarning?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+
+                errorMessage += diagnostic + Environment.NewLine;
+            }
+
+            if (throwErrorException)
+                throw new Error(errorMessage);
         }
 
         private List<ISourceAttributeParser> ComputeParsers()

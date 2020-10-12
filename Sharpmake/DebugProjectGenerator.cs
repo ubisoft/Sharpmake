@@ -225,12 +225,12 @@ namespace Sharpmake
         {
             return new Target(
                 Platform.anycpu,
-                DevEnv.vs2017,
+                DevEnv.vs2019,
                 Optimization.Debug,
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_6_1
+                DotNetFramework.v4_7_2
             );
         }
 
@@ -317,7 +317,7 @@ namespace Sharpmake
             conf.ProjectFileName = "[project.Name].[target.DevEnv]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
 
-            conf.Options.Add(Options.CSharp.LanguageVersion.CSharp5);
+            conf.Options.Add(Options.CSharp.LanguageVersion.CSharp7);
 
             conf.Defines.Add(_projectInfo.Defines.ToArray());
 

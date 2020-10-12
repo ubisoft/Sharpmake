@@ -31,7 +31,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2017,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.v4_6_1
+                    framework: DotNetFramework.v4_7_2
                 )
             );
             return result.ToArray();
@@ -69,7 +69,7 @@ namespace SharpmakeGen
 
                 conf.ReferencesByName.Add("System");
 
-                conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
+                conf.Options.Add(Options.CSharp.LanguageVersion.CSharp7);
                 conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
                 conf.Options.Add(
                     new Options.CSharp.WarningsNotAsErrors(

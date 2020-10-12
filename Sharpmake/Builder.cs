@@ -398,6 +398,9 @@ namespace Sharpmake
         {
             Assembler assembler = new Assembler(Defines);
 
+            // Add currently loaded assemblies
+            assembler.Assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies());
+
             // Add sharpmake assembly
             assembler.Assemblies.Add(_sharpmakeAssembly.Value);
 
