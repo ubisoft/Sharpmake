@@ -2394,6 +2394,11 @@ namespace Sharpmake
             InitCSharpSpecifics();
         }
 
+        [Obsolete("This method was meant to only be called internally, think again if you were calling it from your scripts.")]
+        public static void AddCSharpSpecificPreImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
+        {
+        }
+
         public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
         {
             if (ProjectTypeGuids == CSharpProjectType.Vsix)
