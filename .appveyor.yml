@@ -1,7 +1,7 @@
 # Sharpmake AppVeyor CI configuration
 
 image:
-- Visual Studio 2017
+- Visual Studio 2019
 - macOS
 - Ubuntu
 
