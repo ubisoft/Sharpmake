@@ -17,10 +17,10 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\debug</OutputPath>
+    <OutputPath>..\tmp\bin\debug\sharpmake.generators</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\debug\sharpmake.generators.xml</DocumentationFile>
+    <DocumentationFile>..\tmp\bin\debug\sharpmake.generators\sharpmake.generators.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -34,10 +34,10 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\release</OutputPath>
+    <OutputPath>..\tmp\bin\release\sharpmake.generators</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\release\sharpmake.generators.xml</DocumentationFile>
+    <DocumentationFile>..\tmp\bin\release\sharpmake.generators\sharpmake.generators.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -112,6 +112,7 @@
     <ProjectReference Include="..\Sharpmake\Sharpmake.csproj">
       <Project>{15f793c7-9e88-64a9-591c-7244fcc6b771}</Project>
       <Name>Sharpmake</Name>
+      <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

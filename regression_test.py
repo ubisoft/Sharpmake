@@ -29,7 +29,7 @@ class Test:
             os.chdir(pwd)
 
             # Detects the path of the Sharpmake executable
-            sharpmake_path = find_target_path(self.directory, "Sharpmake.Application.exe")
+            sharpmake_path = find_target_path("Sharpmake.Application", "Sharpmake.Application.exe")
 
             write_line("Using sharpmake " + sharpmake_path)
 
@@ -81,7 +81,7 @@ tests = [
 def find_target_path(directory, target):
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join("..", "bin", optim_token, "samples", target))
+        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, directory, target))
         if os.path.isfile(path):
             return path
 

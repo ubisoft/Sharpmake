@@ -28,7 +28,7 @@ class FunctionalTest(object):
             os.chdir(pwd)
 
             # Detects the path of the Sharpmake executable
-            sharpmake_path = find_target_path(os.path.join(entry_path, "bin"), "Sharpmake.Application.exe")
+            sharpmake_path = find_target_path(self.directory, "Sharpmake.Application.exe")
 
             write_line("Using sharpmake " + sharpmake_path)
 
@@ -145,7 +145,7 @@ def build_with_fastbuild(root_dir, test_dir):
 def find_target_path(directory, target):
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join(directory, optim_token, target))
+        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, "sharpmake.application", target))
         if os.path.isfile(path):
             return path
 
@@ -163,6 +163,10 @@ def red_bg():
 def green_bg():
     if os.name == "nt":
         os.system("color 2F")
+        
+def black_bg():
+    if os.name == "nt":
+        os.system("color 0F")
 
 def pause(timeout=None):
     if timeout is None:
@@ -216,5 +220,6 @@ def launch_functional_tests():
     finally:
         os.chdir(entry_path)
 
+black_bg()
 exit_code = launch_functional_tests()
 sys.exit(exit_code)

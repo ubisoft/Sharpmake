@@ -64,7 +64,7 @@ else:
     sys.exit(-1)
 
 # Check if there are actual DLLs to copy, otherwise it must be compiled in VS.
-if not os.path.isfile(os.path.join(root_dir, "bin/{}/Sharpmake.dll".format(config))):
+if not os.path.isfile(os.path.join(root_dir, "tmp/bin/{}/sharpmake/Sharpmake.dll".format(config))):
     print("Please build Sharpmake in its {} configuration.".format(config))
     sys.exit(1)
 
@@ -86,12 +86,12 @@ class BinarySite:
 
     def copy(self):
         # Copy the DLL.
-        dll_path = os.path.join(root_dir, "bin", config, self.name + ".dll")
+        dll_path = os.path.join(root_dir, "tmp", "bin", config, self.name, self.name + ".dll")
         copy_file(dll_path)
         copy_file(dll_path + ".config")
 
         # Copy the executable.
-        exe_path = os.path.join(root_dir, "bin", config, self.name + ".exe")
+        exe_path = os.path.join(root_dir, "tmp", "bin", config, self.name, self.name + ".exe")
         copy_file(exe_path)
         copy_file(exe_path + ".config")
 
@@ -99,11 +99,11 @@ class BinarySite:
         if deploy_pdb:
             copy_file(dll_path + ".mdb")
             copy_file(exe_path + ".mdb")
-            copy_file(os.path.join(root_dir, "bin", config, self.name + ".pdb"))
+            copy_file(os.path.join(root_dir, "tmp", "bin", config, self.name, self.name + ".pdb"))
 
         # Copy the XML API doc if it exists.
         if deploy_xmldoc:
-            copy_file(os.path.join(root_dir, "bin", config, self.name + ".xml"))
+            copy_file(os.path.join(root_dir, "tmp", "bin", config, self.name, self.name + ".xml"))
 
     def __str__(self):
         return self.name

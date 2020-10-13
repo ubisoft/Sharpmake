@@ -24,8 +24,6 @@ namespace SharpmakeGen
         {
             base.ConfigureAll(conf, target);
 
-            conf.TargetPath = @"[conf.ProjectPath]\bin\[target.Optimization]";
-
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);

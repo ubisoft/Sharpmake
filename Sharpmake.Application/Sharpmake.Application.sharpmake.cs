@@ -14,6 +14,8 @@ namespace SharpmakeGen
         {
             Name = "Sharpmake.Application";
             ApplicationManifest = "app.manifest";
+
+            DependenciesCopyLocal = DependenciesCopyLocalTypes.Default;
         }
 
         public override void ConfigureAll(Configuration conf, Target target)

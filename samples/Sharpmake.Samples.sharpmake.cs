@@ -26,7 +26,7 @@ namespace SharpmakeGen.Samples
             base.ConfigureAll(conf, target);
 
             conf.SolutionFolder = "Samples";
-            conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]\Samples";
+            //conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]\Samples";
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeApplicationProject>(target);

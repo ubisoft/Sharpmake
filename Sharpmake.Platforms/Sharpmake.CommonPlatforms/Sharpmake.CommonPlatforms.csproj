@@ -17,10 +17,10 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\debug</OutputPath>
+    <OutputPath>..\..\tmp\bin\debug\sharpmake.commonplatforms</OutputPath>
     <IntermediateOutputPath>..\..\tmp\obj\debug\sharpmake.commonplatforms</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\tmp\obj\debug\sharpmake.commonplatforms</BaseIntermediateOutputPath>
-    <DocumentationFile>..\..\bin\debug\sharpmake.commonplatforms.xml</DocumentationFile>
+    <DocumentationFile>..\..\tmp\bin\debug\sharpmake.commonplatforms\sharpmake.commonplatforms.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -34,10 +34,10 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\release</OutputPath>
+    <OutputPath>..\..\tmp\bin\release\sharpmake.commonplatforms</OutputPath>
     <IntermediateOutputPath>..\..\tmp\obj\release\sharpmake.commonplatforms</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\..\tmp\obj\release\sharpmake.commonplatforms</BaseIntermediateOutputPath>
-    <DocumentationFile>..\..\bin\release\sharpmake.commonplatforms.xml</DocumentationFile>
+    <DocumentationFile>..\..\tmp\bin\release\sharpmake.commonplatforms\sharpmake.commonplatforms.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -84,10 +84,12 @@
     <ProjectReference Include="..\..\Sharpmake.Generators\Sharpmake.Generators.csproj">
       <Project>{844f66de-b015-340e-720a-8e158b517e93}</Project>
       <Name>Sharpmake.Generators</Name>
+      <Private>false</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\Sharpmake\Sharpmake.csproj">
       <Project>{15f793c7-9e88-64a9-591c-7244fcc6b771}</Project>
       <Name>Sharpmake</Name>
+      <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

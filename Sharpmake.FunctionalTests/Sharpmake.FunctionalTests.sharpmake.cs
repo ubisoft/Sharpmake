@@ -26,7 +26,6 @@ namespace SharpmakeGen
                 base.ConfigureAll(conf, target);
 
                 conf.SolutionFolder = "FunctionalTests";
-                conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]\functionaltests";
 
                 conf.AddPrivateDependency<SharpmakeProject>(target);
                 conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
