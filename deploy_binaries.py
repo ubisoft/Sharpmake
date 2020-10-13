@@ -74,7 +74,7 @@ if not os.path.isdir(target_dir):
 
 ################################################################################
 def copy_file(src):
-    if os.path.isfile(src) and os.path.normpath(os.path.dirname(src)) != os.path.normpath(target_dir):
+    if os.path.isfile(src) and os.path.normcase(os.path.normpath(os.path.dirname(src))) != os.path.normcase(os.path.normpath(target_dir)):
         print("Copying {} to {}".format(os.path.join(root_dir, src), target_dir))
         shutil.copy2(src, target_dir)
 
