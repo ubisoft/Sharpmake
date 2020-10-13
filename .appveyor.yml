@@ -2,6 +2,7 @@
 
 image:
 - Visual Studio 2019
+- Visual Studio 2017
 - macOS
 - Ubuntu
 
@@ -15,6 +16,10 @@ platform:
 configuration:
 - Debug
 - Release
+
+init:
+- sh: >-
+    export NUGET_HTTP_CACHE_PATH=$PWD/tmp/nuget_cache
 
 before_build:
 - cmd: bootstrap.bat
