@@ -147,7 +147,7 @@ for site in copy_list:
     site.copy()
 
 # Also copy the interop allowing the detection of visual studio
-vs_interop = os.path.join(root_dir, "bin", config, "Microsoft.VisualStudio.Setup.Configuration.Interop.dll")
+vs_interop = os.path.join(root_dir, "tmp", "bin", config, "sharpmake", "Microsoft.VisualStudio.Setup.Configuration.Interop.dll")
 if os.path.isfile(vs_interop):
     copy_file(vs_interop)
 
