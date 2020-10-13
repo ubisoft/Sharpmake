@@ -1,10 +1,9 @@
 # Sharpmake AppVeyor CI configuration
 
 image:
-- Visual Studio 2019
-- Visual Studio 2017
 - macOS
 - Ubuntu
+- Visual Studio 2019
 
 skip_commits:
   files:
@@ -26,8 +25,8 @@ before_build:
 - sh: ./bootstrap.sh
 
 build_script:
-  - cmd: CompileSharpmake.bat Sharpmake.sln "%CONFIGURATION%" "%PLATFORM%"
-  - sh: ./CompileSharpmake.sh Sharpmake.sln "${CONFIGURATION}" "${PLATFORM}"
+- cmd: CompileSharpmake.bat Sharpmake.sln "%CONFIGURATION%" "%PLATFORM%"
+- sh: ./CompileSharpmake.sh Sharpmake.sln "${CONFIGURATION}" "${PLATFORM}"
 
 test:
   assemblies:

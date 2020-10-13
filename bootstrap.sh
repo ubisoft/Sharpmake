@@ -25,7 +25,7 @@ fi
 # workaround for https://github.com/mono/mono/issues/6752
 TERM=xterm
 
-SHARPMAKE_EXECUTABLE=$CURRENT_DIR/bin/debug/Sharpmake.Application.exe
+SHARPMAKE_EXECUTABLE=$CURRENT_DIR/tmp/bin/debug/sharpmake.application/Sharpmake.Application.exe
 
 $CURRENT_DIR/CompileSharpmake.sh $CURRENT_DIR/Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
 if [ $? -ne 0 ]; then
