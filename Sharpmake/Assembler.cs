@@ -25,6 +25,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
+using EmbeddedText = Microsoft.CodeAnalysis.EmbeddedText;
 
 namespace Sharpmake
 {
@@ -421,20 +422,26 @@ namespace Sharpmake
         private SourceText ReadSourceCode(string path)
         {
             using (var stream = File.OpenRead(path))
-                return SourceText.From(stream, Encoding.Default);
+                return SourceText.From(stream, Encoding.Default, canBeEmbedded: true);
         }
 
         private Assembly Compile(IBuilderContext builderContext, string[] files, string libraryFile, HashSet<string> references)
         {
             // Parse all files
             var syntaxTrees = new ConcurrentBag<SyntaxTree>();
+            var embeddedTexts = new ConcurrentBag<EmbeddedText>();
             var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp7, DocumentationMode.None, preprocessorSymbols: _defines);
-            Parallel.ForEach(files, f => syntaxTrees.Add(CSharpSyntaxTree.ParseText(ReadSourceCode(f), parseOptions, path: f)));
+            Parallel.ForEach(files, f =>
+            {
+                var sourceText = ReadSourceCode(f);
+                syntaxTrees.Add(CSharpSyntaxTree.ParseText(sourceText, parseOptions, path: f));
+                embeddedTexts.Add(EmbeddedText.FromSource(f, sourceText));
+            });
 
-            return Compile(builderContext, syntaxTrees.ToArray(), libraryFile, references);
+            return Compile(builderContext, syntaxTrees, embeddedTexts, libraryFile, references);
         }
 
-        private Assembly Compile(IBuilderContext builderContext, SyntaxTree[] syntaxTrees, string libraryFile, HashSet<string> references)
+        private Assembly Compile(IBuilderContext builderContext, IEnumerable<SyntaxTree> syntaxTrees, IEnumerable<EmbeddedText> embeddedTexts, string libraryFile, HashSet<string> references)
         {
             // Add references
             var portableExecutableReferences = new List<PortableExecutableReference>();
@@ -447,16 +454,17 @@ namespace Sharpmake
             // Compile
             var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
-                //optimizationLevel: OptimizationLevel.Release,
+                optimizationLevel: OptimizationLevel.Release,
                 warningLevel: 4
             );
             var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
             var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, portableExecutableReferences, compilationOptions);
+            string pdbFilePath = libraryFile != null ? Path.ChangeExtension(libraryFile, ".pdb") : null;
 
             using (var dllStream = new MemoryStream())
             using (var pdbStream = new MemoryStream())
             {
-                EmitResult result = compilation.Emit(dllStream, pdbStream, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb));
+                EmitResult result = compilation.Emit(dllStream, pdbStream, embeddedTexts: embeddedTexts, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: pdbFilePath));
 
                 if (result.Success)
                 {
@@ -467,7 +475,7 @@ namespace Sharpmake
                             dllStream.CopyTo(fileStream);
 
                         pdbStream.Seek(0, SeekOrigin.Begin);
-                        using (var pdbFileStream = new FileStream(Path.ChangeExtension(libraryFile, ".pdb"), FileMode.Create))
+                        using (var pdbFileStream = new FileStream(pdbFilePath, FileMode.Create))
                             pdbStream.CopyTo(pdbFileStream);
 
                         return Assembly.LoadFrom(libraryFile);
