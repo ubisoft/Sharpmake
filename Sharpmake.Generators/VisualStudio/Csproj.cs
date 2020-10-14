@@ -1447,6 +1447,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             project.AddCSharpSpecificImportProjects(importProjects, devenv);
 
+            // Add custom .targets files as import projects.
+            foreach (string targetsFile in project.CustomTargetsFiles)
+            {
+                importProjects.AddRange(targetsFile.Select(f => new ImportProject() { Project = targetsFile }));
+            }
+
             WriteImportProjects(importProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
 
             foreach (var element in project.UsingTasks)
