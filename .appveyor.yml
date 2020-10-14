@@ -30,7 +30,7 @@ build_script:
 
 test:
   assemblies:
-    - 'Sharpmake.UnitTests\bin\*\Sharpmake.UnitTests.dll'
+    - 'tmp/bin/*/Sharpmake.UnitTests/Sharpmake.UnitTests.dll'
 
 after_test:
 - cmd: python regression_test.py
