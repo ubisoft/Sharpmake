@@ -258,7 +258,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Add source files
             var allFiles = new List<Vcxproj.ProjectFile>();
             var includeFiles = new List<Vcxproj.ProjectFile>();
-            var sourceFiles = new List<Vcxproj.ProjectFile>();
+            var javaSourceFiles = new List<Vcxproj.ProjectFile>();
             var contentFiles = new List<Vcxproj.ProjectFile>();
 
             foreach (string file in projectFiles)
@@ -285,9 +285,9 @@ namespace Sharpmake.Generators.VisualStudio
                     files.Add(projectFile);
                 }
                 else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                         (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                         (String.Compare(projectFile.FileExtension, ".java", StringComparison.OrdinalIgnoreCase) == 0))
                 {
-                    sourceFiles.Add(projectFile);
+                    javaSourceFiles.Add(projectFile);
                 }
                 else if (String.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
                 {
@@ -308,12 +308,21 @@ namespace Sharpmake.Generators.VisualStudio
             }
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
 
+            // Write java files
+            fileGenerator.Write(Template.Project.ProjectFilesBegin);
+            foreach (var file in javaSourceFiles)
+            {
+                using (fileGenerator.Declare("file", file))
+                    fileGenerator.Write(Template.Project.ProjectFilesJavaSource);
+            }
+            fileGenerator.Write(Template.Project.ProjectFilesEnd);
+
             // Write content files
             fileGenerator.Write(Template.Project.ProjectFilesBegin);
             foreach (var file in contentFiles)
             {
                 using (fileGenerator.Declare("file", file))
-                    fileGenerator.Write(Template.Project.ContentSimple);
+                    fileGenerator.Write(Template.Project.ProjectFilesContent);
             }
             fileGenerator.Write(Template.Project.ProjectFilesEnd);
 
