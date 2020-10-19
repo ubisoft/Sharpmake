@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Security.Policy;
 
 namespace Sharpmake
 {
@@ -205,8 +204,8 @@ namespace Sharpmake
             {
                 if (_validator == null)
                 {
-                    _remoteDomain = AppDomain.CreateDomain("ExtensionHelperDomain", new Evidence(AppDomain.CurrentDomain.Evidence));
-                    _validator = _remoteDomain.CreateInstanceAndUnwrap(typeof(ExtensionChecker).Assembly.FullName, typeof(ExtensionChecker).FullName) as ExtensionChecker;
+                    _remoteDomain = AppDomain.CreateDomain("ExtensionHelperDomain");
+                    _validator = _remoteDomain.Load(typeof(ExtensionChecker).Assembly.FullName).CreateInstance(typeof(ExtensionChecker).FullName) as ExtensionChecker;
                 }
             }
         }
