@@ -183,6 +183,14 @@ namespace Sharpmake
             pathName = pathName.TrimEnd(Path.DirectorySeparatorChar);
         }
 
+        public static string PathAddPrefixToFileName(string fileFullPath, string prefix)
+        {
+            string fileName;
+            string pathName;
+            PathSplitFileNameFromPath(fileFullPath, out fileName, out pathName);
+            return Path.Combine(pathName, prefix + fileFullPath);
+        }
+
         public static string RegexPathCombine(params string[] parts)
         {
             StringBuilder stringBuilder = new StringBuilder();

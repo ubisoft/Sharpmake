@@ -1628,7 +1628,7 @@ namespace Sharpmake.Generators.FastBuild
                     // here we could also verify that the path is rooted
                     if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
                     {
-                        libraryFile = libPrefix + libraryFile;
+                        libraryFile = Util.PathAddPrefixToFileName(libPrefix, libraryFile);
                         if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
                             libraryFile += "." + platformVcxproj.StaticLibraryFileExtension;
                     }
