@@ -332,7 +332,6 @@ namespace Sharpmake
         public string SharedLibraryFileExtension => "dylib";
         public string ProgramDatabaseFileExtension => string.Empty;
         public string StaticLibraryFileExtension => "a";
-        public string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;
         public bool ExcludesPrecompiledHeadersFromBuild => false;
         public bool HasUserAccountControlSupport => false;
         public bool HasEditAndContinueDebuggingSupport => false;

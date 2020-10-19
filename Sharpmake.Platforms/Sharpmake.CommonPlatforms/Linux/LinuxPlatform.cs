@@ -86,7 +86,6 @@ namespace Sharpmake
             public override string ProgramDatabaseFileExtension => string.Empty;
             public override string StaticLibraryFileExtension => "a";
             public override string SharedLibraryFileExtension => "so";
-            public override string StaticOutputLibraryFileExtension => string.Empty;
             public override string ExecutableFileExtension => string.Empty;
 
             // Ideally the object files should be suffixed .o when compiling with FastBuild, using the CompilerOutputExtension property in ObjectLists
