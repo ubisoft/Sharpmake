@@ -65,8 +65,20 @@ namespace Sharpmake
             #region Project.Configuration.IConfigurationTasks implementation
             public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
             {
-                // Not tested. We may need to root the path like we do in SetupStaticLibraryPaths.
-                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+                if (!dependency.Project.GetType().IsDefined(typeof(Export), false))
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                }
+                else
+                {
+                    if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                        configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                }
+
+                // Reference library using -l<name>, build system knows to look for lib<name>.so
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.AdditionalLinkerOptions.Add("-l" + dependency.TargetFileName);
             }
 
             public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
