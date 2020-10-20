@@ -11,6 +11,8 @@
 !Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj
 
 # Samples and FunctionalTests generated projects
+samples/*/package/*.androidproj
+samples/*/package/temp*
 samples/*/projects/*
 samples/HelloXCode/codebase/temp*
 Sharpmake.FunctionalTests/*/projects/*

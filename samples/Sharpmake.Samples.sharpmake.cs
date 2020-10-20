@@ -16,6 +16,7 @@ namespace SharpmakeGen.Samples
             SourceRootPath = @"[project.SharpmakeCsPath]\[project.Name]";
             SourceFilesExcludeRegex.Add(
                 @"\\codebase\\",
+                @"\\package\\",
                 @"\\projects\\",
                 @"\\reference\\"
             );
@@ -155,6 +156,15 @@ namespace SharpmakeGen.Samples
         public FastBuildSimpleExecutable()
         {
             Name = "FastBuildSimpleExecutable";
+        }
+    }
+
+    [Generate]
+    public class HelloAndroidProject : SampleProject
+    {
+        public HelloAndroidProject()
+        {
+            Name = "HelloAndroid";
         }
     }
 
