@@ -36,9 +36,9 @@ if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 call :UpdateRef samples NetCore\DotNetCoreFrameworkHelloWorld    HelloWorld.sharpmake.cs       reference         NetCore\DotNetCoreFrameworkHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples NetCore\DotNetFrameworkHelloWorld    HelloWorld.sharpmake.cs       reference         NetCore\DotNetFrameworkHelloWorld
+call :UpdateRef samples NetCore\DotNetFrameworkHelloWorld        HelloWorld.sharpmake.cs       reference         NetCore\DotNetFrameworkHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples NetCore\DotNetMultiFrameworksHelloWorld    HelloWorld.sharpmake.cs       reference         NetCore\DotNetMultiFrameworksHelloWorld
+call :UpdateRef samples NetCore\DotNetMultiFrameworksHelloWorld  HelloWorld.sharpmake.cs       reference         NetCore\DotNetMultiFrameworksHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 :: functional tests
@@ -62,9 +62,9 @@ pushd %CD%
 :: set testScopedCurrentDirectory as current
 cd /d %~dp0%~1
 
-set SHARPMAKE_EXECUTABLE=%~dp0bin\Debug\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0bin\Release\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0bin & pause & goto error
+set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\Sharpmake.Application\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\Sharpmake.Application\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\[debug|release]\Sharpmake.Application & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 
