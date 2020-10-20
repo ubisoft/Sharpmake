@@ -876,7 +876,13 @@ namespace Sharpmake
             {
                 // start with huge projects to balance end of tasks
                 List<Project> projects = new List<Project>(_projects.Values);
-                projects.Sort((Project p0, Project p1) => { return p1.Configurations.Count.CompareTo(p0.Configurations.Count); });
+                projects.Sort((Project p0, Project p1) =>
+                {
+                    int p0Int = p0.Configurations.Count * p0.ResolvedSourceFiles.Count;
+                    int p1Int = p1.Configurations.Count * p1.ResolvedSourceFiles.Count;
+                    int cmp = p1Int.CompareTo(p0Int);
+                    return cmp;
+                });
 
                 LinkProjects(projects);
 
