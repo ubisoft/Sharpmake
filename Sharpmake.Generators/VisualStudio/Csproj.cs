@@ -1447,6 +1447,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             project.AddCSharpSpecificImportProjects(importProjects, devenv);
 
+            // Add custom .targets files as import projects.
+            foreach (string targetsFile in project.CustomTargetsFiles)
+            {
+                importProjects.AddRange(targetsFile.Select(f => new ImportProject() { Project = targetsFile }));
+            }
+
             WriteImportProjects(importProjects.Distinct(EqualityComparer<ImportProject>.Default), project, configurations.First(), writer, resolver);
 
             foreach (var element in project.UsingTasks)
@@ -3322,6 +3328,12 @@ namespace Sharpmake.Generators.VisualStudio
             (
             Options.Option(Options.CSharp.SonarQubeExclude.Disabled, () => { options["SonarQubeExclude"] = RemoveLineTag; }),
             Options.Option(Options.CSharp.SonarQubeExclude.Enabled, () => { options["SonarQubeExclude"] = "True"; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.ProduceReferenceAssembly.Enabled, () => { options["ProduceReferenceAssembly"] = "True"; }),
+            Options.Option(Options.CSharp.ProduceReferenceAssembly.Disabled, () => { options["ProduceReferenceAssembly"] = RemoveLineTag; })
             );
 
             options["AssemblyOriginatorKeyFile"] = Options.PathOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf, RemoveLineTag, _projectPath);
