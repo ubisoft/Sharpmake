@@ -435,8 +435,12 @@ namespace Sharpmake.Generators.Generic
             else // Release
                 defines.Add("NDEBUG");
 
-            defines.AddRange(conf.Defines);
-            defines.InsertPrefix("-D");
+            foreach (string define in conf.Defines)
+            {
+                if (!string.IsNullOrWhiteSpace(define))
+                    defines.Add(define.Replace(@"""", @"\"""));
+            }
+            defines.InsertPrefixSuffix(@"-D """, @"""");
             options["Defines"] = defines.JoinStrings(" ");
 
             // Includes
