@@ -437,17 +437,20 @@ namespace Sharpmake.Generators.VisualStudio
             uf.GenerateUserFile(context.Builder, context.Project, context.ProjectConfigurations, generatedFiles, skipFiles);
 
             // configuration general
-            foreach (Project.Configuration conf in context.ProjectConfigurations)
+            using (Builder.Instance.CreateProfilingScope("GenerateImpl:confs2", context.ProjectConfigurations.Count))
             {
-                context.Configuration = conf;
-
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
-                using (fileGenerator.Declare("conf", conf))
-                using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                using (fileGenerator.Declare("clrSupport", (conf.IsFastBuild || !clrSupport) ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                foreach (Project.Configuration conf in context.ProjectConfigurations)
                 {
-                    var platformVcxproj = context.PresentPlatforms[conf.Platform];
-                    platformVcxproj.GenerateProjectConfigurationGeneral(context, fileGenerator);
+                    context.Configuration = conf;
+
+                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (fileGenerator.Declare("conf", conf))
+                    using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
+                    using (fileGenerator.Declare("clrSupport", (conf.IsFastBuild || !clrSupport) ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                    {
+                        var platformVcxproj = context.PresentPlatforms[conf.Platform];
+                        platformVcxproj.GenerateProjectConfigurationGeneral(context, fileGenerator);
+                    }
                 }
             }
 
@@ -466,154 +469,160 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.ProjectAfterImportedProps);
 
             // configuration general2
-            foreach (Project.Configuration conf in context.ProjectConfigurations)
+            using (Builder.Instance.CreateProfilingScope("GenerateImpl:confs3", context.ProjectConfigurations.Count))
             {
-                context.Configuration = conf;
-
-                using (fileGenerator.Declare("project", context.Project))
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
-                using (fileGenerator.Declare("conf", conf))
-                using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                using (fileGenerator.Declare("target", conf.Target))
+                foreach (Project.Configuration conf in context.ProjectConfigurations)
                 {
-                    var platformVcxproj = context.PresentPlatforms[conf.Platform];
+                    context.Configuration = conf;
 
-                    if (conf.IsFastBuild)
+                    using (fileGenerator.Declare("project", context.Project))
+                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                    using (fileGenerator.Declare("conf", conf))
+                    using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
+                    using (fileGenerator.Declare("target", conf.Target))
                     {
-                        var fastBuildCommandLineOptions = new List<string>();
+                        var platformVcxproj = context.PresentPlatforms[conf.Platform];
 
-                        if (FastBuildSettings.FastBuildUseIDE)
-                            fastBuildCommandLineOptions.Add("-ide");
-
-                        if (FastBuildSettings.FastBuildReport)
-                            fastBuildCommandLineOptions.Add("-report");
-
-                        if (FastBuildSettings.FastBuildNoSummaryOnError)
-                            fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                        if (FastBuildSettings.FastBuildSummary)
-                            fastBuildCommandLineOptions.Add("-summary");
-
-                        if (FastBuildSettings.FastBuildVerbose)
-                            fastBuildCommandLineOptions.Add("-verbose");
-
-                        if (FastBuildSettings.FastBuildMonitor)
-                            fastBuildCommandLineOptions.Add("-monitor");
-
-                        // Configuring cache mode if that configuration is allowed to use caching
-                        if (conf.FastBuildCacheAllowed)
+                        if (conf.IsFastBuild)
                         {
-                            // Setting the appropriate cache type commandline for that target.
-                            switch (FastBuildSettings.CacheType)
+                            var fastBuildCommandLineOptions = new List<string>();
+
+                            if (FastBuildSettings.FastBuildUseIDE)
+                                fastBuildCommandLineOptions.Add("-ide");
+
+                            if (FastBuildSettings.FastBuildReport)
+                                fastBuildCommandLineOptions.Add("-report");
+
+                            if (FastBuildSettings.FastBuildNoSummaryOnError)
+                                fastBuildCommandLineOptions.Add("-nosummaryonerror");
+
+                            if (FastBuildSettings.FastBuildSummary)
+                                fastBuildCommandLineOptions.Add("-summary");
+
+                            if (FastBuildSettings.FastBuildVerbose)
+                                fastBuildCommandLineOptions.Add("-verbose");
+
+                            if (FastBuildSettings.FastBuildMonitor)
+                                fastBuildCommandLineOptions.Add("-monitor");
+
+                            // Configuring cache mode if that configuration is allowed to use caching
+                            if (conf.FastBuildCacheAllowed)
                             {
-                                case FastBuildSettings.CacheTypes.CacheRead:
-                                    fastBuildCommandLineOptions.Add("-cacheread");
-                                    break;
-                                case FastBuildSettings.CacheTypes.CacheWrite:
-                                    fastBuildCommandLineOptions.Add("-cachewrite");
-                                    break;
-                                case FastBuildSettings.CacheTypes.CacheReadWrite:
-                                    fastBuildCommandLineOptions.Add("-cache");
-                                    break;
-                                default:
-                                    break;
+                                // Setting the appropriate cache type commandline for that target.
+                                switch (FastBuildSettings.CacheType)
+                                {
+                                    case FastBuildSettings.CacheTypes.CacheRead:
+                                        fastBuildCommandLineOptions.Add("-cacheread");
+                                        break;
+                                    case FastBuildSettings.CacheTypes.CacheWrite:
+                                        fastBuildCommandLineOptions.Add("-cachewrite");
+                                        break;
+                                    case FastBuildSettings.CacheTypes.CacheReadWrite:
+                                        fastBuildCommandLineOptions.Add("-cache");
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
+                                fastBuildCommandLineOptions.Add("-dist");
+
+                            if (FastBuildSettings.FastBuildWait)
+                                fastBuildCommandLineOptions.Add("-wait");
+
+                            if (FastBuildSettings.FastBuildNoStopOnError)
+                                fastBuildCommandLineOptions.Add("-nostoponerror");
+
+                            if (FastBuildSettings.FastBuildFastCancel)
+                                fastBuildCommandLineOptions.Add("-fastcancel");
+
+                            if (FastBuildSettings.FastBuildNoUnity)
+                                fastBuildCommandLineOptions.Add("-nounity");
+
+                            if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
+                                fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
+
+                            if (!string.IsNullOrEmpty(FastBuildCustomArguments))
+                                fastBuildCommandLineOptions.Add(FastBuildCustomArguments);
+
+                            string commandLine = string.Join(" ", fastBuildCommandLineOptions);
+
+                            // Make the commandline written in the bff available, except the master bff -config
+                            Bff.SetCommandLineArguments(conf, commandLine);
+
+                            commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
+
+                            using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
+                            using (fileGenerator.Declare("fastBuildMakeCommandBuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
+                            using (fileGenerator.Declare("fastBuildMakeCommandRebuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
+                            {
+                                platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                             }
                         }
-
-                        if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
-                            fastBuildCommandLineOptions.Add("-dist");
-
-                        if (FastBuildSettings.FastBuildWait)
-                            fastBuildCommandLineOptions.Add("-wait");
-
-                        if (FastBuildSettings.FastBuildNoStopOnError)
-                            fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                        if (FastBuildSettings.FastBuildFastCancel)
-                            fastBuildCommandLineOptions.Add("-fastcancel");
-
-                        if (FastBuildSettings.FastBuildNoUnity)
-                            fastBuildCommandLineOptions.Add("-nounity");
-
-                        if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
-                            fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
-
-                        if (!string.IsNullOrEmpty(FastBuildCustomArguments))
-                            fastBuildCommandLineOptions.Add(FastBuildCustomArguments);
-
-                        string commandLine = string.Join(" ", fastBuildCommandLineOptions);
-
-                        // Make the commandline written in the bff available, except the master bff -config
-                        Bff.SetCommandLineArguments(conf, commandLine);
-
-                        commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
-
-                        using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
-                        using (fileGenerator.Declare("fastBuildMakeCommandBuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
-                        using (fileGenerator.Declare("fastBuildMakeCommandRebuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
+                        else if (conf.CustomBuildSettings != null)
                         {
-                            platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
+                            platformVcxproj.GenerateProjectConfigurationCustomMakeFile(context, fileGenerator);
                         }
-                    }
-                    else if (conf.CustomBuildSettings != null)
-                    {
-                        platformVcxproj.GenerateProjectConfigurationCustomMakeFile(context, fileGenerator);
-                    }
-                    else
-                    {
-                        platformVcxproj.GenerateProjectConfigurationGeneral2(context, fileGenerator);
+                        else
+                        {
+                            platformVcxproj.GenerateProjectConfigurationGeneral2(context, fileGenerator);
+                        }
                     }
                 }
             }
 
             // configuration ItemDefinitionGroup
-            foreach (Project.Configuration conf in context.ProjectConfigurations)
+            using (Builder.Instance.CreateProfilingScope("GenerateImpl:confs4", context.ProjectConfigurations.Count))
             {
-                context.Configuration = conf;
-
-                if (!conf.IsFastBuild)
+                foreach (Project.Configuration conf in context.ProjectConfigurations)
                 {
-                    using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
-                    using (fileGenerator.Declare("conf", conf))
-                    using (fileGenerator.Declare("project", conf.Project))
-                    using (fileGenerator.Declare("target", conf.Target))
-                    using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                    using (fileGenerator.Declare("clrSupport", !clrSupport ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                    context.Configuration = conf;
+
+                    if (!conf.IsFastBuild)
                     {
-                        fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
+                        using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                        using (fileGenerator.Declare("conf", conf))
+                        using (fileGenerator.Declare("project", conf.Project))
+                        using (fileGenerator.Declare("target", conf.Target))
+                        using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
+                        using (fileGenerator.Declare("clrSupport", !clrSupport ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                        {
+                            fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
 
-                        var platformVcxproj = context.PresentPlatforms[conf.Platform];
-                        platformVcxproj.GenerateProjectCompileVcxproj(context, fileGenerator);
-                        platformVcxproj.GenerateProjectLinkVcxproj(context, fileGenerator);
+                            var platformVcxproj = context.PresentPlatforms[conf.Platform];
+                            platformVcxproj.GenerateProjectCompileVcxproj(context, fileGenerator);
+                            platformVcxproj.GenerateProjectLinkVcxproj(context, fileGenerator);
 
-                        if (conf.Project.ContainsASM)
-                            platformVcxproj.GenerateProjectMasmVcxproj(context, fileGenerator);
+                            if (conf.Project.ContainsASM)
+                                platformVcxproj.GenerateProjectMasmVcxproj(context, fileGenerator);
 
-                        if (conf.EventPreBuild.Count != 0)
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsPreBuildEvent);
+                            if (conf.EventPreBuild.Count != 0)
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsPreBuildEvent);
 
-                        if (conf.EventPreLink.Count != 0)
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsPreLinkEvent);
+                            if (conf.EventPreLink.Count != 0)
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsPreLinkEvent);
 
-                        if (conf.EventPrePostLink.Count != 0)
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsPrePostLinkEvent);
+                            if (conf.EventPrePostLink.Count != 0)
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsPrePostLinkEvent);
 
-                        if (conf.EventPostBuild.Count != 0)
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsPostBuildEvent);
+                            if (conf.EventPostBuild.Count != 0)
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsPostBuildEvent);
 
-                        if (conf.CustomBuildStep.Count != 0)
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsCustomBuildStep);
+                            if (conf.CustomBuildStep.Count != 0)
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsCustomBuildStep);
 
-                        if (conf.EventCustomBuild.Count != 0)
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsCustomBuildEvent);
+                            if (conf.EventCustomBuild.Count != 0)
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsCustomBuildEvent);
 
-                        if (conf.Platform.IsPC())
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsResourceCompile);
+                            if (conf.Platform.IsPC())
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsResourceCompile);
 
-                        if (conf.AdditionalManifestFiles.Count != 0 || (Options.GetObjects<Options.Vc.ManifestTool.EnableDpiAwareness>(conf).Any()) && (conf.Platform.IsPC() && conf.Platform.IsMicrosoft()))
-                            fileGenerator.Write(Template.Project.ProjectConfigurationsManifestTool);
+                            if (conf.AdditionalManifestFiles.Count != 0 || (Options.GetObjects<Options.Vc.ManifestTool.EnableDpiAwareness>(conf).Any()) && (conf.Platform.IsPC() && conf.Platform.IsMicrosoft()))
+                                fileGenerator.Write(Template.Project.ProjectConfigurationsManifestTool);
 
-                        fileGenerator.Write(Template.Project.ProjectConfigurationEndItemDefinition);
+                            fileGenerator.Write(Template.Project.ProjectConfigurationEndItemDefinition);
+                        }
                     }
                 }
             }
@@ -622,7 +631,10 @@ namespace Sharpmake.Generators.VisualStudio
             // source file requires to be remove from the projects, so that not 2 same cpp file be in 2 different project.
             // TODO: make a better check
             if (hasNonFastBuildConfig || !context.Project.StripFastBuildSourceFiles || context.ProjectConfigurations.Any(conf => !conf.StripFastBuildSourceFiles))
-                GenerateFilesSection(context, fileGenerator, generatedFiles, skipFiles);
+            {
+                using (Builder.Instance.CreateProfilingScope("GenerateFilesSection"))
+                    GenerateFilesSection(context, fileGenerator, generatedFiles, skipFiles);
+            }
             else if (hasFastBuildConfig)
                 GenerateBffFilesSection(context, fileGenerator);
 
@@ -1294,48 +1306,54 @@ namespace Sharpmake.Generators.VisualStudio
             // Gather files with custom build steps.
             var configurationCustomFileBuildSteps = new Dictionary<Project.Configuration, Dictionary<string, CombinedCustomFileBuildStep>>();
             Strings configurationCustomBuildFiles = new Strings();
-            foreach (Project.Configuration config in context.ProjectConfigurations)
+            using (Builder.Instance.CreateProfilingScope("GenerateFilesSection:confs1", context.ProjectConfigurations.Count))
             {
-                using (fileGenerator.Resolver.NewScopedParameter("project", context.Project))
-                using (fileGenerator.Resolver.NewScopedParameter("config", config))
-                using (fileGenerator.Resolver.NewScopedParameter("target", config.Target))
+                foreach (Project.Configuration config in context.ProjectConfigurations)
                 {
-                    var customFileBuildSteps = CombineCustomFileBuildSteps(context.ProjectDirectory, fileGenerator.Resolver, config.CustomFileBuildSteps.Where(step => step.Filter != Project.Configuration.CustomFileBuildStep.ProjectFilter.BFFOnly));
-                    configurationCustomFileBuildSteps.Add(config, customFileBuildSteps);
-                    foreach (var customBuildSetup in customFileBuildSteps)
+                    using (fileGenerator.Resolver.NewScopedParameter("project", context.Project))
+                    using (fileGenerator.Resolver.NewScopedParameter("config", config))
+                    using (fileGenerator.Resolver.NewScopedParameter("target", config.Target))
                     {
-                        configurationCustomBuildFiles.Add(customBuildSetup.Key);
+                        var customFileBuildSteps = CombineCustomFileBuildSteps(context.ProjectDirectory, fileGenerator.Resolver, config.CustomFileBuildSteps.Where(step => step.Filter != Project.Configuration.CustomFileBuildStep.ProjectFilter.BFFOnly));
+                        configurationCustomFileBuildSteps.Add(config, customFileBuildSteps);
+                        foreach (var customBuildSetup in customFileBuildSteps)
+                        {
+                            configurationCustomBuildFiles.Add(customBuildSetup.Key);
+                        }
                     }
                 }
             }
 
             // type -> files
             var customSourceFiles = new Dictionary<string, List<ProjectFile>>();
-            foreach (var projectFile in allFiles)
+            using (Builder.Instance.CreateProfilingScope("GenerateFilesSection:allFiles", allFiles.Count))
             {
-                string type = null;
-                if (context.Project.ExtensionBuildTools.TryGetValue(projectFile.FileExtension, out type))
+                foreach (var projectFile in allFiles)
                 {
-                    List<ProjectFile> files = null;
-                    if (!customSourceFiles.TryGetValue(type, out files))
+                    string type = null;
+                    if (context.Project.ExtensionBuildTools.TryGetValue(projectFile.FileExtension, out type))
                     {
-                        files = new List<ProjectFile>();
-                        customSourceFiles[type] = files;
+                        List<ProjectFile> files = null;
+                        if (!customSourceFiles.TryGetValue(type, out files))
+                        {
+                            files = new List<ProjectFile>();
+                            customSourceFiles[type] = files;
+                        }
+                        files.Add(projectFile);
                     }
-                    files.Add(projectFile);
-                }
-                else if (configurationCustomBuildFiles.Contains(projectFile.FileNameProjectRelative))
-                {
-                    customBuildFiles.Add(projectFile);
-                }
-                else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                         (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
-                {
-                    sourceFiles.Add(projectFile);
-                }
-                else // if (projectFile.FileExtension == "h")
-                {
-                    includeFiles.Add(projectFile);
+                    else if (configurationCustomBuildFiles.Contains(projectFile.FileNameProjectRelative))
+                    {
+                        customBuildFiles.Add(projectFile);
+                    }
+                    else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
+                             (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                    {
+                        sourceFiles.Add(projectFile);
+                    }
+                    else // if (projectFile.FileExtension == "h")
+                    {
+                        includeFiles.Add(projectFile);
+                    }
                 }
             }
 
