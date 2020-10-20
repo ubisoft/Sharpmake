@@ -2382,26 +2382,41 @@ namespace Sharpmake
         public class StopwatchProfiler : IDisposable
         {
             private readonly Stopwatch _stopWatch;
-            private readonly Action<long> _disposeAction;
+            private readonly Action<long> _disposeActionDuration;
+            private readonly Action<long, long> _disposeActionStartEnd;
             private readonly long _minThresholdMs;
 
-            public StopwatchProfiler(Action<long> disposeAction)
-                : this(disposeAction, 0)
+            public StopwatchProfiler(Action<long> disposeActionDuration)
+                : this(disposeActionDuration, 0)
             {
             }
 
-            public StopwatchProfiler(Action<long> disposeAction, long minThresholdMs)
+            public StopwatchProfiler(Action<long, long> disposeActionStartEnd)
             {
-                _disposeAction = disposeAction;
+                _disposeActionStartEnd = disposeActionStartEnd;
+                _stopWatch = Stopwatch.StartNew();
+                _minThresholdMs = 0;
+            }
+
+            public StopwatchProfiler(Action<long> disposeActionDuration, long minThresholdMs)
+            {
+                _disposeActionDuration = disposeActionDuration;
                 _stopWatch = Stopwatch.StartNew();
                 _minThresholdMs = minThresholdMs;
             }
 
             public void Dispose()
             {
+                _stopWatch.Stop();
+                if (_disposeActionStartEnd != null)
+                {
+                    long timestamp = Stopwatch.GetTimestamp(); // sadly the stopwatch can't tell us the real start time
+                    _disposeActionStartEnd.Invoke(timestamp - _stopWatch.ElapsedTicks, timestamp);
+                }
+
                 long elapsed = _stopWatch.ElapsedMilliseconds;
                 if (elapsed > _minThresholdMs)
-                    _disposeAction(elapsed);
+                    _disposeActionDuration?.Invoke(elapsed);
             }
         }
 

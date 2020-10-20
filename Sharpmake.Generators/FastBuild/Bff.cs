@@ -206,36 +206,46 @@ namespace Sharpmake.Generators.FastBuild
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
             string fastBuildClrSupport = Util.IsDotNet(firstConf) ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
-            var confSourceFiles = GetGeneratedFiles(context, configurations, out filesInNonDefaultSection);
+            Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles;
+            using (builder.CreateProfilingScope("BffGenerator.Generate:GetGeneratedFiles"))
+            {
+                confSourceFiles = GetGeneratedFiles(context, configurations, out filesInNonDefaultSection);
+            }
 
             // Generate all configuration options onces...
             var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
             var cmdLineOptions = new Dictionary<Project.Configuration, ProjectOptionsGenerator.VcxprojCmdLineOptions>();
             var additionalDependenciesPerConf = new Dictionary<Project.Configuration, OrderableStrings>();
-            var projectOptionsGen = new ProjectOptionsGenerator();
-            foreach (Project.Configuration conf in configurations)
+            ProjectOptionsGenerator projectOptionsGen;
+            using (builder.CreateProfilingScope("BffGenerator.Generate:ProjectOptionsGenerator()"))
             {
-                context.Options = new Options.ExplicitOptions();
-                context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
-                context.Configuration = conf;
-
-                GenerateBffOptions(projectOptionsGen, context, additionalDependenciesPerConf);
-
-                options.Add(conf, context.Options);
-                cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
-
-                // Validation of unsupported cases
-                if (conf.EventPreLink.Count > 0)
-                    throw new Error("Sharpmake-FastBuild : Pre-Link Events not yet supported.");
-                if (context.Options["IgnoreImportLibrary"] == "true")
-                    throw new Error("Sharpmake-FastBuild : IgnoreImportLibrary not yet supported.");
-
-                if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
+                projectOptionsGen = new ProjectOptionsGenerator();
+            }
+            using (builder.CreateProfilingScope("BffGenerator.Generate:confs1"))
+            {
+                foreach (Project.Configuration conf in configurations)
                 {
-                    ConfigureUnities(context, confSourceFiles);
+                    context.Options = new Options.ExplicitOptions();
+                    context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
+                    context.Configuration = conf;
+
+                    GenerateBffOptions(projectOptionsGen, context, additionalDependenciesPerConf);
+
+                    options.Add(conf, context.Options);
+                    cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
+
+                    // Validation of unsupported cases
+                    if (conf.EventPreLink.Count > 0)
+                        throw new Error("Sharpmake-FastBuild : Pre-Link Events not yet supported.");
+                    if (context.Options["IgnoreImportLibrary"] == "true")
+                        throw new Error("Sharpmake-FastBuild : IgnoreImportLibrary not yet supported.");
+
+                    if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
+                    {
+                        ConfigureUnities(context, confSourceFiles);
+                    }
                 }
             }
-
             ResolveUnities(project, projectPath);
 
             // Start writing Bff

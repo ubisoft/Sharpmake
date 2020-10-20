@@ -257,182 +257,185 @@ namespace Sharpmake
 
             bool hasFastBuildProjectConf = false;
             var unlinkedConfigurations = new Dictionary<Solution.Configuration, List<Project.Configuration>>(); // This will hold MSBuild -> Fastbuild refs
-            foreach (Solution.Configuration solutionConfiguration in Configurations)
+            using (builder.CreateProfilingScope("Solution.Link:confs", Configurations.Count))
             {
-                // Build SolutionFilesMapping
-                string configurationFile = Path.Combine(solutionConfiguration.SolutionPath, solutionConfiguration.SolutionFileName);
-
-                var fileConfigurationList = SolutionFilesMapping.GetValueOrAdd(configurationFile, new List<Solution.Configuration>());
-                fileConfigurationList.Add(solutionConfiguration);
-
-                var unlinkedList = unlinkedConfigurations.GetValueOrAdd(solutionConfiguration, new List<Project.Configuration>());
-
-                // solutionConfiguration.IncludedProjectInfos will be appended
-                // while iterating, but with projects that we already have resolved,
-                // so no need to parse them again
-                int origCount = solutionConfiguration.IncludedProjectInfos.Count;
-                for (int i = 0; i < origCount; ++i)
+                foreach (Solution.Configuration solutionConfiguration in Configurations)
                 {
-                    Configuration.IncludedProjectInfo configurationProject = solutionConfiguration.IncludedProjectInfos[i];
-                    bool projectIsInactive = configurationProject.InactiveProject;
+                    // Build SolutionFilesMapping
+                    string configurationFile = Path.Combine(solutionConfiguration.SolutionPath, solutionConfiguration.SolutionFileName);
 
-                    Project project = builder.GetProject(configurationProject.Type);
-                    Project.Configuration projectConfiguration = project.GetConfiguration(configurationProject.Target);
+                    var fileConfigurationList = SolutionFilesMapping.GetValueOrAdd(configurationFile, new List<Solution.Configuration>());
+                    fileConfigurationList.Add(solutionConfiguration);
 
-                    if (projectConfiguration == null)
+                    var unlinkedList = unlinkedConfigurations.GetValueOrAdd(solutionConfiguration, new List<Project.Configuration>());
+
+                    // solutionConfiguration.IncludedProjectInfos will be appended
+                    // while iterating, but with projects that we already have resolved,
+                    // so no need to parse them again
+                    int origCount = solutionConfiguration.IncludedProjectInfos.Count;
+                    for (int i = 0; i < origCount; ++i)
                     {
-                        var messageBuilder = new System.Text.StringBuilder();
-                        messageBuilder.AppendFormat("Resolving dependencies for solution {0}, target '{1}': cannot find target '{3}' in project {2}",
-                            GetType().FullName, solutionConfiguration.Target, project.GetType().FullName, configurationProject.Target);
-                        messageBuilder.AppendLine();
+                        Configuration.IncludedProjectInfo configurationProject = solutionConfiguration.IncludedProjectInfos[i];
+                        bool projectIsInactive = configurationProject.InactiveProject;
 
-                        if (project.Configurations.Any())
+                        Project project = builder.GetProject(configurationProject.Type);
+                        Project.Configuration projectConfiguration = project.GetConfiguration(configurationProject.Target);
+
+                        if (projectConfiguration == null)
                         {
-                            messageBuilder.AppendLine("Project configurations are:");
-                            int confNum = 0;
-                            foreach (var conf in project.Configurations)
-                                messageBuilder.AppendLine(++confNum + "/" + project.Configurations.Count + " " + conf.ToString());
-                        }
-                        else
-                        {
-                            messageBuilder.AppendLine("The project does not contain any configurations!");
-                        }
+                            var messageBuilder = new System.Text.StringBuilder();
+                            messageBuilder.AppendFormat("Resolving dependencies for solution {0}, target '{1}': cannot find target '{3}' in project {2}",
+                                GetType().FullName, solutionConfiguration.Target, project.GetType().FullName, configurationProject.Target);
+                            messageBuilder.AppendLine();
 
-                        Trace.WriteLine(messageBuilder.ToString());
-                        Debugger.Break();
-
-                        throw new Error(messageBuilder.ToString());
-                    }
-
-                    if (configurationProject.Project == null)
-                        configurationProject.Project = project;
-                    else if (configurationProject.Project != project)
-                        throw new Error("Tried to match more than one project to Project type.");
-
-                    if (configurationProject.Configuration == null)
-                        configurationProject.Configuration = projectConfiguration;
-                    else if (configurationProject.Configuration != projectConfiguration)
-                        throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
-
-                    hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
-                    if (projectConfiguration.IsFastBuild)
-                        projectConfiguration.AddMasterBff(solutionConfiguration.MasterBffFilePath);
-
-                    bool build = !projectConfiguration.IsExcludedFromBuild && !configurationProject.InactiveProject;
-                    if (build && solutionConfiguration.IncludeOnlyFilterProject && (configurationProject.Project.SourceFilesFiltersCount == 0 || configurationProject.Project.SkipProjectWhenFiltersActive))
-                        build = false;
-
-                    if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
-                    {
-                        if (build)
-                            configurationProject.ToBuild = Configuration.IncludedProjectInfo.Build.Yes;
-                        else if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
-                            configurationProject.ToBuild = Configuration.IncludedProjectInfo.Build.No;
-                    }
-
-                    var dependenciesConfiguration = configurationProject.Configuration.GetRecursiveDependencies();
-                    // TODO: Slow LINQ? May be better to create this list as part of GetRecursiveDependencies
-                    if (!configurationProject.Configuration.IsFastBuild && configurationProject.Configuration.ResolvedDependencies.Any(d => d.IsFastBuild))
-                        unlinkedList.Add(configurationProject.Configuration);
-                    unlinkedList.AddRange(dependenciesConfiguration.Where(c => !c.IsFastBuild && c.ResolvedDependencies.Any(d => d.IsFastBuild)));
-                    foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
-                    {
-                        Project dependencyProject = dependencyConfiguration.Project;
-                        if (dependencyProject.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
-                            continue;
-
-                        Type dependencyProjectType = dependencyProject.GetType();
-                        ITarget dependencyProjectTarget = dependencyConfiguration.Target;
-
-                        hasFastBuildProjectConf |= dependencyConfiguration.IsFastBuild;
-                        if (dependencyConfiguration.IsFastBuild)
-                            dependencyConfiguration.AddMasterBff(solutionConfiguration.MasterBffFilePath);
-
-                        Configuration.IncludedProjectInfo configurationProjectDependency = solutionConfiguration.GetProject(dependencyProjectType);
-
-                        // if that project was not explicitly added to the solution configuration, add it ourselves, as it is needed
-                        if (configurationProjectDependency == null)
-                        {
-                            configurationProjectDependency = new Configuration.IncludedProjectInfo
+                            if (project.Configurations.Any())
                             {
-                                Type = dependencyProjectType,
-                                Project = dependencyProject,
-                                Configuration = dependencyConfiguration,
-                                Target = dependencyProjectTarget,
-                                InactiveProject = projectIsInactive // inherit from the parent: no reason to mark dependencies for build if parent is inactive
-                            };
-                            solutionConfiguration.IncludedProjectInfos.Add(configurationProjectDependency);
-                        }
-                        else if (!projectIsInactive && configurationProjectDependency.InactiveProject)
-                        {
-                            // if the project we found in the solutionConfiguration is inactive, and the current is not, replace its settings
-                            configurationProjectDependency.Type = dependencyProjectType;
-                            configurationProjectDependency.Project = dependencyProject;
-                            configurationProjectDependency.Configuration = dependencyConfiguration;
-                            configurationProjectDependency.Target = dependencyProjectTarget;
-                            configurationProjectDependency.InactiveProject = false;
-                        }
-                        else if (projectIsInactive)
-                        {
-                            // if the current project is inactive, ignore
-                        }
-                        else
-                        {
-                            if (!configurationProjectDependency.Target.IsEqualTo(dependencyProjectTarget))
+                                messageBuilder.AppendLine("Project configurations are:");
+                                int confNum = 0;
+                                foreach (var conf in project.Configurations)
+                                    messageBuilder.AppendLine(++confNum + "/" + project.Configurations.Count + " " + conf.ToString());
+                            }
+                            else
                             {
-                                throw new Error("In solution configuration (solution: {3}, config: {4}) the parent project {5} generates multiple dependency targets for the same child project {0}: {1} and {2}. Look for all AddPublicDependency() and AddPrivateDependency() calls for the child project and follow the dependency chain.",
-                                    configurationProjectDependency.Project?.GetType().ToString(),
-                                    configurationProjectDependency.Target,
-                                    dependencyProjectTarget,
-                                    solutionConfiguration.SolutionFileName,
-                                    solutionConfiguration.Target,
-                                    project.Name
-                                );
+                                messageBuilder.AppendLine("The project does not contain any configurations!");
                             }
 
-                            if (configurationProjectDependency.Project == null)
+                            Trace.WriteLine(messageBuilder.ToString());
+                            Debugger.Break();
+
+                            throw new Error(messageBuilder.ToString());
+                        }
+
+                        if (configurationProject.Project == null)
+                            configurationProject.Project = project;
+                        else if (configurationProject.Project != project)
+                            throw new Error("Tried to match more than one project to Project type.");
+
+                        if (configurationProject.Configuration == null)
+                            configurationProject.Configuration = projectConfiguration;
+                        else if (configurationProject.Configuration != projectConfiguration)
+                            throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
+
+                        hasFastBuildProjectConf |= projectConfiguration.IsFastBuild;
+                        if (projectConfiguration.IsFastBuild)
+                            projectConfiguration.AddMasterBff(solutionConfiguration.MasterBffFilePath);
+
+                        bool build = !projectConfiguration.IsExcludedFromBuild && !configurationProject.InactiveProject;
+                        if (build && solutionConfiguration.IncludeOnlyFilterProject && (configurationProject.Project.SourceFilesFiltersCount == 0 || configurationProject.Project.SkipProjectWhenFiltersActive))
+                            build = false;
+
+                        if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
+                        {
+                            if (build)
+                                configurationProject.ToBuild = Configuration.IncludedProjectInfo.Build.Yes;
+                            else if (configurationProject.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
+                                configurationProject.ToBuild = Configuration.IncludedProjectInfo.Build.No;
+                        }
+
+                        var dependenciesConfiguration = configurationProject.Configuration.GetRecursiveDependencies();
+                        // TODO: Slow LINQ? May be better to create this list as part of GetRecursiveDependencies
+                        if (!configurationProject.Configuration.IsFastBuild && configurationProject.Configuration.ResolvedDependencies.Any(d => d.IsFastBuild))
+                            unlinkedList.Add(configurationProject.Configuration);
+                        unlinkedList.AddRange(dependenciesConfiguration.Where(c => !c.IsFastBuild && c.ResolvedDependencies.Any(d => d.IsFastBuild)));
+                        foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
+                        {
+                            Project dependencyProject = dependencyConfiguration.Project;
+                            if (dependencyProject.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
+                                continue;
+
+                            Type dependencyProjectType = dependencyProject.GetType();
+                            ITarget dependencyProjectTarget = dependencyConfiguration.Target;
+
+                            hasFastBuildProjectConf |= dependencyConfiguration.IsFastBuild;
+                            if (dependencyConfiguration.IsFastBuild)
+                                dependencyConfiguration.AddMasterBff(solutionConfiguration.MasterBffFilePath);
+
+                            Configuration.IncludedProjectInfo configurationProjectDependency = solutionConfiguration.GetProject(dependencyProjectType);
+
+                            // if that project was not explicitly added to the solution configuration, add it ourselves, as it is needed
+                            if (configurationProjectDependency == null)
+                            {
+                                configurationProjectDependency = new Configuration.IncludedProjectInfo
+                                {
+                                    Type = dependencyProjectType,
+                                    Project = dependencyProject,
+                                    Configuration = dependencyConfiguration,
+                                    Target = dependencyProjectTarget,
+                                    InactiveProject = projectIsInactive // inherit from the parent: no reason to mark dependencies for build if parent is inactive
+                                };
+                                solutionConfiguration.IncludedProjectInfos.Add(configurationProjectDependency);
+                            }
+                            else if (!projectIsInactive && configurationProjectDependency.InactiveProject)
+                            {
+                                // if the project we found in the solutionConfiguration is inactive, and the current is not, replace its settings
+                                configurationProjectDependency.Type = dependencyProjectType;
                                 configurationProjectDependency.Project = dependencyProject;
-                            else if (configurationProjectDependency.Project != dependencyProject)
-                                throw new Error("Tried to match more than one project to Project type.");
-
-                            if (configurationProjectDependency.Configuration == null)
                                 configurationProjectDependency.Configuration = dependencyConfiguration;
-                            else if (configurationProjectDependency.Configuration != dependencyConfiguration)
-                                throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
-                        }
-
-                        if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
-                        {
-                            // If we're finding a Fastbuild dependency of an MSBuild project, we know that it'll need re-linking if the All project is generated.
-                            var needsFastbuildRelink = (dependencyConfiguration.IsFastBuild && !configurationProject.Configuration.IsFastBuild && GenerateFastBuildAllProject);
-
-                            var isExcludedSinceNoFilter = solutionConfiguration.IncludeOnlyFilterProject
-                                                      && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive);
-
-                            var skipBuild = dependencyConfiguration.IsExcludedFromBuild
-                                         || projectIsInactive
-                                         || configurationProjectDependency.InactiveProject
-                                         || needsFastbuildRelink
-                                         || isExcludedSinceNoFilter;
-
-                            if (!skipBuild)
-                            {
-                                if (projectConfiguration.Output == Project.Configuration.OutputType.Dll || projectConfiguration.Output == Project.Configuration.OutputType.Exe)
-                                    configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
-                                else
-                                    configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.Yes;
+                                configurationProjectDependency.Target = dependencyProjectTarget;
+                                configurationProjectDependency.InactiveProject = false;
                             }
-                            else if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
-                                configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.No;
+                            else if (projectIsInactive)
+                            {
+                                // if the current project is inactive, ignore
+                            }
+                            else
+                            {
+                                if (!configurationProjectDependency.Target.IsEqualTo(dependencyProjectTarget))
+                                {
+                                    throw new Error("In solution configuration (solution: {3}, config: {4}) the parent project {5} generates multiple dependency targets for the same child project {0}: {1} and {2}. Look for all AddPublicDependency() and AddPrivateDependency() calls for the child project and follow the dependency chain.",
+                                        configurationProjectDependency.Project?.GetType().ToString(),
+                                        configurationProjectDependency.Target,
+                                        dependencyProjectTarget,
+                                        solutionConfiguration.SolutionFileName,
+                                        solutionConfiguration.Target,
+                                        project.Name
+                                    );
+                                }
+
+                                if (configurationProjectDependency.Project == null)
+                                    configurationProjectDependency.Project = dependencyProject;
+                                else if (configurationProjectDependency.Project != dependencyProject)
+                                    throw new Error("Tried to match more than one project to Project type.");
+
+                                if (configurationProjectDependency.Configuration == null)
+                                    configurationProjectDependency.Configuration = dependencyConfiguration;
+                                else if (configurationProjectDependency.Configuration != dependencyConfiguration)
+                                    throw new Error("Tried to match more than one Project Configuration to a solution configuration.");
+                            }
+
+                            if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.YesThroughDependency)
+                            {
+                                // If we're finding a Fastbuild dependency of an MSBuild project, we know that it'll need re-linking if the All project is generated.
+                                var needsFastbuildRelink = (dependencyConfiguration.IsFastBuild && !configurationProject.Configuration.IsFastBuild && GenerateFastBuildAllProject);
+
+                                var isExcludedSinceNoFilter = solutionConfiguration.IncludeOnlyFilterProject
+                                                          && (configurationProjectDependency.Project.SourceFilesFiltersCount == 0 || configurationProjectDependency.Project.SkipProjectWhenFiltersActive);
+
+                                var skipBuild = dependencyConfiguration.IsExcludedFromBuild
+                                             || projectIsInactive
+                                             || configurationProjectDependency.InactiveProject
+                                             || needsFastbuildRelink
+                                             || isExcludedSinceNoFilter;
+
+                                if (!skipBuild)
+                                {
+                                    if (projectConfiguration.Output == Project.Configuration.OutputType.Dll || projectConfiguration.Output == Project.Configuration.OutputType.Exe)
+                                        configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.YesThroughDependency;
+                                    else
+                                        configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.Yes;
+                                }
+                                else if (configurationProjectDependency.ToBuild != Configuration.IncludedProjectInfo.Build.Yes)
+                                    configurationProjectDependency.ToBuild = Configuration.IncludedProjectInfo.Build.No;
+                            }
                         }
                     }
                 }
+
+                if (hasFastBuildProjectConf)
+                    MakeFastBuildAllProjectIfNeeded(builder, unlinkedConfigurations);
+
+                _dependenciesResolved = true;
             }
-
-            if (hasFastBuildProjectConf)
-                MakeFastBuildAllProjectIfNeeded(builder, unlinkedConfigurations);
-
-            _dependenciesResolved = true;
         }
 
         internal void Resolve()
@@ -440,28 +443,31 @@ namespace Sharpmake
             if (_resolved)
                 return;
 
-            Resolver resolver = new Resolver();
-            resolver.SetParameter("solution", this);
-            resolver.Resolve(this);
-
-            if (PerforceRootPath != null)
-                Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
-
-            foreach (Solution.Configuration conf in Configurations)
-                conf.Resolve(resolver);
-
-            foreach (var extraItemKey in ExtraItems.Keys.ToList())
+            using (Builder.Instance.CreateProfilingScope("ResolveSolution"))
             {
-                Strings values = new Strings(ExtraItems[extraItemKey]);
-                foreach (string value in values)
-                {
-                    string newValue = resolver.Resolve(value);
-                    values.UpdateValue(value, newValue);
-                }
-                ExtraItems[extraItemKey] = values;
-            }
+                Resolver resolver = new Resolver();
+                resolver.SetParameter("solution", this);
+                resolver.Resolve(this);
 
-            _resolved = true;
+                if (PerforceRootPath != null)
+                    Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
+
+                foreach (Solution.Configuration conf in Configurations)
+                    conf.Resolve(resolver);
+
+                foreach (var extraItemKey in ExtraItems.Keys.ToList())
+                {
+                    Strings values = new Strings(ExtraItems[extraItemKey]);
+                    foreach (string value in values)
+                    {
+                        string newValue = resolver.Resolve(value);
+                        values.UpdateValue(value, newValue);
+                    }
+                    ExtraItems[extraItemKey] = values;
+                }
+
+                _resolved = true;
+            }
         }
 
         public string ResolveString(string input, Configuration conf = null, ITarget target = null)

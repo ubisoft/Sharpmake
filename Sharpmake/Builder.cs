@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Sharpmake
 {
@@ -133,6 +134,110 @@ namespace Sharpmake
         // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
         private readonly Dictionary<string, string> _references = new Dictionary<string, string>(); // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
+
+        private class ProfilingCompleteEvent
+        {
+            public static readonly string pid = Process.GetCurrentProcess().Id.ToString(); // The process ID for the process that output this event
+            public string name; //  The name of the event, as displayed in Trace Viewer
+            public string tid; // The thread ID for the thread that output this event
+            public string ts; // The tracing clock timestamp of the event. The timestamps are provided at microsecond granularity
+
+            public string dur; // comes with the above: tracing clock duration of complete events in microseconds
+            public int count = -1;
+
+            public string ToJsonString()
+            {
+                if (count != -1)
+                    return $"{{ \"pid\":{pid}, \"tid\":{tid}, \"ts\":{ts}, \"dur\":{dur}, \"ph\":\"X\", \"name\":\"{name}\", \"args\": {{\"count\": {count}}}}}";
+                else
+                    return $"{{ \"pid\":{pid}, \"tid\":{tid}, \"ts\":{ts}, \"dur\":{dur}, \"ph\":\"X\", \"name\":\"{name}\" }}";
+            }
+        }
+        private readonly ConcurrentBag<ProfilingCompleteEvent> _profilingCompleteEvents = new ConcurrentBag<ProfilingCompleteEvent>();
+
+        private class ProfilingInstantEvent
+        {
+            public static readonly string pid = Process.GetCurrentProcess().Id.ToString(); // The process ID for the process that output this event
+            public string name; //  The name of the event, as displayed in Trace Viewer
+            public string tid; // The thread ID for the thread that output this event
+            public string ts; // The tracing clock timestamp of the event. The timestamps are provided at microsecond granularity
+
+            public string ToJsonString()
+            {
+                return $"{{ \"pid\":{pid}, \"tid\":{tid}, \"ts\":{ts}, \"ph\":\"i\", \"name\":\"{name}\" }}";
+            }
+        }
+        private readonly ConcurrentBag<ProfilingInstantEvent> _profilingInstantEvents = new ConcurrentBag<ProfilingInstantEvent>();
+
+
+        public void AddProfilingCompleteEvent(string name, long startTicks, long endTicks, int countArg = -1)
+        {
+            var durTicks = endTicks - startTicks;
+            if (durTicks > 0)
+            {
+                double start = 1000000.0 * (double)startTicks / Stopwatch.Frequency;
+                double end = 1000000.0 * (double)endTicks / Stopwatch.Frequency;
+                double dur = end - start;
+
+                _profilingCompleteEvents.Add(new ProfilingCompleteEvent
+                {
+                    name = name,
+                    tid = Thread.CurrentThread.ManagedThreadId.ToString(),
+                    dur = dur.ToString(),
+                    ts = start.ToString(),
+                    count = countArg
+                });
+            }
+        }
+
+        public void AddProfilingInstantEvent(string name)
+        {
+            double start = 1000000.0 * (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
+
+            _profilingInstantEvents.Add(new ProfilingInstantEvent
+            {
+                name = name,
+                tid = Thread.CurrentThread.ManagedThreadId.ToString(),
+                ts = start.ToString(),
+            });
+        }
+
+        private class TraceFile { }
+
+        private string _traceFileHeaderTemplate = @"{ ""traceEvents"": [" + Environment.NewLine;
+        private string _traceFileFooterTemplate = @"]}";
+
+        public void DumpTraceFile(string filePath)
+        {
+            if (_profilingCompleteEvents.IsEmpty && _profilingInstantEvents.IsEmpty)
+                return;
+
+            var mStream = new MemoryStream();
+            var writer = new StreamWriter(mStream);
+            {
+                writer.Write(_traceFileHeaderTemplate);
+                var lines = new List<string>(_profilingCompleteEvents.Count + _profilingInstantEvents.Count);
+                foreach (var traceEvent in _profilingCompleteEvents)
+                {
+                    lines.Add(traceEvent.ToJsonString());
+                }
+                foreach (var traceEvent in _profilingInstantEvents)
+                {
+                    lines.Add(traceEvent.ToJsonString());
+                }
+                writer.Write(string.Join("," + Environment.NewLine, lines));
+                writer.Write(_traceFileFooterTemplate);
+            }
+            writer.Flush();
+
+            var generationOutput = new GenerationOutput();
+            if (Util.FileWriteIfDifferentInternal(new FileInfo(filePath), mStream, bypassAutoCleanupDatabase: true))
+                generationOutput.Generated.Add(filePath);
+            else
+                generationOutput.Skipped.Add(filePath);
+
+            ReportGenerated(typeof(TraceFile), generationOutput);
+        }
 
         public BuildContext.BaseBuildContext Context { get; private set; }
 
@@ -249,6 +354,31 @@ namespace Sharpmake
                 if (e.InnerException != null)
                     throw e.InnerException;
             }
+        }
+
+        private bool _profilingEnabled = false;
+        public void EnableProfiling()
+        {
+            _profilingEnabled = true;
+        }
+
+        public Util.StopwatchProfiler CreateProfilingScope(string name)
+        {
+            if (!_profilingEnabled)
+                return null;
+            return new Util.StopwatchProfiler((start, end) => { AddProfilingCompleteEvent(name, start, end); });
+        }
+        public Util.StopwatchProfiler CreateProfilingScope(string name, int countArg)
+        {
+            if (!_profilingEnabled)
+                return null;
+            return new Util.StopwatchProfiler((start, end) => { AddProfilingCompleteEvent(name, start, end, countArg); });
+        }
+        public void CreateProfilingInstant(string name)
+        {
+            if (!_profilingEnabled)
+                return;
+            AddProfilingInstantEvent(name);
         }
 
         public void BuildProjectAndSolution()
@@ -486,7 +616,7 @@ namespace Sharpmake
 
         public Project LoadProjectType(Type type)
         {
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| load project {1}", ms, type.Name); }))
+            using (CreateProfilingScope(type.Name))
             {
                 Project.ProjectTypeAttribute projectTypeAttribute;
                 if (type.IsDefined(typeof(Generate), false))
@@ -502,24 +632,35 @@ namespace Sharpmake
                 Project project = Project.CreateProject(type, Arguments.FragmentMasks, projectTypeAttribute);
 
                 // Pre event
-                EventPreProjectConfigure?.Invoke(project);
+                var eventPreProjectConfigure = EventPreProjectConfigure;
+                if (eventPreProjectConfigure != null)
+                {
+                    using (CreateProfilingScope("EventPreProjectConfigure" + project.ClassName))
+                        eventPreProjectConfigure.Invoke(project);
+                }
 
                 project.PreConfigure();
 
                 // Create and Configure all possibles configurations.
-                project.InvokeConfiguration(Context);
+                using (CreateProfilingScope("Configures" + project.ClassName))
+                    project.InvokeConfiguration(Context);
 
-                project.AfterConfigure();
+                using (CreateProfilingScope("AfterConfigure" + project.ClassName))
+                    project.AfterConfigure();
 
                 // Post event
                 if (EventPostProjectConfigure != null)
                 {
-                    foreach (Project.Configuration conf in project.Configurations)
-                        EventPostProjectConfigure?.Invoke(project, conf);
+                    using (CreateProfilingScope("EventPostProjectConfigure" + project.ClassName))
+                    {
+                        foreach (Project.Configuration conf in project.Configurations)
+                            EventPostProjectConfigure?.Invoke(project, conf);
+                    }
                 }
 
                 // Resolve [*]
-                project.Resolve(this, SkipInvalidPath);
+                using (CreateProfilingScope("Resolve"))
+                    project.Resolve(this, SkipInvalidPath);
 
                 // Would be more optimal to not generate the blobs, but simpler that way
                 if (_cleanBlobsOnly)
@@ -693,7 +834,7 @@ namespace Sharpmake
 
         private void LinkProject(Project project)
         {
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| link project {1}", ms, project.Name); }))
+            using (CreateProfilingScope("LinkProject" + project.Name))
             {
                 // Pre event
                 EventPreProjectLink?.Invoke(project);
@@ -707,15 +848,18 @@ namespace Sharpmake
 
         private void LinkSolution(Solution solution)
         {
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| link solution {1}", ms, solution.Name); }))
+            using (CreateProfilingScope("LinkSolution" + solution.Name))
             {
                 // Pre event
-                EventPreSolutionLink?.Invoke(solution);
+                using (CreateProfilingScope("EventPreSolutionLink" + solution.Name))
+                    EventPreSolutionLink?.Invoke(solution);
 
-                solution.Link(this);
+                using (CreateProfilingScope("Solution.Link" + solution.Name))
+                    solution.Link(this);
 
                 // Post event
-                EventPostSolutionLink?.Invoke(solution);
+                using (CreateProfilingScope("EventPostSolutionLink" + solution.Name))
+                    EventPostSolutionLink?.Invoke(solution);
             }
         }
 
@@ -817,13 +961,15 @@ namespace Sharpmake
 
         public IDictionary<Type, GenerationOutput> Generate()
         {
-            Link();
+            using (CreateProfilingScope("Link"))
+                Link();
 
             if (Context.WriteLog)
                 WriteLogs();
 
             LogWriteLine("  generating projects and solutions...");
             using (new Util.StopwatchProfiler(ms => { LogWriteLine("    generation done in {0:0.0} sec", ms / 1000.0f); }))
+            using (CreateProfilingScope("Generation"))
             {
                 var projects = new List<Project>(_projects.Values);
                 var solutions = new List<Solution>(_solutions.Values);
@@ -835,6 +981,7 @@ namespace Sharpmake
                 if (EventPreGeneration != null)
                 {
                     using (new Util.StopwatchProfiler(ms => { LogWriteLine("    pre-generation steps took {0:0.0} sec", ms / 1000.0f); }, minThresholdMs: 100))
+                    using (CreateProfilingScope("PreGen Steps"))
                         EventPreGeneration.Invoke(projects, solutions);
                 }
 
@@ -857,6 +1004,7 @@ namespace Sharpmake
                 if (EventPostGeneration != null || EventPostGenerationReport != null)
                 {
                     using (new Util.StopwatchProfiler(ms => { LogWriteLine("    post-generation steps took {0:0.0} sec", ms / 1000.0f); }, minThresholdMs: 100))
+                    using (CreateProfilingScope("PostGen Steps"))
                     {
                         EventPostGeneration?.Invoke(projects, solutions);
                         EventPostGenerationReport?.Invoke(projects, solutions, _generationReport);
@@ -875,7 +1023,7 @@ namespace Sharpmake
             Solution.Configuration firstConf = configurations.FirstOrDefault();
             Solution solution = firstConf.Solution;
 
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| generate solution file {1}", ms, firstConf.SolutionFileName); }))
+            using (CreateProfilingScope("GenSolution" + Path.GetFileName(solutionFile)))
             {
                 GenerationOutput output = new GenerationOutput();
 
@@ -928,7 +1076,7 @@ namespace Sharpmake
             Project.Configuration firstConf = configurations.FirstOrDefault();
             Project project = firstConf.Project;
 
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| generate project file {1}", ms, firstConf.ProjectFileName); }))
+            using (CreateProfilingScope("GenProject" + Path.GetFileName(projectFile)))
             {
                 GenerationOutput output = new GenerationOutput();
 
@@ -937,24 +1085,27 @@ namespace Sharpmake
                     bool generateProject = false;
 
                     DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
-                    for (int i = 0; i < configurations.Count; ++i)
+                    using (CreateProfilingScope("GenProject" + Path.GetFileName(projectFile) + ":confs"))
                     {
-                        Project.Configuration conf = pair.Value[i];
-                        if (devEnv != conf.Target.GetFragment<DevEnv>())
+                        for (int i = 0; i < configurations.Count; ++i)
                         {
-                            throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\tBoth {0} and {1} try to generate {2}",
-                                devEnv,
-                                conf.Target.GetFragment<DevEnv>(),
-                                projectFile);
-                        }
-
-                        if (!generateProject)
-                        {
-                            if (_usedProjectConfigurations == null ||
-                                Arguments.TypesToGenerate.Contains(project.GetType()) || // generate the project if it was explicitly queried by the user-code
-                                _usedProjectConfigurations.Contains(conf))
+                            Project.Configuration conf = pair.Value[i];
+                            if (devEnv != conf.Target.GetFragment<DevEnv>())
                             {
-                                generateProject = true;
+                                throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\tBoth {0} and {1} try to generate {2}",
+                                    devEnv,
+                                    conf.Target.GetFragment<DevEnv>(),
+                                    projectFile);
+                            }
+
+                            if (!generateProject)
+                            {
+                                if (_usedProjectConfigurations == null ||
+                                    Arguments.TypesToGenerate.Contains(project.GetType()) || // generate the project if it was explicitly queried by the user-code
+                                    _usedProjectConfigurations.Contains(conf))
+                                {
+                                    generateProject = true;
+                                }
                             }
                         }
                     }
@@ -962,7 +1113,10 @@ namespace Sharpmake
                     if (project.SourceFilesFilters == null || (project.SourceFilesFiltersCount != 0 && !project.SkipProjectWhenFiltersActive))
                     {
                         if (generateProject)
-                            _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
+                        {
+                            using (CreateProfilingScope("GenProject" + Path.GetFileName(projectFile) + ":Generate"))
+                                _getGeneratorsManagerCallBack().Generate(this, project, configurations, projectFile, output.Generated, output.Skipped);
+                        }
                     }
                 }
                 catch (Exception ex)
