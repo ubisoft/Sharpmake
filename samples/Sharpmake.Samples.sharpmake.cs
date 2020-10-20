@@ -35,8 +35,8 @@ namespace SharpmakeGen.Samples
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
             {
                 StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
-                StartProgram = @"[conf.TargetPath]\Sharpmake.Application.exe",
-                StartArguments = "/sources(\"[project.SharpmakeMainFile]\")",
+                StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\sharpmake.application\Sharpmake.Application.exe",
+                StartArguments = "/sources('[project.SharpmakeMainFile]')",
                 WorkingDirectory = "[project.SourceRootPath]",
                 OverwriteExistingFile = false
             };
