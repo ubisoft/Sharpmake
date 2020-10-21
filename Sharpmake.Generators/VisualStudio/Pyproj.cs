@@ -193,7 +193,7 @@ namespace Sharpmake.Generators.VisualStudio
                 foreach (PythonVirtualEnvironment virtualEnvironment in _project.VirtualEnvironments)
                 {
                     baseGuid = needsPypatching ? baseGuid : virtualEnvironment.BaseInterpreterGuid.ToString();
-                    pyVersion = String.IsNullOrEmpty(virtualEnvironment.Version) ? currentInterpreterVersion : virtualEnvironment.Version;
+                    string pyVersion = string.IsNullOrEmpty(virtualEnvironment.Version) ? currentInterpreterVersion : virtualEnvironment.Version;
 
                     Write(Template.Project.ProjectItemGroupBegin, writer, resolver);
                     using (resolver.NewScopedParameter("name", virtualEnvironment.Name))
