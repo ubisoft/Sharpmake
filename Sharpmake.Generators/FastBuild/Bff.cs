@@ -1453,10 +1453,11 @@ namespace Sharpmake.Generators.FastBuild
         private static Strings CollectNatvisFiles(BffGenerationContext context)
         {
             Project.Configuration projectConfig = context.Configuration;
+
+            var natvisFiles = new Strings(projectConfig.Project.NatvisFiles);
             if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe)
             {
-                Strings natvisFiles = new Strings(projectConfig.Project.NatvisFiles);
-                HashSet<Project> visitedProjects = new HashSet<Project>();
+                var visitedProjects = new HashSet<Project>();
                 foreach (Project.Configuration resolvedDepConfig in projectConfig.ResolvedDependencies)
                 {
                     if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe)
@@ -1471,13 +1472,8 @@ namespace Sharpmake.Generators.FastBuild
                         }
                     }
                 }
-
-                return natvisFiles;
             }
-            else
-            {
-                return projectConfig.Project.NatvisFiles;
-            }
+            return natvisFiles;
         }
 
         private static void FillEmbeddedNatvisOptions(BffGenerationContext context)
