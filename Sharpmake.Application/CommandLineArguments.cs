@@ -46,6 +46,7 @@ namespace Sharpmake.Application
             public string[] Assemblies = new string[0];
             public HashSet<string> Defines = new HashSet<string>();
             public InputType Input = InputType.Undefined;
+            public string ProfileFile = null;
             public bool Exit = false;
             public bool BlobOnly = false;
             public bool CleanBlobsOnly = false;
@@ -93,6 +94,12 @@ namespace Sharpmake.Application
                 DebugWriteLine("compilation defines: ");
                 foreach (string define in Defines)
                     DebugWriteLine("  " + define);
+            }
+
+            [CommandLine.Option("profile", @"Profile file used to activate and output profiling: ex: /profile( @""D:\profile.json"" )")]
+            public void SetProfileFile(string profileFile)
+            {
+                ProfileFile = profileFile;
             }
 
             [CommandLine.Option("projectlogfiles", @"log files contained in a project for debug purpose: ex: /projectlogfiles( ""s:\p4\ac\dev\sharpmake\projects\win32\system\system.vcproj"" )")]

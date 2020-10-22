@@ -183,6 +183,13 @@ namespace Sharpmake
                 OnOutputUpdated
             }
 
+            public enum ProduceReferenceAssembly
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)

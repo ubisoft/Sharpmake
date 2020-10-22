@@ -444,15 +444,18 @@ namespace Sharpmake.Application
                 }
                 else
                 {
-                    if (parameters.GenerateDebugSolution)
-                        LogWriteLine("Generate debug solution...");
+                    IDictionary<Type, GenerationOutput> outputs;
+                    using (Builder.Instance.CreateProfilingScope("Generate"))
+                        outputs = builder.Generate();
 
-                    var outputs = builder.Generate();
                     foreach (var output in outputs)
                     {
                         if (output.Value.Exception != null)
                             throw new Error(output.Value.Exception, "Error encountered while generating {0}", output.Key);
                     }
+
+                    if (!string.IsNullOrEmpty(parameters.ProfileFile))
+                        builder.DumpTraceFile(parameters.ProfileFile);
 
                     if (parameters.DumpDependency)
                         DependencyTracker.Instance.DumpGraphs(outputs);
@@ -598,28 +601,38 @@ namespace Sharpmake.Application
             if (parameters.ProfileOutput)
                 builder.EventOutputProfile += LogWrite;
 
+            if (!string.IsNullOrEmpty(parameters.ProfileFile))
+                builder.EnableProfiling();
+
             try
             {
                 // Generate debug solution
-                if (generateDebugSolution)
+                using (Builder.Instance.CreateProfilingScope("Debug solution"))
                 {
-                    DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments, parameters.DebugSolutionStartArguments, parameters.Defines.ToArray());
-                    builder.BuildProjectAndSolution();
-                    return builder;
+                    if (generateDebugSolution)
+                    {
+                        LogWriteLine("Generate debug solution...");
+                        DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments, parameters.DebugSolutionStartArguments, parameters.Defines.ToArray());
+                        builder.BuildProjectAndSolution();
+                        return builder;
+                    }
                 }
 
                 // Load user input (either files or pre-built assemblies)
-                switch (parameters.Input)
+                using (Builder.Instance.CreateProfilingScope("EntryPoints"))
                 {
-                    case Argument.InputType.File:
-                        builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadSharpmakeFiles(parameters.Sources));
-                        break;
-                    case Argument.InputType.Assembly:
-                        builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadAssemblies(parameters.Assemblies));
-                        break;
-                    case Argument.InputType.Undefined:
-                    default:
-                        throw new Error("Sharpmake input missing, use /sources() or /assemblies()");
+                    switch (parameters.Input)
+                    {
+                        case Argument.InputType.File:
+                            builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadSharpmakeFiles(parameters.Sources));
+                            break;
+                        case Argument.InputType.Assembly:
+                            builder.ExecuteEntryPointInAssemblies<Main>(builder.LoadAssemblies(parameters.Assemblies));
+                            break;
+                        case Argument.InputType.Undefined:
+                        default:
+                            throw new Error("Sharpmake input missing, use /sources() or /assemblies()");
+                    }
                 }
 
                 if (builder.Arguments.TypesToGenerate.Count == 0)
@@ -628,7 +641,8 @@ namespace Sharpmake.Application
                 builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
 
                 // Call all configuration's methods and resolve project/solution member's values
-                builder.BuildProjectAndSolution();
+                using (Builder.Instance.CreateProfilingScope("Build"))
+                    builder.BuildProjectAndSolution();
 
                 return builder;
             }
