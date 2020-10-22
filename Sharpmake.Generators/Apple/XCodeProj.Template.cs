@@ -260,6 +260,7 @@ namespace Sharpmake.Generators.Apple
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
 				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
+                DEVELOPMENT_TEAM = [item.Options.DevelopmentTeam];
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
 				ENABLE_BITCODE = [item.Options.EnableBitcode];
 				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];

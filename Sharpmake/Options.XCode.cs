@@ -79,21 +79,17 @@ namespace Sharpmake
                     GNU11
                 }
 
-                public class CodeSignEntitlements
+                public class CodeSignEntitlements : StringOption
                 {
-                    public string Value;
-                    public CodeSignEntitlements(string value)
+                    public CodeSignEntitlements(string value) : base(value)
                     {
-                        Value = value;
                     }
                 }
 
-                public class CodeSigningIdentity
+                public class CodeSigningIdentity : StringOption
                 {
-                    public string Value;
-                    public CodeSigningIdentity(string value)
+                    public CodeSigningIdentity(string value) : base(value)
                     {
-                        Value = value;
                     }
                 }
 
@@ -146,9 +142,11 @@ namespace Sharpmake
                     public DevelopmentTeam(string value) : base(value) { }
                 }
 
-                public class ProvisioningStyle : StringOption
+                public enum ProvisioningStyle
                 {
-                    public ProvisioningStyle(string value) : base(value) { }
+                    [Default]
+                    Automatic,
+                    Manual
                 }
 
                 public enum DeploymentPostProcessing
@@ -330,12 +328,10 @@ namespace Sharpmake
                     Enable
                 }
 
-                public class ProvisioningProfile
+                public class ProvisioningProfile : StringOption
                 {
-                    public string ProfileName;
-                    public ProvisioningProfile(string profileName)
+                    public ProvisioningProfile(string profileName) : base(profileName)
                     {
-                        ProfileName = profileName;
                     }
                 }
 
