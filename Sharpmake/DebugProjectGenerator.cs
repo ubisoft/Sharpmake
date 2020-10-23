@@ -18,6 +18,7 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
+using System.Runtime.Versioning;
 
 namespace Sharpmake
 {
@@ -223,6 +224,25 @@ namespace Sharpmake
 
         internal static Target GetTargets()
         {
+            var frameworkString = Assembly
+                .GetEntryAssembly()?
+                .GetCustomAttribute<TargetFrameworkAttribute>()?
+                .FrameworkName ?? "";
+
+            DotNetFramework framework = DotNetFramework.v4_7_2;
+            if (frameworkString.StartsWith(".NETFramework"))
+            {
+                Enum.TryParse(frameworkString.Split('=')[1].Replace('.', '_'), out framework);
+            }
+            else if (frameworkString.StartsWith(".NETCore"))
+            {
+                Enum.TryParse("netcore" + frameworkString.Split('=')[1].Substring(1).Replace('.', '_'), out framework);
+            }
+            else
+            {
+                throw new Error($"Unknown .NET framework '{frameworkString}'");
+            }
+
             return new Target(
                 Platform.anycpu,
                 DevEnv.vs2019,
@@ -230,7 +250,7 @@ namespace Sharpmake
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_7_2
+                framework
             );
         }
 
