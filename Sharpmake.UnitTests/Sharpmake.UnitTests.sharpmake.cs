@@ -30,8 +30,11 @@ namespace SharpmakeGen
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
 
-            conf.ReferencesByNuGetPackage.Add("NUnit", "3.4.1");
-            conf.ReferencesByNuGetPackage.Add("NUnit.Console", "3.4.1");
+            conf.ReferencesByNuGetPackage.Add("NUnit", "3.12.0");
+            conf.ReferencesByNuGetPackage.Add("NUnit.Console", "3.10.0");
+            // vs2017+ requires both test adapter and test sdk to run properly
+            conf.ReferencesByNuGetPackage.Add("NUnit3TestAdapter", "3.17.0");
+            conf.ReferencesByNuGetPackage.Add("Microsoft.NET.Test.Sdk", "16.9.0-preview-20201020-06");
         }
     }
 }
