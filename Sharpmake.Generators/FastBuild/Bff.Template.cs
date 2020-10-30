@@ -371,6 +371,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.OpenMP]'
             + ' [cmdLineOptions.LanguageStandard]'
+            + ' [cmdLineOptions.ConformanceMode]'
             // Output Files options
             // ---------------------------
             + ' [cmdLineOptions.CompilerProgramDatabaseFile]'
