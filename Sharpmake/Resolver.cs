@@ -832,8 +832,6 @@ namespace Sharpmake
             if (_resolvedObject.Add(obj) == false)
                 return;
 
-            var typeWrapper = GetTypeWrapper(obj.GetType());
-
             if (objectPath != null)
             {
                 if (GetResolveStatus(objectPath) == ResolveStatus.Resolved)
@@ -842,6 +840,7 @@ namespace Sharpmake
                 SetResolving(objectPath);
             }
 
+            var typeWrapper = GetTypeWrapper(obj.GetType());
             if (typeWrapper == null)
                 return;
 
