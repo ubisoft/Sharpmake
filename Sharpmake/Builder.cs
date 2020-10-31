@@ -619,7 +619,7 @@ namespace Sharpmake
 
         public Project LoadProjectType(Type type)
         {
-            using (CreateProfilingScope(type.Name))
+            using (CreateProfilingScope(type.ToNiceTypeName()))
             {
                 Project.ProjectTypeAttribute projectTypeAttribute;
                 if (type.IsDefined(typeof(Generate), false))
