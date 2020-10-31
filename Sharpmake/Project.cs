@@ -1818,7 +1818,7 @@ namespace Sharpmake
 
                 XResourcesImg.Resolve(SourceRootPath, resolver);
 
-                using (builder.CreateProfilingScope("ResolveConfs"))
+                using (builder.CreateProfilingScope("ResolveConfs (" + Configurations.Count + ")"))
                 {
                     // Resolve Configuration
                     foreach (Project.Configuration conf in Configurations)
