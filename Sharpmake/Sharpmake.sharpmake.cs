@@ -23,7 +23,10 @@ namespace SharpmakeGen
             conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.Core");
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
-            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.4.0");
+            conf.ReferencesByNuGetPackage.Add("System.Collections.Immutable", "1.7.1");
+            conf.ReferencesByNuGetPackage.Add("System.Reflection.Metadata", "1.7.0");
+
+            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.7.0");
             conf.ReferencesByNuGetPackage.Add("Microsoft.DiaSymReader.Native", "1.7.0");
             conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "1.16.30");
         }
