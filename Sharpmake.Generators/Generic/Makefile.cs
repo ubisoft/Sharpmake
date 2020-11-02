@@ -450,6 +450,7 @@ namespace Sharpmake.Generators.Generic
             includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.DependenciesIncludePaths)));
             PathMakeUnix(includePaths);
             includePaths.InsertPrefix("-I");
+            includePaths.Sort();
             options["Includes"] = includePaths.JoinStrings(" ");
 
             if (conf.ForcedIncludes.Count > 0)
@@ -457,6 +458,7 @@ namespace Sharpmake.Generators.Generic
                 OrderableStrings relativeForceIncludes = new OrderableStrings(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.ForcedIncludes));
                 PathMakeUnix(relativeForceIncludes);
                 relativeForceIncludes.InsertPrefix("-include ");
+                relativeForceIncludes.Sort();
                 options["Includes"] += " " + relativeForceIncludes.JoinStrings(" ");
             }
 
@@ -549,11 +551,13 @@ namespace Sharpmake.Generators.Generic
             OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
             PathMakeUnix(dependenciesLibraryFiles);
             dependenciesLibraryFiles.InsertPrefix("-l");
+            dependenciesLibraryFiles.Sort();
             options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
 
             // LibraryFiles
             OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
             libraryFiles.InsertPrefix("-l");
+            libraryFiles.Sort();
             options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
 
             // LibraryPaths
@@ -563,6 +567,7 @@ namespace Sharpmake.Generators.Generic
             libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesBuiltTargetsLibraryPaths));
             PathMakeUnix(libraryPaths);
             libraryPaths.InsertPrefix("-L");
+            libraryPaths.Sort();
             options["LibraryPaths"] = libraryPaths.JoinStrings(" ");
 
             // Dependencies
@@ -584,6 +589,7 @@ namespace Sharpmake.Generators.Generic
             }
             var depsRelative = Util.PathGetRelative(projectFileInfo.DirectoryName, deps);
             PathMakeUnix(depsRelative);
+            depsRelative.Sort();
             options["LDDEPS"] = depsRelative.JoinStrings(" ");
 
             // LinkCommand
