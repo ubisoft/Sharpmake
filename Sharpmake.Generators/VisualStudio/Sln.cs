@@ -756,7 +756,7 @@ namespace Sharpmake.Generators.VisualStudio
                     e.Configuration.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
                     e.Configuration.Output == Project.Configuration.OutputType.DotNetWindowsApp ||
                     e.Configuration.Output == Project.Configuration.OutputType.Exe)
-                .GroupBy(e => e.Configuration.ProjectFullFileName)
+                .GroupBy(e => e.Configuration.ProjectFileName)
                 .OrderBy(filename => filename.Key, StringComparer.InvariantCultureIgnoreCase)
                 .ToList();
 
