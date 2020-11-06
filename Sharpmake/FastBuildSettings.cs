@@ -57,6 +57,11 @@ namespace Sharpmake
         public static string CachePath = null;
 
         /// <summary>
+        /// Additional settings to add to the global settings node.
+        /// </summary>
+        public static readonly IList<string> AdditionalGlobalSettings = new List<string>();
+
+        /// <summary>
         /// Path to the fastbuild plugin dll if any. This typically will be the path to the Ubisoft asset store plugin DLL but could be any other compatible implementation.
         /// CachePath must also be set to an appropriate url.
         /// </summary>

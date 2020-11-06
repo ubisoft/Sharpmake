@@ -530,6 +530,12 @@ namespace Sharpmake.Generators.FastBuild
                 workerConnectionLimit = ".WorkerConnectionLimit = " + FastBuildSettings.FastBuildWorkerConnectionLimit.ToString();
             }
 
+            string additionalGlobalSettings = FileGeneratorUtilities.RemoveLineTag;
+            if (FastBuildSettings.AdditionalGlobalSettings.Any())
+            {
+                additionalGlobalSettings = string.Join(Environment.NewLine, FastBuildSettings.AdditionalGlobalSettings.Select(setting => "    " + setting));
+            }
+
             string fastBuildPATH = FileGeneratorUtilities.RemoveLineTag;
             if (FastBuildSettings.SetPathToResourceCompilerInEnvironment)
             {
@@ -609,6 +615,7 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
             using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))
             using (masterBffGenerator.Declare("fastBuildAllowDBMigration", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
+            using (masterBffGenerator.Declare("AdditionalGlobalSettings", additionalGlobalSettings))
             using (masterBffGenerator.Declare("fastBuildEnvironments", fastBuildEnvironments))
             using (masterBffGenerator.Declare("envRemoveGuards", envRemoveGuards))
             {

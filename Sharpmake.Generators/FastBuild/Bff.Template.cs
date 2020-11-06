@@ -66,6 +66,7 @@ Settings
     [CachePath]
     [WorkerConnectionLimit]
     .AllowDBMigration_Experimental = [fastBuildAllowDBMigration]
+[AdditionalGlobalSettings]
 }
 ";
 
