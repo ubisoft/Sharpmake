@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections.Generic;
 
 namespace Sharpmake
 {
@@ -189,5 +190,10 @@ namespace Sharpmake
         /// Also it seems that this doesn't occurs with VS2013.
         /// </remarks>
         public static bool EnableVS2012EnumBugWorkaround = false; // activate workaround for VS2012 enum bug(corrupted preprocessor output).
+
+        /// <summary>
+        /// FastBuild names of compilers to set the 'UseRelativePaths_Experimental' option for.
+        /// </summary>
+        public static readonly ISet<string> CompilersUsingRelativePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 }
