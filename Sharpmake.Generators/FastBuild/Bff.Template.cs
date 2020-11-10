@@ -566,6 +566,7 @@ Unity( '[unityFile.UnityName]' )
     .UnityOutputPattern                 = '[unityFile.UnityOutputPattern]'
     .UnityNumFiles                      =  [unityFile.UnityNumFiles]
     .UnityPCH                           = '[unityFile.UnityPCH]'
+    .UseRelativePaths_Experimental      = [unityFile.UseRelativePaths]
 }
 ";
 

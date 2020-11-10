@@ -1842,7 +1842,8 @@ namespace Sharpmake.Generators.FastBuild
                 UnityInputPath = fastBuildUnityPaths,
                 UnityInputFiles = fastBuildUnityInputFiles,
                 UnityInputExcludedFiles = fastBuildUnityInputExcludedfiles,
-                UnityInputPattern = fastBuildUnityInputPattern
+                UnityInputPattern = fastBuildUnityInputPattern,
+                UseRelativePaths = conf.FastBuildUnityUseRelativePaths ? "true" : FileGeneratorUtilities.RemoveLineTag,
             };
 
             // _unities being a dictionary, a new entry will be created only

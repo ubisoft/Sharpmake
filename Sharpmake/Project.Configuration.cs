@@ -1283,6 +1283,11 @@ namespace Sharpmake
             public string BffFullFileName => Path.Combine(ProjectPath, BffFileName);
 
             /// <summary>
+            /// Whether to use relative paths in FASTBuild-generated Unity files.
+            /// </summary>
+            public bool FastBuildUnityUseRelativePaths = false;
+
+            /// <summary>
             /// Gets or sets whether to generate a FASTBuild (.bff) file when using FASTBuild.
             /// </summary>
             /// <remarks>
