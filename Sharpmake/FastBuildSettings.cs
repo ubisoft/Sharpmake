@@ -195,5 +195,10 @@ namespace Sharpmake
         /// FastBuild names of compilers to set the 'UseRelativePaths_Experimental' option for.
         /// </summary>
         public static readonly ISet<string> CompilersUsingRelativePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Additional settings to add to the Compiler node, keyed by compiler name.
+        /// </summary>
+        public static readonly IDictionary<string, IList<string>> AdditionalCompilerSettings = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);            
     }
 }
