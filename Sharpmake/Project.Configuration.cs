@@ -828,6 +828,22 @@ namespace Sharpmake
             public OrderableStrings AdditionalCompilerOptions = new OrderableStrings();
 
             /// <summary>
+            /// Compiler-specific options to pass when invoking the compiler to create PCHs.
+            /// </summary>
+            /// <remarks>
+            /// Currently only respected by the BFF generator.
+            /// </remarks>
+            public OrderableStrings AdditionalCompilerOptionsOnPCHCreate = new OrderableStrings();
+
+            /// <summary>
+            /// Compiler-specific options to pass when invoking the compiler telling it to use PCHs.
+            /// </summary>
+            /// <remarks>
+            /// Currently only respected by the BFF generator.
+            /// </remarks>
+            public OrderableStrings AdditionalCompilerOptionsOnPCHUse = new OrderableStrings();
+
+            /// <summary>
             /// Gets a list of file extensions that are added to a Visual Studio project with the
             /// <b>None</b> build action.
             /// </summary>
