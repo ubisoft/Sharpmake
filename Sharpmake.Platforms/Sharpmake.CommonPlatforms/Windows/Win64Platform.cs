@@ -294,11 +294,14 @@ namespace Sharpmake
                                     {
                                         Version toolsVersion = compilerDevEnv.Value.GetVisualStudioVCToolsVersion();
 
-                                        if (toolsVersion >= new Version("14.22.27905"))
+                                        if (toolsVersion >= new Version("14.22.27905")) // 16.3.2
                                             extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
 
-                                        if (toolsVersion >= new Version("14.25.28610"))
+                                        if (toolsVersion >= new Version("14.25.28610")) // 16.5
                                             extraFiles.Add(@"$ExecutableRootPath$\vcruntime140_1.dll");
+
+                                        if (toolsVersion >= new Version("14.28.29333")) // 16.8
+                                            extraFiles.Add(@"$ExecutableRootPath$\msvcp140_atomic_wait.dll");
                                     }
 
                                     try
