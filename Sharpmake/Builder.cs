@@ -675,7 +675,7 @@ namespace Sharpmake
 
         public Solution LoadSolutionType(Type type)
         {
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| load solution {1}", ms, type.Name); }))
+            using (CreateProfilingScope(type.ToNiceTypeName()))
             {
                 if (!type.IsDefined(typeof(Generate), false) &&
                 !type.IsDefined(typeof(Compile), false) &&
