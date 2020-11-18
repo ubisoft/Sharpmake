@@ -598,9 +598,6 @@ namespace Sharpmake.Application
             builder.EventOutputMessage += LogWrite;
             builder.EventOutputDebug += DebugWrite;
 
-            if (parameters.ProfileOutput)
-                builder.EventOutputProfile += LogWrite;
-
             if (!string.IsNullOrEmpty(parameters.ProfileFile))
                 builder.EnableProfiling();
 

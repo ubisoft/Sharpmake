@@ -90,7 +90,6 @@ namespace Sharpmake
         public event OutputDelegate EventOutputWarning;
         public event OutputDelegate EventOutputMessage;
         public event OutputDelegate EventOutputDebug;
-        public event OutputDelegate EventOutputProfile;
 
         // Configure events
         public delegate void PreProjectConfigure(Project project);
@@ -1255,11 +1254,6 @@ namespace Sharpmake
         public void DebugWriteLine(string message, params object[] args)
         {
             EventOutputDebug?.Invoke(message + Environment.NewLine, args);
-        }
-
-        public void ProfileWriteLine(string message, params object[] args)
-        {
-            EventOutputProfile?.Invoke(message + Environment.NewLine, args);
         }
 
         #endregion

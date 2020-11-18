@@ -61,7 +61,6 @@ namespace Sharpmake.Application
             public bool WriteFiles = true;
             public bool DumpDependency = false;
             private bool _testOptionValid = true;
-            public bool ProfileOutput = false;
             internal TestOptions TestOption;
             internal bool RegressionDiff = true;
             public DirectoryInfo OutputDirectory;
@@ -155,12 +154,6 @@ namespace Sharpmake.Application
             public void CommandLineDebugLog(bool value)
             {
                 DebugLog = value;
-            }
-
-            [CommandLine.Option("profileoutput", @"Write profiling information ( slow ): ex: /profileoutput(<true|false>)")]
-            public void CommandLineProfileOutput(bool value)
-            {
-                ProfileOutput = value;
             }
 
             [CommandLine.Option("diagnostics", @"Output more errors and warnings (slow): ex: /diagnostics")]
