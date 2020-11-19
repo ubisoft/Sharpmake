@@ -962,7 +962,8 @@ namespace Sharpmake
                 NoneFilesCopyIfNewer.IntersectWith(SourceFilesFilters);
             }
 
-            AdditionalFiltering(SourceFiles, ref SourceFilesExclude);
+            using (builder.CreateProfilingScope("Project.ResolveSourceFiles:AdditionalFiltering"))
+                AdditionalFiltering(SourceFiles, ref SourceFilesExclude);
 
             // Add source files
             ResolvedSourceFiles.AddRange(SourceFiles);
