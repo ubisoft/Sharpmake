@@ -13,7 +13,6 @@
 // limitations under the License.
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Sharpmake
 {
@@ -39,7 +38,6 @@ namespace Sharpmake
     public class Export : Attribute
     { }
 
-    [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class Configure : Attribute
     {
