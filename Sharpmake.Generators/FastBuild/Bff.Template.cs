@@ -192,6 +192,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.FixedBaseAddress]'
                             + ' [cmdLineOptions.ImportLibrary]'
                             + ' [cmdLineOptions.TargetMachine]'
+                            + ' [cmdLineOptions.LinkerCreateHotPatchableImage]'
                             + ' /errorReport:queue'
                             + ' [cmdLineOptions.ModuleDefinitionFile]'
                             // Additional linker options
@@ -367,7 +368,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.EnableEnhancedInstructionSet]'
             + ' [cmdLineOptions.FloatingPointModel]'
             + ' [cmdLineOptions.FloatingPointExceptions]'
-            + ' [cmdLineOptions.CreateHotpatchableImage]'
+            + ' [cmdLineOptions.CompilerCreateHotpatchableImage]'
             + ' [cmdLineOptions.SupportJustMyCode]'
             + ' [cmdLineOptions.SpectreMitigation]'
             // Language options

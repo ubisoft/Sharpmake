@@ -105,7 +105,6 @@ del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</N
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
     <OutDir>output\debug_fastbuild_vs2019\</OutDir>
@@ -127,7 +126,6 @@ del "output\debug_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCle
     <NMakeOutput>output\debug_fastbuild_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
     <TargetName>requireprebuildstep</TargetName>
@@ -160,7 +158,6 @@ del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL<
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
     <OutDir>output\release_fastbuild_vs2019\</OutDir>
@@ -182,7 +179,6 @@ del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
     <NMakeOutput>output\release_fastbuild_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
     <TargetName>requireprebuildstep</TargetName>
@@ -229,7 +225,6 @@ del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -313,7 +308,6 @@ del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>

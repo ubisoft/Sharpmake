@@ -822,19 +822,14 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.FloatingPointExceptions.Enable, () => { context.Options["FloatingPointExceptions"] = "true"; context.CommandLineOptions["FloatingPointExceptions"] = "/fp:except"; })
             );
 
-            // CreateHotpatchableImage = "false"
-            // CreateHotpatchableImage = "true"     /hotpatch
-            context.CommandLineOptions["CreateHotpatchableImage"] = FileGeneratorUtilities.RemoveLineTag;
-
-
             //Options.Vc.Compiler.CreateHotPatchableCode.
             //    Disable                                 CreateHotPatchableCode="false"
             //    Enable                                  CreateHotPatchableCode="true"                  /hotpatch
             context.SelectOption
             (
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Default, () => { context.Options["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Disable, () => { context.Options["CreateHotPatchableCode"] = "false"; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Enable, () => { context.Options["CreateHotPatchableCode"] = "true"; context.CommandLineOptions["CreateHotPatchableCode"] = "/hotpatch"; })
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Default, () => { context.Options["CompilerCreateHotpatchableImage"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["CompilerCreateHotpatchableImage"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Disable, () => { context.Options["CompilerCreateHotpatchableImage"] = "false"; context.CommandLineOptions["CompilerCreateHotpatchableImage"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Enable, () => { context.Options["CompilerCreateHotpatchableImage"] = "true"; context.CommandLineOptions["CompilerCreateHotpatchableImage"] = "/hotpatch"; })
             );
 
             //Options.Vc.Compiler.ConformanceMode.
@@ -1664,11 +1659,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             context.SelectOption
             (
-            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.Disable, () => { context.Options["CreateHotPatchableImage"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["CreateHotPatchableImage"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.Enable, () => { context.Options["CreateHotPatchableImage"] = "Enabled"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN"; }),
-            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.X86Image, () => { context.Options["CreateHotPatchableImage"] = "X86Image"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN:5"; }),
-            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.X64Image, () => { context.Options["CreateHotPatchableImage"] = "X64Image"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN:6"; }),
-            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.ItaniumImage, () => { context.Options["CreateHotPatchableImage"] = "ItaniumImage"; context.CommandLineOptions["CreateHotPatchableImage"] = "/FUNCTIONPADMIN:16"; })
+            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.Disable, () => { context.Options["LinkerCreateHotPatchableImage"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LinkerCreateHotPatchableImage"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.Enable, () => { context.Options["LinkerCreateHotPatchableImage"] = "Enabled"; context.CommandLineOptions["LinkerCreateHotPatchableImage"] = "/FUNCTIONPADMIN"; }),
+            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.X86Image, () => { context.Options["LinkerCreateHotPatchableImage"] = "X86Image"; context.CommandLineOptions["LinkerCreateHotPatchableImage"] = "/FUNCTIONPADMIN:5"; }),
+            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.X64Image, () => { context.Options["LinkerCreateHotPatchableImage"] = "X64Image"; context.CommandLineOptions["LinkerCreateHotPatchableImage"] = "/FUNCTIONPADMIN:6"; }),
+            Options.Option(Options.Vc.Linker.CreateHotPatchableImage.ItaniumImage, () => { context.Options["LinkerCreateHotPatchableImage"] = "ItaniumImage"; context.CommandLineOptions["LinkerCreateHotPatchableImage"] = "/FUNCTIONPADMIN:16"; })
             );
 
             context.SelectOption

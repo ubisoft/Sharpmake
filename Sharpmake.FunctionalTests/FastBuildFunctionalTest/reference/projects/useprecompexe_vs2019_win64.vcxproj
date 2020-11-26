@@ -104,7 +104,6 @@ del "output\debug_fastbuild_noblob_vs2019\useprecompexe.lib" >NUL 2>NUL
 del "output\debug_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
     <OutDir>output\debug_fastbuild_vs2019\</OutDir>
@@ -125,7 +124,6 @@ del "output\debug_fastbuild_vs2019\useprecompexe.lib" >NUL 2>NUL
 del "output\debug_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
     <TargetName>useprecompexe</TargetName>
@@ -157,7 +155,6 @@ del "output\release_fastbuild_noblob_vs2019\useprecompexe.lib" >NUL 2>NUL
 del "output\release_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
     <OutDir>output\release_fastbuild_vs2019\</OutDir>
@@ -178,7 +175,6 @@ del "output\release_fastbuild_vs2019\useprecompexe.lib" >NUL 2>NUL
 del "output\release_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>useprecompexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
     <TargetName>useprecompexe</TargetName>
@@ -224,7 +220,6 @@ del "output\release_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -309,7 +304,6 @@ del "output\release_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>

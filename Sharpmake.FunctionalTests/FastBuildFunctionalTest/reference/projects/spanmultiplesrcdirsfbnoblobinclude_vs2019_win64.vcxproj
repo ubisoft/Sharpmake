@@ -83,7 +83,6 @@ del "output\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.pdb
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\codebase\spanmultiplesrcdirs\additional_dir;..\codebase\spanmultiplesrcdirs\dir_individual_files</NMakeIncludeSearchPath>
-    <TargetFileName>spanmultiplesrcdirsfbnoblobinclude.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
     <TargetName>spanmultiplesrcdirsfbnoblobinclude</TargetName>
@@ -116,7 +115,6 @@ del "output\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.p
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\codebase\spanmultiplesrcdirs\additional_dir;..\codebase\spanmultiplesrcdirs\dir_individual_files</NMakeIncludeSearchPath>
-    <TargetFileName>spanmultiplesrcdirsfbnoblobinclude.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
     <TargetName>spanmultiplesrcdirsfbnoblobinclude</TargetName>
@@ -163,7 +161,6 @@ del "output\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.p
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -247,7 +244,6 @@ del "output\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.p
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>

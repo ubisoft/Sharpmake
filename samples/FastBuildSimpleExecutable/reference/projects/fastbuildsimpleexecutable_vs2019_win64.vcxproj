@@ -57,7 +57,6 @@ del "output\win64\debug\fastbuildsimpleexecutable.lib" >NUL 2>NUL
 del "output\win64\debug\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\win64\debug\fastbuildsimpleexecutable.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>fastbuildsimpleexecutable.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>output\win64\release\</OutDir>
@@ -78,7 +77,6 @@ del "output\win64\release\fastbuildsimpleexecutable.lib" >NUL 2>NUL
 del "output\win64\release\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\win64\release\fastbuildsimpleexecutable.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>fastbuildsimpleexecutable.exe</TargetFileName>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>

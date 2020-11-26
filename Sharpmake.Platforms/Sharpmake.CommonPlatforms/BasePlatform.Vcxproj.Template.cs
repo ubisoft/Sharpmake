@@ -54,7 +54,7 @@ namespace Sharpmake
       <EnableEnhancedInstructionSet>[options.EnableEnhancedInstructionSet]</EnableEnhancedInstructionSet>
       <FloatingPointModel>[options.FloatingPointModel]</FloatingPointModel>
       <FloatingPointExceptions>[options.FloatingPointExceptions]</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <CreateHotpatchableImage>[options.CompilerCreateHotpatchableImage]</CreateHotpatchableImage>
       <ConformanceMode>[options.ConformanceMode]</ConformanceMode>
       <DisableLanguageExtensions>[options.DisableLanguageExtensions]</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>[options.TreatWChar_tAsBuiltInType]</TreatWChar_tAsBuiltInType>
@@ -138,6 +138,7 @@ namespace Sharpmake
       <GenerateWindowsMetadata>[options.GenerateWindowsMetadata]</GenerateWindowsMetadata>
       <WindowsMetadataFile>[options.WindowsMetadataFile]</WindowsMetadataFile>
       <TreatLinkerWarningAsErrors>[options.TreatLinkerWarningAsErrors]</TreatLinkerWarningAsErrors>
+      <CreateHotPatchableImage>[options.LinkerCreateHotPatchableImage]</CreateHotPatchableImage>
     </Link>
 ";
 
