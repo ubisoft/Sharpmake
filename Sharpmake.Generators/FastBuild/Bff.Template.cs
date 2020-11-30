@@ -520,6 +520,7 @@ Exec( '[fastBuildPreBuildName]' )
   .ExecUseStdOutAsOutput = [fastBuildPrebuildUseStdOutAsOutput]
   .ExecAlwaysShowOutput =  [fastBuildPrebuildAlwaysShowOutput]
   .PreBuildDependencies = [fastBuildExecPreBuildDependencies]
+  .ExecAlways           = [fastBuildExecAlways]
 }
 
 ";

@@ -123,6 +123,7 @@ namespace Sharpmake.Generators.FastBuild
             public string WorkingPath;
             public bool UseStdOutAsOutput;
             public bool AlwaysShowOutput;
+            public bool ExecAlways;
 
             public ExecNode(string buildStepKey, Project.Configuration.BuildStepExecutable buildStep)
             {
@@ -137,6 +138,7 @@ namespace Sharpmake.Generators.FastBuild
                 WorkingPath = buildStep.ExecutableWorkingDirectory;
                 UseStdOutAsOutput = buildStep.FastBuildUseStdOutAsOutput;
                 AlwaysShowOutput = buildStep.FastBuildAlwaysShowOutput;
+                ExecAlways = buildStep.FastBuildExecAlways;
             }
 
             public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
@@ -152,6 +154,7 @@ namespace Sharpmake.Generators.FastBuild
                 using (resolver.NewScopedParameter("fastBuildPrebuildUseStdOutAsOutput", UseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildPrebuildAlwaysShowOutput", AlwaysShowOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildExecPreBuildDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 26) : FileGeneratorUtilities.RemoveLineTag))
+                using (resolver.NewScopedParameter("fastBuildExecAlways", ExecAlways ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.GenericExecutableSection);
                 }
