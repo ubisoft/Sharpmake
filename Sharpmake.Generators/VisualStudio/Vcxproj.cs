@@ -1034,7 +1034,7 @@ namespace Sharpmake.Generators.VisualStudio
                 }
 
                 Options.ExplicitOptions options = context.ProjectConfigurationOptions[firstConf];
-                foreach (var dependencyInfo in dependencies)
+                foreach (var dependencyInfo in dependencies.OrderBy(project => project.ProjectGuid))
                 {
                     string include = Util.PathGetRelative(context.ProjectDirectory, dependencyInfo.ProjectFullFileNameWithExtension);
 
