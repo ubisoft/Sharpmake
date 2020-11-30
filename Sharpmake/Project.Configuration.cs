@@ -1335,7 +1335,8 @@ namespace Sharpmake
                     string executableWorkingDirectory = "",
                     bool isNameSpecific = false,
                     bool useStdOutAsOutput = false,
-                    bool alwaysShowOutput = false)
+                    bool alwaysShowOutput = false,
+                    bool executeAlways = false)
 
                 {
                     ExecutableFile = executableFile;
@@ -1346,6 +1347,7 @@ namespace Sharpmake
                     IsNameSpecific = isNameSpecific;
                     FastBuildUseStdOutAsOutput = useStdOutAsOutput;
                     FastBuildAlwaysShowOutput = alwaysShowOutput;
+                    FastBuildExecAlways = executeAlways;
                 }
 
                 /// <summary>
@@ -1384,6 +1386,11 @@ namespace Sharpmake
                 public bool FastBuildUseStdOutAsOutput = false;
 
                 public bool FastBuildAlwaysShowOutput = false;
+
+                /// <summary>
+                /// Gets or sets whether the step should be executed every time.
+                /// </summary>
+                public bool FastBuildExecAlways = false;
 
                 internal override void Resolve(Resolver resolver)
                 {
