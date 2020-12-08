@@ -287,17 +287,27 @@ namespace Sharpmake.Generators.VisualStudio
                 string vcTargetsPathKey;
                 devEnv.GetVcPathKeysFromDevEnv(out vcTargetsPathKey, out vcRootPathKey);
 
+                string vcGlobalTargetsPathKey = "VCTargetsPath";
+
                 using (fileGenerator.Declare("vcInstallDirKey", vcRootPathKey))
                 using (fileGenerator.Declare("vcInstallDirValue", Util.EnsureTrailingSeparator(Path.Combine(devEnv.GetVisualStudioDir(), @"VC\"))))
                 using (fileGenerator.Declare("msBuildExtensionsPath", msBuildExtensionsPathWritten ? FileGeneratorUtilities.RemoveLineTag : Util.EnsureTrailingSeparator(GetMSBuildExtensionsPathOverride(devEnv))))
                 using (fileGenerator.Declare("vsVersion", devEnv.GetVisualProjectToolsVersionString()))
-                using (fileGenerator.Declare("vcTargetsPathKey", vcTargetsPathKey))
                 using (fileGenerator.Declare("vcTargetsPath", Util.EnsureTrailingSeparator(GetVCTargetsPathOverride(devEnv))))
                 {
                     msBuildExtensionsPathWritten = true;
-
-                    fileGenerator.Write(Template.Project.VCOverridesProperties);
-                    fileGenerator.Write(Template.Project.VCTargetsPathOverride);
+                    using (fileGenerator.Declare("vcTargetsPathKey", vcTargetsPathKey))
+                    {
+                        fileGenerator.Write(Template.Project.VCOverridesProperties);
+                        fileGenerator.Write(Template.Project.VCTargetsPathOverride);
+                    }
+                    if (MSBuildGlobalSettings.IsOverridingGlobalVCTargetsPath())
+                    {
+                        using (fileGenerator.Declare("vcTargetsPathKey", vcGlobalTargetsPathKey))
+                        {
+                            fileGenerator.Write(Template.Project.VCTargetsPathOverrideConditional);
+                        }
+                    }
                 }
             }
 

@@ -24,6 +24,7 @@ namespace Sharpmake
     {
         // cppPlatformFolders (pre-vs2019)
         private static readonly ConcurrentDictionary<Tuple<DevEnv, string>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, string>, string>();
+        private static bool s_overrideGlobalVCTargetsPath = false;
 
         /// <summary>
         /// Allows overwriting the MSBuild platform folder used for a known sharpmake platform and Visual Studio version.
@@ -163,6 +164,16 @@ namespace Sharpmake
             if (s_additionalVCTargetsPath.TryGetValue(key, out value))
                 return value;
             return null; // No override found
+        }
+
+        public static void SetOverrideGlobalVCTargetsPath(bool overrideGlobalVCTargetsPath)
+        {
+            s_overrideGlobalVCTargetsPath = overrideGlobalVCTargetsPath;
+        }
+
+        public static bool IsOverridingGlobalVCTargetsPath()
+        {
+            return s_overrideGlobalVCTargetsPath;
         }
     }
 }
