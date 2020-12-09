@@ -3079,6 +3079,14 @@ namespace Sharpmake
                                     }
                                 }
 
+                                if (!dependency.ExportDllSymbols && (isImmediate || hasPublicPathToRoot || !goesThroughDLL))
+                                {
+                                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles) ||
+                                        dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly) ||
+                                        dependencySetting == DependencySetting.OnlyBuildOrder)
+                                        BuildOrderDependencies.Add(dependency);
+                                }
+
                                 if (dependencySetting.HasFlag(DependencySetting.AdditionalUsingDirectories) ||
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
