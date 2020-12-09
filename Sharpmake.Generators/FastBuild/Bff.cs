@@ -237,8 +237,8 @@ namespace Sharpmake.Generators.FastBuild
                     // Validation of unsupported cases
                     if (conf.EventPreLink.Count > 0)
                         throw new Error("Sharpmake-FastBuild : Pre-Link Events not yet supported.");
-                    if (context.Options["IgnoreImportLibrary"] == "true")
-                        throw new Error("Sharpmake-FastBuild : IgnoreImportLibrary not yet supported.");
+                    if (context.Options["IgnoreImportLibrary"] == "true" && conf.ExportDllSymbols)
+                        throw new Error("Sharpmake-FastBuild : IgnoreImportLibrary not yet supported, set ExportDllSymbols to false for similar behavior.");
 
                     if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
                     {
