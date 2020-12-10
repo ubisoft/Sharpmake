@@ -7,7 +7,7 @@ using System.Windows;
 [assembly: AssemblyDescription("Dummy description")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
-[assembly: AssemblyProduct("Sharpamke")]
+[assembly: AssemblyProduct("Sharpmake")]
 [assembly: AssemblyCopyright("Copyright © Ubisoft 2020")]
 
 [assembly: AssemblyVersion("1.0.0.0")]
