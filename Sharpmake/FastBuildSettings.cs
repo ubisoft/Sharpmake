@@ -93,6 +93,7 @@ namespace Sharpmake
         public static bool FastBuildFastCancel = false;
         public static bool FastBuildUseIDE = true;
         public static bool FastBuildNoUnity = false;
+        public static bool FastBuildValidateCopyFiles = true;
 
         /// <summary>
         /// Allows retention of build state across BFF changes. Requires v0.97

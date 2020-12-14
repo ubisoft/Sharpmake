@@ -340,6 +340,7 @@ namespace Sharpmake.Generators.FastBuild
                                 // use the global root for alias computation, as the project has not idea in which master bff it has been included
                                 var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffDirectory, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
 
+                                if (FastBuildSettings.FastBuildValidateCopyFiles)
                                 {
                                     string key = sourceFileName + destinationRelativeToGlobal;
                                     string currentSourceFullPath = Util.PathGetAbsolute(masterBffDirectory, sourceFile);
