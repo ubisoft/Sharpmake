@@ -28,7 +28,7 @@ class FunctionalTest(object):
             os.chdir(pwd)
 
             # Detects the path of the Sharpmake executable
-            sharpmake_path = find_target_path(self.directory, "Sharpmake.Application.exe")
+            sharpmake_path = find_sharpmake_path()
 
             write_line("Using sharpmake " + sharpmake_path)
 
@@ -142,10 +142,10 @@ def build_with_fastbuild(root_dir, test_dir):
     write_line("Working dir: " + working_dir)
     return os.system(cmd_line)
 
-def find_target_path(directory, target):
+def find_sharpmake_path():
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, "sharpmake.application", target))
+        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, "Sharpmake.Application.exe"))
         if os.path.isfile(path):
             return path
 

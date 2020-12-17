@@ -62,9 +62,9 @@ pushd %CD%
 :: set testScopedCurrentDirectory as current
 cd /d %~dp0%~1
 
-set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\Sharpmake.Application\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\Sharpmake.Application\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\[debug|release]\Sharpmake.Application & pause & goto error
+set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\[debug|release] & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 

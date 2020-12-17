@@ -19,6 +19,8 @@ namespace SharpmakeGen.Samples
                 @"\\projects\\",
                 @"\\reference\\"
             );
+
+            DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
         }
 
         public override void ConfigureAll(Configuration conf, Target target)
@@ -26,7 +28,7 @@ namespace SharpmakeGen.Samples
             base.ConfigureAll(conf, target);
 
             conf.SolutionFolder = "Samples";
-            //conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]\Samples";
+            conf.TargetPath = @"[project.RootPath]\tmp\samples\[target.Optimization]\[project.Name]";
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
@@ -35,10 +37,9 @@ namespace SharpmakeGen.Samples
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
             {
                 StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
-                StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\sharpmake.application\Sharpmake.Application.exe",
+                StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\Sharpmake.Application.exe",
                 StartArguments = "/sources('[project.SharpmakeMainFile]')",
-                WorkingDirectory = "[project.SourceRootPath]",
-                OverwriteExistingFile = false
+                WorkingDirectory = "[project.SourceRootPath]"
             };
         }
     }

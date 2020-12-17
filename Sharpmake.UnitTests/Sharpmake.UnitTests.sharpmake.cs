@@ -16,8 +16,6 @@ namespace SharpmakeGen
 
             Services.Add("{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}"); // NUnit
 
-            DependenciesCopyLocal = DependenciesCopyLocalTypes.Default;
-
             // indicates where to find the nuget(s) we reference without needing nuget.config or global setting
             CustomProperties.Add("RestoreAdditionalProjectSources", "https://api.nuget.org/v3/index.json");
         }
@@ -26,11 +24,17 @@ namespace SharpmakeGen
         {
             base.ConfigureAll(conf, target);
 
+            conf.TargetPath = @"[project.RootPath]\tmp\unittests\[target.Optimization]";
+
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
 
-            conf.ReferencesByNuGetPackage.Add("NUnit", "3.4.1");
+            conf.ReferencesByNuGetPackage.Add("Microsoft.NET.Test.Sdk", "16.8.3");
+
+            conf.ReferencesByNuGetPackage.Add("NUnit.Console", "3.12.0");
+            conf.ReferencesByNuGetPackage.Add("NUnit", "3.12.0");
+            conf.ReferencesByNuGetPackage.Add("NUnit3TestAdapter", "3.17.0");
         }
     }
 }

@@ -29,13 +29,13 @@ class Test:
             os.chdir(pwd)
 
             # Detects the path of the Sharpmake executable
-            sharpmake_path = find_target_path("Sharpmake.Application", "Sharpmake.Application.exe")
+            sharpmake_path = find_sharpmake_path()
 
             write_line("Using sharpmake " + sharpmake_path)
 
             # Builds the command line argument list.
             sources = "/sources(@\"{}\")".format(os.path.join(self.directory, self.script_name))
-            assemblies = "/assemblies(@\"{}\")".format(find_target_path(self.directory, self.assembly))
+            assemblies = "/assemblies(@\"{}\")".format(find_assembly_path(self.directory, self.assembly))
             referencedir = "/referencedir(@\"{}\")".format(os.path.join(self.directory, "reference"))
             outputdir = "/outputdir(@\"{}\")".format(os.path.join(self.directory, "projects"))
             remaproot = "/remaproot(@\"{}\")".format(self.project_root)
@@ -78,10 +78,16 @@ tests = [
     Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs")
 ]
 
-def find_target_path(directory, target):
+def find_sharpmake_path():
+    return find_target_path("bin", '', "Sharpmake.Application.exe")
+
+def find_assembly_path(directory, target):
+    return find_target_path("samples", directory, target)
+
+def find_target_path(root_directory, subdirectory, target):
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, directory, target))
+        path = os.path.abspath(os.path.join("..", "tmp", root_directory, optim_token, subdirectory, target))
         if os.path.isfile(path):
             return path
 

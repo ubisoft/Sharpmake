@@ -42,8 +42,8 @@ jobs:
       - name: UnitTest
         if: runner.os == 'Windows'
         run: |
-          nuget install NUnit.ConsoleRunner -Version 3.4.1 -OutputDirectory tmp/pkg
-          tmp/pkg/NUnit.ConsoleRunner.3.4.1/tools/nunit3-console.exe tmp/bin/${{ matrix.configuration }}/Sharpmake.UnitTests/Sharpmake.UnitTests.dll
+          nuget install NUnit.ConsoleRunner -Version 3.12.0 -OutputDirectory tmp/pkg
+          tmp/pkg/NUnit.ConsoleRunner.3.12.0/tools/nunit3-console.exe tmp/unittests/${{ matrix.configuration }}/Sharpmake.UnitTests.dll
 
       - name: RegressionTest
         if: runner.os == 'Windows'

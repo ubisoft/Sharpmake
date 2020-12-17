@@ -52,8 +52,6 @@ namespace SharpmakeGen
 
                 RootPath = Globals.AbsoluteRootPath;
 
-                DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
-
                 if (excludeSharpmakeFiles)
                     SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");
             }
@@ -64,7 +62,7 @@ namespace SharpmakeGen
                 conf.ProjectFileName = "[project.Name]";
                 conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
-                conf.TargetPath = @"[project.RootPath]\tmp\bin\[target.Optimization]\[project.Name]";
+                conf.TargetPath = @"[project.RootPath]\tmp\bin\[target.Optimization]";
 
                 conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Optimization]\[project.Name]";
                 conf.BaseIntermediateOutputPath = conf.IntermediatePath;

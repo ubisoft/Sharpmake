@@ -18,6 +18,8 @@ namespace SharpmakeGen
                     @"\\reference\\"
                 );
 
+                DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
+
                 AddTargets(Common.GetDefaultTargets());
             }
 
@@ -26,6 +28,7 @@ namespace SharpmakeGen
                 base.ConfigureAll(conf, target);
 
                 conf.SolutionFolder = "FunctionalTests";
+                conf.TargetPath = @"[project.RootPath]\tmp\functionaltests\[target.Optimization]\[project.Name]";
 
                 conf.AddPrivateDependency<SharpmakeProject>(target);
                 conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
@@ -35,10 +38,9 @@ namespace SharpmakeGen
                 conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
                 {
                     StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
-                    StartProgram = @"[conf.TargetPath]\Sharpmake.Application.exe",
+                    StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\Sharpmake.Application.exe",
                     StartArguments = "/sources(\"[project.Name].sharpmake.cs\")",
-                    WorkingDirectory = "[project.SourceRootPath]",
-                    OverwriteExistingFile = false
+                    WorkingDirectory = "[project.SourceRootPath]"
                 };
             }
         }

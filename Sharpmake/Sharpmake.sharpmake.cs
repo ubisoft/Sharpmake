@@ -20,13 +20,17 @@ namespace SharpmakeGen
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
-            conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.Core");
             conf.ProjectPath = @"[project.SourceRootPath]";
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
-            conf.ReferencesByNuGetPackage.Add("System.Collections.Immutable", "5.0.0");
 
-            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.7.0");
+            // this needs to remain a named reference otherwise the assembly won't work on mono for on unix platforms
+            conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.Core");
+
+            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.8.0");
+
+            // This dependency is not strictly necessary, but Microsoft.CodeAnalysis.CSharp
+            // will throw an exception at runtime if the DLL is not found next to the exe
             conf.ReferencesByNuGetPackage.Add("Microsoft.DiaSymReader.Native", "1.7.0");
             conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "1.16.30");
         }

@@ -6,7 +6,7 @@ COLOR
 :: set batch file directory as current
 pushd "%~dp0"
 
-set SHARPMAKE_EXECUTABLE=tmp\bin\debug\Sharpmake.Application\Sharpmake.Application.exe
+set SHARPMAKE_EXECUTABLE=tmp\bin\debug\Sharpmake.Application.exe
 
 call CompileSharpmake.bat Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
 if %errorlevel% NEQ 0 goto error
