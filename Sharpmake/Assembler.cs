@@ -422,26 +422,24 @@ namespace Sharpmake
         private SourceText ReadSourceCode(string path)
         {
             using (var stream = File.OpenRead(path))
-                return SourceText.From(stream, Encoding.Default, canBeEmbedded: true);
+                return SourceText.From(stream, Encoding.Default);
         }
 
         private Assembly Compile(IBuilderContext builderContext, string[] files, string libraryFile, HashSet<string> references)
         {
             // Parse all files
             var syntaxTrees = new ConcurrentBag<SyntaxTree>();
-            var embeddedTexts = new ConcurrentBag<EmbeddedText>();
             var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp7, DocumentationMode.None, preprocessorSymbols: _defines);
             Parallel.ForEach(files, f =>
             {
                 var sourceText = ReadSourceCode(f);
                 syntaxTrees.Add(CSharpSyntaxTree.ParseText(sourceText, parseOptions, path: f));
-                embeddedTexts.Add(EmbeddedText.FromSource(f, sourceText));
             });
 
-            return Compile(builderContext, syntaxTrees, embeddedTexts, libraryFile, references);
+            return Compile(builderContext, syntaxTrees, libraryFile, references);
         }
 
-        private Assembly Compile(IBuilderContext builderContext, IEnumerable<SyntaxTree> syntaxTrees, IEnumerable<EmbeddedText> embeddedTexts, string libraryFile, HashSet<string> references)
+        private Assembly Compile(IBuilderContext builderContext, IEnumerable<SyntaxTree> syntaxTrees, string libraryFile, HashSet<string> references)
         {
             // Add references
             var portableExecutableReferences = new List<PortableExecutableReference>();
@@ -467,7 +465,6 @@ namespace Sharpmake
                 EmitResult result = compilation.Emit(
                     dllStream,
                     pdbStream,
-                    embeddedTexts: embeddedTexts,
                     options: new EmitOptions(
                         debugInformationFormat: Util.IsRunningInMono() ? DebugInformationFormat.PortablePdb : DebugInformationFormat.Pdb,
                         pdbFilePath: pdbFilePath
