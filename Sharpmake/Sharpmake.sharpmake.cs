@@ -21,6 +21,7 @@ namespace SharpmakeGen
         {
             base.ConfigureAll(conf, target);
             conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.Core");
+            conf.ProjectPath = @"[project.SourceRootPath]";
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
             conf.ReferencesByNuGetPackage.Add("System.Collections.Immutable", "1.7.1");

@@ -62,7 +62,7 @@ namespace SharpmakeGen
             public virtual void ConfigureAll(Configuration conf, Target target)
             {
                 conf.ProjectFileName = "[project.Name]";
-                conf.ProjectPath = @"[project.SourceRootPath]";
+                conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
                 conf.TargetPath = @"[project.RootPath]\tmp\bin\[target.Optimization]\[project.Name]";
 
