@@ -24,8 +24,7 @@ namespace SharpmakeGen
             conf.ProjectPath = @"[project.SourceRootPath]";
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
-            conf.ReferencesByNuGetPackage.Add("System.Collections.Immutable", "1.7.1");
-            conf.ReferencesByNuGetPackage.Add("System.Reflection.Metadata", "1.7.0");
+            conf.ReferencesByNuGetPackage.Add("System.Collections.Immutable", "5.0.0");
 
             conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.7.0");
             conf.ReferencesByNuGetPackage.Add("Microsoft.DiaSymReader.Native", "1.7.0");
