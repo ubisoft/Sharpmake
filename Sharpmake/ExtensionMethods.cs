@@ -100,6 +100,11 @@ namespace Sharpmake
                     return "netstandard2.0";
                 case DotNetFramework.netstandard2_1:
                     return "netstandard2.1";
+                case DotNetFramework.net5_0:
+                    return "net5.0";
+                case DotNetFramework.all_netframework:
+                case DotNetFramework.all_netcore:
+                case DotNetFramework.all_netstandard:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(framework));
             }
@@ -148,6 +153,8 @@ namespace Sharpmake
                     return "netcoreapp3.0";
                 case DotNetFramework.netcore3_1:
                     return "netcoreapp3.1";
+                case DotNetFramework.net5_0:
+                    return "net5.0";
                 case DotNetFramework.netstandard1_0:
                     return "netstandard1.0";
                 case DotNetFramework.netstandard1_1:
@@ -167,7 +174,7 @@ namespace Sharpmake
                 case DotNetFramework.netstandard2_1:
                     return "netstandard2.1";
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(framework));
+                    throw new ArgumentOutOfRangeException(nameof(framework), framework, nameof(DotNetFramework) + " cannot be converted to a folder name.");
             }
         }
 
