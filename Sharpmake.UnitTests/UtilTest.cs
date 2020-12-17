@@ -493,7 +493,7 @@ namespace Sharpmake.UnitTests
         [SetUp]
         public void Init()
         {
-            Util.FakePathPrefix = Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            Util.FakePathPrefix = Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().Location).LocalPath);
 
             string[] files =
             {
