@@ -414,7 +414,7 @@ namespace Sharpmake
                         }
                         else
                         {
-                            if (Util.IsRunningInMono() &&
+                            if (Util.IsRunningOnUnix() &&
                                 index == 0 && currentChar == Path.DirectorySeparatorChar && Path.IsPathRooted(path))
                                 pathHelper.Append(currentChar);
 
@@ -1958,7 +1958,7 @@ namespace Sharpmake
             string[] requiredWorkloads = null
         )
         {
-            if (IsRunningInMono())
+            if (IsRunningOnUnix())
                 return null;
 
             var vsInstallations = GetVisualStudioInstallationsFromQuery(visualVersion, allowPrereleaseVersions, requiredComponents, requiredWorkloads);
@@ -2451,6 +2451,9 @@ namespace Sharpmake
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
 
+        private static readonly bool s_isUnix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
+        public static bool IsRunningOnUnix() => s_isUnix;
+
         public static Platform GetExecutingPlatform() => s_executingPlatform;
 
         private static readonly Platform s_executingPlatform = DetectExecutingPlatform();
@@ -2486,5 +2489,9 @@ namespace Sharpmake
             LogWrite("Warning: Couldn't determine running platform");
             return Platform.win64; // arbitrary
         }
+
+        private static readonly string s_framework = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkName;
+        private static readonly bool s_isDotNetCore = s_framework != null && !s_framework.StartsWith(".NETFramework");
+        public static bool IsRunningDotNetCore() => s_isDotNetCore;
     }
 }

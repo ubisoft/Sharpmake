@@ -192,7 +192,11 @@ namespace Sharpmake.Application
                     if (DebugEnable && informationalVersion != null)
                         versionString += " " + informationalVersion;
                 }
-                LogWriteLine($"sharpmake {versionString}");
+
+                var osplatform = Util.GetExecutingPlatform();
+                string framework = Util.IsRunningInMono() ? "Mono" : (Util.IsRunningDotNetCore() ? ".NET Core" : ".NET Framework");
+
+                LogWriteLine($"sharpmake {versionString} ({osplatform} | {framework})");
                 LogWriteLine("  arguments : {0}", CommandLine.GetProgramCommandLine());
                 LogWriteLine("  directory : {0}", Directory.GetCurrentDirectory());
                 LogWriteLine(string.Empty);
