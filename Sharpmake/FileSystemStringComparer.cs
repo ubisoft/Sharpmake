@@ -29,6 +29,8 @@ namespace Sharpmake
     /// </remarks>
     public class FileSystemStringComparer : IComparer<string>, IEqualityComparer<string>
     {
+        public static FileSystemStringComparer Default { get; } = new FileSystemStringComparer();
+
         private static readonly bool s_hostOsIsCaseSensitive;
 
         static FileSystemStringComparer()
@@ -71,10 +73,9 @@ namespace Sharpmake
             return ((IEqualityComparer<string>)_comparer).GetHashCode(obj);
         }
 
-        private static FileSystemStringComparer s_instance = new FileSystemStringComparer();
         public static int StaticCompare(string x, string y)
         {
-            return s_instance.Compare(x, y);
+            return Default.Compare(x, y);
         }
     }
 }
