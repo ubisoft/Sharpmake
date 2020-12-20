@@ -1,6 +1,6 @@
 # Sharpmake
 
-[![Build status](https://ci.appveyor.com/api/projects/status/5y9eug3x9j078x6i?svg=true)](https://ci.appveyor.com/project/belkiss/sharpmake-36817)
+![build](https://github.com/ubisoft/Sharpmake/workflows/build/badge.svg)
 
 ## Introduction
 Sharpmake is a generator for Visual Studio projects and solutions. It is
