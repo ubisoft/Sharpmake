@@ -31,7 +31,6 @@ namespace SharpmakeGen
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
 
             conf.ReferencesByNuGetPackage.Add("NUnit", "3.4.1");
-            conf.ReferencesByNuGetPackage.Add("NUnit.Console", "3.4.1");
         }
     }
 }
