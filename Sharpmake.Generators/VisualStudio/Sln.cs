@@ -535,15 +535,15 @@ namespace Sharpmake.Generators.VisualStudio
 
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationEnd);
 
-            if (containsMultiDotNetFramework)
-                multiDotNetFrameworkConfigurationNames.Clear();
-
             // write all project target and match then to a solution target
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBegin);
 
             var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>();
             foreach (Solution.ResolvedProject solutionProject in solutionProjects)
             {
+                if (containsMultiDotNetFramework)
+                    multiDotNetFrameworkConfigurationNames.Clear();
+
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
                 {
                     ITarget solutionTarget = solutionConfiguration.Target;
