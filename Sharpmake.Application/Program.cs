@@ -482,7 +482,10 @@ namespace Sharpmake.Application
                 ExtensionMethods.ClearVisualStudioDirCaches();
             }
 
-            CreateBuilderAndGenerate(buildContext, parameters, generateDebugSolution: false);
+            if (!parameters.GenerateDebugSolutionOnly)
+            {
+                CreateBuilderAndGenerate(buildContext, parameters, generateDebugSolution: false);
+            }
         }
 
         private static ExitCode AnalyzeConfigureOrder(Argument parameters, bool stopOnFirstError)
