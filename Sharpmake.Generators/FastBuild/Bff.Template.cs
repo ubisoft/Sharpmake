@@ -108,6 +108,7 @@ Compiler( '[fastbuildCompilerName]' )
     .ExtraFiles             = [fastBuildExtraFiles]
     .CompilerFamily         = '[fastBuildCompilerFamily]'
     [fastBuildVS2012EnumBugWorkaround]
+    .UseLightCache_Experimental  = [fastBuildUseLightCache]
 }
 ";
 

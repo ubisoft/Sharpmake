@@ -184,5 +184,13 @@ namespace Sharpmake
         /// Also it seems that this doesn't occurs with VS2013.
         /// </remarks>
         public static bool EnableVS2012EnumBugWorkaround = false; // activate workaround for VS2012 enum bug(corrupted preprocessor output).
+
+        /// <summary>
+        /// Light Caching mode avoids using the compiler's preprocessor for cache lookups, instead allowing 
+        /// FASTBuild to parse the files itself to gather the required information. 
+        /// This parsing is significantly faster than for each file and additionally allows 
+        /// FASTBuild to eliminate redundant file parsing between object files, further accelerating cache lookups.
+        /// </summary>
+        public static bool FastBuildUseLightCache = false;
     }
 }

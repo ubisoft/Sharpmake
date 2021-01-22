@@ -640,6 +640,7 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28) : FileGeneratorUtilities.RemoveLineTag))
                 using (masterBffGenerator.Declare("fastBuildCompilerFamily", string.IsNullOrEmpty(fastBuildCompilerFamily) ? FileGeneratorUtilities.RemoveLineTag : fastBuildCompilerFamily))
                 using (masterBffGenerator.Declare("fastBuildVS2012EnumBugWorkaround", fastBuildVS2012EnumBugWorkaround))
+                using (masterBffGenerator.Declare("fastBuildUseLightCache", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);
                     foreach (var compilerConfiguration in compilerSettings.Configurations.OrderBy(x => x.Key))
