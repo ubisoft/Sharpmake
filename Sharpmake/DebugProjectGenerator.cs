@@ -226,7 +226,7 @@ namespace Sharpmake
             return new Target(
                 Platform.anycpu,
                 DevEnv.vs2019,
-                Optimization.Debug,
+                Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
@@ -252,6 +252,10 @@ namespace Sharpmake
 
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
+
+            if (conf.Target.GetOptimization() == Optimization.Debug)
+                startArguments += " /debugScripts";
+
             string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
             conf.CsprojUserFile.StartProgram = sharpmakeApplicationExePath;
@@ -269,7 +273,7 @@ namespace Sharpmake
             AddTargets(DebugProjectGenerator.GetTargets());
         }
 
-        [Configure()]
+        [Configure]
         public virtual void Configure(Configuration conf, Target target)
         {
             conf.SolutionPath = DebugProjectGenerator.RootPath;
@@ -310,12 +314,14 @@ namespace Sharpmake
             AddTargets(DebugProjectGenerator.GetTargets());
         }
 
-        [Configure()]
+        [Configure]
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.ProjectPath = RootPath;
             conf.ProjectFileName = "[project.Name].[target.DevEnv]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
+
+            conf.DefaultOption = target.Optimization == Optimization.Debug ? Options.DefaultTarget.Debug : Options.DefaultTarget.Release;
 
             conf.Options.Add(Options.CSharp.LanguageVersion.CSharp7);
 
@@ -330,8 +336,8 @@ namespace Sharpmake
             DebugProjectGenerator.DebugProjectExtension.AddSharpmakePackage(conf);
 
             // set up custom configuration only to setup project
-            if (string.CompareOrdinal(conf.ProjectPath.ToLower(), RootPath.ToLower()) == 0
-                && _projectInfo.IsSetupProject)
+            if (_projectInfo.IsSetupProject &&
+                FileSystemStringComparer.Default.Equals(conf.ProjectPath, RootPath))
             {
                 conf.SetupProjectOptions(_projectInfo.StartArguments);
             }
