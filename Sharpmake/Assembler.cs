@@ -25,12 +25,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-using EmbeddedText = Microsoft.CodeAnalysis.EmbeddedText;
 
 namespace Sharpmake
 {
     public class Assembler
     {
+        public const LanguageVersion SharpmakeScriptsCSharpVersion = LanguageVersion.CSharp7;
+
         /// <summary>
         /// Extra user directory to load assembly from using statement detection
         /// </summary>
@@ -429,7 +430,7 @@ namespace Sharpmake
         {
             // Parse all files
             var syntaxTrees = new ConcurrentBag<SyntaxTree>();
-            var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp7, DocumentationMode.None, preprocessorSymbols: _defines);
+            var parseOptions = new CSharpParseOptions(SharpmakeScriptsCSharpVersion, DocumentationMode.None, preprocessorSymbols: _defines);
             Parallel.ForEach(files, f =>
             {
                 var sourceText = ReadSourceCode(f);

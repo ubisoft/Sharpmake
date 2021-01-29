@@ -3144,10 +3144,12 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.WarningLevel.Level4, () => { options["WarningLevel"] = "4"; })
             );
 
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/configure-language-version#c-language-version-reference
             SelectOption
             (
             Options.Option(Options.CSharp.LanguageVersion.LatestMajorVersion, () => { options["LanguageVersion"] = RemoveLineTag; }),
             Options.Option(Options.CSharp.LanguageVersion.LatestMinorVersion, () => { options["LanguageVersion"] = "latest"; }),
+            Options.Option(Options.CSharp.LanguageVersion.Preview, () => { options["LanguageVersion"] = "preview"; }),
             Options.Option(Options.CSharp.LanguageVersion.ISO1, () => { options["LanguageVersion"] = "ISO-1"; }),
             Options.Option(Options.CSharp.LanguageVersion.ISO2, () => { options["LanguageVersion"] = "ISO-2"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp3, () => { options["LanguageVersion"] = "3"; }),
@@ -3155,7 +3157,11 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.LanguageVersion.CSharp5, () => { options["LanguageVersion"] = "5"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp6, () => { options["LanguageVersion"] = "6"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp7, () => { options["LanguageVersion"] = "7"; }),
-            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; })
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_1, () => { options["LanguageVersion"] = "7.1"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_2, () => { options["LanguageVersion"] = "7.2"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp7_3, () => { options["LanguageVersion"] = "7.3"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp8, () => { options["LanguageVersion"] = "8.0"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp9, () => { options["LanguageVersion"] = "9.0"; })
             );
 
             SelectOption(

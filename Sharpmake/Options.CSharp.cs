@@ -392,19 +392,25 @@ namespace Sharpmake
                 Disabled
             }
 
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/configure-language-version#c-language-version-reference
             public enum LanguageVersion
             {
                 [Default]
-                LatestMajorVersion,
-                LatestMinorVersion,
-                ISO1,
-                ISO2,
+                LatestMajorVersion, // The compiler accepts syntax from the latest released major version of the compiler.
+                LatestMinorVersion, // The compiler accepts syntax from the latest released version of the compiler (including minor version).
+                Preview, // The compiler accepts all valid language syntax from the latest preview version.
+                ISO1, // The compiler accepts only syntax that is included in ISO/IEC 23270:2003 C# (1.0/1.2).
+                ISO2, // The compiler accepts only syntax that is included in ISO/IEC 23270:2006 C# (2.0).
                 CSharp3,
                 CSharp4,
                 CSharp5,
                 CSharp6,
                 CSharp7,
                 CSharp7_1,
+                CSharp7_2,
+                CSharp7_3,
+                CSharp8,
+                CSharp9,
             }
 
             // Disable warning MSB3270 when disabled
