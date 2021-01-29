@@ -57,6 +57,7 @@ namespace Sharpmake.Application
             public bool SkipInvalidPath = false;
             public bool DebugLog = false;
             public bool Debug = false;
+            public bool DebugScripts = false;
             public bool Diagnostics = false;
             public bool WriteFiles = true;
             public bool DumpDependency = false;
@@ -167,6 +168,12 @@ namespace Sharpmake.Application
             public void CommandLineDebug()
             {
                 Debug = true;
+            }
+
+            [CommandLine.Option("debugscripts", @"Compile scripts in debug to ease their debuggging: ex: /debugscripts")]
+            public void CommandLineDebugScripts()
+            {
+                DebugScripts = true;
             }
 
             [CommandLine.Option("sharpmakemutexsuffix", @"Allow custom mutex name suffix. Useful to debug concurrently multiple sharpmake running from different branches. Ex: /sharpmakemutexsuffix(""Name"")")]

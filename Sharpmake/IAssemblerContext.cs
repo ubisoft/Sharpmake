@@ -36,6 +36,7 @@ namespace Sharpmake
         ILoadInfo LoadExtension(string file);
         void AddDefine(string define);
         BuilderCompileErrorBehavior CompileErrorBehavior { get; }
+        bool DebugScripts { get; }
     }
 
     public interface IAssemblerContext

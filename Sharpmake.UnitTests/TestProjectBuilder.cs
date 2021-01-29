@@ -73,6 +73,7 @@ namespace Sharpmake.UnitTests
                 false,
                 false,
                 false,
+                true,
                 GetGeneratorsManager,
                 null
             );

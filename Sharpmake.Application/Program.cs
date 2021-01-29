@@ -434,7 +434,7 @@ namespace Sharpmake.Application
 
         private static void CreateBuilderAndGenerate(BuildContext.BaseBuildContext buildContext, Argument parameters, bool generateDebugSolution)
         {
-            using (Builder builder = CreateBuilder(buildContext, parameters, true, generateDebugSolution))
+            using (Builder builder = CreateBuilder(buildContext, parameters, allowCleanBlobs: true, generateDebugSolution: generateDebugSolution))
             {
                 if (parameters.CleanBlobsOnly)
                 {
@@ -595,6 +595,7 @@ namespace Sharpmake.Application
                 parameters.BlobOnly,
                 parameters.SkipInvalidPath,
                 parameters.Diagnostics,
+                parameters.DebugScripts,
                 Program.GetGeneratorsManager,
                 parameters.Defines
             );
