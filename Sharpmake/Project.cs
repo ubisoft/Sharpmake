@@ -1654,7 +1654,7 @@ namespace Sharpmake
         {
         }
 
-        public void AfterConfigure()
+        public virtual void AfterConfigure()
         {
             foreach (Project.Configuration conf in Configurations)
             {
