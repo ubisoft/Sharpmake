@@ -256,7 +256,7 @@ namespace Sharpmake
             if (conf.Target.GetOptimization() == Optimization.Debug)
                 startArguments += " /debugScripts";
 
-            string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
+            string quote = "\'"; // Use single quote that is cross platform safe
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
             conf.CsprojUserFile.StartProgram = sharpmakeApplicationExePath;
         }
