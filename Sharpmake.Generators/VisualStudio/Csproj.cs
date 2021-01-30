@@ -168,11 +168,25 @@ namespace Sharpmake.Generators.VisualStudio
 
             internal class TargetFrameworksCondition<T> : UniqueList<T>, IResolvableCondition where T : IResolvable
             {
-                public List<DotNetFramework> TargetFrameworks;
+                public List<Tuple<DotNetFramework, DotNetOS, string>> TargetFrameworks;
 
                 public string ResolveCondition(Resolver resolver)
                 {
-                    using (resolver.NewScopedParameter("targetFramework", string.Join(";", TargetFrameworks.Select(conf => conf.ToFolderName()))))
+                    var targetFrameworks = TargetFrameworks.Select(tuple => {
+                        var dotNetFramework = tuple.Item1;
+                        var dotNetOS = tuple.Item2;
+                        var dotNetOSVersion = tuple.Item3;
+
+                        if (dotNetOS == DotNetOS.Default)
+                        {
+                            if (!string.IsNullOrEmpty(dotNetOSVersion))
+                                throw new Error();
+                            return dotNetFramework.ToFolderName();
+                        }
+
+                        return dotNetFramework.ToFolderName() + "-" + dotNetOS.ToString() + dotNetOSVersion;
+                    });
+                    using (resolver.NewScopedParameter("targetFramework", string.Join(";", targetFrameworks)))
                     {
                         return resolver.Resolve(Template.ItemGroups.ItemGroupTargetFrameworkCondition);
                     }
@@ -898,23 +912,25 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 if (itemGroupConditional.Any(it => it.Contains(elem)))
                 {
-                    foreach (var itemGroup in itemGroupConditional.Where(it => it.Contains(elem) && !it.TargetFrameworks.Contains(dotNetFramework)))
+                    foreach (var itemGroup in itemGroupConditional.Where(it => it.Contains(elem)))
                     {
-                        itemGroup.TargetFrameworks.Add(dotNetFramework);
+                        var tuple = Tuple.Create(dotNetFramework, DotNetOS.Default, string.Empty);
+                        if (!itemGroup.TargetFrameworks.Contains(tuple))
+                            itemGroup.TargetFrameworks.Add(tuple);
                     }
                 }
                 else
                 {
                     var newItemGroup = new TargetFrameworksCondition<T>
                     {
-                        TargetFrameworks = new List<DotNetFramework> { dotNetFramework },
+                        TargetFrameworks = new List<Tuple<DotNetFramework, DotNetOS, string>> { Tuple.Create(dotNetFramework, DotNetOS.Default, string.Empty) },
                     };
                     newItemGroup.Add(elem);
                     itemGroupConditional.Add(newItemGroup);
                 }
             }
 
-            public void SetTargetFrameworks(List<DotNetFramework> projectFrameworks)
+            public void SetTargetFrameworks(List<Tuple<DotNetFramework, DotNetOS, string>> projectFrameworks)
             {
                 References.AlwaysTrueElement = new TargetFrameworksCondition<Reference>
                 {
@@ -1034,8 +1050,15 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
-            List<DotNetFramework> projectFrameworks = configurations.Select(
-                conf => conf.Target.GetFragment<DotNetFramework>()).Distinct().ToList();
+            var projectFrameworks = configurations.Select(
+                conf => {
+                    var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                    DotNetOS dotNetOS;
+                    if (!conf.Target.TryGetFragment<DotNetOS>(out dotNetOS))
+                        dotNetOS = DotNetOS.Default;
+                    return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
+                }
+            ).Distinct().ToList();
             itemGroups.SetTargetFrameworks(projectFrameworks);
 
             // valid that 2 conf name in the same project don't have the same name
@@ -1115,25 +1138,21 @@ namespace Sharpmake.Generators.VisualStudio
 
             bool isNetCoreProjectSchema = project.ProjectSchema == CSharpProjectSchema.NetCore ||
                                             (project.ProjectSchema == CSharpProjectSchema.Default &&
-                                              (projectFrameworks.Any(x => x.IsDotNetCore() || x.IsDotNetStandard()) || projectFrameworks.Count > 1)
+                                              (projectFrameworks.Any(x => x.Item1.IsDotNetCore() || x.Item1.IsDotNetStandard()) || projectFrameworks.Count > 1)
                                             );
+
             if (isNetCoreProjectSchema)
             {
-                targetFrameworkString = String.Join(";", projectFrameworks.Select(conf => conf.ToFolderName()));
+                Write(Template.Project.ProjectBeginNetCore, writer, resolver);
 
-                string netCoreSdk = "Microsoft.NET.Sdk";
-                if (project.NetCoreSdkType != NetCoreSdkTypes.Default)
-                    netCoreSdk += "." + project.NetCoreSdkType.ToString();
-
-                using (resolver.NewScopedParameter("sdkVersion", netCoreSdk))
-                {
-                    Write(Template.Project.ProjectBeginNetCore, writer, resolver);
-                }
+                targetFrameworkString = String.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
             }
             else
             {
-                targetFrameworkString = Util.GetDotNetTargetString(projectFrameworks.Single());
-                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, projectFrameworks.Single())))
+                var framework = projectFrameworks.Single().Item1;
+                targetFrameworkString = Util.GetDotNetTargetString(framework);
+
+                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, framework)))
                 {
                     // xml begin header
                     switch (devenv)
@@ -1392,6 +1411,18 @@ namespace Sharpmake.Generators.VisualStudio
                     Write(Template.Project.ProjectConfigurationsRunPostBuildEvent, writer, resolver);
             }
 
+            string netCoreSdk = null;
+            if (isNetCoreProjectSchema)
+            {
+                netCoreSdk = "Microsoft.NET.Sdk";
+                if (project.NetCoreSdkType != NetCoreSdkTypes.Default)
+                    netCoreSdk += "." + project.NetCoreSdkType.ToString();
+
+                using (resolver.NewScopedParameter("importProject", "Sdk.props"))
+                using (resolver.NewScopedParameter("sdkVersion", netCoreSdk))
+                    Write(Template.Project.ImportProjectSdkItem, writer, resolver);
+            }
+
             GenerateFiles(project, configurations, itemGroups, generatedFiles, skipFiles);
 
             #region <Choose> section
@@ -1496,6 +1527,14 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             WriteEvents(options, writer, resolver);
+
+            if (isNetCoreProjectSchema)
+            {
+                using (resolver.NewScopedParameter("importProject", "Sdk.targets"))
+                using (resolver.NewScopedParameter("sdkVersion", netCoreSdk))
+                    Write(Template.Project.ImportProjectSdkItem, writer, resolver);
+            }
+
             Write(Template.Project.ProjectEnd, writer, resolver);
 
             // Write the project file

@@ -2185,6 +2185,12 @@ namespace Sharpmake
             /// </summary>
             public bool PreferRelativePaths = true;
 
+            /// <summary>
+            /// Optional OS version at the end of the TargetFramework, for example, net5.0-ios13.0.
+            /// </summary>
+            /// <remarks>C# only, will throw if the target doesn't have a non-default DotNetOS fragment</remarks>
+            public string DotNetOSVersionSuffix = string.Empty;
+
             internal override void Construct(object owner, ITarget target)
             {
                 base.Construct(owner, target);

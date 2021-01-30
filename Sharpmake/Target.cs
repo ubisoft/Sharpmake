@@ -184,6 +184,19 @@ namespace Sharpmake
         all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1
     }
 
+    // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms
+    [Fragment, Flags]
+    public enum DotNetOS
+    {
+        Default = 1 << 0,
+        android = 1 << 1,
+        ios = 1 << 2,
+        macos = 1 << 3,
+        tvos = 1 << 4,
+        watchos = 1 << 5,
+        windows = 1 << 6
+    }
+
     // Optional
     [Fragment, Flags]
     public enum Blob

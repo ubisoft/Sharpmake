@@ -29,7 +29,7 @@ namespace Sharpmake.Generators.VisualStudio
 <Project ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 ";
                 public static string ProjectBeginNetCore =
-@"<Project Sdk=""[sdkVersion]"">
+@"<Project>
 ";
 
                 public static string ProjectEnd =
@@ -154,6 +154,10 @@ namespace Sharpmake.Generators.VisualStudio
 ";
                 public static string ImportProjectItem =
 @"  <Import Project=""[importProject]"" Condition=""[importCondition]"" />
+";
+
+                public static string ImportProjectSdkItem =
+@"  <Import Project=""[importProject]"" Sdk=""[sdkVersion]"" />
 ";
 
                 public static string VsixConfiguration =
