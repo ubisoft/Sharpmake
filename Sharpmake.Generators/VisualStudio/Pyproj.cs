@@ -126,11 +126,12 @@ namespace Sharpmake.Generators.VisualStudio
                 // xml begin header
                 Write(Template.Project.ProjectBegin, writer, resolver);
 
-                string defaultInterpreterRegisterKeyName = $@"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\{
+                string defaultInterpreterRegisterKeyName = $@"Software\Microsoft\VisualStudio\{
                         devEnvRange.MinDevEnv.GetVisualVersionString()
                     }\PythonTools\Options\Interpreters";
-                var defaultInterpreter = (string)Registry.GetValue(defaultInterpreterRegisterKeyName, "DefaultInterpreter", "{}") ?? "{00000000-0000-0000-0000-000000000000}";
-                var defaultInterpreterVersion = (string)Registry.GetValue(defaultInterpreterRegisterKeyName, "DefaultInterpreterVersion", "2.7") ?? "2.7";
+
+                var defaultInterpreter = GetRegistryCurrentUserSubKeyValue(defaultInterpreterRegisterKeyName, "DefaultInterpreter", "{00000000-0000-0000-0000-000000000000}");
+                var defaultInterpreterVersion = GetRegistryCurrentUserSubKeyValue(defaultInterpreterRegisterKeyName, "DefaultInterpreterVersion", "2.7");
 
                 string currentInterpreterId = defaultInterpreter;
                 string currentInterpreterVersion = defaultInterpreterVersion;
@@ -142,14 +143,14 @@ namespace Sharpmake.Generators.VisualStudio
                     if (pyEnvironment.IsActivated)
                     {
                         string interpreterRegisterKeyName =
-                            $@"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\{
+                            $@"Software\Microsoft\VisualStudio\{
                                 devEnvRange.MinDevEnv.GetVisualVersionString()
                             }\PythonTools\Interpreters\{{{pyEnvironment.Guid}}}";
-                        string interpreterDescription = (string)Registry.GetValue(interpreterRegisterKeyName, "Description", "");
+                        string interpreterDescription = GetRegistryCurrentUserSubKeyValue(interpreterRegisterKeyName, "Description", "");
                         if (interpreterDescription != string.Empty)
                         {
                             currentInterpreterId = $"{{{pyEnvironment.Guid}}}";
-                            currentInterpreterVersion = (string)Registry.GetValue(interpreterRegisterKeyName, "Version", currentInterpreterVersion);
+                            currentInterpreterVersion = GetRegistryCurrentUserSubKeyValue(interpreterRegisterKeyName, "Version", currentInterpreterVersion);
                         }
                     }
                 }
@@ -160,14 +161,14 @@ namespace Sharpmake.Generators.VisualStudio
                     if (virtualEnvironment.IsDefault)
                     {
                         string baseInterpreterRegisterKeyName =
-                            $@"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\{
+                            $@"Software\Microsoft\VisualStudio\{
                                 devEnvRange.MinDevEnv.GetVisualVersionString()
                             }\PythonTools\Interpreters\{{{virtualEnvironment.BaseInterpreterGuid}}}";
-                        string baseInterpreterDescription = (string)Registry.GetValue(baseInterpreterRegisterKeyName, "Description", "");
+                        string baseInterpreterDescription = GetRegistryCurrentUserSubKeyValue(baseInterpreterRegisterKeyName, "Description", "");
                         if (baseInterpreterDescription != string.Empty)
                         {
                             currentInterpreterId = $"{{{virtualEnvironment.Guid}}}";
-                            currentInterpreterVersion = (string)Registry.GetValue(baseInterpreterRegisterKeyName, "Version", currentInterpreterVersion);
+                            currentInterpreterVersion = GetRegistryCurrentUserSubKeyValue(baseInterpreterRegisterKeyName, "Version", currentInterpreterVersion);
                         }
                     }
                 }
@@ -215,13 +216,13 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         // Verify if the interpreter exists in the register.
                         string interpreterRegisterKeyName =
-                            $@"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\{
+                            $@"Software\Microsoft\VisualStudio\{
                                 devEnvRange.MinDevEnv.GetVisualVersionString()
                             }\PythonTools\Interpreters\{{{pyEnvironment.Guid}}}";
-                        string interpreterDescription = (string)Registry.GetValue(interpreterRegisterKeyName, "Description", "");
+                        string interpreterDescription = GetRegistryCurrentUserSubKeyValue(interpreterRegisterKeyName, "Description", "");
                         if (interpreterDescription != string.Empty)
                         {
-                            string interpreterVersion = (string)Registry.GetValue(interpreterRegisterKeyName, "Version", currentInterpreterVersion);
+                            string interpreterVersion = GetRegistryCurrentUserSubKeyValue(interpreterRegisterKeyName, "Version", currentInterpreterVersion);
                             using (resolver.NewScopedParameter("guid", $"{{{pyEnvironment.Guid}}}"))
                             using (resolver.NewScopedParameter("version", interpreterVersion))
                             {
@@ -381,6 +382,22 @@ namespace Sharpmake.Generators.VisualStudio
         private string GetProperRelativePathToSourcePath(string path)
         {
             return Util.PathGetRelative(_project.SourceRootPath, _project.IsSourceFilesCaseSensitive ? Util.GetCapitalizedPath(path) : path);
+        }
+
+        private static string GetRegistryCurrentUserSubKeyValue(string registrySubKey, string value, string fallbackValue)
+        {
+            string key = string.Empty;
+
+            if (Util.GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+            {
+                using (RegistryKey subKey = Registry.CurrentUser.OpenSubKey(registrySubKey))
+                    key = (string)subKey?.GetValue(value);
+            }
+
+            if (string.IsNullOrEmpty(key))
+                key = fallbackValue;
+
+            return key;
         }
 
         private class ProjectDirectory
