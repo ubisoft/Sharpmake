@@ -204,7 +204,7 @@ namespace Sharpmake
         {
             // define class type
             var assemblyName = new AssemblyName(typeSignature);
-            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("DebugSharpmakeModule");
             TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature,
                 TypeAttributes.Public | TypeAttributes.Class |
