@@ -20,7 +20,7 @@ namespace VCPKGSample
 
             // This is necessary since there is no rc.exe in the same directory than link.exe
             FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
-            FastBuildSettings.FastBuildMakeCommand = Util.PathGetAbsolute(sharpmakeFileDirectory, @"..\..\..\tools\FastBuild\FBuild.exe");
+            FastBuildSettings.FastBuildMakeCommand = Util.PathGetAbsolute(sharpmakeFileDirectory, @"..\..\..\tools\FastBuild\Windows-x64\FBuild.exe");
 
             Util.FilesAutoCleanupDBPath = absoluteRootPath;
 			Util.FilesAutoCleanupActive = true;

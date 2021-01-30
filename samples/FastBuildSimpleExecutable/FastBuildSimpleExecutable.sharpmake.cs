@@ -79,7 +79,7 @@ namespace FastBuild
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
-            FastBuildSettings.FastBuildMakeCommand = @"tools\FastBuild\FBuild.exe";
+            FastBuildSettings.FastBuildMakeCommand = @"tools\FastBuild\Windows-x64\FBuild.exe";
 
             arguments.Generate<FastBuildSolution>();
         }

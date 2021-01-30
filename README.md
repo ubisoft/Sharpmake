@@ -79,7 +79,7 @@ functionality
 
 used toolset for functional tests:
 
-tools\FastBuild\FBuild.exe (win x64) and FBuild (osx x64) - v1.01. http://www.fastbuild.org
+tools\FastBuild - v1.01. http://www.fastbuild.org
 
 
 

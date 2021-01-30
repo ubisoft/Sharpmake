@@ -190,7 +190,7 @@ namespace SharpmakeGen.FunctionalTests
             FileInfo fileInfo = Util.GetCurrentSharpmakeFileInfo();
             string sharpmakeRootDirectory = Util.SimplifyPath(Path.Combine(fileInfo.DirectoryName, "..", ".."));
 
-            FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeRootDirectory, @"tools\FastBuild\FBuild.exe");
+            FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeRootDirectory, @"tools\FastBuild\Windows-x64\FBuild.exe");
             FastBuildSettings.FastBuildWait = true;
             FastBuildSettings.WriteAllConfigsSection = true;
 

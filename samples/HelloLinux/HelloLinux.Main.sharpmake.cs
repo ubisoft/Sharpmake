@@ -74,11 +74,14 @@ namespace HelloLinux
             switch (Util.GetExecutingPlatform())
             {
                 case Platform.linux:
-                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "FBuild");
+                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "Linux-x64", "fbuild");
+                    break;
+                case Platform.mac:
+                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "OSX-x64", "FBuild");
                     break;
                 case Platform.win64:
                 default:
-                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "FBuild.exe");
+                    FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "Windows-x64", "FBuild.exe");
                     break;
             }
 

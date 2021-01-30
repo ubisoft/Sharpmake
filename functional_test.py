@@ -5,6 +5,7 @@
 # This script supports Python 3.
 
 import os.path
+import platform
 import sys
 
 if os.name != "nt":
@@ -15,7 +16,7 @@ class FunctionalTest(object):
     def __init__(self, directory, script_name, project_root = ""):
         self.directory = directory
         self.script_name = script_name
-        self.use_mono = os.name == "posix"
+        self.runs_on_unix = os.name == "posix"
         if project_root == "":
             self.project_root = directory
         else:
@@ -33,7 +34,7 @@ class FunctionalTest(object):
             write_line("Using sharpmake " + sharpmake_path)
 
             # Builds the command line argument list.
-            sources = "/sources(@\"{}\")".format(os.path.join(self.directory, self.script_name))
+            sources = "/sources(@\'{}\')".format(os.path.join(self.directory, self.script_name))
             verbose = "/verbose"
 
             args = [
@@ -41,11 +42,9 @@ class FunctionalTest(object):
                 verbose
             ]
 
-            if self.use_mono:
-                args_string = "\" \"".join([arg.replace('"','\\"') for arg in args])
-                cmd_line = "mono --debug {} \"{}\"".format(sharpmake_path, args_string)
-            else:
-                cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
+            cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
+            if self.runs_on_unix:
+                cmd_line = "mono --debug " + cmd_line
 
             generation_exit_code = os.system(cmd_line)
 
@@ -130,7 +129,9 @@ funcTests = [
 
 def build_with_fastbuild(root_dir, test_dir):
     entry_path = os.getcwd()
-    fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", "FBuild.exe");
+    platformSystem = platform.system()
+    fastBuildInfo = ("Linux-x64", "fbuild") if platformSystem == "Linux" else ("OSX-x64", "FBuild") if platformSystem == "Darwin" else ("Windows-x64", "FBuild.exe")
+    fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", fastBuildInfo[0], fastBuildInfo[1]);
     if not os.path.isfile(fastBuildPath):
         return -1
 
