@@ -19,6 +19,10 @@ namespace SharpmakeGen
     public static class Globals
     {
         public static string AbsoluteRootPath = string.Empty;
+
+        // this holds the path where sharpmake binaries are expected to output
+        // note that it will contain an subdirectory per optimization
+        public const string OutputRootPath = @"[project.RootPath]\tmp\bin";
     }
 
     public static class Common
@@ -62,14 +66,14 @@ namespace SharpmakeGen
                 conf.ProjectFileName = "[project.Name]";
                 conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
-                conf.TargetPath = @"[project.RootPath]\tmp\bin\[target.Optimization]";
+                conf.TargetPath = Path.Combine(Globals.OutputRootPath, "[target.Optimization]");
 
                 conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Optimization]\[project.Name]";
                 conf.BaseIntermediateOutputPath = conf.IntermediatePath;
 
                 conf.ReferencesByName.Add("System");
 
-                conf.Options.Add(Sharpmake.Util.ConvertLanguageVersionToSharpmakeOption(Assembler.SharpmakeScriptsCSharpVersion));
+                conf.Options.Add(Util.ConvertLanguageVersionToSharpmakeOption(Assembler.SharpmakeScriptsCSharpVersion));
                 conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
                 conf.Options.Add(
                     new Options.CSharp.WarningsNotAsErrors(
