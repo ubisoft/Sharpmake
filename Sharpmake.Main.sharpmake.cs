@@ -73,7 +73,7 @@ namespace SharpmakeGen
 
                 conf.ReferencesByName.Add("System");
 
-                conf.Options.Add(Util.ConvertLanguageVersionToSharpmakeOption(Assembler.SharpmakeScriptsCSharpVersion));
+                conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
                 conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
                 conf.Options.Add(
                     new Options.CSharp.WarningsNotAsErrors(

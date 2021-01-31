@@ -2108,47 +2108,6 @@ namespace Sharpmake
             return Path.GetFullPath(PathMakeStandard(conf.AppxManifestFilePath));
         }
 
-        public static Options.CSharp.LanguageVersion ConvertLanguageVersionToSharpmakeOption(Microsoft.CodeAnalysis.CSharp.LanguageVersion languageVersion)
-        {
-            switch (languageVersion)
-            {
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp1:
-                    return Options.CSharp.LanguageVersion.ISO1;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp2:
-                    return Options.CSharp.LanguageVersion.ISO2;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp3:
-                    return Options.CSharp.LanguageVersion.CSharp3;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp4:
-                    return Options.CSharp.LanguageVersion.CSharp4;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp5:
-                    return Options.CSharp.LanguageVersion.CSharp5;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp6:
-                    return Options.CSharp.LanguageVersion.CSharp6;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp7:
-                    return Options.CSharp.LanguageVersion.CSharp7;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp7_1:
-                    return Options.CSharp.LanguageVersion.CSharp7_1;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp7_2:
-                    return Options.CSharp.LanguageVersion.CSharp7_2;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp7_3:
-                    return Options.CSharp.LanguageVersion.CSharp7_3;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp8:
-                    return Options.CSharp.LanguageVersion.CSharp8;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp9:
-                    return Options.CSharp.LanguageVersion.CSharp9;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.LatestMajor:
-                    return Options.CSharp.LanguageVersion.LatestMajorVersion;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.Preview:
-                    return Options.CSharp.LanguageVersion.Preview;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.Latest:
-                    return Options.CSharp.LanguageVersion.LatestMinorVersion;
-                case Microsoft.CodeAnalysis.CSharp.LanguageVersion.Default:
-                    return Options.CSharp.LanguageVersion.LatestMajorVersion;
-                default:
-                    throw new NotImplementedException($"Don't know how to convert LanguageVersion {languageVersion} to sharpmake option");
-            }
-        }
-
         /// <summary>
         /// Extension GetValueOrAdd gets the value at the given key or adds at the given key the value provided
         /// </summary>

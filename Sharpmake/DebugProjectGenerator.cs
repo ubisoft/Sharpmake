@@ -323,7 +323,7 @@ namespace Sharpmake
 
             conf.DefaultOption = target.Optimization == Optimization.Debug ? Options.DefaultTarget.Debug : Options.DefaultTarget.Release;
 
-            conf.Options.Add(Util.ConvertLanguageVersionToSharpmakeOption(Assembler.SharpmakeScriptsCSharpVersion));
+            conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
 
             conf.Defines.Add(_projectInfo.Defines.ToArray());
 
