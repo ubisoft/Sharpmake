@@ -64,6 +64,7 @@ namespace Sharpmake
         /// </summary>
         AdditionalUsingDirectories = 1 << 5,
         ForceUsingAssembly = 1 << 6,
+        InheritBuildSteps = 1 << 7,
 
         /// <summary>
         /// Specifies that the dependent project inherits the dependency's library files, library
@@ -72,7 +73,8 @@ namespace Sharpmake
         Default = LibraryFiles |
                   LibraryPaths |
                   IncludePaths |
-                  Defines,
+                  Defines | 
+                  InheritBuildSteps,
 
         /// <summary>
         /// Specifies that the dependent project inherits the dependency's include paths and
@@ -85,6 +87,11 @@ namespace Sharpmake
         DefaultForceUsing = ForceUsingAssembly
                               | IncludePaths
                               | Defines,
+
+        DefaultWithoutBuildSteps = LibraryFiles 
+                            | LibraryPaths 
+                            | IncludePaths 
+                            | Defines,
 
 
         ////////////////////////////////////////////////////////////////////////
@@ -2815,7 +2822,7 @@ namespace Sharpmake
                                    dependency.Project.SharpmakeProjectType == ProjectTypeAttribute.Compile;
 
                     var dependencySetting = propagationSetting._dependencySetting;
-                    if (dependencySetting != DependencySetting.OnlyBuildOrder)
+                    if (dependencySetting.HasFlag(DependencySetting.InheritBuildSteps))
                     {
                         _resolvedEventPreBuildExe.AddRange(dependency.EventPreBuildExe);
                         _resolvedEventPostBuildExe.AddRange(dependency.EventPostBuildExe);
@@ -2962,18 +2969,22 @@ namespace Sharpmake
                         case OutputType.IosApp:
                         case OutputType.Exe:
                             {
-                                if (Output != OutputType.Utility && Output != OutputType.Exe && Output != OutputType.None)
-                                    throw new Error("Project {0} cannot depend on OutputType {1} {2}", this, Output, dependency);
+                                if(dependencySetting != DependencySetting.OnlyBuildOrder)
+                                {
+                                    if (Output != OutputType.Utility && Output != OutputType.Exe && Output != OutputType.None)
+                                        throw new Error("Project {0} cannot depend on OutputType {1} {2}", this, Output, dependency);
 
-                                if (hasPublicPathToRoot)
-                                    resolvedDotNetPublicDependencies.Add(new DotNetDependency(dependency));
-                                else if (isImmediate)
-                                    resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
+                                    if (hasPublicPathToRoot)
+                                        resolvedDotNetPublicDependencies.Add(new DotNetDependency(dependency));
+                                    else if (isImmediate)
+                                        resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
 
-                                if (dependencySetting == DependencySetting.OnlyBuildOrder)
-                                    BuildOrderDependencies.Add(dependency);
-                                else
                                     ConfigurationDependencies.Add(dependency);
+                                }
+                                else
+                                {
+                                    BuildOrderDependencies.Add(dependency);
+                                }
                             }
                             break;
                         case OutputType.Utility: throw new NotImplementedException(dependency.Project.Name + " " + dependency.Output);
