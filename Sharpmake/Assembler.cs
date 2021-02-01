@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -678,12 +677,7 @@ namespace Sharpmake
 
         public static IEnumerable<string> EnumeratePathToDotNetFramework()
         {
-            for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
-            {
-                string frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
-                if (frameworkDirectory != null)
-                    yield return frameworkDirectory;
-            }
+            yield return Path.GetDirectoryName(typeof(object).Assembly.Location);
         }
 
         private static LanguageVersion ConvertSharpmakeOptionToLanguageVersion(Options.CSharp.LanguageVersion languageVersion)

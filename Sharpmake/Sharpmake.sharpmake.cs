@@ -24,9 +24,6 @@ namespace SharpmakeGen
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
 
-            // this needs to remain a named reference otherwise the assembly won't work on mono for on unix platforms
-            conf.ReferencesByNameExternal.Add("Microsoft.Build.Utilities.Core");
-
             conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.8.0");
 
             // This dependency is not strictly necessary, but Microsoft.CodeAnalysis.CSharp

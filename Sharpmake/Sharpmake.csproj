@@ -52,9 +52,6 @@
     <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Utilities.Core">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
