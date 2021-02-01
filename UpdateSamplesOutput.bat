@@ -7,6 +7,12 @@ COLOR
 call CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
 if %errorlevel% NEQ 0 goto error
 
+set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\[debug|release] & pause & goto error
+
+echo Using executable %SHARPMAKE_EXECUTABLE%
+
 :: main
 set ERRORLEVEL_BACKUP=0
 
@@ -62,15 +68,9 @@ pushd %CD%
 :: set testScopedCurrentDirectory as current
 cd /d %~dp0%~1
 
-set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\[debug|release] & pause & goto error
-
-echo Using executable %SHARPMAKE_EXECUTABLE%
-
 echo Updating references of %2...
 rd /s /q "%~2\%~4"
-call %SHARPMAKE_EXECUTABLE% "/sources(@"%~2\%~3") /outputdir(@"%~2\%~4") /remaproot(@"%~5") /verbose"
+call %SHARPMAKE_EXECUTABLE% /sources(@'%~2\%~3') /outputdir(@'%~2\%~4') /remaproot(@'%~5') /verbose
 set ERRORLEVEL_BACKUP=%errorlevel%
 :: restore caller current directory
 popd
