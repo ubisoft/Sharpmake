@@ -573,10 +573,12 @@ namespace Sharpmake.Generators.VisualStudio
                 public bool? DesignTimeSharedInput = null;
                 public string DependentUpon;
                 public string SubType = null;
+                public string Exclude;
 
                 public string Resolve(Resolver resolver)
                 {
                     using (resolver.NewScopedParameter("include", Include))
+                    using (resolver.NewScopedParameter("exclude", Exclude ?? string.Empty))
                     using (resolver.NewScopedParameter("autoGen", AutoGen))
                     using (resolver.NewScopedParameter("designTime", DesignTime))
                     using (resolver.NewScopedParameter("designTimeSharedInput", DesignTimeSharedInput))
@@ -600,9 +602,9 @@ namespace Sharpmake.Generators.VisualStudio
                         AddLinkIfNeeded(writer);
 
                         if (builder.Length == 0)
-                            return resolver.Resolve(Template.ItemGroups.SimpleCompile);
+                            return resolver.Resolve(string.IsNullOrEmpty(Exclude) ? Template.ItemGroups.SimpleCompile : Template.ItemGroups.SimpleCompileWithExclude);
 
-                        builder.Insert(0, Template.ItemGroups.CompileBegin);
+                        builder.Insert(0, string.IsNullOrEmpty(Exclude) ? Template.ItemGroups.CompileBegin : Template.ItemGroups.CompileBeginWithExclude);
                         writer.Write(Template.ItemGroups.CompileEnd);
                         return resolver.Resolve(writer.ToString());
                     }
@@ -1457,6 +1459,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             #endregion
 
+            using (resolver.NewScopedParameter("project", project))
             writer.Write(itemGroups.Resolve(resolver));
 
             var importProjects = new List<ImportProject>(project.ImportProjects);
@@ -1665,6 +1668,11 @@ namespace Sharpmake.Generators.VisualStudio
                 itemGroups.Analyzers.Add(new ItemGroups.Analyzer { Include = include });
             }
             #endregion
+
+            foreach(var glob in project.Globs)
+            {
+                itemGroups.Compiles.Add(new ItemGroups.Compile { Include = glob.Include, Exclude = glob.Exclude });
+            }
 
             foreach (var embeddedResource in project.AdditionalEmbeddedResourceAlwaysCopy)
             {
