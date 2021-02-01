@@ -296,7 +296,7 @@ namespace Sharpmake
         }
 
         [Obsolete("Use the builder with the new debugScripts argument", error: false)]
-        public Builder(BuildContext.BaseBuildContext context, bool multithreaded, bool dumpDependencyGraph, bool cleanBlobsOnly, bool blobOnly, bool skipInvalidPath, bool diagnostics, Func<IGeneratorManager> getGeneratorsManagerCallBack, HashSet<string> defines) 
+        public Builder(BuildContext.BaseBuildContext context, bool multithreaded, bool dumpDependencyGraph, bool cleanBlobsOnly, bool blobOnly, bool skipInvalidPath, bool diagnostics, Func<IGeneratorManager> getGeneratorsManagerCallBack, HashSet<string> defines)
             : this(context, multithreaded, dumpDependencyGraph, cleanBlobsOnly, blobOnly, skipInvalidPath, diagnostics, false, getGeneratorsManagerCallBack, defines) { }
 
         public void Dispose()

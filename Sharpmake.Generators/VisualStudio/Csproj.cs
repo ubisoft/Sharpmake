@@ -172,7 +172,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public string ResolveCondition(Resolver resolver)
                 {
-                    var targetFrameworks = TargetFrameworks.Select(tuple => {
+                    var targetFrameworks = TargetFrameworks.Select(tuple =>
+                    {
                         var dotNetFramework = tuple.Item1;
                         var dotNetOS = tuple.Item2;
                         var dotNetOSVersion = tuple.Item3;
@@ -1053,7 +1054,8 @@ namespace Sharpmake.Generators.VisualStudio
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
             var projectFrameworks = configurations.Select(
-                conf => {
+                conf =>
+                {
                     var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                     DotNetOS dotNetOS;
                     if (!conf.Target.TryGetFragment<DotNetOS>(out dotNetOS))
@@ -1460,7 +1462,7 @@ namespace Sharpmake.Generators.VisualStudio
             #endregion
 
             using (resolver.NewScopedParameter("project", project))
-            writer.Write(itemGroups.Resolve(resolver));
+                writer.Write(itemGroups.Resolve(resolver));
 
             var importProjects = new List<ImportProject>(project.ImportProjects);
 
@@ -1669,7 +1671,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
             #endregion
 
-            foreach(var glob in project.Globs)
+            foreach (var glob in project.Globs)
             {
                 itemGroups.Compiles.Add(new ItemGroups.Compile { Include = glob.Include, Exclude = glob.Exclude });
             }

@@ -469,18 +469,18 @@ namespace Sharpmake.Generators.Generic
                 // ExtraWarnings
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.ExtraWarnings.Enable, () => { cflags.Append("-Wextra "); }),
-                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => {  })
+                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => { })
                     );
 
                 // GenerateDebugInformation
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Enable, () => { cflags.Append("-g "); }),
-                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => {  })
+                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => { })
                     );
 
                 // OptimizationLevel
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => {  }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => { }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.Standard, () => { cflags.Append("-O1 "); }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.Full, () => { cflags.Append("-O2 "); }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.FullWithInlining, () => { cflags.Append("-O3 "); }),
@@ -489,7 +489,7 @@ namespace Sharpmake.Generators.Generic
 
                 // Warnings
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => {  }),
+                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => { }),
                     Options.Option(Options.Makefile.Compiler.Warnings.MoreWarnings, () => { cflags.Append("-Wall "); }),
                     Options.Option(Options.Makefile.Compiler.Warnings.Disable, () => { cflags.Append("-w "); })
                     );
@@ -497,7 +497,7 @@ namespace Sharpmake.Generators.Generic
                 // WarningsAsErrors
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Enable, () => { cflags.Append("-Werror "); }),
-                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => {  })
+                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => { })
                     );
 
                 // AdditionalCompilerOptions
@@ -512,17 +512,17 @@ namespace Sharpmake.Generators.Generic
 
                 // CppLanguageStandard
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default,   () => { cxxflags.Append(""); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp98,     () => { cxxflags.Append("-std=c++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11,     () => { cxxflags.Append("-std=c++11 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14,     () => { cxxflags.Append("-std=c++14 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17,     () => { cxxflags.Append("-std=c++17 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp2a,     () => { cxxflags.Append("-std=c++2a "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp98,  () => { cxxflags.Append("-std=gnu++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11,  () => { cxxflags.Append("-std=gnu++11 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp14,  () => { cxxflags.Append("-std=gnu++14 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp17,  () => { cxxflags.Append("-std=gnu++17 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp2a,  () => { cxxflags.Append("-std=gnu++2a "); })
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default, () => { cxxflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp98, () => { cxxflags.Append("-std=c++98 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11, () => { cxxflags.Append("-std=c++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14, () => { cxxflags.Append("-std=c++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17, () => { cxxflags.Append("-std=c++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp2a, () => { cxxflags.Append("-std=c++2a "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp98, () => { cxxflags.Append("-std=gnu++98 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11, () => { cxxflags.Append("-std=gnu++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp14, () => { cxxflags.Append("-std=gnu++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp17, () => { cxxflags.Append("-std=gnu++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp2a, () => { cxxflags.Append("-std=gnu++2a "); })
                     );
 
                 // Exceptions
