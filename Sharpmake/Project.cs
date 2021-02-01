@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -2066,6 +2066,13 @@ namespace Sharpmake
         public FileType FileType = FileType.File;
     }
 
+    [Resolver.Resolvable]
+    public class GlobSetting
+    {
+        public string Include;
+        public string Exclude;
+    }
+
     public enum CSharpProjectType
     {
         Test,
@@ -2292,6 +2299,7 @@ namespace Sharpmake
         public List<BootstrapperPackage> BootstrapperPackages = new List<BootstrapperPackage>();
         public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
         public List<PublishFile> PublishFiles = new List<PublishFile>();
+        public List<GlobSetting> Globs = new List<GlobSetting>();
 
         /// <summary>
         /// If set to true. Will explicit the RestoreProjectStyle in the project file
