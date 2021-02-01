@@ -78,7 +78,7 @@ namespace Sharpmake
 
         public static string PathMakeStandard(string path)
         {
-            return PathMakeStandard(path, !Util.IsRunningInMono());
+            return PathMakeStandard(path, !Util.IsRunningOnUnix());
         }
 
         /// <summary>
