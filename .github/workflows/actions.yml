@@ -19,10 +19,10 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      - name: Bootstrap.bat
+      - name: Bootstrap.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         shell: cmd
-        run: bootstrap.bat
+        run: bootstrap.bat Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }}
 
       - name: Bootstrap.sh
         if: runner.os != 'Windows'
