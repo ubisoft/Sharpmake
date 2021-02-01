@@ -1748,6 +1748,9 @@ namespace Sharpmake
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
+            if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+                return false;
+
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
                 Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty
@@ -2351,21 +2354,25 @@ namespace Sharpmake
                 return registryValue;
 
             string key = string.Empty;
-            try
+
+            if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
             {
-                using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
+                try
                 {
-                    if (localMachineKey != null)
+                    using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
                     {
-                        key = (string)localMachineKey.GetValue(value);
-                        if (enableLog && string.IsNullOrEmpty(key))
-                            LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                        if (localMachineKey != null)
+                        {
+                            key = (string)localMachineKey.GetValue(value);
+                            if (enableLog && string.IsNullOrEmpty(key))
+                                LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                        }
+                        else if (enableLog)
+                            LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                     }
-                    else if (enableLog)
-                        LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                 }
+                catch { }
             }
-            catch { }
 
             if (string.IsNullOrEmpty(key))
                 key = fallbackValue;
