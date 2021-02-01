@@ -35,7 +35,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.v4_7_2
+                    framework: Assembler.SharpmakeDotNetFramework
                 )
             );
             return result.ToArray();

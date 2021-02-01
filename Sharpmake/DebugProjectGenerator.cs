@@ -230,7 +230,7 @@ namespace Sharpmake
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_7_2
+                Assembler.SharpmakeDotNetFramework
             );
         }
 
