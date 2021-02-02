@@ -467,7 +467,7 @@ namespace Sharpmake
                     dllStream,
                     pdbStream,
                     options: new EmitOptions(
-                        debugInformationFormat: Util.IsRunningOnUnix() ? DebugInformationFormat.PortablePdb : DebugInformationFormat.Pdb,
+                        debugInformationFormat: DebugInformationFormat.PortablePdb,
                         pdbFilePath: pdbFilePath
                     )
                 );
