@@ -584,6 +584,38 @@ namespace Sharpmake
             paths = paths.Select(path => ResolvePathAndFixCase(root, path));
         }
 
+        [Flags]
+        internal enum KeyValuePairResolveType
+        {
+            ResolveKey = 1 << 0,
+            ResolveValue = 1 << 1,
+            ResolveAll = ResolveKey | ResolveValue
+        }
+
+        internal static void ResolvePathAndFixCase(string root, KeyValuePairResolveType resolveType, ref HashSet<KeyValuePair<string, string>> paths)
+        {
+            if (paths.Count == 0)
+                return;
+
+            foreach (var keyValuePair in paths.ToList())
+            {
+                string key = keyValuePair.Key;
+                string value = keyValuePair.Value;
+
+                if (resolveType.HasFlag(KeyValuePairResolveType.ResolveKey))
+                    key = ResolvePathAndFixCase(root, key);
+
+                if (resolveType.HasFlag(KeyValuePairResolveType.ResolveValue))
+                    value = ResolvePathAndFixCase(root, value);
+
+                if (keyValuePair.Key != key || keyValuePair.Value != value)
+                {
+                    paths.Remove(keyValuePair);
+                    paths.Add(new KeyValuePair<string, string>(key, value));
+                }
+            }
+        }
+
         public static void ResolvePath(string root, ref Strings paths)
         {
             List<string> sortedPaths = paths.Values;

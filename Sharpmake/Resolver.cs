@@ -768,6 +768,17 @@ namespace Sharpmake
                             SetResolved(memberPath);
                         }
                     }
+                    else if (fieldValue is HashSet<KeyValuePair<string, string>>)
+                    {
+                        if (CanWriteFieldValue(fieldInfo))
+                        {
+                            SetResolving(memberPath);
+
+                            ResolveKeyPairHashSet((HashSet<KeyValuePair<string, string>>)fieldValue, fallbackValue);
+
+                            SetResolved(memberPath);
+                        }
+                    }
                     else if (fieldInfo.FieldType.IsClass)
                     {
                         object memberObject = fieldValue;
@@ -817,11 +828,41 @@ namespace Sharpmake
 
                             SetResolved(memberPath);
                         }
+                        else if (propertyValue is HashSet<KeyValuePair<string, string>>)
+                        {
+                            SetResolving(memberPath);
+
+                            ResolveKeyPairHashSet((HashSet<KeyValuePair<string, string>>)propertyValue, fallbackValue);
+
+                            SetResolved(memberPath);
+                        }
                         else if (propertyInfo.PropertyType.IsClass)
                         {
                             ResolveObject(memberPath, propertyValue, fallbackValue);
                         }
                     }
+                }
+            }
+        }
+
+        private void ResolveKeyPairHashSet(HashSet<KeyValuePair<string, string>> values, object fallbackValue)
+        {
+            // Empty check to prevent a useless memory allocation in .ToList()
+            if (values.Count == 0)
+                return;
+
+            foreach (var keyValuePair in values.ToList())
+            {
+                bool keyChanged;
+                bool valueChanged;
+
+                string key = Resolve(keyValuePair.Key, fallbackValue, out keyChanged);
+                string value = Resolve(keyValuePair.Value, fallbackValue, out valueChanged);
+
+                if (keyChanged || valueChanged)
+                {
+                    values.Remove(keyValuePair);
+                    values.Add(new KeyValuePair<string, string>(key, value));
                 }
             }
         }
