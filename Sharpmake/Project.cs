@@ -1709,15 +1709,28 @@ namespace Sharpmake
                     var includePathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(IncludePathsExcludeFromWarningRegex).ToArray();
                     var libraryPathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(LibraryPathsExcludeFromWarningRegex).ToArray();
 
-                    // check if the files marked as excluded from build still exist
+                    // check if the files marked with specific options still exist
                     foreach (var array in new Dictionary<Strings, string> {
-                            {conf.ResolvedSourceFilesBuildExclude,                nameof(conf.ResolvedSourceFilesBuildExclude)},
-                            {conf.ResolvedSourceFilesBlobExclude,                 nameof(conf.ResolvedSourceFilesBlobExclude)},
                             {conf.ResolvedSourceFilesWithCompileAsCLROption,      nameof(conf.ResolvedSourceFilesWithCompileAsCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsCOption,        nameof(conf.ResolvedSourceFilesWithCompileAsCOption)},
                             {conf.ResolvedSourceFilesWithCompileAsCPPOption,      nameof(conf.ResolvedSourceFilesWithCompileAsCPPOption)},
                             {conf.ResolvedSourceFilesWithCompileAsNonCLROption,   nameof(conf.ResolvedSourceFilesWithCompileAsNonCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithCompileAsWinRTOption)},
+                        })
+                    {
+                        foreach (string file in array.Key)
+                        {
+                            if (!File.Exists(file))
+                            {
+                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Error: File contained in {array.Value} doesn't exist: {file}.");
+                            }
+                        }
+                    }
+
+                    // check if the files marked as excluded from build still exist
+                    foreach (var array in new Dictionary<Strings, string> {
+                            {conf.ResolvedSourceFilesBuildExclude,                nameof(conf.ResolvedSourceFilesBuildExclude)},
+                            {conf.ResolvedSourceFilesBlobExclude,                 nameof(conf.ResolvedSourceFilesBlobExclude)},
                             {conf.ResolvedSourceFilesWithExcludeAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithExcludeAsWinRTOption)},
                             {conf.PrecompSourceExclude,                           nameof(conf.PrecompSourceExclude)}
                         })
@@ -1726,7 +1739,7 @@ namespace Sharpmake
                         {
                             if (!File.Exists(file))
                             {
-                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Error: File contained in {array.Value} doesn't exist: {file}.");
+                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: File contained in {array.Value} doesn't exist: {file}.", onlyWarn: true);
                             }
                         }
                     }
