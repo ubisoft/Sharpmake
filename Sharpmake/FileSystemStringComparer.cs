@@ -35,8 +35,7 @@ namespace Sharpmake
 
         static FileSystemStringComparer()
         {
-            var operatingSystemFamily = Environment.OSVersion.Platform;
-            s_hostOsIsCaseSensitive = (operatingSystemFamily == PlatformID.MacOSX || operatingSystemFamily == PlatformID.Unix);
+            s_hostOsIsCaseSensitive = Util.IsRunningOnUnix();
         }
 
         private readonly object _comparer;         // Using System::Object as the type because this can be both IComparer or IEqualityComparer.
