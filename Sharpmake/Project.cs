@@ -1765,6 +1765,10 @@ namespace Sharpmake
                     var platformLibraryPaths = configTasks.GetPlatformLibraryPaths(conf);
                     allLibraryPaths.AddRange(platformLibraryPaths);
 
+                    // remove all the rooted files
+                    var allRootedFiles = allLibraryFiles.Where(file => Path.IsPathRooted(file)).ToArray();
+                    allLibraryFiles.RemoveRange(allRootedFiles);
+
                     string platformLibExtension = "." + configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
@@ -1778,7 +1782,7 @@ namespace Sharpmake
                             var toRemove = new List<string>();
                             foreach (string file in allLibraryFiles)
                             {
-                                string path = Path.IsPathRooted(file) ? file : Path.Combine(folder, file);
+                                string path = Path.Combine(folder, file);
                                 if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, "lib" + file + platformLibExtension)))
                                     toRemove.Add(file);
                             }
@@ -1786,6 +1790,9 @@ namespace Sharpmake
                             allLibraryFiles.RemoveRange(toRemove);
                         }
                     }
+
+                    // Add all rooted files that are missing
+                    allLibraryFiles.Add(allRootedFiles.Where(file => !File.Exists(file)).ToArray());
 
                     // everything that remains is a missing library file
                     foreach (string file in allLibraryFiles)
