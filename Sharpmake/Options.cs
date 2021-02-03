@@ -438,10 +438,9 @@ namespace Sharpmake
 
             for (int i = options.Count - 1; i >= 0; --i)
             {
-                string option = options[i] as string;
-                if (option is T)
+                if (options[i] is T stringOption)
                 {
-                    return option;
+                    return stringOption.Value;
                 }
             }
             return string.Empty;
