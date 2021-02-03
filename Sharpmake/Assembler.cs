@@ -118,13 +118,11 @@ namespace Sharpmake
             ParameterInfo[] delegateParameterInfos = delegateMethodInfo.GetParameters();
             ParameterInfo delegateReturnInfos = delegateMethodInfo.ReturnParameter;
 
-            Assembly assembly;
-
             Assembler assembler = new Assembler();
             assembler.UseDefaultReferences = false;
             assembler.Assemblies.AddRange(assemblies);
 
-            assembly = assembler.BuildAssembly(fileInfo.FullName);
+            Assembly assembly = assembler.BuildAssembly(fileInfo.FullName);
 
             List<MethodInfo> matchMethods = new List<MethodInfo>();
 
