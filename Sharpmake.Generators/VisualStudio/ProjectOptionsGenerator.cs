@@ -823,8 +823,8 @@ namespace Sharpmake.Generators.VisualStudio
             //    Enable                                  CreateHotPatchableCode="true"                  /hotpatch
             context.SelectOption
             (
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Default, () => { context.Options["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; ; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; ; }),
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Disable, () => { context.Options["CreateHotPatchableCode"] = "false"; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; ; }),
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Default, () => { context.Options["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Disable, () => { context.Options["CreateHotPatchableCode"] = "false"; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Enable, () => { context.Options["CreateHotPatchableCode"] = "true"; context.CommandLineOptions["CreateHotPatchableCode"] = "/hotpatch"; })
             );
 
