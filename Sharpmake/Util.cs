@@ -1622,7 +1622,7 @@ namespace Sharpmake
 
             private void SerializeDictionary(IDictionary dict)
             {
-                SerializeSequence<IDictionaryEnumerator>(dict, Tuple.Create('{', '}'), e =>
+                SerializeSequence<DictionaryEntry>(dict, Tuple.Create('{', '}'), e =>
                 {
                     if (!(e.Key is string))
                         throw new InvalidDataException(string.Format("Dictionary key '{0}' is not a string.", e.Key));
@@ -1642,7 +1642,7 @@ namespace Sharpmake
                 _parents.Add(sequence);
 
                 // IDictionary returns different enumerators depending on which interface GetEnumerator called from.
-                // IDictionary.GetEnumerator enumerates IDictionaryEnumerator
+                // IDictionary.GetEnumerator enumerates DictionaryEntry 
                 // IEnumerable.GetEnumerator enumerates KeyValuePair<>
                 bool first = true;
                 IEnumerator enumerator = (sequence as IDictionary)?.GetEnumerator() ?? sequence.GetEnumerator();
