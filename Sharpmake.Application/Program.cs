@@ -194,7 +194,7 @@ namespace Sharpmake.Application
                 }
 
                 var osplatform = Util.GetExecutingPlatform();
-                string framework = Util.IsRunningInMono() ? "Mono" : (Util.IsRunningDotNetCore() ? ".NET Core" : ".NET Framework");
+                string framework = (Util.IsRunningInMono() ? "Mono | " : "") + Util.FrameworkDisplayName();
 
                 LogWriteLine($"sharpmake {versionString} ({osplatform} | {framework})");
                 LogWriteLine("  arguments : {0}", CommandLine.GetProgramCommandLine());
