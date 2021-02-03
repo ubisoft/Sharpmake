@@ -1069,12 +1069,13 @@ namespace Sharpmake.Generators.VisualStudio
         public static List<KeyValuePair<string, string>> ConvertPostBuildCopiesToRelative(Project.Configuration conf, string relativeTo)
         {
             var relativePostBuildCopies = new List<KeyValuePair<string, string>>();
-            if (!conf.ResolvedTargetCopyFiles.Any() && conf.CopyDependenciesBuildStep == null && !conf.EventPostBuildCopies.Any())
+            if (!conf.ResolvedTargetCopyFiles.Any() && conf.CopyDependenciesBuildStep == null && !conf.EventPostBuildCopies.Any() && !conf.ResolvedTargetCopyFilesToSubDirectory.Any())
                 return relativePostBuildCopies;
 
             relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFiles.Select(x => new KeyValuePair<string, string>(x, conf.TargetPath)));
             relativePostBuildCopies.AddRange(conf.EventPostBuildCopies);
-
+            relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFilesToSubDirectory.Select(x => new KeyValuePair<string, string>(x.Key, Path.Combine(conf.TargetPath, x.Value))));
+            
             for (int i = 0; i < relativePostBuildCopies.Count;)
             {
                 string sourceFileFullPath = relativePostBuildCopies[i].Key;

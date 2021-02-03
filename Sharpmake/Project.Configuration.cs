@@ -1666,6 +1666,11 @@ namespace Sharpmake
             public Strings TargetCopyFiles = new Strings();
 
             /// <summary>
+            /// Gets or sets the list of files to copy to a sub-directory of the output directory.
+            /// </summary>
+            public HashSet<KeyValuePair<string, string>> TargetCopyFilesToSubDirectory = new HashSet<KeyValuePair<string, string>>();
+
+            /// <summary>
             /// Gets or sets the list of files that the target depends on.
             /// </summary>
             public Strings TargetDependsFiles = new Strings();
@@ -2110,6 +2115,14 @@ namespace Sharpmake
             /// </summary>
             public IEnumerable<string> ResolvedTargetCopyFiles => _resolvedTargetCopyFiles;
 
+            private HashSet<KeyValuePair<string, string>> _resolvedTargetCopyFilesToSubDirectory = new HashSet<KeyValuePair<string, string>>();
+
+            /// <summary>
+            /// Gets the list of resolved files to copy to a sub directory of the target directory.
+            /// </summary>
+            public IEnumerable<KeyValuePair<string, string>> ResolvedTargetCopyFilesToSubDirectory => _resolvedTargetCopyFilesToSubDirectory;
+
+
             private Strings _resolvedTargetDependsFiles = new Strings();
 
             /// <summary>
@@ -2247,6 +2260,8 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SharpmakeCsPath, ref BaseIntermediateOutputPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref LibraryPaths);
                 Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, ref TargetCopyFiles);
+                Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, Util.KeyValuePairResolveType.ResolveAll, ref EventPostBuildCopies);
+                Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, Util.KeyValuePairResolveType.ResolveKey, ref TargetCopyFilesToSubDirectory);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetDependsFiles);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetLibraryPath);
@@ -2303,6 +2318,11 @@ namespace Sharpmake
 
                 _resolvedTargetDependsFiles.AddRange(TargetDependsFiles);
                 _resolvedTargetCopyFiles.AddRange(TargetCopyFiles);
+
+                foreach (var keyValuePair in TargetCopyFilesToSubDirectory)
+                {
+                    _resolvedTargetCopyFilesToSubDirectory.Add(keyValuePair);
+                }
 
                 foreach (var tuple in new[] {
                     Tuple.Create(EventPreBuildExe,        _resolvedEventPreBuildExe),
@@ -2846,6 +2866,11 @@ namespace Sharpmake
                         _resolvedTargetDependsFiles.AddRange(dependency.TargetDependsFiles);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
+                        
+                        foreach (var keyValuePair in dependency.TargetCopyFilesToSubDirectory)
+                        {
+                            _resolvedTargetCopyFilesToSubDirectory.Add(keyValuePair);
+                        }
                     }
                     else if (Output == OutputType.None && isExport == false)
                     {
