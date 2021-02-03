@@ -253,8 +253,8 @@ namespace Sharpmake.UnitTests
         [Test]
         public void PathGetCapitalizedFile()
         {
-            var mockPath1 = Path.GetTempFileName();
-            var mockPath2 = Path.GetTempFileName();
+            var mockPath1 = Util.GetCapitalizedPath(Path.GetTempFileName());
+            var mockPath2 = Util.GetCapitalizedPath(Path.GetTempFileName());
             OrderableStrings paths = new OrderableStrings
             {
                 mockPath1,
@@ -278,8 +278,10 @@ namespace Sharpmake.UnitTests
         [Test]
         public void PathGetCapitalizedDirectory()
         {
-            var tempDirectory1 = Directory.CreateDirectory(Path.GetTempPath() + @"\test1");
-            var tempDirectory2 = Directory.CreateDirectory(Path.GetTempPath() + @"\test2");
+            string temp = Util.GetCapitalizedPath(Path.GetTempPath());
+
+            var tempDirectory1 = Directory.CreateDirectory(temp + @"\test1");
+            var tempDirectory2 = Directory.CreateDirectory(temp + @"\test2");
 
             OrderableStrings paths = new OrderableStrings
             {
