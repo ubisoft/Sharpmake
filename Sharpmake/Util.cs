@@ -1418,7 +1418,7 @@ namespace Sharpmake
                     return 1;
                 }
                 // Both are still going, compare current elements
-                int comparison = Comparer.Default.Compare(iterator1.Current.ToString(), iterator2.Current.ToString());
+                int comparison = string.CompareOrdinal(iterator1.Current.ToString(), iterator2.Current.ToString());
                 // If elements are non-equal, we're done
                 if (comparison != 0)
                 {
