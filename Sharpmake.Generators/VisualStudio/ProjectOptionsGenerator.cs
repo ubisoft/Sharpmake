@@ -1042,15 +1042,25 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // Options.Vc.Compiler.AdditionalOptions
-            if (context.Configuration.AdditionalCompilerOptions.Any())
+            foreach (Tuple<OrderableStrings, string> optionsTuple in new[]
+                    {
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptions, "AdditionalCompilerOptions"),
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHCreate, "AdditionalCompilerOptionsOnPCHCreate"),
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHUse, "AdditionalCompilerOptionsOnPCHUse")
+                    })
             {
-                context.Configuration.AdditionalCompilerOptions.Sort();
-                string additionalCompilerOptions = context.Configuration.AdditionalCompilerOptions.JoinStrings(" ");
-                context.Options["AdditionalCompilerOptions"] = additionalCompilerOptions;
-            }
-            else
-            {
-                context.Options["AdditionalCompilerOptions"] = FileGeneratorUtilities.RemoveLineTag;
+                OrderableStrings optionsStrings = optionsTuple.Item1;
+                string optionsKey = optionsTuple.Item2;
+                if (optionsStrings.Any())
+                {
+                    optionsStrings.Sort();
+                    string additionalCompilerOptions = optionsStrings.JoinStrings(" ");
+                    context.Options[optionsKey] = additionalCompilerOptions;
+                }
+                else
+                {
+                    context.Options[optionsKey] = FileGeneratorUtilities.RemoveLineTag;
+                }
             }
 
             optionsContext.HasClrSupport = clrSupport;

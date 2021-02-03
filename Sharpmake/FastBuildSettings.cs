@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections.Generic;
 
 namespace Sharpmake
 {
@@ -55,6 +56,11 @@ namespace Sharpmake
         /// Ex: http://assetstore/assetstoreservice/v0.3/assetstoreservice.svc|ACE_FB
         /// </summary>
         public static string CachePath = null;
+
+        /// <summary>
+        /// Additional settings to add to the global settings node.
+        /// </summary>
+        public static readonly IList<string> AdditionalGlobalSettings = new List<string>();
 
         /// <summary>
         /// Path to the fastbuild plugin dll if any. This typically will be the path to the Ubisoft asset store plugin DLL but could be any other compatible implementation.
@@ -184,5 +190,15 @@ namespace Sharpmake
         /// Also it seems that this doesn't occurs with VS2013.
         /// </remarks>
         public static bool EnableVS2012EnumBugWorkaround = false; // activate workaround for VS2012 enum bug(corrupted preprocessor output).
+
+        /// <summary>
+        /// FastBuild names of compilers to set the 'UseRelativePaths_Experimental' option for.
+        /// </summary>
+        public static readonly ISet<string> CompilersUsingRelativePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Additional settings to add to the Compiler node, keyed by compiler name.
+        /// </summary>
+        public static readonly IDictionary<string, IList<string>> AdditionalCompilerSettings = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);            
     }
 }
