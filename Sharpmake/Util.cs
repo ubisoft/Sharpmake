@@ -20,6 +20,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -2490,7 +2491,7 @@ namespace Sharpmake
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
 
-        private static readonly bool s_isUnix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
+        private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         public static bool IsRunningOnUnix() => s_isUnix;
 
         public static Platform GetExecutingPlatform() => s_executingPlatform;
@@ -2498,33 +2499,29 @@ namespace Sharpmake
         private static readonly Platform s_executingPlatform = DetectExecutingPlatform();
         private static Platform DetectExecutingPlatform()
         {
-            switch (Environment.OSVersion.Platform)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                case PlatformID.Win32Windows:
-                case PlatformID.Win32NT:
-                    return (Environment.Is64BitOperatingSystem) ? Platform.win64 : Platform.win32;
-                case PlatformID.MacOSX:
-                    return Platform.mac;
-                case PlatformID.Unix: // could be mac or linux
-                    {
-                        bool isMacOs = false;
-                        try
-                        {
-                            var p = new System.Diagnostics.Process();
-                            p.StartInfo.UseShellExecute = false;
-                            p.StartInfo.RedirectStandardOutput = true;
-                            p.StartInfo.FileName = "uname";
-                            p.Start();
-                            string output = p.StandardOutput.ReadToEnd().Trim();
-                            p.WaitForExit();
-
-                            isMacOs = string.CompareOrdinal(output, "Darwin") == 0;
-                        }
-                        catch { }
-
-                        return isMacOs ? Platform.mac : Platform.linux;
-                    }
+                switch (RuntimeInformation.OSArchitecture)
+                {
+                    case Architecture.X86:
+                        return Platform.win32;
+                    case Architecture.X64:
+                        return Platform.win64;
+                    default:
+                        throw new NotSupportedException($"{RuntimeInformation.OSArchitecture} Architecture is not supported on Windows");
+                }
             }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return Platform.mac;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return Platform.linux;
+            }
+
             LogWrite("Warning: Couldn't determine running platform");
             return Platform.win64; // arbitrary
         }
