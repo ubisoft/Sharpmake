@@ -2529,7 +2529,7 @@ namespace Sharpmake
         private static readonly string s_framework = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkName;
         private static readonly string s_frameworkDisplayName = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkDisplayName;
         private static readonly bool s_isDotNetCore = s_framework != null && !s_framework.StartsWith(".NETFramework");
-        public static string FrameworkDisplayName() => s_frameworkDisplayName ?? s_framework ?? "Unknown";
+        public static string FrameworkDisplayName() => !string.IsNullOrEmpty(s_frameworkDisplayName) ? s_frameworkDisplayName : !string.IsNullOrEmpty(s_framework) ? s_framework : "Unknown";
         public static bool IsRunningDotNetCore() => s_isDotNetCore;
     }
 }
