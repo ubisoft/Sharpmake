@@ -1592,6 +1592,7 @@ namespace Sharpmake.Generators.VisualStudio
                             bool isDontUsePrecomp = conf.PrecompSourceExclude.Contains(file.FileName) ||
                                                     conf.PrecompSourceExcludeFolders.Any(folder => file.FileName.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) ||
                                                     conf.PrecompSourceExcludeExtension.Contains(file.FileExtension);
+                            bool hasForcedIncludes = conf.ForcedIncludesFilters.Any(filter => filter.IsValid(file.FileName));
 
                             bool isExcludeFromBuild = conf.ResolvedSourceFilesBuildExclude.Contains(file.FileName);
                             bool consumeWinRTExtensions = conf.ConsumeWinRTExtensions.Contains(file.FileName) || conf.ResolvedSourceFilesWithCompileAsWinRTOption.Contains(file.FileName);
@@ -1636,6 +1637,7 @@ namespace Sharpmake.Generators.VisualStudio
                                               isExcludeFromBuild ||
                                               isPrecompSource ||
                                               (isDontUsePrecomp && hasPrecomp) ||
+                                              hasForcedIncludes ||
                                               isBlobFileDefine ||
                                               isResourceFileDefine ||
                                               isCompileAsCFile ||
@@ -1692,6 +1694,7 @@ namespace Sharpmake.Generators.VisualStudio
                                             fileGenerator.Write(Template.Project.ProjectFilesSourceDoNotCompileAsCLR);
                                         }
 
+                                        bool writeVanillaForcedInclude = false;
                                         if (isPrecompSource)
                                         {
                                             fileGenerator.Write(Template.Project.ProjectFilesSourcePrecompCreate);
@@ -1710,9 +1713,34 @@ namespace Sharpmake.Generators.VisualStudio
                                                 // vanilla list, as we only add it in case we use LLVM,
                                                 // but we could also have tested
                                                 // Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain()
-                                                using (fileGenerator.Declare("options", optionsForConf))
-                                                    fileGenerator.Write(Template.Project.ProjectFilesForcedIncludeVanilla);
+                                                writeVanillaForcedInclude = true;
                                             }
+                                        }
+
+                                        if (hasForcedIncludes)
+                                        {
+                                            Strings forcedIncludes = new Strings(conf.ForcedIncludesFilters
+                                                                                     .Where(filter => filter.IsValid(file.FileName))
+                                                                                     .SelectMany(filter => filter.ForcedIncludes));
+                                            var optionsForConf = context.ProjectConfigurationOptions[conf];
+                                            using (fileGenerator.Declare("ForcedIncludeFiles", forcedIncludes.JoinStrings(";")))
+                                            using (fileGenerator.Declare("options", optionsForConf))
+                                            {
+                                                if (writeVanillaForcedInclude)
+                                                {
+                                                    fileGenerator.Write(Template.Project.ProjectFilesAdditionalForcedIncludeVanilla);
+                                                }
+                                                else
+                                                {
+                                                    fileGenerator.Write(Template.Project.ProjectFilesAdditionalForcedInclude);
+                                                }
+                                            }
+                                        }
+                                        else if (writeVanillaForcedInclude)
+                                        {
+                                            var optionsForConf = context.ProjectConfigurationOptions[conf];
+                                            using (fileGenerator.Declare("options", optionsForConf))
+                                                fileGenerator.Write(Template.Project.ProjectFilesForcedIncludeVanilla);
                                         }
 
                                         if (consumeWinRTExtensions)

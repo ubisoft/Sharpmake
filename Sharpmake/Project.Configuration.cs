@@ -955,6 +955,8 @@ namespace Sharpmake
             /// </summary>
             public Strings ForcedIncludes = new Strings();
 
+            public List<ForcedIncludesFilter> ForcedIncludesFilters = new List<ForcedIncludesFilter>();
+
             /// <summary>
             /// List of files that are built to consume WinRT Extensions.
             /// </summary>
@@ -2431,6 +2433,12 @@ namespace Sharpmake
                         pathOption.Path = resolver.Resolve(pathOption.Path);
                         Util.ResolvePath(Project.SourceRootPath, ref pathOption.Path);
                     }
+                }
+
+                foreach (var filter in ForcedIncludesFilters)
+                {
+                    Util.ResolvePath(Project.SourceRootPath, ref filter.ExcludeFiles);
+                    Util.ResolvePath(Project.SourceRootPath, ref filter.FilterFiles);
                 }
 
                 foreach (var eventDictionary in new[]{

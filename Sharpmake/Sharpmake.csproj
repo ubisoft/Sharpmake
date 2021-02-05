@@ -85,6 +85,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FakeFileTree.cs" />
     <Compile Include="FastBuildSettings.cs" />
+    <Compile Include="FileListFilter.cs" />
     <Compile Include="FileSystemStringComparer.cs" />
     <Compile Include="GeneratedAssemblyConfig.cs" />
     <Compile Include="GenerationOutput.cs" />
