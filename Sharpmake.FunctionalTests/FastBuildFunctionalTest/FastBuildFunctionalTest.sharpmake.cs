@@ -545,6 +545,8 @@ namespace SharpmakeGen.FunctionalTests
 
             Bff.UnityResolver = new Bff.FragmentUnityResolver();
 
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+
             arguments.Generate<FastBuildFunctionalTestSolution>();
         }
     }
