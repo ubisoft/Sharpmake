@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Sharpmake.Generators;
@@ -193,12 +194,12 @@ namespace Sharpmake.Application
                         versionString += " " + informationalVersion;
                 }
 
-                var osplatform = Util.GetExecutingPlatform();
-                string framework = Util.IsRunningInMono() ? "Mono" : (Util.IsRunningDotNetCore() ? ".NET Core" : ".NET Framework");
-
-                LogWriteLine($"sharpmake {versionString} ({osplatform} | {framework})");
-                LogWriteLine("  arguments : {0}", CommandLine.GetProgramCommandLine());
-                LogWriteLine("  directory : {0}", Directory.GetCurrentDirectory());
+                LogWriteLine($"sharpmake {versionString}");
+                LogWriteLine("  platform: {0} - {1}", Util.GetExecutingPlatform().ToString(), RuntimeInformation.OSDescription);
+                LogWriteLine("  compiled with framework: {0}", Util.FrameworkDisplayName());
+                LogWriteLine("  running on framework: {0}", RuntimeInformation.FrameworkDescription);
+                LogWriteLine("  arguments: {0}", CommandLine.GetProgramCommandLine());
+                LogWriteLine("  directory: {0}", Directory.GetCurrentDirectory());
                 LogWriteLine(string.Empty);
 
                 // display help if wanted and quit

@@ -510,6 +510,14 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <Compile Include=""[include]"">
 ";
 
+                public static string SimpleCompileWithExclude =
+@"    <Compile Include=""[include]"" Exclude=""[exclude]""/>
+";
+
+                public static string CompileBeginWithExclude =
+@"    <Compile Include=""[include]"" Exclude=""[exclude]"">
+";
+
                 public static string CompileEnd =
 @"    </Compile>
 ";

@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -31,6 +30,7 @@ namespace Sharpmake
     public class Assembler
     {
         public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
 
         /// <summary>
         /// Extra user directory to load assembly from using statement detection
@@ -118,13 +118,11 @@ namespace Sharpmake
             ParameterInfo[] delegateParameterInfos = delegateMethodInfo.GetParameters();
             ParameterInfo delegateReturnInfos = delegateMethodInfo.ReturnParameter;
 
-            Assembly assembly;
-
             Assembler assembler = new Assembler();
             assembler.UseDefaultReferences = false;
             assembler.Assemblies.AddRange(assemblies);
 
-            assembly = assembler.BuildAssembly(fileInfo.FullName);
+            Assembly assembly = assembler.BuildAssembly(fileInfo.FullName);
 
             List<MethodInfo> matchMethods = new List<MethodInfo>();
 
@@ -467,7 +465,7 @@ namespace Sharpmake
                     dllStream,
                     pdbStream,
                     options: new EmitOptions(
-                        debugInformationFormat: Util.IsRunningOnUnix() ? DebugInformationFormat.PortablePdb : DebugInformationFormat.Pdb,
+                        debugInformationFormat: DebugInformationFormat.PortablePdb,
                         pdbFilePath: pdbFilePath
                     )
                 );
@@ -677,12 +675,7 @@ namespace Sharpmake
 
         public static IEnumerable<string> EnumeratePathToDotNetFramework()
         {
-            for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
-            {
-                string frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
-                if (frameworkDirectory != null)
-                    yield return frameworkDirectory;
-            }
+            yield return Path.GetDirectoryName(typeof(object).Assembly.Location);
         }
 
         private static LanguageVersion ConvertSharpmakeOptionToLanguageVersion(Options.CSharp.LanguageVersion languageVersion)

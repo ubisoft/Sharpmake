@@ -66,6 +66,7 @@ Settings
     [CachePath]
     [WorkerConnectionLimit]
     .AllowDBMigration_Experimental = [fastBuildAllowDBMigration]
+[AdditionalGlobalSettings]
 }
 ";
 
@@ -107,7 +108,9 @@ Compiler( '[fastbuildCompilerName]' )
     .Executable             = '[fastBuildCompilerExecutable]'
     .ExtraFiles             = [fastBuildExtraFiles]
     .CompilerFamily         = '[fastBuildCompilerFamily]'
+    .UseRelativePaths_Experimental = [fastBuildCompilerUseRelativePaths]
     [fastBuildVS2012EnumBugWorkaround]
+[fastBuildCompilerAdditionalSettings]
 }
 ";
 
@@ -205,6 +208,7 @@ Compiler( '[fastbuildCompilerName]' )
     .PCHOptions             = '""%1"" /Fp""%2"" /Fo""%3"" /c'
                             + ' /Yc""[cmdLineOptions.PrecompiledHeaderThrough]""'
                             + ' [fastBuildPCHForceInclude]'
+                            + ' [options.AdditionalCompilerOptionsOnPCHCreate]'
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
@@ -215,6 +219,7 @@ Compiler( '[fastbuildCompilerName]' )
     .PCHInputFile           = '[fastBuildPrecompiledSourceFile]'
     .PCHOutputFile          = '[cmdLineOptions.PrecompiledHeaderFile]'
     .PCHOptions             = '-o ""%2"" -c -x c++-header ""%1""'
+                            + ' [options.AdditionalCompilerOptionsOnPCHCreate]'
                             + ' $CompilerExtraOptions$'
                             + ' $CompilerOptimizations$'
 
@@ -223,8 +228,11 @@ Compiler( '[fastbuildCompilerName]' )
     .PCHOptionsDeoptimized = .PCHOptions
 ";
 
-                public static string UsePrecompClang = @"-include-pch $PCHOutputFile$";
+                public static string UsePrecompClang = @"-include-pch $PCHOutputFile$'
+                            + ' [options.AdditionalCompilerOptionsOnPCHUse]'
+                            + '";
                 public static string UsePrecomp = @"/Yu""[cmdLineOptions.PrecompiledHeaderThrough]"" /Fp""$PCHOutputFile$""'
+                            + ' [options.AdditionalCompilerOptionsOnPCHUse]'
                             + ' [fastBuildPCHForceInclude]";
 
                 public static string ResourceCompilerOptions = @"
@@ -564,6 +572,7 @@ Unity( '[unityFile.UnityName]' )
     .UnityOutputPattern                 = '[unityFile.UnityOutputPattern]'
     .UnityNumFiles                      =  [unityFile.UnityNumFiles]
     .UnityPCH                           = '[unityFile.UnityPCH]'
+    .UseRelativePaths_Experimental      = [unityFile.UseRelativePaths]
 }
 ";
 

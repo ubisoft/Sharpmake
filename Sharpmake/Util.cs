@@ -20,6 +20,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -78,7 +79,7 @@ namespace Sharpmake
 
         public static string PathMakeStandard(string path)
         {
-            return PathMakeStandard(path, !Util.IsRunningInMono());
+            return PathMakeStandard(path, !Util.IsRunningOnUnix());
         }
 
         /// <summary>
@@ -582,6 +583,38 @@ namespace Sharpmake
         internal static void ResolvePathAndFixCase(string root, ref IEnumerable<string> paths)
         {
             paths = paths.Select(path => ResolvePathAndFixCase(root, path));
+        }
+
+        [Flags]
+        internal enum KeyValuePairResolveType
+        {
+            ResolveKey = 1 << 0,
+            ResolveValue = 1 << 1,
+            ResolveAll = ResolveKey | ResolveValue
+        }
+
+        internal static void ResolvePathAndFixCase(string root, KeyValuePairResolveType resolveType, ref HashSet<KeyValuePair<string, string>> paths)
+        {
+            if (paths.Count == 0)
+                return;
+
+            foreach (var keyValuePair in paths.ToList())
+            {
+                string key = keyValuePair.Key;
+                string value = keyValuePair.Value;
+
+                if (resolveType.HasFlag(KeyValuePairResolveType.ResolveKey))
+                    key = ResolvePathAndFixCase(root, key);
+
+                if (resolveType.HasFlag(KeyValuePairResolveType.ResolveValue))
+                    value = ResolvePathAndFixCase(root, value);
+
+                if (keyValuePair.Key != key || keyValuePair.Value != value)
+                {
+                    paths.Remove(keyValuePair);
+                    paths.Add(new KeyValuePair<string, string>(key, value));
+                }
+            }
         }
 
         public static void ResolvePath(string root, ref Strings paths)
@@ -1386,7 +1419,7 @@ namespace Sharpmake
                     return 1;
                 }
                 // Both are still going, compare current elements
-                int comparison = Comparer.Default.Compare(iterator1.Current.ToString(), iterator2.Current.ToString());
+                int comparison = string.CompareOrdinal(iterator1.Current.ToString(), iterator2.Current.ToString());
                 // If elements are non-equal, we're done
                 if (comparison != 0)
                 {
@@ -1748,6 +1781,9 @@ namespace Sharpmake
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
+            if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+                return false;
+
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
                 Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty
@@ -2351,21 +2387,25 @@ namespace Sharpmake
                 return registryValue;
 
             string key = string.Empty;
-            try
+
+            if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
             {
-                using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
+                try
                 {
-                    if (localMachineKey != null)
+                    using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
                     {
-                        key = (string)localMachineKey.GetValue(value);
-                        if (enableLog && string.IsNullOrEmpty(key))
-                            LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                        if (localMachineKey != null)
+                        {
+                            key = (string)localMachineKey.GetValue(value);
+                            if (enableLog && string.IsNullOrEmpty(key))
+                                LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                        }
+                        else if (enableLog)
+                            LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                     }
-                    else if (enableLog)
-                        LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                 }
+                catch { }
             }
-            catch { }
 
             if (string.IsNullOrEmpty(key))
                 key = fallbackValue;
@@ -2451,7 +2491,7 @@ namespace Sharpmake
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
 
-        private static readonly bool s_isUnix = Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
+        private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         public static bool IsRunningOnUnix() => s_isUnix;
 
         public static Platform GetExecutingPlatform() => s_executingPlatform;
@@ -2459,39 +2499,37 @@ namespace Sharpmake
         private static readonly Platform s_executingPlatform = DetectExecutingPlatform();
         private static Platform DetectExecutingPlatform()
         {
-            switch (Environment.OSVersion.Platform)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                case PlatformID.Win32Windows:
-                case PlatformID.Win32NT:
-                    return (Environment.Is64BitOperatingSystem) ? Platform.win64 : Platform.win32;
-                case PlatformID.MacOSX:
-                    return Platform.mac;
-                case PlatformID.Unix: // could be mac or linux
-                    {
-                        bool isMacOs = false;
-                        try
-                        {
-                            var p = new System.Diagnostics.Process();
-                            p.StartInfo.UseShellExecute = false;
-                            p.StartInfo.RedirectStandardOutput = true;
-                            p.StartInfo.FileName = "uname";
-                            p.Start();
-                            string output = p.StandardOutput.ReadToEnd().Trim();
-                            p.WaitForExit();
-
-                            isMacOs = string.CompareOrdinal(output, "Darwin") == 0;
-                        }
-                        catch { }
-
-                        return isMacOs ? Platform.mac : Platform.linux;
-                    }
+                switch (RuntimeInformation.OSArchitecture)
+                {
+                    case Architecture.X86:
+                        return Platform.win32;
+                    case Architecture.X64:
+                        return Platform.win64;
+                    default:
+                        throw new NotSupportedException($"{RuntimeInformation.OSArchitecture} Architecture is not supported on Windows");
+                }
             }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return Platform.mac;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return Platform.linux;
+            }
+
             LogWrite("Warning: Couldn't determine running platform");
             return Platform.win64; // arbitrary
         }
 
         private static readonly string s_framework = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkName;
+        private static readonly string s_frameworkDisplayName = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkDisplayName;
         private static readonly bool s_isDotNetCore = s_framework != null && !s_framework.StartsWith(".NETFramework");
+        public static string FrameworkDisplayName() => !string.IsNullOrEmpty(s_frameworkDisplayName) ? s_frameworkDisplayName : !string.IsNullOrEmpty(s_framework) ? s_framework : "Unknown";
         public static bool IsRunningDotNetCore() => s_isDotNetCore;
     }
 }

@@ -35,7 +35,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.v4_7_2
+                    framework: Assembler.SharpmakeDotNetFramework
                 )
             );
             return result.ToArray();
@@ -55,6 +55,16 @@ namespace SharpmakeGen
                 _generateXmlDoc = generateXmlDoc;
 
                 RootPath = Globals.AbsoluteRootPath;
+
+                // Use the new csproj style
+                ProjectSchema = CSharpProjectSchema.NetCore;
+
+                // prevents output dir to have a framework subfolder
+                CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
+
+                // we need to disable determinism while because we are using wildcards in assembly versions
+                // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
+                CustomProperties.Add("Deterministic", "false");
 
                 if (excludeSharpmakeFiles)
                     SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");

@@ -40,6 +40,7 @@ namespace Sharpmake.Generators.FastBuild
             public string UnityOutputPattern                  = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern of output Unity file names (default Unity*cpp)
             public string UnityNumFiles                       = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
             public string UnityPCH                            = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
+            public string UseRelativePaths                    = FileGeneratorUtilities.RemoveLineTag; // (optional) Use relative paths for generated Unity files
 
             public const string DefaultUnityInputPatternExtension = ".cpp";
 
@@ -63,6 +64,7 @@ namespace Sharpmake.Generators.FastBuild
                     hash = hash * 23 + UnityOutputPattern.GetHashCode();
                     hash = hash * 23 + UnityNumFiles.GetHashCode();
                     hash = hash * 23 + UnityPCH.GetHashCode();
+                    hash = hash * 23 + UseRelativePaths.GetHashCode();
 
                     return hash;
                 }
@@ -93,7 +95,8 @@ namespace Sharpmake.Generators.FastBuild
                     && string.Equals(UnityInputIsolateWritableFilesLimit, unity.UnityInputIsolateWritableFilesLimit)
                     && string.Equals(UnityOutputPattern,                  unity.UnityOutputPattern)
                     && string.Equals(UnityNumFiles,                       unity.UnityNumFiles)
-                    && string.Equals(UnityPCH,                            unity.UnityPCH);
+                    && string.Equals(UnityPCH,                            unity.UnityPCH)
+                    && string.Equals(UseRelativePaths,                    unity.UseRelativePaths);
             }
         }
 

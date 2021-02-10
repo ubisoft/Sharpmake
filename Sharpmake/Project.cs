@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1709,15 +1709,28 @@ namespace Sharpmake
                     var includePathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(IncludePathsExcludeFromWarningRegex).ToArray();
                     var libraryPathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(LibraryPathsExcludeFromWarningRegex).ToArray();
 
-                    // check if the files marked as excluded from build still exist
+                    // check if the files marked with specific options still exist
                     foreach (var array in new Dictionary<Strings, string> {
-                            {conf.ResolvedSourceFilesBuildExclude,                nameof(conf.ResolvedSourceFilesBuildExclude)},
-                            {conf.ResolvedSourceFilesBlobExclude,                 nameof(conf.ResolvedSourceFilesBlobExclude)},
                             {conf.ResolvedSourceFilesWithCompileAsCLROption,      nameof(conf.ResolvedSourceFilesWithCompileAsCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsCOption,        nameof(conf.ResolvedSourceFilesWithCompileAsCOption)},
                             {conf.ResolvedSourceFilesWithCompileAsCPPOption,      nameof(conf.ResolvedSourceFilesWithCompileAsCPPOption)},
                             {conf.ResolvedSourceFilesWithCompileAsNonCLROption,   nameof(conf.ResolvedSourceFilesWithCompileAsNonCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithCompileAsWinRTOption)},
+                        })
+                    {
+                        foreach (string file in array.Key)
+                        {
+                            if (!File.Exists(file))
+                            {
+                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Error: File contained in {array.Value} doesn't exist: {file}.");
+                            }
+                        }
+                    }
+
+                    // check if the files marked as excluded from build still exist
+                    foreach (var array in new Dictionary<Strings, string> {
+                            {conf.ResolvedSourceFilesBuildExclude,                nameof(conf.ResolvedSourceFilesBuildExclude)},
+                            {conf.ResolvedSourceFilesBlobExclude,                 nameof(conf.ResolvedSourceFilesBlobExclude)},
                             {conf.ResolvedSourceFilesWithExcludeAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithExcludeAsWinRTOption)},
                             {conf.PrecompSourceExclude,                           nameof(conf.PrecompSourceExclude)}
                         })
@@ -1726,7 +1739,7 @@ namespace Sharpmake
                         {
                             if (!File.Exists(file))
                             {
-                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Error: File contained in {array.Value} doesn't exist: {file}.");
+                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: File contained in {array.Value} doesn't exist: {file}.", onlyWarn: true);
                             }
                         }
                     }
@@ -1752,6 +1765,10 @@ namespace Sharpmake
                     var platformLibraryPaths = configTasks.GetPlatformLibraryPaths(conf);
                     allLibraryPaths.AddRange(platformLibraryPaths);
 
+                    // remove all the rooted files
+                    var allRootedFiles = allLibraryFiles.Where(file => Path.IsPathRooted(file)).ToArray();
+                    allLibraryFiles.RemoveRange(allRootedFiles);
+
                     string platformLibExtension = "." + configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
@@ -1765,7 +1782,7 @@ namespace Sharpmake
                             var toRemove = new List<string>();
                             foreach (string file in allLibraryFiles)
                             {
-                                string path = Path.IsPathRooted(file) ? file : Path.Combine(folder, file);
+                                string path = Path.Combine(folder, file);
                                 if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, "lib" + file + platformLibExtension)))
                                     toRemove.Add(file);
                             }
@@ -1773,6 +1790,9 @@ namespace Sharpmake
                             allLibraryFiles.RemoveRange(toRemove);
                         }
                     }
+
+                    // Add all rooted files that are missing
+                    allLibraryFiles.Add(allRootedFiles.Where(file => !File.Exists(file)).ToArray());
 
                     // everything that remains is a missing library file
                     foreach (string file in allLibraryFiles)
@@ -2066,6 +2086,13 @@ namespace Sharpmake
         public FileType FileType = FileType.File;
     }
 
+    [Resolver.Resolvable]
+    public class GlobSetting
+    {
+        public string Include;
+        public string Exclude;
+    }
+
     public enum CSharpProjectType
     {
         Test,
@@ -2292,6 +2319,7 @@ namespace Sharpmake
         public List<BootstrapperPackage> BootstrapperPackages = new List<BootstrapperPackage>();
         public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
         public List<PublishFile> PublishFiles = new List<PublishFile>();
+        public List<GlobSetting> Globs = new List<GlobSetting>();
 
         /// <summary>
         /// If set to true. Will explicit the RestoreProjectStyle in the project file

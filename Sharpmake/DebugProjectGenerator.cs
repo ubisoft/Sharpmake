@@ -230,7 +230,7 @@ namespace Sharpmake
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_7_2
+                Assembler.SharpmakeDotNetFramework
             );
         }
 
@@ -310,6 +310,16 @@ namespace Sharpmake
             VsctExtension.Clear();
 
             Name = _projectInfo.DisplayName;
+
+            // Use the new csproj style
+            ProjectSchema = CSharpProjectSchema.NetCore;
+
+            // prevents output dir to have a framework subfolder
+            CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
+
+            // we need to disable determinism while because we are using wildcards in assembly versions
+            // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
+            CustomProperties.Add("Deterministic", "false");
 
             AddTargets(DebugProjectGenerator.GetTargets());
         }
