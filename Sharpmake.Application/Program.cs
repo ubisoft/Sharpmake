@@ -206,7 +206,7 @@ namespace Sharpmake.Application
                 if ((CommandLine.GetProgramCommandLine().Length == 0) || CommandLine.ContainParameter("help"))
                 {
                     LogWriteLine(CommandLine.GetCommandLineHelp(typeof(Argument), false));
-                    return (int)ExitCode.Success;
+                    return CommandLine.ContainParameter("help") ? (int)ExitCode.Success : (int)ExitCode.Error;
                 }
 
                 AppDomain.CurrentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
