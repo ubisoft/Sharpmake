@@ -368,6 +368,17 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { context.Options["LanguageStandard"] = "stdcpp17"; context.CommandLineOptions["LanguageStandard"] = "/std:c++17"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { context.Options["LanguageStandard"] = "stdcpplatest"; context.CommandLineOptions["LanguageStandard"] = "/std:c++latest"; })
                 );
+
+                //Options.Vc.Compiler.CLanguageStandard.
+                //    Legacy                                  LanguageStandard_C=""
+                //    C11                                     LanguageStandard_C="stdc11"                                    /std:c11
+                //    C17                                     LanguageStandard_C="stdc17"                                    /std:c17
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.Legacy, () => { context.Options["LanguageStandard_C"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard_C"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.C11,    () => { context.Options["LanguageStandard_C"] = "stdc11"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c11"; }),
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.C17,    () => { context.Options["LanguageStandard_C"] = "stdc17"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c17"; })
+                );
             }
 
             // Compiler section

@@ -378,6 +378,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.RemoveUnreferencedCodeData]'
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.OpenMP]'
+            + ' [cmdLineOptions.LanguageStandard_C]'
             + ' [cmdLineOptions.LanguageStandard]'
             + ' [cmdLineOptions.ConformanceMode]'
             // Output Files options
