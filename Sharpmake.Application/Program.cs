@@ -195,11 +195,11 @@ namespace Sharpmake.Application
                 }
 
                 LogWriteLine($"sharpmake {versionString}");
+                LogWriteLine("  arguments: {0}", CommandLine.GetProgramCommandLine());
+                LogWriteLine("  directory: {0}", Directory.GetCurrentDirectory());
                 LogWriteLine("  platform: {0} - {1}", Util.GetExecutingPlatform().ToString(), RuntimeInformation.OSDescription);
                 LogWriteLine("  compiled with framework: {0}", Util.FrameworkDisplayName());
                 LogWriteLine("  running on framework: {0}", RuntimeInformation.FrameworkDescription);
-                LogWriteLine("  arguments: {0}", CommandLine.GetProgramCommandLine());
-                LogWriteLine("  directory: {0}", Directory.GetCurrentDirectory());
                 LogWriteLine(string.Empty);
 
                 // display help if wanted and quit
