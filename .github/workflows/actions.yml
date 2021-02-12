@@ -48,3 +48,7 @@ jobs:
       - name: RegressionTest
         if: runner.os == 'Windows'
         run: python regression_test.py
+
+      - name: FunctionalTest
+        if: runner.os == 'Windows'
+        run: python functional_test.py
