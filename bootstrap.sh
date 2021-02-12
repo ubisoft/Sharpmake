@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Script arguments:
+# %1: Main sharpmake file
+# $2: Target(Normally should be Debug or Release)
+# if arguments are omitted, defaults to Sharpmake.Main.sharpmake.cs and Debug
 
 function success {
 	echo Bootstrap succeeded \!
@@ -25,9 +29,11 @@ fi
 # workaround for https://github.com/mono/mono/issues/6752
 TERM=xterm
 
-SHARPMAKE_EXECUTABLE=$CURRENT_DIR/tmp/bin/debug/Sharpmake.Application.exe
+SHARPMAKE_OPTIM=${2:-"debug"}
 
-$CURRENT_DIR/CompileSharpmake.sh $CURRENT_DIR/Sharpmake.Application/Sharpmake.Application.csproj Debug AnyCPU
+SHARPMAKE_EXECUTABLE=$CURRENT_DIR/tmp/bin/$SHARPMAKE_OPTIM/Sharpmake.Application.exe
+
+$CURRENT_DIR/CompileSharpmake.sh $CURRENT_DIR/Sharpmake.Application/Sharpmake.Application.csproj $SHARPMAKE_OPTIM AnyCPU
 if [ $? -ne 0 ]; then
     echo "The build has failed."
     if [ -f $SHARPMAKE_EXECUTABLE ]; then
@@ -45,7 +51,7 @@ fi
 SHARPMAKE_MAIN=${1:-"$CURRENT_DIR/Sharpmake.Main.sharpmake.cs"}
 
 echo "Generating Sharpmake solution..."
-SM_CMD="mono --debug \"${SHARPMAKE_EXECUTABLE}\" \"/sources(\\\"${SHARPMAKE_MAIN}\\\")\" /verbose"
+SM_CMD="mono --debug \"${SHARPMAKE_EXECUTABLE}\" \"/sources('${SHARPMAKE_MAIN}') /verbose\""
 echo $SM_CMD
 eval $SM_CMD || error
 
