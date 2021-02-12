@@ -29,12 +29,12 @@ jobs:
         shell: bash
         run: ./bootstrap.sh
 
-      - name: CompileSharpmake.bat
+      - name: CompileSharpmake.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         shell: cmd
         run: CompileSharpmake.bat Sharpmake.sln "${{ matrix.configuration }}" "Any CPU"
 
-      - name: CompileSharpmake.sh
+      - name: CompileSharpmake.sh ${{ matrix.configuration }}
         if: runner.os != 'Windows'
         shell: bash
         run: ./CompileSharpmake.sh Sharpmake.sln "${{ matrix.configuration }}"
