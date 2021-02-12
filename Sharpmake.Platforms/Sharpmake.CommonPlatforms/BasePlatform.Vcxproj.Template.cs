@@ -62,6 +62,7 @@ namespace Sharpmake
       <ForceConformanceInForLoopScope>[options.ForceConformanceInForLoopScope]</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
       <OpenMPSupport>[options.OpenMP]</OpenMPSupport>
+      <LanguageStandard_C>[options.LanguageStandard_C]</LanguageStandard_C>
       <LanguageStandard>[options.LanguageStandard]</LanguageStandard>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <AssemblerOutput>NoListing</AssemblerOutput>

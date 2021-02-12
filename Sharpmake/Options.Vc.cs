@@ -573,6 +573,16 @@ namespace Sharpmake
                     Latest
                 }
 
+                public enum CLanguageStandard
+                {
+                    [Default]
+                    Legacy,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    C11,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    C17
+                }
+
                 public enum SupportJustMyCode
                 {
                     [Default]
