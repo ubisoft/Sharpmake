@@ -94,7 +94,7 @@ class FastBuildFunctionalTest(FunctionalTest):
 
     def verifyCustomBuildEvents(self, projectDir):
         output_dir = os.path.join(projectDir, self.directory, "projects", "output")
-        target_dirs = ["debug_fastbuild_noblob_vs2017", "debug_fastbuild_vs2017", "release_fastbuild_noblob_vs2017", "release_fastbuild_vs2017"]
+        target_dirs = ["debug_fastbuild_noblob_vs2019", "debug_fastbuild_vs2019", "release_fastbuild_noblob_vs2019", "release_fastbuild_vs2019"]
 
         for target_dir in target_dirs:
             target_dir = os.path.join(output_dir, target_dir)

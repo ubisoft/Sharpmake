@@ -96,7 +96,7 @@ namespace SharpmakeGen.FunctionalTests
             var targets = new List<ITarget> {
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2017,
+                    DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
                     Blob.NoBlob,
                     BuildSystem.MSBuild
