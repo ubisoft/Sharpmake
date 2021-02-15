@@ -376,8 +376,8 @@ namespace Sharpmake.Generators.VisualStudio
                 context.SelectOption
                 (
                 Options.Option(Options.Vc.Compiler.CLanguageStandard.Legacy, () => { context.Options["LanguageStandard_C"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard_C"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Options.Option(Options.Vc.Compiler.CLanguageStandard.C11,    () => { context.Options["LanguageStandard_C"] = "stdc11"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c11"; }),
-                Options.Option(Options.Vc.Compiler.CLanguageStandard.C17,    () => { context.Options["LanguageStandard_C"] = "stdc17"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c17"; })
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.C11, () => { context.Options["LanguageStandard_C"] = "stdc11"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c11"; }),
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.C17, () => { context.Options["LanguageStandard_C"] = "stdc17"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c17"; })
                 );
             }
 
@@ -1086,7 +1086,7 @@ namespace Sharpmake.Generators.VisualStudio
             relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFiles.Select(x => new KeyValuePair<string, string>(x, conf.TargetPath)));
             relativePostBuildCopies.AddRange(conf.EventPostBuildCopies);
             relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFilesToSubDirectory.Select(x => new KeyValuePair<string, string>(x.Key, Path.Combine(conf.TargetPath, x.Value))));
-            
+
             for (int i = 0; i < relativePostBuildCopies.Count;)
             {
                 string sourceFileFullPath = relativePostBuildCopies[i].Key;

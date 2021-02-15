@@ -61,7 +61,7 @@ namespace HelloXCode
             //       different names per configurations to work properly...
             //conf.TargetFileName += "_" + target.Optimization.ToString().ToLowerInvariant().First(); // suffix with lowered first letter of optim
             //if (conf.IsFastBuild)
-                //conf.TargetFileName += "x";
+            //conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
         }

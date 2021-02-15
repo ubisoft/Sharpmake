@@ -2866,7 +2866,7 @@ namespace Sharpmake
                         _resolvedTargetDependsFiles.AddRange(dependency.TargetDependsFiles);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
-                        
+
                         foreach (var keyValuePair in dependency.TargetCopyFilesToSubDirectory)
                         {
                             _resolvedTargetCopyFilesToSubDirectory.Add(keyValuePair);
