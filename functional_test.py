@@ -5,6 +5,7 @@
 # This script supports Python 3.
 
 import os.path
+import platform
 import sys
 
 if os.name != "nt":
@@ -15,7 +16,7 @@ class FunctionalTest(object):
     def __init__(self, directory, script_name, project_root = ""):
         self.directory = directory
         self.script_name = script_name
-        self.use_mono = os.name == "posix"
+        self.runs_on_unix = os.name == "posix"
         if project_root == "":
             self.project_root = directory
         else:
@@ -28,12 +29,12 @@ class FunctionalTest(object):
             os.chdir(pwd)
 
             # Detects the path of the Sharpmake executable
-            sharpmake_path = find_target_path(os.path.join(entry_path, "bin"), "Sharpmake.Application.exe")
+            sharpmake_path = find_sharpmake_path()
 
             write_line("Using sharpmake " + sharpmake_path)
 
             # Builds the command line argument list.
-            sources = "/sources(@\"{}\")".format(os.path.join(self.directory, self.script_name))
+            sources = "/sources(@\'{}\')".format(os.path.join(self.directory, self.script_name))
             verbose = "/verbose"
 
             args = [
@@ -41,11 +42,9 @@ class FunctionalTest(object):
                 verbose
             ]
 
-            if self.use_mono:
-                args_string = "\" \"".join([arg.replace('"','\\"') for arg in args])
-                cmd_line = "mono --debug {} \"{}\"".format(sharpmake_path, args_string)
-            else:
-                cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
+            cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
+            if self.runs_on_unix:
+                cmd_line = "mono --debug " + cmd_line
 
             generation_exit_code = os.system(cmd_line)
 
@@ -95,7 +94,7 @@ class FastBuildFunctionalTest(FunctionalTest):
 
     def verifyCustomBuildEvents(self, projectDir):
         output_dir = os.path.join(projectDir, self.directory, "projects", "output")
-        target_dirs = ["debug_fastbuild_noblob_vs2017", "debug_fastbuild_vs2017", "release_fastbuild_noblob_vs2017", "release_fastbuild_vs2017"]
+        target_dirs = ["debug_fastbuild_noblob_vs2019", "debug_fastbuild_vs2019", "release_fastbuild_noblob_vs2019", "release_fastbuild_vs2019"]
 
         for target_dir in target_dirs:
             target_dir = os.path.join(output_dir, target_dir)
@@ -130,7 +129,9 @@ funcTests = [
 
 def build_with_fastbuild(root_dir, test_dir):
     entry_path = os.getcwd()
-    fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", "FBuild.exe");
+    platformSystem = platform.system()
+    fastBuildInfo = ("Linux-x64", "fbuild") if platformSystem == "Linux" else ("OSX-x64", "FBuild") if platformSystem == "Darwin" else ("Windows-x64", "FBuild.exe")
+    fastBuildPath = os.path.join(entry_path, "tools", "FastBuild", fastBuildInfo[0], fastBuildInfo[1]);
     if not os.path.isfile(fastBuildPath):
         return -1
 
@@ -142,10 +143,10 @@ def build_with_fastbuild(root_dir, test_dir):
     write_line("Working dir: " + working_dir)
     return os.system(cmd_line)
 
-def find_target_path(directory, target):
+def find_sharpmake_path():
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join(directory, optim_token, target))
+        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, "Sharpmake.Application.exe"))
         if os.path.isfile(path):
             return path
 
@@ -163,6 +164,10 @@ def red_bg():
 def green_bg():
     if os.name == "nt":
         os.system("color 2F")
+        
+def black_bg():
+    if os.name == "nt":
+        os.system("color 0F")
 
 def pause(timeout=None):
     if timeout is None:
@@ -216,5 +221,6 @@ def launch_functional_tests():
     finally:
         os.chdir(entry_path)
 
+black_bg()
 exit_code = launch_functional_tests()
 sys.exit(exit_code)

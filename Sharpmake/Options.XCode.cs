@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
 using System.Linq;
 
 namespace Sharpmake
@@ -77,21 +79,17 @@ namespace Sharpmake
                     GNU11
                 }
 
-                public class CodeSignEntitlements
+                public class CodeSignEntitlements : StringOption
                 {
-                    public string Value;
-                    public CodeSignEntitlements(string value)
+                    public CodeSignEntitlements(string value) : base(value)
                     {
-                        Value = value;
                     }
                 }
 
-                public class CodeSigningIdentity
+                public class CodeSigningIdentity : StringOption
                 {
-                    public string Value;
-                    public CodeSigningIdentity(string value)
+                    public CodeSigningIdentity(string value) : base(value)
                     {
-                        Value = value;
                     }
                 }
 
@@ -144,9 +142,11 @@ namespace Sharpmake
                     public DevelopmentTeam(string value) : base(value) { }
                 }
 
-                public class ProvisioningStyle : StringOption
+                public enum ProvisioningStyle
                 {
-                    public ProvisioningStyle(string value) : base(value) { }
+                    [Default]
+                    Automatic,
+                    Manual
                 }
 
                 public enum DeploymentPostProcessing
@@ -186,6 +186,7 @@ namespace Sharpmake
                     { }
                 }
 
+                [Obsolete("AssetCatalog is not used anymore.", error: true)]
                 public class AssetCatalog : Strings
                 {
                     public AssetCatalog(params string[] paths)
@@ -327,12 +328,10 @@ namespace Sharpmake
                     Enable
                 }
 
-                public class ProvisioningProfile
+                public class ProvisioningProfile : StringOption
                 {
-                    public string ProfileName;
-                    public ProvisioningProfile(string profileName)
+                    public ProvisioningProfile(string profileName) : base(profileName)
                     {
-                        ProfileName = profileName;
                     }
                 }
 
@@ -387,13 +386,14 @@ namespace Sharpmake
                     Disable
                 }
 
-                public class TargetedDeviceFamily
+                [Flags]
+                public enum TargetedDeviceFamily
                 {
-                    public string Value;
-                    public TargetedDeviceFamily(string value)
-                    {
-                        Value = value;
-                    }
+                    [Default]
+                    Ios = 1 << 0,
+                    Ipad = 1 << 1,
+
+                    IosAndIpad = Ios | Ipad
                 }
 
                 public class AssetCatalogCompilerAppIconName : StringOption

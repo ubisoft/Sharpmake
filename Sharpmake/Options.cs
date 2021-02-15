@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -438,10 +438,9 @@ namespace Sharpmake
 
             for (int i = options.Count - 1; i >= 0; --i)
             {
-                string option = options[i] as string;
-                if (option is T)
+                if (options[i] is T stringOption)
                 {
-                    return option;
+                    return stringOption.Value;
                 }
             }
             return string.Empty;

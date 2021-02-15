@@ -61,7 +61,7 @@ _ReSharper*/
 project.json
 project.lock.json
 Sharpmake.VC.db
-
+.vscode
 .idea
 
 # Desktop Services Store on MacOS

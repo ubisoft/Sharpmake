@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -294,11 +294,14 @@ namespace Sharpmake
                                     {
                                         Version toolsVersion = compilerDevEnv.Value.GetVisualStudioVCToolsVersion();
 
-                                        if (toolsVersion >= new Version("14.22.27905"))
+                                        if (toolsVersion >= new Version("14.22.27905")) // 16.3.2
                                             extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
 
-                                        if (toolsVersion >= new Version("14.25.28610"))
+                                        if (toolsVersion >= new Version("14.25.28610")) // 16.5
                                             extraFiles.Add(@"$ExecutableRootPath$\vcruntime140_1.dll");
+
+                                        if (toolsVersion >= new Version("14.28.29333")) // 16.8
+                                            extraFiles.Add(@"$ExecutableRootPath$\msvcp140_atomic_wait.dll");
                                     }
 
                                     try

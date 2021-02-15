@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -423,7 +423,6 @@ namespace Sharpmake
 
             options["ExcludedSourceFileNames"] = XCodeUtil.XCodeFormatList(conf.ResolvedSourceFilesBuildExclude, 4);
             options["SpecificLibraryPaths"] = FileGeneratorUtilities.RemoveLineTag;
-            options["TargetedDeviceFamily"] = "1,2";
             options["BuildDirectory"] = (conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath;
 
             SelectPrecompiledHeaderOptions(context);
@@ -501,17 +500,12 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU17, () => options["CppStandard"] = "gnu++17")
             );
 
-            Options.XCode.Compiler.DevelopmentTeam developmentTeam = Options.GetObject<Options.XCode.Compiler.DevelopmentTeam>(conf);
-            if (developmentTeam != null)
-                options["DevelopmentTeam"] = developmentTeam.Value;
-            else
-                options["DevelopmentTeam"] = FileGeneratorUtilities.RemoveLineTag;
+            options["DevelopmentTeam"] = Options.StringOption.Get<Options.XCode.Compiler.DevelopmentTeam>(conf);
 
-            Options.XCode.Compiler.ProvisioningStyle provisioningStyle = Options.GetObject<Options.XCode.Compiler.ProvisioningStyle>(conf);
-            if (provisioningStyle != null)
-                options["ProvisioningStyle"] = provisioningStyle.Value;
-            else
-                options["ProvisioningStyle"] = "Automatic";
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.ProvisioningStyle.Automatic, () => { options["ProvisioningStyle"] = "Automatic"; }),
+                Options.Option(Options.XCode.Compiler.ProvisioningStyle.Manual, () => { options["ProvisioningStyle"] = "Manual"; })
+            );
 
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.DebugInformationFormat.Dwarf, () => options["DebugInformationFormat"] = "dwarf"),
@@ -667,11 +661,7 @@ namespace Sharpmake
                     throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
             }
 
-            Options.XCode.Compiler.ProvisioningProfile provisioningProfile = Options.GetObject<Options.XCode.Compiler.ProvisioningProfile>(conf);
-            if (provisioningProfile != null)
-                options["ProvisioningProfile"] = provisioningProfile.ProfileName;
-            else
-                options["ProvisioningProfile"] = FileGeneratorUtilities.RemoveLineTag;
+            options["ProvisioningProfile"] = Options.StringOption.Get<Options.XCode.Compiler.ProvisioningProfile>(conf);
 
             Options.XCode.Compiler.SDKRoot sdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
             if (sdkRoot != null)
@@ -682,12 +672,11 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.SkipInstall.Enable, () => options["SkipInstall"] = "YES")
             );
 
-            Options.XCode.Compiler.TargetedDeviceFamily targetedDeviceFamily = Options.GetObject<Options.XCode.Compiler.TargetedDeviceFamily>(conf);
-            if (targetedDeviceFamily != null)
-                options["TargetedDeviceFamily"] = targetedDeviceFamily.Value;
-            else
-                options["TargetedDeviceFamily"] = FileGeneratorUtilities.RemoveLineTag;
-
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad, () => options["TargetedDeviceFamily"] = "1,2"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ios, () => options["TargetedDeviceFamily"] = "1"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2")
+            );
 
             Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);
             if (validArchs != null)

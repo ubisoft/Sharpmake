@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,21 +25,22 @@ namespace Sharpmake.Generators.FastBuild
     {
         public class Unity
         {
-            public string UnityName                           = string.Empty; // Name of unity
-            public string UnityOutputPath                     = string.Empty; // Path to output generated Unity files
-            public string UnityInputPath                      = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) to find files
-            public string UnityInputExcludePath               = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) in which to ignore files
-            public string UnityInputExcludePattern            = FileGeneratorUtilities.RemoveLineTag; // (optional) Wildcard pattern(s) of files/folders to exclude
-            public string UnityInputPattern                   = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern(s) of files to find (default *cpp)
-            public string UnityInputPathRecurse               = FileGeneratorUtilities.RemoveLineTag; // (optional) Recurse when searching for files (default true)
-            public string UnityInputFiles                     = FileGeneratorUtilities.RemoveLineTag; // (optional) Explicit list of files to include
-            public string UnityInputExcludedFiles             = FileGeneratorUtilities.RemoveLineTag; // (optional) Explicit list of excluded files (partial, root-relative of full path)
-            public string UnityInputObjectLists               = FileGeneratorUtilities.RemoveLineTag; // (optional) ObjectList(s) to use as input
-            public string UnityInputIsolateWritableFiles      = FileGeneratorUtilities.RemoveLineTag; // (optional) Build writable files individually (default false)
+            public string UnityName = string.Empty; // Name of unity
+            public string UnityOutputPath = string.Empty; // Path to output generated Unity files
+            public string UnityInputPath = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) to find files
+            public string UnityInputExcludePath = FileGeneratorUtilities.RemoveLineTag; // (optional) Path (or paths) in which to ignore files
+            public string UnityInputExcludePattern = FileGeneratorUtilities.RemoveLineTag; // (optional) Wildcard pattern(s) of files/folders to exclude
+            public string UnityInputPattern = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern(s) of files to find (default *cpp)
+            public string UnityInputPathRecurse = FileGeneratorUtilities.RemoveLineTag; // (optional) Recurse when searching for files (default true)
+            public string UnityInputFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Explicit list of files to include
+            public string UnityInputExcludedFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Explicit list of excluded files (partial, root-relative of full path)
+            public string UnityInputObjectLists = FileGeneratorUtilities.RemoveLineTag; // (optional) ObjectList(s) to use as input
+            public string UnityInputIsolateWritableFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Build writable files individually (default false)
             public string UnityInputIsolateWritableFilesLimit = FileGeneratorUtilities.RemoveLineTag; // (optional) Disable isolation when many files are writable (default 0)
-            public string UnityOutputPattern                  = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern of output Unity file names (default Unity*cpp)
-            public string UnityNumFiles                       = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
-            public string UnityPCH                            = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
+            public string UnityOutputPattern = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern of output Unity file names (default Unity*cpp)
+            public string UnityNumFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
+            public string UnityPCH = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
+            public string UseRelativePaths = FileGeneratorUtilities.RemoveLineTag; // (optional) Use relative paths for generated Unity files
 
             public const string DefaultUnityInputPatternExtension = ".cpp";
 
@@ -63,6 +64,7 @@ namespace Sharpmake.Generators.FastBuild
                     hash = hash * 23 + UnityOutputPattern.GetHashCode();
                     hash = hash * 23 + UnityNumFiles.GetHashCode();
                     hash = hash * 23 + UnityPCH.GetHashCode();
+                    hash = hash * 23 + UseRelativePaths.GetHashCode();
 
                     return hash;
                 }
@@ -79,21 +81,22 @@ namespace Sharpmake.Generators.FastBuild
 
             private bool Equals(Unity unity)
             {
-                return string.Equals(UnityName,                           unity.UnityName)
-                    && string.Equals(UnityOutputPath,                     unity.UnityOutputPath)
-                    && string.Equals(UnityInputPath,                      unity.UnityInputPath)
-                    && string.Equals(UnityInputExcludePath,               unity.UnityInputExcludePath)
-                    && string.Equals(UnityInputExcludePattern,            unity.UnityInputExcludePattern)
-                    && string.Equals(UnityInputPattern,                   unity.UnityInputPattern)
-                    && string.Equals(UnityInputPathRecurse,               unity.UnityInputPathRecurse)
-                    && string.Equals(UnityInputFiles,                     unity.UnityInputFiles)
-                    && string.Equals(UnityInputExcludedFiles,             unity.UnityInputExcludedFiles)
-                    && string.Equals(UnityInputObjectLists,               unity.UnityInputObjectLists)
-                    && string.Equals(UnityInputIsolateWritableFiles,      unity.UnityInputIsolateWritableFiles)
+                return string.Equals(UnityName, unity.UnityName)
+                    && string.Equals(UnityOutputPath, unity.UnityOutputPath)
+                    && string.Equals(UnityInputPath, unity.UnityInputPath)
+                    && string.Equals(UnityInputExcludePath, unity.UnityInputExcludePath)
+                    && string.Equals(UnityInputExcludePattern, unity.UnityInputExcludePattern)
+                    && string.Equals(UnityInputPattern, unity.UnityInputPattern)
+                    && string.Equals(UnityInputPathRecurse, unity.UnityInputPathRecurse)
+                    && string.Equals(UnityInputFiles, unity.UnityInputFiles)
+                    && string.Equals(UnityInputExcludedFiles, unity.UnityInputExcludedFiles)
+                    && string.Equals(UnityInputObjectLists, unity.UnityInputObjectLists)
+                    && string.Equals(UnityInputIsolateWritableFiles, unity.UnityInputIsolateWritableFiles)
                     && string.Equals(UnityInputIsolateWritableFilesLimit, unity.UnityInputIsolateWritableFilesLimit)
-                    && string.Equals(UnityOutputPattern,                  unity.UnityOutputPattern)
-                    && string.Equals(UnityNumFiles,                       unity.UnityNumFiles)
-                    && string.Equals(UnityPCH,                            unity.UnityPCH);
+                    && string.Equals(UnityOutputPattern, unity.UnityOutputPattern)
+                    && string.Equals(UnityNumFiles, unity.UnityNumFiles)
+                    && string.Equals(UnityPCH, unity.UnityPCH)
+                    && string.Equals(UseRelativePaths, unity.UseRelativePaths);
             }
         }
 
@@ -123,6 +126,7 @@ namespace Sharpmake.Generators.FastBuild
             public string WorkingPath;
             public bool UseStdOutAsOutput;
             public bool AlwaysShowOutput;
+            public bool ExecAlways;
 
             public ExecNode(string buildStepKey, Project.Configuration.BuildStepExecutable buildStep)
             {
@@ -137,6 +141,7 @@ namespace Sharpmake.Generators.FastBuild
                 WorkingPath = buildStep.ExecutableWorkingDirectory;
                 UseStdOutAsOutput = buildStep.FastBuildUseStdOutAsOutput;
                 AlwaysShowOutput = buildStep.FastBuildAlwaysShowOutput;
+                ExecAlways = buildStep.FastBuildExecAlways;
             }
 
             public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
@@ -152,6 +157,7 @@ namespace Sharpmake.Generators.FastBuild
                 using (resolver.NewScopedParameter("fastBuildPrebuildUseStdOutAsOutput", UseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildPrebuildAlwaysShowOutput", AlwaysShowOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildExecPreBuildDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 26) : FileGeneratorUtilities.RemoveLineTag))
+                using (resolver.NewScopedParameter("fastBuildExecAlways", ExecAlways ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.GenericExecutableSection);
                 }

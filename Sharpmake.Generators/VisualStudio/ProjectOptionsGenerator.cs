@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -368,6 +367,17 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { context.Options["LanguageStandard"] = "stdcpp14"; context.CommandLineOptions["LanguageStandard"] = "/std:c++14"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { context.Options["LanguageStandard"] = "stdcpp17"; context.CommandLineOptions["LanguageStandard"] = "/std:c++17"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { context.Options["LanguageStandard"] = "stdcpplatest"; context.CommandLineOptions["LanguageStandard"] = "/std:c++latest"; })
+                );
+
+                //Options.Vc.Compiler.CLanguageStandard.
+                //    Legacy                                  LanguageStandard_C=""
+                //    C11                                     LanguageStandard_C="stdc11"                                    /std:c11
+                //    C17                                     LanguageStandard_C="stdc17"                                    /std:c17
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.Legacy, () => { context.Options["LanguageStandard_C"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["LanguageStandard_C"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.C11, () => { context.Options["LanguageStandard_C"] = "stdc11"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c11"; }),
+                Options.Option(Options.Vc.Compiler.CLanguageStandard.C17, () => { context.Options["LanguageStandard_C"] = "stdc17"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c17"; })
                 );
             }
 
@@ -824,8 +834,8 @@ namespace Sharpmake.Generators.VisualStudio
             //    Enable                                  CreateHotPatchableCode="true"                  /hotpatch
             context.SelectOption
             (
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Default, () => { context.Options["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; ; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; ; }),
-                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Disable, () => { context.Options["CreateHotPatchableCode"] = "false"; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; ; }),
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Default, () => { context.Options["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Disable, () => { context.Options["CreateHotPatchableCode"] = "false"; context.CommandLineOptions["CreateHotPatchableCode"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.Vc.Compiler.CreateHotPatchableCode.Enable, () => { context.Options["CreateHotPatchableCode"] = "true"; context.CommandLineOptions["CreateHotPatchableCode"] = "/hotpatch"; })
             );
 
@@ -1043,15 +1053,25 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // Options.Vc.Compiler.AdditionalOptions
-            if (context.Configuration.AdditionalCompilerOptions.Any())
+            foreach (Tuple<OrderableStrings, string> optionsTuple in new[]
+                    {
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptions, "AdditionalCompilerOptions"),
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHCreate, "AdditionalCompilerOptionsOnPCHCreate"),
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHUse, "AdditionalCompilerOptionsOnPCHUse")
+                    })
             {
-                context.Configuration.AdditionalCompilerOptions.Sort();
-                string additionalCompilerOptions = context.Configuration.AdditionalCompilerOptions.JoinStrings(" ");
-                context.Options["AdditionalCompilerOptions"] = additionalCompilerOptions;
-            }
-            else
-            {
-                context.Options["AdditionalCompilerOptions"] = FileGeneratorUtilities.RemoveLineTag;
+                OrderableStrings optionsStrings = optionsTuple.Item1;
+                string optionsKey = optionsTuple.Item2;
+                if (optionsStrings.Any())
+                {
+                    optionsStrings.Sort();
+                    string additionalCompilerOptions = optionsStrings.JoinStrings(" ");
+                    context.Options[optionsKey] = additionalCompilerOptions;
+                }
+                else
+                {
+                    context.Options[optionsKey] = FileGeneratorUtilities.RemoveLineTag;
+                }
             }
 
             optionsContext.HasClrSupport = clrSupport;
@@ -1060,11 +1080,12 @@ namespace Sharpmake.Generators.VisualStudio
         public static List<KeyValuePair<string, string>> ConvertPostBuildCopiesToRelative(Project.Configuration conf, string relativeTo)
         {
             var relativePostBuildCopies = new List<KeyValuePair<string, string>>();
-            if (!conf.ResolvedTargetCopyFiles.Any() && conf.CopyDependenciesBuildStep == null && !conf.EventPostBuildCopies.Any())
+            if (!conf.ResolvedTargetCopyFiles.Any() && conf.CopyDependenciesBuildStep == null && !conf.EventPostBuildCopies.Any() && !conf.ResolvedTargetCopyFilesToSubDirectory.Any())
                 return relativePostBuildCopies;
 
             relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFiles.Select(x => new KeyValuePair<string, string>(x, conf.TargetPath)));
             relativePostBuildCopies.AddRange(conf.EventPostBuildCopies);
+            relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFilesToSubDirectory.Select(x => new KeyValuePair<string, string>(x.Key, Path.Combine(conf.TargetPath, x.Value))));
 
             for (int i = 0; i < relativePostBuildCopies.Count;)
             {

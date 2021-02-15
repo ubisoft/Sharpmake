@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,7 +90,6 @@ namespace Sharpmake
         public event OutputDelegate EventOutputWarning;
         public event OutputDelegate EventOutputMessage;
         public event OutputDelegate EventOutputDebug;
-        public event OutputDelegate EventOutputProfile;
 
         // Configure events
         public delegate void PreProjectConfigure(Project project);
@@ -130,6 +129,7 @@ namespace Sharpmake
         private bool _cleanBlobsOnly = false;
         public bool BlobOnly = false;
         public bool Diagnostics = false;
+        private bool _debugScripts = false;
         private ThreadPool _tasks;
         // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
@@ -262,6 +262,7 @@ namespace Sharpmake
             bool blobOnly,
             bool skipInvalidPath,
             bool diagnostics,
+            bool debugScripts,
             Func<IGeneratorManager> getGeneratorsManagerCallBack,
             HashSet<string> defines)
         {
@@ -272,6 +273,7 @@ namespace Sharpmake
             _cleanBlobsOnly = cleanBlobsOnly;
             BlobOnly = blobOnly;
             Diagnostics = diagnostics;
+            _debugScripts = debugScripts;
             SkipInvalidPath = skipInvalidPath;
             _getGeneratorsManagerCallBack = getGeneratorsManagerCallBack;
             _getGeneratorsManagerCallBack().InitializeBuilder(this);
@@ -292,6 +294,10 @@ namespace Sharpmake
                 _tasks.Start(nbThreads);
             }
         }
+
+        [Obsolete("Use the builder with the new debugScripts argument", error: false)]
+        public Builder(BuildContext.BaseBuildContext context, bool multithreaded, bool dumpDependencyGraph, bool cleanBlobsOnly, bool blobOnly, bool skipInvalidPath, bool diagnostics, Func<IGeneratorManager> getGeneratorsManagerCallBack, HashSet<string> defines)
+            : this(context, multithreaded, dumpDependencyGraph, cleanBlobsOnly, blobOnly, skipInvalidPath, diagnostics, false, getGeneratorsManagerCallBack, defines) { }
 
         public void Dispose()
         {
@@ -528,6 +534,9 @@ namespace Sharpmake
         {
             Assembler assembler = new Assembler(Defines);
 
+            // Add currently loaded assemblies
+            assembler.Assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies());
+
             // Add sharpmake assembly
             assembler.Assemblies.Add(_sharpmakeAssembly.Value);
 
@@ -616,7 +625,7 @@ namespace Sharpmake
 
         public Project LoadProjectType(Type type)
         {
-            using (CreateProfilingScope(type.Name))
+            using (CreateProfilingScope(type.ToNiceTypeName()))
             {
                 Project.ProjectTypeAttribute projectTypeAttribute;
                 if (type.IsDefined(typeof(Generate), false))
@@ -672,7 +681,7 @@ namespace Sharpmake
 
         public Solution LoadSolutionType(Type type)
         {
-            using (new Util.StopwatchProfiler(ms => { ProfileWriteLine("    |{0,5} ms| load solution {1}", ms, type.Name); }))
+            using (CreateProfilingScope(type.ToNiceTypeName()))
             {
                 if (!type.IsDefined(typeof(Generate), false) &&
                 !type.IsDefined(typeof(Compile), false) &&
@@ -873,7 +882,13 @@ namespace Sharpmake
             {
                 // start with huge projects to balance end of tasks
                 List<Project> projects = new List<Project>(_projects.Values);
-                projects.Sort((Project p0, Project p1) => { return p1.Configurations.Count.CompareTo(p0.Configurations.Count); });
+                projects.Sort((Project p0, Project p1) =>
+                {
+                    int p0Int = p0.Configurations.Count * p0.ResolvedSourceFiles.Count;
+                    int p1Int = p1.Configurations.Count * p1.ResolvedSourceFiles.Count;
+                    int cmp = p1Int.CompareTo(p0Int);
+                    return cmp;
+                });
 
                 LinkProjects(projects);
 
@@ -1186,10 +1201,13 @@ namespace Sharpmake
 
             public BuilderCompileErrorBehavior CompileErrorBehavior { get; }
 
+            public bool DebugScripts { get; }
+
             public BuilderContext(Builder builder, BuilderCompileErrorBehavior compileErrorBehavior)
             {
                 _builder = builder;
                 CompileErrorBehavior = compileErrorBehavior;
+                DebugScripts = builder._debugScripts;
             }
 
             public ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, IEnumerable<IParsingFlowParser> flowParsers, params string[] files)
@@ -1246,11 +1264,6 @@ namespace Sharpmake
         public void DebugWriteLine(string message, params object[] args)
         {
             EventOutputDebug?.Invoke(message + Environment.NewLine, args);
-        }
-
-        public void ProfileWriteLine(string message, params object[] args)
-        {
-            EventOutputProfile?.Invoke(message + Environment.NewLine, args);
         }
 
         #endregion

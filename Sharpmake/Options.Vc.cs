@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -571,6 +571,16 @@ namespace Sharpmake
                     GNU17,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     Latest
+                }
+
+                public enum CLanguageStandard
+                {
+                    [Default]
+                    Legacy,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    C11,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    C17
                 }
 
                 public enum SupportJustMyCode

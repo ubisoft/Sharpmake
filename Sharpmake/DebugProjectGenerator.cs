@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ namespace Sharpmake
         {
             // define class type
             var assemblyName = new AssemblyName(typeSignature);
-            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("DebugSharpmakeModule");
             TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature,
                 TypeAttributes.Public | TypeAttributes.Class |
@@ -225,12 +225,12 @@ namespace Sharpmake
         {
             return new Target(
                 Platform.anycpu,
-                DevEnv.vs2017,
-                Optimization.Debug,
+                DevEnv.vs2019,
+                Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_6_1
+                Assembler.SharpmakeDotNetFramework
             );
         }
 
@@ -252,7 +252,11 @@ namespace Sharpmake
 
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
-            string quote = Util.IsRunningInMono() ? @"\""" : @""""; // When running in Mono, we must escape "
+
+            if (conf.Target.GetOptimization() == Optimization.Debug)
+                startArguments += " /debugScripts";
+
+            string quote = "\'"; // Use single quote that is cross platform safe
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
             conf.CsprojUserFile.StartProgram = sharpmakeApplicationExePath;
         }
@@ -269,7 +273,7 @@ namespace Sharpmake
             AddTargets(DebugProjectGenerator.GetTargets());
         }
 
-        [Configure()]
+        [Configure]
         public virtual void Configure(Configuration conf, Target target)
         {
             conf.SolutionPath = DebugProjectGenerator.RootPath;
@@ -307,17 +311,29 @@ namespace Sharpmake
 
             Name = _projectInfo.DisplayName;
 
+            // Use the new csproj style
+            ProjectSchema = CSharpProjectSchema.NetCore;
+
+            // prevents output dir to have a framework subfolder
+            CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
+
+            // we need to disable determinism while because we are using wildcards in assembly versions
+            // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
+            CustomProperties.Add("Deterministic", "false");
+
             AddTargets(DebugProjectGenerator.GetTargets());
         }
 
-        [Configure()]
+        [Configure]
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.ProjectPath = RootPath;
             conf.ProjectFileName = "[project.Name].[target.DevEnv]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
 
-            conf.Options.Add(Options.CSharp.LanguageVersion.CSharp5);
+            conf.DefaultOption = target.Optimization == Optimization.Debug ? Options.DefaultTarget.Debug : Options.DefaultTarget.Release;
+
+            conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
 
             conf.Defines.Add(_projectInfo.Defines.ToArray());
 
@@ -330,8 +346,8 @@ namespace Sharpmake
             DebugProjectGenerator.DebugProjectExtension.AddSharpmakePackage(conf);
 
             // set up custom configuration only to setup project
-            if (string.CompareOrdinal(conf.ProjectPath.ToLower(), RootPath.ToLower()) == 0
-                && _projectInfo.IsSetupProject)
+            if (_projectInfo.IsSetupProject &&
+                FileSystemStringComparer.Default.Equals(conf.ProjectPath, RootPath))
             {
                 conf.SetupProjectOptions(_projectInfo.StartArguments);
             }

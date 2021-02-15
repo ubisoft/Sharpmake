@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -275,7 +275,9 @@ namespace Sharpmake.Generators.Apple
             ProjectVariantGroup variantGroup = new ProjectVariantGroup();
             _projectItems.Add(variantGroup);
 
-            Strings projectFiles = project.GetSourceFilesForConfigurations(configurations);
+            Strings resourceFiles = new Strings(project.ResourceFiles);
+            Strings sourceFiles = new Strings(project.GetSourceFilesForConfigurations(configurations).Except(resourceFiles));
+
             string workspacePath = Directory.GetParent(configurations[0].ProjectFullFileNameWithExtension).FullName;
 
             //Generate options for each configuration
@@ -284,13 +286,6 @@ namespace Sharpmake.Generators.Apple
             {
                 context.Configuration = configuration;
                 _optionMapping[configuration] = GenerateOptions(context);
-
-                Strings assetCatalog = Options.GetStrings<Options.XCode.Compiler.AssetCatalog>(configuration);
-                XCodeUtil.ResolveProjectPaths(project, assetCatalog);
-                foreach (string asset in assetCatalog)
-                {
-                    projectFiles.Add(asset);
-                }
             }
 
             _projectReferencesGroups = new Dictionary<ProjectFolder, ProjectReference>();
@@ -338,8 +333,8 @@ namespace Sharpmake.Generators.Apple
                 foreach (var conf in targetConfigurations)
                 {
                     if (!conf.IsFastBuild)
-                        PrepareSourceFiles(xCodeTargetName, projectFiles.Where(file => { return !project.ResourceFiles.Contains(file); }), project, conf, workspacePath);
-                    PrepareResourceFiles(xCodeTargetName, project.ResourceFiles, project, conf);
+                        PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, conf, workspacePath);
+                    PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, conf);
                     PrepareExternalResourceFiles(xCodeTargetName, project, conf);
 
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPreBuildPhases, conf.EventPreBuild.GetEnumerator());

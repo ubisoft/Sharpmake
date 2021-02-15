@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,23 +85,23 @@ namespace Sharpmake
     [Fragment, Flags]
     public enum Platform
     {
-        win32      = 1 << 0,
-        win64      = 1 << 1,
-        anycpu     = 1 << 2,
-        x360       = 1 << 3,
-        durango    = 1 << 4,
-        ps3        = 1 << 5,
-        ps3spu     = 1 << 6,
-        orbis      = 1 << 7,
-        wii        = 1 << 8,
-        wiiu       = 1 << 9,
-        nx         = 1 << 10,
-        nvshield   = 1 << 11,
-        ctr        = 1 << 12,
-        ios        = 1 << 13,
-        android    = 1 << 14,
-        linux      = 1 << 15,
-        mac        = 1 << 16,
+        win32 = 1 << 0,
+        win64 = 1 << 1,
+        anycpu = 1 << 2,
+        x360 = 1 << 3,
+        durango = 1 << 4,
+        ps3 = 1 << 5,
+        ps3spu = 1 << 6,
+        orbis = 1 << 7,
+        wii = 1 << 8,
+        wiiu = 1 << 9,
+        nx = 1 << 10,
+        nvshield = 1 << 11,
+        ctr = 1 << 12,
+        ios = 1 << 13,
+        android = 1 << 14,
+        linux = 1 << 15,
+        mac = 1 << 16,
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
@@ -144,43 +144,57 @@ namespace Sharpmake
         [Obsolete("Please use at least .net framework 3.5.", error: false)]
         v3 = v3_5,
 
-        v3_5              = 1 << 0,
+        v3_5 = 1 << 0,
         v3_5clientprofile = 1 << 1,
-        v4_0              = 1 << 2,
-        v4_5              = 1 << 3,
-        v4_5_1            = 1 << 4,
-        v4_5_2            = 1 << 5,
+        v4_0 = 1 << 2,
+        v4_5 = 1 << 3,
+        v4_5_1 = 1 << 4,
+        v4_5_2 = 1 << 5,
         v4_5clientprofile = 1 << 6,
-        v4_6              = 1 << 7,
-        v4_6_1            = 1 << 8,
-        v4_6_2            = 1 << 9,
-        v4_7              = 1 << 10,
-        v4_7_1            = 1 << 11,
-        v4_7_2            = 1 << 12,
-        v4_8              = 1 << 13,
-        netcore1_0        = 1 << 14,
-        netcore1_1        = 1 << 15,
-        netcore2_0        = 1 << 16,
-        netcore2_1        = 1 << 17,
-        netcore2_2        = 1 << 18,
-        netcore3_0        = 1 << 19,
-        netcore3_1        = 1 << 20,
-        netstandard1_0    = 1 << 21,
-        netstandard1_1    = 1 << 22,
-        netstandard1_2    = 1 << 23,
-        netstandard1_3    = 1 << 24,
-        netstandard1_4    = 1 << 25,
-        netstandard1_5    = 1 << 26,
-        netstandard1_6    = 1 << 27,
-        netstandard2_0    = 1 << 28,
-        netstandard2_1    = 1 << 29,
+        v4_6 = 1 << 7,
+        v4_6_1 = 1 << 8,
+        v4_6_2 = 1 << 9,
+        v4_7 = 1 << 10,
+        v4_7_1 = 1 << 11,
+        v4_7_2 = 1 << 12,
+        v4_8 = 1 << 13,
+        netcore1_0 = 1 << 14,
+        netcore1_1 = 1 << 15,
+        netcore2_0 = 1 << 16,
+        netcore2_1 = 1 << 17,
+        netcore2_2 = 1 << 18,
+        netcore3_0 = 1 << 19,
+        netcore3_1 = 1 << 20,
+        net5_0 = 1 << 21,
+        netstandard1_0 = 1 << 22,
+        netstandard1_1 = 1 << 23,
+        netstandard1_2 = 1 << 24,
+        netstandard1_3 = 1 << 25,
+        netstandard1_4 = 1 << 26,
+        netstandard1_5 = 1 << 27,
+        netstandard1_6 = 1 << 28,
+        netstandard2_0 = 1 << 29,
+        netstandard2_1 = 1 << 30,
 
         [CompositeFragment]
         all_netframework = v3_5 | v3_5clientprofile | v4_0 | v4_5 | v4_5_1 | v4_5_2 | v4_5clientprofile | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
         [CompositeFragment]
-        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1,
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0,
         [CompositeFragment]
         all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1
+    }
+
+    // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms
+    [Fragment, Flags]
+    public enum DotNetOS
+    {
+        Default = 1 << 0,
+        android = 1 << 1,
+        ios = 1 << 2,
+        macos = 1 << 3,
+        tvos = 1 << 4,
+        watchos = 1 << 5,
+        windows = 1 << 6
     }
 
     // Optional

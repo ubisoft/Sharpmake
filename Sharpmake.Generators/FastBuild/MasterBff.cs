@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -530,6 +530,12 @@ namespace Sharpmake.Generators.FastBuild
                 workerConnectionLimit = ".WorkerConnectionLimit = " + FastBuildSettings.FastBuildWorkerConnectionLimit.ToString();
             }
 
+            string additionalGlobalSettings = FileGeneratorUtilities.RemoveLineTag;
+            if (FastBuildSettings.AdditionalGlobalSettings.Any())
+            {
+                additionalGlobalSettings = string.Join(Environment.NewLine, FastBuildSettings.AdditionalGlobalSettings.Select(setting => "    " + setting));
+            }
+
             string fastBuildPATH = FileGeneratorUtilities.RemoveLineTag;
             if (FastBuildSettings.SetPathToResourceCompilerInEnvironment)
             {
@@ -609,6 +615,7 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
             using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))
             using (masterBffGenerator.Declare("fastBuildAllowDBMigration", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
+            using (masterBffGenerator.Declare("AdditionalGlobalSettings", additionalGlobalSettings))
             using (masterBffGenerator.Declare("fastBuildEnvironments", fastBuildEnvironments))
             using (masterBffGenerator.Declare("envRemoveGuards", envRemoveGuards))
             {
@@ -626,6 +633,12 @@ namespace Sharpmake.Generators.FastBuild
                 var compilerPlatform = compilerSettings.PlatformFlags;
                 string fastBuildCompilerFamily = UtilityMethods.GetFBuildCompilerFamily(compilerSettings.FastBuildCompilerFamily);
 
+                string fastBuildCompilerUseRelativePaths = FileGeneratorUtilities.RemoveLineTag;
+                if (FastBuildSettings.CompilersUsingRelativePaths.Contains(compiler.Key))
+                {
+                    fastBuildCompilerUseRelativePaths = "true";
+                }
+
                 string fastBuildVS2012EnumBugWorkaround = FileGeneratorUtilities.RemoveLineTag;
                 if (FastBuildSettings.EnableVS2012EnumBugWorkaround &&
                     compilerSettings.DevEnv == DevEnv.vs2012 &&
@@ -634,12 +647,21 @@ namespace Sharpmake.Generators.FastBuild
                     fastBuildVS2012EnumBugWorkaround = ".VS2012EnumBugFix = true";
                 }
 
+                string fastBuildCompilerAdditionalSettings = FileGeneratorUtilities.RemoveLineTag;
+                if (FastBuildSettings.AdditionalCompilerSettings.TryGetValue(compiler.Key, out IList<string> extraOptions) &&
+                    extraOptions.Any())
+                {
+                    fastBuildCompilerAdditionalSettings = string.Join(Environment.NewLine, extraOptions.Select(option => "    " + option));
+                }
+
                 using (masterBffGenerator.Declare("fastbuildCompilerName", compiler.Key))
                 using (masterBffGenerator.Declare("fastBuildCompilerRootPath", compilerSettings.RootPath))
                 using (masterBffGenerator.Declare("fastBuildCompilerExecutable", string.IsNullOrEmpty(compilerSettings.Executable) ? FileGeneratorUtilities.RemoveLineTag : compilerSettings.Executable))
                 using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28) : FileGeneratorUtilities.RemoveLineTag))
                 using (masterBffGenerator.Declare("fastBuildCompilerFamily", string.IsNullOrEmpty(fastBuildCompilerFamily) ? FileGeneratorUtilities.RemoveLineTag : fastBuildCompilerFamily))
+                using (masterBffGenerator.Declare("fastBuildCompilerUseRelativePaths", fastBuildCompilerUseRelativePaths))
                 using (masterBffGenerator.Declare("fastBuildVS2012EnumBugWorkaround", fastBuildVS2012EnumBugWorkaround))
+                using (masterBffGenerator.Declare("fastBuildCompilerAdditionalSettings", fastBuildCompilerAdditionalSettings))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);
                     foreach (var compilerConfiguration in compilerSettings.Configurations.OrderBy(x => x.Key))

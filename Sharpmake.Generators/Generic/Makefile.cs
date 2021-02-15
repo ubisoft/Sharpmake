@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ namespace Sharpmake.Generators.Generic
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
                 using (fileGenerator.Declare("projectName", resolvedProject.ProjectName))
-                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName), false)))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.ProjectRuleBegin);
@@ -169,7 +169,7 @@ namespace Sharpmake.Generators.Generic
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
-                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName), false)))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.CleanRuleProject);
@@ -280,8 +280,30 @@ namespace Sharpmake.Generators.Generic
                 // Configurations variables.
                 foreach (Project.Configuration conf in configurations)
                 {
+                    string precompHeader = "";
+                    string precompHeaderOut = "";
+                    string precompIntermediate = "";
+                    string precompCommand = "";
+
+                    if (!string.IsNullOrEmpty(conf.PrecompHeader))
+                    {
+                        // Support pch files in sub folders
+                        var pchFile = PathMakeUnix(conf.PrecompHeader);
+                        // Don't make additional subfolder in temp directory
+                        var pchObj = Path.GetFileName(conf.PrecompHeader);
+                        var fileName = Path.Combine(PathMakeUnix(project.SourceRootPath), pchFile);
+                        precompHeader = PathMakeUnix(Util.PathGetRelative(projectFileInfo.DirectoryName, fileName, true));
+                        precompHeaderOut = $"$(OBJDIR)/{pchObj}";
+                        precompIntermediate = $"$(OBJDIR)/{pchObj}.gch";
+                        precompCommand = "-include $(PCHOUT)";
+                    }
+
                     using (fileGenerator.Declare("name", conf.Name.ToLower()))
                     using (fileGenerator.Declare("options", options[conf]))
+                    using (fileGenerator.Declare("precompHeader", precompHeader))
+                    using (fileGenerator.Declare("precompHeaderOut", precompHeaderOut))
+                    using (fileGenerator.Declare("precompIntermediate", precompIntermediate))
+                    using (fileGenerator.Declare("precompCommand", precompCommand))
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationVariables);
                     }
@@ -413,8 +435,12 @@ namespace Sharpmake.Generators.Generic
             else // Release
                 defines.Add("NDEBUG");
 
-            defines.AddRange(conf.Defines);
-            defines.InsertPrefix("-D");
+            foreach (string define in conf.Defines)
+            {
+                if (!string.IsNullOrWhiteSpace(define))
+                    defines.Add(define.Replace(@"""", @"\"""));
+            }
+            defines.InsertPrefixSuffix(@"-D """, @"""");
             options["Defines"] = defines.JoinStrings(" ");
 
             // Includes
@@ -424,6 +450,7 @@ namespace Sharpmake.Generators.Generic
             includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.DependenciesIncludePaths)));
             PathMakeUnix(includePaths);
             includePaths.InsertPrefix("-I");
+            includePaths.Sort();
             options["Includes"] = includePaths.JoinStrings(" ");
 
             if (conf.ForcedIncludes.Count > 0)
@@ -431,6 +458,7 @@ namespace Sharpmake.Generators.Generic
                 OrderableStrings relativeForceIncludes = new OrderableStrings(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.ForcedIncludes));
                 PathMakeUnix(relativeForceIncludes);
                 relativeForceIncludes.InsertPrefix("-include ");
+                relativeForceIncludes.Sort();
                 options["Includes"] += " " + relativeForceIncludes.JoinStrings(" ");
             }
 
@@ -441,18 +469,18 @@ namespace Sharpmake.Generators.Generic
                 // ExtraWarnings
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.ExtraWarnings.Enable, () => { cflags.Append("-Wextra "); }),
-                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => { })
                     );
 
                 // GenerateDebugInformation
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Enable, () => { cflags.Append("-g "); }),
-                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => { })
                     );
 
                 // OptimizationLevel
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => { cflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => { }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.Standard, () => { cflags.Append("-O1 "); }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.Full, () => { cflags.Append("-O2 "); }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.FullWithInlining, () => { cflags.Append("-O3 "); }),
@@ -461,7 +489,7 @@ namespace Sharpmake.Generators.Generic
 
                 // Warnings
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => { cflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => { }),
                     Options.Option(Options.Makefile.Compiler.Warnings.MoreWarnings, () => { cflags.Append("-Wall "); }),
                     Options.Option(Options.Makefile.Compiler.Warnings.Disable, () => { cflags.Append("-w "); })
                     );
@@ -469,7 +497,7 @@ namespace Sharpmake.Generators.Generic
                 // WarningsAsErrors
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Enable, () => { cflags.Append("-Werror "); }),
-                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => { })
                     );
 
                 // AdditionalCompilerOptions
@@ -484,13 +512,17 @@ namespace Sharpmake.Generators.Generic
 
                 // CppLanguageStandard
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17, () => { cxxflags.Append("-std=c++17 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14, () => { cxxflags.Append("-std=c++14 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11, () => { cxxflags.Append("-std=c++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default, () => { cxxflags.Append(""); }),
                     Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp98, () => { cxxflags.Append("-std=c++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11, () => { cxxflags.Append("-std=gnu++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11, () => { cxxflags.Append("-std=c++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14, () => { cxxflags.Append("-std=c++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17, () => { cxxflags.Append("-std=c++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp2a, () => { cxxflags.Append("-std=c++2a "); }),
                     Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp98, () => { cxxflags.Append("-std=gnu++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default, () => { cxxflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11, () => { cxxflags.Append("-std=gnu++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp14, () => { cxxflags.Append("-std=gnu++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp17, () => { cxxflags.Append("-std=gnu++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp2a, () => { cxxflags.Append("-std=gnu++2a "); })
                     );
 
                 // Exceptions
@@ -513,17 +545,19 @@ namespace Sharpmake.Generators.Generic
             #region Linker
 
             // OutputFile
-            options["OutputFile"] = FormatOutputFileName(conf);
+            options["OutputFile"] = FormatOutputFileName(conf).Replace(" ", @"\ ");
 
             // DependenciesLibraryFiles
             OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
             PathMakeUnix(dependenciesLibraryFiles);
             dependenciesLibraryFiles.InsertPrefix("-l");
+            dependenciesLibraryFiles.Sort();
             options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
 
             // LibraryFiles
             OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
             libraryFiles.InsertPrefix("-l");
+            libraryFiles.Sort();
             options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
 
             // LibraryPaths
@@ -533,6 +567,7 @@ namespace Sharpmake.Generators.Generic
             libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesBuiltTargetsLibraryPaths));
             PathMakeUnix(libraryPaths);
             libraryPaths.InsertPrefix("-L");
+            libraryPaths.Sort();
             options["LibraryPaths"] = libraryPaths.JoinStrings(" ");
 
             // Dependencies
@@ -543,10 +578,10 @@ namespace Sharpmake.Generators.Generic
                 {
                     case Project.Configuration.OutputType.None: continue;
                     case Project.Configuration.OutputType.Lib:
-                    case Project.Configuration.OutputType.Dll:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
                         deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
                         break;
+                    case Project.Configuration.OutputType.Dll:
                     default:
                         deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
                         break;
@@ -554,12 +589,17 @@ namespace Sharpmake.Generators.Generic
             }
             var depsRelative = Util.PathGetRelative(projectFileInfo.DirectoryName, deps);
             PathMakeUnix(depsRelative);
+            depsRelative.Sort();
             options["LDDEPS"] = depsRelative.JoinStrings(" ");
 
             // LinkCommand
             if (conf.Output == Project.Configuration.OutputType.Lib)
             {
                 options["LinkCommand"] = Template.Project.LinkCommandLib;
+            }
+            else if (conf.Output == Project.Configuration.OutputType.Dll)
+            {
+                options["LinkCommand"] = Template.Project.LinkCommandDll;
             }
             else
             {
@@ -652,9 +692,13 @@ namespace Sharpmake.Generators.Generic
 
         #region Utils
 
-        private static string PathMakeUnix(string path)
+        private static string PathMakeUnix(string path, bool escapeSpaces = true)
         {
-            return path.Replace(Util.WindowsSeparator, Util.UnixSeparator).TrimEnd(Util.UnixSeparator);
+            string clean = path.Replace(Util.WindowsSeparator, Util.UnixSeparator).TrimEnd(Util.UnixSeparator);
+            if (escapeSpaces)
+                return clean.Replace(" ", @"\ ");
+
+            return clean;
         }
 
         private static void PathMakeUnix(IList<string> paths)

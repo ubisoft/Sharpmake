@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -828,6 +828,22 @@ namespace Sharpmake
             public OrderableStrings AdditionalCompilerOptions = new OrderableStrings();
 
             /// <summary>
+            /// Compiler-specific options to pass when invoking the compiler to create PCHs.
+            /// </summary>
+            /// <remarks>
+            /// Currently only respected by the BFF generator.
+            /// </remarks>
+            public OrderableStrings AdditionalCompilerOptionsOnPCHCreate = new OrderableStrings();
+
+            /// <summary>
+            /// Compiler-specific options to pass when invoking the compiler telling it to use PCHs.
+            /// </summary>
+            /// <remarks>
+            /// Currently only respected by the BFF generator.
+            /// </remarks>
+            public OrderableStrings AdditionalCompilerOptionsOnPCHUse = new OrderableStrings();
+
+            /// <summary>
             /// Gets a list of file extensions that are added to a Visual Studio project with the
             /// <b>None</b> build action.
             /// </summary>
@@ -1283,6 +1299,11 @@ namespace Sharpmake
             public string BffFullFileName => Path.Combine(ProjectPath, BffFileName);
 
             /// <summary>
+            /// Whether to use relative paths in FASTBuild-generated Unity files.
+            /// </summary>
+            public bool FastBuildUnityUseRelativePaths = false;
+
+            /// <summary>
             /// Gets or sets whether to generate a FASTBuild (.bff) file when using FASTBuild.
             /// </summary>
             /// <remarks>
@@ -1335,7 +1356,8 @@ namespace Sharpmake
                     string executableWorkingDirectory = "",
                     bool isNameSpecific = false,
                     bool useStdOutAsOutput = false,
-                    bool alwaysShowOutput = false)
+                    bool alwaysShowOutput = false,
+                    bool executeAlways = false)
 
                 {
                     ExecutableFile = executableFile;
@@ -1346,6 +1368,7 @@ namespace Sharpmake
                     IsNameSpecific = isNameSpecific;
                     FastBuildUseStdOutAsOutput = useStdOutAsOutput;
                     FastBuildAlwaysShowOutput = alwaysShowOutput;
+                    FastBuildExecAlways = executeAlways;
                 }
 
                 /// <summary>
@@ -1384,6 +1407,11 @@ namespace Sharpmake
                 public bool FastBuildUseStdOutAsOutput = false;
 
                 public bool FastBuildAlwaysShowOutput = false;
+
+                /// <summary>
+                /// Gets or sets whether the step should be executed every time.
+                /// </summary>
+                public bool FastBuildExecAlways = false;
 
                 internal override void Resolve(Resolver resolver)
                 {
@@ -1636,6 +1664,11 @@ namespace Sharpmake
             /// Gets or sets the list of files to copy to the output directory.
             /// </summary>
             public Strings TargetCopyFiles = new Strings();
+
+            /// <summary>
+            /// Gets or sets the list of files to copy to a sub-directory of the output directory.
+            /// </summary>
+            public HashSet<KeyValuePair<string, string>> TargetCopyFilesToSubDirectory = new HashSet<KeyValuePair<string, string>>();
 
             /// <summary>
             /// Gets or sets the list of files that the target depends on.
@@ -2082,6 +2115,14 @@ namespace Sharpmake
             /// </summary>
             public IEnumerable<string> ResolvedTargetCopyFiles => _resolvedTargetCopyFiles;
 
+            private HashSet<KeyValuePair<string, string>> _resolvedTargetCopyFilesToSubDirectory = new HashSet<KeyValuePair<string, string>>();
+
+            /// <summary>
+            /// Gets the list of resolved files to copy to a sub directory of the target directory.
+            /// </summary>
+            public IEnumerable<KeyValuePair<string, string>> ResolvedTargetCopyFilesToSubDirectory => _resolvedTargetCopyFilesToSubDirectory;
+
+
             private Strings _resolvedTargetDependsFiles = new Strings();
 
             /// <summary>
@@ -2178,6 +2219,12 @@ namespace Sharpmake
             /// </summary>
             public bool PreferRelativePaths = true;
 
+            /// <summary>
+            /// Optional OS version at the end of the TargetFramework, for example, net5.0-ios13.0.
+            /// </summary>
+            /// <remarks>C# only, will throw if the target doesn't have a non-default DotNetOS fragment</remarks>
+            public string DotNetOSVersionSuffix = string.Empty;
+
             internal override void Construct(object owner, ITarget target)
             {
                 base.Construct(owner, target);
@@ -2213,6 +2260,8 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SharpmakeCsPath, ref BaseIntermediateOutputPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref LibraryPaths);
                 Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, ref TargetCopyFiles);
+                Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, Util.KeyValuePairResolveType.ResolveAll, ref EventPostBuildCopies);
+                Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, Util.KeyValuePairResolveType.ResolveKey, ref TargetCopyFilesToSubDirectory);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetDependsFiles);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetLibraryPath);
@@ -2269,6 +2318,11 @@ namespace Sharpmake
 
                 _resolvedTargetDependsFiles.AddRange(TargetDependsFiles);
                 _resolvedTargetCopyFiles.AddRange(TargetCopyFiles);
+
+                foreach (var keyValuePair in TargetCopyFilesToSubDirectory)
+                {
+                    _resolvedTargetCopyFilesToSubDirectory.Add(keyValuePair);
+                }
 
                 foreach (var tuple in new[] {
                     Tuple.Create(EventPreBuildExe,        _resolvedEventPreBuildExe),
@@ -2812,6 +2866,11 @@ namespace Sharpmake
                         _resolvedTargetDependsFiles.AddRange(dependency.TargetDependsFiles);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPreBuildExe);
                         _resolvedExecDependsFiles.AddRange(dependency.EventPostBuildExe);
+
+                        foreach (var keyValuePair in dependency.TargetCopyFilesToSubDirectory)
+                        {
+                            _resolvedTargetCopyFilesToSubDirectory.Add(keyValuePair);
+                        }
                     }
                     else if (Output == OutputType.None && isExport == false)
                     {

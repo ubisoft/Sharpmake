@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,8 +37,12 @@ namespace Sharpmake
                     Cpp11,
                     Cpp14,
                     Cpp17,
+                    Cpp2a,
                     GnuCpp98,
-                    GnuCpp11
+                    GnuCpp11,
+                    GnuCpp14,
+                    GnuCpp17,
+                    GnuCpp2a,
                 }
 
                 public enum Exceptions

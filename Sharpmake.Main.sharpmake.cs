@@ -19,6 +19,10 @@ namespace SharpmakeGen
     public static class Globals
     {
         public static string AbsoluteRootPath = string.Empty;
+
+        // this holds the path where sharpmake binaries are expected to output
+        // note that it will contain an subdirectory per optimization
+        public const string OutputRootPath = @"[project.RootPath]\tmp\bin";
     }
 
     public static class Common
@@ -29,9 +33,9 @@ namespace SharpmakeGen
             result.Add(
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2017,
+                    DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
-                    framework: DotNetFramework.v4_6_1
+                    framework: Assembler.SharpmakeDotNetFramework
                 )
             );
             return result.ToArray();
@@ -52,6 +56,16 @@ namespace SharpmakeGen
 
                 RootPath = Globals.AbsoluteRootPath;
 
+                // Use the new csproj style
+                ProjectSchema = CSharpProjectSchema.NetCore;
+
+                // prevents output dir to have a framework subfolder
+                CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
+
+                // we need to disable determinism while because we are using wildcards in assembly versions
+                // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
+                CustomProperties.Add("Deterministic", "false");
+
                 if (excludeSharpmakeFiles)
                     SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");
             }
@@ -60,16 +74,16 @@ namespace SharpmakeGen
             public virtual void ConfigureAll(Configuration conf, Target target)
             {
                 conf.ProjectFileName = "[project.Name]";
-                conf.ProjectPath = @"[project.SourceRootPath]";
+                conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
-                conf.TargetPath = @"[project.RootPath]\bin\[target.Optimization]";
+                conf.TargetPath = Path.Combine(Globals.OutputRootPath, "[target.Optimization]");
 
                 conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Optimization]\[project.Name]";
                 conf.BaseIntermediateOutputPath = conf.IntermediatePath;
 
                 conf.ReferencesByName.Add("System");
 
-                conf.Options.Add(Options.CSharp.LanguageVersion.CSharp6);
+                conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
                 conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
                 conf.Options.Add(
                     new Options.CSharp.WarningsNotAsErrors(

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,11 +45,11 @@ export config
 
                 public static string ProjectRuleEnd =
                     "\n\t@echo \" ==== Building [projectName] ($(config)) ====\"" +
-                    "\n\t@${MAKE} --no-print-directory -C [projectFileDirectory] -f [projectFileName]\n\n";
+                    "\n\t@${MAKE} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\"\n\n";
 
                 public static string CleanRuleBegin = "clean:\n";
 
-                public static string CleanRuleProject = "\t@${MAKE} --no-print-directory -C [projectFileDirectory] -f [projectFileName] clean\n";
+                public static string CleanRuleProject = "\t@${MAKE} --no-print-directory -C \"[projectFileDirectory]\" -f \"[projectFileName]\" clean\n";
 
                 public static string CleanRuleEnd = "\n";
 
@@ -103,6 +103,10 @@ endif
   RESFLAGS  += $(DEFINES) $(INCLUDES)
   LDDEPS    += [options.LDDEPS]
   LINKCMD    = [options.LinkCommand]
+  PCH        = [precompHeader]
+  PCHOUT     = [precompHeaderOut]
+  GCH        = [precompIntermediate]
+  PCHCMD     = [precompCommand]
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -115,6 +119,8 @@ endif
 
 ";
                 public static string LinkCommandLib = "$(AR) -rcs $(TARGET) $(OBJECTS)";
+
+                public static string LinkCommandDll = "$(CXX) -shared -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)";
 
                 public static string LinkCommandExe = "$(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)";
 
@@ -180,32 +186,35 @@ prelink:
 	$(PRELINKCMDS)
 
 ifneq (,$(PCH))
-$(GCH): $(PCH)
+$(GCH): $(PCH) | $(OBJDIR)
 	@echo $(notdir $<)
 	-$(SILENT) cp $< $(OBJDIR)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o ""$@"" -c ""$<""
+	$(SILENT) $(CXX) $(CXXFLAGS) -xc++-header -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 endif
 
 ";
 
                 public static readonly string ObjectRuleCxx =
-@"$(OBJDIR)/[objectFile]: [sourceFile] | $(OBJDIR)
+@"$(OBJDIR)/[objectFile]: [sourceFile] $(GCH) | $(OBJDIR)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o ""$@"" -c ""$<""
+	$(SILENT) $(CXX) $(CXXFLAGS) $(PCHCMD) -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 
 ";
 
                 public static readonly string ObjectRuleC =
-@"$(OBJDIR)/[objectFile]: [sourceFile] | $(OBJDIR)
+@"$(OBJDIR)/[objectFile]: [sourceFile] $(GCH) | $(OBJDIR)
 	@echo $(notdir $<)
-	$(SILENT) $(CXX)  $(CFLAGS) -x c -o ""$@"" -c ""$<""
+	$(SILENT) $(CXX)  $(CFLAGS) $(PCHCMD) -x c -o ""$@"" -c ""$<""
 	$(SILENT) $(POSTFILECMDS)
 
 ";
 
-                public static string Footer = "-include $(OBJECTS:%.o=%.d)\n";
+                public static string Footer =
+@"-include $(OBJECTS:%.o=%.d)
+-include $(GCH:%.gch=%.d)
+";
             }
         }
     }

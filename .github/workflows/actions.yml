@@ -1,0 +1,54 @@
+# Sharpmake GitHub Actions CI configuration
+
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        configuration: [debug, release]
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Bootstrap.bat ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: bootstrap.bat Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }}
+
+      - name: Bootstrap.sh ${{ matrix.configuration }}
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ./bootstrap.sh Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }}
+
+      - name: CompileSharpmake.bat ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: CompileSharpmake.bat Sharpmake.sln "${{ matrix.configuration }}" "Any CPU"
+
+      - name: CompileSharpmake.sh ${{ matrix.configuration }}
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ./CompileSharpmake.sh Sharpmake.sln "${{ matrix.configuration }}"
+
+      - name: UnitTest
+        if: runner.os == 'Windows'
+        run: |
+          nuget install NUnit.ConsoleRunner -Version 3.12.0 -OutputDirectory tmp/pkg
+          tmp/pkg/NUnit.ConsoleRunner.3.12.0/tools/nunit3-console.exe tmp/unittests/${{ matrix.configuration }}/Sharpmake.UnitTests.dll
+
+      - name: RegressionTest
+        if: runner.os == 'Windows'
+        run: python regression_test.py
+
+      - name: FunctionalTest
+        if: runner.os == 'Windows'
+        run: python functional_test.py

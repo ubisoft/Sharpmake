@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -625,6 +625,9 @@ namespace Sharpmake.Generators.FastBuild
                             // Do not take Cpp Language conformance into account while compiling in C
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // MSVC
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
                             fastBuildSourceFileType = "/TC";
@@ -634,6 +637,8 @@ namespace Sharpmake.Generators.FastBuild
                             // Do not take C Language conformance into account while compiling in Cpp
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CLanguageStd", FileGeneratorUtilities.RemoveLineTag));
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // MSVC
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard_C", FileGeneratorUtilities.RemoveLineTag));
 
                             fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
@@ -1842,7 +1847,8 @@ namespace Sharpmake.Generators.FastBuild
                 UnityInputPath = fastBuildUnityPaths,
                 UnityInputFiles = fastBuildUnityInputFiles,
                 UnityInputExcludedFiles = fastBuildUnityInputExcludedfiles,
-                UnityInputPattern = fastBuildUnityInputPattern
+                UnityInputPattern = fastBuildUnityInputPattern,
+                UseRelativePaths = conf.FastBuildUnityUseRelativePaths ? "true" : FileGeneratorUtilities.RemoveLineTag,
             };
 
             // _unities being a dictionary, a new entry will be created only

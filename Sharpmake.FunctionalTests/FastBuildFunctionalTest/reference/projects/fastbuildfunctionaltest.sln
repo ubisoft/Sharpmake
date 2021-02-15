@@ -6,8 +6,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FastBuild", "FastBuild", "{
 		fastbuildfunctionaltest.bff = fastbuildfunctionaltest.bff
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixCppAndCExe", "mixcppandcexe_vs2017_win64.vcxproj", "{5A047CB1-D2C4-4765-6F6F-EDD60899737F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExplicitlyOrderedPostBuildTest", "explicitlyorderedpostbuildtest_vs2017_win64.vcxproj", "{77AE9D0E-D7D9-039E-9DB9-180932FD4AE9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest_All", "fastbuildfunctionaltest_all.vcxproj", "{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}"
@@ -25,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest_All
 		{51338055-3ACC-BA7F-9658-06DC5B06394E} = {51338055-3ACC-BA7F-9658-06DC5B06394E}
 		{573CBFD5-C93E-15F6-9BFE-132BA37EAE47} = {573CBFD5-C93E-15F6-9BFE-132BA37EAE47}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixCppAndCExe", "mixcppandcexe_vs2017_win64.vcxproj", "{5A047CB1-D2C4-4765-6F6F-EDD60899737F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildCopyDirTest", "postbuildcopydirtest_vs2017_win64.vcxproj", "{B0087514-0636-5209-BC43-4E8096928555}"
 EndProject
@@ -56,14 +56,6 @@ Global
 		Release|MSBuild = Release|MSBuild
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
-		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
 		{77AE9D0E-D7D9-039E-9DB9-180932FD4AE9}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
 		{77AE9D0E-D7D9-039E-9DB9-180932FD4AE9}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
 		{77AE9D0E-D7D9-039E-9DB9-180932FD4AE9}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
@@ -82,6 +74,14 @@ Global
 		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
 		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|FastBuild_NoBlob.Build.0 = Release_FastBuild_NoBlob_vs2017|x64
 		{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}.Release|MSBuild.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2017|x64
+		{5A047CB1-D2C4-4765-6F6F-EDD60899737F}.Release|MSBuild.Build.0 = Release_MSBuild_vs2017|x64
 		{B0087514-0636-5209-BC43-4E8096928555}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2017|x64
 		{B0087514-0636-5209-BC43-4E8096928555}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2017|x64
 		{B0087514-0636-5209-BC43-4E8096928555}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2017|x64

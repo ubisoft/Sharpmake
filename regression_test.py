@@ -16,7 +16,7 @@ class Test:
         self.directory = directory
         self.assembly = directory + ".dll" # same name as the directory for now
         self.script_name = script_name
-        self.use_mono = os.name == "posix"
+        self.runs_on_unix = os.name == "posix"
         if project_root == "":
             self.project_root = directory
         else:
@@ -29,17 +29,17 @@ class Test:
             os.chdir(pwd)
 
             # Detects the path of the Sharpmake executable
-            sharpmake_path = find_target_path(self.directory, "Sharpmake.Application.exe")
+            sharpmake_path = find_sharpmake_path()
 
             write_line("Using sharpmake " + sharpmake_path)
 
             # Builds the command line argument list.
-            sources = "/sources(@\"{}\")".format(os.path.join(self.directory, self.script_name))
-            assemblies = "/assemblies(@\"{}\")".format(find_target_path(self.directory, self.assembly))
-            referencedir = "/referencedir(@\"{}\")".format(os.path.join(self.directory, "reference"))
-            outputdir = "/outputdir(@\"{}\")".format(os.path.join(self.directory, "projects"))
-            remaproot = "/remaproot(@\"{}\")".format(self.project_root)
-            test = "/test(@\"Regression\")"
+            sources = "/sources(@\'{}\')".format(os.path.join(self.directory, self.script_name))
+            assemblies = "/assemblies(@\'{}\')".format(find_assembly_path(self.directory, self.assembly))
+            referencedir = "/referencedir(@\'{}\')".format(os.path.join(self.directory, "reference"))
+            outputdir = "/outputdir(@\'{}\')".format(os.path.join(self.directory, "projects"))
+            remaproot = "/remaproot(@\'{}\')".format(self.project_root)
+            test = "/test(@\'Regression\')"
             verbose = "/verbose"
 
             args = [
@@ -51,11 +51,9 @@ class Test:
                 verbose
             ]
 
-            if self.use_mono:
-                args_string = "\" \"".join([arg.replace('"','\\"') for arg in args])
-                cmd_line = "mono --debug {} \"{}\"".format(sharpmake_path, args_string)
-            else:
-                cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
+            cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
+            if self.runs_on_unix:
+                cmd_line = "mono --debug " + cmd_line
 
             return os.system(cmd_line)
 
@@ -78,10 +76,16 @@ tests = [
     Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs")
 ]
 
-def find_target_path(directory, target):
+def find_sharpmake_path():
+    return find_target_path("bin", '', "Sharpmake.Application.exe")
+
+def find_assembly_path(directory, target):
+    return find_target_path("samples", directory, target)
+
+def find_target_path(root_directory, subdirectory, target):
     optim_tokens = ["debug", "release"]
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join("..", "bin", optim_token, "samples", target))
+        path = os.path.abspath(os.path.join("..", "tmp", root_directory, optim_token, subdirectory, target))
         if os.path.isfile(path):
             return path
 
@@ -99,11 +103,11 @@ def red_bg():
 def green_bg():
     if os.name == "nt":
         os.system("color 2F")
-        
+
 def black_bg():
     if os.name == "nt":
         os.system("color 0F")
-       
+
 
 def pause(timeout=None):
     if timeout is None:

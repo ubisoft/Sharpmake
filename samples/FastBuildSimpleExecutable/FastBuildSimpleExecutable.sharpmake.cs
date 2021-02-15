@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ namespace FastBuild
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
-            FastBuildSettings.FastBuildMakeCommand = @"tools\FastBuild\FBuild.exe";
+            FastBuildSettings.FastBuildMakeCommand = @"tools\FastBuild\Windows-x64\FBuild.exe";
 
             arguments.Generate<FastBuildSolution>();
         }

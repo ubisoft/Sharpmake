@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -535,15 +535,15 @@ namespace Sharpmake.Generators.VisualStudio
 
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationEnd);
 
-            if (containsMultiDotNetFramework)
-                multiDotNetFrameworkConfigurationNames.Clear();
-
             // write all project target and match then to a solution target
             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBegin);
 
             var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>();
             foreach (Solution.ResolvedProject solutionProject in solutionProjects)
             {
+                if (containsMultiDotNetFramework)
+                    multiDotNetFrameworkConfigurationNames.Clear();
+
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
                 {
                     ITarget solutionTarget = solutionConfiguration.Target;
@@ -756,7 +756,9 @@ namespace Sharpmake.Generators.VisualStudio
                     e.Configuration.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
                     e.Configuration.Output == Project.Configuration.OutputType.DotNetWindowsApp ||
                     e.Configuration.Output == Project.Configuration.OutputType.Exe)
-                .GroupBy(e => e.Configuration.ProjectFullFileName).ToList();
+                .GroupBy(e => e.Configuration.ProjectFileName)
+                .OrderBy(filename => filename.Key, StringComparer.InvariantCultureIgnoreCase)
+                .ToList();
 
             // If there is more than one, set the one with the same name as the solution
             if (executableProjects.Count > 1)

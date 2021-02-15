@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ namespace Sharpmake
         ILoadInfo LoadExtension(string file);
         void AddDefine(string define);
         BuilderCompileErrorBehavior CompileErrorBehavior { get; }
+        bool DebugScripts { get; }
     }
 
     public interface IAssemblerContext

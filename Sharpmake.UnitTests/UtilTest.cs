@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -253,8 +253,8 @@ namespace Sharpmake.UnitTests
         [Test]
         public void PathGetCapitalizedFile()
         {
-            var mockPath1 = Path.GetTempFileName();
-            var mockPath2 = Path.GetTempFileName();
+            var mockPath1 = Util.GetCapitalizedPath(Path.GetTempFileName());
+            var mockPath2 = Util.GetCapitalizedPath(Path.GetTempFileName());
             OrderableStrings paths = new OrderableStrings
             {
                 mockPath1,
@@ -278,8 +278,10 @@ namespace Sharpmake.UnitTests
         [Test]
         public void PathGetCapitalizedDirectory()
         {
-            var tempDirectory1 = Directory.CreateDirectory(Path.GetTempPath() + @"\test1");
-            var tempDirectory2 = Directory.CreateDirectory(Path.GetTempPath() + @"\test2");
+            string temp = Util.GetCapitalizedPath(Path.GetTempPath());
+
+            var tempDirectory1 = Directory.CreateDirectory(temp + @"\test1");
+            var tempDirectory2 = Directory.CreateDirectory(temp + @"\test2");
 
             OrderableStrings paths = new OrderableStrings
             {
@@ -493,7 +495,7 @@ namespace Sharpmake.UnitTests
         [SetUp]
         public void Init()
         {
-            Util.FakePathPrefix = Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            Util.FakePathPrefix = Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().Location).LocalPath);
 
             string[] files =
             {
