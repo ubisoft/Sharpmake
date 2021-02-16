@@ -38,6 +38,11 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: ./CompileSharpmake.sh Sharpmake.sln "${{ matrix.configuration }}"
+        
+      - name: GenerateMdbFiles.bat
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: GenerateMdbFiles.bat
 
       - name: UnitTest
         if: runner.os == 'Windows'
@@ -52,3 +57,10 @@ jobs:
       - name: FunctionalTest
         if: runner.os == 'Windows'
         run: python functional_test.py
+
+      - name: Upload sharpmake cross-platform release binaries
+        if: runner.os == 'Windows' && matrix.configuration == 'release'
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'Sharpmake-${{github.sha}}'
+          path: tmp/bin
