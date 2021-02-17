@@ -351,15 +351,8 @@ namespace Sharpmake
             if (entryPointMethodInfo == null)
                 return;
 
-            try
-            {
-                entryPointMethodInfo.Invoke(null, new object[] { Arguments });
-            }
-            catch (TargetInvocationException e)
-            {
-                if (e.InnerException != null)
-                    throw e.InnerException;
-            }
+
+            entryPointMethodInfo.Invoke(null, new object[] { Arguments });
         }
 
         private bool _profilingEnabled = false;

@@ -220,30 +220,14 @@ namespace Sharpmake
                                 string executeCode = String.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action execute = Assembler.BuildDelegate<Action>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
-                                try
-                                {
-                                    execute();
-                                }
-                                catch (TargetInvocationException e)
-                                {
-                                    if (e.InnerException != null)
-                                        throw (e.InnerException);
-                                }
+                                execute();
                             }
                             else
                             {
                                 string executeCode = String.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action<object> execute = Assembler.BuildDelegate<Action<object>>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
-                                try
-                                {
-                                    execute(instance);
-                                }
-                                catch (TargetInvocationException e)
-                                {
-                                    if (e.InnerException != null)
-                                        throw (e.InnerException);
-                                }
+                                execute(instance);
                             }
                             executedMethods.Add(uniqueExecutedMethodName);
                         }
