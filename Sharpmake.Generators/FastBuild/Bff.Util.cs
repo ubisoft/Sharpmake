@@ -299,12 +299,13 @@ namespace Sharpmake.Generators.FastBuild
                 {
                     var unity = unitySection.Key;
                     var unityConfigurations = unitySection.Value;
+                    var projectRelativePath = Util.PathGetRelative(project.RootPath, projectPath, true);
 
                     // Don't use Object.GetHashCode() on a int[] object from GetMergedFragmentValuesAcrossConfigurations() as it is
                     // non-deterministic and depends on order of execution. String.GetHashCode() is stable as long as we don't use
                     // <UseRandomizedStringHashAlgorithm enabled="1" /> in the application config file, or as long as we don't use
                     // .NET Core. It can change between .NET versions, however; naming should be stable between different runs on the same machine.
-                    int hashcode = unity.GetHashCode() ^ projectPath.GetHashCode() ^ string.Join("_", unityConfigurations).GetHashCode();
+                    int hashcode = unity.GetHashCode() ^ projectRelativePath.GetHashCode() ^ string.Join("_", unityConfigurations).GetHashCode();
 
                     unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
