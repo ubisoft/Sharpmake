@@ -934,7 +934,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         Strings fastBuildPreBuildDependencies = new Strings();
-                        UniqueList<Project.Configuration> orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
+                        var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
                         fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
                         fastBuildPreBuildDependencies.AddRange(preBuildTargets);
 

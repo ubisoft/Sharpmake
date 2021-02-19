@@ -402,7 +402,7 @@ namespace Sharpmake.Generators.VisualStudio
                         if (buildDepsGuids.Any())
                         {
                             fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
-                            foreach (string guid in buildDepsGuids)
+                            foreach (string guid in buildDepsGuids.SortedValues)
                             {
                                 using (fileGenerator.Declare("projectDependencyGuid", guid))
                                     fileGenerator.Write(Template.Solution.ProjectDependency);
