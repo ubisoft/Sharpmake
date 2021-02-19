@@ -417,7 +417,8 @@ namespace Sharpmake.Generators.FastBuild
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
-                                    fastBuildProjectDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                    fastBuildProjectDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig) + "_LibraryDependency");
+                                    fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
                                 else
                                 {
@@ -1278,8 +1279,10 @@ namespace Sharpmake.Generators.FastBuild
                                             {
                                                 string genLibName = "'" + fastBuildOutputFileShortName + "_" + outputType + "'";
                                                 using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                                using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetSection);
+                                                    bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
                                                 }
                                             }
                                         }
@@ -1288,10 +1291,12 @@ namespace Sharpmake.Generators.FastBuild
                                 case Project.Configuration.OutputType.None:
                                     {
                                         // Write Target Alias
-                                        using (resolver.NewScopedParameter("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
-                                        using (resolver.NewScopedParameter("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                        using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
+                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                        using (bffGenerator.Declare("fastBuildOutputType", outputType))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
+                                            bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
                                         }
                                     }
                                     break;

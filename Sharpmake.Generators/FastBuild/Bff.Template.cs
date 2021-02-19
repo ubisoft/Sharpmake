@@ -468,6 +468,16 @@ Alias( '[fastBuildOutputFileShortName]' )
 }
 
 ";
+
+                public static string TargetForLibraryDependencySection = @"
+//=================================================================================================================
+Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
+{
+    .Targets = '[fastBuildOutputFileShortName]_[fastBuildOutputType]'
+}
+
+";
+
                 public static string CopyFileSection = @"
 //=================================================================================================================
 Copy( '[fastBuildCopyAlias]' )
