@@ -1712,6 +1712,11 @@ namespace Sharpmake
             public Strings TargetCopyFiles = new Strings();
 
             /// <summary>
+            /// Target copy files path, where the TargetCopyFiles files will be copied
+            /// </summary>
+            public string TargetCopyFilesPath = "[conf.TargetPath]";
+
+            /// <summary>
             /// Gets or sets the list of files to copy to a sub-directory of the output directory.
             /// </summary>
             public HashSet<KeyValuePair<string, string>> TargetCopyFilesToSubDirectory = new HashSet<KeyValuePair<string, string>>();
@@ -2319,6 +2324,7 @@ namespace Sharpmake
                     Util.ResolvePath(Project.SharpmakeCsPath, ref BaseIntermediateOutputPath);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref LibraryPaths);
                 Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, ref TargetCopyFiles);
+                Util.ResolvePath(Project.SharpmakeCsPath, ref TargetCopyFilesPath);
                 Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, Util.KeyValuePairResolveType.ResolveAll, ref EventPostBuildCopies);
                 Util.ResolvePathAndFixCase(Project.SharpmakeCsPath, Util.KeyValuePairResolveType.ResolveKey, ref TargetCopyFilesToSubDirectory);
                 Util.ResolvePath(Project.SharpmakeCsPath, ref TargetDependsFiles);

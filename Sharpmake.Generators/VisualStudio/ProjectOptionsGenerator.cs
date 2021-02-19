@@ -1081,7 +1081,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (!conf.ResolvedTargetCopyFiles.Any() && conf.CopyDependenciesBuildStep == null && !conf.EventPostBuildCopies.Any() && !conf.ResolvedTargetCopyFilesToSubDirectory.Any())
                 return relativePostBuildCopies;
 
-            relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFiles.Select(x => new KeyValuePair<string, string>(x, conf.TargetPath)));
+            relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFiles.Select(x => new KeyValuePair<string, string>(x, conf.TargetCopyFilesPath)));
             relativePostBuildCopies.AddRange(conf.EventPostBuildCopies);
             relativePostBuildCopies.AddRange(conf.ResolvedTargetCopyFilesToSubDirectory.Select(x => new KeyValuePair<string, string>(x.Key, Path.Combine(conf.TargetPath, x.Value))));
 
