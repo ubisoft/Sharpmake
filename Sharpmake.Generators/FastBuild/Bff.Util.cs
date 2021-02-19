@@ -536,11 +536,11 @@ namespace Sharpmake.Generators.FastBuild
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
         }
 
-        internal static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
+        internal static List<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
         {
             var dependencies = new UniqueList<Project.Configuration>();
             GetOrderedFlattenedProjectDependenciesInternal(conf, dependencies, allDependencies, fuDependencies);
-            return dependencies;
+            return dependencies.OrderBy(c => c.ProjectGuid).ToList();
         }
 
         private static void GetOrderedFlattenedProjectDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies, bool allDependencies, bool fuDependencies)
@@ -581,11 +581,11 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        internal static UniqueList<Project.Configuration> GetOrderedFlattenedBuildOnlyDependencies(Project.Configuration conf)
+        internal static List<Project.Configuration> GetOrderedFlattenedBuildOnlyDependencies(Project.Configuration conf)
         {
             var dependencies = new UniqueList<Project.Configuration>();
             GetOrderedFlattenedBuildOnlyDependenciesInternal(conf, dependencies);
-            return dependencies;
+            return dependencies.OrderBy(c => c.ProjectGuid).ToList();
         }
 
         private static void GetOrderedFlattenedBuildOnlyDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies)
