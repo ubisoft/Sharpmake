@@ -523,7 +523,7 @@ namespace Sharpmake.Generators.FastBuild
                                         // use the global root for alias computation, as the project has not idea in which master bff it has been included
                                         var destinationRelativeToGlobal = Util.GetConvertedRelativePath(projectPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
                                         string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(Path.GetFileName(sourceFile), destinationRelativeToGlobal);
-                                        fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
+                                        fastBuildBuildOnlyDependencies.Add(fastBuildCopyAlias);
                                     }
                                 }
                             }
@@ -1249,8 +1249,8 @@ namespace Sharpmake.Generators.FastBuild
                                                     }
                                                     return false;
                                                 });
-                                            // These are all pre-build steps, at least in principle, so insert them before the other build steps.
-                                            fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
+
+                                            fastBuildProjectDependencies.AddRange(fileCustomBuildKeys);
 
                                             // Resolve node name of the prebuild dependency for PostBuildEvents.
                                             string resolvedSectionNodeIdentifier;
