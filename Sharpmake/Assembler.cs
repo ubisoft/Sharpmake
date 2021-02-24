@@ -470,6 +470,9 @@ namespace Sharpmake
                     )
                 );
 
+                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
+                LogCompilationResult(result, throwErrorException);
+
                 if (result.Success)
                 {
                     if (libraryFile != null)
@@ -488,8 +491,6 @@ namespace Sharpmake
                     return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
 
-                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
-                LogCompilationResult(result, throwErrorException);
             }
 
             return null;
@@ -509,7 +510,7 @@ namespace Sharpmake
                 errorMessage += diagnostic + Environment.NewLine;
             }
 
-            if (throwErrorException)
+            if (!result.Success && throwErrorException)
                 throw new Error(errorMessage);
         }
 
