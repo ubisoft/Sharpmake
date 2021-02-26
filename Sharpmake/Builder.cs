@@ -129,7 +129,7 @@ namespace Sharpmake
         private bool _cleanBlobsOnly = false;
         public bool BlobOnly = false;
         public bool Diagnostics = false;
-        private bool _debugScripts = false;
+        private readonly bool _debugScripts = false;
         private ThreadPool _tasks;
         // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
@@ -297,7 +297,7 @@ namespace Sharpmake
 
         [Obsolete("Use the builder with the new debugScripts argument", error: false)]
         public Builder(BuildContext.BaseBuildContext context, bool multithreaded, bool dumpDependencyGraph, bool cleanBlobsOnly, bool blobOnly, bool skipInvalidPath, bool diagnostics, Func<IGeneratorManager> getGeneratorsManagerCallBack, HashSet<string> defines)
-            : this(context, multithreaded, dumpDependencyGraph, cleanBlobsOnly, blobOnly, skipInvalidPath, diagnostics, false, getGeneratorsManagerCallBack, defines) { }
+            : this(context, multithreaded, dumpDependencyGraph, cleanBlobsOnly, blobOnly, skipInvalidPath, diagnostics, true, getGeneratorsManagerCallBack, defines) { }
 
         public void Dispose()
         {
