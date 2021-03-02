@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Debug_FastBuild_NoBlob_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_FastBuild_vs2019|x64">
+      <Configuration>Debug_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_MSBuild_vs2019|x64">
+      <Configuration>Debug_MSBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Release_FastBuild_NoBlob_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_vs2019|x64">
+      <Configuration>Release_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_MSBuild_vs2019|x64">
+      <Configuration>Release_MSBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3B88798D-8E0B-330F-7C31-7F761D686B03}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>UsePrecompExe</RootNamespace>
+    <ProjectName>UsePrecompExe</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">
+    <OutDir>output\debug_fastbuild_noblob_vs2019\</OutDir>
+    <IntDir>build\debug_fastbuild_noblob_vs2019\useprecompexe\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.obj" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.a" >NUL 2>NUL
+del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.lib" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.exe" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.elf" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.exp" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.ilk" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.lib" >NUL 2>NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_noblob_vs2019\useprecompexe.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <TargetFileName>useprecompexe.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
+    <OutDir>output\debug_fastbuild_vs2019\</OutDir>
+    <IntDir>build\debug_fastbuild_vs2019\useprecompexe\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe UsePrecompExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean UsePrecompExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
+del "build\debug_fastbuild_vs2019\useprecompexe\*.obj" >NUL 2>NUL
+del "build\debug_fastbuild_vs2019\useprecompexe\*.a" >NUL 2>NUL
+del "build\debug_fastbuild_vs2019\useprecompexe\*.lib" >NUL 2>NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.exe" >NUL 2>NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.elf" >NUL 2>NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.exp" >NUL 2>NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.ilk" >NUL 2>NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.lib" >NUL 2>NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_vs2019\useprecompexe.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <TargetFileName>useprecompexe.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
+    <TargetName>useprecompexe</TargetName>
+    <OutDir>output\debug_msbuild_vs2019\</OutDir>
+    <IntDir>build\debug_msbuild_vs2019\useprecompexe\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\debug_msbuild_vs2019\useprecompexe.exe</OutputFile>
+    <EmbedManifest>false</EmbedManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">
+    <OutDir>output\release_fastbuild_noblob_vs2019\</OutDir>
+    <IntDir>build\release_fastbuild_noblob_vs2019\useprecompexe\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.obj" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.a" >NUL 2>NUL
+del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.lib" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.exe" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.elf" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.exp" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.ilk" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.lib" >NUL 2>NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_noblob_vs2019\useprecompexe.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <TargetFileName>useprecompexe.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
+    <OutDir>output\release_fastbuild_vs2019\</OutDir>
+    <IntDir>build\release_fastbuild_vs2019\useprecompexe\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe UsePrecompExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean UsePrecompExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
+del "build\release_fastbuild_vs2019\useprecompexe\*.obj" >NUL 2>NUL
+del "build\release_fastbuild_vs2019\useprecompexe\*.a" >NUL 2>NUL
+del "build\release_fastbuild_vs2019\useprecompexe\*.lib" >NUL 2>NUL
+del "output\release_fastbuild_vs2019\useprecompexe.exe" >NUL 2>NUL
+del "output\release_fastbuild_vs2019\useprecompexe.elf" >NUL 2>NUL
+del "output\release_fastbuild_vs2019\useprecompexe.exp" >NUL 2>NUL
+del "output\release_fastbuild_vs2019\useprecompexe.ilk" >NUL 2>NUL
+del "output\release_fastbuild_vs2019\useprecompexe.lib" >NUL 2>NUL
+del "output\release_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_vs2019\useprecompexe.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <TargetFileName>useprecompexe.exe</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
+    <TargetName>useprecompexe</TargetName>
+    <OutDir>output\release_msbuild_vs2019\</OutDir>
+    <IntDir>build\release_msbuild_vs2019\useprecompexe\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\release_msbuild_vs2019\useprecompexe.exe</OutputFile>
+    <EmbedManifest>false</EmbedManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>build\debug_msbuild_vs2019\useprecompexe\UsePrecompExe.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>build\debug_msbuild_vs2019\useprecompexe\useprecompexe_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\debug_msbuild_vs2019\useprecompexe.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ManifestFile>build\debug_msbuild_vs2019\useprecompexe\useprecompexe.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\debug_msbuild_vs2019\useprecompexe.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\debug_msbuild_vs2019\useprecompexe.map</MapFileName>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>build\release_msbuild_vs2019\useprecompexe\UsePrecompExe.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>build\release_msbuild_vs2019\useprecompexe\useprecompexe_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\release_msbuild_vs2019\useprecompexe.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ManifestFile>build\release_msbuild_vs2019\useprecompexe\useprecompexe.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\release_msbuild_vs2019\useprecompexe.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\release_msbuild_vs2019\useprecompexe.map</MapFileName>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\UsePrecompExe\noprecomp_util.h" />
+    <ClInclude Include="..\codebase\UsePrecompExe\precomp.h" />
+    <ClInclude Include="..\codebase\UsePrecompExe\util.h" />
+    <ClInclude Include="..\codebase\UsePrecompExe\util_noprecomp_excludedbyextension.h" />
+    <ClInclude Include="..\codebase\UsePrecompExe\util_withprecomp_weirdextension.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\codebase\UsePrecompExe\main.cpp" />
+    <ClCompile Include="..\codebase\UsePrecompExe\noprecomp_util.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\codebase\UsePrecompExe\precomp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\codebase\UsePrecompExe\util.cpp" />
+    <ClCompile Include="..\codebase\UsePrecompExe\util_noprecomp_excludedbyextension.ceepeepee">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\codebase\UsePrecompExe\util_withprecomp_weirdextension.ceecee" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="useprecompexe_vs2019_win64.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
