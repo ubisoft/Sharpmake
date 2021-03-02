@@ -451,7 +451,7 @@ namespace Sharpmake
             // Compile
             var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
-                optimizationLevel: (builderContext != null && builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
+                optimizationLevel: (builderContext == null || builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
                 warningLevel: 4
             );
             var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
