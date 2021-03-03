@@ -41,7 +41,7 @@ jobs:
         run: ./CompileSharpmake.sh Sharpmake.sln "${{ matrix.configuration }}"
         
       - name: GenerateMdbFiles.bat
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.configuration == 'release'
         shell: cmd
         run: GenerateMdbFiles.bat
 
