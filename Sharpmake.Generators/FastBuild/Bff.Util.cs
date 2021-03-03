@@ -299,12 +299,13 @@ namespace Sharpmake.Generators.FastBuild
                 {
                     var unity = unitySection.Key;
                     var unityConfigurations = unitySection.Value;
+                    var projectRelativePath = Util.PathGetRelative(project.RootPath, projectPath, true);
 
                     // Don't use Object.GetHashCode() on a int[] object from GetMergedFragmentValuesAcrossConfigurations() as it is
                     // non-deterministic and depends on order of execution. String.GetHashCode() is stable as long as we don't use
                     // <UseRandomizedStringHashAlgorithm enabled="1" /> in the application config file, or as long as we don't use
                     // .NET Core. It can change between .NET versions, however; naming should be stable between different runs on the same machine.
-                    int hashcode = unity.GetHashCode() ^ projectPath.GetHashCode() ^ string.Join("_", unityConfigurations).GetHashCode();
+                    int hashcode = unity.GetHashCode() ^ projectRelativePath.GetHashCode() ^ string.Join("_", unityConfigurations).GetHashCode();
 
                     unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
@@ -436,9 +437,9 @@ namespace Sharpmake.Generators.FastBuild
         }
     }
 
-    internal static class UtilityMethods
+    public static class UtilityMethods
     {
-        public static string GetFBuildCompilerFamily(this CompilerFamily compilerFamily)
+        internal static string GetFBuildCompilerFamily(this CompilerFamily compilerFamily)
         {
             switch (compilerFamily)
             {
@@ -457,7 +458,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public static string GetFBuildLinkerType(this CompilerSettings.LinkerType linkerType)
+        internal static string GetFBuildLinkerType(this CompilerSettings.LinkerType linkerType)
         {
             switch (linkerType)
             {
@@ -472,28 +473,28 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public static bool TestPlatformFlags(this UniqueList<Platform> platforms, Platform platformFlags)
+        internal static bool TestPlatformFlags(this UniqueList<Platform> platforms, Platform platformFlags)
         {
             return platforms.Any(platform => platformFlags.HasFlag(platform));
         }
 
-        public static bool IsSupportedFastBuildPlatform(this Platform platform)
+        internal static bool IsSupportedFastBuildPlatform(this Platform platform)
         {
             return PlatformRegistry.Has<IPlatformBff>(platform);
         }
 
-        public static bool IsFastBuildEnabledProjectConfig(this Project.Configuration conf)
+        internal static bool IsFastBuildEnabledProjectConfig(this Project.Configuration conf)
         {
             return conf.IsFastBuild && conf.Platform.IsSupportedFastBuildPlatform() && !conf.DoNotGenerateFastBuild;
         }
 
-        public static string GetFastBuildCopyAlias(string sourceFileName, string destinationFolder)
+        internal static string GetFastBuildCopyAlias(string sourceFileName, string destinationFolder)
         {
             string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetHashCode().ToString("X8"));
             return fastBuildCopyAlias;
         }
 
-        public static string GetBffFileCopyPattern(string copyPattern)
+        internal static string GetBffFileCopyPattern(string copyPattern)
         {
             if (string.IsNullOrEmpty(copyPattern))
                 return copyPattern;
@@ -506,7 +507,7 @@ namespace Sharpmake.Generators.FastBuild
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
         }
 
-        public static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
+        internal static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
         {
             var dependencies = new UniqueList<Project.Configuration>();
             GetOrderedFlattenedProjectDependenciesInternal(conf, dependencies, allDependencies, fuDependencies);
@@ -581,7 +582,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null)
+        internal static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null)
         {
             // Select items.
             List<string> items = new List<string>(collection.Count);
@@ -605,11 +606,17 @@ namespace Sharpmake.Generators.FastBuild
             return FBuildFormatList(items, spaceLength);
         }
 
-        public static string FBuildFormatSingleListItem(string item)
+        internal static string FBuildFormatSingleListItem(string item)
         {
             return string.Format("'{0}'", item);
         }
 
+        /// <summary>
+        /// Build a list of string in the format of BFF array, on multiple lines if needed, indenting using spaceLength spaces.
+        /// </summary>
+        /// <param name="items">The list of values to put in the BFF array.</param>
+        /// <param name="spaceLength">The indentation size, in spaces, in case multiple lines are generated.</param>
+        /// <returns>The formatted string, or <see cref="FileGeneratorUtilities.RemoveLineTag"/> if the list is empty.</returns>
         public static string FBuildFormatList(List<string> items, int spaceLength)
         {
             if (items.Count == 0)
@@ -642,7 +649,7 @@ namespace Sharpmake.Generators.FastBuild
             return strBuilder.ToString();
         }
 
-        public static void WriteCustomBuildStepAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project.Configuration.CustomFileBuildStep buildStep, Func<string, bool> functor)
+        internal static void WriteCustomBuildStepAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project.Configuration.CustomFileBuildStep buildStep, Func<string, bool> functor)
         {
             var relativeBuildStep = buildStep.MakePathRelative(bffGenerator.Resolver,
                 (path, commandRelative) =>
@@ -668,7 +675,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public static void WriteConfigCustomBuildStepsAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project project, Project.Configuration config, Func<string, bool> functor)
+        internal static void WriteConfigCustomBuildStepsAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project project, Project.Configuration config, Func<string, bool> functor)
         {
             using (bffGenerator.Resolver.NewScopedParameter("project", project))
             using (bffGenerator.Resolver.NewScopedParameter("config", config))
@@ -683,7 +690,7 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        public static bool HasFastBuildConfig(List<Solution.Configuration> configurations)
+        internal static bool HasFastBuildConfig(List<Solution.Configuration> configurations)
         {
             bool hasFastBuildConfig = configurations.Any(
                 x => x.IncludedProjectInfos.Any(
@@ -693,7 +700,7 @@ namespace Sharpmake.Generators.FastBuild
             return hasFastBuildConfig;
         }
 
-        public static string GetNormalizedPathForBuildStep(string projectRootPath, string projectFolderPath, string path)
+        internal static string GetNormalizedPathForBuildStep(string projectRootPath, string projectFolderPath, string path)
         {
             if (string.IsNullOrEmpty(path))
                 return FileGeneratorUtilities.RemoveLineTag;
@@ -743,7 +750,7 @@ namespace Sharpmake.Generators.FastBuild
             return node;
         }
 
-        public static List<Bff.BffNodeBase> GetBffNodesFromBuildSteps(Dictionary<string, Project.Configuration.BuildStepBase> buildSteps, Strings preBuildDependencies)
+        internal static List<Bff.BffNodeBase> GetBffNodesFromBuildSteps(Dictionary<string, Project.Configuration.BuildStepBase> buildSteps, Strings preBuildDependencies)
         {
             var result = new List<Bff.BffNodeBase>();
 

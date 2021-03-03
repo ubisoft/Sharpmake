@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug_FastBuild_NoBlob_vs2017|x64">
-      <Configuration>Debug_FastBuild_NoBlob_vs2017</Configuration>
+    <ProjectConfiguration Include="Debug_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Debug_FastBuild_NoBlob_vs2019</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug_FastBuild_vs2017|x64">
-      <Configuration>Debug_FastBuild_vs2017</Configuration>
+    <ProjectConfiguration Include="Debug_FastBuild_vs2019|x64">
+      <Configuration>Debug_FastBuild_vs2019</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release_FastBuild_NoBlob_vs2017|x64">
-      <Configuration>Release_FastBuild_NoBlob_vs2017</Configuration>
+    <ProjectConfiguration Include="Release_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Release_FastBuild_NoBlob_vs2019</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release_FastBuild_vs2017|x64">
-      <Configuration>Release_FastBuild_vs2017</Configuration>
+    <ProjectConfiguration Include="Release_FastBuild_vs2019|x64">
+      <Configuration>Release_FastBuild_vs2019</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -25,33 +25,33 @@
     <ProjectName>FastBuildFunctionalTest_All</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2017|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2017|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2017|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2017|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,32 +60,32 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2017|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN64;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2017|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe FastBuildFunctionalTest_All_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_All_Debug_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN64;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2017|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64</NMakePreprocessorDefinitions>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2017|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe FastBuildFunctionalTest_All_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\FBuild.exe -clean FastBuildFunctionalTest_All_Release_FastBuild_vs2017_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <ItemGroup>

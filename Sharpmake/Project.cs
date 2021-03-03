@@ -1585,18 +1585,9 @@ namespace Sharpmake
         internal static Project CreateProject(Type projectType, List<Object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
         {
             Project project;
-            try
-            {
-                project = Activator.CreateInstance(projectType) as Project;
-                project.SharpmakeProjectType = projectTypeAttribute;
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException != null && (e.InnerException is Error || e.InnerException is InternalError))
-                    throw e.InnerException;
 
-                throw new Error(e, "Cannot create instances of type: {0}, make sure it's public", projectType.Name);
-            }
+            project = Activator.CreateInstance(projectType) as Project;
+            project.SharpmakeProjectType = projectTypeAttribute;
 
             project.Targets.SetGlobalFragmentMask(fragmentMasks.ToArray());
             project.Targets.BuildTargets();

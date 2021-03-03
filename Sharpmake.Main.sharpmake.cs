@@ -76,7 +76,7 @@ namespace SharpmakeGen
                 conf.ProjectFileName = "[project.Name]";
                 conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
-                conf.TargetPath = Path.Combine(Globals.OutputRootPath, "[target.Optimization]");
+                conf.TargetPath = Path.Combine(Globals.OutputRootPath, "[lower:target.Optimization]");
 
                 conf.IntermediatePath = @"[project.RootPath]\tmp\obj\[target.Optimization]\[project.Name]";
                 conf.BaseIntermediateOutputPath = conf.IntermediatePath;

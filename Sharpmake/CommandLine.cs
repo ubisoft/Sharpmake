@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -220,30 +220,14 @@ namespace Sharpmake
                                 string executeCode = String.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action execute = Assembler.BuildDelegate<Action>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
-                                try
-                                {
-                                    execute();
-                                }
-                                catch (TargetInvocationException e)
-                                {
-                                    if (e.InnerException != null)
-                                        throw (e.InnerException);
-                                }
+                                execute();
                             }
                             else
                             {
                                 string executeCode = String.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action<object> execute = Assembler.BuildDelegate<Action<object>>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
-                                try
-                                {
-                                    execute(instance);
-                                }
-                                catch (TargetInvocationException e)
-                                {
-                                    if (e.InnerException != null)
-                                        throw (e.InnerException);
-                                }
+                                execute(instance);
                             }
                             executedMethods.Add(uniqueExecutedMethodName);
                         }

@@ -451,7 +451,7 @@ namespace Sharpmake
             // Compile
             var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
-                optimizationLevel: (builderContext != null && builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
+                optimizationLevel: (builderContext == null || builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
                 warningLevel: 4
             );
             var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
@@ -469,6 +469,9 @@ namespace Sharpmake
                         pdbFilePath: pdbFilePath
                     )
                 );
+
+                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
+                LogCompilationResult(result, throwErrorException);
 
                 if (result.Success)
                 {
@@ -488,8 +491,6 @@ namespace Sharpmake
                     return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
 
-                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
-                LogCompilationResult(result, throwErrorException);
             }
 
             return null;
@@ -509,7 +510,7 @@ namespace Sharpmake
                 errorMessage += diagnostic + Environment.NewLine;
             }
 
-            if (throwErrorException)
+            if (!result.Success && throwErrorException)
                 throw new Error(errorMessage);
         }
 

@@ -253,9 +253,6 @@ namespace Sharpmake
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
 
-            if (conf.Target.GetOptimization() == Optimization.Debug)
-                startArguments += " /debugScripts";
-
             string quote = "\'"; // Use single quote that is cross platform safe
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
             conf.CsprojUserFile.StartProgram = sharpmakeApplicationExePath;

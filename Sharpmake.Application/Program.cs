@@ -596,9 +596,9 @@ namespace Sharpmake.Application
                 parameters.BlobOnly,
                 parameters.SkipInvalidPath,
                 parameters.Diagnostics,
-                parameters.DebugScripts,
-                Program.GetGeneratorsManager,
-                parameters.Defines
+                debugScripts: true, // warning: some code that rely on callstacks misbehaves in release, because methods can completely disappear due to optimizations, so force disable for now
+                getGeneratorsManagerCallBack: GetGeneratorsManager,
+                defines: parameters.Defines
             );
 
             // Allow message log from builder.
