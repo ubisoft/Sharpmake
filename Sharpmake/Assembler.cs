@@ -490,7 +490,6 @@ namespace Sharpmake
 
                     return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
-
             }
 
             return null;
