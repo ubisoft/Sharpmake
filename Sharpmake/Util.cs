@@ -997,7 +997,7 @@ namespace Sharpmake
                         readStream.Close();
                     }
                 }
-                catch (SerializationException)
+                catch
                 {
                     // File is likely corrupted.
                     // This is no big deal except that cleanup won't occur.
