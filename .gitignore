@@ -41,7 +41,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-tmp/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -67,3 +66,6 @@ Sharpmake.VC.db
 
 # Desktop Services Store on MacOS
 **/.DS_Store
+
+# Discard tmp files
+[Tt]mp/
