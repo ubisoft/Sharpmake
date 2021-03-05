@@ -175,7 +175,7 @@ namespace Sharpmake
 
     public class PackageAttributeParser : SimpleSourceAttributeParser
     {
-        private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
 
         public PackageAttributeParser() : base("Package", 1, "Sharpmake")
         {
