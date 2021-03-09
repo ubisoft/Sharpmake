@@ -436,19 +436,28 @@ namespace Sharpmake
             public enum UACExecutionLevel
             {
                 /// <summary>
-                /// Use the same privileges as the process that created the program.
+                /// UAC Execution Level: as invoker.
                 /// </summary>
+                /// <remarks>
+                /// Use the same privileges as the process that created the program.
+                /// </remarks>
                 asInvoker,
 
                 /// <summary>
-                /// Use the highest privileges available to the current user.
+                /// UAC Execution Level: highest available.
                 /// </summary>
+                /// <remarks>
+                /// Use the highest privileges available to the current user.
+                /// </remarks>
                 highestAvailable,
 
                 /// <summary>
+                /// UAC Execution Level: require administrator.
+                /// </summary>
+                /// <remarks>
                 /// Always run with administrator privileges. This will usually open a UAC dialog
                 /// box for the user.
-                /// </summary>
+                /// </remarks>
                 requireAdministrator
             }
 
