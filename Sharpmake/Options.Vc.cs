@@ -820,16 +820,51 @@ namespace Sharpmake
                     Enable,
                 }
 
+                /// <summary>
+                /// Enable Enhanced Instruction Set
+                /// </summary>
+                /// <remarks>
+                /// Enable use of instructions found on processors that support enhanced instruction sets, e.g., the SSE, SSE2, AVX, AVX2 and AVX-512 enhancements to IA-32; AVX, AVX2 and AVX-512 to x64. Currently /arch:SSE and /arch:SSE2 are only available when building for the x86 architecture. If no option is specified, the compiler will use instructions found on processors that support SSE2. Use of enhanced instructions can be disabled with /arch:IA32.   (/arch:SSE, /arch:SSE2, /arch:AVX, /arch:AVX2, /arch:AVX512, /arch:IA32)
+                /// </remarks>
                 public enum EnhancedInstructionSet
                 {
+                    /// <summary>
+                    /// Not Set
+                    /// </summary>
                     [Default]
                     Disable,
+
+                    /// <summary>
+                    /// Streaming SIMD Extensions. (/arch:SSE)
+                    /// </summary>
                     SIMD,
+
+                    /// <summary>
+                    /// Streaming SIMD Extensions 2. (/arch:SSE2)
+                    /// </summary>
                     SIMD2,
+
+                    /// <summary>
+                    /// Advanced Vector Extensions. (/arch:AVX)
+                    /// </summary>
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     AdvancedVectorExtensions,
+
+                    /// <summary>
+                    /// Advanced Vector Extensions 2. (/arch:AVX2)
+                    /// </summary>
                     [DevEnvVersion(minimum = DevEnv.vs2013)]
                     AdvancedVectorExtensions2,
+
+                    /// <summary>
+                    /// Advanced Vector Extensions 512. (/arch:AVX512)
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    AdvancedVectorExtensions512,
+
+                    /// <summary>
+                    /// No Enhanced Instructions. (/arch:IA32)
+                    /// </summary>
                     [DevEnvVersion(minimum = DevEnv.vs2012)]
                     NoEnhancedInstructions,
                 }
