@@ -652,7 +652,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["ForcedUsingFiles"] = ForceUsingFiles.Remove(ForceUsingFiles.Length - 1, 1);
             }
 
-            //Options.Vc.Compiler.CompileAsWinRT.     
+            //Options.Vc.Compiler.CompileAsWinRT.
             //    Disable                                 CompileAsWinRT="false"
             //    Enable                                  CompileAsWinRT="true"
             context.SelectOption
@@ -899,7 +899,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.ForceLoopScope.Enable, () => { context.Options["ForceConformanceInForLoopScope"] = "true"; context.CommandLineOptions["ForceConformanceInForLoopScope"] = "/Zc:forScope"; })
             );
 
-            //Options.Vc.Compiler.OpenMP.   
+            //Options.Vc.Compiler.OpenMP.
             //    Disable                                 OpenMP="false"                                  /openmp-
             //    Enable                                  OpenMP="true"                                   /openmp
             context.SelectOption
@@ -908,8 +908,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.OpenMP.Enable, () => { context.Options["OpenMP"] = "true"; context.CommandLineOptions["OpenMP"] = "/openmp"; })
             );
 
-            //Options.Vc.Compiler.GenerateXMLDocumentation.   
-            //    Disable                                 GenerateXMLDocumentation="false"                                  
+            //Options.Vc.Compiler.GenerateXMLDocumentation.
+            //    Disable                                 GenerateXMLDocumentation="false"
             //    Enable                                  GenerateXMLDocumentation="true"                                   /openmp
             context.SelectOption
             (

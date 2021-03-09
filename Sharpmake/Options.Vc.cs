@@ -491,7 +491,7 @@ namespace Sharpmake
                 /// Enable Intrinsic Functions
                 /// </summary>
                 /// <remarks>
-                /// Using intrinsic functions generates faster, but possibly larger, code. 
+                /// Using intrinsic functions generates faster, but possibly larger, code.
                 /// </remarks>
                 public enum Intrinsic
                 {
