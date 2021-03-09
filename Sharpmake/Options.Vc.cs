@@ -1036,12 +1036,47 @@ namespace Sharpmake
                     Enable
                 }
 
+                /// <summary>
+                /// Calling Convention
+                /// </summary>
+                /// <remarks>
+                /// Select the default calling convention for your application (can be overridden by function).
+                /// </remarks>
                 public enum CallingConvention
                 {
+                    /// <summary>
+                    /// __cdecl
+                    /// </summary>
+                    /// <remarks>
+                    /// Specifies the __cdecl calling convention for all functions except C++ member functions and functions marked __stdcall or __fastcall.
+                    /// </remarks>
                     [Default]
                     cdecl,
+
+                    /// <summary>
+                    /// __fastcall
+                    /// </summary>
+                    /// <remarks>
+                    /// Specifies the __fastcall calling convention for all functions except C++ member sfunctions and functions marked __cdecl or __stdcall. All __fastcall functions must have prototypes.
+                    /// </remarks>
                     fastcall,
+
+                    /// <summary>
+                    /// __stdcall
+                    /// </summary>
+                    /// <remarks>
+                    /// Specifies the __stdcall calling convention for all functions except C++ member functions and functions marked __cdecl or __fastcall. All __stdcall functions must have prototypes.
+                    /// </remarks>
                     stdcall,
+
+                    /// <summary>
+                    /// __vectorcall
+                    /// </summary>
+                    /// <remarks>
+                    /// Specifies the __vectorcall calling convention for all functions except C++ member functions and functions marked __cdecl, __fastcall, or __stdcall. All __vectorcall functions must have prototypes.
+                    /// </remarks>
+                    [DevEnvVersion(minimum = DevEnv.vs2013)]
+                    vectorcall
                 }
 
                 /// <summary>

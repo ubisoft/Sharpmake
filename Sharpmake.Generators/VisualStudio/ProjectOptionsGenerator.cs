@@ -931,7 +931,8 @@ namespace Sharpmake.Generators.VisualStudio
             (
             Options.Option(Options.Vc.Compiler.CallingConvention.cdecl, () => { context.Options["CallingConvention"] = "Cdecl"; context.CommandLineOptions["CallingConvention"] = "/Gd"; }),
             Options.Option(Options.Vc.Compiler.CallingConvention.fastcall, () => { context.Options["CallingConvention"] = "FastCall"; context.CommandLineOptions["CallingConvention"] = "/Gr"; }),
-            Options.Option(Options.Vc.Compiler.CallingConvention.stdcall, () => { context.Options["CallingConvention"] = "StdCall"; context.CommandLineOptions["CallingConvention"] = "/Gz"; })
+            Options.Option(Options.Vc.Compiler.CallingConvention.stdcall, () => { context.Options["CallingConvention"] = "StdCall"; context.CommandLineOptions["CallingConvention"] = "/Gz"; }),
+            Options.Option(Options.Vc.Compiler.CallingConvention.vectorcall, () => { context.Options["CallingConvention"] = "VectorCall"; context.CommandLineOptions["CallingConvention"] = "/Gv"; })
             );
 
             //Options.Vc.Compiler.ShowIncludes.
