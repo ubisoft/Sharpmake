@@ -1607,12 +1607,62 @@ namespace Sharpmake
                     NoRuntimeTrackingAndEnableOptimizations
                 }
 
+                /// <summary>
+                /// The /SUBSYSTEM option tells the operating system how to run the .exe file.The choice of subsystem affects the entry point symbol (or entry point function) that the linker will choose.
+                /// </summary>
                 public enum SubSystem
                 {
+                    /// <summary>
+                    /// Not Set
+                    /// </summary>
+                    /// <remarks>
+                    /// No subsystem set.
+                    /// </remarks>
+                    NotSet,
+
+                    /// <summary>
+                    /// Win32 character-mode application. Console applications are given a console by the operating system. If main or wmain is defined, CONSOLE is the default.
+                    /// </summary>
                     [Default]
                     Console,
-                    Application,
-                    Native
+
+                    /// <summary>
+                    /// Application does not require a console, probably because it creates its own windows for interaction with the user. If WinMain or wWinMain is defined, WINDOWS is the default.
+                    /// </summary>
+                    Windows,
+
+                    /// <summary>
+                    /// Device drivers for Windows NT. If /DRIVER:WDM is specified, NATIVE is the default.
+                    /// </summary>
+                    Native,
+
+                    /// <summary>
+                    /// EFI Application.
+                    /// </summary>
+                    EFI_Application,
+
+                    /// <summary>
+                    /// EFI Boot Service Driver.
+                    /// </summary>
+                    EFI_Boot_Service_Driver,
+
+                    /// <summary>
+                    /// EFI ROM.
+                    /// </summary>
+                    EFI_ROM,
+
+                    /// <summary>
+                    /// EFI Runtime.
+                    /// </summary>
+                    EFI_Runtime,
+
+                    /// <summary>
+                    /// Application that runs with the POSIX subsystem in Windows NT.
+                    /// </summary>
+                    POSIX,
+
+                    [Obsolete("Use '" + nameof(Windows) + "' enum entry instead", true)]
+                    Application
                 }
 
                 public enum DLLDefine

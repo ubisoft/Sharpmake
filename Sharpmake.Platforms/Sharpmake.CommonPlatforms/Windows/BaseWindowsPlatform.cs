@@ -45,7 +45,7 @@ namespace Sharpmake
                     case Project.Configuration.OutputType.Exe:
                         context.SelectOption(
                             Options.Option(Options.Vc.Linker.SubSystem.Console, () => { defines.Add("_CONSOLE"); }),
-                            Options.Option(Options.Vc.Linker.SubSystem.Application, () => { defines.Add("_WINDOWS"); }));
+                            Options.Option(Options.Vc.Linker.SubSystem.Windows, () => { defines.Add("_WINDOWS"); }));
                         break;
                     case Project.Configuration.OutputType.Lib:
                         defines.Add("_LIB");

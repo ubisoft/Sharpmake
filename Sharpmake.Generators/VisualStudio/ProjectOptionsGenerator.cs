@@ -1490,15 +1490,17 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Linker.AssemblyDebug.NoRuntimeTrackingAndEnableOptimizations, () => { context.Options["AssemblyDebug"] = "false"; context.CommandLineOptions["AssemblyDebug"] = "/ASSEMBLYDEBUG:DISABLE"; })
             );
 
-            //SubSystem
-            //    Console                                 SubSystem="1"                           /SUBSYSTEM:CONSOLE
-            //    Windows                                 SubSystem="2"                           /SUBSYSTEM:WINDOWS
-            //    Native                                  SubSystem="3"                           /SUBSYSTEM:NATIVE
             context.SelectOption
             (
+            Options.Option(Options.Vc.Linker.SubSystem.NotSet, () => { context.Options["SubSystem"] = "NotSet"; context.CommandLineOptions["SubSystem"] = FileGeneratorUtilities.RemoveLineTag; }),
             Options.Option(Options.Vc.Linker.SubSystem.Console, () => { context.Options["SubSystem"] = "Console"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:CONSOLE"; }),
-            Options.Option(Options.Vc.Linker.SubSystem.Application, () => { context.Options["SubSystem"] = "Windows"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:WINDOWS"; }),
-            Options.Option(Options.Vc.Linker.SubSystem.Native, () => { context.Options["SubSystem"] = "Native"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:NATIVE"; })
+            Options.Option(Options.Vc.Linker.SubSystem.Windows, () => { context.Options["SubSystem"] = "Windows"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:WINDOWS"; }),
+            Options.Option(Options.Vc.Linker.SubSystem.Native, () => { context.Options["SubSystem"] = "Native"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:NATIVE"; }),
+            Options.Option(Options.Vc.Linker.SubSystem.EFI_Application, () => { context.Options["SubSystem"] = "EFI Application"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:EFI_APPLICATION"; }),
+            Options.Option(Options.Vc.Linker.SubSystem.EFI_Boot_Service_Driver, () => { context.Options["SubSystem"] = "EFI Boot Service Driver"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER"; }),
+            Options.Option(Options.Vc.Linker.SubSystem.EFI_ROM, () => { context.Options["SubSystem"] = "EFI ROM"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:EFI_ROM"; }),
+            Options.Option(Options.Vc.Linker.SubSystem.EFI_Runtime, () => { context.Options["SubSystem"] = "EFI Runtime"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:EFI_RUNTIME_DRIVER"; }),
+            Options.Option(Options.Vc.Linker.SubSystem.POSIX, () => { context.Options["SubSystem"] = "POSIX"; context.CommandLineOptions["SubSystem"] = "/SUBSYSTEM:POSIX"; })
             );
 
 
