@@ -1146,13 +1146,52 @@ namespace Sharpmake
                     No
                 }
 
+                /// <summary>
+                /// Spectre Mitigation
+                /// </summary>
+                /// <remarks>
+                /// Spectre mitigations for CVE 2017-5753.
+                /// </remarks>
                 public enum SpectreMitigation
                 {
                     [Default]
                     Default,
+
+                    /// <summary>
+                    /// Enable Spectre mitigation feature for CVE 2017-5753
+                    /// </summary>
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
-                    Enabled,
-                    Disabled
+                    Spectre,
+
+                    /// <summary>
+                    /// All Loads
+                    /// </summary>
+                    /// <remarks>
+                    /// Enable Spectre mitigations for all load instructions
+                    /// </remarks>
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    SpectreLoad,
+
+                    /// <summary>
+                    /// All Control Flow Loads
+                    /// </summary>
+                    /// <remarks>
+                    /// Enable Spectre mitigations for all control flow load instructions
+                    /// </remarks>
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    SpectreLoadCF,
+
+                    /// <summary>
+                    /// Disabled
+                    /// </summary>
+                    /// <remarks>
+                    /// Not Set.
+                    /// </remarks>
+                    [DevEnvVersion(minimum = DevEnv.vs2017)]
+                    Disabled,
+
+                    [Obsolete("Use '" + nameof(Spectre) + "' enum entry instead", true)]
+                    Enabled
                 }
 
                 /// <summary>

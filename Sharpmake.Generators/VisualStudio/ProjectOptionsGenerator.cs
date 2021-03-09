@@ -973,14 +973,12 @@ namespace Sharpmake.Generators.VisualStudio
                 context.CommandLineOptions["SupportJustMyCode"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
-            //Options.Vc.Compiler.SpectreMitigation.
-            //    Default
-            //    Enabled                               SpectreMitigation="Spectre"                       /Qspectre
-            //    Disabled                              SpectreMitigation="false"
             context.SelectOption
             (
             Options.Option(Options.Vc.Compiler.SpectreMitigation.Default, () => { context.Options["SpectreMitigation"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["SpectreMitigation"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.Compiler.SpectreMitigation.Enabled, () => { context.Options["SpectreMitigation"] = "Spectre"; context.CommandLineOptions["SpectreMitigation"] = "/Qspectre"; }),
+            Options.Option(Options.Vc.Compiler.SpectreMitigation.Spectre, () => { context.Options["SpectreMitigation"] = "Spectre"; context.CommandLineOptions["SpectreMitigation"] = "/Qspectre"; }),
+            Options.Option(Options.Vc.Compiler.SpectreMitigation.SpectreLoad, () => { context.Options["SpectreMitigation"] = "SpectreLoad"; context.CommandLineOptions["SpectreMitigation"] = "/Qspectre-load"; }),
+            Options.Option(Options.Vc.Compiler.SpectreMitigation.SpectreLoadCF, () => { context.Options["SpectreMitigation"] = "SpectreLoadCF"; context.CommandLineOptions["SpectreMitigation"] = "/Qspectre-load-cf"; }),
             Options.Option(Options.Vc.Compiler.SpectreMitigation.Disabled, () => { context.Options["SpectreMitigation"] = "false"; context.CommandLineOptions["SpectreMitigation"] = FileGeneratorUtilities.RemoveLineTag; })
             );
 
