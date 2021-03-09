@@ -1888,11 +1888,37 @@ namespace Sharpmake
                     ItaniumImage
                 }
 
+                /// <summary>
+                /// Force File Output
+                /// </summary>
+                /// <remarks>
+                /// Tells the linker to create an .exe file or DLL even if a symbol is referenced but not defined or is multiply defined. It may create invalid exe file.
+                /// </remarks>
                 public enum ForceFileOutput
                 {
                     [Default]
                     Default,
-                    MultiplyDefinedSymbolOnly
+
+                    /// <summary>
+                    /// /FORCE with no arguments implies both multiple and unresolved.
+                    /// </summary>
+                    Enable,
+
+                    /// <summary>
+                    /// Multiply Defined Symbol Only
+                    /// </summary>
+                    /// <remarks>
+                    /// Use /FORCE:MULTIPLE to create an output file whether or not LINK finds more than one definition for a symbol.
+                    /// </remarks>
+                    MultiplyDefinedSymbolOnly,
+
+                    /// <summary>
+                    /// Undefined Symbol Only
+                    /// </summary>
+                    /// <remarks>
+                    /// Use /FORCE:UNRESOLVED to create an output file whether or not LINK finds an undefined symbol. /FORCE:UNRESOLVED is ignored if the entry point symbol is unresolved.
+                    /// </remarks>
+                    UndefinedSymbolOnly
                 }
 
                 public class DisableSpecificWarnings : Strings

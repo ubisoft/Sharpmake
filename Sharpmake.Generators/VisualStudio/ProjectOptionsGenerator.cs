@@ -1699,11 +1699,12 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["FunctionOrder"] = (fctOrder != null) ? fctOrder.Order : FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["FunctionOrder"] = (fctOrder != null) ? @"/ORDER:@""" + fctOrder.Order + @"""" : FileGeneratorUtilities.RemoveLineTag;
 
-            // ForceFileOutput
             context.SelectOption
             (
             Options.Option(Options.Vc.Linker.ForceFileOutput.Default, () => { context.Options["ForceFileOutput"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["ForceFileOutput"] = FileGeneratorUtilities.RemoveLineTag; }),
-            Options.Option(Options.Vc.Linker.ForceFileOutput.MultiplyDefinedSymbolOnly, () => { context.Options["ForceFileOutput"] = "MultiplyDefinedSymbolOnly"; context.CommandLineOptions["ForceFileOutput"] = "/FORCE:MULTIPLE"; })
+            Options.Option(Options.Vc.Linker.ForceFileOutput.Enable, () => { context.Options["ForceFileOutput"] = "Enabled"; context.CommandLineOptions["ForceFileOutput"] = "/FORCE"; }),
+            Options.Option(Options.Vc.Linker.ForceFileOutput.MultiplyDefinedSymbolOnly, () => { context.Options["ForceFileOutput"] = "MultiplyDefinedSymbolOnly"; context.CommandLineOptions["ForceFileOutput"] = "/FORCE:MULTIPLE"; }),
+            Options.Option(Options.Vc.Linker.ForceFileOutput.UndefinedSymbolOnly, () => { context.Options["ForceFileOutput"] = "UndefinedSymbolOnly"; context.CommandLineOptions["ForceFileOutput"] = "/FORCE:UNRESOLVED"; })
             );
 
             //CreateHotPatchableImage
