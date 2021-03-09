@@ -1760,13 +1760,58 @@ namespace Sharpmake
                     RemoveRedundantCOMDATs
                 }
 
+                /// <summary>
+                /// Link Time Code Generation
+                /// </summary>
+                /// <remarks>
+                /// Specifies link-time code generation.
+                /// </remarks>
                 public enum LinkTimeCodeGeneration
                 {
+                    /// <summary>
+                    /// Default LTCG setting.
+                    /// </summary>
                     [Default]
                     Default,
+
+                    /// <summary>
+                    /// Use Fast Link Time Code Generation
+                    /// </summary>
+                    /// <remarks>
+                    /// Use Link Time Code Generation.
+                    /// </remarks>
+                    UseFastLinkTimeCodeGeneration,
+
+                    /// <summary>
+                    /// Use Link Time Code Generation
+                    /// </summary>
+                    /// <remarks>
+                    /// Use Link Time Code Generation.
+                    /// </remarks>
                     UseLinkTimeCodeGeneration,
+
+                    /// <summary>
+                    /// Profile Guided Optimization - Instrument
+                    /// </summary>
+                    /// <remarks>
+                    /// Specifies link-time code generation.
+                    /// </remarks>
                     ProfileGuidedOptimizationInstrument,
+
+                    /// <summary>
+                    /// Profile Guided Optimization - Optimization
+                    /// </summary>
+                    /// <remarks>
+                    /// Specifies that the linker should use the profile data created after running the instrumented binary to create an optimized image.
+                    /// </remarks>
                     ProfileGuidedOptimizationOptimize,
+
+                    /// <summary>
+                    /// Profile Guided Optimization - Update
+                    /// </summary>
+                    /// <remarks>
+                    /// Allows and tracks list of input files to be added or modified from what was specified in the :PGINSTRUMENT phase.
+                    /// </remarks>
                     ProfileGuidedOptimizationUpdate
                 }
 
