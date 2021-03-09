@@ -198,26 +198,55 @@ namespace Sharpmake
                     Disabled
                 }
 
+                /// <summary>
+                /// Warning Level
+                /// </summary>
+                /// <remarks>
+                /// Select how strict you want the compiler to be about code errors.
+                /// </remarks>
                 public enum WarningLevel
                 {
+                    /// <summary>
+                    /// Turn Off All Warnings
+                    /// </summary>
+                    /// <remarks>
+                    /// Level 0 disables all warnings.
+                    /// </remarks>
                     Level0,
+
+                    /// <summary>
+                    /// Level 1 displays severe warnings. Level 1 is the default warning level at the command line.
+                    /// </summary>
                     Level1,
+
+                    /// <summary>
+                    /// Level 2 displays all level 1 warnings and warnings less severe than level 1.
+                    /// </summary>
                     Level2,
+
+                    /// <summary>
+                    /// Level 3 displays all level 2 warnings and all other warnings recommended for production purposes.
+                    /// </summary>
                     Level3,
+
+                    /// <summary>
+                    /// Level 4 displays all level 3 warnings plus informational warnings, which in most cases can be safely ignored.
+                    /// </summary>
                     [Default]
                     Level4,
+
+                    /// <summary>
+                    /// Enables all warnings, including those disabled by default.
+                    /// </summary>
                     EnableAllWarnings
                 }
 
-                [Obsolete("Use option TreatWarningsAsErrors instead")]
-                public enum TreatWarningAsError
-                {
-                    Enable,
-                    [Default]
-                    Disable
-                }
-
-
+                /// <summary>
+                /// Treat Warnings As Errors
+                /// </summary>
+                /// <remarks>
+                /// Treats all compiler warnings as errors. For a new project, it may be best to use /WX in all compilations; resolving all warnings will ensure the fewest possible hard-to-find code defects.
+                /// </remarks>
                 public enum TreatWarningsAsErrors
                 {
                     Enable,
