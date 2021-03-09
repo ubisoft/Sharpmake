@@ -1322,12 +1322,72 @@ namespace Sharpmake
                     No
                 }
 
+                /// <summary>
+                /// Show Progress
+                /// </summary>
+                /// <remarks>
+                /// Prints Linker Progress Messages
+                /// </remarks>
                 public enum ShowProgress
                 {
+                    /// <summary>
+                    /// Not Set
+                    /// </summary>
+                    /// <remarks>
+                    /// No verbosity.
+                    /// </remarks>
                     [Default]
                     NotSet,
+
+                    /// <summary>
+                    /// Display all progress messages
+                    /// </summary>
+                    LinkVerbose,
+
+                    /// <summary>
+                    /// For Libraries Searched
+                    /// </summary>
+                    /// <remarks>
+                    /// Displays progress messages indicating just the libraries searched.
+                    /// </remarks>
+                    LinkVerboseLib,
+
+                    /// <summary>
+                    /// About COMDAT folding during optimized linking
+                    /// </summary>
+                    /// <remarks>
+                    /// Displays information about COMDAT folding during optimized linking.
+                    /// </remarks>
+                    LinkVerboseICF,
+
+                    /// <summary>
+                    /// About data removed during optimized linking
+                    /// </summary>
+                    /// <remarks>
+                    /// Displays information about functions and data removed during optimized linking.
+                    /// </remarks>
+                    LinkVerboseREF,
+
+                    /// <summary>
+                    /// About Modules incompatible with SEH
+                    /// </summary>
+                    /// <remarks>
+                    /// Displays information about modoules incompatible with Safe Exception Handling.
+                    /// </remarks>
+                    LinkVerboseSAFESEH,
+
+                    /// <summary>
+                    /// About linker activity related to managed code
+                    /// </summary>
+                    /// <remarks>
+                    /// Display information about linker activity related to managed code.
+                    /// </remarks>
+                    LinkVerboseCLR,
+
+                    [Obsolete("Use '" + nameof(LinkVerbose) + "' enum entry instead", true)]
                     DisplayAllProgressMessages,
-                    DisplaysSomeProgressMessages
+                    [Obsolete("Use '" + nameof(LinkVerboseLib) + "' enum entry instead", true)]
+                    DisplaysSomeProgressMessages,
                 }
 
                 /// <summary>
