@@ -294,13 +294,45 @@ namespace Sharpmake
                     Disable
                 }
 
+                /// <summary>
+                /// Common Language RunTime Support
+                /// </summary>
+                /// <remarks>
+                /// Use the .NET runtime service.  This switch is incompatible with some other switches; see the documentation on the /clr family of switches for details.
+                /// </remarks>
                 public enum CommonLanguageRuntimeSupport
                 {
+                    /// <summary>
+                    /// No Common Language RunTime Support
+                    /// </summary>
                     [Default]
                     NoClrSupport,
+
+                    /// <summary>
+                    /// Common Language RunTime Support
+                    /// </summary>
+                    /// <remarks>
+                    /// Creates metadata for your application that can be consumed by other CLR applications, and allows your application to consume types and data in the metadata of other CLR components.
+                    /// </remarks>
                     ClrSupport,  // clr
+
+                    /// <summary>
+                    /// Pure MSIL Common Language RunTime Support
+                    /// </summary>
+                    /// <remarks>
+                    /// Produces an MSIL-only output file with no native executable code, although it can contain native types compiled to MSIL.
+                    /// </remarks>
                     PureMsilClrSupport,  // clr:pure
+
+                    /// <summary>
+                    /// Safe MSIL Common Language RunTime Support
+                    /// </summary>
+                    /// <remarks>
+                    /// Produces an MSIL-only (no native executable code) and verifiable output file.
+                    /// </remarks>
                     SafeMsilClrSupport,  // clr:safe
+
+                    [Obsolete("This option is not supported by msvc anymore.", true)]
                     SafeMsilClrSupportOldSyntax  // clr:oldSyntax
                 }
 
