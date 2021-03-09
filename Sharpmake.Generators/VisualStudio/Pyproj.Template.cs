@@ -38,7 +38,6 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectDescription =
 @"  <PropertyGroup>
-    <Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>[guid]</ProjectGuid>
     <ProjectHome>[projectHome]</ProjectHome>
@@ -51,7 +50,6 @@ namespace Sharpmake.Generators.VisualStudio
     <InterpreterId>[interpreterId]</InterpreterId>
     <InterpreterVersion>[interpreterVersion]</InterpreterVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=""'$(Configuration)' == 'Debug'"" />
   <PropertyGroup>
     <VisualStudioVersion Condition="" '$(VisualStudioVersion)' == '' "">10.0</VisualStudioVersion>
     <PtvsTargetsFile>[ptvsTargetsFile]</PtvsTargetsFile>
