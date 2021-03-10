@@ -200,7 +200,7 @@ class MySolution : Solution
 The entry point is the Main, a function called once and found in the main .sharpmake.cs file passed to Sharpmake.exe:
 
 ```csharp
-static class Main
+public static class Main
 {
     [Sharpmake.Main]
     public static void SharpmakeMain(Sharpmake.Arguments arguments)
