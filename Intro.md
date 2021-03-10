@@ -224,7 +224,7 @@ class MyArguments
     }
 }
 
-static class Main
+public static class Main
 {
     public static MyArguments Arguments = new MyArguments();
 
