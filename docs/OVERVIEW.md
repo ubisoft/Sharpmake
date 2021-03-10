@@ -247,7 +247,10 @@ namespace HelloWorld
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\generated";
             conf.AddProject<HelloWorldProject>(target);
         }
- 
+    }
+
+    public static class Main
+    {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
@@ -1487,7 +1490,10 @@ namespace CSharpHelloWorld
  
             conf.AddProject<HelloWorld>(target);
         }
- 
+    }
+
+    public static class Main
+    {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
