@@ -419,10 +419,10 @@ namespace Sharpmake.Application
         {
             LogWriteLine(Environment.NewLine + "Unhandled exception Error:");
             LogWriteLine(Util.GetCompleteExceptionMessage(unhandledExceptionEventArgs.ExceptionObject as Exception, "\t"));
-            
+
             Environment.Exit((int)ExitCode.UnknownError);
         }
-        
+
         private static void LogSharpmakeExtensionLoaded(Assembly extensionAssembly)
         {
             if (extensionAssembly == null)
