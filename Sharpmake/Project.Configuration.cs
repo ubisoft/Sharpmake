@@ -85,50 +85,6 @@ namespace Sharpmake
         DefaultForceUsing = ForceUsingAssembly
                               | IncludePaths
                               | Defines,
-
-
-        ////////////////////////////////////////////////////////////////////////
-        // OLD AND DEPRECATED FLAGS
-        [Obsolete("Please use OnlyBuildOrder instead.", error: false)]
-        OnlyDependencyInSolution = -1,
-
-        [Obsolete("Please use OnlyBuildOrder instead.", error: false)]
-        ForcedDependencyInSolution = -1,
-
-        [Obsolete("Please replace by OnlyBuildOrder if that's what you wanted, otherwise remove it, it isn't needed.", error: false)]
-        ProjectReference = -1,
-
-        [Obsolete("Please replace by LibraryFiles.", error: false)]
-        InheritLibraryFiles = -1,
-
-        [Obsolete("Please replace by LibraryPaths.", error: false)]
-        InheritLibraryPaths = -1,
-
-        [Obsolete("Please replace by IncludePaths.", error: false)]
-        InheritIncludePaths = -1,
-
-        [Obsolete("Please replace by Defines.", error: false)]
-        InheritDefines = -1,
-
-        [Obsolete("Please remove this.", error: false)]
-        InheritDependencies = -1,
-
-        [Obsolete("Please replace by LibraryFiles if needed, sharpmake controls the dependency inheritance.", error: false)]
-        InheritFromDependenciesLibraryFiles = -1,
-
-        [Obsolete("Please replace by LibraryPaths if needed, sharpmake controls the dependency inheritance.", error: false)]
-        InheritFromDependenciesLibraryPaths = -1,
-
-        [Obsolete("Please replace by IncludePaths if needed, sharpmake controls the dependency inheritance.", error: false)]
-        InheritFromDependenciesIncludePaths = -1,
-
-        [Obsolete("Please replace by Defines if needed, sharpmake controls the dependency inheritance.", error: false)]
-        InheritFromDependenciesDefines = -1,
-
-        [Obsolete("Please replace by OnlyBuildOrder if needed, sharpmake controls the dependency inheritance.", error: false)]
-        InheritFromDependenciesNothing = -1,
-        [Obsolete("Please replace by OnlyBuildOrder if needed, sharpmake controls the dependency inheritance.", error: false)]
-        InheritFromDependenciesDependencies = -1,
     }
 
     /// <summary>
@@ -2057,16 +2013,10 @@ namespace Sharpmake
             private readonly Strings _fastBuildMasterBffList = new Strings();
             private readonly object _fastBuildMasterBffListLock = new object();
 
-            [Obsolete("Sharpmake will determine the projects to build.")]
-            public bool IsMainProject = false;
-
             /// <summary>
             /// Gets or sets whether FASTBuild blobs (unities) will be used in the build.
             /// </summary>
             public bool FastBuildBlobbed = true;
-
-            [Obsolete("Use FastBuildDistribution instead.")]
-            public bool FastBuildDisableDistribution = false;
 
             /// <summary>
             /// Gets or sets whether FASTBuild tasks will be distributed on the network.
@@ -2457,28 +2407,6 @@ namespace Sharpmake
                 SetDependency(projectType, target, dependencySetting);
             }
 
-            // These dependencies will be propagated to other dependent projects, but not across dll dependencies.
-            [Obsolete("Protected dependencies are deprecated, please use public/private instead.", error: false)]
-            public void AddProtectedDependency<TPROJECT>(
-                ITarget target,
-                DependencySetting dependencySetting = DependencySetting.Default,
-                [CallerFilePath] string sourceFilePath = "",
-                [CallerLineNumber] int sourceLineNumber = 0)
-            {
-                AddPublicDependency(target, typeof(TPROJECT), dependencySetting, sourceFilePath, sourceLineNumber);
-            }
-
-            [Obsolete("Protected dependencies are deprecated, please use public/private instead.", error: false)]
-            public void AddProtectedDependency(
-                ITarget target,
-                Type projectType,
-                DependencySetting dependencySetting = DependencySetting.Default,
-                [CallerFilePath] string sourceFilePath = "",
-                [CallerLineNumber] int sourceLineNumber = 0)
-            {
-                AddPublicDependency(target, projectType, dependencySetting, sourceFilePath, sourceLineNumber);
-            }
-
             // These dependencies will never be propagated to other projects that depend on us
             public void AddPrivateDependency<TPROJECT>(
                 ITarget target,
@@ -2509,29 +2437,11 @@ namespace Sharpmake
                 SetDependency(projectType, target, dependencySetting);
             }
 
-            // These dependencies will only be added to solutions for build ordering
-            [Obsolete("Solution only dependencies are deprecated, please use Private with OnlyBuildOrder flag instead.", error: false)]
-            public void AddSolutionOnlyDependency<TPROJECT>(
-                ITarget target,
-                [CallerFilePath] string sourceFilePath = "",
-                [CallerLineNumber] int sourceLineNumber = 0)
-            {
-                AddPrivateDependency(target, typeof(TPROJECT), DependencySetting.OnlyBuildOrder, sourceFilePath, sourceLineNumber);
-            }
-            [Obsolete("Solution only dependencies are deprecated, please use Private with OnlyBuildOrder flag instead.", error: false)]
-            public void AddSolutionOnlyDependency(
-                ITarget target,
-                Type projectType,
-                [CallerFilePath] string sourceFilePath = "",
-                [CallerLineNumber] int sourceLineNumber = 0)
-            {
-                AddPrivateDependency(target, projectType, DependencySetting.OnlyBuildOrder, sourceFilePath, sourceLineNumber);
-            }
-
             public bool HaveDependency<TPROJECT>()
             {
                 return HaveDependency(typeof(TPROJECT));
             }
+
             public bool HaveDependency(Type projectType)
             {
                 return UnResolvedPrivateDependencies.ContainsKey(projectType) || UnResolvedProtectedDependencies.ContainsKey(projectType) || UnResolvedPublicDependencies.ContainsKey(projectType);
@@ -3160,13 +3070,6 @@ namespace Sharpmake
                 if (string.IsNullOrEmpty(OutputExtension))
                     OutputExtension = PlatformRegistry.Get<IConfigurationTasks>(Platform).GetDefaultOutputExtension(Output);
             }
-
-            #region Deprecated
-            [Obsolete("This delegate was used only by " + nameof(FastBuildFileIncludeCondition) + " which had no effect. It will be removed.")]
-            public delegate bool FastBuildFileIncludeConditionDelegate(Project.Configuration conf);
-            [Obsolete("This property could be set but was never used by Sharpmake. It will be removed.")]
-            public FastBuildFileIncludeConditionDelegate FastBuildFileIncludeCondition = null;
-            #endregion
         }
     }
 }

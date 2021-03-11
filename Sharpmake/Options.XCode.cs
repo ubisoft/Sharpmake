@@ -186,14 +186,6 @@ namespace Sharpmake
                     { }
                 }
 
-                [Obsolete("AssetCatalog is not used anymore.", error: true)]
-                public class AssetCatalog : Strings
-                {
-                    public AssetCatalog(params string[] paths)
-                        : base(paths)
-                    { }
-                }
-
                 public class ExternalResourceFiles : Strings
                 {
                     public ExternalResourceFiles(params string[] paths)

@@ -125,11 +125,6 @@ namespace Sharpmake
             }
         }
 
-        [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf", error: true)]
-        public void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
-        {
-        }
-
         public void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
         {
             string outputTypeArgument;

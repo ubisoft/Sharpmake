@@ -28,15 +28,6 @@ namespace Sharpmake
                 Other
             }
 
-            [Obsolete("Use the DefaultPlatform CSharpProject member")]
-            public enum DefaultPlatform
-            {
-                [Default]
-                AnyCPU,
-                x86,
-                x64
-            }
-
             public enum FileAlignment
             {
                 None,

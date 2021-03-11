@@ -344,15 +344,6 @@ namespace Sharpmake
                     UseMfcDynamic
                 }
 
-                [Obsolete("Please use " + nameof(PreferredToolArchitecture) + " instead", true)]
-                public enum NativeEnvironment
-                {
-                    [DevEnvVersion(minimum = DevEnv.vs2012)]
-                    Enable,
-                    [Default]
-                    Disable
-                }
-
                 public enum PreferredToolArchitecture
                 {
                     [Default]
@@ -959,14 +950,6 @@ namespace Sharpmake
                 {
                     [Default]
                     Disable,
-                    Enable,
-                }
-
-                [Obsolete("Use option RemoveUnreferencedCodeData instead")]
-                public enum RemovedUnreferencedCOMDAT
-                {
-                    Disable,
-                    [Default]
                     Enable,
                 }
 
@@ -2044,14 +2027,6 @@ namespace Sharpmake
                 {
                     public UndefinePreprocessorDefinitions(params string[] definitions)
                         : base(definitions)
-                    { }
-                }
-
-                [Obsolete("Please use " + nameof(Project.Configuration.ResourceIncludePaths) + " instead", true)]
-                public class AdditionalIncludeDirectories : Strings
-                {
-                    public AdditionalIncludeDirectories(params string[] dirs)
-                        : base(dirs)
                     { }
                 }
             }

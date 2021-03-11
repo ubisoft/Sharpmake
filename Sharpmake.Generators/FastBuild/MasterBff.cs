@@ -781,11 +781,5 @@ namespace Sharpmake.Generators.FastBuild
             resolved.Add(bffToParse);
             unresolved.Remove(bffToParse);
         }
-
-        [Obsolete("This method is not supported anymore.")]
-        public static bool IsMasterBffFilename(string filename)
-        {
-            return false;
-        }
     }
 }

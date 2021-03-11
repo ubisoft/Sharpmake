@@ -109,12 +109,6 @@ namespace Sharpmake
             }
         }
 
-        [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf")]
-        public virtual void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
-        {
-            SetupExtraLinkerSettings(fileGenerator, outputType);
-        }
-
         public virtual void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
         {
             SetupExtraLinkerSettings(fileGenerator, configuration.Output);
@@ -471,12 +465,6 @@ namespace Sharpmake
         }
 
         protected virtual IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
-        {
-            yield break;
-        }
-
-        [Obsolete("Implement GetPlatformIncludePathsWithPrefixImpl instead")]
-        protected virtual IEnumerable<string> GetPlatformIncludePathsImpl(IGenerationContext context)
         {
             yield break;
         }

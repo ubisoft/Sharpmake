@@ -2012,12 +2012,6 @@ namespace Sharpmake.Generators.VisualStudio
             );
         }
 
-        [Obsolete("Use MakeBuildStepName taking the 2 extra arguments projectRootPath and rootPath", error: true)]
-        public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep)
-        {
-            return null;
-        }
-
         public static string MakeBuildStepName(Project.Configuration conf, Project.Configuration.BuildStepBase eventBuildStep, Vcxproj.BuildStep buildStep, string projectRootPath, string projectPath)
         {
             if (!eventBuildStep.IsResolved)

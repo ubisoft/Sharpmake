@@ -534,8 +534,6 @@ Exec( '[fastBuildPreBuildName]' )
 }
 
 ";
-                [Obsolete("Section has been renamed to: GenericExecutableSection")]
-                public static string GenericExcutableSection = GenericExecutableSection;
 
                 public static string TestSection = @"
 //=================================================================================================================

@@ -2253,12 +2253,6 @@ namespace Sharpmake
             return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetPlatformString(target) ?? platform.ToString();
         }
 
-        [Obsolete("GetPlatformString() now requires a `target` parameter.")]
-        public static string GetPlatformString(Platform platform, Project project, bool isForSolution = false)
-        {
-            return GetPlatformString(platform, project, null, isForSolution);
-        }
-
         public static string CallerInfoTag = "CALLER_INFO: ";
         public static string FormatCallerInfo(string sourceFilePath, int sourceLineNumber)
         {
