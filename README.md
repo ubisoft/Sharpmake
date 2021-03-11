@@ -79,7 +79,7 @@ functionality
 
 used toolset for functional tests:
 
-tools\FastBuild - v1.01. http://www.fastbuild.org
+tools\FastBuild - v1.04. http://www.fastbuild.org
 
 
 
