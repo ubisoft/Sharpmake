@@ -282,7 +282,7 @@ namespace Sharpmake.Generators.FastBuild
                 string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
 
                 // $(ProjectDir) has a trailing slash
-                return $@"$(ProjectDir){fastBuildExecutable}{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
+                return $@"""$(ProjectDir){fastBuildExecutable}""{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
             }
         }
 
