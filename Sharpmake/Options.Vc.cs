@@ -1243,8 +1243,8 @@ namespace Sharpmake
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     Disabled,
 
-                    [Obsolete("Use '" + nameof(Spectre) + "' enum entry instead", true)]
-                    Enabled
+                    [Obsolete("Use '" + nameof(Spectre) + "' enum entry instead", error: false)]
+                    Enabled = Spectre
                 }
 
                 /// <summary>
@@ -1367,10 +1367,10 @@ namespace Sharpmake
                     /// </remarks>
                     LinkVerboseCLR,
 
-                    [Obsolete("Use '" + nameof(LinkVerbose) + "' enum entry instead", true)]
-                    DisplayAllProgressMessages,
-                    [Obsolete("Use '" + nameof(LinkVerboseLib) + "' enum entry instead", true)]
-                    DisplaysSomeProgressMessages,
+                    [Obsolete("Use '" + nameof(LinkVerbose) + "' enum entry instead", error: false)]
+                    DisplayAllProgressMessages = LinkVerbose,
+                    [Obsolete("Use '" + nameof(LinkVerboseLib) + "' enum entry instead", error: false)]
+                    DisplaysSomeProgressMessages = LinkVerboseLib
                 }
 
                 /// <summary>
