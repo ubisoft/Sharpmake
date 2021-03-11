@@ -1661,8 +1661,8 @@ namespace Sharpmake
                     /// </summary>
                     POSIX,
 
-                    [Obsolete("Use '" + nameof(Windows) + "' enum entry instead", true)]
-                    Application
+                    [Obsolete("Use '" + nameof(Windows) + "' enum entry instead", error: false)]
+                    Application = Windows
                 }
 
                 public enum DLLDefine
