@@ -266,6 +266,8 @@ namespace Sharpmake
             return new string[] { };
         }
 
+        internal static readonly char[] WildcardCharacters = { '*', '?' };
+
         public static bool IsPathWithWildcards(string path)
         {
             return path.IndexOfAny(Util.WildcardCharacters) != -1;
