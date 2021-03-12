@@ -712,16 +712,6 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 switch (platformToolset)
                                 {
-                                    case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1700";
-                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                        break;
-                                    case Options.Vc.General.PlatformToolset.LLVM_vs2014:
-                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1900";
-                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                        break;
                                     case Options.Vc.General.PlatformToolset.LLVM:
                                     case Options.Vc.General.PlatformToolset.ClangCL:
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->

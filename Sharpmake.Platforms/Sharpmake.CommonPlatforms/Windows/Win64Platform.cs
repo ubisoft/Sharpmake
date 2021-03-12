@@ -164,8 +164,6 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.v142:
                             compilerDevEnv = DevEnv.vs2019;
                             break;
-                        case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                        case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                         case Options.Vc.General.PlatformToolset.LLVM:
                         case Options.Vc.General.PlatformToolset.ClangCL:
 

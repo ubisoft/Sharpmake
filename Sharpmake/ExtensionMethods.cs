@@ -755,8 +755,6 @@ namespace Sharpmake
                 case Options.Vc.General.PlatformToolset.v120_xp:
                 case Options.Vc.General.PlatformToolset.v140_xp:
                 case Options.Vc.General.PlatformToolset.v141_xp:
-                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
                 case Options.Vc.General.PlatformToolset.ClangCL:
                 case Options.Vc.General.PlatformToolset.Default:
@@ -788,8 +786,6 @@ namespace Sharpmake
                     return DevEnv.vs2017;
                 case Options.Vc.General.PlatformToolset.v142:
                     return DevEnv.vs2019;
-                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
                 case Options.Vc.General.PlatformToolset.ClangCL:
                     return null;
@@ -831,8 +827,6 @@ namespace Sharpmake
         {
             switch (platformToolset)
             {
-                case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                case Options.Vc.General.PlatformToolset.LLVM_vs2014:
                 case Options.Vc.General.PlatformToolset.LLVM:
                 case Options.Vc.General.PlatformToolset.ClangCL:
                     return true;
