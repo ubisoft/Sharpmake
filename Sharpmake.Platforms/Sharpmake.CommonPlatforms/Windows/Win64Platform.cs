@@ -167,7 +167,7 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.LLVM:
                         case Options.Vc.General.PlatformToolset.ClangCL:
 
-                            platformToolSetPath = ClangForWindows.Settings.LLVMInstallDir;
+                            platformToolSetPath = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.Settings.LLVMInstallDirVsEmbedded(devEnv) : ClangForWindows.Settings.LLVMInstallDir;
                             pathToCompiler = Path.Combine(platformToolSetPath, "bin");
                             compilerExeName = "clang-cl.exe";
 
@@ -419,18 +419,22 @@ namespace Sharpmake
                 string includePrefix = "/I";
 
                 var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration);
+                DevEnv devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? context.DevelopmentEnvironment;
+
                 if (platformToolset.IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
                     includePrefix = "/clang:-isystem";
-                    string clangIncludePath = ClangForWindows.GetWindowsClangIncludePath();
-                    includes.Add(new IncludeWithPrefix(includePrefix, clangIncludePath));
 
                     Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
                     if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(context.Configuration, ref overridenPlatformToolset))
+                    {
                         platformToolset = overridenPlatformToolset;
-                }
+                        devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? context.DevelopmentEnvironment;
+                    }
 
-                DevEnv devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? context.DevelopmentEnvironment;
+                    string clangIncludePath = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.GetWindowsClangIncludePath(devEnv) : ClangForWindows.GetWindowsClangIncludePath();
+                    includes.Add(new IncludeWithPrefix(includePrefix, clangIncludePath));
+                }
 
                 // when using clang-cl, mark MSVC includes, so they are properly recognized
                 IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(devEnv.GetWindowsIncludePath());

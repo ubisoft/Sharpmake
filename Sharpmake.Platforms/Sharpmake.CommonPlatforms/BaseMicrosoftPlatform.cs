@@ -101,7 +101,7 @@ namespace Sharpmake
             if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable ||
                (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset.IsLLVMToolchain()))
             {
-                linkerPathOverride = Path.Combine(ClangForWindows.Settings.LLVMInstallDir, "bin");
+                linkerPathOverride = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.GetWindowsClangExecutablePath(conf.Target.GetFragment<DevEnv>()) : ClangForWindows.GetWindowsClangExecutablePath();
                 linkerExeOverride = "lld-link.exe";
                 librarianExeOverride = "llvm-lib.exe";
             }

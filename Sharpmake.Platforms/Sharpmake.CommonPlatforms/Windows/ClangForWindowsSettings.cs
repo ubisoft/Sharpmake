@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
@@ -26,14 +27,29 @@ namespace Sharpmake
             return Path.Combine(Settings.LLVMInstallDir, "bin");
         }
 
+        public static string GetWindowsClangExecutablePath(DevEnv devEnv)
+        {
+            return Path.Combine(Settings.LLVMInstallDirVsEmbedded(devEnv), "bin");
+        }
+
         public static string GetWindowsClangIncludePath()
         {
             return Path.Combine(Settings.LLVMInstallDir, "lib", "clang", Settings.ClangVersion, "include");
         }
 
+        public static string GetWindowsClangIncludePath(DevEnv devEnv)
+        {
+            return Path.Combine(Settings.LLVMInstallDirVsEmbedded(devEnv), "lib", "clang", Settings.ClangVersionVsEmbedded(devEnv), "include");
+        }
+
         public static string GetWindowsClangLibraryPath()
         {
             return Path.Combine(Settings.LLVMInstallDir, "lib", "clang", Settings.ClangVersion, "lib", "windows");
+        }
+
+        public static string GetWindowsClangLibraryPath(DevEnv devEnv)
+        {
+            return Path.Combine(Settings.LLVMInstallDirVsEmbedded(devEnv), "lib", "clang", Settings.ClangVersionVsEmbedded(devEnv), "lib", "windows");
         }
 
         public static class Settings
@@ -53,6 +69,15 @@ namespace Sharpmake
                     s_llvmInstallDir = Util.PathMakeStandard(value);
                     OverridenLLVMInstallDir = true;
                 }
+            }
+
+            public static string LLVMInstallDirVsEmbedded(DevEnv devEnv)
+            {
+                if (OverridenLLVMInstallDir)
+                    return LLVMInstallDir;
+
+                string vsDir = devEnv.GetVisualStudioDir();
+                return Path.Combine(vsDir, "VC", "Tools", "Llvm", "x64");
             }
 
             private static string s_clangVersion;
@@ -77,6 +102,17 @@ namespace Sharpmake
                         throw new Error($"Cannot find required files for Clang {s_clangVersion} in {LLVMInstallDir}");
                 }
             }
+
+            private static readonly ConcurrentDictionary<DevEnv, string> s_vsEmbeddedClangVersion = new ConcurrentDictionary<DevEnv, string>();
+            public static string ClangVersionVsEmbedded(DevEnv devEnv)
+            {
+                if (OverridenLLVMInstallDir)
+                    return ClangVersion;
+
+                return s_vsEmbeddedClangVersion.GetOrAdd(devEnv, d => {
+                    return Util.GetClangVersionFromLLVMInstallDir(LLVMInstallDirVsEmbedded(devEnv));
+                });
+            }
         }
 
         public static void WriteLLVMOverrides(IVcxprojGenerationContext context, IFileGenerator generator)
@@ -90,13 +126,25 @@ namespace Sharpmake
         {
             if (Settings.OverridenLLVMInstallDir)
             {
-                bool hasClangConfiguration = context.ProjectConfigurations.Any(conf => Options.GetObject<Options.Vc.General.PlatformToolset>(conf).IsLLVMToolchain());
-
-                if (hasClangConfiguration)
+                var allPlatformToolsets = context.ProjectConfigurations.Select(Options.GetObject<Options.Vc.General.PlatformToolset>);
+                var llvmToolsets = allPlatformToolsets.Where(t => t.IsLLVMToolchain()).Distinct().ToList();
+                if (llvmToolsets.Count > 0)
                 {
-                    using (resolver.NewScopedParameter("custompropertyname", "LLVMInstallDir"))
-                    using (resolver.NewScopedParameter("custompropertyvalue", Settings.LLVMInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
-                        return resolver.Resolve(Vcxproj.Template.Project.CustomProperty);
+                    if (llvmToolsets.Count == 1)
+                    {
+                        if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
+                            throw new Error("Different vs versions not supported in the same vcxproj");
+                        var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
+
+                        var llvmInstallDir = llvmToolsets[0] == Options.Vc.General.PlatformToolset.ClangCL ? Settings.LLVMInstallDirVsEmbedded(devEnv) : Settings.LLVMInstallDir;
+                        using (resolver.NewScopedParameter("custompropertyname", "LLVMInstallDir"))
+                        using (resolver.NewScopedParameter("custompropertyvalue", llvmInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                            return resolver.Resolve(Vcxproj.Template.Project.CustomProperty);
+                    }
+                    else
+                    {
+                        throw new Error("Varying llvm platform toolsets in the same vcxproj file! That's not supported");
+                    }
                 }
             }
 
