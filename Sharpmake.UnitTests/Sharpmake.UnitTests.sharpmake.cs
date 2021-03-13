@@ -24,7 +24,7 @@ namespace SharpmakeGen
         {
             base.ConfigureAll(conf, target);
 
-            conf.TargetPath = @"[project.RootPath]\tmp\unittests\[target.Optimization]";
+            conf.TargetPath = @"[project.RootPath]\tmp\unittests\[lower:target.Optimization]";
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
