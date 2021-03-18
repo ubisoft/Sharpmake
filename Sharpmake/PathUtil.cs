@@ -759,6 +759,30 @@ namespace Sharpmake
         }
 
         /// <summary>
+        /// Returns path with drive letter in lower case.
+        /// 
+        /// WSL mounts windows drive using lowercase letters: /mnt/c, /mnt/d...
+        /// </summary>
+        /// <param name="path">The path to be modified.</param>
+        /// <returns></returns>
+        internal static string DecapitalizeDriveLetter(string path)
+        {
+            if (path.Length < 2 || path[1] != ':')
+                return path;
+            return path.Substring(0,1).ToLower() + path.Substring(1);
+        }
+
+        internal static string ConvertToUnixSeparators(string path)
+        {
+            return path.Replace(WindowsSeparator, UnixSeparator);
+        }
+
+        internal static string ConvertToMountedUnixPath(string path)
+        {
+            return ConvertToUnixSeparators(DecapitalizeDriveLetter(EnsureTrailingSeparator(path)).Replace(@":", string.Empty));
+        }
+
+        /// <summary>
         /// The input path got its beginning of path matching the inputHeadPath replaced by the replacementHeadPath.
         /// 
         /// Throws if the fullInputPath doesn't start with inputHeadPath.
