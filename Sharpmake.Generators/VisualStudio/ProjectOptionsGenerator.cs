@@ -180,9 +180,9 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (context.Configuration.Target.GetPlatform() == Platform.linux)
             {
-                context.Options["ProjectDirectory"] = "/mnt/" + context.ProjectDirectoryCapitalized.Replace(@":", string.Empty).Replace('\\', '/');
-                context.Options["OutputDirectoryRemote"] = (@"$(RemoteProjectDir)" + context.Options["OutputDirectory"]).Replace('\\', '/');
-                context.Options["IntermediateDirectoryRemote"] = (@"$(RemoteProjectDir)" + context.Options["IntermediateDirectory"]).Replace('\\', '/');
+                context.Options["ProjectDirectory"] = "/mnt/" + Util.ConvertToMountedUnixPath(context.ProjectDirectoryCapitalized);
+                context.Options["OutputDirectoryRemote"] = (@"$(RemoteProjectDir)/" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["OutputDirectory"])));
+                context.Options["IntermediateDirectoryRemote"] = (@"$(RemoteProjectDir)/" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["IntermediateDirectory"])));
             }
         }
 
