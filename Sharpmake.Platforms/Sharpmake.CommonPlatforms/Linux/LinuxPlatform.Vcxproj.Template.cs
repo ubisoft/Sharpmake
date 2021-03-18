@@ -97,8 +97,8 @@ namespace Sharpmake
             private const string _projectConfigurationsGeneral2 =
                 @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
         <TargetName>[options.OutputFileName]</TargetName>
-        <OutDir>[options.OutputDirectoryRemote]\</OutDir>
-        <IntDir>[options.IntermediateDirectoryRemote]\</IntDir>
+        <OutDir>[options.OutputDirectoryRemote]</OutDir>
+        <IntDir>[options.IntermediateDirectoryRemote]</IntDir>
         <TargetExt>[options.OutputFileExtension]</TargetExt>
         <GenerateManifest>[options.GenerateManifest]</GenerateManifest>
         <PostBuildEventUseInBuild>[options.PostBuildEventEnable]</PostBuildEventUseInBuild>
@@ -125,8 +125,8 @@ namespace Sharpmake
 <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
 <RemoteRootDir></RemoteRootDir>
 <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
-<OutDir>[options.OutputDirectoryRemote]\</OutDir>
-<IntDir>[options.IntermediateDirectoryRemote]\</IntDir>
+<OutDir>[options.OutputDirectoryRemote]</OutDir>
+<IntDir>[options.IntermediateDirectoryRemote]</IntDir>
 <BuildCommandLine>cd [relativeMasterBffPath]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandBuild]</BuildCommandLine>
