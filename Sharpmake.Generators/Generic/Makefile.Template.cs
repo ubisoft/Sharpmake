@@ -108,10 +108,13 @@ endif
   GCH        = [precompIntermediate]
   PCHCMD     = [precompCommand]
   define PREBUILDCMDS
+    [precompPreBuildCmds]
   endef
   define PRELINKCMDS
+    [precompPreLinkCmds]
   endef
   define POSTBUILDCMDS
+    [precompPostBuildCmds]
   endef
   define POSTFILECMDS
   endef
