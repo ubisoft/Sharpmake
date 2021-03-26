@@ -64,6 +64,12 @@ namespace HelloLinux
             //conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
+
+            // Create a separate package directory before building.
+            string packageDir = $@"{RootPath}\package";
+            conf.EventPreBuild.Add($"mkdir {packageDir}");
+            // Copy the build artifacts to the package directory.
+            conf.EventPostBuild.Add($@"cp [conf.TargetPath]\[project.Name].* {packageDir}");
         }
 
         ////////////////////////////////////////////////////////////////////////
