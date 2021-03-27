@@ -175,6 +175,9 @@ namespace Sharpmake.Application
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).
             System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
 
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += AppDomain_UnhandledException;
+
             Mutex oneInstanceMutex = null;
             Argument parameters = new Argument();
             ExitCode exitCode = ExitCode.Success;
@@ -410,6 +413,14 @@ namespace Sharpmake.Application
         private static void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             LogSharpmakeExtensionLoaded(args.LoadedAssembly);
+        }
+
+        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            LogWriteLine(Environment.NewLine + "Unhandled exception Error:");
+            LogWriteLine(Util.GetCompleteExceptionMessage(unhandledExceptionEventArgs.ExceptionObject as Exception, "\t"));
+
+            Environment.Exit((int)ExitCode.UnknownError);
         }
 
         private static void LogSharpmakeExtensionLoaded(Assembly extensionAssembly)

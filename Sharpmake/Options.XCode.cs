@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -182,14 +182,6 @@ namespace Sharpmake
                 public class ExternalResourceFolders : Strings
                 {
                     public ExternalResourceFolders(params string[] paths)
-                        : base(paths)
-                    { }
-                }
-
-                [Obsolete("AssetCatalog is not used anymore.", error: true)]
-                public class AssetCatalog : Strings
-                {
-                    public AssetCatalog(params string[] paths)
                         : base(paths)
                     { }
                 }

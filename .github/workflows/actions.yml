@@ -5,6 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -40,7 +41,7 @@ jobs:
         run: ./CompileSharpmake.sh Sharpmake.sln "${{ matrix.configuration }}"
         
       - name: GenerateMdbFiles.bat
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.configuration == 'release'
         shell: cmd
         run: GenerateMdbFiles.bat
 

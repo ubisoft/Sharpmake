@@ -33,12 +33,6 @@ namespace Sharpmake
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
 
         /// <summary>
-        /// Extra user directory to load assembly from using statement detection
-        /// </summary>
-        [Obsolete("AssemblyDirectory is not used anymore")]
-        public List<string> AssemblyDirectory { get { return _assemblyDirectory; } }
-
-        /// <summary>
         /// Extra user assembly to use while compiling
         /// </summary>
         public List<Assembly> Assemblies { get { return _assemblies; } }
@@ -490,7 +484,6 @@ namespace Sharpmake
 
                     return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
-
             }
 
             return null;

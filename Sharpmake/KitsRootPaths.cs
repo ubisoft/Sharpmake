@@ -33,9 +33,6 @@ namespace Sharpmake
 
         private static ConcurrentDictionary<Options.Vc.General.WindowsTargetPlatformVersion, bool> s_windowsTargetPlatformVersionInstalled = new ConcurrentDictionary<Options.Vc.General.WindowsTargetPlatformVersion, bool>();
 
-        [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
-        public static Options.Vc.General.WindowsTargetPlatformVersion WindowsTargetPlatformVersion { get; private set; } = Options.Vc.General.WindowsTargetPlatformVersion.v8_1;
-
         private static KitsRootPaths s_kitsRootsInstance = new KitsRootPaths();
 
         public KitsRootPaths()
@@ -148,12 +145,6 @@ namespace Sharpmake
                 return version.Value;
 
             throw new NotImplementedException("No WindowsTargetPlatformVersion associated with " + devEnv);
-        }
-
-        [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
-        public static string GetWindowsTargetPlatformVersion()
-        {
-            throw new Error();
         }
 
         public static string GetNETFXKitsDir(DotNetFramework dotNetFramework)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectDescription =
 @"  <PropertyGroup>
-    <Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>[guid]</ProjectGuid>
     <ProjectHome>[projectHome]</ProjectHome>
@@ -51,7 +50,6 @@ namespace Sharpmake.Generators.VisualStudio
     <InterpreterId>[interpreterId]</InterpreterId>
     <InterpreterVersion>[interpreterVersion]</InterpreterVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=""'$(Configuration)' == 'Debug'"" />
   <PropertyGroup>
     <VisualStudioVersion Condition="" '$(VisualStudioVersion)' == '' "">10.0</VisualStudioVersion>
     <PtvsTargetsFile>[ptvsTargetsFile]</PtvsTargetsFile>

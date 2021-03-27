@@ -1956,19 +1956,6 @@ namespace Sharpmake
         }
 
         #endregion
-
-        #region Deprecated
-        [Obsolete("Use " + nameof(SourceFilesBlobExtensions) + ".")]
-        public Strings SourceFilesBlobExtension => SourceFilesBlobExtensions;
-        [Obsolete("Use " + nameof(ResourceFilesExtensions) + ".")]
-        public Strings ResourceFilesExtension => ResourceFilesExtensions;
-        [Obsolete("Use " + nameof(NatvisFilesExtensions) + ".")]
-        public Strings NatvisFilesExtension => NatvisFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesExtensions) + ".")]
-        protected Strings SourceFilesExtension => SourceFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesCompileExtensions) + ".")]
-        protected Strings SourceFilesCompileExtension => SourceFilesCompileExtensions;
-        #endregion
     }
 
     [Sharpmake.Generate]
@@ -2224,10 +2211,6 @@ namespace Sharpmake
             this.InitAspNetProject();
         }
 
-        [Obsolete("Not needed anymore, InitAspNetProject() handle it")]
-        public void AddCommonWebExtensions()
-        { }
-
         public void AddDefaultReferences(Configuration conf)
         {
             CSharpProjectExtensions.AddAspNetReferences(conf);
@@ -2433,11 +2416,6 @@ namespace Sharpmake
             InitCSharpSpecifics();
         }
 
-        [Obsolete("This method was meant to only be called internally, think again if you were calling it from your scripts.")]
-        public static void AddCSharpSpecificPreImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
-        {
-        }
-
         public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
         {
             if (ProjectTypeGuids == CSharpProjectType.Vsix)
@@ -2579,13 +2557,6 @@ namespace Sharpmake
 
             return "Resources";
         }
-
-        #region Deprecated
-        [Obsolete("Use " + nameof(NoneExtensions) + ".")]
-        public Strings NoneExtension => NoneExtensions;
-        [Obsolete("Use " + nameof(EmbeddedResourceExtensions) + ".")]
-        public Strings EmbeddedResourceExtension => EmbeddedResourceExtensions;
-        #endregion
     }
 
     public class PythonVirtualEnvironment

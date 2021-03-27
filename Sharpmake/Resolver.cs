@@ -607,10 +607,10 @@ namespace Sharpmake
             Lower
         }
 
-        private static readonly char[] _modifierNameSplitter = new [] { ':' };
+        private static readonly char[] s_modifierNameSplitter = new[] { ':' };
         private static string ExtractNameAndModifier(string rawInput, out PropertyModifier modifier)
         {
-            string[] chunks = rawInput.Split(_modifierNameSplitter);
+            string[] chunks = rawInput.Split(s_modifierNameSplitter);
 
             if (chunks.Length < 2)
             {
@@ -639,10 +639,10 @@ namespace Sharpmake
             }
         }
 
-        private static readonly char[] _memberPathSplitter = new[] { _pathSeparator };
+        private static readonly char[] s_memberPathSplitter = new[] { _pathSeparator };
         private string GetMemberStringValue(string memberPath, bool throwIfNotFound)
         {
-            string[] names = memberPath.Split(_memberPathSplitter);
+            string[] names = memberPath.Split(s_memberPathSplitter);
 
             if (names.Length == 0)
             {

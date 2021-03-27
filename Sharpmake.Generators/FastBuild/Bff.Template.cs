@@ -341,6 +341,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.WarningLevel]'
             + ' [cmdLineOptions.TreatWarningAsError]'
             + ' [cmdLineOptions.DiagnosticsFormat]'
+            + ' [cmdLineOptions.EnableASAN]'
             + ' [fastBuildCompileAsC]'
             // Multi-threaded build is already handled by FASTBuild
             // + ' [cmdLineOptions.MultiProcessorCompilation]'
@@ -533,8 +534,6 @@ Exec( '[fastBuildPreBuildName]' )
 }
 
 ";
-                [Obsolete("Section has been renamed to: GenericExecutableSection")]
-                public static string GenericExcutableSection = GenericExecutableSection;
 
                 public static string TestSection = @"
 //=================================================================================================================
