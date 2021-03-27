@@ -25,7 +25,7 @@ namespace Sharpmake
     {
         public static readonly char UnixSeparator = '/';
         public static readonly char WindowsSeparator = '\\';
-        private static readonly string UnixMountPointForWindowsDrives = "/mnt/";
+        private static readonly string s_unixMountPointForWindowsDrives = "/mnt/";
 
         public static readonly bool UsesUnixSeparator = Path.DirectorySeparatorChar == UnixSeparator;
 
@@ -770,7 +770,7 @@ namespace Sharpmake
         {
             if (path.Length < 2 || path[1] != ':')
                 return path;
-            return path.Substring(0,1).ToLower() + path.Substring(1);
+            return path.Substring(0, 1).ToLower() + path.Substring(1);
         }
 
         internal static string ConvertToUnixSeparators(string path)
@@ -780,7 +780,7 @@ namespace Sharpmake
 
         internal static string ConvertToMountedUnixPath(string path)
         {
-            return UnixMountPointForWindowsDrives + ConvertToUnixSeparators(DecapitalizeDriveLetter(EnsureTrailingSeparator(path)).Replace(@":", string.Empty));
+            return s_unixMountPointForWindowsDrives + ConvertToUnixSeparators(DecapitalizeDriveLetter(EnsureTrailingSeparator(path)).Replace(@":", string.Empty));
         }
 
         /// <summary>

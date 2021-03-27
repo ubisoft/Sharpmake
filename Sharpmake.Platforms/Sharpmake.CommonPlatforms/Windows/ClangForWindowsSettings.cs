@@ -109,7 +109,8 @@ namespace Sharpmake
                 if (OverridenLLVMInstallDir)
                     return ClangVersion;
 
-                return s_vsEmbeddedClangVersion.GetOrAdd(devEnv, d => {
+                return s_vsEmbeddedClangVersion.GetOrAdd(devEnv, d =>
+                {
                     return Util.GetClangVersionFromLLVMInstallDir(LLVMInstallDirVsEmbedded(devEnv));
                 });
             }
