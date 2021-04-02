@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -184,6 +184,7 @@ namespace Sharpmake
     <CLRSupport>[options.CLRSupport]</CLRSupport>
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
+    <EnableASAN>[options.EnableASAN]</EnableASAN>
   </PropertyGroup>
 ";
 

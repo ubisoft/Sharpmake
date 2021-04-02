@@ -108,6 +108,7 @@
     <Compile Include="Options.cs" />
     <Compile Include="PackageReferences.Template.cs" />
     <Compile Include="PackageReferences.cs" />
+    <Compile Include="PathUtil.cs" />
     <Compile Include="PlatformAttributes.cs" />
     <Compile Include="PlatformEventArgs.cs" />
     <Compile Include="PlatformExceptions.cs" />

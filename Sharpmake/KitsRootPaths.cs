@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,9 +32,6 @@ namespace Sharpmake
         private static readonly ConcurrentDictionary<DotNetFramework, string> s_netFxToolsDir = new ConcurrentDictionary<DotNetFramework, string>();
 
         private static ConcurrentDictionary<Options.Vc.General.WindowsTargetPlatformVersion, bool> s_windowsTargetPlatformVersionInstalled = new ConcurrentDictionary<Options.Vc.General.WindowsTargetPlatformVersion, bool>();
-
-        [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
-        public static Options.Vc.General.WindowsTargetPlatformVersion WindowsTargetPlatformVersion { get; private set; } = Options.Vc.General.WindowsTargetPlatformVersion.v8_1;
 
         private static KitsRootPaths s_kitsRootsInstance = new KitsRootPaths();
 
@@ -148,12 +145,6 @@ namespace Sharpmake
                 return version.Value;
 
             throw new NotImplementedException("No WindowsTargetPlatformVersion associated with " + devEnv);
-        }
-
-        [Obsolete("WindowsTargetPlatformVersion is per DevEnv, please use " + nameof(GetWindowsTargetPlatformVersionForDevEnv) + " instead", error: true)]
-        public static string GetWindowsTargetPlatformVersion()
-        {
-            throw new Error();
         }
 
         public static string GetNETFXKitsDir(DotNetFramework dotNetFramework)

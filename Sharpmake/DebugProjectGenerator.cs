@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,16 +29,11 @@ namespace Sharpmake
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
 
-        [Obsolete("Implement IDebugProjectExtension instead to override sharpmake package version")]
-        public static string PackageVersion { get; set; }
-
-        [Obsolete("Implement IDebugProjectExtension instead to override sharpmake package version")]
-        public static string PackageName { get; set; }
-
         public interface IDebugProjectExtension
         {
             void AddSharpmakePackage(Project.Configuration config);
             void AddReferences(Project.Configuration config, IEnumerable<string> additionalReferences = null);
+            string GetSharpmakeExecutableFullPath();
         }
 
         public class DefaultDebugProjectExtension : IDebugProjectExtension
@@ -76,6 +71,19 @@ namespace Sharpmake
             public virtual bool ShouldUseLocalSharpmakeDll()
             {
                 return true;
+            }
+
+            public virtual string GetSharpmakeExecutableFullPath()
+            {
+                string sharpmakeApplicationExePath = Process.GetCurrentProcess().MainModule.FileName;
+
+                if (Util.IsRunningInMono())
+                {
+                    // When running within Mono, sharpmakeApplicationExePath will at this point wrongly refer to the
+                    // mono (or mono-sgen) executable. Fix it so that it points to Sharpmake.Application.exe.
+                    sharpmakeApplicationExePath = $"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}";
+                }
+                return sharpmakeApplicationExePath;
             }
         }
 
@@ -241,24 +249,12 @@ namespace Sharpmake
         /// <param name="startArguments"></param>
         public static void SetupProjectOptions(this Project.Configuration conf, string startArguments)
         {
-            string sharpmakeApplicationExePath = Process.GetCurrentProcess().MainModule.FileName;
-
-            if (Util.IsRunningInMono())
-            {
-                // When running within Mono, sharpmakeApplicationExePath will at this point wrongly refer to the
-                // mono (or mono-sgen) executable. Fix it so that it points to Sharpmake.Application.exe.
-                sharpmakeApplicationExePath = $"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}";
-            }
-
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings();
             conf.CsprojUserFile.StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program;
 
-            if (conf.Target.GetOptimization() == Optimization.Debug)
-                startArguments += " /debugScripts";
-
             string quote = "\'"; // Use single quote that is cross platform safe
             conf.CsprojUserFile.StartArguments = $@"/sources(@{quote}{string.Join(";", MainSources)}{quote}) {startArguments}";
-            conf.CsprojUserFile.StartProgram = sharpmakeApplicationExePath;
+            conf.CsprojUserFile.StartProgram = DebugProjectExtension.GetSharpmakeExecutableFullPath();
         }
     }
 

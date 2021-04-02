@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -174,6 +174,9 @@ namespace Sharpmake.Application
             }
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).
             System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += AppDomain_UnhandledException;
 
             Mutex oneInstanceMutex = null;
             Argument parameters = new Argument();
@@ -412,6 +415,14 @@ namespace Sharpmake.Application
             LogSharpmakeExtensionLoaded(args.LoadedAssembly);
         }
 
+        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            LogWriteLine(Environment.NewLine + "Unhandled exception Error:");
+            LogWriteLine(Util.GetCompleteExceptionMessage(unhandledExceptionEventArgs.ExceptionObject as Exception, "\t"));
+
+            Environment.Exit((int)ExitCode.UnknownError);
+        }
+
         private static void LogSharpmakeExtensionLoaded(Assembly extensionAssembly)
         {
             if (extensionAssembly == null)
@@ -596,9 +607,9 @@ namespace Sharpmake.Application
                 parameters.BlobOnly,
                 parameters.SkipInvalidPath,
                 parameters.Diagnostics,
-                parameters.DebugScripts,
-                Program.GetGeneratorsManager,
-                parameters.Defines
+                debugScripts: true, // warning: some code that rely on callstacks misbehaves in release, because methods can completely disappear due to optimizations, so force disable for now
+                getGeneratorsManagerCallBack: GetGeneratorsManager,
+                defines: parameters.Defines
             );
 
             // Allow message log from builder.

@@ -13,10 +13,11 @@ if os.name != "nt":
 
 
 class FunctionalTest(object):
-    def __init__(self, directory, script_name, project_root = ""):
+    def __init__(self, directory, script_name, extra_args = [], project_root = ""):
         self.directory = directory
         self.script_name = script_name
         self.runs_on_unix = os.name == "posix"
+        self.extra_args = extra_args
         if project_root == "":
             self.project_root = directory
         else:
@@ -41,6 +42,7 @@ class FunctionalTest(object):
                 sources,
                 verbose
             ]
+            args.extend(self.extra_args)
 
             cmd_line = "{} \"{}\"".format(sharpmake_path, " ".join(args))
             if self.runs_on_unix:
@@ -94,7 +96,7 @@ class FastBuildFunctionalTest(FunctionalTest):
 
     def verifyCustomBuildEvents(self, projectDir):
         output_dir = os.path.join(projectDir, self.directory, "projects", "output")
-        target_dirs = ["debug_fastbuild_noblob_vs2017", "debug_fastbuild_vs2017", "release_fastbuild_noblob_vs2017", "release_fastbuild_vs2017"]
+        target_dirs = ["debug_fastbuild_noblob_vs2019", "debug_fastbuild_vs2019", "release_fastbuild_noblob_vs2019", "release_fastbuild_vs2019"]
 
         for target_dir in target_dirs:
             target_dir = os.path.join(output_dir, target_dir)
@@ -120,10 +122,18 @@ class NoAllFastBuildProjectFunctionalTest(FunctionalTest):
     def build(self, projectDir):
         return build_with_fastbuild(projectDir, self.directory)
 
+class SharpmakePackageFunctionalTest(FunctionalTest):
+    def __init__(self):
+        super(SharpmakePackageFunctionalTest, self).__init__("SharpmakePackageFunctionalTest", "SharpmakePackageFunctionalTest.sharpmake.cs", ["/generateDebugSolution"])
+
+    def build(self, projectDir):
+        return 0
+
 
 funcTests = [
     FastBuildFunctionalTest(),
-    NoAllFastBuildProjectFunctionalTest()
+    NoAllFastBuildProjectFunctionalTest(),
+    SharpmakePackageFunctionalTest()
 ]
 
 

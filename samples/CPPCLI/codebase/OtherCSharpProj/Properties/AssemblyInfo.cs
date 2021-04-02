@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("OtherCSharpProj")]
-[assembly: AssemblyCopyright("Copyright © Ubisoft 2019")]
+[assembly: AssemblyCopyright("Copyright © Ubisoft 2017, 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

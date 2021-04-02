@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -712,16 +712,6 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 switch (platformToolset)
                                 {
-                                    case Options.Vc.General.PlatformToolset.LLVM_vs2012:
-                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1700";
-                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                        break;
-                                    case Options.Vc.General.PlatformToolset.LLVM_vs2014:
-                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        llvmClangCompilerOptions = "-m64 -fmsc-version=1900";
-                                        fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
-                                        break;
                                     case Options.Vc.General.PlatformToolset.LLVM:
                                     case Options.Vc.General.PlatformToolset.ClangCL:
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->

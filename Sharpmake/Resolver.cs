@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,17 +24,17 @@ namespace Sharpmake
 {
     /// <summary>
     /// Resolver
-    /// 
+    ///
     /// Resolver is a search and replace engine of property and member, it's actually may
     /// resolve Object, List<string> and string. To be resolved, an object must have [Resolvable] attribute.
     /// Supported type of parameters is: Object and Map
-    /// 
+    ///
     /// ex:
     ///     class Foo
     ///     {
     ///         public int Value = 1;
     ///     }
-    ///      
+    ///
     ///     void Test()
     ///     {
     ///         Foo foo = new Foo();
@@ -44,12 +44,12 @@ namespace Sharpmake
     ///         resolver.SetParameter("foo", foo);
     ///
     ///         Console.WriteLine(resolver.Resolve(str));
-    ///         
+    ///
     ///         // Output: "foo.Value = 1"
     ///     }
-    ///     
+    ///
     /// Object must have [Resolvable] attribute to be resolved, ex:
-    /// 
+    ///
     ///     [Resolvable]
     ///     class C1
     ///     {
@@ -74,9 +74,9 @@ namespace Sharpmake
     ///         Console.WriteLine(c1.Str);
     ///         // Output: "c2.Int = 2"
     ///     }
-    /// 
+    ///
     /// Example of Dictionary<string, T>
-    /// 
+    ///
     ///     [Resolvable]
     ///     class C1
     ///     {
@@ -368,7 +368,8 @@ namespace Sharpmake
                         if (!(currentChar >= 'a' && currentChar <= 'z' ||
                             currentChar >= 'A' && currentChar <= 'Z' ||
                             currentChar >= '0' && currentChar <= '9' ||
-                            currentChar == '.' || currentChar == '_'
+                            currentChar == '.' || currentChar == '_' ||
+                            currentChar == ':'
                             ))
                         {
                             isValidMember = false;
@@ -509,7 +510,7 @@ namespace Sharpmake
 
         public string[] _pathBeginStrings = { "[" };
 
-        public char _pathSeparator = '.';
+        public const char _pathSeparator = '.';
 
         private void Reset()
         {
@@ -600,9 +601,48 @@ namespace Sharpmake
             }
         }
 
+        private enum PropertyModifier
+        {
+            None,
+            Lower
+        }
+
+        private static readonly char[] s_modifierNameSplitter = new[] { ':' };
+        private static string ExtractNameAndModifier(string rawInput, out PropertyModifier modifier)
+        {
+            string[] chunks = rawInput.Split(s_modifierNameSplitter);
+
+            if (chunks.Length < 2)
+            {
+                modifier = PropertyModifier.None;
+                return rawInput;
+            }
+            else if (chunks.Length == 2)
+            {
+                modifier = (PropertyModifier)Enum.Parse(typeof(PropertyModifier), chunks[0], true);
+                return chunks[1];
+            }
+            else
+            {
+                throw new NotSupportedException($"{chunks.Length - 1} modifiers were found in '{rawInput}', only one is supported.");
+            }
+        }
+
+        private static string ApplyModifier(PropertyModifier modifier, string input)
+        {
+            switch (modifier)
+            {
+                case PropertyModifier.None: return input;
+                case PropertyModifier.Lower: return input.ToLowerInvariant();
+                default:
+                    throw new NotSupportedException($"Don't know how to apply modifier {modifier} to '{input}'");
+            }
+        }
+
+        private static readonly char[] s_memberPathSplitter = new[] { _pathSeparator };
         private string GetMemberStringValue(string memberPath, bool throwIfNotFound)
         {
-            string[] names = memberPath.Split(new[] { _pathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            string[] names = memberPath.Split(s_memberPathSplitter);
 
             if (names.Length == 0)
             {
@@ -611,7 +651,9 @@ namespace Sharpmake
                 return null;
             }
 
-            string parameterName = names[0];
+            PropertyModifier modifier = PropertyModifier.None;
+            string parameterName = ExtractNameAndModifier(names[0], out modifier);
+
             // get the parameters...
             if (!IsCaseSensitive)
                 parameterName = parameterName.ToLowerInvariant();
@@ -653,7 +695,10 @@ namespace Sharpmake
                 {
                     var dictionary = parameter as IDictionary;
                     if (dictionary.Contains(nameChunk))
-                        return dictionary[nameChunk].ToString();
+                    {
+                        parameter = dictionary[nameChunk];
+                        found = true;
+                    }
                 }
 
                 if (!found)
@@ -688,7 +733,7 @@ namespace Sharpmake
                 name += _pathSeparator + nameChunk;
             }
 
-            return parameter == null ? "null" : parameter.ToString();
+            return parameter == null ? "null" : ApplyModifier(modifier, parameter.ToString());
         }
 
         private static bool CanWriteFieldValue(FieldInfo fieldInfo)

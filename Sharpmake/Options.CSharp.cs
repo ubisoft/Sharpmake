@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,15 +26,6 @@ namespace Sharpmake
                 Debug,
                 Release,
                 Other
-            }
-
-            [Obsolete("Use the DefaultPlatform CSharpProject member")]
-            public enum DefaultPlatform
-            {
-                [Default]
-                AnyCPU,
-                x86,
-                x64
             }
 
             public enum FileAlignment

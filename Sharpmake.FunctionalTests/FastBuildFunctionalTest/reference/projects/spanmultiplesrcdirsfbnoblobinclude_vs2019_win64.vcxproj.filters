@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class1.cpp">
+      <Filter>additional_dir</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class2.cpp">
+      <Filter>additional_dir</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\additional_dir\extra_file.cpp">
+      <Filter>additional_dir</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp">
+      <Filter>dir_individual_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp">
+      <Filter>dir_individual_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\main_dir\main.cpp" />
+    <ClCompile Include="..\codebase\SpanMultipleSrcDirs\main_dir\util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class1.h">
+      <Filter>additional_dir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\codebase\SpanMultipleSrcDirs\additional_dir\extra_class2.h">
+      <Filter>additional_dir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.h">
+      <Filter>dir_individual_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\codebase\SpanMultipleSrcDirs\main_dir\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="additional_dir">
+      <UniqueIdentifier>{173fda8e-2a40-2ee4-5390-a08e7c8d4bc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dir_individual_files">
+      <UniqueIdentifier>{ec204f4c-1501-dfbd-46f8-0e66ef3cf495}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

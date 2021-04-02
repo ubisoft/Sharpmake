@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ namespace Sharpmake
             if (useLldLink == Options.Vc.LLVM.UseLldLink.Enable ||
                (useLldLink == Options.Vc.LLVM.UseLldLink.Default && platformToolset.IsLLVMToolchain()))
             {
-                linkerPathOverride = Path.Combine(ClangForWindows.Settings.LLVMInstallDir, "bin");
+                linkerPathOverride = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.GetWindowsClangExecutablePath(conf.Target.GetFragment<DevEnv>()) : ClangForWindows.GetWindowsClangExecutablePath();
                 linkerExeOverride = "lld-link.exe";
                 librarianExeOverride = "llvm-lib.exe";
             }

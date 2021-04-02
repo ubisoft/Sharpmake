@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,9 +61,15 @@ namespace HelloLinux
             //       different names per configurations to work properly...
             //conf.TargetFileName += "_" + target.Optimization.ToString().ToLowerInvariant().First(); // suffix with lowered first letter of optim
             //if (conf.IsFastBuild)
-                //conf.TargetFileName += "x";
+            //conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
+
+            // Create a separate package directory before building.
+            string packageDir = $@"{RootPath}\package";
+            conf.EventPreBuild.Add($"mkdir {packageDir}");
+            // Copy the build artifacts to the package directory.
+            conf.EventPostBuild.Add($@"cp [conf.TargetPath]\[project.Name].* {packageDir}");
         }
 
         ////////////////////////////////////////////////////////////////////////

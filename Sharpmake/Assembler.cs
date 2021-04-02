@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,12 +31,6 @@ namespace Sharpmake
     {
         public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
-
-        /// <summary>
-        /// Extra user directory to load assembly from using statement detection
-        /// </summary>
-        [Obsolete("AssemblyDirectory is not used anymore")]
-        public List<string> AssemblyDirectory { get { return _assemblyDirectory; } }
 
         /// <summary>
         /// Extra user assembly to use while compiling
@@ -451,7 +445,7 @@ namespace Sharpmake
             // Compile
             var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
-                optimizationLevel: (builderContext != null && builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
+                optimizationLevel: (builderContext == null || builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
                 warningLevel: 4
             );
             var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
@@ -470,6 +464,9 @@ namespace Sharpmake
                     )
                 );
 
+                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
+                LogCompilationResult(result, throwErrorException);
+
                 if (result.Success)
                 {
                     if (libraryFile != null)
@@ -487,9 +484,6 @@ namespace Sharpmake
 
                     return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
-
-                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
-                LogCompilationResult(result, throwErrorException);
             }
 
             return null;
@@ -509,7 +503,7 @@ namespace Sharpmake
                 errorMessage += diagnostic + Environment.NewLine;
             }
 
-            if (throwErrorException)
+            if (!result.Success && throwErrorException)
                 throw new Error(errorMessage);
         }
 

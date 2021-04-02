@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1585,18 +1585,9 @@ namespace Sharpmake
         internal static Project CreateProject(Type projectType, List<Object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
         {
             Project project;
-            try
-            {
-                project = Activator.CreateInstance(projectType) as Project;
-                project.SharpmakeProjectType = projectTypeAttribute;
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException != null && (e.InnerException is Error || e.InnerException is InternalError))
-                    throw e.InnerException;
 
-                throw new Error(e, "Cannot create instances of type: {0}, make sure it's public", projectType.Name);
-            }
+            project = Activator.CreateInstance(projectType) as Project;
+            project.SharpmakeProjectType = projectTypeAttribute;
 
             project.Targets.SetGlobalFragmentMask(fragmentMasks.ToArray());
             project.Targets.BuildTargets();
@@ -1965,19 +1956,6 @@ namespace Sharpmake
         }
 
         #endregion
-
-        #region Deprecated
-        [Obsolete("Use " + nameof(SourceFilesBlobExtensions) + ".")]
-        public Strings SourceFilesBlobExtension => SourceFilesBlobExtensions;
-        [Obsolete("Use " + nameof(ResourceFilesExtensions) + ".")]
-        public Strings ResourceFilesExtension => ResourceFilesExtensions;
-        [Obsolete("Use " + nameof(NatvisFilesExtensions) + ".")]
-        public Strings NatvisFilesExtension => NatvisFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesExtensions) + ".")]
-        protected Strings SourceFilesExtension => SourceFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesCompileExtensions) + ".")]
-        protected Strings SourceFilesCompileExtension => SourceFilesCompileExtensions;
-        #endregion
     }
 
     [Sharpmake.Generate]
@@ -2233,10 +2211,6 @@ namespace Sharpmake
             this.InitAspNetProject();
         }
 
-        [Obsolete("Not needed anymore, InitAspNetProject() handle it")]
-        public void AddCommonWebExtensions()
-        { }
-
         public void AddDefaultReferences(Configuration conf)
         {
             CSharpProjectExtensions.AddAspNetReferences(conf);
@@ -2442,11 +2416,6 @@ namespace Sharpmake
             InitCSharpSpecifics();
         }
 
-        [Obsolete("This method was meant to only be called internally, think again if you were calling it from your scripts.")]
-        public static void AddCSharpSpecificPreImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
-        {
-        }
-
         public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
         {
             if (ProjectTypeGuids == CSharpProjectType.Vsix)
@@ -2588,13 +2557,6 @@ namespace Sharpmake
 
             return "Resources";
         }
-
-        #region Deprecated
-        [Obsolete("Use " + nameof(NoneExtensions) + ".")]
-        public Strings NoneExtension => NoneExtensions;
-        [Obsolete("Use " + nameof(EmbeddedResourceExtensions) + ".")]
-        public Strings EmbeddedResourceExtension => EmbeddedResourceExtensions;
-        #endregion
     }
 
     public class PythonVirtualEnvironment

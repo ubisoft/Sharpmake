@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -284,6 +284,10 @@ namespace Sharpmake.Generators.Generic
                     string precompHeaderOut = "";
                     string precompIntermediate = "";
                     string precompCommand = "";
+                    string precompPreBuildCmds = "";
+                    string precompPreLinkCmds = "";
+                    string precompPostBuildCmds = "";
+
 
                     if (!string.IsNullOrEmpty(conf.PrecompHeader))
                     {
@@ -298,12 +302,22 @@ namespace Sharpmake.Generators.Generic
                         precompCommand = "-include $(PCHOUT)";
                     }
 
+                    if (conf.EventPreBuild.Any())
+                        precompPreBuildCmds = conf.EventPreBuild.Aggregate((curr, next) => $"{curr} && {next}");
+                    if (conf.EventPreLink.Any())
+                        precompPreLinkCmds = conf.EventPreLink.Aggregate((curr, next) => $"{curr} && {next}");
+                    if (conf.EventPostBuild.Any())
+                        precompPostBuildCmds = conf.EventPostBuild.Aggregate((curr, next) => $"{curr} && {next}");
+
                     using (fileGenerator.Declare("name", conf.Name.ToLower()))
                     using (fileGenerator.Declare("options", options[conf]))
                     using (fileGenerator.Declare("precompHeader", precompHeader))
                     using (fileGenerator.Declare("precompHeaderOut", precompHeaderOut))
                     using (fileGenerator.Declare("precompIntermediate", precompIntermediate))
                     using (fileGenerator.Declare("precompCommand", precompCommand))
+                    using (fileGenerator.Declare("precompPreBuildCmds", precompPreBuildCmds))
+                    using (fileGenerator.Declare("precompPreLinkCmds", precompPreLinkCmds))
+                    using (fileGenerator.Declare("precompPostBuildCmds", precompPostBuildCmds))
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationVariables);
                     }

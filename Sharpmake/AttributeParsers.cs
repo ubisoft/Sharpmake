@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -175,7 +175,7 @@ namespace Sharpmake
 
     public class PackageAttributeParser : SimpleSourceAttributeParser
     {
-        private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, IAssemblyInfo> s_assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
 
         public PackageAttributeParser() : base("Package", 1, "Sharpmake")
         {
@@ -199,14 +199,14 @@ namespace Sharpmake
             }
 
             IAssemblyInfo assemblyInfo;
-            if (_assemblies.TryGetValue(includeAbsolutePath, out assemblyInfo))
+            if (s_assemblies.TryGetValue(includeAbsolutePath, out assemblyInfo))
             {
                 if (assemblyInfo == null)
                     throw new Error($"Circular Sharpmake.Package dependency on {includeFilename}");
                 context.AddReference(assemblyInfo);
                 return;
             }
-            _assemblies[includeAbsolutePath] = null;
+            s_assemblies[includeAbsolutePath] = null;
 
             string[] files;
             if (Util.IsPathWithWildcards(includeFilename))
@@ -224,7 +224,7 @@ namespace Sharpmake
             }
 
             assemblyInfo = context.BuildLoadAndAddReferenceToSharpmakeFilesAssembly(files);
-            _assemblies[includeAbsolutePath] = assemblyInfo;
+            s_assemblies[includeAbsolutePath] = assemblyInfo;
         }
     }
 

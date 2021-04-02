@@ -12,7 +12,7 @@
 
 # Samples and FunctionalTests generated projects
 samples/*/projects/*
-samples/HelloXCode/codebase/temp*
+samples/*/codebase/temp*
 Sharpmake.FunctionalTests/*/projects/*
 !**/reference/**/*.*
 ## Ignore Visual Studio temporary files, build results, and
@@ -66,3 +66,6 @@ Sharpmake.VC.db
 
 # Desktop Services Store on MacOS
 **/.DS_Store
+
+# Discard tmp files
+[Tt]mp/

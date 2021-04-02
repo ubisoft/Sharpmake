@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -341,6 +341,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.WarningLevel]'
             + ' [cmdLineOptions.TreatWarningAsError]'
             + ' [cmdLineOptions.DiagnosticsFormat]'
+            + ' [cmdLineOptions.EnableASAN]'
             + ' [fastBuildCompileAsC]'
             // Multi-threaded build is already handled by FASTBuild
             // + ' [cmdLineOptions.MultiProcessorCompilation]'
@@ -533,8 +534,6 @@ Exec( '[fastBuildPreBuildName]' )
 }
 
 ";
-                [Obsolete("Section has been renamed to: GenericExecutableSection")]
-                public static string GenericExcutableSection = GenericExecutableSection;
 
                 public static string TestSection = @"
 //=================================================================================================================

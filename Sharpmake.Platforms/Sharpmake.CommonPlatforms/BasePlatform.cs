@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -107,12 +107,6 @@ namespace Sharpmake
             {
                 context.CommandLineOptions["ResourcePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
             }
-        }
-
-        [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf")]
-        public virtual void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
-        {
-            SetupExtraLinkerSettings(fileGenerator, outputType);
         }
 
         public virtual void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
@@ -471,12 +465,6 @@ namespace Sharpmake
         }
 
         protected virtual IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
-        {
-            yield break;
-        }
-
-        [Obsolete("Implement GetPlatformIncludePathsWithPrefixImpl instead")]
-        protected virtual IEnumerable<string> GetPlatformIncludePathsImpl(IGenerationContext context)
         {
             yield break;
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -780,12 +780,6 @@ namespace Sharpmake.Generators.FastBuild
 
             resolved.Add(bffToParse);
             unresolved.Remove(bffToParse);
-        }
-
-        [Obsolete("This method is not supported anymore.")]
-        public static bool IsMasterBffFilename(string filename)
-        {
-            return false;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -106,12 +106,6 @@ namespace Sharpmake
         public override bool AddLibPrefix(Configuration conf)
         {
             return false;
-        }
-
-        [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf")]
-        public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile)
-        {
-            base.SetupExtraLinkerSettings(fileGenerator, outputType, fastBuildOutputFile);
         }
 
         public override void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
