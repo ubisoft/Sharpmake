@@ -517,7 +517,6 @@ namespace Sharpmake
 
             public enum AutoGenerateBindingRedirects
             {
-                [DevEnvVersion(minimum = DevEnv.vs2013)]
                 Enabled,
                 [Default]
                 Disabled

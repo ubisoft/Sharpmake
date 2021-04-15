@@ -109,7 +109,6 @@ Compiler( '[fastbuildCompilerName]' )
     .ExtraFiles             = [fastBuildExtraFiles]
     .CompilerFamily         = '[fastBuildCompilerFamily]'
     .UseRelativePaths_Experimental = [fastBuildCompilerUseRelativePaths]
-    [fastBuildVS2012EnumBugWorkaround]
 [fastBuildCompilerAdditionalSettings]
 }
 ";

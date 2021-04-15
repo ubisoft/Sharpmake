@@ -450,21 +450,9 @@ namespace Sharpmake.UnitTests
         [Test]
         public void GetToolVersionStringException()
         {
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.vs2010, DotNetFramework.v4_7_2));
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.xcode4ios, DotNetFramework.v4_7_2));
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.eclipse, DotNetFramework.v4_7_2));
-            Assert.Catch<NotImplementedException>(() => Util.GetToolVersionString(DevEnv.make, DotNetFramework.v4_7_2));
-        }
-
-        /// <summary>
-        ///     Verify that the right version of DotNetFramework is returned accordingly to the ToolVersion
-        ///  </summary>
-        [Test]
-        public void GetToolVersionString()
-        {
-            Assert.AreEqual(DotNetFramework.v4_0.ToVersionString(), Util.GetToolVersionString(DevEnv.vs2010, DotNetFramework.v4_5clientprofile));
-            Assert.AreEqual(DotNetFramework.v4_0.ToVersionString(), Util.GetToolVersionString(DevEnv.vs2012, DotNetFramework.v4_0));
-            Assert.AreEqual(DotNetFramework.v4_5.ToVersionString(), Util.GetToolVersionString(DevEnv.vs2013, DotNetFramework.v4_0));
+            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.xcode4ios));
+            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.eclipse));
+            Assert.Catch<NotImplementedException>(() => Util.GetToolVersionString(DevEnv.make));
         }
 
         /// <summary>

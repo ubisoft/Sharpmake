@@ -230,7 +230,7 @@ namespace Sharpmake
 
             public DevEnvVersion()
             {
-                minimum = DevEnv.vs2010;
+                minimum = DevEnv.vs2015;
             }
         }
 

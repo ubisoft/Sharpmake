@@ -1121,7 +1121,7 @@ namespace Sharpmake.UnitTests
                 IsFileNameToLower = false;
 
                 SourceRootPath = Directory.GetCurrentDirectory() + "/[project.Name]";
-                AddTargets(new Target(Platform.win64, DevEnv.vs2012, Optimization.Debug));
+                AddTargets(new Target(Platform.win64, DevEnv.vs2015, Optimization.Debug));
             }
 
             [ConfigurePriority(-100)]

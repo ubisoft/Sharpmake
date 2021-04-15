@@ -170,6 +170,7 @@ namespace Sharpmake
         /// It seems that by adding a space between the enum keyword and the name it avoids that problem that looks like memory corruption in the compiler.
         /// Also it seems that this doesn't occurs with VS2013.
         /// </remarks>
+        [Obsolete("Sharpmake doesn't support generating for vs2012 anymore, so this setting is useless.", error: false)]
         public static bool EnableVS2012EnumBugWorkaround = false; // activate workaround for VS2012 enum bug(corrupted preprocessor output).
 
         /// <summary>

@@ -1015,32 +1015,12 @@ namespace Sharpmake
             return s_isVisualStudio2015Installed.Value;
         }
 
-        private static bool? s_isVisualStudio2013Installed = null;
-        public static bool IsVisualStudio2013Installed()
-        {
-            if (!s_isVisualStudio2013Installed.HasValue)
-                s_isVisualStudio2013Installed = IsVisualStudioInstalled(DevEnv.vs2013);
-
-            return s_isVisualStudio2013Installed.Value;
-        }
-
-        private static bool? s_isVisualStudio2012Installed = null;
-        public static bool IsVisualStudio2012Installed()
-        {
-            if (!s_isVisualStudio2012Installed.HasValue)
-                s_isVisualStudio2012Installed = IsVisualStudioInstalled(DevEnv.vs2012);
-
-            return s_isVisualStudio2012Installed.Value;
-        }
-
-        private static bool? s_isVisualStudio2010Installed = null;
-        public static bool IsVisualStudio2010Installed()
-        {
-            if (!s_isVisualStudio2010Installed.HasValue)
-                s_isVisualStudio2010Installed = IsVisualStudioInstalled(DevEnv.vs2010);
-
-            return s_isVisualStudio2010Installed.Value;
-        }
+        [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
+        public static bool IsVisualStudio2013Installed() => false;
+        [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
+        public static bool IsVisualStudio2012Installed() => false;
+        [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
+        public static bool IsVisualStudio2010Installed() => false;
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
@@ -1284,18 +1264,16 @@ namespace Sharpmake
             return string.Format("v{0}", version);
         }
 
+        [Obsolete("Use " + nameof(GetToolVersionString) + " without the second argument.")]
         public static string GetToolVersionString(DevEnv env, DotNetFramework desiredFramework)
+        {
+            return GetToolVersionString(env);
+        }
+
+        public static string GetToolVersionString(DevEnv env)
         {
             switch (env)
             {
-                case DevEnv.vs2010:
-                    if (desiredFramework > DotNetFramework.v4_5clientprofile)
-                        throw new Exception(string.Format("The target framework ({0}) isn't supported in the target environment({1})", desiredFramework, env));
-                    return DotNetFramework.v4_0.ToVersionString(); //"Both Visual Studio 2010 and Visual Studio 2012 use a ToolsVersion of 4.0" ref:http://msdn.microsoft.com/en-us/LIbrary/bb383796%28v=vs.110%29.aspx
-                case DevEnv.vs2012:
-                    return DotNetFramework.v4_0.ToVersionString();
-                case DevEnv.vs2013:
-                    return DotNetFramework.v4_5.ToVersionString();
                 case DevEnv.vs2015:
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
@@ -1375,9 +1353,6 @@ namespace Sharpmake
             {
                 switch (conf.Target.GetFragment<DevEnv>())
                 {
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:

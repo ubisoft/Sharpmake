@@ -1156,24 +1156,19 @@ namespace Sharpmake.Generators.VisualStudio
                 var framework = projectFrameworks.Single().Item1;
                 targetFrameworkString = Util.GetDotNetTargetString(framework);
 
-                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, framework)))
+                // xml begin header
+                switch (devenv)
                 {
-                    // xml begin header
-                    switch (devenv)
-                    {
-                        case DevEnv.vs2010:
-                        case DevEnv.vs2012:
-                        case DevEnv.vs2013:
-                        case DevEnv.vs2015:
-                            Write(Template.Project.ProjectBegin, writer, resolver);
-                            break;
-                        case DevEnv.vs2017:
-                        case DevEnv.vs2019:
+                    case DevEnv.vs2015:
+                        Write(Template.Project.ProjectBegin, writer, resolver);
+                        break;
+                    case DevEnv.vs2017:
+                    case DevEnv.vs2019:
+                        using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv)))
                             Write(Template.Project.ProjectBeginVs2017, writer, resolver);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
@@ -2469,9 +2464,8 @@ namespace Sharpmake.Generators.VisualStudio
                         itemGroups.Nones.Add(new ItemGroups.None { Include = include });
                     }
                 }
-                // packages.config: Default in vs2013, vs2012, and vs2010
-                else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
-                        || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv <= DevEnv.vs2013))
+                // packages.config: only if manually chosen
+                else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig)
                 {
                     var packagesConfig = new PackagesConfig();
                     packagesConfig.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);

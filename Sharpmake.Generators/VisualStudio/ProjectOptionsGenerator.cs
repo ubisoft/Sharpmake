@@ -868,7 +868,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             //    Disable                                 RemoveUnreferencedCodeData="false"
             //    Enable                                  RemoveUnreferencedCodeData="true"                /Zc:inline
-            if (!context.DevelopmentEnvironment.IsVisualStudio() || context.DevelopmentEnvironment < DevEnv.vs2013)
+            if (!context.DevelopmentEnvironment.IsVisualStudio())
             {
                 context.Options["RemoveUnreferencedCodeData"] = FileGeneratorUtilities.RemoveLineTag;
                 context.CommandLineOptions["RemoveUnreferencedCodeData"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1150,25 +1150,10 @@ namespace Sharpmake.Generators.VisualStudio
         {
             switch (context.DevelopmentEnvironment)
             {
-                case DevEnv.vs2010:
-                case DevEnv.vs2012:
-                    {
-                        // Falling back to <_IsNativeEnvironment> that has same effect
-                        context.Options["PreferredToolArchitecture"] = FileGeneratorUtilities.RemoveLineTag;
-                        context.SelectOption
-                        (
-                        Options.Option(Options.Vc.General.PreferredToolArchitecture.Default, () => { context.Options["_IsNativeEnvironment"] = FileGeneratorUtilities.RemoveLineTag; }),
-                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x86, () => { context.Options["_IsNativeEnvironment"] = "false"; }),
-                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x64, () => { context.Options["_IsNativeEnvironment"] = "true"; })
-                        );
-                    }
-                    break;
-                case DevEnv.vs2013:
                 case DevEnv.vs2015:
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
                     {
-                        context.Options["_IsNativeEnvironment"] = FileGeneratorUtilities.RemoveLineTag;
                         context.SelectOption
                         (
                         Options.Option(Options.Vc.General.PreferredToolArchitecture.Default, () => { context.Options["PreferredToolArchitecture"] = FileGeneratorUtilities.RemoveLineTag; }),
@@ -1185,11 +1170,6 @@ namespace Sharpmake.Generators.VisualStudio
             context.SelectOption
             (
                 Options.Option(Options.Vc.General.PlatformToolset.Default, () => { context.Options["PlatformToolset"] = context.DevelopmentEnvironment.GetDefaultPlatformToolset(); }),
-                Options.Option(Options.Vc.General.PlatformToolset.v100, () => { context.Options["PlatformToolset"] = "v100"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.v110, () => { context.Options["PlatformToolset"] = "v110"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.v110_xp, () => { context.Options["PlatformToolset"] = "v110_xp"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.v120, () => { context.Options["PlatformToolset"] = "v120"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.v120_xp, () => { context.Options["PlatformToolset"] = "v120_xp"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v140, () => { context.Options["PlatformToolset"] = "v140"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v140_xp, () => { context.Options["PlatformToolset"] = "v140_xp"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v141, () => { context.Options["PlatformToolset"] = "v141"; }),
@@ -1355,34 +1335,20 @@ namespace Sharpmake.Generators.VisualStudio
             //IgnoreImportLibrary
             //    Enable                                  IgnoreImportLibrary="true"
             //    Disable                                 IgnoreImportLibrary="false"
-            if (context.Configuration.Target.GetFragment<DevEnv>() == DevEnv.vs2010)
-            {
-                context.Options["IgnoreImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
-            }
-            else
-            {
-                context.SelectOption
-                (
-                Options.Option(Options.Vc.Linker.IgnoreImportLibrary.Enable, () => { context.Options["IgnoreImportLibrary"] = "true"; }),
-                Options.Option(Options.Vc.Linker.IgnoreImportLibrary.Disable, () => { context.Options["IgnoreImportLibrary"] = "false"; })
-                );
-            }
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Linker.IgnoreImportLibrary.Enable, () => { context.Options["IgnoreImportLibrary"] = "true"; }),
+            Options.Option(Options.Vc.Linker.IgnoreImportLibrary.Disable, () => { context.Options["IgnoreImportLibrary"] = "false"; })
+            );
 
             //RunCodeAnalysis
             //    Enable                                  RunCodeAnalysis="true"
             //    Disable                                 RunCodeAnalysis="false"
-            if (context.Configuration.Target.GetFragment<DevEnv>() == DevEnv.vs2010)
-            {
-                context.Options["RunCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag;
-            }
-            else
-            {
-                context.SelectOption
-                (
-                Options.Option(Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable, () => { context.Options["RunCodeAnalysis"] = "true"; }),
-                Options.Option(Options.Vc.CodeAnalysis.RunCodeAnalysis.Disable, () => { context.Options["RunCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag; })
-                );
-            }
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable, () => { context.Options["RunCodeAnalysis"] = "true"; }),
+            Options.Option(Options.Vc.CodeAnalysis.RunCodeAnalysis.Disable, () => { context.Options["RunCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
 
             //UseLibraryDependencyInputs
             //    Enable                                  UseLibraryDependencyInputs="true"

@@ -30,21 +30,6 @@ namespace Sharpmake
     public enum DevEnv
     {
         /// <summary>
-        /// Visual Studio 2010.
-        /// </summary>
-        vs2010 = 1 << 0,
-
-        /// <summary>
-        /// Visual Studio 2012
-        /// </summary>
-        vs2012 = 1 << 1,
-
-        /// <summary>
-        /// Visual Studio 2013
-        /// </summary>
-        vs2013 = 1 << 2,
-
-        /// <summary>
         /// Visual Studio 2015
         /// </summary>
         vs2015 = 1 << 3,
@@ -78,7 +63,14 @@ namespace Sharpmake
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
-        VisualStudio = vs2010 | vs2012 | vs2013 | vs2015 | vs2017 | vs2019
+        VisualStudio = vs2015 | vs2017 | vs2019,
+
+        [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
+        vs2010 = -1,
+        [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
+        vs2012 = -1,
+        [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
+        vs2013 = -1,
     }
 
     // Mandatory
