@@ -1156,19 +1156,21 @@ namespace Sharpmake.Generators.VisualStudio
                 var framework = projectFrameworks.Single().Item1;
                 targetFrameworkString = Util.GetDotNetTargetString(framework);
 
-                // xml begin header
-                switch (devenv)
+                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv)))
                 {
-                    case DevEnv.vs2015:
-                        Write(Template.Project.ProjectBegin, writer, resolver);
-                        break;
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                        using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv)))
+                    // xml begin header
+                    switch (devenv)
+                    {
+                        case DevEnv.vs2015:
+                            Write(Template.Project.ProjectBegin, writer, resolver);
+                            break;
+                        case DevEnv.vs2017:
+                        case DevEnv.vs2019:
                             Write(Template.Project.ProjectBeginVs2017, writer, resolver);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
             }
 
