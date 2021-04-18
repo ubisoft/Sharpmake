@@ -253,4 +253,13 @@ namespace SharpmakeGen.Samples
             Name = "SimpleExeLibDependency";
         }
     }
+
+    [Generate]
+    public class VcpkgProject : SampleProject
+    {
+        public VcpkgProject()
+        {
+            Name = "vcpkg";
+        }
+    }
 }

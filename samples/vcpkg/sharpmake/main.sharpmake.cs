@@ -23,10 +23,8 @@ namespace VCPKGSample
             FastBuildSettings.FastBuildMakeCommand = Util.PathGetAbsolute(sharpmakeFileDirectory, @"..\..\..\tools\FastBuild\Windows-x64\FBuild.exe");
 
             Util.FilesAutoCleanupDBPath = absoluteRootPath;
-			Util.FilesAutoCleanupActive = true;
+            Util.FilesAutoCleanupActive = true;
             arguments.Generate<VCPKGSampleSolution>();
-
-
         }
     }
 }

@@ -70,11 +70,6 @@ namespace VCPKGSample.Extern
     [Sharpmake.Export]
     class ZLib : VCPKG
     {
-        public override void ConfigureAll(Configuration conf, Target target)
-        {
-            base.ConfigureAll(conf, target);
-        }
-
         public override void ConfigureDebug(Configuration conf, Target target)
         {
             base.ConfigureDebug(conf, target);
