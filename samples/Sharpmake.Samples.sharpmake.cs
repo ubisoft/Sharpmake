@@ -38,7 +38,7 @@ namespace SharpmakeGen.Samples
             {
                 StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
                 StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\Sharpmake.Application.exe",
-                StartArguments = "/sources('[project.SharpmakeMainFile]')",
+                StartArguments = "/sources(@'[project.SharpmakeMainFile]')",
                 WorkingDirectory = "[project.SourceRootPath]"
             };
         }
