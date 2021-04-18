@@ -117,6 +117,8 @@ namespace CompileDataBaseCommand
             arguments.Builder.EventPostProjectLink += GenerateProjectDatabase;
             arguments.Builder.EventPostSolutionLink += GenerateSolutionDatabase;
 
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+
             arguments.Generate<MainSolution>();
         }
 
