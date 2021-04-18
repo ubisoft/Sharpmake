@@ -13,7 +13,7 @@
     <ProjectName>ChildProject</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -33,7 +33,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>childproject</TargetName>
     <OutDir>output\win32\release\</OutDir>
-    <IntDir>obj\win32\release\</IntDir>
+    <IntDir>obj\childproject\win32\release\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
@@ -87,7 +87,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>obj\win32\release\childproject_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>obj\childproject\win32\release\childproject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -124,11 +124,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\codebase\stdafx.h" />
+    <ClInclude Include="..\codebase\ChildProject\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\codebase\main.cpp" />
-    <ClCompile Include="..\codebase\stdafx.cpp" />
+    <ClCompile Include="..\codebase\ChildProject\main.cpp" />
+    <ClCompile Include="..\codebase\ChildProject\stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

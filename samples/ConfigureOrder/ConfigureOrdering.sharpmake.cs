@@ -1,4 +1,4 @@
-// Copyright (c) 2017, 2019 Ubisoft Entertainment
+// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Sharpmake;
-using System.Diagnostics;
 using System;
 
 // This sample shows how to order the configure call within a project or a solution.
@@ -38,7 +37,7 @@ namespace ConfigureOrdering
         public FooBarProject()
         {
             AddTargets(Util.DefaultTarget);
-            SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
+            SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
         }
 
         /// <summary>
@@ -50,6 +49,7 @@ namespace ConfigureOrdering
         public virtual void Bar(Configuration conf, Target target)
         {
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]\[target.Name]";
 
             if (executedMethodFlags.Equals(ConfigureMethod.None))
             {
@@ -77,7 +77,7 @@ namespace ConfigureOrdering
         public ParentProject()
         {
             AddTargets(Util.DefaultTarget);
-            SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
+            SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
         }
 
         protected ConfigureMethod executedMethodFlags = new ConfigureMethod();
@@ -86,6 +86,8 @@ namespace ConfigureOrdering
         public virtual void Bar(Configuration conf, Target target)
         {
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]\[target.Name]";
+
             if (executedMethodFlags.Equals(ConfigureMethod.None))
             {
                 conf.Defines.Add("FIRST_ParentProject_Bar");
@@ -109,8 +111,6 @@ namespace ConfigureOrdering
     [Sharpmake.Generate]
     public class ChildProject : ParentProject
     {
-        public ChildProject() : base() { }
-
         [Configure()]
         public virtual void FooBar(Configuration conf, Target target)
         {
@@ -136,6 +136,8 @@ namespace ConfigureOrdering
         public override void Foo(Configuration conf, Target target)
         {
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]\[target.Name]";
+
             if (executedMethodFlags.Equals(ConfigureMethod.None))
             {
                 conf.Defines.Add("FIRST_ChildProject_Foo");
