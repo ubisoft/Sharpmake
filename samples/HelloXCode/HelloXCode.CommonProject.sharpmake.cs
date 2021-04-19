@@ -72,6 +72,7 @@ namespace HelloXCode
         [Configure(Platform.mac)]
         public virtual void ConfigureMac(Configuration conf, CommonTarget target)
         {
+            conf.Options.Add(Options.XCode.Compiler.OnlyActiveArch.Enable);
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////

@@ -104,7 +104,7 @@ namespace HelloXCode
                 if (DevEnv != DevEnv.xcode4ios)
                     dirNameParts.Add(DevEnv.ToString());
 
-                return string.Join("_", dirNameParts);
+                return string.Join("_", dirNameParts).ToLowerInvariant();
             }
         }
 
