@@ -218,8 +218,7 @@ namespace Sharpmake.Generators.Apple
 "               },
 
                 { ItemSection.PBXSourcesBuildPhase,
-@"		[item.Uid] /* Sources */ =
-		{
+@"		[item.Uid] /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
