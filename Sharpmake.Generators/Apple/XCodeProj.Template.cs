@@ -293,8 +293,8 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* Legacy Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MACH_O_TYPE = ""[item.Options.MachOType]"";
 				FASTBUILD_TARGET = ""[item.Options.FastBuildTarget]"";
+				MACH_O_TYPE = ""[item.Options.MachOType]"";
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = [item.Options.TargetName];
