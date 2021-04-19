@@ -404,9 +404,6 @@ namespace Sharpmake.Generators.Apple
 
                 _projectItems.Add(targetOutputFile);
 
-                var projectOutputBuildFile = new ProjectBuildFile(targetOutputFile);
-                _projectItems.Add(projectOutputBuildFile);
-
                 ProjectTarget target;
                 if (!firstConf.IsFastBuild)
                 {
