@@ -248,7 +248,6 @@ namespace Sharpmake.Generators.Apple
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
-				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
 				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
 				COPY_PHASE_STRIP = [item.Options.StripDebugSymbolsDuringCopy];
 				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
