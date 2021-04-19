@@ -606,8 +606,8 @@ namespace Sharpmake.Generators.Apple
                 {
                     if (item.Build)
                     {
-                        ProjectFile fileItem = (ProjectFile)item;
-                        ProjectBuildFile buildFileItem = new ProjectBuildFile(fileItem);
+                        var fileItem = (ProjectFile)item;
+                        var buildFileItem = new ProjectBuildFile(fileItem);
                         _projectItems.Add(buildFileItem);
                         _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
                     }
@@ -635,8 +635,8 @@ namespace Sharpmake.Generators.Apple
                 item.Build = true;
                 item.Source = true;
 
-                ProjectFile fileItem = (ProjectFile)item;
-                ProjectBuildFile buildFileItem = new ProjectBuildFile(fileItem);
+                var fileItem = (ProjectFile)item;
+                var buildFileItem = new ProjectBuildFile(fileItem);
                 _projectItems.Add(buildFileItem);
                 _resourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
             }
@@ -1386,7 +1386,8 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectBuildFile : ProjectItem
         {
-            public ProjectBuildFile(ProjectFileBase file) : base(ItemSection.PBXBuildFile, file.Name)
+            public ProjectBuildFile(ProjectFileBase file)
+                : base(ItemSection.PBXBuildFile, file.Name)
             {
                 File = file;
             }
