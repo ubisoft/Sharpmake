@@ -99,8 +99,7 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
-[itemChildren]
-			);
+[itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
 		};
 "               },
@@ -126,8 +125,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
 			children = (
-[itemChildren]
-			);
+[itemChildren]			);
 			name = ""[item.Name]"";
 			path = ""[item.Path]"";
 			sourceTree = [item.SourceTree];
@@ -148,8 +146,7 @@ namespace Sharpmake.Generators.Apple
 			buildRules = (
 			);
 			dependencies = (
-[itemChildren]
-			);
+[itemChildren]			);
 			name = ""[item.Identifier]"";
 			productInstallPath = ""[item.ProductInstallPath]"";
 			productName = ""[item.Identifier]"";
@@ -181,8 +178,7 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXProject;
 			attributes = {
 				TargetAttributes = {
-[itemTargetAttributes]
-				};
+[itemTargetAttributes]				};
 			};
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXProject ""[item.Identifier]"" */;
 			compatibilityVersion = ""[item.CompatibilityVersion]"";
@@ -194,12 +190,10 @@ namespace Sharpmake.Generators.Apple
 			mainGroup = [item.MainGroup.Uid] /* [item.MainGroup.Name] */;
 			projectDirPath = """";
 			projectReferences = (
-[itemProjectReferences]
-			);
+[itemProjectReferences]			);
 			projectRoot = """";
 			targets = (
-[itemTargets]
-			);
+[itemTargets]			);
 		};
 "               },
 
@@ -218,8 +212,7 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
-[itemChildren]
-			);
+[itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
 		};
 "               },
@@ -230,8 +223,7 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
-[itemChildren]
-			);
+[itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
 		};
 "               },
@@ -396,8 +388,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* Build configuration list for [item.ConfigurationType] ""[item.RelatedItem.Identifier]"" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-[itemChildren]
-			);
+[itemChildren]			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = ""[item.DefaultConfiguration.Identifier]"";
 		};
