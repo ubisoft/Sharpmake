@@ -162,7 +162,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = ""[item.BuildArgumentsString]"";
-			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
+			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXLegacyTarget ""[item.Identifier]"" */;
 			buildPhases = (
 			);
 			buildToolPath = ""[item.BuildToolPath]"";
