@@ -191,8 +191,8 @@ namespace Sharpmake.Generators.Apple
             WriteSection<ProjectFile>(configurations[0], fileGenerator);
             WriteSection<ProjectFrameworksBuildPhase>(configurations[0], fileGenerator);
             WriteSection<ProjectFolder>(configurations[0], fileGenerator);
-            WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
             WriteSection<ProjectLegacyTarget>(configurations[0], fileGenerator);
+            WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
             WriteSection<ProjectMain>(configurations[0], fileGenerator);
             WriteSection<ProjectReferenceProxy>(configurations[0], fileGenerator);
             WriteSection<ProjectResourcesBuildPhase>(configurations[0], fileGenerator);
