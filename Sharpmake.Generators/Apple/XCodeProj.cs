@@ -717,7 +717,7 @@ namespace Sharpmake.Generators.Apple
         private void WriteSection<ProjectItemType>(Project.Configuration configuration, IFileGenerator fileGenerator)
             where ProjectItemType : ProjectItem
         {
-            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType);
+            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType).OrderBy(item => item.Uid, StringComparer.Ordinal);
             if (projectItems.Any())
             {
                 ProjectItem firstItem = projectItems.First();
