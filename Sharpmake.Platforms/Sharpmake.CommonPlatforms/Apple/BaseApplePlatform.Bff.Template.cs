@@ -20,6 +20,7 @@ namespace Sharpmake
     .LinkerOptions          = '-o ""%2"" ""%1""[outputTypeArgument]'
                             // Library Search Path
                             // ---------------------------
+                            + ' [cmdLineOptions.SysLibRoot]'
                             + ' [cmdLineOptions.AdditionalLibraryDirectories]'
                             // Libraries
                             // ---------------------------

@@ -78,6 +78,21 @@ namespace Sharpmake
                     cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
+
+            public override void SelectLinkerOptions(IGenerationContext context)
+            {
+                base.SelectLinkerOptions(context);
+
+                var options = context.Options;
+                var cmdLineOptions = context.CommandLineOptions;
+                var conf = context.Configuration;
+
+                // Sysroot
+                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+                if (customSdkRoot != null)
+                    cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
+            }
         }
     }
 }

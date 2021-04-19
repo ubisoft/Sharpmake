@@ -892,7 +892,7 @@ namespace Sharpmake
             }
         }
 
-        public void SelectLinkerOptions(IGenerationContext context)
+        public virtual void SelectLinkerOptions(IGenerationContext context)
         {
             var options = context.Options;
             var cmdLineOptions = context.CommandLineOptions;
