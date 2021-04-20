@@ -61,11 +61,6 @@ namespace Sharpmake
             return string.Empty;
         }
 
-        public virtual bool AddLibPrefix(Configuration conf)
-        {
-            return false;
-        }
-
         public virtual void SelectPreprocessorDefinitionsBff(IBffGenerationContext context)
         {
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
@@ -139,7 +134,7 @@ namespace Sharpmake
         public virtual string PackageFileExtension => ExecutableFileExtension;
         public abstract string SharedLibraryFileExtension { get; }
         public abstract string ProgramDatabaseFileExtension { get; }
-        public virtual string StaticLibraryFileExtension => "lib";
+        public virtual string StaticLibraryFileExtension => ".lib";
         public virtual string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;
         public virtual bool ExcludesPrecompiledHeadersFromBuild => false;
         public virtual bool HasUserAccountControlSupport => false;
@@ -197,11 +192,6 @@ namespace Sharpmake
         public virtual IEnumerable<VariableAssignment> GetEnvironmentVariables(IGenerationContext context)
         {
             yield break;
-        }
-
-        public virtual string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-        {
-            return string.Empty;
         }
 
         public virtual void SetupSdkOptions(IGenerationContext context)

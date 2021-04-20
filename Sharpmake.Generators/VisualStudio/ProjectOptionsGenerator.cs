@@ -40,7 +40,6 @@ namespace Sharpmake.Generators.VisualStudio
             public string OutputDirectoryRelative { get; set; }
             public string OutputLibraryDirectoryRelative { get; set; }
             public string IntermediateDirectoryRelative { get; set; }
-            public string TargetName { get; set; }
             public bool HasClrSupport { get; set; }
             public EnvironmentVariableResolver Resolver { get; }
             public string PlatformLibraryExtension { get; }
@@ -156,7 +155,6 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["IntermediateDirectory"] = context.Configuration.Output != Project.Configuration.OutputType.None ? optionsContext.IntermediateDirectoryRelative : FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["IntermediateDirectory"] = FormatCommandLineOptionPath(context, optionsContext.IntermediateDirectoryRelative);
 
-            optionsContext.TargetName = context.Configuration.TargetFileFullName;
             if (!string.IsNullOrEmpty(context.Configuration.LayoutDir))
                 context.Options["LayoutDir"] = Util.PathGetRelative(context.ProjectDirectory, context.Configuration.LayoutDir);
             else
@@ -1218,16 +1216,12 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateLinkerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            string outputExtension = context.Configuration.OutputExtension;
-            if (outputExtension.Length > 0 && !outputExtension.StartsWith(".", StringComparison.Ordinal))
-                outputExtension = outputExtension.Insert(0, ".");
-
-            string outputFileName = optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output) + optionsContext.TargetName;
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
 
             context.Options["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["OutputFileName"] = outputFileName;
-            context.Options["OutputFileExtension"] = outputExtension;
+            context.Options["OutputFileName"] = context.Configuration.TargetFileFullName;
+            context.Options["OutputFileExtension"] = context.Configuration.OutputExtension;
 
             context.Options["AdditionalDeploymentFolders"] = "";
 
@@ -1240,16 +1234,16 @@ namespace Sharpmake.Generators.VisualStudio
                 case Project.Configuration.OutputType.DotNetWindowsApp:
                 case Project.Configuration.OutputType.IosApp:
                 case Project.Configuration.OutputType.IosTestBundle:
-                    context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + outputFileName + outputExtension;
+                    context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullNameWithExtension;
                     if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
                     {
-                        string importLibRelative = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".lib";
+                        string importLibRelative = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullName + ".lib";
                         context.Options["ImportLibrary"] = importLibRelative;
                         context.CommandLineOptions["ImportLibrary"] = "/IMPLIB:" + FormatCommandLineOptionPath(context, importLibRelative);
                     }
                     break;
                 case Project.Configuration.OutputType.Lib:
-                    context.Options["OutputFile"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + outputFileName + outputExtension;
+                    context.Options["OutputFile"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullNameWithExtension;
                     break;
                 case Project.Configuration.OutputType.Utility:
                 case Project.Configuration.OutputType.None:
@@ -1644,7 +1638,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (profileGuideOptimization)
             {
-                string profileGuidedDatabase = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + ".pgd";
+                string profileGuidedDatabase = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullName + ".pgd";
                 context.Options["ProfileGuidedDatabase"] = profileGuidedDatabase;
                 context.CommandLineOptions["ProfileGuidedDatabase"] = @"/PGD:""" + profileGuidedDatabase + @"""";
             }
@@ -2076,7 +2070,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (context.Options["EmbedManifest"] == "false")
                 {
-                    string manifestFile = optionsContext.IntermediateDirectoryRelative + Util.WindowsSeparator + optionsContext.TargetName + context.Configuration.ManifestFileSuffix;
+                    string manifestFile = optionsContext.IntermediateDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullName + context.Configuration.ManifestFileSuffix;
                     context.Options["ManifestFile"] = manifestFile;
                     context.CommandLineOptions["ManifestFile"] = @"/ManifestFile:""" + FormatCommandLineOptionPath(context, manifestFile) + @"""";
                 }
@@ -2212,11 +2206,12 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectGenerateMapFileOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+
             Action enableMapOption = () =>
             {
                 context.Options["GenerateMapFile"] = "true";
-                string targetNamePrefix = optionsContext.PlatformVcxproj.GetOutputFileNamePrefix(context, context.Configuration.Output);
-                string mapFile = Path.Combine(optionsContext.OutputDirectoryRelative, targetNamePrefix + optionsContext.TargetName + ".map");
+                string mapFile = Path.Combine(optionsContext.OutputDirectoryRelative, context.Configuration.TargetFileFullName + ".map");
                 context.Options["MapFileName"] = mapFile;
 
                 string mapFileBffRelative = FormatCommandLineOptionPath(context, mapFile);

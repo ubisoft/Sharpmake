@@ -741,7 +741,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix("." + platformVcxproj.StaticLibraryFileExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileExtension, true);
 
             context.Options["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -789,27 +789,28 @@ namespace Sharpmake.Generators.VisualStudio
             Strings ignoreSpecificLibraryNames
         )
         {
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
             IPlatformVcxproj platformVcxproj = context.PresentPlatforms[context.Configuration.Platform];
 
             var otherLibraryFiles = new OrderableStrings(context.Configuration.LibraryFiles);
             otherLibraryFiles.AddRange(context.Configuration.DependenciesOtherLibraryFiles);
             otherLibraryFiles.AddRange(platformVcxproj.GetLibraryFiles(context));
+
+            // convert all root paths to be relative to the project folder
+            for (int i = 0; i < otherLibraryFiles.Count; ++i)
+            {
+                string libraryFile = otherLibraryFiles[i];
+                if (Path.IsPathRooted(libraryFile))
+                    otherLibraryFiles[i] = Util.GetConvertedRelativePath(context.ProjectDirectory, libraryFile, context.ProjectDirectory, true, context.Project.RootPath);
+            }
             otherLibraryFiles.Sort();
+
+            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
 
             // put the built library files before any other
             var libraryFiles = new OrderableStrings(context.Configuration.DependenciesBuiltTargetsLibraryFiles);
             libraryFiles.Sort();
             libraryFiles.AddRange(otherLibraryFiles);
-
-            // convert all root paths to be relative to the project folder
-            for (int i = 0; i < libraryFiles.Count; ++i)
-            {
-                string libraryFile = libraryFiles[i];
-                if (Path.IsPathRooted(libraryFile))
-                    libraryFiles[i] = Util.GetConvertedRelativePath(context.ProjectDirectory, libraryFile, context.ProjectDirectory, true, context.Project.RootPath);
-            }
-
-            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
 
             var additionalDependencies = new Strings();
             foreach (string libraryFile in libraryFiles)
@@ -819,15 +820,13 @@ namespace Sharpmake.Generators.VisualStudio
                 //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
                 // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
                 string decoratedName = libraryFile;
-                string extension = Path.GetExtension(libraryFile).ToLower();
-                if (extension.StartsWith(".", StringComparison.Ordinal))
-                    extension = extension.Substring(1);
+                string extension = Path.GetExtension(libraryFile).ToLowerInvariant();
 
                 if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
                 {
                     decoratedName = libPrefix + libraryFile;
                     if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
-                        decoratedName += "." + platformVcxproj.StaticLibraryFileExtension;
+                        decoratedName += platformVcxproj.StaticLibraryFileExtension;
                 }
 
                 if (!ignoreSpecificLibraryNames.Contains(decoratedName))

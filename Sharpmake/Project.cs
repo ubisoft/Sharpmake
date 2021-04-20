@@ -68,7 +68,7 @@ namespace Sharpmake
         public string SharpmakeCsPath { get; private set; }                               // Path of the CsFileName, ex: "c:\dev\MyProject"
         public string SharpmakeCsProjectPath => SharpmakeCsPath;                          // TODO LC: check what is expected
 
-        private string _assemblyName;
+        private string _assemblyName = string.Empty;
         public string AssemblyName
         {
             get { return _assemblyName; }
@@ -1649,8 +1649,6 @@ namespace Sharpmake
         {
             foreach (Project.Configuration conf in Configurations)
             {
-                conf.SetDefaultOutputExtension();
-
                 if (conf.IsFastBuild && SourceFilesFiltersRegex.Count > 0)
                 {
                     if (conf.FastBuildBlobbed)
@@ -1760,7 +1758,8 @@ namespace Sharpmake
                     var allRootedFiles = allLibraryFiles.Where(file => Path.IsPathRooted(file)).ToArray();
                     allLibraryFiles.RemoveRange(allRootedFiles);
 
-                    string platformLibExtension = "." + configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
+                    string platformLibPrefix = configTasks.GetOutputFileNamePrefix(Configuration.OutputType.Lib);
+                    string platformLibExtension = configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
                         if (!folder.StartsWith("$", StringComparison.Ordinal) && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
@@ -1774,7 +1773,7 @@ namespace Sharpmake
                             foreach (string file in allLibraryFiles)
                             {
                                 string path = Path.Combine(folder, file);
-                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, "lib" + file + platformLibExtension)))
+                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, platformLibPrefix + file + platformLibExtension)))
                                     toRemove.Add(file);
                             }
 

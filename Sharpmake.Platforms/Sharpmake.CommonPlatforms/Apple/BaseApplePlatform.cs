@@ -79,8 +79,6 @@ namespace Sharpmake
             generator.Write(_compilerExtraOptionsGeneral);
         }
 
-        public bool AddLibPrefix(Configuration conf) => true;
-
         public virtual void SelectPreprocessorDefinitionsBff(IBffGenerationContext context)
         {
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
@@ -266,27 +264,36 @@ namespace Sharpmake
                 // libraries work better. iOS is Darwin/Cocoa so assuming that the same goes
                 // for it.
                 case Project.Configuration.OutputType.Exe:
+                    return ExecutableFileExtension;
                 case Project.Configuration.OutputType.IosApp:
+                    return ".app";
                 case Project.Configuration.OutputType.IosTestBundle:
-                    return string.Empty;
+                    return ".xctest";
                 case Project.Configuration.OutputType.Lib:
-                    return "a";
+                    return StaticLibraryFileExtension;
                 case Project.Configuration.OutputType.Dll:
-                    return "dylib";
+                    return SharedLibraryFileExtension;
 
                 // .NET remains the same on all platforms. (Mono loads .exe and .dll regardless
                 // of platforms, and I assume the same about .NET Core.)
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                    return "exe";
+                    return ".exe";
                 case Project.Configuration.OutputType.DotNetClassLibrary:
-                    return "dll";
+                    return ".dll";
 
                 case Project.Configuration.OutputType.None:
                     return string.Empty;
                 default:
                     return outputType.ToString().ToLower();
             }
+        }
+
+        public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+        {
+            if (outputType != Project.Configuration.OutputType.Exe)
+                return "lib";
+            return string.Empty;
         }
 
         public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
@@ -296,27 +303,42 @@ namespace Sharpmake
 
         public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
-            // There's no implib on apple platforms, the dynlib does both
+            // There's no implib on apple platforms, the dynlib does both,
+            // and it's found the same way as static libs with -l to the linker
             if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export &&
                 !(configuration.IsFastBuild && !dependency.IsFastBuild))
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileName, dependency.TargetFileOrderNumber);
             }
             else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileName, dependency.TargetFileOrderNumber);
             }
         }
 
         public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
-            DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+            if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export &&
+                !(configuration.IsFastBuild && !dependency.IsFastBuild))
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                    configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileName, dependency.TargetFileOrderNumber);
+            }
+            else
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                    configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileName, dependency.TargetFileOrderNumber);
+            }
         }
 
         #endregion
@@ -324,9 +346,9 @@ namespace Sharpmake
         #region IPlatformVcxproj implementation
         public string ExecutableFileExtension => string.Empty;
         public string PackageFileExtension => ExecutableFileExtension;
-        public string SharedLibraryFileExtension => "dylib";
+        public string SharedLibraryFileExtension => ".dylib";
         public string ProgramDatabaseFileExtension => string.Empty;
-        public string StaticLibraryFileExtension => "a";
+        public string StaticLibraryFileExtension => ".a";
         public string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;
         public bool ExcludesPrecompiledHeadersFromBuild => false;
         public bool HasUserAccountControlSupport => false;
@@ -383,12 +405,6 @@ namespace Sharpmake
         public IEnumerable<VariableAssignment> GetEnvironmentVariables(IGenerationContext context)
         {
             yield break;
-        }
-        public string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-        {
-            if (outputType != Project.Configuration.OutputType.Exe)
-                return "lib";
-            return string.Empty;
         }
 
         public void SetupDeleteExtensionsOnCleanOptions(IGenerationContext context)

@@ -284,7 +284,7 @@ namespace Sharpmake.Generators.Apple
 				OBJROOT = ""[item.Configuration.IntermediatePath]"";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
 				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
-				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
+				PRODUCT_NAME = ""[item.Configuration.TargetFileName]"";
 				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
@@ -326,7 +326,7 @@ namespace Sharpmake.Generators.Apple
 				GCC_ENABLE_CPP_RTTI = [item.Options.RuntimeTypeInfo];
 				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
-				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
+				PRODUCT_NAME = ""[item.Configuration.TargetFileName]"";
 				TEST_HOST = ""[testHost]"";
 				WRAPPER_EXTENSION = xctest;
 			};

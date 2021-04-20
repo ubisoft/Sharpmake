@@ -54,12 +54,19 @@ namespace Sharpmake
                 switch (outputType)
                 {
                     case Project.Configuration.OutputType.Exe:
-                        return string.Empty;
+                        return ExecutableFileExtension;
                     case Project.Configuration.OutputType.Dll:
-                        return "so";
+                        return SharedLibraryFileExtension;
                     default:
-                        return "a";
+                        return StaticLibraryFileExtension;
                 }
+            }
+
+            public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+            {
+                if (outputType != Project.Configuration.OutputType.Exe)
+                    return "lib";
+                return string.Empty;
             }
 
             public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration conf)
@@ -79,14 +86,14 @@ namespace Sharpmake
                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                         configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
                 }
                 else
                 {
                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                         configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
                 }
             }
 
@@ -99,19 +106,12 @@ namespace Sharpmake
 
             #region IPlatformVcxproj implementation
             public override string ProgramDatabaseFileExtension => string.Empty;
-            public override string StaticLibraryFileExtension => "a";
-            public override string SharedLibraryFileExtension => "so";
+            public override string StaticLibraryFileExtension => ".a";
+            public override string SharedLibraryFileExtension => ".so";
             public override string StaticOutputLibraryFileExtension => string.Empty;
             public override string ExecutableFileExtension => string.Empty;
 
             // Ideally the object files should be suffixed .o when compiling with FastBuild, using the CompilerOutputExtension property in ObjectLists
-
-            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-            {
-                if (outputType != Project.Configuration.OutputType.Exe)
-                    return "lib";
-                return string.Empty;
-            }
 
             public override void SetupPlatformToolsetOptions(IGenerationContext context)
             {
@@ -405,11 +405,6 @@ namespace Sharpmake
             {
                 generator.Write(_compilerExtraOptions);
                 generator.Write(_compilerOptimizationOptions);
-            }
-
-            public override bool AddLibPrefix(Configuration conf)
-            {
-                return true;
             }
 
             public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)

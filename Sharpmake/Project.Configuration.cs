@@ -212,8 +212,15 @@ namespace Sharpmake
                 /// Gets the default file extension for a given output type.
                 /// </summary>
                 /// <param name="outputType">The <see cref="OutputType"/> whose default file extension we are seeking.</param>
-                /// <returns>A string, containing the file extension (not including the dot (.) prefix).</returns>
+                /// <returns>A string, containing the file extension (could be empty on some platforms, like exe on linux).</returns>
                 string GetDefaultOutputExtension(OutputType outputType);
+
+                /// <summary>
+                /// Gets the default file prefix for a given output type.
+                /// </summary>
+                /// <param name="outputType">The <see cref="OutputType"/> whose default file prefix we are seeking.</param>
+                /// <returns>A string, containing the file prefix (for instance lib on linux).</returns>
+                string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType);
 
                 /// <summary>
                 /// Gets the library paths native to the specified configuration's platform.
@@ -438,7 +445,7 @@ namespace Sharpmake
             /// <summary>
             /// Gets or sets the project's output extension (ie: .dll, .self, .exe, .dlu).
             /// </summary>
-            public string OutputExtension = "";
+            public string OutputExtension = null;
 
             /// <summary>
             /// Gets or sets whether to copy output files to the output directory.
@@ -1604,14 +1611,22 @@ namespace Sharpmake
 
             /// <summary>
             /// Gets or sets the prefix to prepend to the target name.
+            /// If left null, sharpmake will set it to the default for the platform
+            /// according to the output type, when the conf is resolved.
             /// </summary>
-            public string TargetFilePrefix = "";
+            public string TargetFilePrefix = null;
 
             /// <summary>
-            /// Gets or sets the full file name of the target, without the path but with the suffix
+            /// Gets the full file name of the target, without the path but with the suffix, and without the extension
             /// and the prefix.
             /// </summary>
-            public string TargetFileFullName = "[conf.TargetFilePrefix][conf.TargetFileName][conf.TargetFileSuffix]";
+            public string TargetFileFullName { get; internal set; } = "[conf.TargetFilePrefix][conf.TargetFileName][conf.TargetFileSuffix]";
+
+            /// <summary>
+            /// Gets the full file name of the target, without the path but with the suffix, and the extension
+            /// and the prefix.
+            /// </summary>
+            public string TargetFileFullNameWithExtension { get; internal set; } = "[conf.TargetFileFullName][conf.OutputExtension]";
 
             /// <summary>
             /// Gets or sets the ordering index of the target when added as a library to another
@@ -1978,15 +1993,14 @@ namespace Sharpmake
             /// </summary>
             public string ProgramDatabaseExtension { get; private set; }
 
-            private string _customTargetFileExtension = null;
+            [Obsolete("Use " + nameof(OutputExtension) + " instead", error: true)]
             public string TargetFileExtension
             {
                 get
                 {
-                    return !string.IsNullOrEmpty(_customTargetFileExtension) ? _customTargetFileExtension :
-                                  (Output == OutputType.Dll || Output == OutputType.DotNetClassLibrary ? DllExtension : CompressedExecutableExtension);
+                    return null;
                 }
-                set { _customTargetFileExtension = value; }
+                set { }
             }
 
 
@@ -2199,13 +2213,20 @@ namespace Sharpmake
                     Output = OutputType.None;
             }
 
+            private bool IsResolved = false;
+
             internal void Resolve(Resolver resolver)
             {
+                if (IsResolved)
+                    throw new Error("Can't resolve twice!");
+
                 if (PrecompHeader == null && PrecompSource != null)
                     throw new Error("Incoherent settings for {0} : PrecompHeader is null but PrecompSource is not", ToString());
                 // TODO : Is it OK to comment this or is it a hack ?
                 //if (PrecompHeader != null && PrecompSource == null)
                 //    throw new Error("Incoherent settings for {0} : PrecompSource is null but PrecompHeader is not", ToString());
+
+                SetPlatformDependentProperties();
 
                 resolver.SetParameter("conf", this);
                 resolver.SetParameter("target", Target);
@@ -2269,10 +2290,12 @@ namespace Sharpmake
 
                 if (Project.IsTargetFileNameToLower)
                 {
-                    TargetFileName = TargetFileName.ToLowerInvariant();
-                    TargetFileFullName = TargetFileFullName.ToLowerInvariant();
-                    TargetFileSuffix = TargetFileSuffix.ToLowerInvariant();
                     TargetFilePrefix = TargetFilePrefix.ToLowerInvariant();
+                    TargetFileName = TargetFileName.ToLowerInvariant();
+                    TargetFileSuffix = TargetFileSuffix.ToLowerInvariant();
+                    TargetFileFullName = TargetFileFullName.ToLowerInvariant();
+                    TargetFileFullNameWithExtension = TargetFileFullNameWithExtension.ToLowerInvariant();
+                    OutputExtension = OutputExtension.ToLowerInvariant();
                 }
 
                 _resolvedTargetDependsFiles.AddRange(TargetDependsFiles);
@@ -2354,6 +2377,8 @@ namespace Sharpmake
 
                 resolver.RemoveParameter("conf");
                 resolver.RemoveParameter("target");
+
+                IsResolved = true;
             }
 
             private void SetDependency(
@@ -2879,8 +2904,7 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
-                                string platformDllExtension = "." + dependency.OutputExtension;
-                                string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullName + platformDllExtension);
+                                string dependencyDllFullPath = Path.Combine(dependency.TargetPath, dependency.TargetFileFullNameWithExtension);
                                 if ((Output == OutputType.Exe || ExecuteTargetCopy)
                                     && dependencySetting.HasFlag(DependencySetting.LibraryFiles)
                                     && dependency.TargetPath != TargetPath)
@@ -3065,10 +3089,19 @@ namespace Sharpmake
                 return rootNode;
             }
 
-            internal void SetDefaultOutputExtension()
+            internal void SetPlatformDependentProperties()
             {
-                if (string.IsNullOrEmpty(OutputExtension))
-                    OutputExtension = PlatformRegistry.Get<IConfigurationTasks>(Platform).GetDefaultOutputExtension(Output);
+                var configTasks = PlatformRegistry.Get<IConfigurationTasks>(Platform);
+
+                DllExtension = configTasks.GetDefaultOutputExtension(OutputType.Dll);
+                ExecutableExtension = configTasks.GetDefaultOutputExtension(OutputType.Exe);
+
+                if (TargetFilePrefix == null)
+                    TargetFilePrefix = configTasks.GetOutputFileNamePrefix(Output);
+                if (OutputExtension == null)
+                    OutputExtension = configTasks.GetDefaultOutputExtension(Output);
+                if (Project is CSharpProject)
+                    TargetFileName = Project.AssemblyName;
             }
         }
     }

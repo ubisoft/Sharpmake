@@ -52,14 +52,6 @@ namespace Sharpmake.Generators.FastBuild
         /// </summary>
         string CppConfigName(Configuration conf);
 
-        /// <summary>
-        /// Gets whether a library prefix (usually `lib`) is required on that platform when
-        /// building libraries.
-        /// </summary>
-        /// <param name="conf">The <see cref="Configuration"/> under which the check is requested.</param>
-        /// <returns>`true` if a prefix is required, `false` otherwise.</returns>
-        bool AddLibPrefix(Configuration conf);
-
         void SelectPreprocessorDefinitionsBff(IBffGenerationContext context);
 
         /// <summary>

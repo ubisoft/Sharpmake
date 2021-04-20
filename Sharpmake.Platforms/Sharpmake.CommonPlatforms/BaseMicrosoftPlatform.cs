@@ -37,7 +37,21 @@ namespace Sharpmake
         #region Project.Configuration.IConfigurationTasks implementation
         public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
         {
-            DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+            if (dependency.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Export &&
+                !(configuration.IsFastBuild && !dependency.IsFastBuild))
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                    configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName + StaticLibraryFileExtension, dependency.TargetFileOrderNumber);
+            }
+            else
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
+                    configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName + StaticLibraryFileExtension, dependency.TargetFileOrderNumber);
+            }
         }
 
         public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
@@ -52,17 +66,22 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                    return "exe";
+                    return ExecutableFileExtension;
                 case Project.Configuration.OutputType.Lib:
-                    return "lib";
+                    return StaticLibraryFileExtension;
                 case Project.Configuration.OutputType.Dll:
                 case Project.Configuration.OutputType.DotNetClassLibrary:
-                    return "dll";
+                    return ".dll";
                 case Project.Configuration.OutputType.None:
                     return string.Empty;
                 default:
-                    return outputType.ToString().ToLower();
+                    throw new NotImplementedException("Please add extension for output type " + outputType);
             }
+        }
+
+        public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+        {
+            return string.Empty;
         }
 
         public virtual IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
@@ -109,10 +128,10 @@ namespace Sharpmake
         #endregion
 
         #region IPlatformVcxproj implementation
-        public override string ExecutableFileExtension => "exe";
-        public override string SharedLibraryFileExtension => "lib";
-        public override string ProgramDatabaseFileExtension => "pdb";
-        public override string StaticLibraryFileExtension => "lib";
+        public override string ExecutableFileExtension => ".exe";
+        public override string SharedLibraryFileExtension => ".lib";
+        public override string ProgramDatabaseFileExtension => ".pdb";
+        public override string StaticLibraryFileExtension => ".lib";
         #endregion
 
         public enum RuntimeLibrary

@@ -1260,37 +1260,11 @@ namespace Sharpmake.Generators.Apple
             }
 
             public ProjectOutputFile(Project.Configuration conf, string name = null)
-                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + GetFilePrefix(conf.Output) + conf.TargetFileFullName + GetFileExtension(conf))
+                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + conf.TargetFileFullNameWithExtension)
             {
                 Name = name ?? conf.Project.Name + " " + conf.Name;
                 BuildableName = System.IO.Path.GetFileName(FullPath);
                 _conf = conf;
-            }
-
-            private static string GetFilePrefix(Project.Configuration.OutputType outputType)
-            {
-                return (outputType == Project.Configuration.OutputType.Lib || outputType == Project.Configuration.OutputType.Dll) ? "lib" : "";
-            }
-
-            public static string GetFileExtension(Project.Configuration conf)
-            {
-                switch (conf.Output)
-                {
-                    case Project.Configuration.OutputType.Dll:
-                        return ".dylib";
-                    case Project.Configuration.OutputType.Lib:
-                        return ".a";
-                    case Project.Configuration.OutputType.Exe:
-                        return ""; // Mac executable
-                    case Project.Configuration.OutputType.IosApp:
-                        return ".app";
-                    case Project.Configuration.OutputType.IosTestBundle:
-                        return ".xctest";
-                    case Project.Configuration.OutputType.None:
-                        return "";
-                    default:
-                        throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
-                }
             }
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.BUILT_PRODUCTS_DIR; } }
@@ -1835,12 +1809,12 @@ namespace Sharpmake.Generators.Apple
                 {
                     ProjectNativeTarget testHostTarget = testHostTargetDependency.NativeTarget;
 
-                    // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration. 
-                    // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app) 
+                    // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration.
+                    // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app)
                     // that match the unit tests bundle ProjectBuildConfiguration.
                     Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
 
-                    testHostParam = String.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, ProjectOutputFile.GetFileExtension(testConfig));
+                    testHostParam = String.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, testConfig.Output);
                 }
 
                 resolverParameters.Add("testHost", testHostParam);

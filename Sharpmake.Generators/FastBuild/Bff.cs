@@ -790,7 +790,7 @@ namespace Sharpmake.Generators.FastBuild
                             StringBuilder builderForceUsingFiles = new StringBuilder();
                             foreach (var fuConfig in conf.ForceUsingDependencies)
                             {
-                                builderForceUsingFiles.AppendFormat(@" /FU""{0}.dll""", GetOutputFileName(fuConfig));
+                                builderForceUsingFiles.AppendFormat(@" /FU""{0}.dll""", fuConfig.TargetFileFullName);
                             }
                             foreach (var f in conf.ForceUsingFiles.Union(conf.DependenciesForceUsingFiles))
                             {
@@ -1520,7 +1520,7 @@ namespace Sharpmake.Generators.FastBuild
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix("." + platformVcxproj.StaticLibraryFileExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileExtension, true);
 
             context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1592,6 +1592,8 @@ namespace Sharpmake.Generators.FastBuild
             Strings ignoreSpecificLibraryNames
         )
         {
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
 
@@ -1599,7 +1601,7 @@ namespace Sharpmake.Generators.FastBuild
             string platformOutputLibraryExtension = string.Empty;
             string platformPrefix = string.Empty;
             platformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefix);
-            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
+            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
 
             var additionalDependencies = new OrderableStrings();
 
@@ -1623,15 +1625,13 @@ namespace Sharpmake.Generators.FastBuild
                     //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
                     // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
                     string extension = Path.GetExtension(libraryFile).ToLower();
-                    if (extension.StartsWith(".", StringComparison.Ordinal))
-                        extension = extension.Substring(1);
 
                     // here we could also verify that the path is rooted
                     if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
                     {
                         libraryFile = libPrefix + libraryFile;
                         if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
-                            libraryFile += "." + platformVcxproj.StaticLibraryFileExtension;
+                            libraryFile += platformVcxproj.StaticLibraryFileExtension;
                     }
                     libraryFile = platformPrefix + libraryFile + platformOutputLibraryExtension;
 
@@ -1889,24 +1889,6 @@ namespace Sharpmake.Generators.FastBuild
                 strBuilder.Append(",");
 
             return strBuilder.ToString();
-        }
-
-        private static string GetOutputFileName(Project.Configuration conf)
-        {
-            string targetNamePrefix = "";
-
-            if (conf.OutputExtension == "")
-            {
-                bool addLibPrefix = false;
-
-                if (conf.Output != Project.Configuration.OutputType.Exe)
-                    addLibPrefix = PlatformRegistry.Get<IPlatformBff>(conf.Platform).AddLibPrefix(conf);
-
-                if (addLibPrefix)
-                    targetNamePrefix = "lib";
-            }
-            string targetName = conf.Project is CSharpProject ? conf.TargetFileName : conf.TargetFileFullName;
-            return targetNamePrefix + targetName;
         }
 
         private static void Write(string value, TextWriter writer, Resolver resolver)
