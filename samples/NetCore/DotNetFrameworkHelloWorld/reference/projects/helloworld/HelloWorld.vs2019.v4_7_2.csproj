@@ -4,12 +4,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{FDCE244A-2E34-8A3A-A9B1-489020F0DAE6}</ProjectGuid>
+    <ProjectGuid>{AA8FA7D7-B647-16D9-001F-40E3B47416DF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HelloWorld</RootNamespace>
     <AssemblyName>the other name</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\anycpu\debug</OutputPath>
+    <OutputPath>output\vs2019\debug</OutputPath>
     <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\anycpu\release</OutputPath>
+    <OutputPath>output\vs2019\release</OutputPath>
     <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>

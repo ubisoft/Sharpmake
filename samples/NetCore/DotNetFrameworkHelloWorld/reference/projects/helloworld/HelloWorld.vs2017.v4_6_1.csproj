@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\anycpu\debug</OutputPath>
+    <OutputPath>output\vs2017\debug</OutputPath>
     <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\anycpu\release</OutputPath>
+    <OutputPath>output\vs2017\release</OutputPath>
     <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>

@@ -30,7 +30,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.netcore1_0),
+                    DotNetFramework.netcore2_1),
                 new Target(
                     Platform.anycpu,
                     DevEnv.vs2019,
@@ -38,7 +38,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.netcore2_0)
+                    DotNetFramework.netcore3_1)
             };
 
             public HelloWorld()
@@ -97,7 +97,8 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.netcore1_0 | DotNetFramework.netcore2_0)
+                    DotNetFramework.netcore2_1 | DotNetFramework.netcore3_1
+                )
             };
 
             public HelloWorldMultiFramework()

@@ -40,7 +40,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_2)
+                    DotNetFramework.v4_7_2)
             };
 
             public HelloWorld()
@@ -59,6 +59,7 @@ namespace NetCore
             {
                 conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
                 conf.ProjectPath = @"[project.RootPath]";
+                conf.TargetPath = @"[conf.ProjectPath]\output\[target.DevEnv]\[conf.Name]";
 
                 conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
             }
@@ -97,7 +98,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_1 | DotNetFramework.v4_6_2)
+                    DotNetFramework.v4_6_1 | DotNetFramework.v4_7_2)
             };
 
             public HelloWorldMultiFramework()
