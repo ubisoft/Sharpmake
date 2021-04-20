@@ -96,10 +96,10 @@ namespace HelloLinux
                 var dirNameParts = new List<string>();
 
                 dirNameParts.Add(Platform.ToString());
-                dirNameParts.Add(Optimization.ToString());
+                dirNameParts.Add(Optimization.ToString().ToLowerInvariant());
 
                 if (BuildSystem == BuildSystem.FastBuild)
-                    dirNameParts.Add(BuildSystem.ToString());
+                    dirNameParts.Add(BuildSystem.ToString().ToLowerInvariant());
 
                 return string.Join("_", dirNameParts);
             }
