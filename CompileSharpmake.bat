@@ -7,9 +7,6 @@
 
 setlocal enabledelayedexpansion
 
-:: Clear previous run status
-COLOR
-
 set VSWHERE="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if not exist %VSWHERE% (
     echo ERROR: Cannot determine the location of the vswhere command Common Tools folder.
@@ -59,13 +56,11 @@ goto success
 
 @REM -----------------------------------------------------------------------
 :success
-COLOR 2F
 set ERROR_CODE=0
 goto end
 
 @REM -----------------------------------------------------------------------
 :error
-COLOR 4F
 set ERROR_CODE=1
 goto end
 
