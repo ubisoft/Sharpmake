@@ -14,6 +14,7 @@
 
 using Sharpmake;
 using System;
+using System.IO;
 
 namespace CSharpImports
 {
@@ -22,14 +23,17 @@ namespace CSharpImports
     {
         public CSharpImports()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2017,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_6_1));
+            AddTargets(
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2019,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild,
+                    DotNetFramework.v4_7_2
+                )
+            );
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
@@ -37,17 +41,23 @@ namespace CSharpImports
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
             AssemblyName = "the other name";
 
-            PreImportProjects.Insert(0, new ImportProject
-            {
-                Project = "PRE [project.Name]-[conf.ProjectFileName]",
-                Condition = "PRE condition"
-            });
+            PreImportProjects.Insert(
+                0,
+                new ImportProject
+                {
+                    Project = @"..\..\[project.Name]-pre.props", // path is relative to the csproj output location
+                    Condition = "'$(Configuration)' == 'Debug'"
+                }
+            );
 
-            ImportProjects.Insert(0, new ImportProject
-            {
-                Project = "POST [project.Name]-[conf.ProjectFileName]",
-                Condition = "POST condition"
-            });
+            ImportProjects.Insert(
+                0,
+                new ImportProject
+                {
+                    Project = @"..\..\[project.Name]-post.props", // path is relative to the csproj output location
+                    Condition = "'$(Configuration)' == 'Release'"
+                }
+            );
         }
 
         [Configure()]
@@ -65,14 +75,17 @@ namespace CSharpImports
     {
         public CSharpImportsSolution()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2017,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_6_1));
+            AddTargets(
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2019,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild,
+                    DotNetFramework.v4_7_2
+                )
+            );
         }
 
         [Configure()]
@@ -86,7 +99,10 @@ namespace CSharpImports
 
             conf.AddProject<CSharpImports>(target);
         }
+    }
 
+    public static class Main
+    {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
