@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">x86</PlatformTarget>
-    <ProjectGuid>{E41A3E38-4166-4973-643C-05F1713AA05F}</ProjectGuid>
+    <ProjectGuid>{81B57E84-A2EB-53E8-8AAC-3847232697E6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OtherCSharpProj</RootNamespace>
     <AssemblyName>OtherCSharpProj</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\win32\debug</OutputPath>
-    <IntermediateOutputPath>temp\vs2017\v4_5\noblob_msbuild_vs2017_v4_5_debug_dll_win32</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_7_2\debug</OutputPath>
+    <IntermediateOutputPath>temp\othercsharpproj\vs2019\v4_7_2\debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,8 +29,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\win32\release</OutputPath>
-    <IntermediateOutputPath>temp\vs2017\v4_5\noblob_msbuild_vs2017_v4_5_release_dll_win32</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_7_2\release</OutputPath>
+    <IntermediateOutputPath>temp\othercsharpproj\vs2019\v4_7_2\release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

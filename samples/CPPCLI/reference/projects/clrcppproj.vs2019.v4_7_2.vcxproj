@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -11,15 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4C39E4CB-12DF-351E-6ECA-91BB2E73A1D8}</ProjectGuid>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <ProjectGuid>{3EB6F23B-6AF0-875B-6F8E-D1449D6B0280}</ProjectGuid>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>CLRCPPProj</RootNamespace>
     <ProjectName>CLRCPPProj</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -28,7 +28,7 @@
     <CharacterSet>MultiByte</CharacterSet>
     <CLRSupport>true</CLRSupport>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -36,7 +36,7 @@
     <CharacterSet>MultiByte</CharacterSet>
     <CLRSupport>true</CLRSupport>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>clrcppproj</TargetName>
     <OutDir>output\win32\debug\</OutDir>
-    <IntDir>temp\vs2017\win32\noblob_msbuild_vs2017_v4_6_2_debug_dll_win32\</IntDir>
+    <IntDir>temp\clrcppproj\vs2019\v4_7_2\debug\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
@@ -58,7 +58,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>clrcppproj</TargetName>
     <OutDir>output\win32\release\</OutDir>
-    <IntDir>temp\vs2017\win32\noblob_msbuild_vs2017_v4_6_2_release_dll_win32\</IntDir>
+    <IntDir>temp\clrcppproj\vs2019\v4_7_2\release\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
@@ -111,12 +111,13 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\vs2017\win32\noblob_msbuild_vs2017_v4_6_2_debug_dll_win32\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\clrcppproj\vs2019\v4_7_2\debug\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
       <OutputFile>output\win32\debug\clrcppproj.dll</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>output\win32\debug</AdditionalLibraryDirectories>
@@ -194,12 +195,13 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\vs2017\win32\noblob_msbuild_vs2017_v4_6_2_release_dll_win32\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\clrcppproj\vs2019\v4_7_2\release\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
       <OutputFile>output\win32\release\clrcppproj.dll</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>output\win32\release</AdditionalLibraryDirectories>
@@ -247,17 +249,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="MySql.Data.Entity">
-      <HintPath>..\..\..\..\..\external\MySql\v2.0\MySql.Data.Entity.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <ProjectReference Include="OtherCSharpProj.vs2017.v4_6_2.csproj">
-      <Project>{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}</Project>
+    <ProjectReference Include="OtherCSharpProj.vs2019.v4_7_2.csproj">
+      <Project>{81B57E84-A2EB-53E8-8AAC-3847232697E6}</Project>
       <Name>OtherCSharpProj</Name>
       <Private>true</Private>
     </ProjectReference>
-    <ProjectReference Include="theemptycppproject.vs2017.win32.v4_6_2.vcxproj">
-      <Project>{BDA16963-2D34-12B6-315C-5FC24F66C76F}</Project>
+    <ProjectReference Include="theemptycppproject.vs2019.v4_7_2.vcxproj">
+      <Project>{0B7B372C-D9BE-10C9-80D0-EB5C7ABCABAE}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
