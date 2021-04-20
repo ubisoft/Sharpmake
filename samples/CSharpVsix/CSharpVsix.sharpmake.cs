@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2019 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,27 @@
 
 using Sharpmake;
 using System;
-using System.IO;
 
 namespace CSharpVsix
 {
+    public class Common
+    {
+        public static Target[] GetDefaultTargets()
+        {
+            return new Target[]{
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2017,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild,
+                    DotNetFramework.v4_7_2
+                )
+            };
+        }
+    }
+
     [Sharpmake.Generate]
     public class CSharpVsixProject : CSharpProject
     {
@@ -32,6 +49,7 @@ namespace CSharpVsix
             RootNamespace = "CSharpVsix";
 
             VsctCompileFiles.Add(@"[project.SourceRootPath]\HelloWorldCommandPackage.vsct");
+            VSIXProjectVersion = 3;
 
             ResourcesPath = @"[project.SourceRootPath]\Resources";
 
@@ -44,71 +62,57 @@ namespace CSharpVsix
 
             AdditionalNone.Add(@"[project.SourceRootPath]\source.extension.vsixmanifest");
             AdditionalNone.Add(@"[project.SourceRootPath]\Key.snk");
-            AdditionalNone.Add(@"[project.SourceRootPath]\packages.config");
-
-            AddTargets(
-                new Target(
-                    Platform.anycpu,
-                    DevEnv.vs2015,
-                    Optimization.Debug | Optimization.Release,
-                    OutputType.Dll,
-                    Blob.NoBlob,
-                    BuildSystem.MSBuild,
-                    DotNetFramework.v4_5
-                )
-            );
-
-            // This Path will be used to get all SourceFiles in this Folder and all subFolders
 
             AssemblyName = "CSharpVsix";
+
+            AddTargets(Common.GetDefaultTargets());
         }
 
         [Configure()]
         public virtual void ConfigureAll(Configuration conf, Target target)
         {
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
-            conf.ReferencesByName.Add(
-                "EnvDTE100",
-                "EnvDTE90",
-                "Extensibility",
-                "stdole",                               //Interops
-                "Microsoft.VisualStudio.CommandBars",
-                "EnvDTE",
-                "EnvDTE80",
-                "Microsoft.CSharp",
-                "Microsoft.VisualStudio.OLE.Interop",
-                "Microsoft.VisualStudio.Shell.11.0",
-                "Microsoft.VisualStudio.Shell.Immutable.10.0",
-                "Microsoft.VisualStudio.Shell.Immutable.11.0",
-                "Microsoft.VisualStudio.Shell.Interop",
-                "Microsoft.VisualStudio.Shell.Interop.10.0",
-                "Microsoft.VisualStudio.Shell.Interop.11.0",
-                "Microsoft.VisualStudio.Shell.Interop.8.0",
-                "Microsoft.VisualStudio.Shell.Interop.9.0",
-                "PresentationCore",
-                "PresentationFramework",
-                "System",
-                "System.Core",
-                "System.Drawing",
-                "System.Design",
-                "System.Windows.Forms",
-                "System.Xaml",
-                "System.Xml",
-                "WindowsBase",
-                "Microsoft.VisualStudio.Shell.Immutable.12.0",
-                "Microsoft.VisualStudio.Shell.Interop.12.0"
+
+            // we support vs2017 and up, so the nuget version needs to start with 15
+            conf.ReferencesByNuGetPackage.Add(
+                "Microsoft.VisualStudio.SDK", "15.0.1"
             );
+
+            // When referencing VS SDK NuGet packages using PackageReference, assemblies are referenced instead of linked. This package corrects that.
+            conf.ReferencesByNuGetPackage.Add(
+                "Microsoft.VisualStudio.SDK.EmbedInteropTypes", "15.0.36"
+            );
+
+            conf.ReferencesByName.Add(
+                "System.Design"
+            );
+
             conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
             conf.ProjectPath = @"[project.RootPath]";
 
-            conf.Options.Add(new Options.CSharp.MinimumVisualStudioVersion("14.0"));
+            conf.Options.Add(Options.CSharp.AutoGenerateBindingRedirects.Enabled);
             conf.Options.Add(Options.CSharp.SignAssembly.Enabled);
             conf.Options.Add(new Options.CSharp.AssemblyOriginatorKeyFile("Key.snk"));
             conf.Options.Add(Options.CSharp.BootstrapperEnabled.Enabled);
             conf.Options.Add(Options.CSharp.CreateVsixContainer.Enabled);
-            conf.Options.Add(Options.CSharp.DeployExtension.Disabled);
             conf.Options.Add(Options.CSharp.UseCodeBase.Enabled);
+
+            // minimum is vs2017
+            conf.Options.Add(new Options.CSharp.MinimumVisualStudioVersion("15.0"));
+            conf.Options.Add(new Options.CSharp.OldToolsVersion("15.0"));
+
             conf.Options.Add(new Options.CSharp.VsToolsPath(@"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)"));
+
+            conf.CsprojUserFile = new Configuration.CsprojUserFileSettings
+            {
+                StartAction = Configuration.CsprojUserFileSettings.StartActionSetting.Program,
+                StartArguments = "/rootSuffix Exp",
+                StartProgram = "$(DevEnvDir)devenv.exe"
+            };
+
+            // !IMPORTANT! Comment out the below line to allow nicer experience when working from VS
+            // Ideally, sharpmake should support adding the condition $(BuildingInsideVisualStudio)' != 'true' on the tag
+            conf.Options.Add(Options.CSharp.DeployExtension.Disabled);
         }
     }
 
@@ -117,14 +121,7 @@ namespace CSharpVsix
     {
         public CSharpVsixSolution()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2015,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_5));
+            AddTargets(Common.GetDefaultTargets());
         }
 
         [Configure()]
