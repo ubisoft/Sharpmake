@@ -1,7 +1,6 @@
-#ifndef PRIVATE_WIDGET_H__
-#define PRIVATE_WIDGET_H__
+#pragma once
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 class QPrivateWidgetChildren;
 
@@ -15,5 +14,3 @@ public:
 protected:
     QPrivateWidgetChildren* children;
 };
-
-#endif //PRIVATE_WIDGET_H__

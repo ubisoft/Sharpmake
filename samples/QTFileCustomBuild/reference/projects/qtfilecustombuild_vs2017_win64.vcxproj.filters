@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="..\codebase\floatanglespinbox.cpp" />
     <ClCompile Include="..\codebase\floatcosanglespinbox.cpp" />
+    <ClCompile Include="..\codebase\main.cpp" />
     <ClCompile Include="..\codebase\privatewidget.cpp" />
     <ClCompile Include="..\codebase\stdafx.cpp" />
     <ClCompile Include="obj\win64\qt\debug\moc_floatanglespinbox.cpp">

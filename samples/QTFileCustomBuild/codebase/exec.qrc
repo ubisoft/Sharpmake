@@ -1,2 +1,6 @@
-IDI_ICON1		ICON		DISCARDABLE	"QtExe.ico"
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>blank.png</file>
+</qresource>
+</RCC>
 
