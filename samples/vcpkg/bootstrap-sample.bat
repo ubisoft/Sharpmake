@@ -2,6 +2,11 @@
 
 SETLOCAL
 
+set SHARPMAKE_OPTIM=debug
+if not "%~1" == "" (
+    set SHARPMAKE_OPTIM=%~1
+)
+
 call :DECOMPRESS_VCPKG_EXPORTED_PACKAGES
 IF ERRORLEVEL 1 exit /b %ERRORLEVEL%
 
@@ -22,10 +27,5 @@ exit /B %ERRORLEVEL%
 
 :: Generate projects using Sharpmake
 :GENERATE_PROJECTS
-%~dp0..\..\bin\Release\Sharpmake.Application.exe /sources(@".\sharpmake\main.sharpmake.cs") /generatedebugsolution
+%~dp0..\..\tmp\bin\%SHARPMAKE_OPTIM%\Sharpmake.Application.exe /sources(@'.\sharpmake\main.sharpmake.cs')
 exit /B %ERRORLEVEL%
-
-
-
-
-

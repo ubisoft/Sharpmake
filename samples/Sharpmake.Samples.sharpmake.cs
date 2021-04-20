@@ -260,6 +260,7 @@ namespace SharpmakeGen.Samples
         public VcpkgProject()
         {
             Name = "vcpkg";
+            SharpmakeMainFile = @"sharpmake\main.sharpmake.cs";
         }
     }
 }
