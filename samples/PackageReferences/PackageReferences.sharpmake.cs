@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2019 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,17 @@ namespace CSharpPackageReference
     {
         public PackageReferences()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_5 | DotNetFramework.v4_6_2));
+            AddTargets(
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2017 | DevEnv.vs2019,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild,
+                    DotNetFramework.v4_7_2
+                )
+            );
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
@@ -43,6 +46,8 @@ namespace CSharpPackageReference
         {
             conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
             conf.ProjectPath = @"[project.RootPath]";
+
+            conf.TargetPath = @"[conf.ProjectPath]\output\[target.DevEnv]\[conf.Name]";
 
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
 
@@ -58,14 +63,17 @@ namespace CSharpPackageReference
     {
         public PackageReferenceSolution()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2015 | DevEnv.vs2017 | DevEnv.vs2019,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_5 | DotNetFramework.v4_6_2));
+            AddTargets(
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2017 | DevEnv.vs2019,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild,
+                    DotNetFramework.v4_7_2
+                )
+            );
         }
 
         [Configure()]
