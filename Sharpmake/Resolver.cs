@@ -723,7 +723,7 @@ namespace Sharpmake
                         }
 
                         throw new NotFoundException(
-                            $"Cannot find path '{nameChunk}' in parameter path '{memberPath}'.",
+                            $"Cannot find path '{nameChunk}' in parameter path '{memberPath}'",
                             possibleArguments
                         );
                     }
@@ -733,7 +733,12 @@ namespace Sharpmake
                 name += _pathSeparator + nameChunk;
             }
 
-            return parameter == null ? "null" : ApplyModifier(modifier, parameter.ToString());
+            if (parameter == null)
+            {
+                throw new NotFoundException(parameterName + name + " is null, please set a proper value for sharpmake to resolve it");
+            }
+
+            return ApplyModifier(modifier, parameter.ToString());
         }
 
         private static bool CanWriteFieldValue(FieldInfo fieldInfo)

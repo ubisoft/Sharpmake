@@ -118,8 +118,7 @@ namespace Sharpmake.UnitTests
 
             obj = new FieldClass();
             obj.String = "[p1.NullObject]";
-            resolver.Resolve(obj);
-            Assert.That(obj.String, Is.EqualTo("null"));
+            Assert.Throws<Error>(() => resolver.Resolve(obj));
         }
 
         [Test]
