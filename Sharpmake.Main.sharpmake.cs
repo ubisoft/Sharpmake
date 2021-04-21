@@ -114,9 +114,11 @@ namespace SharpmakeGen
 
             AddTargets(Common.GetDefaultTargets());
 
-            ExtraItems[".github"] = new Strings { @".github\workflows\actions.yml" };
+            ExtraItems[".github"] = new Strings {
+                @".github\workflows\actions.yml"
+            };
 
-            ExtraItems["batch_files"] = new Strings{
+            ExtraItems["BatchFiles"] = new Strings {
                 "bootstrap.bat",
                 "CompileSharpmake.bat",
                 "GenerateMdbFiles.bat",
