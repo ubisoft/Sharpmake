@@ -24,7 +24,7 @@ namespace SharpmakeGen
 
             conf.Options.Add(Options.CSharp.AllowUnsafeBlocks.Enabled);
 
-            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.8.0");
+            conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "3.9.0");
             conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "2.3.2262-g94fae01e");
         }
     }

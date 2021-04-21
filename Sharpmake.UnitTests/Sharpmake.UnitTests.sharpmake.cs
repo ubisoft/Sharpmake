@@ -30,10 +30,10 @@ namespace SharpmakeGen
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
 
-            conf.ReferencesByNuGetPackage.Add("Microsoft.NET.Test.Sdk", "16.8.3");
+            conf.ReferencesByNuGetPackage.Add("Microsoft.NET.Test.Sdk", "16.9.4");
 
             conf.ReferencesByNuGetPackage.Add("NUnit.Console", "3.12.0");
-            conf.ReferencesByNuGetPackage.Add("NUnit", "3.12.0");
+            conf.ReferencesByNuGetPackage.Add("NUnit", "3.13.1");
             conf.ReferencesByNuGetPackage.Add("NUnit3TestAdapter", "3.17.0");
         }
     }
