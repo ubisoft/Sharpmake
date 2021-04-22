@@ -13,7 +13,6 @@ namespace VCPKGSample
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
-
             FileInfo sharpmakeFileInfo = Util.GetCurrentSharpmakeFileInfo();
             string sharpmakeFileDirectory = Util.PathMakeStandard(sharpmakeFileInfo.DirectoryName);
             string absoluteRootPath = Util.PathGetAbsolute(sharpmakeFileDirectory, @"..\tmp");

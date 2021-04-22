@@ -2213,11 +2213,11 @@ namespace Sharpmake
                     Output = OutputType.None;
             }
 
-            private bool IsResolved = false;
+            private bool _isResolved = false;
 
             internal void Resolve(Resolver resolver)
             {
-                if (IsResolved)
+                if (_isResolved)
                     throw new Error("Can't resolve twice!");
 
                 if (PrecompHeader == null && PrecompSource != null)
@@ -2378,7 +2378,7 @@ namespace Sharpmake
                 resolver.RemoveParameter("conf");
                 resolver.RemoveParameter("target");
 
-                IsResolved = true;
+                _isResolved = true;
             }
 
             private void SetDependency(
