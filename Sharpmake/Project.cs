@@ -172,12 +172,7 @@ namespace Sharpmake
         public Strings NoneExtensionsCopyIfNewer = new Strings();
 
         public Strings XResourcesResw = new Strings();
-
-        /// <summary>
-        /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
-        /// </summary>
-        public bool EnableDefaultItems { get; set; } = false;
-
+        
         public class XResourcesImgContainer : IEnumerable<string>
         {
             /// <summary>
@@ -2303,6 +2298,11 @@ namespace Sharpmake
         /// If set to true. Will explicit the RestoreProjectStyle in the project file
         /// </summary>
         public bool ExplicitNugetRestoreProjectStyle = false;
+
+        /// <summary>
+        /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
+        /// </summary>
+        public bool EnableDefaultItems { get; set; } = false;
 
         public bool IncludeResxAsResources = true;
         public string RootNamespace;
