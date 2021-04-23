@@ -173,7 +173,10 @@ namespace Sharpmake
 
         public Strings XResourcesResw = new Strings();
 
-        public bool EnableDefaultItems { get; set; } = false;                           // Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
+        /// <summary>
+        /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
+        /// </summary>
+        public bool EnableDefaultItems { get; set; } = false;
 
         public class XResourcesImgContainer : IEnumerable<string>
         {
