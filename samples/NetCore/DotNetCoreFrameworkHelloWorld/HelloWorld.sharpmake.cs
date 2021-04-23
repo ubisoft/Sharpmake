@@ -52,6 +52,7 @@ namespace NetCore
                 // This Path will be used to get all SourceFiles in this Folder and all subFolders
                 SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
                 AssemblyName = "the other name";
+                EnableDefaultItems = true;
             }
 
             [Configure()]

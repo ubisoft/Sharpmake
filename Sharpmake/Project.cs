@@ -2299,6 +2299,11 @@ namespace Sharpmake
         /// </summary>
         public bool ExplicitNugetRestoreProjectStyle = false;
 
+        /// <summary>
+        /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
+        /// </summary>
+        public bool EnableDefaultItems { get; set; } = false;
+
         public bool IncludeResxAsResources = true;
         public string RootNamespace;
         public Platform? DefaultPlatform;
