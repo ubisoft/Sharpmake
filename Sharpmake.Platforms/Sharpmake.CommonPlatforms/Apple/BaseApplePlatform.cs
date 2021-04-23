@@ -624,9 +624,9 @@ namespace Sharpmake
             options["FrameworkPaths"] = XCodeUtil.XCodeFormatList(frameworkPaths, 4);
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Disable, () => options["GenerateDebuggingSymbols"] = "NO"),
-                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.DeadStrip, () => options["GenerateDebuggingSymbols"] = "YES"),
-                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Enable, () => options["GenerateDebuggingSymbols"] = "YES")
+                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Disable, () => { options["GenerateDebuggingSymbols"] = "NO"; cmdLineOptions["GenerateDebuggingSymbols"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.DeadStrip, () => { options["GenerateDebuggingSymbols"] = "YES"; cmdLineOptions["GenerateDebuggingSymbols"] = "-g"; }),
+                Options.Option(Options.XCode.Compiler.GenerateDebuggingSymbols.Enable, () => { options["GenerateDebuggingSymbols"] = "YES"; cmdLineOptions["GenerateDebuggingSymbols"] = "-g"; })
             );
 
             Options.XCode.Compiler.InfoPListFile infoPListFile = Options.GetObject<Options.XCode.Compiler.InfoPListFile>(conf);
