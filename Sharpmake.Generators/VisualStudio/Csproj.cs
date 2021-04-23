@@ -1198,7 +1198,7 @@ namespace Sharpmake.Generators.VisualStudio
             string projectConfigurationCondition = Template.Project.DefaultProjectConfigurationCondition;
             if (isNetCoreProjectSchema)
             {
-                netCoreEnableDefaultItems = "false";
+                netCoreEnableDefaultItems = project.EnableDefaultItems.ToString();
                 targetFrameworkVersionString = "TargetFramework";
                 projectPropertyGuid = RemoveLineTag;
                 if (projectFrameworks.Count() > 1)
