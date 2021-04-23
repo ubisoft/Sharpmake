@@ -172,7 +172,7 @@ namespace Sharpmake
         public Strings NoneExtensionsCopyIfNewer = new Strings();
 
         public Strings XResourcesResw = new Strings();
-        
+
         public class XResourcesImgContainer : IEnumerable<string>
         {
             /// <summary>
