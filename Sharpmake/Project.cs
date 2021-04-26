@@ -1196,7 +1196,12 @@ namespace Sharpmake
                 foreach (var conf in Configurations)
                     conf.ResolvedSourceFilesBlobExclude.AddRange(SourceFilesBlobExclude);
 
-                foreach (string sourceFile in ResolvedSourceFiles)
+                // Use ResolvedSourceFiles sorted by relative paths
+                var sortedResolvedSourceFiles = ResolvedSourceFiles.Zip(resolvedSourceFilesRelative, (file, relFile) => new Tuple<string, string>(file, relFile))
+                                                                   .OrderBy(t => t.Item2, StringComparer.OrdinalIgnoreCase)
+                                                                   .Select(t => t.Item1);
+               
+                foreach (string sourceFile in sortedResolvedSourceFiles)
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.BlobbingResolving, sourceFile))
                         Debugger.Break();
