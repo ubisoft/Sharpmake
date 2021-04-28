@@ -215,7 +215,7 @@ namespace Sharpmake.Generators.FastBuild
             // Generate all configuration options onces...
             var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
             var cmdLineOptions = new Dictionary<Project.Configuration, ProjectOptionsGenerator.VcxprojCmdLineOptions>();
-            var additionalDependenciesPerConf = new Dictionary<Project.Configuration, OrderableStrings>();
+            var dependenciesInfoPerConf = new Dictionary<Project.Configuration, DependenciesInfo>();
             ProjectOptionsGenerator projectOptionsGen;
             using (builder.CreateProfilingScope("BffGenerator.Generate:ProjectOptionsGenerator()"))
             {
@@ -229,7 +229,7 @@ namespace Sharpmake.Generators.FastBuild
                     context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
                     context.Configuration = conf;
 
-                    GenerateBffOptions(projectOptionsGen, context, additionalDependenciesPerConf);
+                    GenerateBffOptions(projectOptionsGen, context, dependenciesInfoPerConf);
 
                     options.Add(conf, context.Options);
                     cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
@@ -309,7 +309,8 @@ namespace Sharpmake.Generators.FastBuild
                     bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
                     bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
 
-                    OrderableStrings additionalDependencies = additionalDependenciesPerConf[conf];
+                    var dependenciesInfo = dependenciesInfoPerConf[conf];
+                    OrderableStrings additionalDependencies = dependenciesInfo.AdditionalDependencies;
 
                     foreach (var tuple in confSubConfigs.Keys)
                     {
@@ -417,8 +418,10 @@ namespace Sharpmake.Generators.FastBuild
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
-                                    fastBuildProjectDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig) + "_LibraryDependency");
-                                    fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                    string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
+                                    if (!dependenciesInfo.IgnoredLibraryNames.Contains(depProjConfig.TargetFileFullNameWithExtension))
+                                        fastBuildProjectDependencies.Add(shortProjectName + "_LibraryDependency");
+                                    fastBuildBuildOnlyDependencies.Add(shortProjectName);
                                 }
                                 else if (!depProjConfig.IsExcludedFromBuild)
                                 {
@@ -1362,10 +1365,16 @@ namespace Sharpmake.Generators.FastBuild
             return $@"{prefix}{Util.DoubleQuotes}{resolvedInclude}{Util.DoubleQuotes}";
         }
 
+        private class DependenciesInfo
+        {
+            public OrderableStrings AdditionalDependencies;
+            public Strings IgnoredLibraryNames;
+        }
+
         private static void GenerateBffOptions(
             ProjectOptionsGenerator projectOptionsGen,
             BffGenerationContext context,
-            Dictionary<Project.Configuration, OrderableStrings> additionalDependenciesPerConf
+            Dictionary<Project.Configuration, DependenciesInfo> dependenciesInfoPerConf
         )
         {
             // resolve targetPlatformVersion as it may be used in includes
@@ -1392,8 +1401,8 @@ namespace Sharpmake.Generators.FastBuild
 
             FillLinkerOptions(context);
 
-            OrderableStrings additionalDependencies = FillLibrariesOptions(context);
-            additionalDependenciesPerConf.Add(context.Configuration, additionalDependencies);
+            var dependenciesInfo = FillLibrariesOptions(context);
+            dependenciesInfoPerConf.Add(context.Configuration, dependenciesInfo);
         }
 
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)
@@ -1502,9 +1511,9 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private static OrderableStrings FillLibrariesOptions(BffGenerationContext context)
+        private static DependenciesInfo FillLibrariesOptions(BffGenerationContext context)
         {
-            OrderableStrings additionalDependencies = null;
+            var dependenciesInfo = new DependenciesInfo();
 
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
@@ -1525,6 +1534,7 @@ namespace Sharpmake.Generators.FastBuild
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
             ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
+            dependenciesInfo.IgnoredLibraryNames = ignoreSpecificLibraryNames;
 
             context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1537,7 +1547,11 @@ namespace Sharpmake.Generators.FastBuild
 
                 //AdditionalDependencies
                 //                                            AdditionalDependencies="lib1;lib2"      "lib1;lib2" 
-                additionalDependencies = SelectAdditionalDependenciesOption(context, libFiles, ignoreSpecificLibraryNames);
+                dependenciesInfo.AdditionalDependencies = SelectAdditionalDependenciesOption(context, libFiles, ignoreSpecificLibraryNames);
+            }
+            else
+            {
+                dependenciesInfo.AdditionalDependencies = new OrderableStrings();
             }
 
             ////IgnoreSpecificLibraryNames
@@ -1555,7 +1569,7 @@ namespace Sharpmake.Generators.FastBuild
                 context.CommandLineOptions["IgnoreDefaultLibraryNames"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
-            return additionalDependencies;
+            return dependenciesInfo;
         }
 
         private static void SelectAdditionalLibraryDirectoriesOption(BffGenerationContext context)
