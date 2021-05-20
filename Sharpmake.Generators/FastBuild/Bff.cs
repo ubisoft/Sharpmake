@@ -420,7 +420,7 @@ namespace Sharpmake.Generators.FastBuild
                                     fastBuildProjectDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig) + "_LibraryDependency");
                                     fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
-                                else
+                                else if (!depProjConfig.IsExcludedFromBuild)
                                 {
                                     fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
@@ -440,6 +440,10 @@ namespace Sharpmake.Generators.FastBuild
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
                                     fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                }
+                                else
+                                {
+                                    fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
                             }
                         }
