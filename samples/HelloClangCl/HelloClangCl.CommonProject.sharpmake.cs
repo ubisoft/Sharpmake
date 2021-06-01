@@ -122,6 +122,14 @@ namespace HelloClangCl
         ////////////////////////////////////////////////////////////////////////
         #region Build system
         [ConfigurePriority(ConfigurePriorities.BuildSystem)]
+        [Configure(BuildSystem.MSBuild)]
+        public virtual void ConfigureMSBuild(Configuration conf, CommonTarget target)
+        {
+            // starting with vs2019 16.10, need this to fix warning: argument unused during compilation: '/MP'
+            conf.Options.Add(Options.Vc.Compiler.MultiProcessorCompilation.Disable);
+        }
+
+        [ConfigurePriority(ConfigurePriorities.BuildSystem)]
         [Configure(BuildSystem.FastBuild)]
         public virtual void ConfigureFastBuild(Configuration conf, CommonTarget target)
         {
