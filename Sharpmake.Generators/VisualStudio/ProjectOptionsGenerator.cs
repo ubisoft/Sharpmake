@@ -2016,7 +2016,7 @@ namespace Sharpmake.Generators.VisualStudio
                 throw new Error("Event hasn't been resolved!");
 
             Func<string, string> extractName = (name) => name.Substring(name.LastIndexOf(@"\", StringComparison.Ordinal) + 1).Replace('.', '_');
-
+           
             bool isPostBuildCustomActionWithSpecificName = buildStep == Vcxproj.BuildStep.PostBuild || buildStep == Vcxproj.BuildStep.PostBuildCustomAction || eventBuildStep.IsNameSpecific;
 
             if (eventBuildStep is Project.Configuration.BuildStepExecutable)
@@ -2027,7 +2027,16 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    execName = @"Exec_" + extractName(cEvent.ExecutableFile) + "_" + (normalizedConfTargetPath + conf.TargetFileFullName + cEvent.ExecutableOtherArguments).GetHashCode().ToString("X8");
+                    execName = @"Exec_" 
+                        + extractName(cEvent.ExecutableFile) 
+                        + "_"
+                        + (
+                            normalizedConfTargetPath +
+                            conf.TargetFileFullName +
+                            cEvent.ExecutableInputFileArgumentOption + 
+                            cEvent.ExecutableOtherArguments
+                          ).
+                        GetHashCode().ToString("X8");
                 }
                 else
                 {
