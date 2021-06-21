@@ -694,7 +694,7 @@ namespace Sharpmake
             // Add all precomp files
             foreach (Configuration conf in Configurations)
             {
-                if (conf.PrecompSource != null)
+                if (!string.IsNullOrEmpty(conf.PrecompSource))
                     precompSource.Add(conf.PrecompSource);
             }
 
