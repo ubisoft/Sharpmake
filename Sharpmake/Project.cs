@@ -1820,6 +1820,7 @@ namespace Sharpmake
                 // Resolve full paths
                 _rootPath = Util.SimplifyPath(RootPath);
                 Util.ResolvePath(SharpmakeCsPath, ref _sourceRootPath);
+                Util.ResolvePath(SharpmakeCsPath, ref AdditionalSourceRootPaths);
                 Util.ResolvePath(SourceRootPath, ref SourceFiles);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesExclude);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesBlobExclude);
