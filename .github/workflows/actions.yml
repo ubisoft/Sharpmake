@@ -280,7 +280,7 @@ jobs:
 
       - name: Install Qt
         if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v2.13.0
+        uses: jurplel/install-qt-action@v2.13.2
 
       - name: QTFileCustomBuild ${{ matrix.configuration }}
         if: runner.os == 'Windows'
