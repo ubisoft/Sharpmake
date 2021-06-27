@@ -1,0 +1,17 @@
+---
+version: 2
+updates:
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+
+  # Maintain NuGet dependencies in sharpmake's csproj
+  # not ideal because the versions are in the .sharpmake.cs
+  # but at least we'll get notified
+  - package-ecosystem: "nuget"
+    directory: "/Sharpmake"
+    schedule:
+      interval: daily
