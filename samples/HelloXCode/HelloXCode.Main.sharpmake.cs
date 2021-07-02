@@ -36,6 +36,7 @@ namespace HelloXCode
         public static string RootDirectory;
         public static string TmpDirectory { get { return Path.Combine(RootDirectory, "temp"); } }
         public static string OutputDirectory { get { return Path.Combine(TmpDirectory, "bin"); } }
+        public static string ExternalDirectory { get { return Path.Combine(RootDirectory, @"..\external"); } }
     }
 
     public static class Main
