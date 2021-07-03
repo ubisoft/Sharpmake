@@ -18,7 +18,7 @@ Settings
         "TMP=$TMP$",
         "TEMP=$TEMP$",
         "USERPROFILE=$USERPROFILE$",
-        "SystemRoot=C:\Windows"
+        "SystemRoot=C:\WINDOWS"
         "PATH=C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64"
     }
 
@@ -27,7 +27,7 @@ Settings
 //=================================================================================================================
 Compiler( 'Compiler-x64-vs2019' )
 {
-    .ExecutableRootPath     = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\bin\HostX64\x64'
+    .ExecutableRootPath     = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\HostX64\x64'
     .Executable             = '$ExecutableRootPath$\cl.exe'
     .ExtraFiles             = {
                                 '$ExecutableRootPath$\1033\clui.dll',
@@ -46,7 +46,7 @@ Compiler( 'Compiler-x64-vs2019' )
                                 '$ExecutableRootPath$\tbbmalloc.dll',
                                 '$ExecutableRootPath$\vcruntime140.dll',
                                 '$ExecutableRootPath$\vcruntime140_1.dll',
-                                'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat',
+                                'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat',
                                 'C:\Program Files (x86)\Windows Kits\10\Redist\10.0.19041.0\ucrt\DLLs\x64\api-ms-win-core-console-l1-1-0.dll',
                                 'C:\Program Files (x86)\Windows Kits\10\Redist\10.0.19041.0\ucrt\DLLs\x64\api-ms-win-core-console-l1-2-0.dll',
                                 'C:\Program Files (x86)\Windows Kits\10\Redist\10.0.19041.0\ucrt\DLLs\x64\api-ms-win-core-datetime-l1-1-0.dll',
@@ -94,8 +94,8 @@ Compiler( 'Compiler-x64-vs2019' )
 
 .win64Config =
 [
-    .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\bin\Hostx64\x64'
-    .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\bin\Hostx64\x64'
+    .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64'
+    .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64'
     .ResourceCompiler       = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe'
     .Compiler               = 'Compiler-x64-vs2019'
     .Librarian              = '$LinkerPath$\lib.exe'

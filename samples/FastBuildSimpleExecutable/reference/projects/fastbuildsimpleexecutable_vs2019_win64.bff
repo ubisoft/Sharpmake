@@ -18,8 +18,8 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -99,8 +99,8 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
@@ -168,8 +168,8 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -250,8 +250,8 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input

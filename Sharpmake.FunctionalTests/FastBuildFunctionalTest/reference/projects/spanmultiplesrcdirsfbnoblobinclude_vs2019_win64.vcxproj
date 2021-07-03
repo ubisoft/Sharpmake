@@ -25,7 +25,7 @@
     <ProjectName>SpanMultipleSrcDirsFBNoBlobInclude</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
@@ -67,9 +67,9 @@
     <OutDir>output\debug_fastbuild_noblob_vs2019\</OutDir>
     <IntDir>build\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\*unity*.cpp" >NUL 2>NUL
 del "build\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\*.obj" >NUL 2>NUL
 del "build\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\*.a" >NUL 2>NUL
@@ -100,9 +100,9 @@ del "output\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude.pdb
     <OutDir>output\release_fastbuild_noblob_vs2019\</OutDir>
     <IntDir>build\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\*unity*.cpp" >NUL 2>NUL
 del "build\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\*.obj" >NUL 2>NUL
 del "build\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobinclude\*.a" >NUL 2>NUL

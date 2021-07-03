@@ -42,9 +42,9 @@
     <OutDir>output\debug_fastbuild_vs2019\</OutDir>
     <IntDir>build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\*unity*.cpp" >NUL 2>NUL
 del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\*.obj" >NUL 2>NUL
 del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\*.a" >NUL 2>NUL
@@ -64,9 +64,9 @@ del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude.pdb" >NUL 2
     <OutDir>output\release_fastbuild_vs2019\</OutDir>
     <IntDir>build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\*unity*.cpp" >NUL 2>NUL
 del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\*.obj" >NUL 2>NUL
 del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\*.a" >NUL 2>NUL
