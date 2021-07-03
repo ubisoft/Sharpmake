@@ -262,7 +262,6 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMak
     <NMakeOutput>[options.OutputFile]</NMakeOutput>
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
-    <TargetFileName>[options.OutputFileName].exe</TargetFileName>
   </PropertyGroup>
 ";
 
