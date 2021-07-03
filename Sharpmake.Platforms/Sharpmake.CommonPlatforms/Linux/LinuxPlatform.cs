@@ -268,15 +268,15 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = "-Wl --enc"; }),
+                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = "-Wl,--enc"; }),
                 Sharpmake.Options.Option(Options.Linker.EditAndContinue.Disable, () => { options["EditAndContinue"] = "false"; cmdLineOptions["EditAndContinue"] = FileGeneratorUtilities.RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
                 Sharpmake.Options.Option(Options.Linker.InfoStripping.None, () => { options["InfoStripping"] = "None"; cmdLineOptions["InfoStripping"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = "-Wl -S"; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = "-Wl -s"; })
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-S"; }),
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-s"; })
                 );
 
                 context.SelectOption
