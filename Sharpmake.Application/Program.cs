@@ -169,7 +169,17 @@ namespace Sharpmake.Application
         {
             if (CommandLine.ContainParameter("breakintodebugger"))
             {
-                System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
+                }
+                else
+                {
+                    Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
+                    while (Console.ReadKey(true).Key != ConsoleKey.Enter) {
+                        Console.WriteLine("Press ENTER to continue");
+                    }
+                }
                 Debugger.Break();
             }
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).
