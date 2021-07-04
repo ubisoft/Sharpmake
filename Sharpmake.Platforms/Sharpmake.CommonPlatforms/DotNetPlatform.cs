@@ -31,22 +31,22 @@ namespace Sharpmake
         #endregion
 
         #region IConfigurationTasks
-        public override string SharedLibraryFileExtension => ".dll";
-        public override string ProgramDatabaseFileExtension => ".pdb";
-        public override string ExecutableFileExtension => ".exe";
+        public override string SharedLibraryFileFullExtension => ".dll";
+        public override string ProgramDatabaseFileFullExtension => ".pdb";
+        public override string ExecutableFileFullExtension => ".exe";
 
-        public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+        public string GetDefaultOutputFullExtension(Project.Configuration.OutputType outputType)
         {
             switch (outputType)
             {
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                    return ExecutableFileExtension;
+                    return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.Lib:
                 case Project.Configuration.OutputType.Dll:
                 case Project.Configuration.OutputType.DotNetClassLibrary:
-                    return SharedLibraryFileExtension;
+                    return SharedLibraryFileFullExtension;
                 case Project.Configuration.OutputType.None:
                     return string.Empty;
                 default:

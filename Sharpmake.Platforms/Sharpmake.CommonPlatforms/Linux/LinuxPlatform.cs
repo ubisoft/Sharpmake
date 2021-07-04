@@ -49,16 +49,19 @@ namespace Sharpmake
 
             #region Project.Configuration.IConfigurationTasks implementation
 
-            public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+            // The below method was replaced by GetDefaultOutputFullExtension
+            // string GetDefaultOutputExtension(OutputType outputType);
+
+            public string GetDefaultOutputFullExtension(Project.Configuration.OutputType outputType)
             {
                 switch (outputType)
                 {
                     case Project.Configuration.OutputType.Exe:
-                        return ExecutableFileExtension;
+                        return ExecutableFileFullExtension;
                     case Project.Configuration.OutputType.Dll:
-                        return SharedLibraryFileExtension;
+                        return SharedLibraryFileFullExtension;
                     default:
-                        return StaticLibraryFileExtension;
+                        return StaticLibraryFileFullExtension;
                 }
             }
 
@@ -105,11 +108,11 @@ namespace Sharpmake
             #endregion
 
             #region IPlatformVcxproj implementation
-            public override string ProgramDatabaseFileExtension => string.Empty;
-            public override string StaticLibraryFileExtension => ".a";
-            public override string SharedLibraryFileExtension => ".so";
-            public override string StaticOutputLibraryFileExtension => string.Empty;
-            public override string ExecutableFileExtension => string.Empty;
+            public override string ProgramDatabaseFileFullExtension => string.Empty;
+            public override string StaticLibraryFileFullExtension => ".a";
+            public override string SharedLibraryFileFullExtension => ".so";
+            public override string StaticOutputLibraryFileFullExtension => string.Empty;
+            public override string ExecutableFileFullExtension => string.Empty;
 
             // Ideally the object files should be suffixed .o when compiling with FastBuild, using the CompilerOutputExtension property in ObjectLists
 

@@ -415,7 +415,7 @@ namespace Sharpmake.Generators.Generic
                 switch (conf.Platform)
                 {
                     case Platform.linux:
-                        conf.GeneratorSetGeneratedInformation(".elf", ".elf", ".so", ".pdb");
+                        conf.GeneratorSetOutputFullExtensions(".elf", ".elf", ".so", ".pdb");
                         break;
                     default:
                         break;

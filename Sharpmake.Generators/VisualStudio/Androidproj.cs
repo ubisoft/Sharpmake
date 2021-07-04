@@ -127,11 +127,11 @@ namespace Sharpmake.Generators.VisualStudio
                 // set generator information
                 var platformVcxproj = context.PresentPlatforms[conf.Platform];
                 var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(conf.Platform);
-                conf.GeneratorSetGeneratedInformation(
-                    platformVcxproj.ExecutableFileExtension,
-                    platformVcxproj.PackageFileExtension,
-                    configurationTasks.GetDefaultOutputExtension(Project.Configuration.OutputType.Dll),
-                    platformVcxproj.ProgramDatabaseFileExtension);
+                conf.GeneratorSetOutputFullExtensions(
+                    platformVcxproj.ExecutableFileFullExtension,
+                    platformVcxproj.PackageFileFullExtension,
+                    configurationTasks.GetDefaultOutputFullExtension(Project.Configuration.OutputType.Dll),
+                    platformVcxproj.ProgramDatabaseFileFullExtension);
 
                 projectConfigurationOptions.Add(conf, new Options.ExplicitOptions());
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();

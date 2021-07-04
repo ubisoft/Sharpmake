@@ -130,12 +130,12 @@ namespace Sharpmake
         #endregion
 
         #region IPlatformVcxproj implementation
-        public abstract string ExecutableFileExtension { get; }
-        public virtual string PackageFileExtension => ExecutableFileExtension;
-        public abstract string SharedLibraryFileExtension { get; }
-        public abstract string ProgramDatabaseFileExtension { get; }
-        public virtual string StaticLibraryFileExtension => ".lib";
-        public virtual string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;
+        public abstract string ExecutableFileFullExtension { get; }
+        public virtual string PackageFileFullExtension => ExecutableFileFullExtension;
+        public abstract string SharedLibraryFileFullExtension { get; }
+        public abstract string ProgramDatabaseFileFullExtension { get; }
+        public virtual string StaticLibraryFileFullExtension => ".lib";
+        public virtual string StaticOutputLibraryFileFullExtension => StaticLibraryFileFullExtension;
         public virtual bool ExcludesPrecompiledHeadersFromBuild => false;
         public virtual bool HasUserAccountControlSupport => false;
         public virtual bool HasEditAndContinueDebuggingSupport => false;

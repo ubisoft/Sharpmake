@@ -1086,7 +1086,7 @@ namespace Sharpmake.Generators.VisualStudio
                 configurationNameMapping[projectUniqueName] = conf;
 
                 // set generator information
-                conf.GeneratorSetGeneratedInformation(".exe", ".exe", ".dll", ".pdb");
+                conf.GeneratorSetOutputFullExtensions(".exe", ".exe", ".dll", ".pdb");
             }
 
             string outputType;

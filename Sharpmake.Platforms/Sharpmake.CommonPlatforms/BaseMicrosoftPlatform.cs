@@ -43,14 +43,14 @@ namespace Sharpmake
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName + StaticLibraryFileExtension, dependency.TargetFileOrderNumber);
+                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName + StaticLibraryFileFullExtension, dependency.TargetFileOrderNumber);
             }
             else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName + StaticLibraryFileExtension, dependency.TargetFileOrderNumber);
+                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName + StaticLibraryFileFullExtension, dependency.TargetFileOrderNumber);
             }
         }
 
@@ -59,16 +59,19 @@ namespace Sharpmake
             DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
         }
 
-        public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+        // The below method was replaced by GetDefaultOutputFullExtension
+        // string GetDefaultOutputExtension(OutputType outputType);
+
+        public string GetDefaultOutputFullExtension(Project.Configuration.OutputType outputType)
         {
             switch (outputType)
             {
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                    return ExecutableFileExtension;
+                    return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.Lib:
-                    return StaticLibraryFileExtension;
+                    return StaticLibraryFileFullExtension;
                 case Project.Configuration.OutputType.Dll:
                 case Project.Configuration.OutputType.DotNetClassLibrary:
                     return ".dll";
@@ -128,10 +131,10 @@ namespace Sharpmake
         #endregion
 
         #region IPlatformVcxproj implementation
-        public override string ExecutableFileExtension => ".exe";
-        public override string SharedLibraryFileExtension => ".lib";
-        public override string ProgramDatabaseFileExtension => ".pdb";
-        public override string StaticLibraryFileExtension => ".lib";
+        public override string ExecutableFileFullExtension => ".exe";
+        public override string SharedLibraryFileFullExtension => ".lib";
+        public override string ProgramDatabaseFileFullExtension => ".pdb";
+        public override string StaticLibraryFileFullExtension => ".lib";
         #endregion
 
         public enum RuntimeLibrary

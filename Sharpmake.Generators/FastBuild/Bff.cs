@@ -468,7 +468,7 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
 
-                                var staticLibExtension = vcxprojPlatform.StaticLibraryFileExtension;
+                                var staticLibExtension = vcxprojPlatform.StaticLibraryFileFullExtension;
 
                                 fastBuildOutputFile = Path.ChangeExtension(fastBuildOutputFile, null); // removes the extension
                                 fastBuildOutputFile += "_" + subConfigIndex.ToString();
@@ -1520,7 +1520,7 @@ namespace Sharpmake.Generators.FastBuild
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
 
             context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1627,11 +1627,11 @@ namespace Sharpmake.Generators.FastBuild
                     string extension = Path.GetExtension(libraryFile).ToLower();
 
                     // here we could also verify that the path is rooted
-                    if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
+                    if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
                     {
                         libraryFile = libPrefix + libraryFile;
-                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
-                            libraryFile += platformVcxproj.StaticLibraryFileExtension;
+                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileFullExtension))
+                            libraryFile += platformVcxproj.StaticLibraryFileFullExtension;
                     }
                     libraryFile = platformPrefix + libraryFile + platformOutputLibraryExtension;
 

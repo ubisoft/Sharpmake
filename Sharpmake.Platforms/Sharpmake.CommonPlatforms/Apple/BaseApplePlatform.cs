@@ -254,7 +254,11 @@ namespace Sharpmake
 
 
         #region IConfigurationTasks
-        public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+
+        // The below method was replaced by GetDefaultOutputFullExtension
+        // string GetDefaultOutputExtension(OutputType outputType);
+
+        public string GetDefaultOutputFullExtension(Project.Configuration.OutputType outputType)
         {
             switch (outputType)
             {
@@ -264,15 +268,15 @@ namespace Sharpmake
                 // libraries work better. iOS is Darwin/Cocoa so assuming that the same goes
                 // for it.
                 case Project.Configuration.OutputType.Exe:
-                    return ExecutableFileExtension;
+                    return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.IosApp:
                     return ".app";
                 case Project.Configuration.OutputType.IosTestBundle:
                     return ".xctest";
                 case Project.Configuration.OutputType.Lib:
-                    return StaticLibraryFileExtension;
+                    return StaticLibraryFileFullExtension;
                 case Project.Configuration.OutputType.Dll:
-                    return SharedLibraryFileExtension;
+                    return SharedLibraryFileFullExtension;
 
                 // .NET remains the same on all platforms. (Mono loads .exe and .dll regardless
                 // of platforms, and I assume the same about .NET Core.)
@@ -344,12 +348,12 @@ namespace Sharpmake
         #endregion
 
         #region IPlatformVcxproj implementation
-        public string ExecutableFileExtension => string.Empty;
-        public string PackageFileExtension => ExecutableFileExtension;
-        public string SharedLibraryFileExtension => ".dylib";
-        public string ProgramDatabaseFileExtension => string.Empty;
-        public string StaticLibraryFileExtension => ".a";
-        public string StaticOutputLibraryFileExtension => StaticLibraryFileExtension;
+        public string ExecutableFileFullExtension => string.Empty;
+        public string PackageFileFullExtension => ExecutableFileFullExtension;
+        public string SharedLibraryFileFullExtension => ".dylib";
+        public string ProgramDatabaseFileFullExtension => string.Empty;
+        public string StaticLibraryFileFullExtension => ".a";
+        public string StaticOutputLibraryFileFullExtension => StaticLibraryFileFullExtension;
         public bool ExcludesPrecompiledHeadersFromBuild => false;
         public bool HasUserAccountControlSupport => false;
         public bool HasEditAndContinueDebuggingSupport => false;

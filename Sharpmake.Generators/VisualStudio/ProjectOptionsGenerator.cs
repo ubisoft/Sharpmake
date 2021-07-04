@@ -1221,7 +1221,7 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["ImportLibrary"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["OutputFileName"] = context.Configuration.TargetFileFullName;
-            context.Options["OutputFileExtension"] = context.Configuration.OutputExtension;
+            context.Options["OutputFileExtension"] = context.Configuration.TargetFileFullExtension;
 
             context.Options["AdditionalDeploymentFolders"] = "";
 

@@ -31,12 +31,23 @@ namespace Sharpmake.Generators.VisualStudio
 
     public interface IPlatformVcxproj
     {
-        string ExecutableFileExtension { get; }
-        string PackageFileExtension { get; }
-        string SharedLibraryFileExtension { get; }
-        string ProgramDatabaseFileExtension { get; }
-        string StaticLibraryFileExtension { get; }
-        string StaticOutputLibraryFileExtension { get; }
+        // ExecutableFileExtension
+        // PackageFileExtension
+        // SharedLibraryFileExtension
+        // ProgramDatabaseFileExtension
+        // StaticLibraryFileExtension
+        // StaticOutputLibraryFileExtension
+
+        // the above properties have been replaced by their "Full" equivalents below
+        // because most required sharpmake to add a leading ".", which was an issue on some platforms
+
+        string ExecutableFileFullExtension { get; }
+        string PackageFileFullExtension { get; }
+        string SharedLibraryFileFullExtension { get; }
+        string ProgramDatabaseFileFullExtension { get; }
+        string StaticLibraryFileFullExtension { get; }
+        string StaticOutputLibraryFileFullExtension { get; }
+
         bool ExcludesPrecompiledHeadersFromBuild { get; }
         bool HasUserAccountControlSupport { get; }
         bool HasEditAndContinueDebuggingSupport { get; }

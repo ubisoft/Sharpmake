@@ -1764,7 +1764,7 @@ namespace Sharpmake
                     allLibraryFiles.RemoveRange(allRootedFiles);
 
                     string platformLibPrefix = configTasks.GetOutputFileNamePrefix(Configuration.OutputType.Lib);
-                    string platformLibExtension = configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
+                    string platformLibExtension = configTasks.GetDefaultOutputFullExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
                         if (!folder.StartsWith("$", StringComparison.Ordinal) && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))

@@ -74,16 +74,19 @@ namespace Sharpmake
                 DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
             }
 
-            public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+            // The below method was replaced by GetDefaultOutputFullExtension
+            // string GetDefaultOutputExtension(OutputType outputType);
+
+            public string GetDefaultOutputFullExtension(Project.Configuration.OutputType outputType)
             {
                 switch (outputType)
                 {
                     case Project.Configuration.OutputType.Exe:
-                        return ExecutableFileExtension;
+                        return ExecutableFileFullExtension;
                     case Project.Configuration.OutputType.Dll:
-                        return SharedLibraryFileExtension;
+                        return SharedLibraryFileFullExtension;
                     default:
-                        return StaticLibraryFileExtension;
+                        return StaticLibraryFileFullExtension;
                 }
             }
 
@@ -101,10 +104,10 @@ namespace Sharpmake
             #endregion
 
             #region IPlatformVcxproj implementation
-            public override string ProgramDatabaseFileExtension => string.Empty;
-            public override string SharedLibraryFileExtension => ".so";
-            public override string StaticLibraryFileExtension => ".a";
-            public override string ExecutableFileExtension => string.Empty;
+            public override string ProgramDatabaseFileFullExtension => string.Empty;
+            public override string SharedLibraryFileFullExtension => ".so";
+            public override string StaticLibraryFileFullExtension => ".a";
+            public override string ExecutableFileFullExtension => string.Empty;
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
