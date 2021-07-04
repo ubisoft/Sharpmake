@@ -443,17 +443,20 @@ namespace Sharpmake.Generators.FastBuild
         {
             switch (compilerFamily)
             {
+                case CompilerFamily.Auto: return string.Empty;
                 case CompilerFamily.MSVC: return "msvc";
                 case CompilerFamily.Clang: return "clang";
                 case CompilerFamily.GCC: return "gcc";
                 case CompilerFamily.SNC: return "snc";
                 case CompilerFamily.CodeWarriorWii: return "codewarrior-wii";
+                case CompilerFamily.GreenHillsWiiU: return "greenhills-wiiu";
                 case CompilerFamily.CudaNVCC: return "cuda-nvcc";
                 case CompilerFamily.QtRCC: return "qt-rcc";
                 case CompilerFamily.VBCC: return "vbcc";
                 case CompilerFamily.OrbisWavePsslc: return "orbis-wave-psslc";
                 case CompilerFamily.ClangCl: return "clang-cl";
-                case CompilerFamily.Auto: return string.Empty;
+                case CompilerFamily.CSharp: return "csharp";
+                case CompilerFamily.Custom: return "custom";
                 default: throw new Exception("Unrecognized compiler family");
             }
         }
