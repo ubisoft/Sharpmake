@@ -231,10 +231,11 @@ namespace Sharpmake
             writer.Flush();
 
             var generationOutput = new GenerationOutput();
-            if (Util.FileWriteIfDifferentInternal(new FileInfo(filePath), mStream, bypassAutoCleanupDatabase: true))
-                generationOutput.Generated.Add(filePath);
+            var fileInfo = new FileInfo(filePath);
+            if (Util.FileWriteIfDifferentInternal(fileInfo, mStream, bypassAutoCleanupDatabase: true))
+                generationOutput.Generated.Add(fileInfo.FullName);
             else
-                generationOutput.Skipped.Add(filePath);
+                generationOutput.Skipped.Add(fileInfo.FullName);
 
             ReportGenerated(typeof(TraceFile), generationOutput);
         }
