@@ -109,7 +109,7 @@ namespace Sharpmake
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex));
 
             if (arrayIndex + _references.Count >= array.Length)
-                throw new ArgumentException(String.Format("Array too small : {0} expect minimum {1}", array.Length, arrayIndex + _references.Count), nameof(array));
+                throw new ArgumentException(string.Format("Array too small : {0} expect minimum {1}", array.Length, arrayIndex + _references.Count), nameof(array));
 
             int i = 0;
             foreach (DotNetReference dotNetReference in _references)

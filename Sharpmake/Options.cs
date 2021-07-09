@@ -355,7 +355,7 @@ namespace Sharpmake
             return GetObject<T>(conf.Options, conf.DefaultOption);
         }
 
-        public static T GetObject<T>(List<Object> options, DefaultTarget defaultTarget)
+        public static T GetObject<T>(List<object> options, DefaultTarget defaultTarget)
         {
             for (int i = options.Count - 1; i >= 0; --i)
             {

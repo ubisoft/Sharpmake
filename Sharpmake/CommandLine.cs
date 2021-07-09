@@ -156,7 +156,7 @@ namespace Sharpmake
                             else
                                 parametersName[i] = parameter.Name;
                         }
-                        help.WriteLine("({0})", String.Join(", ", parametersName));
+                        help.WriteLine("({0})", string.Join(", ", parametersName));
                         if (option.Description.Length != 0)
                             help.WriteLine("\t{0}", option.Description.Replace(Environment.NewLine, Environment.NewLine + "\t"));
                     }
@@ -217,14 +217,14 @@ namespace Sharpmake
 
                             if (isStatic)
                             {
-                                string executeCode = String.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
+                                string executeCode = string.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action execute = Assembler.BuildDelegate<Action>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
                                 execute();
                             }
                             else
                             {
-                                string executeCode = String.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
+                                string executeCode = string.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action<object> execute = Assembler.BuildDelegate<Action<object>>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
                                 execute(instance);
@@ -234,10 +234,10 @@ namespace Sharpmake
                         catch (Error e)
                         {
                             string[] parametersName = methodInfo.GetParameters().Select((ParameterInfo p) => p.ToString()).ToArray();
-                            errors.Append(String.Format("Command line option '/{0}' have invalid parameters '({1})', maybe not compatible with '({2})'" + Environment.NewLine + "\t",
+                            errors.Append(string.Format("Command line option '/{0}' have invalid parameters '({1})', maybe not compatible with '({2})'" + Environment.NewLine + "\t",
                                 parameter.Name,
                                 parameter.Args,
-                                String.Join(", ", parametersName)));
+                                string.Join(", ", parametersName)));
 
                             errors.Append(e.Message + Environment.NewLine);
                         }
@@ -283,9 +283,9 @@ namespace Sharpmake
             public override string ToString()
             {
                 if (ArgsCount == 0)
-                    return String.Format("/{0}", Name);
+                    return string.Format("/{0}", Name);
 
-                return String.Format("/{0}({1})", Name, Args);
+                return string.Format("/{0}({1})", Name, Args);
             }
         }
 
@@ -382,7 +382,7 @@ namespace Sharpmake
 
                 parameter.Args = builder.ToString().Trim();
 
-                if (!String.IsNullOrEmpty(parameter.Args))
+                if (!string.IsNullOrEmpty(parameter.Args))
                     ++parameter.ArgsCount;
 
                 // skip ')'

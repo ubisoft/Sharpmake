@@ -597,7 +597,7 @@ namespace Sharpmake.Generators.Apple
                     continue;
 
                 item.Build = !configuration.ResolvedSourceFilesBuildExclude.Contains(item.FullPath);
-                item.Source = project.SourceFilesCompileExtensions.Contains(item.Extension) || (String.Compare(item.Extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (String.Compare(item.Extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
+                item.Source = project.SourceFilesCompileExtensions.Contains(item.Extension) || (string.Compare(item.Extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(item.Extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
 
                 if (item.Source)
                 {
@@ -1476,7 +1476,7 @@ namespace Sharpmake.Generators.Apple
                 }
             }
 
-            public String script;
+            public string script;
 
             public ProjectShellScriptBuildPhase(uint buildActionMask)
                 : base(ItemSection.PBXShellScriptBuildPhase, "ShellScrips", buildActionMask)
@@ -1544,7 +1544,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectNativeTarget NativeTarget { get { return _target; } }
             public ProjectContainerProxy Proxy { get { return _proxy; } }
             public ProjectReference ProjectReference { get { return _projectReference; } }
-            public String TargetIdentifier
+            public string TargetIdentifier
             {
                 get
                 {
@@ -1608,11 +1608,11 @@ namespace Sharpmake.Generators.Apple
 
             public ProjectResourcesBuildPhase ResourcesBuildPhase { get; set; }
             public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
-            public String SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
+            public string SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
             public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
             public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
-            public String ShellScriptPreBuildPhaseUIDs
+            public string ShellScriptPreBuildPhaseUIDs
             {
                 get
                 {
@@ -1622,7 +1622,7 @@ namespace Sharpmake.Generators.Apple
                     return RemoveLineTag;
                 }
             }
-            public String ShellScriptPostBuildPhaseUIDs
+            public string ShellScriptPostBuildPhaseUIDs
             {
                 get
                 {
@@ -1812,7 +1812,7 @@ namespace Sharpmake.Generators.Apple
                     // that match the unit tests bundle ProjectBuildConfiguration.
                     Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
 
-                    testHostParam = String.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, testConfig.Output);
+                    testHostParam = string.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, testConfig.Output);
                 }
 
                 resolverParameters.Add("testHost", testHostParam);

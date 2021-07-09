@@ -1587,7 +1587,7 @@ namespace Sharpmake
             Compile
         }
 
-        internal static Project CreateProject(Type projectType, List<Object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
+        internal static Project CreateProject(Type projectType, List<object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
         {
             Project project;
 
@@ -2261,7 +2261,7 @@ namespace Sharpmake
         public string ResourcesPath = null;
         public string ContentPath = null;
         public string BaseIntermediateOutputPath = string.Empty;
-        public string ApplicationIcon = String.Empty;
+        public string ApplicationIcon = string.Empty;
         public string ApplicationManifest = "app.manifest";
         public string ApplicationSplashScreen = string.Empty;
         public string StartupObject = string.Empty;
@@ -2455,12 +2455,12 @@ namespace Sharpmake
             base.ResolveSourceFiles(builder);
 
             //Getting CorrectCaseVersion
-            if (!String.IsNullOrEmpty(ResourcesPath) && Directory.Exists(ResourcesPath))
+            if (!string.IsNullOrEmpty(ResourcesPath) && Directory.Exists(ResourcesPath))
             {
                 ResolvedResourcesFullFileNames = new Strings(GetDirectoryFiles(new DirectoryInfo(ResourcesPath)).Select(GetCapitalizedFile));
             }
 
-            if (!String.IsNullOrEmpty(ContentPath) && Directory.Exists(ContentPath))
+            if (!string.IsNullOrEmpty(ContentPath) && Directory.Exists(ContentPath))
             {
                 ResolvedContentFullFileNames = new Strings(GetDirectoryFiles(new DirectoryInfo(ContentPath)).Select(GetCapitalizedFile));
             }
@@ -2518,7 +2518,7 @@ namespace Sharpmake
             }*/
         }
 
-        private List<String> _filteredEmbeddedAssemblies = null;
+        private List<string> _filteredEmbeddedAssemblies = null;
         public virtual string GetLinkFolder(string file)
         {
             if (PreserveLinkFolderPaths)
@@ -2578,7 +2578,7 @@ namespace Sharpmake
         public string Version;
 
         public PythonVirtualEnvironment(string name, string path, bool isDefault)
-            : this(name, path, String.Empty, isDefault, default(Guid))
+            : this(name, path, string.Empty, isDefault, default(Guid))
         { }
 
         public PythonVirtualEnvironment(string name, string path, string version, bool isDefault)
@@ -2586,7 +2586,7 @@ namespace Sharpmake
         { }
 
         public PythonVirtualEnvironment(string name, string path, bool isDefault, Guid baseInterpreterGuid)
-            : this(name, path, String.Empty, isDefault, baseInterpreterGuid)
+            : this(name, path, string.Empty, isDefault, baseInterpreterGuid)
         { }
 
         public PythonVirtualEnvironment(string name, string path, string version, bool isDefault, Guid baseInterpreterGuid)
@@ -2617,7 +2617,7 @@ namespace Sharpmake
         public List<PythonEnvironment> Environments = new List<PythonEnvironment>();
         public List<PythonVirtualEnvironment> VirtualEnvironments = new List<PythonVirtualEnvironment>();
         public Strings SearchPaths = new Strings();
-        public string StartupFile = String.Empty;
+        public string StartupFile = string.Empty;
         public bool IsSourceFilesCaseSensitive = true;
 
         private void InitPythonSpecifics()

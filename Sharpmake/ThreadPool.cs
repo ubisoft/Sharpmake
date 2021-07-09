@@ -138,7 +138,7 @@ namespace Sharpmake
                 for (int i = 0; i < numThread; ++i)
                 {
                     _thread[i] = new Thread(ThreadWork);
-                    _thread[i].Name = String.Format("Tasks Thread #{0,3}", i);
+                    _thread[i].Name = string.Format("Tasks Thread #{0,3}", i);
                     _thread[i].Start(i);
                 }
             }

@@ -1125,7 +1125,7 @@ namespace Sharpmake.Generators.VisualStudio
                         inconsistencyReports.Append($"Config1: {context.ProjectConfigurations.ElementAt(i)}\n");
                         inconsistencyReports.Append($"Config2: {context.ProjectConfigurations.ElementAt(j)}\n");
                         inconsistencyReports.Append("Config1 depends on the following projects but not Config2:\n=> ");
-                        inconsistencyReports.Append(String.Join(Environment.NewLine + "=> ", ex.ToList()) + Environment.NewLine);
+                        inconsistencyReports.Append(string.Join(Environment.NewLine + "=> ", ex.ToList()) + Environment.NewLine);
                         inconsistencyReports.Append(new string('-', 70) + Environment.NewLine);
                     }
                 }
@@ -1345,7 +1345,7 @@ namespace Sharpmake.Generators.VisualStudio
                         customBuildFiles.Add(projectFile);
                     }
                     else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                             (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                             (string.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
                     {
                         sourceFiles.Add(projectFile);
                     }
@@ -1572,8 +1572,8 @@ namespace Sharpmake.Generators.VisualStudio
                             bool consumeWinRTExtensions = conf.ConsumeWinRTExtensions.Contains(file.FileName) || conf.ResolvedSourceFilesWithCompileAsWinRTOption.Contains(file.FileName);
                             bool excludeWinRTExtensions = conf.ExcludeWinRTExtensions.Contains(file.FileName) || conf.ResolvedSourceFilesWithExcludeAsWinRTOption.Contains(file.FileName);
 
-                            bool isBlobFileDefine = conf.BlobFileDefine != String.Empty && file.FileName.EndsWith(Project.BlobExtension, StringComparison.OrdinalIgnoreCase);
-                            bool isResourceFileDefine = conf.ResourceFileDefine != String.Empty && file.FileName.EndsWith(".rc", StringComparison.OrdinalIgnoreCase);
+                            bool isBlobFileDefine = conf.BlobFileDefine != string.Empty && file.FileName.EndsWith(Project.BlobExtension, StringComparison.OrdinalIgnoreCase);
+                            bool isResourceFileDefine = conf.ResourceFileDefine != string.Empty && file.FileName.EndsWith(".rc", StringComparison.OrdinalIgnoreCase);
                             bool isCompileAsCFile = conf.ResolvedSourceFilesWithCompileAsCOption.Contains(file.FileName);
                             bool isCompileAsCPPFile = conf.ResolvedSourceFilesWithCompileAsCPPOption.Contains(file.FileName);
                             bool isCompileAsCLRFile = conf.ResolvedSourceFilesWithCompileAsCLROption.Contains(file.FileName);
@@ -1862,14 +1862,14 @@ namespace Sharpmake.Generators.VisualStudio
                 Project.Configuration conf = context.ProjectConfigurations[i];
                 var compiledFiles = configurationCompiledFiles[i];
 
-                compiledFiles.Sort((l, r) => { return String.Compare(l.FileNameWithoutExtension, r.FileNameWithoutExtension, StringComparison.OrdinalIgnoreCase); });
+                compiledFiles.Sort((l, r) => { return string.Compare(l.FileNameWithoutExtension, r.FileNameWithoutExtension, StringComparison.OrdinalIgnoreCase); });
 
                 for (int j = 0; j < compiledFiles.Count - 1; ++j)
                 {
                     ProjectFile l = compiledFiles[j];
                     ProjectFile r = compiledFiles[j + 1];
 
-                    if (String.Compare(l.FileNameWithoutExtension, r.FileNameSourceRelative, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(l.FileNameWithoutExtension, r.FileNameSourceRelative, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         string plausibleCause = "";
 

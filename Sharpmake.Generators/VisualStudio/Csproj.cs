@@ -1149,7 +1149,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 Write(Template.Project.ProjectBeginNetCore, writer, resolver);
 
-                targetFrameworkString = String.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
+                targetFrameworkString = string.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
             }
             else
             {

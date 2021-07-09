@@ -26,13 +26,13 @@ namespace Sharpmake
             : base(message)
         { }
         public Error(string message, params object[] args)
-            : base(String.Format(message, args))
+            : base(string.Format(message, args))
         { }
         public Error(Exception innerException)
             : base("Sharpmake Error", innerException)
         { }
         public Error(Exception innerException, string message, params object[] args)
-            : base(String.Format(message, args), innerException)
+            : base(string.Format(message, args), innerException)
         { }
 
         public static void Valid(bool condition)
@@ -62,13 +62,13 @@ namespace Sharpmake
             : base(message)
         { }
         public InternalError(string message, params object[] args)
-            : base(String.Format(message, args))
+            : base(string.Format(message, args))
         { }
         public InternalError(Exception innerException)
             : base("Sharpmake Internal Error", innerException)
         { }
         public InternalError(Exception innerException, string message, params object[] args)
-            : base(String.Format(message, args), innerException)
+            : base(string.Format(message, args), innerException)
         { }
 
         protected InternalError(SerializationInfo info, StreamingContext context)

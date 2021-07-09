@@ -1283,7 +1283,7 @@ namespace Sharpmake
                 case DevEnv.eclipse:
                     throw new NotSupportedException("Eclipse does not support Tool Version. ");
                 default:
-                    throw new NotImplementedException(String.Format("ToolVersion not set for Visual Studio {0}", env));
+                    throw new NotImplementedException(string.Format("ToolVersion not set for Visual Studio {0}", env));
             }
         }
 
@@ -1337,7 +1337,7 @@ namespace Sharpmake
         public static bool IsCpp(Project.Configuration conf)
         {
             string extension = Path.GetExtension(conf.ProjectFullFileNameWithExtension);
-            return (String.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
+            return (string.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public static string GetProjectFileExtension(Project.Configuration conf)
@@ -1480,7 +1480,7 @@ namespace Sharpmake
                     case Platform.win64: return "x64";
                     case Platform.anycpu: return isForSolution ? "Any CPU" : "AnyCPU";
                     default:
-                        throw new Exception(String.Format("This platform: {0} is not supported", platform));
+                        throw new Exception(string.Format("This platform: {0} is not supported", platform));
                 }
             }
             else if (project is PythonProject)
@@ -1560,7 +1560,7 @@ namespace Sharpmake
             return (x << r) | (x >> (32 - r));
         }
 
-        public static Object ReadRegistryValue(string key, string value, Object defaultValue = null)
+        public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }

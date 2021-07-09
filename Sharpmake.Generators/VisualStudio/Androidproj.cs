@@ -285,11 +285,11 @@ namespace Sharpmake.Generators.VisualStudio
                     files.Add(projectFile);
                 }
                 else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                         (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                         (string.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
                 {
                     sourceFiles.Add(projectFile);
                 }
-                else if (String.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
+                else if (string.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     includeFiles.Add(projectFile);
                 }

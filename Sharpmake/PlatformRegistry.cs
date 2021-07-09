@@ -280,7 +280,7 @@ namespace Sharpmake
         /// </summary>
         /// <param name="platform">The <see cref="Platform"/> to register to.</param>
         /// <param name="ifaceType">The interface to register to.</param>
-        /// <param name="implementation">An <see cref="Object"/> that implements <paramref name="ifaceType"/>.</param>
+        /// <param name="implementation">An <see cref="object"/> that implements <paramref name="ifaceType"/>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="ifaceType"/> or <paramref name="implementation"/> are `null`.</exception>
         /// <exception cref="ArgumentException"><paramref name="implementation"/> does not implement <paramref name="ifaceType"/>.</exception>
         /// <remarks>

@@ -127,7 +127,7 @@ namespace Sharpmake
             public List<ResolvedProject> Dependencies = new List<ResolvedProject>();
 
             // User data, may be use by generator to attach user data
-            public Dictionary<string, Object> UserData = new Dictionary<string, Object>();
+            public Dictionary<string, object> UserData = new Dictionary<string, object>();
         }
 
         public Dictionary<string, List<Solution.Configuration>> SolutionFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
@@ -146,7 +146,7 @@ namespace Sharpmake
             }
         }
 
-        internal static Solution CreateProject(Type solutionType, List<Object> fragmentMasks)
+        internal static Solution CreateProject(Type solutionType, List<object> fragmentMasks)
         {
             Solution solution;
             try

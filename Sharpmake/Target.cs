@@ -458,7 +458,7 @@ namespace Sharpmake
             }
         }
 
-        public bool AndMask(Object fragmentMask)
+        public bool AndMask(object fragmentMask)
         {
             FieldInfo[] fragmentFields = GetType().GetFields();
 

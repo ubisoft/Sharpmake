@@ -617,7 +617,7 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildSourceFileType;
-                        string clangFileLanguage = String.Empty;
+                        string clangFileLanguage = string.Empty;
 
                         if (isCompileAsCFile)
                         {
@@ -806,7 +806,7 @@ namespace Sharpmake.Generators.FastBuild
                         if (isOutputTypeExeOrDll && conf.PostBuildStampExe != null)
                         {
                             fastBuildStampExecutable = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStampExe.ExecutableFile, true));
-                            fastBuildStampArguments = String.Format("{0} {1} {2}",
+                            fastBuildStampArguments = string.Format("{0} {1} {2}",
                                 conf.PostBuildStampExe.ExecutableInputFileArgumentOption,
                                 conf.PostBuildStampExe.ExecutableOutputFileArgumentOption,
                                 conf.PostBuildStampExe.ExecutableOtherArguments);
@@ -1924,8 +1924,8 @@ namespace Sharpmake.Generators.FastBuild
             foreach (var projectFile in allFiles)
             {
                 if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                    (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
-                    (String.Compare(projectFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0))
+                    (string.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
+                    (string.Compare(projectFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0))
                     sourceFiles.Add(projectFile);
             }
 
@@ -1947,13 +1947,13 @@ namespace Sharpmake.Generators.FastBuild
                                                         conf.ResolvedSourceFilesWithCompileAsWinRTOption.Contains(file.FileName)) &&
                                                         !(conf.ExcludeWinRTExtensions.Contains(file.FileName) ||
                                                         conf.ResolvedSourceFilesWithExcludeAsWinRTOption.Contains(file.FileName));
-                        bool isASMFile = String.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
+                        bool isASMFile = string.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
 
                         Options.Vc.Compiler.Exceptions exceptionSetting = conf.GetExceptionSettingForFile(file.FileName);
 
                         if (isCompileAsCLRFile || isConsumeWinRTExtensions)
                             isDontUsePrecomp = true;
-                        if (String.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
+                        if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             isDontUsePrecomp = true;
                             isCompileAsCFile = true;

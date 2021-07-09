@@ -120,7 +120,7 @@ namespace NetCore
             [Configure]
             public void ConfigureAll(Configuration conf, ITarget target)
             {
-                conf.SolutionFileName = String.Format("{0}.{1}",
+                conf.SolutionFileName = string.Format("{0}.{1}",
                                                       Name,
                                                       "[target.DevEnv]");
                 conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";
