@@ -133,27 +133,27 @@ namespace Sharpmake.Generators.VisualStudio
             string key = Path.GetFullPath(projectFile).ToLower();
             Lazy<string> guid = s_projectGUIDS.GetOrAdd(key, new Lazy<string>(() =>
             {
-               if (!File.Exists(key))
-               {
-                   throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
-               }
+                if (!File.Exists(key))
+                {
+                    throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
+                }
 
-               var projectFileInfo = new FileInfo(projectFile);
-               using (StreamReader projectFileStream = projectFileInfo.OpenText())
-               {
-                   string line = projectFileStream.ReadLine();
-                   while (line != null)
-                   {
-                       Match match = s_projectGuidRegex.Match(line);
-                       if (match.Success)
-                       {
-                           return match.Groups["GUID"].ToString().ToUpper();
-                       }
-                       line = projectFileStream.ReadLine();
-                   }
-               }
+                var projectFileInfo = new FileInfo(projectFile);
+                using (StreamReader projectFileStream = projectFileInfo.OpenText())
+                {
+                    string line = projectFileStream.ReadLine();
+                    while (line != null)
+                    {
+                        Match match = s_projectGuidRegex.Match(line);
+                        if (match.Success)
+                        {
+                            return match.Groups["GUID"].ToString().ToUpper();
+                        }
+                        line = projectFileStream.ReadLine();
+                    }
+                }
 
-               return null;
+                return null;
             }));
 
             return guid.Value;
