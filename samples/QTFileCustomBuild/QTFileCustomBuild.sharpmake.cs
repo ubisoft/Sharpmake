@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
-using Sharpmake;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Text;
+using Sharpmake;
 using ProjConfiguration = Sharpmake.Project.Configuration;
 
 namespace QTFileCustomBuild

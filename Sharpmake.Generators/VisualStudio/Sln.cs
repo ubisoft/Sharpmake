@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace Sharpmake.Generators.VisualStudio
 {
@@ -132,7 +132,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             string key = Path.GetFullPath(projectFile).ToLower();
             Lazy<string> guid = s_projectGUIDS.GetOrAdd(key, new Lazy<string>(() =>
-           {
+            {
                if (!File.Exists(key))
                {
                    throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
@@ -154,7 +154,7 @@ namespace Sharpmake.Generators.VisualStudio
                }
 
                return null;
-           }));
+            }));
 
             return guid.Value;
         }
@@ -171,10 +171,18 @@ namespace Sharpmake.Generators.VisualStudio
             string fileExt = Path.GetExtension(filenameLC);
             switch (fileExt)
             {
-                case Vcxproj.ProjectExtension: guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper(); break;
-                case CSproj.ProjectExtension: guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper(); break;
-                case Pyproj.ProjectExtension: guid = ProjectTypeGuids.Python.ToString().ToUpper(); break;
-                case Androidproj.ProjectExtension: guid = ProjectTypeGuids.Android.ToString().ToUpper(); break;
+                case Vcxproj.ProjectExtension:
+                    guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper();
+                    break;
+                case CSproj.ProjectExtension:
+                    guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper();
+                    break;
+                case Pyproj.ProjectExtension:
+                    guid = ProjectTypeGuids.Python.ToString().ToUpper();
+                    break;
+                case Androidproj.ProjectExtension:
+                    guid = ProjectTypeGuids.Android.ToString().ToUpper();
+                    break;
                 default:
                     throw new Error("Unknown file extension {0} : unable to detect file type GUID [{1}]", fileExt, projectFile);
             }
@@ -284,9 +292,15 @@ namespace Sharpmake.Generators.VisualStudio
             // write solution header
             switch (devEnv)
             {
-                case DevEnv.vs2015: fileGenerator.Write(Template.Solution.HeaderBeginVs2015); break;
-                case DevEnv.vs2017: fileGenerator.Write(Template.Solution.HeaderBeginVs2017); break;
-                case DevEnv.vs2019: fileGenerator.Write(Template.Solution.HeaderBeginVs2019); break;
+                case DevEnv.vs2015:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2015);
+                    break;
+                case DevEnv.vs2017:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2017);
+                    break;
+                case DevEnv.vs2019:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2019);
+                    break;
                 default:
                     Console.WriteLine("Unsupported DevEnv for solution " + solutionConfigurations[0].Target.GetFragment<DevEnv>());
                     break;

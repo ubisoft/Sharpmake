@@ -1476,9 +1476,12 @@ namespace Sharpmake
             {
                 switch (platform)
                 {
-                    case Platform.win32: return "x86";
-                    case Platform.win64: return "x64";
-                    case Platform.anycpu: return isForSolution ? "Any CPU" : "AnyCPU";
+                    case Platform.win32:
+                        return "x86";
+                    case Platform.win64:
+                        return "x64";
+                    case Platform.anycpu:
+                        return isForSolution ? "Any CPU" : "AnyCPU";
                     default:
                         throw new Exception(string.Format("This platform: {0} is not supported", platform));
                 }
@@ -1661,15 +1664,18 @@ namespace Sharpmake
         {
             public int Compare(string x, string y)
             {
-                if (x == y) return 0;
+                if (x == y)
+                    return 0;
                 var version = new { First = GetVersion(x), Second = GetVersion(y) };
                 int limit = Math.Max(version.First.Length, version.Second.Length);
                 for (int i = 0; i < limit; i++)
                 {
                     int first = version.First.ElementAtOrDefault(i);
                     int second = version.Second.ElementAtOrDefault(i);
-                    if (first > second) return 1;
-                    if (second > first) return -1;
+                    if (first > second)
+                        return 1;
+                    if (second > first)
+                        return -1;
                 }
                 return 0;
             }

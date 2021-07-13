@@ -69,14 +69,19 @@ namespace Sharpmake
 
             public int CompareTo(PackageReference other)
             {
-                if (ReferenceEquals(this, other)) return 0;
-                if (ReferenceEquals(null, other)) return 1;
+                if (ReferenceEquals(this, other))
+                    return 0;
+                if (ReferenceEquals(null, other))
+                    return 1;
                 var nameComparison = string.Compare(Name, other.Name, StringComparison.OrdinalIgnoreCase);
-                if (nameComparison != 0) return nameComparison;
+                if (nameComparison != 0)
+                    return nameComparison;
                 var versionComparison = string.Compare(Version, other.Version, StringComparison.OrdinalIgnoreCase);
-                if (versionComparison != 0) return versionComparison;
+                if (versionComparison != 0)
+                    return versionComparison;
                 var referenceTypeComparison = string.Compare(ReferenceType, other.ReferenceType, StringComparison.OrdinalIgnoreCase);
-                if (referenceTypeComparison != 0) return referenceTypeComparison;
+                if (referenceTypeComparison != 0)
+                    return referenceTypeComparison;
                 return string.Compare(string.Join(",", GetFormatedAssetsDependency(PrivateAssets)), string.Join(",", GetFormatedAssetsDependency(other.PrivateAssets)), StringComparison.OrdinalIgnoreCase);
             }
 

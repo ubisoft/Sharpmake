@@ -1034,7 +1034,8 @@ namespace Sharpmake
                             SourceFilesExceptionsEnabledWithSEH.Add(filename);
                         }
                         break;
-                    default: throw new NotImplementedException("Exception setting for file " + filename + " not recognized");
+                    default:
+                        throw new NotImplementedException("Exception setting for file " + filename + " not recognized");
                 }
             }
 
@@ -2738,9 +2739,12 @@ namespace Sharpmake
 
                 public override bool Equals(object obj)
                 {
-                    if (ReferenceEquals(null, obj)) return false;
-                    if (ReferenceEquals(this, obj)) return true;
-                    if (obj.GetType() != GetType()) return false;
+                    if (ReferenceEquals(null, obj))
+                        return false;
+                    if (ReferenceEquals(this, obj))
+                        return true;
+                    if (obj.GetType() != GetType())
+                        return false;
 
                     PropagationSettings other = (PropagationSettings)obj;
 

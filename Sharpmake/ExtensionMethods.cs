@@ -247,9 +247,12 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
-                case DevEnv.vs2015: return "2015";
-                case DevEnv.vs2017: return "2017";
-                case DevEnv.vs2019: return "2019";
+                case DevEnv.vs2015:
+                    return "2015";
+                case DevEnv.vs2017:
+                    return "2017";
+                case DevEnv.vs2019:
+                    return "2019";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -674,17 +677,28 @@ namespace Sharpmake
         {
             switch (windowsTargetPlatformVersion)
             {
-                case Options.Vc.General.WindowsTargetPlatformVersion.v8_1: return "8.1";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0: return "10.0.10240.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0: return "10.0.10586.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0: return "10.0.14393.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0: return "10.0.15063.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0: return "10.0.16299.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0: return "10.0.17134.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0: return "10.0.17763.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_18362_0: return "10.0.18362.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0: return "10.0.19041.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.Latest: return "$(LatestTargetPlatformVersion)";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v8_1:
+                    return "8.1";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0:
+                    return "10.0.10240.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0:
+                    return "10.0.10586.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0:
+                    return "10.0.14393.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0:
+                    return "10.0.15063.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0:
+                    return "10.0.16299.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0:
+                    return "10.0.17134.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0:
+                    return "10.0.17763.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_18362_0:
+                    return "10.0.18362.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0:
+                    return "10.0.19041.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
+                    return "$(LatestTargetPlatformVersion)";
                 default:
                     throw new ArgumentOutOfRangeException(windowsTargetPlatformVersion.ToString());
             }

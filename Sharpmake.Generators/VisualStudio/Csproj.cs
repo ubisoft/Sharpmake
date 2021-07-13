@@ -238,16 +238,21 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public bool Equals(ItemGroupItem other)
                 {
-                    if (ReferenceEquals(null, other)) return false;
-                    if (ReferenceEquals(this, other)) return true;
+                    if (ReferenceEquals(null, other))
+                        return false;
+                    if (ReferenceEquals(this, other))
+                        return true;
                     return string.Equals(Include, other.Include);
                 }
 
                 public override bool Equals(object obj)
                 {
-                    if (ReferenceEquals(null, obj)) return false;
-                    if (ReferenceEquals(this, obj)) return true;
-                    if (obj.GetType() != GetType()) return false;
+                    if (ReferenceEquals(null, obj))
+                        return false;
+                    if (ReferenceEquals(this, obj))
+                        return true;
+                    if (obj.GetType() != GetType())
+                        return false;
                     return Equals((ItemGroupItem)obj);
                 }
 
@@ -662,23 +667,30 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public int CompareTo(ItemTemplate other)
                 {
-                    if (ReferenceEquals(this, other)) return 0;
-                    if (ReferenceEquals(null, other)) return 1;
+                    if (ReferenceEquals(this, other))
+                        return 0;
+                    if (ReferenceEquals(null, other))
+                        return 1;
                     return string.Compare(_template, other._template, StringComparison.OrdinalIgnoreCase);
                 }
 
                 public bool Equals(ItemTemplate other)
                 {
-                    if (ReferenceEquals(null, other)) return false;
-                    if (ReferenceEquals(this, other)) return true;
+                    if (ReferenceEquals(null, other))
+                        return false;
+                    if (ReferenceEquals(this, other))
+                        return true;
                     return string.Equals(_template, other._template, StringComparison.OrdinalIgnoreCase);
                 }
 
                 public override bool Equals(object obj)
                 {
-                    if (ReferenceEquals(null, obj)) return false;
-                    if (ReferenceEquals(this, obj)) return true;
-                    if (obj.GetType() != this.GetType()) return false;
+                    if (ReferenceEquals(null, obj))
+                        return false;
+                    if (ReferenceEquals(this, obj))
+                        return true;
+                    if (obj.GetType() != this.GetType())
+                        return false;
                     return Equals((ItemTemplate)obj);
                 }
 
@@ -1107,12 +1119,24 @@ namespace Sharpmake.Generators.VisualStudio
             string projectTypeGuids = RemoveLineTag;
             switch (project.ProjectTypeGuids)
             {
-                case CSharpProjectType.Test: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.CSharpTestProject); break;
-                case CSharpProjectType.Vsix: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VsixProject); break;
-                case CSharpProjectType.Vsto: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VstoProject); break;
-                case CSharpProjectType.Wpf: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WpfProject); break;
-                case CSharpProjectType.Wcf: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WcfProject); break;
-                case CSharpProjectType.AspNetMvc5: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.AspNetMvc5Project); break;
+                case CSharpProjectType.Test:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.CSharpTestProject);
+                    break;
+                case CSharpProjectType.Vsix:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VsixProject);
+                    break;
+                case CSharpProjectType.Vsto:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VstoProject);
+                    break;
+                case CSharpProjectType.Wpf:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WpfProject);
+                    break;
+                case CSharpProjectType.Wcf:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WcfProject);
+                    break;
+                case CSharpProjectType.AspNetMvc5:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.AspNetMvc5Project);
+                    break;
             }
 
             var resolver = new Resolver();
@@ -2404,13 +2428,17 @@ namespace Sharpmake.Generators.VisualStudio
             switch (reference.Type)
             {
                 case DotNetReference.ReferenceType.Project:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.ProjectReferences; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.ProjectReferences;
+                    break;
                 case DotNetReference.ReferenceType.DotNet:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetReferences; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetReferences;
+                    break;
                 case DotNetReference.ReferenceType.DotNetExtensions:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetExtensions; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetExtensions;
+                    break;
                 case DotNetReference.ReferenceType.External:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.ExternalReferences; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.ExternalReferences;
+                    break;
             }
 
             bool? isPrivate = projectDependenciesCopyLocal.HasFlag(typeToCheck);

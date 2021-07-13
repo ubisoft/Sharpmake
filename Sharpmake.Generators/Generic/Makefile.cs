@@ -590,7 +590,8 @@ namespace Sharpmake.Generators.Generic
             {
                 switch (depConf.Output)
                 {
-                    case Project.Configuration.OutputType.None: continue;
+                    case Project.Configuration.OutputType.None:
+                        continue;
                     case Project.Configuration.OutputType.Lib:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
                         deps.Add(Path.Combine(depConf.TargetLibraryPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);

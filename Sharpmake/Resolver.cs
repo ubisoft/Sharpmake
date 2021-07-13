@@ -632,8 +632,10 @@ namespace Sharpmake
         {
             switch (modifier)
             {
-                case PropertyModifier.None: return input;
-                case PropertyModifier.Lower: return input.ToLowerInvariant();
+                case PropertyModifier.None:
+                    return input;
+                case PropertyModifier.Lower:
+                    return input.ToLowerInvariant();
                 default:
                     throw new NotSupportedException($"Don't know how to apply modifier {modifier} to '{input}'");
             }

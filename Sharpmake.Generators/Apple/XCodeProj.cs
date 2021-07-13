@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -1125,42 +1125,73 @@ namespace Sharpmake.Generators.Apple
             {
                 switch (_extension)
                 {
-                    case "": return "\"compiled.mach-o.executable\"";
-                    case ".c": return "sourcecode.c.c";
-                    case ".cpp": return "sourcecode.cpp.cpp";
-                    case ".h": return "sourcecode.c.h";
-                    case ".hpp": return "sourcecode.c.h";
-                    case ".s": return "sourcecode.asm";
-                    case ".m": return "sourcecode.c.objc";
-                    case ".j": return "sourcecode.c.objc";
-                    case ".mm": return "sourcecode.cpp.objcpp";
+                    case "":
+                        return "\"compiled.mach-o.executable\"";
+                    case ".c":
+                        return "sourcecode.c.c";
+                    case ".cpp":
+                        return "sourcecode.cpp.cpp";
+                    case ".h":
+                        return "sourcecode.c.h";
+                    case ".hpp":
+                        return "sourcecode.c.h";
+                    case ".s":
+                        return "sourcecode.asm";
+                    case ".m":
+                        return "sourcecode.c.objc";
+                    case ".j":
+                        return "sourcecode.c.objc";
+                    case ".mm":
+                        return "sourcecode.cpp.objcpp";
 
-                    case ".xcodeproj": return "\"wrapper.pb-project\"";
-                    case ".framework": return "wrapper.framework";
-                    case ".bundle": return "\"wrapper.plug-in\"";
-                    case ".nib": return "wrapper.nib";
-                    case ".app": return "wrapper.application";
-                    case ".xctest": return "wrapper.cfbundle";
-                    case ".dylib": return "\"compiled.mach-o.dylib\"";
+                    case ".xcodeproj":
+                        return "\"wrapper.pb-project\"";
+                    case ".framework":
+                        return "wrapper.framework";
+                    case ".bundle":
+                        return "\"wrapper.plug-in\"";
+                    case ".nib":
+                        return "wrapper.nib";
+                    case ".app":
+                        return "wrapper.application";
+                    case ".xctest":
+                        return "wrapper.cfbundle";
+                    case ".dylib":
+                        return "\"compiled.mach-o.dylib\"";
 
-                    case ".txt": return "text";
-                    case ".plist": return "text.plist.xml";
-                    case ".ico": return "text";
-                    case ".rtf": return "text.rtf";
-                    case ".strings": return "text.plist.strings";
-                    case ".json": return "text.json";
+                    case ".txt":
+                        return "text";
+                    case ".plist":
+                        return "text.plist.xml";
+                    case ".ico":
+                        return "text";
+                    case ".rtf":
+                        return "text.rtf";
+                    case ".strings":
+                        return "text.plist.strings";
+                    case ".json":
+                        return "text.json";
 
-                    case ".a": return "archive.ar";
+                    case ".a":
+                        return "archive.ar";
 
-                    case ".png": return "image.png";
-                    case ".tiff": return "image.tiff";
+                    case ".png":
+                        return "image.png";
+                    case ".tiff":
+                        return "image.tiff";
 
-                    case ".ipk": return "file.ipk";
-                    case ".pem": return "file.pem";
-                    case ".loc8": return "file.loc8";
-                    case ".metapreload": return "file.metapreload";
-                    case ".gf": return "file.gf";
-                    case ".xib": return "file.xib";
+                    case ".ipk":
+                        return "file.ipk";
+                    case ".pem":
+                        return "file.pem";
+                    case ".loc8":
+                        return "file.loc8";
+                    case ".metapreload":
+                        return "file.metapreload";
+                    case ".gf":
+                        return "file.gf";
+                    case ".xib":
+                        return "file.xib";
                 }
 
                 return "\"?\"";

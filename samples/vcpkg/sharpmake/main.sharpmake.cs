@@ -1,5 +1,5 @@
-using Sharpmake;
 using System.IO;
+using Sharpmake;
 
 [module: Sharpmake.Include("baseclasses.sharpmake.cs")]
 [module: Sharpmake.Include("externprojects.sharpmake.cs")]

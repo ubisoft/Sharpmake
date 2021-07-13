@@ -13,8 +13,8 @@
 // limitations under the License.
 using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Sharpmake
 {

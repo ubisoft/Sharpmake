@@ -45,18 +45,25 @@ namespace Sharpmake
 
         public int CompareTo(DotNetReference other)
         {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
+            if (ReferenceEquals(this, other))
+                return 0;
+            if (ReferenceEquals(null, other))
+                return 1;
             var includeComparison = string.Compare(Include, other.Include, StringComparison.Ordinal);
-            if (includeComparison != 0) return includeComparison;
+            if (includeComparison != 0)
+                return includeComparison;
             var linkFolderComparison = string.Compare(LinkFolder, other.LinkFolder, StringComparison.Ordinal);
-            if (linkFolderComparison != 0) return linkFolderComparison;
+            if (linkFolderComparison != 0)
+                return linkFolderComparison;
             var specificVersionComparison = Nullable.Compare(SpecificVersion, other.SpecificVersion);
-            if (specificVersionComparison != 0) return specificVersionComparison;
+            if (specificVersionComparison != 0)
+                return specificVersionComparison;
             var hintPathComparison = string.Compare(HintPath, other.HintPath, StringComparison.Ordinal);
-            if (hintPathComparison != 0) return hintPathComparison;
+            if (hintPathComparison != 0)
+                return hintPathComparison;
             var privateComparison = Nullable.Compare(Private, other.Private);
-            if (privateComparison != 0) return privateComparison;
+            if (privateComparison != 0)
+                return privateComparison;
             return Nullable.Compare(EmbedInteropTypes, other.EmbedInteropTypes);
         }
     }

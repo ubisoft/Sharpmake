@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Sharpmake;
 using System;
+using Sharpmake;
 
 // This sample shows how to order the configure call within a project or a solution.
 
