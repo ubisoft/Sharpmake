@@ -176,7 +176,8 @@ namespace Sharpmake.Application
                 else
                 {
                     Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
-                    while (Console.ReadKey(true).Key != ConsoleKey.Enter) {
+                    while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                    {
                         Console.WriteLine("Press ENTER to continue");
                     }
                 }

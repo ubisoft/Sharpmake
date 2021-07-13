@@ -1200,7 +1200,7 @@ namespace Sharpmake
                 var sortedResolvedSourceFiles = ResolvedSourceFiles.Zip(resolvedSourceFilesRelative, (file, relFile) => new Tuple<string, string>(file, relFile))
                                                                    .OrderBy(t => t.Item2, StringComparer.OrdinalIgnoreCase)
                                                                    .Select(t => t.Item1);
-               
+
                 foreach (string sourceFile in sortedResolvedSourceFiles)
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.BlobbingResolving, sourceFile))
