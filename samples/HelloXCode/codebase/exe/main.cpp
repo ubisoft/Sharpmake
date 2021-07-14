@@ -3,25 +3,13 @@
 #include "util_static_lib2.h"
 #include "sub folder/useless_static_lib2.h"
 
+#include <external.h>
+
 int main(int, char**)
 {
     std::cout << "Hello XCode World, from " CREATION_DATE "!" << std::endl;
 
-#if _DEBUG
-    std::cout << "- Exe is built in Debug"
-#  if USES_FASTBUILD
-        " with FastBuild"
-#  endif
-        "!" << std::endl;
-#endif
-
-#if NDEBUG
-    std::cout << "- Exe is built in Release"
-#  if USES_FASTBUILD
-        " with FastBuild"
-#  endif
-        "!" << std::endl;
-#endif
+    PrintBuildString("Exe");
 
     std::vector<int> someArray(5, 6);
 
