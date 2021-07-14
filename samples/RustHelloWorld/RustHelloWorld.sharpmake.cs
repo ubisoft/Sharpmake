@@ -1,0 +1,99 @@
+﻿// Copyright (c) 2017 Ubisoft Entertainment
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Sharpmake;
+using System;
+
+namespace RustHelloWorld
+{
+    [Sharpmake.Generate]
+    public class Cpp : Project
+    {
+        public Cpp()
+        {
+            AddTargets(new Target(
+                Platform.win64,
+                DevEnv.vs2017,
+                Optimization.Debug | Optimization.Release
+            ));
+
+            RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
+
+            // This Path will be used to get all SourceFiles in this Folder and all subFolders
+            SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
+        }
+
+        [Configure()]
+        public void ConfigureAll(Configuration conf, Target target)
+        {
+            conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
+            conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+
+            conf.AddPrivateDependency<HelloWorld>(target);
+        }
+    }
+
+    [Sharpmake.Generate]
+    public class HelloWorld : RustProject
+    {
+        public HelloWorld()
+            : base(typeof(Target))
+        {
+            AddTargets(new Target(
+                Platform.win64,
+                DevEnv.vs2017,
+                Optimization.Debug | Optimization.Release
+            ));
+            
+            SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
+        }
+
+        [Sharpmake.Configure()]
+        public void ConfigureAll(Configuration conf, Target target)
+        {
+            ConfigureRustBuildStep(conf, target.Platform);
+
+            conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+        }
+    }
+
+    [Sharpmake.Generate]
+    public class HelloWorldSolution : Solution
+    {
+        public HelloWorldSolution()
+        {
+            Name = "HelloWorld";
+
+            AddTargets(new Target(
+                    Platform.win64,
+                    DevEnv.vs2017,
+                    Optimization.Debug // | Optimization.Release
+            ));
+        }
+
+        [Configure()]
+        public void ConfigureAll(Configuration conf, Target target)
+        {
+            conf.SolutionFileName = "[solution.Name]_[target.DevEnv]_[target.Platform]";
+            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
+            conf.AddProject<Cpp>(target);
+        }
+
+        [Sharpmake.Main]
+        public static void SharpmakeMain(Sharpmake.Arguments arguments)
+        {
+            arguments.Generate<HelloWorldSolution>();
+        }
+    }
+}
