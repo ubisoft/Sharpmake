@@ -63,6 +63,8 @@ namespace HelloClangCl
                 conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
+
+            conf.Options.Add(Options.Vc.Compiler.CppLanguageStandard.CPP17);
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -154,7 +156,6 @@ namespace HelloClangCl
         {
             // no need to specify the PlatformToolset here since we want the default
 
-            conf.Options.Add(Options.Vc.General.WarningLevel.EnableAllWarnings);
             conf.Options.Add(Options.Vc.General.TreatWarningsAsErrors.Enable);
         }
 
@@ -164,7 +165,6 @@ namespace HelloClangCl
         {
             conf.Options.Add(Options.Vc.General.PlatformToolset.ClangCL);
 
-            conf.Options.Add(Options.Vc.General.WarningLevel.EnableAllWarnings);
             conf.Options.Add(Options.Vc.General.TreatWarningsAsErrors.Enable);
 
             conf.AdditionalCompilerOptions.Add(

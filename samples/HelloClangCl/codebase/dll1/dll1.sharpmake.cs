@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Sharpmake;
+using System;
+using System.IO;
 
 namespace HelloClangCl
 {
@@ -40,6 +41,18 @@ namespace HelloClangCl
             conf.ExportDefines.Add("UTIL_DLL_IMPORT");
 
             conf.IncludePaths.Add(SourceRootPath);
+
+            string outputFileName = @"[conf.TargetPath]\[conf.TargetFileFullName].step_output.txt";
+            conf.EventPostBuildExecute.Add(
+                "sentinel_[conf.Name]",
+                new Configuration.BuildStepExecutable(
+                    Path.Combine(Environment.SystemDirectory, "cmd.exe"),
+                    @"[conf.TargetPath]\[conf.TargetFileFullNameWithExtension]",
+                    outputFileName,
+                    $@"/c ""echo dll linked > {outputFileName}""",
+                    "[conf.TargetPath]"
+                )
+            );
 
             conf.AddPrivateDependency<StaticLib1Project>(target);
         }
