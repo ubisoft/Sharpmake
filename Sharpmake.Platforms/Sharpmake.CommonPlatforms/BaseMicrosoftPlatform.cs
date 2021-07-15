@@ -76,6 +76,7 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.DotNetClassLibrary:
                     return ".dll";
                 case Project.Configuration.OutputType.None:
+                case Project.Configuration.OutputType.Utility:
                     return string.Empty;
                 default:
                     throw new NotImplementedException("Please add extension for output type " + outputType);
