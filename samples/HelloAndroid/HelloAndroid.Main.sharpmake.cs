@@ -49,11 +49,11 @@ namespace HelloAndroid
             string JavaPath = System.Environment.GetEnvironmentVariable("JAVA_HOME");
             string AntPath = System.Environment.GetEnvironmentVariable("ANT_HOME");
 
-            if (AndroidSdkPath == null) 
+            if (AndroidSdkPath == null)
             {
                 throw new Error("ANDROID_SDK_ROOT environment variable undefined");
             }
-            else if (!Directory.Exists(AndroidSdkPath)) 
+            else if (!Directory.Exists(AndroidSdkPath))
             {
                 throw new Error(AndroidSdkPath + " directory does not exist.");
             }
@@ -78,11 +78,11 @@ namespace HelloAndroid
             }
 
             // Android global settings config
-            {                
-                Android.GlobalSettings.AndroidHome =AndroidSdkPath;
+            {
+                Android.GlobalSettings.AndroidHome = AndroidSdkPath;
                 Android.GlobalSettings.JavaHome = JavaPath;
                 Android.GlobalSettings.AntHome = AntPath;
-                Android.GlobalSettings.NdkRoot = AndroidNdkPath;               
+                Android.GlobalSettings.NdkRoot = AndroidNdkPath;
             }
         }
     }

@@ -68,7 +68,7 @@ namespace HelloAndroid
         [Configure(Platform.android)]
         public virtual void ConfigureAndroid(Configuration conf, CommonTarget target)
         {
-            conf.Options.Add(Options.Android.General.AndroidAPILevel.Latest);            
+            conf.Options.Add(Options.Android.General.AndroidAPILevel.Latest);
             conf.Options.Add(Options.Android.General.UseOfStl.LibCpp_Shared);
 
             //Make the VS debugger stop at the expected breakpoint with correct stack for Android project.
