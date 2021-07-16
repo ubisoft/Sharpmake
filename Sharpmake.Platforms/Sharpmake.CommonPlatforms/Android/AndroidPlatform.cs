@@ -426,6 +426,13 @@ namespace Sharpmake
                 );
             }
 
+            public override void SelectPrecompiledHeaderOptions(IGenerationContext context)
+            {
+                base.SelectPrecompiledHeaderOptions(context);
+
+                FixupPrecompiledHeaderOptions(context);
+            }
+
             public override void SelectLinkerOptions(IGenerationContext context)
             {
                 var options = context.Options;

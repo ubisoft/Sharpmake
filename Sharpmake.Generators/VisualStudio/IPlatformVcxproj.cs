@@ -77,6 +77,7 @@ namespace Sharpmake.Generators.VisualStudio
         void SetupPlatformToolsetOptions(IGenerationContext context);
         void SetupPlatformTargetOptions(IGenerationContext context);
         void SelectCompilerOptions(IGenerationContext context);
+        void SelectPrecompiledHeaderOptions(IGenerationContext context);
         void SelectLinkerOptions(IGenerationContext context);
         void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context);
         void SelectApplicationFormatOptions(IGenerationContext context);

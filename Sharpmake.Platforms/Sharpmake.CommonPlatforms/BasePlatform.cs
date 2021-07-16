@@ -212,6 +212,63 @@ namespace Sharpmake
         {
         }
 
+        protected void FixupPrecompiledHeaderOptions(IGenerationContext context)
+        {
+            var options = context.Options;
+            var cmdLineOptions = context.CommandLineOptions;
+            var conf = context.Configuration;
+
+            if (options["UsePrecompiledHeader"] == "NotUsing")
+            {
+                options["UsePrecompiledHeader"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+            else
+            {
+                Strings pathsToConsider = new Strings(context.ProjectSourceCapitalized);
+                pathsToConsider.AddRange(context.Project.AdditionalSourceRootPaths);
+                pathsToConsider.AddRange(GetIncludePaths(context));
+
+                string pchFileSourceRelative = context.Options["PrecompiledHeaderThrough"];
+
+                string pchFileVcxprojRelative = null;
+                bool foundPchInclude = false;
+
+                foreach (var includePath in pathsToConsider)
+                {
+                    var pchFile = Util.PathGetAbsolute(includePath, pchFileSourceRelative);
+                    if (conf.Project.ResolvedSourceFiles.Contains(pchFile))
+                    {
+                        pchFileVcxprojRelative = Util.PathGetRelative(context.ProjectDirectory, pchFile, true);
+                        foundPchInclude = true;
+                        break;
+                    }
+                }
+
+                if (!foundPchInclude)
+                {
+                    foreach (var includePath in pathsToConsider)
+                    {
+                        var pchFile = Util.PathGetAbsolute(includePath, pchFileSourceRelative);
+                        if (Util.FileExists(pchFile))
+                        {
+                            pchFileVcxprojRelative = Util.PathGetRelative(context.ProjectDirectory, pchFile, true);
+                            foundPchInclude = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!foundPchInclude)
+                    throw new Error($"Sharpmake couldn't locate the PCH '{pchFileSourceRelative}' in {conf}");
+
+                context.Options["PrecompiledHeaderThrough"] = pchFileVcxprojRelative;
+            }
+        }
+
+        public virtual void SelectPrecompiledHeaderOptions(IGenerationContext context)
+        {
+        }
+
         public virtual void SelectLinkerOptions(IGenerationContext context)
         {
         }

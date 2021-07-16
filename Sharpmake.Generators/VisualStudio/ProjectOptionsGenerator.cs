@@ -1040,6 +1040,8 @@ namespace Sharpmake.Generators.VisualStudio
             // UndefineAllPreprocessorDefinitions
             context.CommandLineOptions["UndefineAllPreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
 
+            optionsContext.PlatformVcxproj.SelectPrecompiledHeaderOptions(context);
+
             // Default defines...
             optionsContext.PlatformVcxproj.SelectCompilerOptions(context);
 
