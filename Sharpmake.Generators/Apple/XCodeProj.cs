@@ -556,6 +556,7 @@ namespace Sharpmake.Generators.Apple
 
         private static void FillCompilerOptions(IGenerationContext context, IPlatformVcxproj platformVcxproj)
         {
+            platformVcxproj.SelectPrecompiledHeaderOptions(context);
             platformVcxproj.SelectCompilerOptions(context);
         }
 

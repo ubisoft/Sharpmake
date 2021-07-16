@@ -852,7 +852,12 @@ namespace Sharpmake
             options["WarningOptions"] = FileGeneratorUtilities.RemoveLineTag;
         }
 
-        private void SelectPrecompiledHeaderOptions(IGenerationContext context)
+        public virtual void SelectPrecompiledHeaderOptions(IGenerationContext context)
+        {
+            FixupPrecompiledHeaderOptions(context);
+        }
+
+        protected void FixupPrecompiledHeaderOptions(IGenerationContext context)
         {
             var options = context.Options;
             var cmdLineOptions = context.CommandLineOptions;
