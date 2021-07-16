@@ -249,6 +249,13 @@ Alias( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects' )
 {
      Using( .win64Config )
@@ -474,6 +481,13 @@ Executable( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
@@ -709,6 +723,13 @@ Alias( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_0_objects' )
 {
      Using( .win64Config )
@@ -934,6 +955,13 @@ Executable( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'MixCppAndCExe_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'MixCppAndCExe_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'MixCppAndCExe_Release_FastBuild_vs2019_win64_Executable'
 }

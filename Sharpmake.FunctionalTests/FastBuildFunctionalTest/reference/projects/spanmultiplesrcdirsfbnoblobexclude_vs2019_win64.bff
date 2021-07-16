@@ -173,6 +173,13 @@ Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64' 
 
 
 //=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -331,6 +338,13 @@ Executable( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_
 
 //=================================================================================================================
 Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }

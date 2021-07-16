@@ -160,6 +160,13 @@ Alias( 'FastBuildSimpleExecutable_Debug_win64' )
 
 
 //=================================================================================================================
+Alias( 'FastBuildSimpleExecutable_Debug_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildSimpleExecutable_Debug_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
 {
      Using( .win64Config )
@@ -305,6 +312,13 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'FastBuildSimpleExecutable_Release_win64' )
+{
+    .Targets = 'FastBuildSimpleExecutable_Release_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildSimpleExecutable_Release_win64_LibraryDependency' )
 {
     .Targets = 'FastBuildSimpleExecutable_Release_win64_Executable'
 }

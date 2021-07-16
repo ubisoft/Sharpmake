@@ -207,6 +207,13 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -391,6 +398,13 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64' )
                    'Copy_FF2A720D',
                    'Copy_81DF5222'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
 
 
@@ -582,6 +596,13 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -766,6 +787,13 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64' )
                    'Copy_F2DE4EF5',
                    'Copy_7608D0EA'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_Executable'
 }
 
 

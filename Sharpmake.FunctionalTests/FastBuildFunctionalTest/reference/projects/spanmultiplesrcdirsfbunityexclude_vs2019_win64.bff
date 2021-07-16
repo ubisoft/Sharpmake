@@ -179,6 +179,13 @@ Alias( 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -326,6 +333,13 @@ Executable( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64_Ex
 
 //=================================================================================================================
 Alias( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64_Executable'
 }

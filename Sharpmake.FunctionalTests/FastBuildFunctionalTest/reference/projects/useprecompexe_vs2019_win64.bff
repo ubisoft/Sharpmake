@@ -271,6 +271,13 @@ Alias( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects' )
 {
      Using( .win64Config )
@@ -516,6 +523,13 @@ Executable( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
@@ -768,6 +782,13 @@ Alias( 'UsePrecompExe_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'UsePrecompExe_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'UsePrecompExe_Release_FastBuild_vs2019_win64_0_objects' )
 {
      Using( .win64Config )
@@ -1010,6 +1031,13 @@ Executable( 'UsePrecompExe_Release_FastBuild_vs2019_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'UsePrecompExe_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'UsePrecompExe_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'UsePrecompExe_Release_FastBuild_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'UsePrecompExe_Release_FastBuild_vs2019_win64_Executable'
 }

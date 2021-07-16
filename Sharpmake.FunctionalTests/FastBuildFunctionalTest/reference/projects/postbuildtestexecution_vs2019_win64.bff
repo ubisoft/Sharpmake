@@ -183,6 +183,13 @@ Alias( 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -343,6 +350,13 @@ Alias( 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64' )
                    'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64_Executable',
                    'Test_postbuildtestexecution_exe_A4801F4C'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
 
 
@@ -510,6 +524,13 @@ Alias( 'PostBuildTestExecution_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildTestExecution_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildTestExecution_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildTestExecution_Release_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -670,6 +691,13 @@ Alias( 'PostBuildTestExecution_Release_FastBuild_vs2019_win64' )
                    'PostBuildTestExecution_Release_FastBuild_vs2019_win64_Executable',
                    'Test_postbuildtestexecution_exe_BBAD16BB'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildTestExecution_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildTestExecution_Release_FastBuild_vs2019_win64_Executable'
 }
 
 

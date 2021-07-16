@@ -182,6 +182,13 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -341,6 +348,13 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64' )
                    'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_Executable',
                    'Copy_12D176C2'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
 
 
@@ -507,6 +521,13 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -666,6 +687,13 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64' )
                    'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executable',
                    'Copy_5FB7030A'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executable'
 }
 
 

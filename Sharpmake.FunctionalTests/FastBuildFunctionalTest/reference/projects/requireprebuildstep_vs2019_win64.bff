@@ -173,6 +173,13 @@ Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -321,6 +328,13 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executabl
 
 //=================================================================================================================
 Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
@@ -480,6 +494,13 @@ Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -628,6 +649,13 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable'
 }
