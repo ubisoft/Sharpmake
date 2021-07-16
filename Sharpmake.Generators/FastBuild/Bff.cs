@@ -473,14 +473,9 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
 
-                                var staticLibExtension = vcxprojPlatform.StaticLibraryFileFullExtension;
-
                                 fastBuildOutputFile = Path.ChangeExtension(fastBuildOutputFile, null); // removes the extension
                                 fastBuildOutputFile += "_" + subConfigIndex.ToString();
-
-                                if (!staticLibExtension.StartsWith(".", StringComparison.Ordinal))
-                                    fastBuildOutputFile += '.';
-                                fastBuildOutputFile += staticLibExtension;
+                                fastBuildOutputFile += vcxprojPlatform.StaticLibraryFileFullExtension;
 
                                 subConfigObjectList.Add(fastBuildOutputFileShortName);
                                 additionalLibs.Add(fastBuildOutputFileShortName + "_objects");
