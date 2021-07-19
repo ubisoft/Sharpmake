@@ -21,6 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         configuration: [debug, release]
+        android-configuration: [debug noblob, release noblob]
 
     steps:
       - name: Checkout the repo
