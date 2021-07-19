@@ -43,6 +43,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public const string ProjectDescription =
 @"  <PropertyGroup Label=""Globals"">
+    <AndroidBuildType>[androidBuildType]</AndroidBuildType>
     <ProjectGuid>{[guid]}</ProjectGuid>
     <RootNamespace>[projectName]</RootNamespace>
     <MinimumVisualStudioVersion>[toolsVersion]</MinimumVisualStudioVersion>
@@ -140,6 +141,17 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ContentSimple =
 @"    <Content Include=""[file.FileNameSourceRelative]"" />
+";
+
+                public static string GradleTemplate =
+@"    <GradleTemplate Include=""[gradleTemplateFile]"" />
+";
+
+                public static string GradlePackage =
+@"    <GradlePackage>
+      <GradlePlugin>[gradlePlugin]</GradlePlugin>
+      <GradleVersion>[gradleVersion]</GradleVersion>
+    </GradlePackage>
 ";
             }
         }

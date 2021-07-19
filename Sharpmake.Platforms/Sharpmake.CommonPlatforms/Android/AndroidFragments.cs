@@ -26,5 +26,12 @@ namespace Sharpmake
             x86 = 1 << 2,
             x86_64 = 1 << 3,
         }
+
+        [Fragment, Flags]
+        public enum AndroidBuildType
+        {
+            Ant = 1 << 0,
+            Gradle = 1 << 1
+        }
     }
 }

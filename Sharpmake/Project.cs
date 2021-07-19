@@ -2643,6 +2643,8 @@ namespace Sharpmake
     /// </summary>
     public class AndroidPackageProject : Project
     {
+        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+
         public string AndroidManifest { get; set; } = "AndroidManifest.xml";
 
         public string AntBuildRootDirectory { get; set; } = @"$(OutDir)Package\";
@@ -2651,6 +2653,12 @@ namespace Sharpmake
 
         public string AntProjectPropertiesFile { get; set; } = "project.properties";
 
+        public Strings GradleTemplateFiles = new Strings();
+
+        public string GradlePlugin { get; set; } = RemoveLineTag;
+
+        public string GradleVersion { get; set; } = RemoveLineTag;
+
         /// <summary>
         /// The project type to lookup in the dependencies of the package to be used as the application library.
         /// This library is the first to be loaded when the package is started.
@@ -2658,7 +2666,7 @@ namespace Sharpmake
         /// <remarks>
         /// It is an error if the specified type can't be found in the configuration dependencies.
         /// </remarks>
-
+            
         public Type AppLibType { get; set; }
 
         public AndroidPackageProject() : this(typeof(Target))
