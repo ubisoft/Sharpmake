@@ -40,6 +40,14 @@ namespace Sharpmake.Generators.VisualStudio
                 @"  </ItemGroup>
 ";
 
+            public const string ItemDefinitionGroupBegin =
+                @"  <ItemDefinitionGroup>
+";
+
+            public const string ItemDefinitionGroupEnd =
+                @"  </ItemDefinitionGroup>
+";
+
             public static string CustomProperty =
                 @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
 ";
