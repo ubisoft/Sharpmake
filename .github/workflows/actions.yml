@@ -238,8 +238,8 @@ jobs:
         working-directory: 'samples/HelloAndroid'
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}" "arm64_v8"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}" "x86_64"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }} noblob" "arm64"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }} noblob" "x64"
           
       - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }}
         if: runner.os == 'Windows'
