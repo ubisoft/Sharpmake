@@ -21,7 +21,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         configuration: [debug, release]
-        android-configuration: [debug noblob, release noblob]
 
     steps:
       - name: Checkout the repo
@@ -239,8 +238,8 @@ jobs:
         working-directory: 'samples/HelloAndroid'
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.android-configuration }}" "arm64_v8"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.android-configuration }}" "x86_64"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }} NoBlob" "arm64_v8"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }} NoBlob" "x86_64"
           
       - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }}
         if: runner.os == 'Windows'
