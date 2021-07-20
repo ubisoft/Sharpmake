@@ -28,12 +28,12 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_obj
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -109,10 +109,10 @@ Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_Exe
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -182,6 +182,13 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -190,12 +197,12 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_o
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -272,10 +279,10 @@ Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_E
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -345,6 +352,13 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -353,12 +367,12 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects' )
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -434,10 +448,10 @@ Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_Executable
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -507,6 +521,13 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects' )
 {
      Using( .win64Config )
@@ -515,12 +536,12 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects'
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -597,10 +618,10 @@ Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executab
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -666,6 +687,13 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64' )
                    'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executable',
                    'Copy_5FB7030A'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executable'
 }
 
 

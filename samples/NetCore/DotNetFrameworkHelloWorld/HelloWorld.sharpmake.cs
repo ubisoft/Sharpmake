@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Sharpmake;
 using System;
 using System.IO;
+using Sharpmake;
 
 namespace NetCore
 {
@@ -40,7 +40,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_2)
+                    DotNetFramework.v4_7_2)
             };
 
             public HelloWorld()
@@ -59,6 +59,7 @@ namespace NetCore
             {
                 conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
                 conf.ProjectPath = @"[project.RootPath]";
+                conf.TargetPath = @"[conf.ProjectPath]\output\[target.DevEnv]\[conf.Name]";
 
                 conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
             }
@@ -75,7 +76,7 @@ namespace NetCore
             [Configure()]
             public void ConfigureAll(Configuration conf, Target target)
             {
-                conf.SolutionFileName = String.Format("{0}.{1}.{2}",
+                conf.SolutionFileName = string.Format("{0}.{1}.{2}",
                     Name,
                     "[target.DevEnv]",
                     "[target.Framework]");
@@ -97,7 +98,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_1 | DotNetFramework.v4_6_2)
+                    DotNetFramework.v4_6_1 | DotNetFramework.v4_7_2)
             };
 
             public HelloWorldMultiFramework()

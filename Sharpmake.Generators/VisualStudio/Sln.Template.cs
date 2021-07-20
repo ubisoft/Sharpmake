@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
+
 namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Sln
@@ -19,16 +21,18 @@ namespace Sharpmake.Generators.VisualStudio
         {
             public static class Solution
             {
+                [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
                 public static string HeaderBeginVs2010 =
 @"Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 ";
 
+                [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
                 public static string HeaderBeginVs2012 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 ";
-
+                [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
                 public static string HeaderBeginVs2013 =
 @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013

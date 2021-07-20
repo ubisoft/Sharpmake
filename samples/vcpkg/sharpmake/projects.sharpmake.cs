@@ -16,8 +16,8 @@ namespace VCPKGSample
             conf.Output = Configuration.OutputType.Exe;
             conf.Options.Add(Options.Vc.Compiler.Exceptions.Enable);
 
-			conf.AddPrivateDependency<Extern.Curl>(target);
-			conf.AddPrivateDependency<Extern.RapidJSON>(target);
+            conf.AddPrivateDependency<Extern.Curl>(target);
+            conf.AddPrivateDependency<Extern.RapidJSON>(target);
         }
     }
 

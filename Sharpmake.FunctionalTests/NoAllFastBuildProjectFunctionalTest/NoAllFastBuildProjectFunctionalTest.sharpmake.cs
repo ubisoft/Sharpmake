@@ -194,6 +194,8 @@ namespace SharpmakeGen.FunctionalTests
             FastBuildSettings.FastBuildWait = true;
             FastBuildSettings.WriteAllConfigsSection = true;
 
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+
             Bff.UnityResolver = new Bff.FragmentUnityResolver();
 
             arguments.Generate<NoAllFastBuildProjectFunctionalTestSolution>();

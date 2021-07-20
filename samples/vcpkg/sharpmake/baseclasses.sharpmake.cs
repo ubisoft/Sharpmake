@@ -2,7 +2,6 @@ using Sharpmake;
 
 namespace VCPKGSample
 {
-
     /// <summary>
     /// This class is used to define the targets fragments used everywhere in this sample
     /// </summary>

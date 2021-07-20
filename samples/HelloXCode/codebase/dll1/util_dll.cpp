@@ -3,6 +3,7 @@
 
 #include "src/util_static_lib1.h"
 #include <iostream>
+#include <external.h>
 
 int UtilDll1::ComputeSum(const std::vector<int>& someInts)
 {
@@ -10,21 +11,7 @@ int UtilDll1::ComputeSum(const std::vector<int>& someInts)
     for (int item : someInts)
         acc += item;
 
-#if _DEBUG
-    std::cout << "- Dll1 is built in Debug"
-#  if USES_FASTBUILD
-        " with FastBuild"
-#  endif
-        "!" << std::endl;
-#endif
-
-#if NDEBUG
-    std::cout << "- Dll1 is built in Release"
-#  if USES_FASTBUILD
-        " with FastBuild"
-#  endif
-        "!" << std::endl;
-#endif
+    PrintBuildString("Dll1");
 
     acc += static_lib1_utils::GetRandomPosition();
     

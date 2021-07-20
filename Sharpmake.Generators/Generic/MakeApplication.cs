@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ namespace Sharpmake.Generators.Generic
                     throw new Error("Android makefiles require a debug, release and final configuration. ");
 
                 _appPlatform = Options.GetString<Options.AndroidMakefile.AppPlatform>(configurationDebug);
-                if (String.IsNullOrEmpty(_appPlatform))
+                if (string.IsNullOrEmpty(_appPlatform))
                     _appPlatform = DefaultAppPlatform;
 
                 Strings abis = Options.GetStrings<Options.AndroidMakefile.SupportedABIs>(configurationDebug);
@@ -137,7 +137,7 @@ namespace Sharpmake.Generators.Generic
                 _cFlagsRelease = compilerFlagsRelease.DefaultIfEmpty("").Aggregate((first, next) => first + " " + next);
 
                 _toolchainVersion = Options.GetString<Options.AndroidMakefile.ToolchainVersion>(configurationDebug);
-                if (String.IsNullOrEmpty(_toolchainVersion))
+                if (string.IsNullOrEmpty(_toolchainVersion))
                     _toolchainVersion = DefaultToolchainVersion;
             }
 

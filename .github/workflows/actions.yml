@@ -1,20 +1,26 @@
 # Sharpmake GitHub Actions CI configuration
 
 name: build
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    # Run at 02:17 every day
+    - cron: '17 2 * * *'
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         configuration: [debug, release]
-
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      DOTNET_NOLOGO: true
 
     steps:
       - name: Checkout the repo
@@ -22,28 +28,23 @@ jobs:
 
       - name: Bootstrap.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
-        shell: cmd
-        run: bootstrap.bat Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }}
+        run: .\bootstrap.bat Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }}
 
       - name: Bootstrap.sh ${{ matrix.configuration }}
         if: runner.os != 'Windows'
-        shell: bash
         run: ./bootstrap.sh Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }}
 
       - name: CompileSharpmake.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
-        shell: cmd
-        run: CompileSharpmake.bat Sharpmake.sln "${{ matrix.configuration }}" "Any CPU"
+        run: .\CompileSharpmake.bat Sharpmake.sln "${{ matrix.configuration }}" "Any CPU"
 
       - name: CompileSharpmake.sh ${{ matrix.configuration }}
         if: runner.os != 'Windows'
-        shell: bash
         run: ./CompileSharpmake.sh Sharpmake.sln "${{ matrix.configuration }}"
-        
+
       - name: GenerateMdbFiles.bat
         if: runner.os == 'Windows' && matrix.configuration == 'release'
-        shell: cmd
-        run: GenerateMdbFiles.bat
+        run: .\GenerateMdbFiles.bat
 
       - name: UnitTest
         if: runner.os == 'Windows'
@@ -55,13 +56,265 @@ jobs:
         if: runner.os == 'Windows'
         run: python regression_test.py
 
-      - name: FunctionalTest
-        if: runner.os == 'Windows'
-        run: python functional_test.py
-
       - name: Upload sharpmake cross-platform release binaries
         if: runner.os == 'Windows' && matrix.configuration == 'release'
         uses: actions/upload-artifact@v2
         with:
-          name: 'Sharpmake-${{github.sha}}'
+          name: 'Sharpmake-${{ github.sha }}'
           path: tmp/bin
+
+  functional_test:
+    needs: [build]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest] # only windows for now, but ideally should be all
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Download sharpmake cross-platform release binaries
+        uses: actions/download-artifact@v2
+        with:
+          name: 'Sharpmake-${{ github.sha }}'
+          path: tmp/bin
+
+      - name: FunctionalTest
+        if: runner.os == 'Windows'
+        run: python functional_test.py
+
+  samples:
+    needs: [build]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        configuration: [debug, release]
+
+    env:
+      SHARPMAKE_EXE: ${{ github.workspace }}/tmp/bin/release/Sharpmake.Application.exe
+      COMPILE_BATCH: ${{ github.workspace }}/CompileSharpmake.bat
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Download sharpmake cross-platform release binaries
+        uses: actions/download-artifact@v2
+        with:
+          name: 'Sharpmake-${{ github.sha }}'
+          path: tmp/bin
+
+      - name: CompileCommandDatabase ${{ matrix.configuration }}
+        if: runner.os == 'Windows' && matrix.configuration == 'debug' # only has a debug config, so skip in release
+        working-directory: 'samples/CompileCommandDatabase'
+        run: | # TODO: ideally here we should try and compile the generated json file
+          & $env:SHARPMAKE_EXE "/sources('CompileCommandDatabase.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\CompileCommandDatabaseSolution_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
+          projects\exeprojectname\output\win64\${{ matrix.configuration }}\exeprojectname.exe
+
+      - name: ConfigureOrder ${{ matrix.configuration }}
+        if: runner.os == 'Windows' && matrix.configuration == 'release'
+        working-directory: 'samples/ConfigureOrder'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('main.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\configureorderingsolution.sln "Release" "Win32"
+          projects\output\win32\${{ matrix.configuration }}\childproject.exe
+          projects\output\win32\${{ matrix.configuration }}\foobarproject.exe
+          projects\output\win32\${{ matrix.configuration }}\parentproject.exe
+
+      - name: CPPCLI ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/CPPCLI'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('CLRTest.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\CPPCLI.vs2017.v4_6_2.sln "${{ matrix.configuration }}" "Win32"
+          projects\output\vs2017\v4_6_2\${{ matrix.configuration }}\TestCSharpConsole.exe
+          & $env:COMPILE_BATCH projects\CPPCLI.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Win32"
+          projects\output\vs2019\v4_7_2\${{ matrix.configuration }}\TestCSharpConsole.exe
+
+      - name: CSharpHelloWorld ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/CSharpHelloWorld'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2017.v4_6_1.sln "${{ matrix.configuration }}" "Any CPU"
+          & "projects\helloworld\output\anycpu\${{ matrix.configuration }}\the other name.exe"
+
+      - name: CSharpImports ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/CSharpImports'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('CSharpImports.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\CSharpImportsSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
+          & "projects\csharpimports\output\anycpu\${{ matrix.configuration }}\the other name.exe"
+
+      - name: CSharpVsix ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/CSharpVsix'
+        run: | # that one can't be run unfortunately
+          & $env:SHARPMAKE_EXE "/sources('CSharpVsix.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\CSharpVsixSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
+
+      - name: CSharpWCF ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/CSharpWCF'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('CSharpWCF.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\CSharpWCFSolution.vs2015.v4_5.sln "${{ matrix.configuration }}" "Any CPU"
+
+      - name: FastBuildSimpleExecutable ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/FastBuildSimpleExecutable'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('FastBuildSimpleExecutable.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\fastbuildsample_vs2019_win64.sln "${{ matrix.configuration }}" "x64"
+          projects\output\win64\${{ matrix.configuration }}\fastbuildsimpleexecutable.exe
+
+      - name: HelloClangCl debug
+        if: runner.os == 'Windows' && matrix.configuration == 'debug'
+        working-directory: 'samples/HelloClangCl'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloClangCl.Main.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "ClangCl ${{ matrix.configuration }}" "MSBuild"
+          codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}\exe_d.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "ClangCl ${{ matrix.configuration }}" "FastBuild"
+          codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_fastbuild\exe_dx.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "MSVC ${{ matrix.configuration }}" "MSBuild"
+          codebase\temp\bin\win64_msvc_${{ matrix.configuration }}\exe_d.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "MSVC ${{ matrix.configuration }}" "FastBuild"
+          codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_fastbuild\exe_dx.exe
+
+      - name: HelloClangCl release # sad to duplicate, but exe name changes, TODO: find a better way
+        if: runner.os == 'Windows' && matrix.configuration == 'release'
+        working-directory: 'samples/HelloClangCl'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloClangCl.Main.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "ClangCl ${{ matrix.configuration }}" "MSBuild"
+          codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}\exe_r.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "ClangCl ${{ matrix.configuration }}" "FastBuild"
+          codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_fastbuild\exe_rx.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "MSVC ${{ matrix.configuration }}" "MSBuild"
+          codebase\temp\bin\win64_msvc_${{ matrix.configuration }}\exe_r.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "MSVC ${{ matrix.configuration }}" "FastBuild"
+          codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_fastbuild\exe_rx.exe
+
+      - name: HelloLinux ${{ matrix.configuration }}
+        if: runner.os == 'Linux'
+        working-directory: 'samples/HelloLinux'
+        run: |
+          mono --debug $SHARPMAKE_EXE "/sources('HelloLinux.Main.sharpmake.cs')"
+          cd codebase/temp/solutions
+          make -f HelloLinux_linux_make.make config=${{ matrix.configuration }}
+          cd ../bin/linux_${{ matrix.configuration }}
+          ./exe
+
+      - name: HelloWorld ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/HelloWorld'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\helloworld_vs2019_win32.sln "${{ matrix.configuration }}" "Win32"
+          projects\output\win32\${{ matrix.configuration }}\helloworld.exe
+          & $env:COMPILE_BATCH projects\helloworld_vs2019_win64.sln "${{ matrix.configuration }}" "x64"
+          projects\output\win64\${{ matrix.configuration }}\helloworld.exe
+
+      - name: HelloXCode ${{ matrix.configuration }}
+        if: runner.os == 'macOS'
+        working-directory: 'samples/HelloXCode'
+        run: |
+          mono --debug $SHARPMAKE_EXE "/sources('HelloXCode.Main.sharpmake.cs')"
+          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme "exe FastBuild"
+          codebase/temp/bin/mac_${{ matrix.configuration }}_fastbuild/exe
+          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_mac
+          cd codebase/temp/bin/mac_${{ matrix.configuration }}
+          DYLD_LIBRARY_PATH=. ./exe
+
+      - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/NetCore/DotNetCoreFrameworkHelloWorld'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\HelloWorldMultiFrameworkSolution.vs2019.sln "${{ matrix.configuration }}" "Any CPU"
+          dotnet "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1\the other name.dll"
+          dotnet "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\the other name.dll"
+          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2017.netcore2_1.sln "${{ matrix.configuration }}" "Any CPU"
+          dotnet "projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1\the other name.dll"
+          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2019.netcore3_1.sln "${{ matrix.configuration }}" "Any CPU"
+          dotnet "projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\the other name.dll"
+
+      - name: NetCore/DotNetFrameworkHelloWorld ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/NetCore/DotNetFrameworkHelloWorld'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\HelloWorldMultiFrameworkSolution.vs2019.sln "${{ matrix.configuration }}" "Any CPU"
+          & "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\net461\the other name.exe"
+          & "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\net472\the other name.exe"
+          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2017.v4_6_1.sln "${{ matrix.configuration }}" "Any CPU"
+          & "projects\helloworld\output\vs2017\${{ matrix.configuration }}\the other name.exe"
+          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
+          & "projects\helloworld\output\vs2019\${{ matrix.configuration }}\the other name.exe"
+
+      - name: NetCore/DotNetMultiFrameworksHelloWorld ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/NetCore/DotNetMultiFrameworksHelloWorld'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\HelloWorldMultiFrameworksSolution.vs2019.sln "${{ matrix.configuration }}" "Any CPU"
+          dotnet "projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\HelloWorldMultiFrameworks.dll"
+          & "projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\net461\HelloWorldMultiFrameworks.exe"
+
+      - name: PackageReferences ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/PackageReferences'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('PackageReferences.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
+          projects\packagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe
+          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
+          projects\packagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe
+
+      - name: Install Qt
+        if: runner.os == 'Windows'
+        uses: jurplel/install-qt-action@v2.13.2
+
+      - name: QTFileCustomBuild ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/QTFileCustomBuild'
+        run: | # TODO: there's a retail config, compile it as well or remove it
+          & $env:SHARPMAKE_EXE "/sources('QTFileCustomBuild.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\qtfilecustombuild_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
+          projects\output\win64\${{ matrix.configuration }}\qtfilecustombuild.exe
+
+      - name: SimpleExeLibDependency ${{ matrix.configuration }}
+        if: runner.os == 'Windows' && matrix.configuration == 'debug'
+        working-directory: 'samples/SimpleExeLibDependency'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('SimpleExeLibDependency.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\ExeLibSolutionName_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
+          projects\output\win64\${{ matrix.configuration }}\simpleexeprojectname.exe
+
+      - name: vcpkg debug
+        if: runner.os == 'Windows' && matrix.configuration == 'debug'
+        working-directory: 'samples/vcpkg'
+        run: |
+          .\bootstrap-sample.bat release
+          & $env:COMPILE_BATCH tmp\projects\vcpkgsample_vs2019.sln "Debug" "x64"
+          bin\debug-msbuild\vcpkgsample_d.exe
+          & $env:COMPILE_BATCH tmp\projects\vcpkgsample_vs2019.sln "Debug_FastBuild" "x64"
+          bin\debug-fastbuild\vcpkgsample_d.exe
+
+      - name: vcpkg release
+        if: runner.os == 'Windows' && matrix.configuration == 'release'
+        working-directory: 'samples/vcpkg'
+        run: |
+          .\bootstrap-sample.bat release
+          & $env:COMPILE_BATCH tmp\projects\vcpkgsample_vs2019.sln "Release" "x64"
+          bin\release-msbuild\vcpkgsample.exe
+          & $env:COMPILE_BATCH tmp\projects\vcpkgsample_vs2019.sln "Release_FastBuild" "x64"
+          bin\release-fastbuild\vcpkgsample.exe
+

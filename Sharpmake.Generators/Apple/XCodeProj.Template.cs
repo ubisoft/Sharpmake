@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -99,8 +99,7 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
-[itemChildren]
-			);
+[itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
 		};
 "               },
@@ -126,8 +125,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXGroup;
 			children = (
-[itemChildren]
-			);
+[itemChildren]			);
 			name = ""[item.Name]"";
 			path = ""[item.Path]"";
 			sourceTree = [item.SourceTree];
@@ -148,8 +146,7 @@ namespace Sharpmake.Generators.Apple
 			buildRules = (
 			);
 			dependencies = (
-[itemChildren]
-			);
+[itemChildren]			);
 			name = ""[item.Identifier]"";
 			productInstallPath = ""[item.ProductInstallPath]"";
 			productName = ""[item.Identifier]"";
@@ -162,7 +159,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.Identifier] */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = ""[item.BuildArgumentsString]"";
-			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
+			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXLegacyTarget ""[item.Identifier]"" */;
 			buildPhases = (
 			);
 			buildToolPath = ""[item.BuildToolPath]"";
@@ -181,8 +178,7 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXProject;
 			attributes = {
 				TargetAttributes = {
-[itemTargetAttributes]
-				};
+[itemTargetAttributes]				};
 			};
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXProject ""[item.Identifier]"" */;
 			compatibilityVersion = ""[item.CompatibilityVersion]"";
@@ -194,12 +190,10 @@ namespace Sharpmake.Generators.Apple
 			mainGroup = [item.MainGroup.Uid] /* [item.MainGroup.Name] */;
 			projectDirPath = """";
 			projectReferences = (
-[itemProjectReferences]
-			);
+[itemProjectReferences]			);
 			projectRoot = """";
 			targets = (
-[itemTargets]
-			);
+[itemTargets]			);
 		};
 "               },
 
@@ -218,20 +212,17 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
-[itemChildren]
-			);
+[itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
 		};
 "               },
 
                 { ItemSection.PBXSourcesBuildPhase,
-@"		[item.Uid] /* Sources */ =
-		{
+@"		[item.Uid] /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
-[itemChildren]
-			);
+[itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
 		};
 "               },
@@ -253,46 +244,45 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* Native Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ""[item.Options.CodeSignEntitlements]"";
 				CODE_SIGN_IDENTITY = ""[item.Options.CodeSigningIdentity]"";
-				SYMROOT = ""[item.Options.BuildDirectory]"";
-				CONFIGURATION_BUILD_DIR = ""$(SYMROOT)"";
-				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
 				""CODE_SIGN_IDENTITY[sdk=iphoneos*]"" = ""[item.Options.CodeSigningIdentity]"";
-				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
-				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
-                DEVELOPMENT_TEAM = [item.Options.DevelopmentTeam];
 				CONFIGURATION_BUILD_DIR = ""[item.Options.BuildDirectory]"";
+				CONFIGURATION_TEMP_DIR = ""$(OBJROOT)"";
+				COPY_PHASE_STRIP = [item.Options.StripDebugSymbolsDuringCopy];
+				DEAD_CODE_STRIPPING = [item.Options.DeadStripping];
+				DEBUG_INFORMATION_FORMAT = [item.Options.DebugInformationFormat];
+				DEPLOYMENT_POSTPROCESSING = [item.Options.DeploymentPostProcessing];
+				DEVELOPMENT_TEAM = [item.Options.DevelopmentTeam];
 				ENABLE_BITCODE = [item.Options.EnableBitcode];
 				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = [item.Options.FrameworkPaths];
-				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
-				MACH_O_TYPE = ""[item.Options.MachOType]"";
-				COPY_PHASE_STRIP = [item.Options.StripDebugSymbolsDuringCopy];
+				GCC_DYNAMIC_NO_PIC = [item.Options.DynamicNoPic];
 				GCC_ENABLE_CPP_EXCEPTIONS = [item.Options.CppExceptionHandling];
-				GCC_ENABLE_OBJC_EXCEPTIONS = [item.Options.ObjCExceptionHandling];
 				GCC_ENABLE_CPP_RTTI = [item.Options.RuntimeTypeInfo];
+				GCC_ENABLE_OBJC_EXCEPTIONS = [item.Options.ObjCExceptionHandling];
 				GCC_GENERATE_DEBUGGING_SYMBOLS = [item.Options.GenerateDebuggingSymbols];
 				GCC_INLINES_ARE_PRIVATE_EXTERN = [item.Options.PrivateInlines];
-				DEPLOYMENT_POSTPROCESSING = [item.Options.DeploymentPostProcessing];
-				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
-				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
-				GCC_DYNAMIC_NO_PIC = [item.Options.DynamicNoPic];
 				GCC_MODEL_TUNING = [item.Options.ModelTuning];
-				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
-				CODE_SIGN_ENTITLEMENTS = ""[item.Options.CodeSignEntitlements]"";
-				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
-				OBJROOT = ""[item.Configuration.IntermediatePath]"";
-				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
-				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
-				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
-				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
-				VALID_ARCHS = ""[item.Options.ValidArchs]"";
-				SKIP_INSTALL = [item.Options.SkipInstall];
-				STRIP_INSTALLED_PRODUCT = [item.Options.StripLinkedProduct];
+				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
 				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
+				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
+				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
+				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
 				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = [item.Options.SpecificSimulatorLibraryPaths];
+				MACH_O_TYPE = ""[item.Options.MachOType]"";
+				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
+				OBJROOT = ""[item.Configuration.IntermediatePath]"";
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
+				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
+				PRODUCT_NAME = ""[item.Configuration.TargetFileName]"";
+				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
+				SKIP_INSTALL = [item.Options.SkipInstall];
+				STRIP_INSTALLED_PRODUCT = [item.Options.StripLinkedProduct];
+				SYMROOT = ""[item.Options.BuildDirectory]"";
+				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 			};
 			name = [item.Options.TargetName];
 		};
@@ -302,8 +292,8 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* Legacy Target - [item.Optimization] */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MACH_O_TYPE = ""[item.Options.MachOType]"";
 				FASTBUILD_TARGET = ""[item.Options.FastBuildTarget]"";
+				MACH_O_TYPE = ""[item.Options.MachOType]"";
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = [item.Options.TargetName];
@@ -326,7 +316,7 @@ namespace Sharpmake.Generators.Apple
 				GCC_ENABLE_CPP_RTTI = [item.Options.RuntimeTypeInfo];
 				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
-				PRODUCT_NAME = ""[item.Configuration.TargetFileFullName]"";
+				PRODUCT_NAME = ""[item.Configuration.TargetFileName]"";
 				TEST_HOST = ""[testHost]"";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -344,9 +334,9 @@ namespace Sharpmake.Generators.Apple
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = [item.Options.ClangAnalyzerLocalizabilityNonlocalized];
 				CLANG_CXX_LANGUAGE_STANDARD = ""[item.Options.CppStandard]"";
 				CLANG_CXX_LIBRARY = ""[item.Options.LibraryStandard]"";
+				CLANG_ENABLE_MODULES = [item.Options.ClangEnableModules];
 				CLANG_ENABLE_OBJC_ARC = [item.Options.AutomaticReferenceCounting];
 				CLANG_ENABLE_OBJC_WEAK = [item.Options.ObjCWeakReferences];
-				CLANG_ENABLE_MODULES = [item.Options.ClangEnableModules];
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = [item.Options.WarningBlockCaptureAutoReleasing];
 				CLANG_WARN_BOOL_CONVERSION = [item.Options.WarningBooleanConversion];
 				CLANG_WARN_COMMA = [item.Options.WarningComma];
@@ -361,32 +351,32 @@ namespace Sharpmake.Generators.Apple
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = [item.Options.WarningObjCImplicitRetainSelf];
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = [item.Options.WarningObjCLiteralConversion];
 				CLANG_WARN_OBJC_ROOT_CLASS = [item.Options.WarningRootClass];
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = [item.Options.WarningDuplicateMethodMatch];
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = [item.Options.WarningRangeLoopAnalysis];
 				CLANG_WARN_STRICT_PROTOTYPES = [item.Options.WarningStrictPrototypes];
 				CLANG_WARN_SUSPICIOUS_MOVE = [item.Options.WarningSuspiciousMove];
 				CLANG_WARN_UNREACHABLE_CODE = [item.Options.WarningUnreachableCode];
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = [item.Options.WarningDuplicateMethodMatch];
 				ENABLE_STRICT_OBJC_MSGSEND = [item.Options.StrictObjCMsgSend];
 				ENABLE_TESTABILITY = [item.Options.Testability];
 				EXECUTABLE_PREFIX = [item.Options.ExecutablePrefix];
 				GCC_C_LANGUAGE_STANDARD = ""[item.Options.CStandard]"";
 				GCC_NO_COMMON_BLOCKS = [item.Options.GccNoCommonBlocks];
+				GCC_OPTIMIZATION_LEVEL = [item.Options.OptimizationLevel];
 				GCC_PRECOMPILE_PREFIX_HEADER = [item.Options.UsePrecompiledHeader];
 				GCC_PREFIX_HEADER = ""[item.Options.PrecompiledHeader]"";
-				GCC_OPTIMIZATION_LEVEL = [item.Options.OptimizationLevel];
 				GCC_PREPROCESSOR_DEFINITIONS = [item.Options.PreprocessorDefinitions];
+				GCC_TREAT_WARNINGS_AS_ERRORS = [item.Options.TreatWarningsAsErrors];
 				GCC_WARN_64_TO_32_BIT_CONVERSION = [item.Options.Warning64To32BitConversion];
 				GCC_WARN_ABOUT_RETURN_TYPE = [item.Options.WarningReturnType];
 				GCC_WARN_UNDECLARED_SELECTOR = [item.Options.WarningUndeclaredSelector];
 				GCC_WARN_UNINITIALIZED_AUTOS = [item.Options.WarningUniniatializedAutos];
 				GCC_WARN_UNUSED_FUNCTION = [item.Options.WarningUnusedFunction];
 				GCC_WARN_UNUSED_VARIABLE = [item.Options.WarningUnusedVariable];
-				GCC_TREAT_WARNINGS_AS_ERRORS = [item.Options.TreatWarningsAsErrors];
-				SDKROOT = ""[item.Options.SDKRoot]"";
-				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
 				ONLY_ACTIVE_ARCH = [item.Options.OnlyActiveArch];
 				OTHER_CPLUSPLUSFLAGS = [item.Options.CompilerOptions];
 				OTHER_LDFLAGS = [item.Options.LinkerOptions];
+				SDKROOT = ""[item.Options.SDKRoot]"";
+				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
 			};
 			name = [item.Options.TargetName];
 		};
@@ -396,8 +386,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* Build configuration list for [item.ConfigurationType] ""[item.RelatedItem.Identifier]"" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-[itemChildren]
-			);
+[itemChildren]			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = ""[item.DefaultConfiguration.Identifier]"";
 		};

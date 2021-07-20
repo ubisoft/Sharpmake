@@ -215,7 +215,7 @@ namespace Sharpmake.Generators.FastBuild
             // Generate all configuration options onces...
             var options = new Dictionary<Project.Configuration, Options.ExplicitOptions>();
             var cmdLineOptions = new Dictionary<Project.Configuration, ProjectOptionsGenerator.VcxprojCmdLineOptions>();
-            var additionalDependenciesPerConf = new Dictionary<Project.Configuration, OrderableStrings>();
+            var dependenciesInfoPerConf = new Dictionary<Project.Configuration, DependenciesInfo>();
             ProjectOptionsGenerator projectOptionsGen;
             using (builder.CreateProfilingScope("BffGenerator.Generate:ProjectOptionsGenerator()"))
             {
@@ -229,7 +229,7 @@ namespace Sharpmake.Generators.FastBuild
                     context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
                     context.Configuration = conf;
 
-                    GenerateBffOptions(projectOptionsGen, context, additionalDependenciesPerConf);
+                    GenerateBffOptions(projectOptionsGen, context, dependenciesInfoPerConf);
 
                     options.Add(conf, context.Options);
                     cmdLineOptions.Add(conf, (ProjectOptionsGenerator.VcxprojCmdLineOptions)context.CommandLineOptions);
@@ -237,8 +237,8 @@ namespace Sharpmake.Generators.FastBuild
                     // Validation of unsupported cases
                     if (conf.EventPreLink.Count > 0)
                         throw new Error("Sharpmake-FastBuild : Pre-Link Events not yet supported.");
-                    if (context.Options["IgnoreImportLibrary"] == "true")
-                        throw new Error("Sharpmake-FastBuild : IgnoreImportLibrary not yet supported.");
+                    if (context.Options["IgnoreImportLibrary"] == "true" && conf.ExportDllSymbols)
+                        throw new Error("Sharpmake-FastBuild : IgnoreImportLibrary not yet supported, set ExportDllSymbols to false for similar behavior.");
 
                     if (conf.Output != Project.Configuration.OutputType.None && conf.FastBuildBlobbed)
                     {
@@ -309,7 +309,8 @@ namespace Sharpmake.Generators.FastBuild
                     bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
                     bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
 
-                    OrderableStrings additionalDependencies = additionalDependenciesPerConf[conf];
+                    var dependenciesInfo = dependenciesInfoPerConf[conf];
+                    OrderableStrings additionalDependencies = dependenciesInfo.AdditionalDependencies;
 
                     foreach (var tuple in confSubConfigs.Keys)
                     {
@@ -417,9 +418,12 @@ namespace Sharpmake.Generators.FastBuild
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
-                                    fastBuildProjectDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                    string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
+                                    if (!dependenciesInfo.IgnoredLibraryNames.Contains(depProjConfig.TargetFileFullNameWithExtension))
+                                        fastBuildProjectDependencies.Add(shortProjectName + "_LibraryDependency");
+                                    fastBuildBuildOnlyDependencies.Add(shortProjectName);
                                 }
-                                else
+                                else if (!depProjConfig.IsExcludedFromBuild)
                                 {
                                     fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
@@ -439,6 +443,10 @@ namespace Sharpmake.Generators.FastBuild
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
                                     fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                }
+                                else
+                                {
+                                    fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
                                 }
                             }
                         }
@@ -468,14 +476,9 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 fastBuildOutputFileShortName += "_" + subConfigIndex.ToString();
 
-                                var staticLibExtension = vcxprojPlatform.StaticLibraryFileExtension;
-
                                 fastBuildOutputFile = Path.ChangeExtension(fastBuildOutputFile, null); // removes the extension
                                 fastBuildOutputFile += "_" + subConfigIndex.ToString();
-
-                                if (!staticLibExtension.StartsWith(".", StringComparison.Ordinal))
-                                    fastBuildOutputFile += '.';
-                                fastBuildOutputFile += staticLibExtension;
+                                fastBuildOutputFile += vcxprojPlatform.StaticLibraryFileFullExtension;
 
                                 subConfigObjectList.Add(fastBuildOutputFileShortName);
                                 additionalLibs.Add(fastBuildOutputFileShortName + "_objects");
@@ -523,7 +526,7 @@ namespace Sharpmake.Generators.FastBuild
                                         // use the global root for alias computation, as the project has not idea in which master bff it has been included
                                         var destinationRelativeToGlobal = Util.GetConvertedRelativePath(projectPath, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
                                         string fastBuildCopyAlias = UtilityMethods.GetFastBuildCopyAlias(Path.GetFileName(sourceFile), destinationRelativeToGlobal);
-                                        fastBuildTargetSubTargets.Add(fastBuildCopyAlias);
+                                        fastBuildBuildOnlyDependencies.Add(fastBuildCopyAlias);
                                     }
                                 }
                             }
@@ -617,7 +620,7 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildConsumeWinRTExtension = isConsumeWinRTExtensions ? "/ZW" : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildUsingPlatformConfig = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildSourceFileType;
-                        string clangFileLanguage = String.Empty;
+                        string clangFileLanguage = string.Empty;
 
                         if (isCompileAsCFile)
                         {
@@ -790,7 +793,7 @@ namespace Sharpmake.Generators.FastBuild
                             StringBuilder builderForceUsingFiles = new StringBuilder();
                             foreach (var fuConfig in conf.ForceUsingDependencies)
                             {
-                                builderForceUsingFiles.AppendFormat(@" /FU""{0}.dll""", GetOutputFileName(fuConfig));
+                                builderForceUsingFiles.AppendFormat(@" /FU""{0}.dll""", fuConfig.TargetFileFullName);
                             }
                             foreach (var f in conf.ForceUsingFiles.Union(conf.DependenciesForceUsingFiles))
                             {
@@ -806,7 +809,7 @@ namespace Sharpmake.Generators.FastBuild
                         if (isOutputTypeExeOrDll && conf.PostBuildStampExe != null)
                         {
                             fastBuildStampExecutable = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStampExe.ExecutableFile, true));
-                            fastBuildStampArguments = String.Format("{0} {1} {2}",
+                            fastBuildStampArguments = string.Format("{0} {1} {2}",
                                 conf.PostBuildStampExe.ExecutableInputFileArgumentOption,
                                 conf.PostBuildStampExe.ExecutableOutputFileArgumentOption,
                                 conf.PostBuildStampExe.ExecutableOtherArguments);
@@ -933,7 +936,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         Strings fastBuildPreBuildDependencies = new Strings();
-                        UniqueList<Project.Configuration> orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
+                        var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
                         fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
                         fastBuildPreBuildDependencies.AddRange(preBuildTargets);
 
@@ -1249,8 +1252,8 @@ namespace Sharpmake.Generators.FastBuild
                                                     }
                                                     return false;
                                                 });
-                                            // These are all pre-build steps, at least in principle, so insert them before the other build steps.
-                                            fastBuildTargetSubTargets.InsertRange(0, fileCustomBuildKeys);
+
+                                            fastBuildProjectDependencies.AddRange(fileCustomBuildKeys);
 
                                             // Resolve node name of the prebuild dependency for PostBuildEvents.
                                             string resolvedSectionNodeIdentifier;
@@ -1278,8 +1281,10 @@ namespace Sharpmake.Generators.FastBuild
                                             {
                                                 string genLibName = "'" + fastBuildOutputFileShortName + "_" + outputType + "'";
                                                 using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                                using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetSection);
+                                                    bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
                                                 }
                                             }
                                         }
@@ -1288,10 +1293,12 @@ namespace Sharpmake.Generators.FastBuild
                                 case Project.Configuration.OutputType.None:
                                     {
                                         // Write Target Alias
-                                        using (resolver.NewScopedParameter("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
-                                        using (resolver.NewScopedParameter("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                        using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
+                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                        using (bffGenerator.Declare("fastBuildOutputType", outputType))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
+                                            bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
                                         }
                                     }
                                     break;
@@ -1358,10 +1365,16 @@ namespace Sharpmake.Generators.FastBuild
             return $@"{prefix}{Util.DoubleQuotes}{resolvedInclude}{Util.DoubleQuotes}";
         }
 
+        private class DependenciesInfo
+        {
+            public OrderableStrings AdditionalDependencies;
+            public Strings IgnoredLibraryNames;
+        }
+
         private static void GenerateBffOptions(
             ProjectOptionsGenerator projectOptionsGen,
             BffGenerationContext context,
-            Dictionary<Project.Configuration, OrderableStrings> additionalDependenciesPerConf
+            Dictionary<Project.Configuration, DependenciesInfo> dependenciesInfoPerConf
         )
         {
             // resolve targetPlatformVersion as it may be used in includes
@@ -1388,8 +1401,8 @@ namespace Sharpmake.Generators.FastBuild
 
             FillLinkerOptions(context);
 
-            OrderableStrings additionalDependencies = FillLibrariesOptions(context);
-            additionalDependenciesPerConf.Add(context.Configuration, additionalDependencies);
+            var dependenciesInfo = FillLibrariesOptions(context);
+            dependenciesInfoPerConf.Add(context.Configuration, dependenciesInfo);
         }
 
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)
@@ -1498,9 +1511,9 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        private static OrderableStrings FillLibrariesOptions(BffGenerationContext context)
+        private static DependenciesInfo FillLibrariesOptions(BffGenerationContext context)
         {
-            OrderableStrings additionalDependencies = null;
+            var dependenciesInfo = new DependenciesInfo();
 
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
@@ -1520,7 +1533,8 @@ namespace Sharpmake.Generators.FastBuild
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix("." + platformVcxproj.StaticLibraryFileExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
+            dependenciesInfo.IgnoredLibraryNames = ignoreSpecificLibraryNames;
 
             context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1533,7 +1547,11 @@ namespace Sharpmake.Generators.FastBuild
 
                 //AdditionalDependencies
                 //                                            AdditionalDependencies="lib1;lib2"      "lib1;lib2" 
-                additionalDependencies = SelectAdditionalDependenciesOption(context, libFiles, ignoreSpecificLibraryNames);
+                dependenciesInfo.AdditionalDependencies = SelectAdditionalDependenciesOption(context, libFiles, ignoreSpecificLibraryNames);
+            }
+            else
+            {
+                dependenciesInfo.AdditionalDependencies = new OrderableStrings();
             }
 
             ////IgnoreSpecificLibraryNames
@@ -1551,7 +1569,7 @@ namespace Sharpmake.Generators.FastBuild
                 context.CommandLineOptions["IgnoreDefaultLibraryNames"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
-            return additionalDependencies;
+            return dependenciesInfo;
         }
 
         private static void SelectAdditionalLibraryDirectoriesOption(BffGenerationContext context)
@@ -1592,6 +1610,8 @@ namespace Sharpmake.Generators.FastBuild
             Strings ignoreSpecificLibraryNames
         )
         {
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
 
@@ -1599,7 +1619,7 @@ namespace Sharpmake.Generators.FastBuild
             string platformOutputLibraryExtension = string.Empty;
             string platformPrefix = string.Empty;
             platformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefix);
-            string libPrefix = platformVcxproj.GetOutputFileNamePrefix(context, Project.Configuration.OutputType.Lib);
+            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
 
             var additionalDependencies = new OrderableStrings();
 
@@ -1623,15 +1643,13 @@ namespace Sharpmake.Generators.FastBuild
                     //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
                     // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
                     string extension = Path.GetExtension(libraryFile).ToLower();
-                    if (extension.StartsWith(".", StringComparison.Ordinal))
-                        extension = extension.Substring(1);
 
                     // here we could also verify that the path is rooted
-                    if (extension != platformVcxproj.StaticLibraryFileExtension && extension != platformVcxproj.SharedLibraryFileExtension)
+                    if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
                     {
                         libraryFile = libPrefix + libraryFile;
-                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileExtension))
-                            libraryFile += "." + platformVcxproj.StaticLibraryFileExtension;
+                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileFullExtension))
+                            libraryFile += platformVcxproj.StaticLibraryFileFullExtension;
                     }
                     libraryFile = platformPrefix + libraryFile + platformOutputLibraryExtension;
 
@@ -1891,24 +1909,6 @@ namespace Sharpmake.Generators.FastBuild
             return strBuilder.ToString();
         }
 
-        private static string GetOutputFileName(Project.Configuration conf)
-        {
-            string targetNamePrefix = "";
-
-            if (conf.OutputExtension == "")
-            {
-                bool addLibPrefix = false;
-
-                if (conf.Output != Project.Configuration.OutputType.Exe)
-                    addLibPrefix = PlatformRegistry.Get<IPlatformBff>(conf.Platform).AddLibPrefix(conf);
-
-                if (addLibPrefix)
-                    targetNamePrefix = "lib";
-            }
-            string targetName = conf.Project is CSharpProject ? conf.TargetFileName : conf.TargetFileFullName;
-            return targetNamePrefix + targetName;
-        }
-
         private static void Write(string value, TextWriter writer, Resolver resolver)
         {
             string resolvedValue = resolver.Resolve(value);
@@ -1942,8 +1942,8 @@ namespace Sharpmake.Generators.FastBuild
             foreach (var projectFile in allFiles)
             {
                 if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                    (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
-                    (String.Compare(projectFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0))
+                    (string.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0) ||
+                    (string.Compare(projectFile.FileExtension, ".resx", StringComparison.OrdinalIgnoreCase) == 0))
                     sourceFiles.Add(projectFile);
             }
 
@@ -1965,13 +1965,13 @@ namespace Sharpmake.Generators.FastBuild
                                                         conf.ResolvedSourceFilesWithCompileAsWinRTOption.Contains(file.FileName)) &&
                                                         !(conf.ExcludeWinRTExtensions.Contains(file.FileName) ||
                                                         conf.ResolvedSourceFilesWithExcludeAsWinRTOption.Contains(file.FileName));
-                        bool isASMFile = String.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
+                        bool isASMFile = string.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
 
                         Options.Vc.Compiler.Exceptions exceptionSetting = conf.GetExceptionSettingForFile(file.FileName);
 
                         if (isCompileAsCLRFile || isConsumeWinRTExtensions)
                             isDontUsePrecomp = true;
-                        if (String.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
+                        if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             isDontUsePrecomp = true;
                             isCompileAsCFile = true;

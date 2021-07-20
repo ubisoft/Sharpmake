@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-
-using NUnit.Framework;
 using System.Globalization;
+using System.IO;
+using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {
@@ -46,8 +45,10 @@ namespace Sharpmake.UnitTests
         {
             _serializer.Dispose();
 
-            Assert.Throws<ObjectDisposedException>(delegate { _writer.Write(string.Empty); });
-            Assert.Throws<ObjectDisposedException>(delegate { _serializer.Serialize(string.Empty); });
+            Assert.Throws<ObjectDisposedException>(delegate
+            { _writer.Write(string.Empty); });
+            Assert.Throws<ObjectDisposedException>(delegate
+            { _serializer.Serialize(string.Empty); });
         }
 
         [Test]
@@ -81,7 +82,8 @@ namespace Sharpmake.UnitTests
         [Test]
         public void SerializeObject()
         {
-            Assert.Throws<ArgumentException>(delegate { _serializer.Serialize(new object()); });
+            Assert.Throws<ArgumentException>(delegate
+            { _serializer.Serialize(new object()); });
         }
 
         [Test]
@@ -169,7 +171,8 @@ namespace Sharpmake.UnitTests
                 { 256, "The key is not a string." }
             };
 
-            Assert.Throws<InvalidDataException>(delegate { _serializer.Serialize(dict); });
+            Assert.Throws<InvalidDataException>(delegate
+            { _serializer.Serialize(dict); });
         }
 
         [Test]
@@ -254,7 +257,8 @@ namespace Sharpmake.UnitTests
             first.Add(second);
             second.Add(first);
 
-            Assert.Throws<InvalidDataException>(delegate { _serializer.Serialize(first); });
+            Assert.Throws<InvalidDataException>(delegate
+            { _serializer.Serialize(first); });
         }
 
         [Test]

@@ -33,7 +33,7 @@
     <ProjectName>RequirePreBuildStep</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
@@ -89,9 +89,9 @@
     <OutDir>output\debug_fastbuild_noblob_vs2019\</OutDir>
     <IntDir>build\debug_fastbuild_noblob_vs2019\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
 del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
 del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
@@ -105,15 +105,14 @@ del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</N
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
     <OutDir>output\debug_fastbuild_vs2019\</OutDir>
     <IntDir>build\debug_fastbuild_vs2019\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe RequirePreBuildStep_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean RequirePreBuildStep_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
 del "build\debug_fastbuild_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
 del "build\debug_fastbuild_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
@@ -127,7 +126,6 @@ del "output\debug_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCle
     <NMakeOutput>output\debug_fastbuild_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
     <TargetName>requireprebuildstep</TargetName>
@@ -144,9 +142,9 @@ del "output\debug_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCle
     <OutDir>output\release_fastbuild_noblob_vs2019\</OutDir>
     <IntDir>build\release_fastbuild_noblob_vs2019\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
 del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
 del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
@@ -160,15 +158,14 @@ del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL<
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
     <OutDir>output\release_fastbuild_vs2019\</OutDir>
     <IntDir>build\release_fastbuild_vs2019\requireprebuildstep\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe RequirePreBuildStep_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean RequirePreBuildStep_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
 del "build\release_fastbuild_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
 del "build\release_fastbuild_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
@@ -182,7 +179,6 @@ del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
     <NMakeOutput>output\release_fastbuild_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
-    <TargetFileName>requireprebuildstep.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
     <TargetName>requireprebuildstep</TargetName>
@@ -229,7 +225,6 @@ del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -313,7 +308,6 @@ del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeC
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>

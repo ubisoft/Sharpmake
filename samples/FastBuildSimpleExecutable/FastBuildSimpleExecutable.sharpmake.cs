@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using Sharpmake;
 
 namespace FastBuild
 {
+    public static class Globals
+    {
+        // branch root path relative to current sharpmake file location
+        public const string RelativeRootPath = @".\codebase";
+        public static string RootDirectory;
+    }
+
     [Sharpmake.Generate]
     public class FastBuildSimpleExecutable : Project
     {
@@ -23,9 +31,11 @@ namespace FastBuild
         {
             Name = "FastBuildSimpleExecutable";
 
+            StripFastBuildSourceFiles = false;
+
             AddTargets(new Target(
                         Platform.win64,
-                        DevEnv.vs2017,
+                        DevEnv.vs2019,
                         Optimization.Debug | Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,
@@ -59,7 +69,7 @@ namespace FastBuild
 
             AddTargets(new Target(
                         Platform.win64,
-                        DevEnv.vs2017,
+                        DevEnv.vs2019,
                         Optimization.Debug | Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,
@@ -75,11 +85,30 @@ namespace FastBuild
 
             conf.AddProject<FastBuildSimpleExecutable>(target);
         }
+    }
+
+    public static class Main
+    {
+        private static void ConfigureRootDirectory()
+        {
+            FileInfo fileInfo = Util.GetCurrentSharpmakeFileInfo();
+            string rootDirectory = Path.Combine(fileInfo.DirectoryName, Globals.RelativeRootPath);
+            Globals.RootDirectory = Util.SimplifyPath(rootDirectory);
+        }
 
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
-            FastBuildSettings.FastBuildMakeCommand = @"tools\FastBuild\Windows-x64\FBuild.exe";
+            ConfigureRootDirectory();
+
+            // for the purpose of this sample, we'll reuse the FastBuild executable that live in the sharpmake source repo
+            string sharpmakeFastBuildDir = Util.PathGetAbsolute(Globals.RootDirectory, @"..\..\..\tools\FastBuild");
+            FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "Windows-x64", "FBuild.exe");
+
+            // This is necessary since there is no rc.exe in the same directory than link.exe
+            FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
+
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
 
             arguments.Generate<FastBuildSolution>();
         }

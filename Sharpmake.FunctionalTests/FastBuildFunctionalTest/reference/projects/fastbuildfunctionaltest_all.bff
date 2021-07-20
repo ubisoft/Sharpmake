@@ -28,6 +28,13 @@ Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64_Unknown'
+}
+
+
+//=================================================================================================================
 Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64' )
 {
     .Targets = {
@@ -42,6 +49,13 @@ Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64' )
                    'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_win64',
                    'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64_Unknown'
 }
 
 
@@ -64,6 +78,13 @@ Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64_Unknown'
+}
+
+
+//=================================================================================================================
 Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64' )
 {
     .Targets = {
@@ -78,6 +99,13 @@ Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64' )
                    'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64',
                    'UsePrecompExe_Release_FastBuild_vs2019_win64'
                }
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64_Unknown'
 }
 
 

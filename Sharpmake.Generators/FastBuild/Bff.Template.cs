@@ -109,7 +109,6 @@ Compiler( '[fastbuildCompilerName]' )
     .ExtraFiles             = [fastBuildExtraFiles]
     .CompilerFamily         = '[fastBuildCompilerFamily]'
     .UseRelativePaths_Experimental = [fastBuildCompilerUseRelativePaths]
-    [fastBuildVS2012EnumBugWorkaround]
 [fastBuildCompilerAdditionalSettings]
 }
 ";
@@ -193,6 +192,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.FixedBaseAddress]'
                             + ' [cmdLineOptions.ImportLibrary]'
                             + ' [cmdLineOptions.TargetMachine]'
+                            + ' [cmdLineOptions.LinkerCreateHotPatchableImage]'
                             + ' /errorReport:queue'
                             + ' [cmdLineOptions.ModuleDefinitionFile]'
                             // Additional linker options
@@ -368,7 +368,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.EnableEnhancedInstructionSet]'
             + ' [cmdLineOptions.FloatingPointModel]'
             + ' [cmdLineOptions.FloatingPointExceptions]'
-            + ' [cmdLineOptions.CreateHotpatchableImage]'
+            + ' [cmdLineOptions.CompilerCreateHotpatchableImage]'
             + ' [cmdLineOptions.SupportJustMyCode]'
             + ' [cmdLineOptions.SpectreMitigation]'
             // Language options
@@ -468,6 +468,16 @@ Alias( '[fastBuildOutputFileShortName]' )
 }
 
 ";
+
+                public static string TargetForLibraryDependencySection = @"
+//=================================================================================================================
+Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
+{
+    .Targets = '[fastBuildOutputFileShortName]_[fastBuildOutputType]'
+}
+
+";
+
                 public static string CopyFileSection = @"
 //=================================================================================================================
 Copy( '[fastBuildCopyAlias]' )

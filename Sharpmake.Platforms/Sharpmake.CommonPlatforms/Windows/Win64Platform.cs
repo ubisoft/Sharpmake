@@ -142,17 +142,6 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.Default:
                             compilerDevEnv = devEnv;
                             break;
-                        case Options.Vc.General.PlatformToolset.v100:
-                            compilerDevEnv = DevEnv.vs2010;
-                            break;
-                        case Options.Vc.General.PlatformToolset.v110:
-                        case Options.Vc.General.PlatformToolset.v110_xp:
-                            compilerDevEnv = DevEnv.vs2012;
-                            break;
-                        case Options.Vc.General.PlatformToolset.v120:
-                        case Options.Vc.General.PlatformToolset.v120_xp:
-                            compilerDevEnv = DevEnv.vs2013;
-                            break;
                         case Options.Vc.General.PlatformToolset.v140:
                         case Options.Vc.General.PlatformToolset.v140_xp:
                             compilerDevEnv = DevEnv.vs2015;
@@ -211,34 +200,6 @@ namespace Sharpmake
 
                         switch (compilerDevEnv)
                         {
-                            case DevEnv.vs2012:
-                                {
-                                    extraFiles.Add(
-                                        @"$ExecutableRootPath$\c1ast.dll",
-                                        @"$ExecutableRootPath$\c1xxast.dll",
-                                        @"$ExecutableRootPath$\mspft110.dll",
-                                        @"$ExecutableRootPath$\msobj110.dll",
-                                        @"$ExecutableRootPath$\mspdb110.dll",
-                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC110.CRT\msvcp110.dll"),
-                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC110.CRT\msvcr110.dll"),
-                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC110.CRT\vccorlib110.dll")
-                                    );
-                                }
-                                break;
-                            case DevEnv.vs2013:
-                                {
-                                    extraFiles.Add(
-                                        @"$ExecutableRootPath$\c1ast.dll",
-                                        @"$ExecutableRootPath$\c1xxast.dll",
-                                        @"$ExecutableRootPath$\mspft120.dll",
-                                        @"$ExecutableRootPath$\msobj120.dll",
-                                        @"$ExecutableRootPath$\mspdb120.dll",
-                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC120.CRT\msvcp120.dll"),
-                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC120.CRT\msvcr120.dll"),
-                                        Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC120.CRT\vccorlib120.dll")
-                                    );
-                                }
-                                break;
                             case DevEnv.vs2015:
                             case DevEnv.vs2017:
                             case DevEnv.vs2019:

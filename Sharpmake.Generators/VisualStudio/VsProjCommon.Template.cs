@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,14 @@ namespace Sharpmake.Generators.VisualStudio
 
             public static string ItemGroupEnd =
                 @"  </ItemGroup>
+";
+
+            public const string ItemDefinitionGroupBegin =
+                @"  <ItemDefinitionGroup>
+";
+
+            public const string ItemDefinitionGroupEnd =
+                @"  </ItemDefinitionGroup>
 ";
 
             public static string CustomProperty =

@@ -68,7 +68,7 @@ namespace Sharpmake
         public string SharpmakeCsPath { get; private set; }                               // Path of the CsFileName, ex: "c:\dev\MyProject"
         public string SharpmakeCsProjectPath => SharpmakeCsPath;                          // TODO LC: check what is expected
 
-        private string _assemblyName;
+        private string _assemblyName = string.Empty;
         public string AssemblyName
         {
             get { return _assemblyName; }
@@ -694,7 +694,7 @@ namespace Sharpmake
             // Add all precomp files
             foreach (Configuration conf in Configurations)
             {
-                if (conf.PrecompSource != null)
+                if (!string.IsNullOrEmpty(conf.PrecompSource))
                     precompSource.Add(conf.PrecompSource);
             }
 
@@ -1196,7 +1196,12 @@ namespace Sharpmake
                 foreach (var conf in Configurations)
                     conf.ResolvedSourceFilesBlobExclude.AddRange(SourceFilesBlobExclude);
 
-                foreach (string sourceFile in ResolvedSourceFiles)
+                // Use ResolvedSourceFiles sorted by relative paths
+                var sortedResolvedSourceFiles = ResolvedSourceFiles.Zip(resolvedSourceFilesRelative, (file, relFile) => new Tuple<string, string>(file, relFile))
+                                                                   .OrderBy(t => t.Item2, StringComparer.OrdinalIgnoreCase)
+                                                                   .Select(t => t.Item1);
+
+                foreach (string sourceFile in sortedResolvedSourceFiles)
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.BlobbingResolving, sourceFile))
                         Debugger.Break();
@@ -1582,7 +1587,7 @@ namespace Sharpmake
             Compile
         }
 
-        internal static Project CreateProject(Type projectType, List<Object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
+        internal static Project CreateProject(Type projectType, List<object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
         {
             Project project;
 
@@ -1649,8 +1654,6 @@ namespace Sharpmake
         {
             foreach (Project.Configuration conf in Configurations)
             {
-                conf.SetDefaultOutputExtension();
-
                 if (conf.IsFastBuild && SourceFilesFiltersRegex.Count > 0)
                 {
                     if (conf.FastBuildBlobbed)
@@ -1760,7 +1763,8 @@ namespace Sharpmake
                     var allRootedFiles = allLibraryFiles.Where(file => Path.IsPathRooted(file)).ToArray();
                     allLibraryFiles.RemoveRange(allRootedFiles);
 
-                    string platformLibExtension = "." + configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
+                    string platformLibPrefix = configTasks.GetOutputFileNamePrefix(Configuration.OutputType.Lib);
+                    string platformLibExtension = configTasks.GetDefaultOutputFullExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
                         if (!folder.StartsWith("$", StringComparison.Ordinal) && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
@@ -1774,7 +1778,7 @@ namespace Sharpmake
                             foreach (string file in allLibraryFiles)
                             {
                                 string path = Path.Combine(folder, file);
-                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, "lib" + file + platformLibExtension)))
+                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, platformLibPrefix + file + platformLibExtension)))
                                     toRemove.Add(file);
                             }
 
@@ -1816,6 +1820,7 @@ namespace Sharpmake
                 // Resolve full paths
                 _rootPath = Util.SimplifyPath(RootPath);
                 Util.ResolvePath(SharpmakeCsPath, ref _sourceRootPath);
+                Util.ResolvePath(SharpmakeCsPath, ref AdditionalSourceRootPaths);
                 Util.ResolvePath(SourceRootPath, ref SourceFiles);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesExclude);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesBlobExclude);
@@ -2257,7 +2262,7 @@ namespace Sharpmake
         public string ResourcesPath = null;
         public string ContentPath = null;
         public string BaseIntermediateOutputPath = string.Empty;
-        public string ApplicationIcon = String.Empty;
+        public string ApplicationIcon = string.Empty;
         public string ApplicationManifest = "app.manifest";
         public string ApplicationSplashScreen = string.Empty;
         public string StartupObject = string.Empty;
@@ -2299,6 +2304,11 @@ namespace Sharpmake
         /// If set to true. Will explicit the RestoreProjectStyle in the project file
         /// </summary>
         public bool ExplicitNugetRestoreProjectStyle = false;
+
+        /// <summary>
+        /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
+        /// </summary>
+        public bool EnableDefaultItems { get; set; } = false;
 
         public bool IncludeResxAsResources = true;
         public string RootNamespace;
@@ -2446,12 +2456,12 @@ namespace Sharpmake
             base.ResolveSourceFiles(builder);
 
             //Getting CorrectCaseVersion
-            if (!String.IsNullOrEmpty(ResourcesPath) && Directory.Exists(ResourcesPath))
+            if (!string.IsNullOrEmpty(ResourcesPath) && Directory.Exists(ResourcesPath))
             {
                 ResolvedResourcesFullFileNames = new Strings(GetDirectoryFiles(new DirectoryInfo(ResourcesPath)).Select(GetCapitalizedFile));
             }
 
-            if (!String.IsNullOrEmpty(ContentPath) && Directory.Exists(ContentPath))
+            if (!string.IsNullOrEmpty(ContentPath) && Directory.Exists(ContentPath))
             {
                 ResolvedContentFullFileNames = new Strings(GetDirectoryFiles(new DirectoryInfo(ContentPath)).Select(GetCapitalizedFile));
             }
@@ -2509,7 +2519,7 @@ namespace Sharpmake
             }*/
         }
 
-        private List<String> _filteredEmbeddedAssemblies = null;
+        private List<string> _filteredEmbeddedAssemblies = null;
         public virtual string GetLinkFolder(string file)
         {
             if (PreserveLinkFolderPaths)
@@ -2569,7 +2579,7 @@ namespace Sharpmake
         public string Version;
 
         public PythonVirtualEnvironment(string name, string path, bool isDefault)
-            : this(name, path, String.Empty, isDefault, default(Guid))
+            : this(name, path, string.Empty, isDefault, default(Guid))
         { }
 
         public PythonVirtualEnvironment(string name, string path, string version, bool isDefault)
@@ -2577,7 +2587,7 @@ namespace Sharpmake
         { }
 
         public PythonVirtualEnvironment(string name, string path, bool isDefault, Guid baseInterpreterGuid)
-            : this(name, path, String.Empty, isDefault, baseInterpreterGuid)
+            : this(name, path, string.Empty, isDefault, baseInterpreterGuid)
         { }
 
         public PythonVirtualEnvironment(string name, string path, string version, bool isDefault, Guid baseInterpreterGuid)
@@ -2608,7 +2618,7 @@ namespace Sharpmake
         public List<PythonEnvironment> Environments = new List<PythonEnvironment>();
         public List<PythonVirtualEnvironment> VirtualEnvironments = new List<PythonVirtualEnvironment>();
         public Strings SearchPaths = new Strings();
-        public string StartupFile = String.Empty;
+        public string StartupFile = string.Empty;
         public bool IsSourceFilesCaseSensitive = true;
 
         private void InitPythonSpecifics()
@@ -2633,6 +2643,8 @@ namespace Sharpmake
     /// </summary>
     public class AndroidPackageProject : Project
     {
+        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+
         public string AndroidManifest { get; set; } = "AndroidManifest.xml";
 
         public string AntBuildRootDirectory { get; set; } = @"$(OutDir)Package\";
@@ -2641,6 +2653,12 @@ namespace Sharpmake
 
         public string AntProjectPropertiesFile { get; set; } = "project.properties";
 
+        public Strings GradleTemplateFiles = new Strings();
+
+        public string GradlePlugin { get; set; } = RemoveLineTag;
+
+        public string GradleVersion { get; set; } = RemoveLineTag;
+
         /// <summary>
         /// The project type to lookup in the dependencies of the package to be used as the application library.
         /// This library is the first to be loaded when the package is started.
@@ -2648,7 +2666,6 @@ namespace Sharpmake
         /// <remarks>
         /// It is an error if the specified type can't be found in the configuration dependencies.
         /// </remarks>
-
         public Type AppLibType { get; set; }
 
         public AndroidPackageProject() : this(typeof(Target))

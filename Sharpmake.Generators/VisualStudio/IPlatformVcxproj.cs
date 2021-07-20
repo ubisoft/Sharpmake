@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,12 +31,23 @@ namespace Sharpmake.Generators.VisualStudio
 
     public interface IPlatformVcxproj
     {
-        string ExecutableFileExtension { get; }
-        string PackageFileExtension { get; }
-        string SharedLibraryFileExtension { get; }
-        string ProgramDatabaseFileExtension { get; }
-        string StaticLibraryFileExtension { get; }
-        string StaticOutputLibraryFileExtension { get; }
+        // ExecutableFileExtension
+        // PackageFileExtension
+        // SharedLibraryFileExtension
+        // ProgramDatabaseFileExtension
+        // StaticLibraryFileExtension
+        // StaticOutputLibraryFileExtension
+
+        // the above properties have been replaced by their "Full" equivalents below
+        // because most required sharpmake to add a leading ".", which was an issue on some platforms
+
+        string ExecutableFileFullExtension { get; }
+        string PackageFileFullExtension { get; }
+        string SharedLibraryFileFullExtension { get; }
+        string ProgramDatabaseFileFullExtension { get; }
+        string StaticLibraryFileFullExtension { get; }
+        string StaticOutputLibraryFileFullExtension { get; }
+
         bool ExcludesPrecompiledHeadersFromBuild { get; }
         bool HasUserAccountControlSupport { get; }
         bool HasEditAndContinueDebuggingSupport { get; }
@@ -59,13 +70,14 @@ namespace Sharpmake.Generators.VisualStudio
 
         IEnumerable<VariableAssignment> GetEnvironmentVariables(IGenerationContext context);
 
-        string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType);
+        // GetOutputFileNamePrefix is now in IConfigurationTasks
 
         void SetupDeleteExtensionsOnCleanOptions(IGenerationContext context);
         void SetupSdkOptions(IGenerationContext context);
         void SetupPlatformToolsetOptions(IGenerationContext context);
         void SetupPlatformTargetOptions(IGenerationContext context);
         void SelectCompilerOptions(IGenerationContext context);
+        void SelectPrecompiledHeaderOptions(IGenerationContext context);
         void SelectLinkerOptions(IGenerationContext context);
         void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context);
         void SelectApplicationFormatOptions(IGenerationContext context);

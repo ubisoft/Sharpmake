@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,9 +98,6 @@ namespace Sharpmake.Generators
                                 MakefileGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
@@ -150,9 +147,6 @@ namespace Sharpmake.Generators
                                 MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:

@@ -197,12 +197,6 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
-                case DevEnv.vs2010:
-                    return "4.0";
-                case DevEnv.vs2012:
-                    return "4.0";
-                case DevEnv.vs2013:
-                    return "12.0";
                 case DevEnv.vs2015:
                     return "14.0";
                 case DevEnv.vs2017:
@@ -218,12 +212,6 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
-                case DevEnv.vs2010:
-                    return 10;
-                case DevEnv.vs2012:
-                    return 11;
-                case DevEnv.vs2013:
-                    return 12;
                 case DevEnv.vs2015:
                     return 14;
                 case DevEnv.vs2017:
@@ -244,12 +232,6 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
-                case DevEnv.vs2010:
-                    return "v100";
-                case DevEnv.vs2012:
-                    return "v110";
-                case DevEnv.vs2013:
-                    return "v120";
                 case DevEnv.vs2015:
                     return "v140";
                 case DevEnv.vs2017:
@@ -265,12 +247,12 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
-                case DevEnv.vs2010: return "2010";
-                case DevEnv.vs2012: return "2012";
-                case DevEnv.vs2013: return "2013";
-                case DevEnv.vs2015: return "2015";
-                case DevEnv.vs2017: return "2017";
-                case DevEnv.vs2019: return "2019";
+                case DevEnv.vs2015:
+                    return "2015";
+                case DevEnv.vs2017:
+                    return "2017";
+                case DevEnv.vs2019:
+                    return "2019";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -352,9 +334,6 @@ namespace Sharpmake
                 string vsDir = visualVersion.GetVisualStudioDir();
                 switch (visualVersion)
                 {
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                         return Path.Combine(vsDir, "VC");
 
@@ -405,10 +384,6 @@ namespace Sharpmake
 
             switch (visualVersion)
             {
-                case DevEnv.vs2010:
-                    return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Microsoft.Cpp\v4.0"));
-                case DevEnv.vs2012:
-                case DevEnv.vs2013:
                 case DevEnv.vs2015:
                     string versionSubfolder = visualVersion.GetDefaultPlatformToolset().ToUpperInvariant(); // this is enough for now but we could make a specific method to retrieve this value
                     return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Microsoft.Cpp\v4.0", versionSubfolder));
@@ -468,9 +443,6 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
-                case DevEnv.vs2010:
-                case DevEnv.vs2012:
-                case DevEnv.vs2013:
                 case DevEnv.vs2015:
                     {
                         string targetPlatform = (platform == Platform.win64) ? "amd64" : "";
@@ -575,61 +547,54 @@ namespace Sharpmake
             string visualStudioDir = Util.EnsureTrailingSeparator(visualVersion.GetVisualStudioVCRootPath());
             string visualStudioInclude = string.Format(@"{0}include;{0}atlmfc\include", visualStudioDir);
 
-            if (visualVersion == DevEnv.vs2010)
-            {
-                return visualStudioInclude;
-            }
-            else
-            {
-                KitsRootEnum useKitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
+            KitsRootEnum useKitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
 
-                switch (useKitsRoot)
-                {
-                    case KitsRootEnum.KitsRoot:
-                        {
-                            string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot));
-                            return String.Format(@"{0};{1}Include\shared;{1}Include\um;{1}Include\WinRT;", visualStudioInclude, kitsRoot);
-                        }
-                    case KitsRootEnum.KitsRoot81:
-                        {
-                            string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
-                            return String.Format(@"{0};{1}Include\shared;{1}Include\um;{1}Include\WinRT;", visualStudioInclude, kitsRoot);
-                        }
-                    case KitsRootEnum.KitsRoot10:
-                        {
-                            string kitsRoot10 = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10));
-                            Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
-                            string platformVersion = windowsTargetPlatformVersion.ToVersionString();
-                            var paths = new List<string> {
-                                $@"{visualStudioInclude}",
-                                $@"{kitsRoot10}Include\{platformVersion}\um",     // $(UM_IncludePath)
-                                $@"{kitsRoot10}Include\{platformVersion}\shared", // $(KIT_SHARED_IncludePath)
-                                $@"{kitsRoot10}Include\{platformVersion}\winrt",  // $(WinRT_IncludePath)
-                                $@"{kitsRoot10}Include\{platformVersion}\ucrt",   // $(UniversalCRT_IncludePath)
-                            };
+            switch (useKitsRoot)
+            {
+                case KitsRootEnum.KitsRoot:
+                    {
+                        string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot));
+                        return string.Format(@"{0};{1}Include\shared;{1}Include\um;{1}Include\WinRT;", visualStudioInclude, kitsRoot);
+                    }
+                case KitsRootEnum.KitsRoot81:
+                    {
+                        string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
+                        return string.Format(@"{0};{1}Include\shared;{1}Include\um;{1}Include\WinRT;", visualStudioInclude, kitsRoot);
+                    }
+                case KitsRootEnum.KitsRoot10:
+                    {
+                        string kitsRoot10 = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10));
+                        Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
+                        string platformVersion = windowsTargetPlatformVersion.ToVersionString();
+                        var paths = new List<string> {
+                            $@"{visualStudioInclude}",
+                            $@"{kitsRoot10}Include\{platformVersion}\um",     // $(UM_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\shared", // $(KIT_SHARED_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\winrt",  // $(WinRT_IncludePath)
+                            $@"{kitsRoot10}Include\{platformVersion}\ucrt",   // $(UniversalCRT_IncludePath)
+                        };
 
-                            if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                        if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
+                        {
+                            //
+                            // Version 10.0.10240.0 and below only contain the UCRT libraries
+                            // and headers, not the usual Win32 stuff. So if we are using
+                            // version 10240 or older, also include the Windows 8.1 paths so we
+                            // have a complete Win32 support.
+                            //
+
+                            string kitsRoot81 = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
+                            paths.AddRange(new[]
                             {
-                                //
-                                // Version 10.0.10240.0 and below only contain the UCRT libraries
-                                // and headers, not the usual Win32 stuff. So if we are using
-                                // version 10240 or older, also include the Windows 8.1 paths so we
-                                // have a complete Win32 support.
-                                //
-
-                                string kitsRoot81 = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
-                                paths.AddRange(new[]
-                                {
-                                    $@"{kitsRoot81}Include\um",
-                                    $@"{kitsRoot81}Include\shared"
-                                });
-                            }
-
-                            return string.Join(";", paths);
+                                $@"{kitsRoot81}Include\um",
+                                $@"{kitsRoot81}Include\shared"
+                            });
                         }
-                    default:
-                        throw new NotImplementedException("No WindowsResourceCompiler associated with " + visualVersion);
-                }
+
+                        return string.Join(";", paths);
+                    }
+                default:
+                    throw new NotImplementedException("No WindowsResourceCompiler associated with " + visualVersion);
             }
         }
 
@@ -642,61 +607,54 @@ namespace Sharpmake
 
             string visualStudioLib = string.Format(@"{0}lib{1};{0}atlmfc\lib{1};", visualStudioVCDir, subDir);
 
-            if (visualVersion == DevEnv.vs2010)
+            KitsRootEnum useKitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
+            string targetPlatform = platform == Platform.win64 ? "x64" : "x86";
+
+            switch (useKitsRoot)
             {
-                return visualStudioLib;
-            }
-            else
-            {
-                KitsRootEnum useKitsRoot = KitsRootPaths.GetUseKitsRootForDevEnv(visualVersion);
-                string targetPlatform = platform == Platform.win64 ? "x64" : "x86";
-
-                switch (useKitsRoot)
-                {
-                    case KitsRootEnum.KitsRoot:
+                case KitsRootEnum.KitsRoot:
+                    {
+                        string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot));
+                        return string.Format(@"{0};{1}lib\win8\um\{2};{1}References\CommonConfiguration\Neutral;", visualStudioLib, kitsRoot, targetPlatform);
+                    }
+                case KitsRootEnum.KitsRoot81:
+                    {
+                        string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
+                        return string.Format(@"{0};{1}lib\winv6.3\um\{2};{1}References\CommonConfiguration\Neutral;", visualStudioLib, kitsRoot, targetPlatform);
+                    }
+                case KitsRootEnum.KitsRoot10:
+                    {
+                        string netFxPath = string.Empty;
+                        if (dotNetFramework.HasValue && visualVersion >= DevEnv.vs2015)
                         {
-                            string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot));
-                            return string.Format(@"{0};{1}lib\win8\um\{2};{1}References\CommonConfiguration\Neutral;", visualStudioLib, kitsRoot, targetPlatform);
+                            string netFXKitsDir = Util.EnsureTrailingSeparator(KitsRootPaths.GetNETFXKitsDir(dotNetFramework.Value < DotNetFramework.v4_6 ? DotNetFramework.v4_6 : dotNetFramework.Value));
+                            netFxPath = Path.Combine(netFXKitsDir, "Lib", "um", targetPlatform);
                         }
-                    case KitsRootEnum.KitsRoot81:
+
+                        string kitsRoot10 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
+                        Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
+                        string platformVersion = windowsTargetPlatformVersion.ToVersionString();
+                        var paths = new[]
                         {
-                            string kitsRoot = Util.EnsureTrailingSeparator(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81));
-                            return string.Format(@"{0};{1}lib\winv6.3\um\{2};{1}References\CommonConfiguration\Neutral;", visualStudioLib, kitsRoot, targetPlatform);
-                        }
-                    case KitsRootEnum.KitsRoot10:
+                            visualStudioLib,
+                            Path.Combine(kitsRoot10, "Lib", platformVersion, "ucrt", targetPlatform),   // $(UniversalCRT_LibraryPath_x86) or $(UniversalCRT_LibraryPath_x64)
+                            Path.Combine(kitsRoot10, "Lib", platformVersion, "um", targetPlatform),     // $(WindowsSDK_LibraryPath_x86) or $(WindowsSDK_LibraryPath_x64)
+                            netFxPath
+                        }.ToList();
+
+                        if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
                         {
-                            string netFxPath = string.Empty;
-                            if (dotNetFramework.HasValue && visualVersion >= DevEnv.vs2015)
-                            {
-                                string netFXKitsDir = Util.EnsureTrailingSeparator(KitsRootPaths.GetNETFXKitsDir(dotNetFramework.Value < DotNetFramework.v4_6 ? DotNetFramework.v4_6 : dotNetFramework.Value));
-                                netFxPath = Path.Combine(netFXKitsDir, "Lib", "um", targetPlatform);
-                            }
-
-                            string kitsRoot10 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10);
-                            Options.Vc.General.WindowsTargetPlatformVersion windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(visualVersion);
-                            string platformVersion = windowsTargetPlatformVersion.ToVersionString();
-                            var paths = new[]
-                            {
-                                visualStudioLib,
-                                Path.Combine(kitsRoot10, "Lib", platformVersion, "ucrt", targetPlatform),   // $(UniversalCRT_LibraryPath_x86) or $(UniversalCRT_LibraryPath_x64)
-                                Path.Combine(kitsRoot10, "Lib", platformVersion, "um", targetPlatform),     // $(WindowsSDK_LibraryPath_x86) or $(WindowsSDK_LibraryPath_x64)
-                                netFxPath
-                            }.ToList();
-
-                            if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0)
-                            {
-                                string kitsRoot81 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81);
-                                paths.AddRange(new[] {
-                                    Path.Combine(kitsRoot81, "lib", "winv6.3", "um", targetPlatform),
-                                    Path.Combine(kitsRoot81, "References", "CommonConfiguration", "Neutral")
-                                });
-                            }
-
-                            return string.Join(";", paths);
+                            string kitsRoot81 = KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot81);
+                            paths.AddRange(new[] {
+                                Path.Combine(kitsRoot81, "lib", "winv6.3", "um", targetPlatform),
+                                Path.Combine(kitsRoot81, "References", "CommonConfiguration", "Neutral")
+                            });
                         }
-                    default:
-                        throw new NotImplementedException("No WindowsResourceCompiler associated with " + visualVersion);
-                }
+
+                        return string.Join(";", paths);
+                    }
+                default:
+                    throw new NotImplementedException("No WindowsResourceCompiler associated with " + visualVersion);
             }
         }
 
@@ -719,17 +677,28 @@ namespace Sharpmake
         {
             switch (windowsTargetPlatformVersion)
             {
-                case Options.Vc.General.WindowsTargetPlatformVersion.v8_1: return "8.1";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0: return "10.0.10240.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0: return "10.0.10586.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0: return "10.0.14393.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0: return "10.0.15063.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0: return "10.0.16299.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0: return "10.0.17134.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0: return "10.0.17763.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_18362_0: return "10.0.18362.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0: return "10.0.19041.0";
-                case Options.Vc.General.WindowsTargetPlatformVersion.Latest: return "$(LatestTargetPlatformVersion)";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v8_1:
+                    return "8.1";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10240_0:
+                    return "10.0.10240.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_10586_0:
+                    return "10.0.10586.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_14393_0:
+                    return "10.0.14393.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_15063_0:
+                    return "10.0.15063.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_16299_0:
+                    return "10.0.16299.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0:
+                    return "10.0.17134.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0:
+                    return "10.0.17763.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_18362_0:
+                    return "10.0.18362.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0:
+                    return "10.0.19041.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
+                    return "$(LatestTargetPlatformVersion)";
                 default:
                     throw new ArgumentOutOfRangeException(windowsTargetPlatformVersion.ToString());
             }
@@ -739,20 +708,12 @@ namespace Sharpmake
         {
             switch (platformToolset)
             {
-                case Options.Vc.General.PlatformToolset.v100:
-                    return visualVersion == DevEnv.vs2010;
-                case Options.Vc.General.PlatformToolset.v110:
-                    return visualVersion == DevEnv.vs2012;
-                case Options.Vc.General.PlatformToolset.v120:
-                    return visualVersion == DevEnv.vs2013;
                 case Options.Vc.General.PlatformToolset.v140:
                     return visualVersion == DevEnv.vs2015;
                 case Options.Vc.General.PlatformToolset.v141:
                     return visualVersion == DevEnv.vs2017;
                 case Options.Vc.General.PlatformToolset.v142:
                     return visualVersion == DevEnv.vs2019;
-                case Options.Vc.General.PlatformToolset.v110_xp:
-                case Options.Vc.General.PlatformToolset.v120_xp:
                 case Options.Vc.General.PlatformToolset.v140_xp:
                 case Options.Vc.General.PlatformToolset.v141_xp:
                 case Options.Vc.General.PlatformToolset.LLVM:
@@ -770,14 +731,6 @@ namespace Sharpmake
             {
                 case Options.Vc.General.PlatformToolset.Default:
                     return null;
-                case Options.Vc.General.PlatformToolset.v100:
-                    return DevEnv.vs2010;
-                case Options.Vc.General.PlatformToolset.v110:
-                case Options.Vc.General.PlatformToolset.v110_xp:
-                    return DevEnv.vs2012;
-                case Options.Vc.General.PlatformToolset.v120:
-                case Options.Vc.General.PlatformToolset.v120_xp:
-                    return DevEnv.vs2013;
                 case Options.Vc.General.PlatformToolset.v140:
                 case Options.Vc.General.PlatformToolset.v140_xp:
                     return DevEnv.vs2015;
@@ -798,14 +751,6 @@ namespace Sharpmake
         {
             switch (devEnv)
             {
-                case DevEnv.vs2012:
-                    vcTargetsPathKey = "VCTargetsPath11";
-                    vcRootPathKey = "VCInstallDir_110";
-                    break;
-                case DevEnv.vs2013:
-                    vcTargetsPathKey = "VCTargetsPath12";
-                    vcRootPathKey = "VCInstallDir_120";
-                    break;
                 case DevEnv.vs2015:
                     vcTargetsPathKey = "VCTargetsPath14";
                     vcRootPathKey = "VCInstallDir_140";

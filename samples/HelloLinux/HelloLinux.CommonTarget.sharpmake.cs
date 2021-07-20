@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,10 +96,10 @@ namespace HelloLinux
                 var dirNameParts = new List<string>();
 
                 dirNameParts.Add(Platform.ToString());
-                dirNameParts.Add(Optimization.ToString());
+                dirNameParts.Add(Optimization.ToString().ToLowerInvariant());
 
                 if (BuildSystem == BuildSystem.FastBuild)
-                    dirNameParts.Add(BuildSystem.ToString());
+                    dirNameParts.Add(BuildSystem.ToString().ToLowerInvariant());
 
                 return string.Join("_", dirNameParts);
             }

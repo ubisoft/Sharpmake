@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ namespace Sharpmake.Generators.VisualStudio
     public partial class Androidproj : IProjectGenerator
     {
         public const string ProjectExtension = ".androidproj";
-
         private class GenerationContext : IVcxprojGenerationContext
         {
             #region IVcxprojGenerationContext implementation
@@ -99,6 +98,10 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
+        // The default value used by the Ant build type is to remove the AndroidBuildType tag
+        private string _androidBuildType = FileGeneratorUtilities.RemoveLineTag;
+        private bool _isGradleBuild { get { return _androidBuildType.Equals("Gradle", StringComparison.InvariantCultureIgnoreCase); } }
+
         public void Generate(
             Builder builder,
             Project project,
@@ -127,11 +130,11 @@ namespace Sharpmake.Generators.VisualStudio
                 // set generator information
                 var platformVcxproj = context.PresentPlatforms[conf.Platform];
                 var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(conf.Platform);
-                conf.GeneratorSetGeneratedInformation(
-                    platformVcxproj.ExecutableFileExtension,
-                    platformVcxproj.PackageFileExtension,
-                    configurationTasks.GetDefaultOutputExtension(Project.Configuration.OutputType.Dll),
-                    platformVcxproj.ProgramDatabaseFileExtension);
+                conf.GeneratorSetOutputFullExtensions(
+                    platformVcxproj.ExecutableFileFullExtension,
+                    platformVcxproj.PackageFileFullExtension,
+                    configurationTasks.GetDefaultOutputFullExtension(Project.Configuration.OutputType.Dll),
+                    platformVcxproj.ProgramDatabaseFileFullExtension);
 
                 projectConfigurationOptions.Add(conf, new Options.ExplicitOptions());
                 context.CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
@@ -166,6 +169,9 @@ namespace Sharpmake.Generators.VisualStudio
             string androidTargetsPath = Options.GetConfOption<Options.Android.General.AndroidTargetsPath>(context.ProjectConfigurations, rootpath: context.ProjectDirectoryCapitalized);
 
             var firstConf = context.ProjectConfigurations.First();
+            _androidBuildType = Options.GetOptionValue("androidBuildType", context.ProjectConfigurationOptions.Values, FileGeneratorUtilities.RemoveLineTag);
+
+            using (fileGenerator.Declare("androidBuildType", _androidBuildType))
             using (fileGenerator.Declare("projectName", firstConf.ProjectName))
             using (fileGenerator.Declare("guid", firstConf.ProjectGuid))
             using (fileGenerator.Declare("toolsVersion", toolsVersion))
@@ -219,9 +225,21 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
                     {
-                        fileGenerator.Write(Template.Project.AntPackage);
+                        if (!_isGradleBuild)
+                            fileGenerator.Write(Template.Project.AntPackage);
                     }
                     fileGenerator.Write(Template.Project.ProjectConfigurationEndItemDefinition);
+                }
+            }
+
+            if (_isGradleBuild)
+            {
+                using (fileGenerator.Declare("gradlePlugin", context.AndroidPackageProject.GradlePlugin))
+                using (fileGenerator.Declare("gradleVersion", context.AndroidPackageProject.GradleVersion))
+                {
+                    fileGenerator.Write(VsProjCommon.Template.ItemDefinitionGroupBegin);
+                    fileGenerator.Write(Template.Project.GradlePackage);
+                    fileGenerator.Write(VsProjCommon.Template.ItemDefinitionGroupEnd);
                 }
             }
 
@@ -285,11 +303,11 @@ namespace Sharpmake.Generators.VisualStudio
                     files.Add(projectFile);
                 }
                 else if (context.Project.SourceFilesCompileExtensions.Contains(projectFile.FileExtension) ||
-                         (String.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
+                         (string.Compare(projectFile.FileExtension, ".rc", StringComparison.OrdinalIgnoreCase) == 0))
                 {
                     sourceFiles.Add(projectFile);
                 }
-                else if (String.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
+                else if (string.Compare(projectFile.FileExtension, ".h", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     includeFiles.Add(projectFile);
                 }
@@ -300,35 +318,52 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // Write header files
-            fileGenerator.Write(Template.Project.ProjectFilesBegin);
-            foreach (var file in includeFiles)
+            if (includeFiles.Count > 0)
             {
-                using (fileGenerator.Declare("file", file))
-                    fileGenerator.Write(Template.Project.ProjectFilesHeader);
+                fileGenerator.Write(Template.Project.ProjectFilesBegin);
+                foreach (var file in includeFiles)
+                {
+                    using (fileGenerator.Declare("file", file))
+                        fileGenerator.Write(Template.Project.ProjectFilesHeader);
+                }
+                fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
-            fileGenerator.Write(Template.Project.ProjectFilesEnd);
 
             // Write content files
-            fileGenerator.Write(Template.Project.ProjectFilesBegin);
-            foreach (var file in contentFiles)
+            if (contentFiles.Count > 0)
             {
-                using (fileGenerator.Declare("file", file))
-                    fileGenerator.Write(Template.Project.ContentSimple);
+                fileGenerator.Write(Template.Project.ProjectFilesBegin);
+                foreach (var file in contentFiles)
+                {
+                    using (fileGenerator.Declare("file", file))
+                        fileGenerator.Write(Template.Project.ContentSimple);
+                }
+                fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
-            fileGenerator.Write(Template.Project.ProjectFilesEnd);
-
 
             // Write Android project files
             fileGenerator.Write(Template.Project.ItemGroupBegin);
 
-            using (fileGenerator.Declare("antBuildXml", context.AndroidPackageProject.AntBuildXml))
-            using (fileGenerator.Declare("antProjectPropertiesFile", context.AndroidPackageProject.AntProjectPropertiesFile))
-            using (fileGenerator.Declare("androidManifest", context.AndroidPackageProject.AndroidManifest))
+            if (_isGradleBuild)
             {
-                fileGenerator.Write(Template.Project.AntBuildXml);
-                fileGenerator.Write(Template.Project.AndroidManifest);
-                fileGenerator.Write(Template.Project.AntProjectPropertiesFile);
+                foreach (var file in context.AndroidPackageProject.GradleTemplateFiles)
+                {
+                    using (fileGenerator.Declare("gradleTemplateFile", file))
+                        fileGenerator.Write(Template.Project.GradleTemplate);
+                }
             }
+            else
+            {
+                using (fileGenerator.Declare("antBuildXml", context.AndroidPackageProject.AntBuildXml))
+                using (fileGenerator.Declare("antProjectPropertiesFile", context.AndroidPackageProject.AntProjectPropertiesFile))
+                using (fileGenerator.Declare("androidManifest", context.AndroidPackageProject.AndroidManifest))
+                {
+                    fileGenerator.Write(Template.Project.AntBuildXml);
+                    fileGenerator.Write(Template.Project.AndroidManifest);
+                    fileGenerator.Write(Template.Project.AntProjectPropertiesFile);
+                }
+            }
+
             fileGenerator.Write(Template.Project.ItemGroupEnd);
         }
 

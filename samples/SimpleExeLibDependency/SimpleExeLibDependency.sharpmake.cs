@@ -1,4 +1,4 @@
-// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
+// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,11 @@ namespace SimpleExeLibDependency
             conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
 
+            conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]_[target.Optimization]_[target.DevEnv]";
+
             conf.Options.Add(Options.Vc.Linker.TreatLinkerWarningAsErrors.Enable);
+
+            conf.Defines.Add("_HAS_EXCEPTIONS=0");
 
             conf.AddPublicDependency<LibStuffProject>(target);
         }
@@ -67,6 +71,8 @@ namespace SimpleExeLibDependency
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+
             arguments.Generate<ExeLibSolution>();
         }
     }

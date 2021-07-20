@@ -1015,32 +1015,12 @@ namespace Sharpmake
             return s_isVisualStudio2015Installed.Value;
         }
 
-        private static bool? s_isVisualStudio2013Installed = null;
-        public static bool IsVisualStudio2013Installed()
-        {
-            if (!s_isVisualStudio2013Installed.HasValue)
-                s_isVisualStudio2013Installed = IsVisualStudioInstalled(DevEnv.vs2013);
-
-            return s_isVisualStudio2013Installed.Value;
-        }
-
-        private static bool? s_isVisualStudio2012Installed = null;
-        public static bool IsVisualStudio2012Installed()
-        {
-            if (!s_isVisualStudio2012Installed.HasValue)
-                s_isVisualStudio2012Installed = IsVisualStudioInstalled(DevEnv.vs2012);
-
-            return s_isVisualStudio2012Installed.Value;
-        }
-
-        private static bool? s_isVisualStudio2010Installed = null;
-        public static bool IsVisualStudio2010Installed()
-        {
-            if (!s_isVisualStudio2010Installed.HasValue)
-                s_isVisualStudio2010Installed = IsVisualStudioInstalled(DevEnv.vs2010);
-
-            return s_isVisualStudio2010Installed.Value;
-        }
+        [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
+        public static bool IsVisualStudio2013Installed() => false;
+        [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
+        public static bool IsVisualStudio2012Installed() => false;
+        [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
+        public static bool IsVisualStudio2010Installed() => false;
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
@@ -1284,18 +1264,16 @@ namespace Sharpmake
             return string.Format("v{0}", version);
         }
 
+        [Obsolete("Use " + nameof(GetToolVersionString) + " without the second argument.")]
         public static string GetToolVersionString(DevEnv env, DotNetFramework desiredFramework)
+        {
+            return GetToolVersionString(env);
+        }
+
+        public static string GetToolVersionString(DevEnv env)
         {
             switch (env)
             {
-                case DevEnv.vs2010:
-                    if (desiredFramework > DotNetFramework.v4_5clientprofile)
-                        throw new Exception(string.Format("The target framework ({0}) isn't supported in the target environment({1})", desiredFramework, env));
-                    return DotNetFramework.v4_0.ToVersionString(); //"Both Visual Studio 2010 and Visual Studio 2012 use a ToolsVersion of 4.0" ref:http://msdn.microsoft.com/en-us/LIbrary/bb383796%28v=vs.110%29.aspx
-                case DevEnv.vs2012:
-                    return DotNetFramework.v4_0.ToVersionString();
-                case DevEnv.vs2013:
-                    return DotNetFramework.v4_5.ToVersionString();
                 case DevEnv.vs2015:
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
@@ -1305,7 +1283,7 @@ namespace Sharpmake
                 case DevEnv.eclipse:
                     throw new NotSupportedException("Eclipse does not support Tool Version. ");
                 default:
-                    throw new NotImplementedException(String.Format("ToolVersion not set for Visual Studio {0}", env));
+                    throw new NotImplementedException(string.Format("ToolVersion not set for Visual Studio {0}", env));
             }
         }
 
@@ -1359,7 +1337,7 @@ namespace Sharpmake
         public static bool IsCpp(Project.Configuration conf)
         {
             string extension = Path.GetExtension(conf.ProjectFullFileNameWithExtension);
-            return (String.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
+            return (string.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public static string GetProjectFileExtension(Project.Configuration conf)
@@ -1375,9 +1353,6 @@ namespace Sharpmake
             {
                 switch (conf.Target.GetFragment<DevEnv>())
                 {
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
@@ -1501,11 +1476,14 @@ namespace Sharpmake
             {
                 switch (platform)
                 {
-                    case Platform.win32: return "x86";
-                    case Platform.win64: return "x64";
-                    case Platform.anycpu: return isForSolution ? "Any CPU" : "AnyCPU";
+                    case Platform.win32:
+                        return "x86";
+                    case Platform.win64:
+                        return "x64";
+                    case Platform.anycpu:
+                        return isForSolution ? "Any CPU" : "AnyCPU";
                     default:
-                        throw new Exception(String.Format("This platform: {0} is not supported", platform));
+                        throw new Exception(string.Format("This platform: {0} is not supported", platform));
                 }
             }
             else if (project is PythonProject)
@@ -1585,7 +1563,7 @@ namespace Sharpmake
             return (x << r) | (x >> (32 - r));
         }
 
-        public static Object ReadRegistryValue(string key, string value, Object defaultValue = null)
+        public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }
@@ -1686,15 +1664,18 @@ namespace Sharpmake
         {
             public int Compare(string x, string y)
             {
-                if (x == y) return 0;
+                if (x == y)
+                    return 0;
                 var version = new { First = GetVersion(x), Second = GetVersion(y) };
                 int limit = Math.Max(version.First.Length, version.Second.Length);
                 for (int i = 0; i < limit; i++)
                 {
                     int first = version.First.ElementAtOrDefault(i);
                     int second = version.Second.ElementAtOrDefault(i);
-                    if (first > second) return 1;
-                    if (second > first) return -1;
+                    if (first > second)
+                        return 1;
+                    if (second > first)
+                        return -1;
                 }
                 return 0;
             }

@@ -21,7 +21,6 @@ namespace VCPKGSample.Extern
 
             // Add root lib path for vcpkg packages.
             conf.LibraryPaths.Add(@"[project.SharpmakeCsPath]\..\extern\vcpkg\installed\x64-windows-static\lib");
-
         }
 
         public override void ConfigureDebug(Configuration conf, Target target)
@@ -38,7 +37,7 @@ namespace VCPKGSample.Extern
 
     // Curl is a vcpkg package. The package is installed by bootstrap-sample.bat
     [Sharpmake.Export]
-    class Curl : VCPKG
+    internal class Curl : VCPKG
     {
         public override void ConfigureAll(Configuration conf, Target target)
         {
@@ -68,13 +67,8 @@ namespace VCPKGSample.Extern
 
     // ZLib is a vcpkg package. The package is installed by bootstrap-sample.bat as a dependency to curl.
     [Sharpmake.Export]
-    class ZLib : VCPKG
+    internal class ZLib : VCPKG
     {
-        public override void ConfigureAll(Configuration conf, Target target)
-        {
-            base.ConfigureAll(conf, target);
-        }
-
         public override void ConfigureDebug(Configuration conf, Target target)
         {
             base.ConfigureDebug(conf, target);
@@ -93,7 +87,7 @@ namespace VCPKGSample.Extern
     // RapidJSON is a vcpkg package. The package is installed by bootstrap-sample.bat
     // This project is header only.
     [Sharpmake.Export]
-    class RapidJSON : VCPKG
+    internal class RapidJSON : VCPKG
     {
     }
 }

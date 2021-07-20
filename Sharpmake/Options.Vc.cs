@@ -31,16 +31,6 @@ namespace Sharpmake
                 {
                     [Default]
                     Default,  // same as Visual Studio version
-                    [DevEnvVersion(minimum = DevEnv.vs2010)]
-                    v100, // Visual Studio 2010
-                    [DevEnvVersion(minimum = DevEnv.vs2012)]
-                    v110, // Visual Studio 2012
-                    [DevEnvVersion(minimum = DevEnv.vs2012)]
-                    v110_xp, // Visual Studio 2012 - Windows XP
-                    [DevEnvVersion(minimum = DevEnv.vs2013)]
-                    v120, // Visual Studio 2013
-                    [DevEnvVersion(minimum = DevEnv.vs2013)]
-                    v120_xp, // Visual Studio 2013 - Windows XP
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
                     v140, // Visual Studio 2015
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
@@ -60,6 +50,17 @@ namespace Sharpmake
                     LLVM_vs2012,
                     [Obsolete("Use either LLVM or ClangCL", error: true)]
                     LLVM_vs2014,
+
+                    [Obsolete("Sharpmake doesn't support this toolset anymore.", error: true)]
+                    v100, // Visual Studio 2010
+                    [Obsolete("Sharpmake doesn't support this toolset anymore.", error: true)]
+                    v110, // Visual Studio 2012
+                    [Obsolete("Sharpmake doesn't support this toolset anymore.", error: true)]
+                    v110_xp, // Visual Studio 2012 - Windows XP
+                    [Obsolete("Sharpmake doesn't support this toolset anymore.", error: true)]
+                    v120, // Visual Studio 2013
+                    [Obsolete("Sharpmake doesn't support this toolset anymore.", error: true)]
+                    v120_xp, // Visual Studio 2013 - Windows XP
                 }
 
                 /// <summary>
@@ -794,7 +795,6 @@ namespace Sharpmake
                 {
                     [Default]
                     Disable,
-                    [DevEnvVersion(minimum = DevEnv.vs2013)]
                     Enable,
                 }
 
@@ -839,13 +839,11 @@ namespace Sharpmake
                     /// <summary>
                     /// Advanced Vector Extensions. (/arch:AVX)
                     /// </summary>
-                    [DevEnvVersion(minimum = DevEnv.vs2012)]
                     AdvancedVectorExtensions,
 
                     /// <summary>
                     /// Advanced Vector Extensions 2. (/arch:AVX2)
                     /// </summary>
-                    [DevEnvVersion(minimum = DevEnv.vs2013)]
                     AdvancedVectorExtensions2,
 
                     /// <summary>
@@ -857,7 +855,6 @@ namespace Sharpmake
                     /// <summary>
                     /// No Enhanced Instructions. (/arch:IA32)
                     /// </summary>
-                    [DevEnvVersion(minimum = DevEnv.vs2012)]
                     NoEnhancedInstructions,
                 }
 
@@ -1059,7 +1056,6 @@ namespace Sharpmake
                     /// <remarks>
                     /// Specifies the __vectorcall calling convention for all functions except C++ member functions and functions marked __cdecl, __fastcall, or __stdcall. All __vectorcall functions must have prototypes.
                     /// </remarks>
-                    [DevEnvVersion(minimum = DevEnv.vs2013)]
                     vectorcall
                 }
 

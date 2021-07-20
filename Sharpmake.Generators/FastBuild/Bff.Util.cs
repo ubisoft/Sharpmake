@@ -72,9 +72,12 @@ namespace Sharpmake.Generators.FastBuild
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                    return false;
+                if (ReferenceEquals(this, obj))
+                    return true;
+                if (obj.GetType() != GetType())
+                    return false;
 
                 return Equals((Unity)obj);
             }
@@ -443,18 +446,36 @@ namespace Sharpmake.Generators.FastBuild
         {
             switch (compilerFamily)
             {
-                case CompilerFamily.MSVC: return "msvc";
-                case CompilerFamily.Clang: return "clang";
-                case CompilerFamily.GCC: return "gcc";
-                case CompilerFamily.SNC: return "snc";
-                case CompilerFamily.CodeWarriorWii: return "codewarrior-wii";
-                case CompilerFamily.CudaNVCC: return "cuda-nvcc";
-                case CompilerFamily.QtRCC: return "qt-rcc";
-                case CompilerFamily.VBCC: return "vbcc";
-                case CompilerFamily.OrbisWavePsslc: return "orbis-wave-psslc";
-                case CompilerFamily.ClangCl: return "clang-cl";
-                case CompilerFamily.Auto: return string.Empty;
-                default: throw new Exception("Unrecognized compiler family");
+                case CompilerFamily.Auto:
+                    return string.Empty;
+                case CompilerFamily.MSVC:
+                    return "msvc";
+                case CompilerFamily.Clang:
+                    return "clang";
+                case CompilerFamily.GCC:
+                    return "gcc";
+                case CompilerFamily.SNC:
+                    return "snc";
+                case CompilerFamily.CodeWarriorWii:
+                    return "codewarrior-wii";
+                case CompilerFamily.GreenHillsWiiU:
+                    return "greenhills-wiiu";
+                case CompilerFamily.CudaNVCC:
+                    return "cuda-nvcc";
+                case CompilerFamily.QtRCC:
+                    return "qt-rcc";
+                case CompilerFamily.VBCC:
+                    return "vbcc";
+                case CompilerFamily.OrbisWavePsslc:
+                    return "orbis-wave-psslc";
+                case CompilerFamily.ClangCl:
+                    return "clang-cl";
+                case CompilerFamily.CSharp:
+                    return "csharp";
+                case CompilerFamily.Custom:
+                    return "custom";
+                default:
+                    throw new Exception("Unrecognized compiler family");
             }
         }
 
@@ -462,14 +483,22 @@ namespace Sharpmake.Generators.FastBuild
         {
             switch (linkerType)
             {
-                case CompilerSettings.LinkerType.CodeWarriorLd: return "codewarrior-ld";
-                case CompilerSettings.LinkerType.GCC: return "gcc";
-                case CompilerSettings.LinkerType.GreenHillsExlr: return "greenhills-exlr";
-                case CompilerSettings.LinkerType.MSVC: return "msvc";
-                case CompilerSettings.LinkerType.ClangOrbis: return "clang-orbis";
-                case CompilerSettings.LinkerType.SNCPS3: return "snc-ps3";
-                case CompilerSettings.LinkerType.Auto: return string.Empty;
-                default: throw new Exception("Unrecognized linker type");
+                case CompilerSettings.LinkerType.CodeWarriorLd:
+                    return "codewarrior-ld";
+                case CompilerSettings.LinkerType.GCC:
+                    return "gcc";
+                case CompilerSettings.LinkerType.GreenHillsExlr:
+                    return "greenhills-exlr";
+                case CompilerSettings.LinkerType.MSVC:
+                    return "msvc";
+                case CompilerSettings.LinkerType.ClangOrbis:
+                    return "clang-orbis";
+                case CompilerSettings.LinkerType.SNCPS3:
+                    return "snc-ps3";
+                case CompilerSettings.LinkerType.Auto:
+                    return string.Empty;
+                default:
+                    throw new Exception("Unrecognized linker type");
             }
         }
 
@@ -507,11 +536,11 @@ namespace Sharpmake.Generators.FastBuild
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
         }
 
-        internal static UniqueList<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
+        internal static List<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
         {
             var dependencies = new UniqueList<Project.Configuration>();
             GetOrderedFlattenedProjectDependenciesInternal(conf, dependencies, allDependencies, fuDependencies);
-            return dependencies;
+            return dependencies.OrderBy(c => c.ProjectGuid).ToList();
         }
 
         private static void GetOrderedFlattenedProjectDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies, bool allDependencies, bool fuDependencies)
@@ -552,11 +581,11 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        internal static UniqueList<Project.Configuration> GetOrderedFlattenedBuildOnlyDependencies(Project.Configuration conf)
+        internal static List<Project.Configuration> GetOrderedFlattenedBuildOnlyDependencies(Project.Configuration conf)
         {
             var dependencies = new UniqueList<Project.Configuration>();
             GetOrderedFlattenedBuildOnlyDependenciesInternal(conf, dependencies);
-            return dependencies;
+            return dependencies.OrderBy(c => c.ProjectGuid).ToList();
         }
 
         private static void GetOrderedFlattenedBuildOnlyDependenciesInternal(Project.Configuration conf, UniqueList<Project.Configuration> dependencies)

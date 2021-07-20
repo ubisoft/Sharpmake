@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2019 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,14 +24,17 @@ namespace ConfigureOrdering
             get
             {
                 if (s_defaultTarget == null)
+                {
                     s_defaultTarget = new Target(
-                                        Platform.win32,
-                                        DevEnv.vs2017,
-                                        Optimization.Release,
-                                        OutputType.Lib,
-                                        Blob.NoBlob,
-                                        BuildSystem.MSBuild,
-                                        DotNetFramework.v4_6_2);
+                        Platform.win32,
+                        DevEnv.vs2017,
+                        Optimization.Release,
+                        OutputType.Lib,
+                        Blob.NoBlob,
+                        BuildSystem.MSBuild,
+                        DotNetFramework.v4_6_2
+                    );
+                }
                 return s_defaultTarget;
             }
         }

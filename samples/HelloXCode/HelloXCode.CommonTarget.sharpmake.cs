@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ namespace HelloXCode
                 if (DevEnv != DevEnv.xcode4ios)
                     dirNameParts.Add(DevEnv.ToString());
 
-                return string.Join("_", dirNameParts);
+                return string.Join("_", dirNameParts).ToLowerInvariant();
             }
         }
 

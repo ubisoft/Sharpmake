@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Sharpmake;
-using Sharpmake.Generators.JsonCompilationDatabase;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Sharpmake;
+using Sharpmake.Generators.JsonCompilationDatabase;
 
 namespace CompileDataBaseCommand
 {
@@ -116,6 +116,8 @@ namespace CompileDataBaseCommand
             // Generally you should only generate either for projets or solution but this is a sample so we do both ;)
             arguments.Builder.EventPostProjectLink += GenerateProjectDatabase;
             arguments.Builder.EventPostSolutionLink += GenerateSolutionDatabase;
+
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
 
             arguments.Generate<MainSolution>();
         }

@@ -2,14 +2,16 @@
 #include "privatewidget.h"
 #include <cmath>
 
-class QPrivateWidgetChildren
+class QPrivateWidgetChildren: public QWidget
 {
     Q_OBJECT
 public:
     QPrivateWidgetChildren() {}
 };
 
-QPrivateWidget(QWidget *parent /* = 0 */) : QWidget(parent), chilren(nullptr)
+QPrivateWidget::QPrivateWidget(QWidget *parent /* = 0 */)
+    : QWidget(parent)
+    , children(nullptr)
 {
 }
 

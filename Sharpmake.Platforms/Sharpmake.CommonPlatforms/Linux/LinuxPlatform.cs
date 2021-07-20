@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,17 +49,27 @@ namespace Sharpmake
 
             #region Project.Configuration.IConfigurationTasks implementation
 
-            public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+            // The below method was replaced by GetDefaultOutputFullExtension
+            // string GetDefaultOutputExtension(OutputType outputType);
+
+            public string GetDefaultOutputFullExtension(Project.Configuration.OutputType outputType)
             {
                 switch (outputType)
                 {
                     case Project.Configuration.OutputType.Exe:
-                        return string.Empty;
+                        return ExecutableFileFullExtension;
                     case Project.Configuration.OutputType.Dll:
-                        return "so";
+                        return SharedLibraryFileFullExtension;
                     default:
-                        return "a";
+                        return StaticLibraryFileFullExtension;
                 }
+            }
+
+            public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
+            {
+                if (outputType != Project.Configuration.OutputType.Exe)
+                    return "lib";
+                return string.Empty;
             }
 
             public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration conf)
@@ -79,14 +89,14 @@ namespace Sharpmake
                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                         configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                        configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
                 }
                 else
                 {
                     if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                         configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullName, dependency.TargetFileOrderNumber);
+                        configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
                 }
             }
 
@@ -98,20 +108,13 @@ namespace Sharpmake
             #endregion
 
             #region IPlatformVcxproj implementation
-            public override string ProgramDatabaseFileExtension => string.Empty;
-            public override string StaticLibraryFileExtension => "a";
-            public override string SharedLibraryFileExtension => "so";
-            public override string StaticOutputLibraryFileExtension => string.Empty;
-            public override string ExecutableFileExtension => string.Empty;
+            public override string ProgramDatabaseFileFullExtension => string.Empty;
+            public override string StaticLibraryFileFullExtension => ".a";
+            public override string SharedLibraryFileFullExtension => ".so";
+            public override string StaticOutputLibraryFileFullExtension => string.Empty;
+            public override string ExecutableFileFullExtension => string.Empty;
 
             // Ideally the object files should be suffixed .o when compiling with FastBuild, using the CompilerOutputExtension property in ObjectLists
-
-            public override string GetOutputFileNamePrefix(IGenerationContext context, Project.Configuration.OutputType outputType)
-            {
-                if (outputType != Project.Configuration.OutputType.Exe)
-                    return "lib";
-                return string.Empty;
-            }
 
             public override void SetupPlatformToolsetOptions(IGenerationContext context)
             {
@@ -268,15 +271,15 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = "-Wl --enc"; }),
+                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = "-Wl,--enc"; }),
                 Sharpmake.Options.Option(Options.Linker.EditAndContinue.Disable, () => { options["EditAndContinue"] = "false"; cmdLineOptions["EditAndContinue"] = FileGeneratorUtilities.RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
                 Sharpmake.Options.Option(Options.Linker.InfoStripping.None, () => { options["InfoStripping"] = "None"; cmdLineOptions["InfoStripping"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = "-Wl -S"; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = "-Wl -s"; })
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-S"; }),
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-s"; })
                 );
 
                 context.SelectOption
@@ -405,11 +408,6 @@ namespace Sharpmake
             {
                 generator.Write(_compilerExtraOptions);
                 generator.Write(_compilerOptimizationOptions);
-            }
-
-            public override bool AddLibPrefix(Configuration conf)
-            {
-                return true;
             }
 
             public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)

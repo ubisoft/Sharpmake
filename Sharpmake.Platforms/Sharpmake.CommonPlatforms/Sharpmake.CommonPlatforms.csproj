@@ -57,7 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Android\AndroidBuildTargets.cs" />
+    <Compile Include="Android\AndroidFragments.cs" />
     <Compile Include="Android\AndroidPlatform.Vcxproj.Template.cs" />
     <Compile Include="Android\AndroidPlatform.cs" />
     <Compile Include="Android\GlobalSettings.cs" />

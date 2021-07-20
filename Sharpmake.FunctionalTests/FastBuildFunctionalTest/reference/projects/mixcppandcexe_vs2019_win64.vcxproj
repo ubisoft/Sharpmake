@@ -33,7 +33,7 @@
     <ProjectName>MixCppAndCExe</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
@@ -89,9 +89,9 @@
     <OutDir>output\debug_fastbuild_noblob_vs2019\</OutDir>
     <IntDir>build\debug_fastbuild_noblob_vs2019\mixcppandcexe\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
 del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
 del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
@@ -104,15 +104,14 @@ del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.lib" >NUL 2>NUL
 del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
     <OutDir>output\debug_fastbuild_vs2019\</OutDir>
     <IntDir>build\debug_fastbuild_vs2019\mixcppandcexe\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe MixCppAndCExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean MixCppAndCExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
 del "build\debug_fastbuild_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
 del "build\debug_fastbuild_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
@@ -125,7 +124,6 @@ del "output\debug_fastbuild_vs2019\mixcppandcexe.lib" >NUL 2>NUL
 del "output\debug_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
     <TargetName>mixcppandcexe</TargetName>
@@ -142,9 +140,9 @@ del "output\debug_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanComm
     <OutDir>output\release_fastbuild_noblob_vs2019\</OutDir>
     <IntDir>build\release_fastbuild_noblob_vs2019\mixcppandcexe\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
 del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
 del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
@@ -157,15 +155,14 @@ del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.lib" >NUL 2>NUL
 del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
     <OutDir>output\release_fastbuild_vs2019\</OutDir>
     <IntDir>build\release_fastbuild_vs2019\mixcppandcexe\</IntDir>
     <NMakeBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe MixCppAndCExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
-$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe -clean MixCppAndCExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
 del "build\release_fastbuild_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
 del "build\release_fastbuild_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
@@ -178,7 +175,6 @@ del "output\release_fastbuild_vs2019\mixcppandcexe.lib" >NUL 2>NUL
 del "output\release_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
-    <TargetFileName>mixcppandcexe.exe</TargetFileName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
     <TargetName>mixcppandcexe</TargetName>
@@ -224,7 +220,6 @@ del "output\release_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -307,7 +302,6 @@ del "output\release_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCo
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>

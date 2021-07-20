@@ -340,6 +340,7 @@ namespace Sharpmake.Generators.FastBuild
                                 // use the global root for alias computation, as the project has not idea in which master bff it has been included
                                 var destinationRelativeToGlobal = Util.GetConvertedRelativePath(masterBffDirectory, destinationFolder, conf.Project.RootPath, true, conf.Project.RootPath);
 
+                                if (FastBuildSettings.FastBuildValidateCopyFiles)
                                 {
                                     string key = sourceFileName + destinationRelativeToGlobal;
                                     string currentSourceFullPath = Util.PathGetAbsolute(masterBffDirectory, sourceFile);
@@ -640,14 +641,6 @@ namespace Sharpmake.Generators.FastBuild
                     fastBuildCompilerUseRelativePaths = "true";
                 }
 
-                string fastBuildVS2012EnumBugWorkaround = FileGeneratorUtilities.RemoveLineTag;
-                if (FastBuildSettings.EnableVS2012EnumBugWorkaround &&
-                    compilerSettings.DevEnv == DevEnv.vs2012 &&
-                    compilerPlatform.HasFlag(Platform.win64))
-                {
-                    fastBuildVS2012EnumBugWorkaround = ".VS2012EnumBugFix = true";
-                }
-
                 string fastBuildCompilerAdditionalSettings = FileGeneratorUtilities.RemoveLineTag;
                 if (FastBuildSettings.AdditionalCompilerSettings.TryGetValue(compiler.Key, out IList<string> extraOptions) &&
                     extraOptions.Any())
@@ -661,7 +654,6 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28) : FileGeneratorUtilities.RemoveLineTag))
                 using (masterBffGenerator.Declare("fastBuildCompilerFamily", string.IsNullOrEmpty(fastBuildCompilerFamily) ? FileGeneratorUtilities.RemoveLineTag : fastBuildCompilerFamily))
                 using (masterBffGenerator.Declare("fastBuildCompilerUseRelativePaths", fastBuildCompilerUseRelativePaths))
-                using (masterBffGenerator.Declare("fastBuildVS2012EnumBugWorkaround", fastBuildVS2012EnumBugWorkaround))
                 using (masterBffGenerator.Declare("fastBuildCompilerAdditionalSettings", fastBuildCompilerAdditionalSettings))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);

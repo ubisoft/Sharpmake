@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using NUnit.Framework;
 using System.IO;
+using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {
@@ -264,10 +264,7 @@ namespace Sharpmake.UnitTests
 
                 foreach (var dependency in conf.DotNetPublicDependencies)
                 {
-                    if (dependency.Configuration.Project.GetType() == typeof(CSharpTestProjects.CSharpNoDependencyProject2))
-                        Assert.False(dependency.ReferenceOutputAssembly);
-                    else
-                        Assert.IsNull(dependency.ReferenceOutputAssembly);
+                    Assert.IsNull(dependency.ReferenceOutputAssembly);
                 }
             }
         }
