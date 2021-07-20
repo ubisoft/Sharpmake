@@ -2666,7 +2666,6 @@ namespace Sharpmake
         /// <remarks>
         /// It is an error if the specified type can't be found in the configuration dependencies.
         /// </remarks>
-            
         public Type AppLibType { get; set; }
 
         public AndroidPackageProject() : this(typeof(Target))
