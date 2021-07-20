@@ -30,6 +30,7 @@ namespace HelloAndroid
             base.ConfigureAll(conf, target);
 
             conf.AddProject<ExePackaging>(target);
+			conf.StartupProject = conf.GetProject(typeof(ExePackaging));
         }
     }
 }
