@@ -1,3 +1,4 @@
+SET
 @echo off
 :: Batch arguments:
 :: %~1 Main sharpmake file
