@@ -1306,7 +1306,8 @@ namespace Sharpmake.Generators.FastBuild
                                         using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies, 15)))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
-                                            bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
+                                            if (!project.IsFastBuildAll)
+                                                bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
                                         }
                                     }
                                     break;
