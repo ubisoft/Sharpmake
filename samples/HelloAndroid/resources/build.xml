@@ -26,8 +26,8 @@
     <!-- if sdk.dir was not set from one of the property file, then
          get it from the ANDROID_HOME env var. -->
     <property environment="env" />
-    <condition property="sdk.dir" value="${env.ANT_HOME}">
-        <isset property="env.ANT_HOME" />
+    <condition property="sdk.dir" value="${env.ANDROID_HOME}">
+        <isset property="env.ANDROID" />
     </condition>
 
     <!-- The project.properties file contains project specific properties such as 
@@ -77,6 +77,6 @@
          in order to avoid having your file be overridden by tools such as "android update project"
     -->
     <!-- version-tag: 1 -->
-    <import file="${sdk.dir}/build.xml" />
+    <import file="${sdk.dir}/tools/ant/build.xml" optional="true"/>
 
 </project>
