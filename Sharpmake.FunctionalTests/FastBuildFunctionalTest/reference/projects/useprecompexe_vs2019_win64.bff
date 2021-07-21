@@ -24,7 +24,7 @@ Unity( 'UsePrecompExe_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -116,7 +116,7 @@ ObjectList( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -196,7 +196,7 @@ ObjectList( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\useprecompexe\'
     .Libraries              = {
                                   'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_0_objects',
@@ -280,7 +280,7 @@ Alias( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -373,7 +373,7 @@ ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -454,7 +454,7 @@ ObjectList( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\useprecompexe\'
     .Libraries              = {
                                   'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects',
@@ -538,7 +538,7 @@ Alias( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -627,7 +627,7 @@ ObjectList( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -707,7 +707,7 @@ ObjectList( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\useprecompexe\'
     .Libraries              = {
                                   'UsePrecompExe_Debug_FastBuild_vs2019_win64_0_objects',
@@ -791,7 +791,7 @@ Alias( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Release_FastBuild_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -881,7 +881,7 @@ ObjectList( 'UsePrecompExe_Release_FastBuild_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'UsePrecompExe_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\useprecompexe\'
 
     .CompilerExtraOptions   = ''
@@ -962,7 +962,7 @@ ObjectList( 'UsePrecompExe_Release_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'UsePrecompExe_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\useprecompexe\'
     .Libraries              = {
                                   'UsePrecompExe_Release_FastBuild_vs2019_win64_0_objects',

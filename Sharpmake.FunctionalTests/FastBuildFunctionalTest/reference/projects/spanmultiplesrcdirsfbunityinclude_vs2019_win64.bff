@@ -30,7 +30,7 @@ Unity( 'SpanMultipleSrcDirsFBUnityInclude_unity' )
 //=================================================================================================================
 ObjectList( 'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\'
 
     .CompilerExtraOptions   = ''
@@ -108,7 +108,7 @@ ObjectList( 'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64_obje
 //=================================================================================================================
 Executable( 'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\'
     .Libraries              = 'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude.exe'
@@ -189,7 +189,7 @@ Alias( 'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64_LibraryDe
 //=================================================================================================================
 ObjectList( 'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\'
 
     .CompilerExtraOptions   = ''
@@ -268,7 +268,7 @@ ObjectList( 'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64_ob
 //=================================================================================================================
 Executable( 'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude\'
     .Libraries              = 'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityinclude.exe'

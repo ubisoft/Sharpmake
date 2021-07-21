@@ -22,7 +22,7 @@ Unity( 'MixCppAndCExe_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -98,7 +98,7 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -174,7 +174,7 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\mixcppandcexe\'
     .Libraries              = {
                                   'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_0_objects',
@@ -258,7 +258,7 @@ Alias( 'MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -335,7 +335,7 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -412,7 +412,7 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\mixcppandcexe\'
     .Libraries              = {
                                   'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_0_objects',
@@ -496,7 +496,7 @@ Alias( 'MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -572,7 +572,7 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -648,7 +648,7 @@ ObjectList( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\mixcppandcexe\'
     .Libraries              = {
                                   'MixCppAndCExe_Debug_FastBuild_vs2019_win64_0_objects',
@@ -732,7 +732,7 @@ Alias( 'MixCppAndCExe_Debug_FastBuild_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_0_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -809,7 +809,7 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_0_objects' )
 //=================================================================================================================
 ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\mixcppandcexe\'
 
     .CompilerExtraOptions   = ''
@@ -886,7 +886,7 @@ ObjectList( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'MixCppAndCExe_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\mixcppandcexe\'
     .Libraries              = {
                                   'MixCppAndCExe_Release_FastBuild_vs2019_win64_0_objects',
