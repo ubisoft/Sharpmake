@@ -455,7 +455,6 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
     [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
-
 ";
 
                 public static string EndSection = "}\n\n";
