@@ -509,6 +509,7 @@ namespace Sharpmake.Generators.FastBuild
                         Strings preBuildTargets = new Strings();
 
                         var fastBuildTargetSubTargets = new List<string>();
+                        var fastBuildTargetLibraryDependencies = new List<string>();
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
                             {
@@ -545,7 +546,9 @@ namespace Sharpmake.Generators.FastBuild
 
                             if (conf.Output == Project.Configuration.OutputType.Lib && useObjectLists)
                             {
-                                fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_objects");
+                                string objectList = fastBuildOutputFileShortName + "_objects";
+                                fastBuildTargetLibraryDependencies.Add(objectList);
+                                fastBuildTargetSubTargets.Add(objectList);
                             }
                             else if (conf.Output == Project.Configuration.OutputType.None && project.IsFastBuildAll)
                             {
@@ -556,7 +559,9 @@ namespace Sharpmake.Generators.FastBuild
                             }
                             else
                             {
-                                fastBuildTargetSubTargets.Add(fastBuildOutputFileShortName + "_" + outputType);
+                                string targetId = fastBuildOutputFileShortName + "_" + outputType;
+                                fastBuildTargetLibraryDependencies.Add(targetId);
+                                fastBuildTargetSubTargets.Add(targetId);
                             }
 
                             if (isLastSubConfig) // post-build steps on the last subconfig
@@ -608,6 +613,8 @@ namespace Sharpmake.Generators.FastBuild
 
                                     if (!fastBuildTargetSubTargets.Contains(subTarget))
                                         fastBuildTargetSubTargets.Add(subTarget);
+                                    if (!fastBuildTargetLibraryDependencies.Contains(subTarget))
+                                        fastBuildTargetLibraryDependencies.Add(subTarget);
                                 }
                             }
                         }
@@ -1282,6 +1289,7 @@ namespace Sharpmake.Generators.FastBuild
                                                 string genLibName = "'" + fastBuildOutputFileShortName + "_" + outputType + "'";
                                                 using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
                                                 using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
+                                                using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies, 15)))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
@@ -1295,7 +1303,7 @@ namespace Sharpmake.Generators.FastBuild
                                         // Write Target Alias
                                         using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
                                         using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
-                                        using (bffGenerator.Declare("fastBuildOutputType", outputType))
+                                        using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies, 15)))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                             bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);

@@ -472,7 +472,7 @@ Alias( '[fastBuildOutputFileShortName]' )
 //=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
 {
-    .Targets = '[fastBuildOutputFileShortName]_[fastBuildOutputType]'
+    .Targets = [fastBuildTargetLibraryDependencies]
 }
 
 ";
