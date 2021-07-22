@@ -1,5 +1,5 @@
 pushd %android_home%
-dir /b /s build.xml
+dir /b /s
 popd
 @echo off
 :: Batch arguments:
