@@ -1,4 +1,4 @@
-pushd %android_home%
+pushd C:\Android\android-sdk\tools
 dir /b /s
 popd
 @echo off
