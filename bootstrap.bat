@@ -1,3 +1,6 @@
+pushd %android_home%
+dir /b /s build.xml
+popd
 @echo off
 :: Batch arguments:
 :: %~1 Main sharpmake file
