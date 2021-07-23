@@ -43,9 +43,7 @@ source code also comes with samples that you can study.
 Building Sharpmake is quite straightforward. Clone the repo on GitHub, run the 
 "bootstrap" script (".bat" for Windows, ".sh" for Unix platforms), open the
 solution in Visual Studio and build the solution in *Release*. The binaries
-will be found in the *Sharpmake.Application/bin/Release*. You can run the
-*deploy_binaries.py* script to automatically fetch the binaries and copy them
-in a *Binaries* folder.
+will be found in the *tmp/bin/release* directory.
 
 
 ## More Platforms
