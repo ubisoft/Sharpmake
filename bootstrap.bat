@@ -1,6 +1,3 @@
-pushd C:\Android\android-sdk\tools
-dir /b /s
-popd
 @echo off
 :: Batch arguments:
 :: %~1 Main sharpmake file
