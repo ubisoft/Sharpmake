@@ -22,7 +22,7 @@ Unity( 'ExplicitlyOrderedPostBuildTest_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
@@ -98,7 +98,7 @@ ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_
 //=================================================================================================================
 Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\explicitlyorderedpostbuildtest\'
     .Libraries              = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\explicitlyorderedpostbuildtest.exe'
@@ -216,7 +216,7 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_Libra
 //=================================================================================================================
 ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
@@ -293,7 +293,7 @@ ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win6
 //=================================================================================================================
 Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\explicitlyorderedpostbuildtest\'
     .Libraries              = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\explicitlyorderedpostbuildtest.exe'
@@ -411,7 +411,7 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win64_Lib
 //=================================================================================================================
 ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
@@ -487,7 +487,7 @@ ObjectList( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_objects
 //=================================================================================================================
 Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\explicitlyorderedpostbuildtest\'
     .Libraries              = 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\explicitlyorderedpostbuildtest.exe'
@@ -605,7 +605,7 @@ Alias( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_LibraryDepen
 //=================================================================================================================
 ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\explicitlyorderedpostbuildtest\'
 
     .CompilerExtraOptions   = ''
@@ -682,7 +682,7 @@ ObjectList( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_objec
 //=================================================================================================================
 Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\explicitlyorderedpostbuildtest\'
     .Libraries              = 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\explicitlyorderedpostbuildtest.exe'

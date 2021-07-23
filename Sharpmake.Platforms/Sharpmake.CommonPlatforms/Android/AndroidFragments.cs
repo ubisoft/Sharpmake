@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,13 @@ namespace Sharpmake
             arm64_v8a = 1 << 1,
             x86 = 1 << 2,
             x86_64 = 1 << 3,
+        }
+
+        [Fragment, Flags]
+        public enum AndroidBuildType
+        {
+            Ant = 1 << 0,
+            Gradle = 1 << 1
         }
     }
 }

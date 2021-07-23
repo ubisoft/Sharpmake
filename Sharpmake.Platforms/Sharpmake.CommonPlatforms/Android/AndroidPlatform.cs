@@ -244,6 +244,9 @@ namespace Sharpmake
 
                 var sdkIncludePaths = GetSdkIncludePaths(context);
                 options["IncludePath"] = sdkIncludePaths.JoinStrings(";");
+
+                var androidBuildType = GetBuildTypeString(context);
+                options["androidBuildType"] = androidBuildType;
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -539,6 +542,25 @@ namespace Sharpmake
                 androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include\" + archIncludePath);
 
                 return androidIncludePaths;
+            }
+
+            private string GetBuildTypeString(IGenerationContext context)
+            {
+                var conf = context.Configuration;
+
+                AndroidBuildType buildType = AndroidBuildType.Ant;
+                conf.Target.TryGetFragment<Sharpmake.Android.AndroidBuildType>(out buildType);
+
+                switch (buildType)
+                {
+                    // To build using Ant the AndroidBuiltType must not exist in the Android vsproj
+                    case AndroidBuildType.Ant:
+                        return FileGeneratorUtilities.RemoveLineTag;
+                    case AndroidBuildType.Gradle:
+                        return "Gradle";
+                    default:
+                        throw new System.Exception(string.Format("Unsupported Android build type: {0}", buildType));
+                }
             }
 
             #endregion // IPlatformVcxproj implementation
