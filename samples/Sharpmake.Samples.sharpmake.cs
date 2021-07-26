@@ -118,6 +118,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class CustomBuildStepProject : SampleProject
+    {
+        public CustomBuildStepProject()
+        {
+            Name = "CustomBuildStep";
+        }
+    }
+
+    [Generate]
     public class DotNetCoreFrameworkHelloWorldProject : SampleProject
     {
         public DotNetCoreFrameworkHelloWorldProject()
