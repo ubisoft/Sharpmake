@@ -261,6 +261,7 @@ namespace Sharpmake.Generators.FastBuild
             int configIndex = 0;
 
             var defaultTuple = GetDefaultTupleConfig();
+            var allFileCustomBuild = new Dictionary<string, Project.Configuration.CustomFileBuildStepData>();
 
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
@@ -942,6 +943,30 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildEmbeddedResources = UtilityMethods.FBuildFormatList(fastbuildEmbeddedResourceFilesList, 30);
                         }
 
+                        var fileCustomBuildKeys = new Strings();
+                        UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
+                            key =>
+                            {
+                                if (!allFileCustomBuild.TryGetValue(key.Description, out var alreadyRegistered))
+                                {
+                                    allFileCustomBuild.Add(key.Description, key);
+                                    bffGenerator.Write(Template.ConfigurationFile.GenericExecutableSection);
+                                }
+                                else if (key.Executable != alreadyRegistered.Executable ||
+                                        key.KeyInput != alreadyRegistered.KeyInput ||
+                                        key.Output != alreadyRegistered.Output ||
+                                        key.ExecutableArguments != alreadyRegistered.ExecutableArguments)
+                                {
+                                    throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExecutableSection)));
+                                }
+
+                                fileCustomBuildKeys.Add(key.Description);
+
+                                return false;
+                            });
+
+                        fastBuildBuildOnlyDependencies.AddRange(fileCustomBuildKeys);
+
                         Strings fastBuildPreBuildDependencies = new Strings();
                         var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
                         fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
@@ -1243,24 +1268,6 @@ namespace Sharpmake.Generators.FastBuild
                                             }
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
-
-                                            var fileCustomBuildKeys = new Strings();
-                                            UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
-                                                key =>
-                                                {
-                                                    if (!fileCustomBuildKeys.Contains(key))
-                                                    {
-                                                        fileCustomBuildKeys.Add(key);
-                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExecutableSection);
-                                                    }
-                                                    else
-                                                    {
-                                                        throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExecutableSection)));
-                                                    }
-                                                    return false;
-                                                });
-
-                                            fastBuildProjectDependencies.AddRange(fileCustomBuildKeys);
 
                                             // Resolve node name of the prebuild dependency for PostBuildEvents.
                                             string resolvedSectionNodeIdentifier;

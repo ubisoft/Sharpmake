@@ -159,6 +159,14 @@ jobs:
           & $env:SHARPMAKE_EXE "/sources('CSharpVsix.sharpmake.cs')"
           & $env:COMPILE_BATCH projects\CSharpVsixSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
 
+      - name: CustomBuildStep ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/CustomBuildStep'
+        run: | 
+          & $env:SHARPMAKE_EXE "/sources('CustomBuildStep.sharpmake.cs')"
+          & $env:COMPILE_BATCH projects\custombuildstepsolution_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
+          projects\output\win64\${{ matrix.configuration }}\custombuildstep.exe
+
       - name: CSharpWCF ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         working-directory: 'samples/CSharpWCF'
