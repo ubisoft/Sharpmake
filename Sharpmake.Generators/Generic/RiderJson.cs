@@ -12,7 +12,7 @@ namespace Sharpmake.Generators.Generic
     /// <summary>
     /// Generator for Rider project model json files.
     /// </summary>
-    public partial class R4UE : IProjectGenerator
+    public partial class RiderJson : IProjectGenerator
     {
         /// <summary>
         /// Callback which should be added to <see cref="Builder.EventPostGeneration"/> in order to generate Rider project model.
@@ -21,7 +21,7 @@ namespace Sharpmake.Generators.Generic
         {
             var builder = Builder.Instance;
             var riderFolder = Path.Combine(solutions.First().SharpmakeCsPath, ".Rider");
-            var generator = new R4UE();
+            var generator = new RiderJson();
             var configs = solutions.First().Configurations.ToList();
             
             // Do not move. Acquires all the information about projects for later usage in "Modules" sections.

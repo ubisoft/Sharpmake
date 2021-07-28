@@ -1,6 +1,6 @@
 ﻿namespace Sharpmake.Generators.Generic
 {
-    public partial class R4UE
+    public partial class RiderJson
     {
         public static class Template
         {

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sharpmake.Generators.Generic
 {
-    public static class R4UeUtil
+    public static class RiderJsonUtil
     {
         public static bool CheckOptions(this Project.Configuration config, params object[] options)
         {
