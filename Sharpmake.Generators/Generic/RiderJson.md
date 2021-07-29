@@ -8,7 +8,14 @@ and their configurations;
 The following is the mapping of Sharpmake properties to Rider Json.
 
 ## Relations between Sharpmake and Rider Json properties
-### General
+### Solution
+| Sharpmake | Rider Json |
+| --------- | ---------- |
+| ``Solution.Configuration.IncludedProjectInfo.Configuration`` | ``ProjectConfig`` |
+| ``Solution.Configuration`` | ``SolutionConfig`` |
+| ``Solution.Configuration.IncludedProjectInfo.ToBuild`` | ``DoBuild`` |
+
+### Project
 | Sharpmake | Rider Json |
 | --------- | ---------- |
 | ``Project.Configuration.ProjectName`` | ``Name`` |

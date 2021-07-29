@@ -218,48 +218,36 @@ namespace Sharpmake.Generators.Generic
                 return fastBuildCommandLineOptions;
             }
         }
-        
-        private void GenerateConfOptions(RiderGenerationContext context)
-        {
-            var projectOptionsGen = new ProjectOptionsGenerator();
-            projectOptionsGen.GenerateOptions(context);
-        }
-        
+
         /// <summary>
         /// Generates "root.json" file, gathers information about projects for later usage in "Modules" section.
         /// </summary>
         public void Generate(Builder builder, List<Project> projects, List<Solution.Configuration> configurations, string rootFile, List<string> generatedFiles,
             List<string> skipFiles)
         {
-            var info = new OrderedDictionary();
-            foreach (var project in projects)
-            {
-                var riderProjInfo = new RiderProjectInfo(project.Name);
-                var projInfo = new Dictionary<string, List<string>>();
-
-                foreach (var config in project.Configurations)
-                {
-                    riderProjInfo.ReadConfiguration(config);
-                    if (!projInfo.ContainsKey(config.Platform.ToString()))
-                    {
-                        
-                        projInfo.Add(config.Platform.ToString(), new List<string>());
-                    }
-                    
-                    projInfo[config.Platform.ToString()].Add(config.Name);
-                }
-                
-                _projectsInfo.Add(riderProjInfo.Name, riderProjInfo);
-                info.Add(project.Name, projInfo);
-            }
+            var projectsInfo = ReadProjects(projects);
             
+            foreach (var solutionConfig in configurations)
+            {
+                foreach (var proj in solutionConfig.IncludedProjectInfos)
+                {
+                    var projInfo = projectsInfo[proj.Project.Name] as Dictionary<string, List<object>>;
+                    var projConfig = new Dictionary<string, string>();
+                    projConfig.Add("ProjectConfig", proj.Configuration.Name);
+                    projConfig.Add("SolutionConfig", solutionConfig.Name);
+                    projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
+
+                    projInfo[proj.Configuration.Platform.ToString()].Add(projConfig);
+                }
+            }
+
             var file = new FileInfo(rootFile);
 
             using (var stream = new MemoryStream())
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
             using (var serializer = new Util.JsonSerializer(writer) { IsOutputFormatted = true })
             {
-                serializer.Serialize(info);
+                serializer.Serialize(projectsInfo);
                 serializer.Flush();
 
                 if (builder.Context.WriteGeneratedFile(null, file, stream))
@@ -272,7 +260,29 @@ namespace Sharpmake.Generators.Generic
                 }
             }
         }
-        
+
+        private OrderedDictionary ReadProjects(List<Project> projects)
+        {
+            var info = new OrderedDictionary();
+            foreach (var project in projects) {
+                var riderProjInfo = new RiderProjectInfo(project.Name);
+                var initialProjectInfo = new Dictionary<string, List<object>>();
+
+                foreach (var config in project.Configurations) {
+                    riderProjInfo.ReadConfiguration(config);
+                    if (!initialProjectInfo.ContainsKey(config.Platform.ToString())) {
+                        initialProjectInfo.Add(config.Platform.ToString(), new List<object>());
+                    }
+                }
+
+                info.Add(project.Name, initialProjectInfo);
+
+                _projectsInfo.Add(riderProjInfo.Name, riderProjInfo);
+            }
+
+            return info;
+        }
+
         /// <summary>
         /// Generates all <paramref name="project"/>-related configuration files.
         /// </summary>
@@ -282,7 +292,8 @@ namespace Sharpmake.Generators.Generic
             foreach (var config in configurations)
             {
                 var context = new RiderGenerationContext(builder, project, config, projectFile);
-                GenerateConfOptions(context);
+                var projectOptionsGen = new ProjectOptionsGenerator();
+                projectOptionsGen.GenerateOptions(context);
                 GenerateConfiguration(context, generatedFiles, skipFiles);
             }
         }
