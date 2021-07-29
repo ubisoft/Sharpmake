@@ -14,18 +14,21 @@ namespace Sharpmake.Generators.Generic
     /// </summary>
     public partial class RiderJson : IProjectGenerator
     {
+        public static string SolutionName = null;
+        
         /// <summary>
         /// Callback which should be added to <see cref="Builder.EventPostGeneration"/> in order to generate Rider project model.
         /// </summary>
         public static void PostGenerationCallback(List<Project> projects, List<Solution> solutions)
         {
             var builder = Builder.Instance;
-            var riderFolder = Path.Combine(solutions.First().SharpmakeCsPath, ".Rider");
+            var solution = solutions.FirstOrDefault(it => it.Name == SolutionName) ?? solutions.First();
+            var riderFolder = Path.Combine(solution.SharpmakeCsPath, ".Rider");
             var generator = new RiderJson();
-            var configs = solutions.First().Configurations.ToList();
+            var configs = solution.Configurations.ToList();
             
             // Do not move. Acquires all the information about projects for later usage in "Modules" sections.
-            generator.Generate(builder, projects, configs, Path.Combine(riderFolder, "root.json"), new List<string>(),
+            generator.Generate(builder, configs, Path.Combine(riderFolder, "root.json"), new List<string>(),
                                new List<string>());
             
             foreach (var project in projects)
@@ -47,6 +50,7 @@ namespace Sharpmake.Generators.Generic
             public Strings PrivateIncludePaths { get; }
             public Strings PublicDefinitions { get; }
             public Strings PrivateDefinitions { get; }
+            public Strings Configurations { get; }
 
             public RiderProjectInfo(string projectName)
             {
@@ -56,6 +60,7 @@ namespace Sharpmake.Generators.Generic
                 PrivateIncludePaths = new Strings();
                 PublicDefinitions = new Strings();
                 PrivateDefinitions = new Strings();
+                Configurations = new Strings();
             }
 
             /// <summary>
@@ -68,6 +73,7 @@ namespace Sharpmake.Generators.Generic
                 PrivateIncludePaths.AddRange(config.IncludePrivatePaths);
                 PublicDefinitions.AddRange(config.ExportDefines);
                 PrivateDefinitions.AddRange(config.Defines);
+                Configurations.Add(config.Name);
             }
 
             /// <summary>
@@ -220,24 +226,40 @@ namespace Sharpmake.Generators.Generic
         }
 
         /// <summary>
-        /// Generates "root.json" file, gathers information about projects for later usage in "Modules" section.
+        /// Generates "root.json" file for <see cref="SolutionName"/> solution.
+        /// Also gathers information about projects for later usage in "Modules" section.
         /// </summary>
-        public void Generate(Builder builder, List<Project> projects, List<Solution.Configuration> configurations, string rootFile, List<string> generatedFiles,
+        public void Generate(Builder builder, List<Solution.Configuration> configurations, string rootFile, List<string> generatedFiles,
             List<string> skipFiles)
         {
-            var projectsInfo = ReadProjects(projects);
-            
+            var info = new OrderedDictionary();
+ 
             foreach (var solutionConfig in configurations)
             {
                 foreach (var proj in solutionConfig.IncludedProjectInfos)
                 {
-                    var projInfo = projectsInfo[proj.Project.Name] as Dictionary<string, List<object>>;
+                    if (!info.Contains(proj.Project.Name))
+                    {
+                        info.Add(proj.Project.Name, new Dictionary<string, List<object>>());
+                        _projectsInfo.Add(proj.Project.Name, new RiderProjectInfo(proj.Project.Name));
+                    }
+                    
+                    var riderProjInfo = _projectsInfo[proj.Project.Name];
+                    riderProjInfo.ReadConfiguration(proj.Configuration);
+                    
+                    var projObject = info[riderProjInfo.Name] as Dictionary<string, List<object>>;
                     var projConfig = new Dictionary<string, string>();
-                    projConfig.Add("ProjectConfig", proj.Configuration.Name);
+
+                    projConfig.Add("ProjectConfig", riderProjInfo.Name);
                     projConfig.Add("SolutionConfig", solutionConfig.Name);
                     projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
 
-                    projInfo[proj.Configuration.Platform.ToString()].Add(projConfig);
+                    if (!projObject.ContainsKey(proj.Configuration.Platform.ToString()))
+                    {
+                        projObject.Add(proj.Configuration.Platform.ToString(), new List<object>());
+                    }
+                    
+                    projObject[proj.Configuration.Platform.ToString()].Add(projConfig);
                 }
             }
 
@@ -247,7 +269,7 @@ namespace Sharpmake.Generators.Generic
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
             using (var serializer = new Util.JsonSerializer(writer) { IsOutputFormatted = true })
             {
-                serializer.Serialize(projectsInfo);
+                serializer.Serialize(info);
                 serializer.Flush();
 
                 if (builder.Context.WriteGeneratedFile(null, file, stream))
@@ -261,28 +283,6 @@ namespace Sharpmake.Generators.Generic
             }
         }
 
-        private OrderedDictionary ReadProjects(List<Project> projects)
-        {
-            var info = new OrderedDictionary();
-            foreach (var project in projects) {
-                var riderProjInfo = new RiderProjectInfo(project.Name);
-                var initialProjectInfo = new Dictionary<string, List<object>>();
-
-                foreach (var config in project.Configurations) {
-                    riderProjInfo.ReadConfiguration(config);
-                    if (!initialProjectInfo.ContainsKey(config.Platform.ToString())) {
-                        initialProjectInfo.Add(config.Platform.ToString(), new List<object>());
-                    }
-                }
-
-                info.Add(project.Name, initialProjectInfo);
-
-                _projectsInfo.Add(riderProjInfo.Name, riderProjInfo);
-            }
-
-            return info;
-        }
-
         /// <summary>
         /// Generates all <paramref name="project"/>-related configuration files.
         /// </summary>
@@ -291,6 +291,11 @@ namespace Sharpmake.Generators.Generic
         {
             foreach (var config in configurations)
             {
+                if (!_projectsInfo.ContainsKey(project.Name) || !_projectsInfo[project.Name].Configurations.Contains(config.Name))
+                {
+                    continue;
+                }
+                
                 var context = new RiderGenerationContext(builder, project, config, projectFile);
                 var projectOptionsGen = new ProjectOptionsGenerator();
                 projectOptionsGen.GenerateOptions(context);
