@@ -22,7 +22,7 @@ The following is the mapping of Sharpmake properties to Rider Json.
 | ``Project.Configuration.Name`` | ``Configuration`` |
 | ``Configuration.Platform`` | ``Platform`` |
 | ``IPlatformVcxproj.GetPlatformIncludePaths()`` | ``EnvironmentIncludePaths`` |
-| ``Project.Configuration.Defines`` | ``EnvironmentDefinitions`` |
+| ``IPlatformVcxproj.GetImplicitlyDefinedSymbols()`` | ``EnvironmentDefinitions`` |
 | ``Project.Configuration.ResolvedDependencies`` | ``Modules`` |
 
 ### Toolchain Info

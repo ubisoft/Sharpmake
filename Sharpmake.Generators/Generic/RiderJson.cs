@@ -359,7 +359,7 @@ namespace Sharpmake.Generators.Generic
             info.Add("Platform", context.Configuration.Platform.ToString());
             info.Add("ToolchainInfo", toolchain);
             info.Add("EnvironmentIncludePaths", includePaths);
-            info.Add("EnvironmentDefinitions", context.Configuration.Defines);
+            info.Add("EnvironmentDefinitions", platformVcxproj.GetImplicitlyDefinedSymbols(context));
             info.Add("Modules", modules);
             
             var file = new FileInfo($"{context.ProjectPath}_{context.Configuration.Platform}_{context.Configuration.Name}.json");
