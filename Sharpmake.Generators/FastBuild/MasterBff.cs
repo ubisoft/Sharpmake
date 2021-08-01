@@ -666,6 +666,7 @@ namespace Sharpmake.Generators.FastBuild
                         using (masterBffGenerator.Declare("fastBuildBinPath", compConf.BinPath))
                         using (masterBffGenerator.Declare("fastBuildLinkerPath", compConf.LinkerPath))
                         using (masterBffGenerator.Declare("fastBuildResourceCompiler", compConf.ResourceCompiler))
+                        using (masterBffGenerator.Declare("fastBuildResourceCompilerName", compConf.ResourceCompiler != FileGeneratorUtilities.RemoveLineTag ? "RC" + compilerConfiguration.Key : FileGeneratorUtilities.RemoveLineTag))
                         using (masterBffGenerator.Declare("fastBuildCompilerName", compConf.Compiler != FileGeneratorUtilities.RemoveLineTag ? compConf.Compiler : compiler.Key))
                         using (masterBffGenerator.Declare("fastBuildLibrarian", compConf.Librarian))
                         using (masterBffGenerator.Declare("fastBuildLinker", compConf.Linker))
@@ -674,6 +675,9 @@ namespace Sharpmake.Generators.FastBuild
                         using (masterBffGenerator.Declare("fastBuildExecutable", compConf.Executable))
                         using (masterBffGenerator.Declare("fastBuildUsing", compConf.UsingOtherConfiguration))
                         {
+                            if (compConf.ResourceCompiler != FileGeneratorUtilities.RemoveLineTag)
+                                masterBffGenerator.Write(Bff.Template.ConfigurationFile.ResourceCompilerSettings);
+
                             masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerConfiguration);
                         }
                     }
