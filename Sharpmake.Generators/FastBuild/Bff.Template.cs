@@ -113,13 +113,21 @@ Compiler( '[fastbuildCompilerName]' )
 }
 ";
 
+                public static string ResourceCompilerSettings = @"
+Compiler( '[fastBuildResourceCompilerName]' )
+{
+    .Executable             = '[fastBuildResourceCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
                 public static string CompilerConfiguration = @"
 [fastBuildConfigurationName] =
 [
     Using( [fastBuildUsing] )
     .BinPath                = '[fastBuildBinPath]'
     .LinkerPath             = '[fastBuildLinkerPath]'
-    .ResourceCompiler       = '[fastBuildResourceCompiler]'
+    .ResourceCompiler       = '[fastBuildResourceCompilerName]'
     .Compiler               = '[fastBuildCompilerName]'
     .Librarian              = '[fastBuildLibrarian]'
     .Linker                 = '[fastBuildLinker]'
