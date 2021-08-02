@@ -700,7 +700,7 @@ namespace Sharpmake.Generators.FastBuild
             using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", FileGeneratorUtilities.RemoveLineTag))
             using (bffGenerator.Declare("fastBuildPrebuildAlwaysShowOutput", FileGeneratorUtilities.RemoveLineTag))
             using (bffGenerator.Declare("fastBuildExecPreBuildDependencies", FileGeneratorUtilities.RemoveLineTag))
-            using (bffGenerator.Declare("fastBuildExecAlways", "true"))
+            using (bffGenerator.Declare("fastBuildExecAlways", FileGeneratorUtilities.RemoveLineTag))
             {
                 functor(relativeBuildStep);
             }
