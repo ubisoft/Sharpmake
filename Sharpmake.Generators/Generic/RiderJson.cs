@@ -14,7 +14,8 @@ namespace Sharpmake.Generators.Generic
     /// </summary>
     public partial class RiderJson : IProjectGenerator
     {
-        public static string SolutionName = null;
+        public static string SolutionName = null;   
+        public static string OutputPath = "";
         
         /// <summary>
         /// Callback which should be added to <see cref="Builder.EventPostGeneration"/> in order to generate Rider project model.
@@ -23,7 +24,7 @@ namespace Sharpmake.Generators.Generic
         {
             var builder = Builder.Instance;
             var solution = solutions.FirstOrDefault(it => it.Name == SolutionName) ?? solutions.First();
-            var riderFolder = Path.Combine(solution.SharpmakeCsPath, ".Rider");
+            var riderFolder = Path.Combine(solution.SharpmakeCsPath, OutputPath, ".Rider");
             var generator = new RiderJson();
             var configs = solution.Configurations.ToList();
             
@@ -250,7 +251,7 @@ namespace Sharpmake.Generators.Generic
                     var projObject = info[riderProjInfo.Name] as Dictionary<string, List<object>>;
                     var projConfig = new Dictionary<string, string>();
 
-                    projConfig.Add("ProjectConfig", riderProjInfo.Name);
+                    projConfig.Add("ProjectConfig", proj.Configuration.Name);
                     projConfig.Add("SolutionConfig", solutionConfig.Name);
                     projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
 
