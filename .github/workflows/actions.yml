@@ -210,6 +210,16 @@ jobs:
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_vs2019.sln "MSVC ${{ matrix.configuration }}" "FastBuild"
           codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_fastbuild\exe_rx.exe
 
+      - name: HelloEvents
+        if: runner.os == 'Windows'
+        working-directory: 'samples/HelloEvents'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloEvents.Main.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloEvents_win64_vs2019.sln "${{ matrix.configuration }}" "win64"
+          codebase\temp\bin\win64_${{ matrix.configuration }}\exe\exe.exe
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloEvents_win64_vs2019.sln "${{ matrix.configuration }}_FastBuild" "win64"
+          codebase\temp\bin\win64_${{ matrix.configuration }}_fastbuild\exe\exe.exe
+
       - name: HelloLinux ${{ matrix.configuration }}
         if: runner.os == 'Linux'
         working-directory: 'samples/HelloLinux'
