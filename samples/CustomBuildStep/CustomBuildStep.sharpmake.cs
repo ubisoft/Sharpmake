@@ -44,7 +44,8 @@ namespace FastBuild
         public void ConfigureAll(Configuration conf, Target target)
         {
             conf.CustomFileBuildSteps.Add(
-                new Configuration.CustomFileBuildStep {
+                new Configuration.CustomFileBuildStep
+                {
                     KeyInput = "filegeneration.bat",
                     Output = "main.cpp",
                     Description = $"Generate main.cpp",
