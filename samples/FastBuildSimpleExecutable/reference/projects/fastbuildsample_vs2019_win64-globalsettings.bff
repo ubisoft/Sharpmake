@@ -108,8 +108,14 @@ Compiler( 'RC.win64Config' )
     .Linker                 = '$LinkerPath$\link.exe'
 ]
 
+Compiler( 'ML.win64ConfigMasm' )
+{
+    .Executable             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64\ml64.exe'
+    .CompilerFamily         = 'custom'
+}
+
 .win64ConfigMasm =
 [
     Using( .win64Config )
-    .Compiler               = '$BinPath$\ml64.exe'
+    .Compiler               = 'ML.win64ConfigMasm'
 ]
