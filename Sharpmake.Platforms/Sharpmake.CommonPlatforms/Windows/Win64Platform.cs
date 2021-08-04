@@ -328,11 +328,12 @@ namespace Sharpmake
                 if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
                     resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
 
+                string capitalizedBinPath = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
                 configurations.Add(
                     configName,
                     new CompilerSettings.Configuration(
                         Platform.win64,
-                        binPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath)),
+                        binPath: capitalizedBinPath,
                         linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
                         resourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resCompiler)),
                         librarian: Path.Combine(@"$LinkerPath$", librarianExe),
@@ -340,13 +341,17 @@ namespace Sharpmake
                     )
                 );
 
+                string masmConfigurationName = configName + "Masm";
+                var masmConfiguration = new CompilerSettings.Configuration(
+                    Platform.win64,
+                    compiler: "ML" + masmConfigurationName,
+                    usingOtherConfiguration: configName
+                );
+                masmConfiguration.Masm = Path.Combine(capitalizedBinPath, "ml64.exe");
+
                 configurations.Add(
-                    configName + "Masm",
-                    new CompilerSettings.Configuration(
-                        Platform.win64,
-                        compiler: @"$BinPath$\ml64.exe",
-                        usingOtherConfiguration: configName
-                    )
+                    masmConfigurationName,
+                    masmConfiguration
                 );
             }
             #endregion

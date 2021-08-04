@@ -31,6 +31,9 @@ namespace HelloClangCl
 
             conf.SolutionFolder = "StaticLibs";
 
+            // skip the generation of the lib, and use the obj for the link instead
+            conf.Options.Add(Options.Vc.Linker.UseLibraryDependencyInputs.Enable);
+
             conf.IncludePaths.Add(SourceRootPath);
         }
     }

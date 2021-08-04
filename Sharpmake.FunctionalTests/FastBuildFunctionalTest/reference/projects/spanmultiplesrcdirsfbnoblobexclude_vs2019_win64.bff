@@ -12,7 +12,7 @@
 //=================================================================================================================
 ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobexclude\'
 
     .CompilerExtraOptions   = ''
@@ -101,7 +101,7 @@ ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_wi
 //=================================================================================================================
 Executable( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobexclude\'
     .Libraries              = 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobexclude.exe'
@@ -182,7 +182,7 @@ Alias( 'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64_L
 //=================================================================================================================
 ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobexclude\'
 
     .CompilerExtraOptions   = ''
@@ -272,7 +272,7 @@ ObjectList( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_
 //=================================================================================================================
 Executable( 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobexclude\'
     .Libraries              = 'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\spanmultiplesrcdirsfbnoblobexclude.exe'

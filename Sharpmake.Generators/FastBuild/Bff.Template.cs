@@ -113,13 +113,29 @@ Compiler( '[fastbuildCompilerName]' )
 }
 ";
 
+                internal static string ResourceCompilerSettings = @"
+Compiler( '[fastBuildResourceCompilerName]' )
+{
+    .Executable             = '[fastBuildResourceCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
+                internal static string MasmCompilerSettings = @"
+Compiler( '[fastBuildMasmCompilerName]' )
+{
+    .Executable             = '[fastBuildMasmCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
                 public static string CompilerConfiguration = @"
 [fastBuildConfigurationName] =
 [
     Using( [fastBuildUsing] )
     .BinPath                = '[fastBuildBinPath]'
     .LinkerPath             = '[fastBuildLinkerPath]'
-    .ResourceCompiler       = '[fastBuildResourceCompiler]'
+    .ResourceCompiler       = '[fastBuildResourceCompilerName]'
     .Compiler               = '[fastBuildCompilerName]'
     .Librarian              = '[fastBuildLibrarian]'
     .Linker                 = '[fastBuildLinker]'
@@ -455,7 +471,6 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
     [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
-
 ";
 
                 public static string EndSection = "}\n\n";
@@ -473,7 +488,7 @@ Alias( '[fastBuildOutputFileShortName]' )
 //=================================================================================================================
 Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
 {
-    .Targets = '[fastBuildOutputFileShortName]_[fastBuildOutputType]'
+    .Targets = [fastBuildTargetLibraryDependencies]
 }
 
 ";
@@ -493,7 +508,7 @@ Copy( '[fastBuildCopyAlias]' )
 //=================================================================================================================
 [fastBuildOutputType]( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
     .Libraries              = [fastBuildProjectDependencies]
     .PreBuildDependencies   = [fastBuildBuildOnlyDependencies]
@@ -508,7 +523,7 @@ Copy( '[fastBuildCopyAlias]' )
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_resources' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
@@ -516,7 +531,7 @@ ObjectList( '[fastBuildOutputFileShortName]_resources' )
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
@@ -524,7 +539,7 @@ ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_objects' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 

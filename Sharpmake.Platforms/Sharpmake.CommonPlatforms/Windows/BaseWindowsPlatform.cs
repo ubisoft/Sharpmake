@@ -92,6 +92,23 @@ namespace Sharpmake
                     context.Options["ExecutablePath"] = devEnv.GetWindowsExecutablePath(conf.Platform);
                 }
 
+                Options.Vc.General.PlatformToolset platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                if (Options.Vc.General.PlatformToolset.LLVM == platformToolset)
+                {
+                    Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                    if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset))
+                        platformToolset = overridenPlatformToolset;
+
+                    devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? devEnv;
+
+                    context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + devEnv.GetWindowsExecutablePath(conf.Platform);
+                    if (Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable)
+                    {
+                        context.Options["IncludePath"] = ClangForWindows.GetWindowsClangIncludePath() + ";" + devEnv.GetWindowsIncludePath();
+                        context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
+                    }
+                }
+
                 var systemIncludes = new OrderableStrings(conf.DependenciesIncludeSystemPaths);
                 systemIncludes.AddRange(conf.IncludeSystemPaths);
                 if (systemIncludes.Count > 0)

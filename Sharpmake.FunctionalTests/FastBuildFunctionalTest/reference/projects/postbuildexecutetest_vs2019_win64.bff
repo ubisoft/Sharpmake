@@ -22,7 +22,7 @@ Unity( 'PostBuildExecuteTest_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
@@ -98,7 +98,7 @@ ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildexecutetest\'
     .Libraries              = 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildexecutetest.exe'
@@ -192,7 +192,7 @@ Alias( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependen
 //=================================================================================================================
 ObjectList( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
@@ -269,7 +269,7 @@ ObjectList( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_objects'
 //=================================================================================================================
 Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildexecutetest\'
     .Libraries              = 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildexecutetest.exe'
@@ -363,7 +363,7 @@ Alias( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_LibraryDepend
 //=================================================================================================================
 ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
@@ -439,7 +439,7 @@ ObjectList( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildexecutetest\'
     .Libraries              = 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildexecutetest.exe'
@@ -533,7 +533,7 @@ Alias( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildexecutetest\'
 
     .CompilerExtraOptions   = ''
@@ -610,7 +610,7 @@ ObjectList( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildexecutetest\'
     .Libraries              = 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildexecutetest.exe'

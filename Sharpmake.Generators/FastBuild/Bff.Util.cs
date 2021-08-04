@@ -678,7 +678,7 @@ namespace Sharpmake.Generators.FastBuild
             return strBuilder.ToString();
         }
 
-        internal static void WriteCustomBuildStepAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project.Configuration.CustomFileBuildStep buildStep, Func<string, bool> functor)
+        internal static void WriteCustomBuildStepAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project.Configuration.CustomFileBuildStep buildStep, Func<Project.Configuration.CustomFileBuildStepData, bool> functor)
         {
             var relativeBuildStep = buildStep.MakePathRelative(bffGenerator.Resolver,
                 (path, commandRelative) =>
@@ -699,12 +699,14 @@ namespace Sharpmake.Generators.FastBuild
             using (bffGenerator.Declare("fastBuildPrebuildWorkingPath", FileGeneratorUtilities.RemoveLineTag))
             using (bffGenerator.Declare("fastBuildPrebuildUseStdOutAsOutput", FileGeneratorUtilities.RemoveLineTag))
             using (bffGenerator.Declare("fastBuildPrebuildAlwaysShowOutput", FileGeneratorUtilities.RemoveLineTag))
+            using (bffGenerator.Declare("fastBuildExecPreBuildDependencies", FileGeneratorUtilities.RemoveLineTag))
+            using (bffGenerator.Declare("fastBuildExecAlways", FileGeneratorUtilities.RemoveLineTag))
             {
-                functor(relativeBuildStep.Description);
+                functor(relativeBuildStep);
             }
         }
 
-        internal static void WriteConfigCustomBuildStepsAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project project, Project.Configuration config, Func<string, bool> functor)
+        internal static void WriteConfigCustomBuildStepsAsGenericExecutable(string projectRoot, FileGenerator bffGenerator, Project project, Project.Configuration config, Func<Project.Configuration.CustomFileBuildStepData, bool> functor)
         {
             using (bffGenerator.Resolver.NewScopedParameter("project", project))
             using (bffGenerator.Resolver.NewScopedParameter("config", config))

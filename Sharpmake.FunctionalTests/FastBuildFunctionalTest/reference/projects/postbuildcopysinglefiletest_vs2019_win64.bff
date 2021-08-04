@@ -22,7 +22,7 @@ Unity( 'PostBuildCopySingleFileTest_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
@@ -98,7 +98,7 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_obj
 //=================================================================================================================
 Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\'
     .Libraries              = 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe'
@@ -191,7 +191,7 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_LibraryD
 //=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
@@ -268,7 +268,7 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_o
 //=================================================================================================================
 Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\'
     .Libraries              = 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe'
@@ -361,7 +361,7 @@ Alias( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_Librar
 //=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
@@ -437,7 +437,7 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\'
     .Libraries              = 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.exe'
@@ -530,7 +530,7 @@ Alias( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_LibraryDependen
 //=================================================================================================================
 ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
@@ -607,7 +607,7 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects'
 //=================================================================================================================
 Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildcopysinglefiletest\'
     .Libraries              = 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildcopysinglefiletest.exe'

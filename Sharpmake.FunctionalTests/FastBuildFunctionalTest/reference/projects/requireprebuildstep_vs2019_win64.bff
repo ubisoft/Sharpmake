@@ -22,7 +22,7 @@ Unity( 'RequirePreBuildStep_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
@@ -101,7 +101,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe'
@@ -182,7 +182,7 @@ Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependenc
 //=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
@@ -262,7 +262,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects' 
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe'
@@ -343,7 +343,7 @@ Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_LibraryDepende
 //=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
@@ -422,7 +422,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\requireprebuildstep.exe'
@@ -503,7 +503,7 @@ Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
@@ -583,7 +583,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\requireprebuildstep.exe'

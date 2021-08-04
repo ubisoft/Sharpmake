@@ -12,7 +12,7 @@
 //=================================================================================================================
 ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
 
     .CompilerExtraOptions   = ''
@@ -88,7 +88,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
 //=================================================================================================================
 Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
     .Libraries              = 'FastBuildSimpleExecutable_Debug_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.exe'
@@ -169,7 +169,7 @@ Alias( 'FastBuildSimpleExecutable_Debug_win64_LibraryDependency' )
 //=================================================================================================================
 ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
 
     .CompilerExtraOptions   = ''
@@ -246,7 +246,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
 //=================================================================================================================
 Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
     .Libraries              = 'FastBuildSimpleExecutable_Release_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.exe'
