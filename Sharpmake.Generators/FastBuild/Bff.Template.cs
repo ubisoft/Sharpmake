@@ -113,10 +113,18 @@ Compiler( '[fastbuildCompilerName]' )
 }
 ";
 
-                public static string ResourceCompilerSettings = @"
+                internal static string ResourceCompilerSettings = @"
 Compiler( '[fastBuildResourceCompilerName]' )
 {
     .Executable             = '[fastBuildResourceCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
+                internal static string MasmCompilerSettings = @"
+Compiler( '[fastBuildMasmCompilerName]' )
+{
+    .Executable             = '[fastBuildMasmCompiler]'
     .CompilerFamily         = 'custom'
 }
 ";
