@@ -3442,6 +3442,18 @@ namespace Sharpmake.Generators.VisualStudio
             options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
             options["ProductVersion"] = Options.StringOption.Get<Options.CSharp.ProductVersion>(conf);
 
+            SelectOption
+            (
+                Options.Option(Options.CSharp.UseWpf.Enabled, () => { options["UseWpf"] = "true"; }),
+                Options.Option(Options.CSharp.UseWpf.Disabled, () => { options["UseWpf"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+                Options.Option(Options.CSharp.UseWindowsForms.Enabled, () => { options["UseWindowsForms"] = "true"; }),
+                Options.Option(Options.CSharp.UseWindowsForms.Disabled, () => { options["UseWindowsForms"] = RemoveLineTag; })
+            );
+
             // concat defines, don't add options.Defines since they are automatically added by VS
             Strings defines = new Strings();
             defines.AddRange(options.ExplicitDefines);
