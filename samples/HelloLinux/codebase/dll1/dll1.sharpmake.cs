@@ -40,6 +40,8 @@ namespace HelloLinux
             conf.Defines.Add("UTIL_DLL_EXPORT");
             conf.ExportDefines.Add("UTIL_DLL_IMPORT");
 
+            conf.LibraryFiles.Add("m");
+
             conf.IncludePaths.Add(SourceRootPath);
 
             conf.AddPrivateDependency<StaticLib1Project>(target);

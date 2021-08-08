@@ -41,7 +41,7 @@ int main(int, char**)
 
     // from dll1
     UtilDll1 utilityDll;
-    utilityDll.ComputeSum(someArray);
+    utilityDll.ComputeMagicNumber(someArray);
 
     // from static_lib2
     Util2 utilityStatic;
