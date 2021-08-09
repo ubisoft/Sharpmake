@@ -48,17 +48,25 @@ namespace Sharpmake.Generators.Generic
         private class RiderProjectInfo
         {
             public string Name { get; }
+            public string SourcePath { get; }
+            public Strings SourceExtensions { get; }
+
             public Strings PublicDependencyModules { get; }
+            public Strings PrivateDependencyModules { get; }
             public Strings PublicIncludePaths { get; }
             public Strings PrivateIncludePaths { get; }
             public Strings PublicDefinitions { get; }
             public Strings PrivateDefinitions { get; }
             public Strings Configurations { get; }
 
-            public RiderProjectInfo(string projectName)
+            public RiderProjectInfo(Project project)
             {
-                Name = projectName;
+                Name = project.Name;
+                SourceExtensions = project.SourceFilesExtensions;
+                SourcePath = project.SourceRootPath;
+                
                 PublicDependencyModules = new Strings();
+                PrivateDependencyModules = new Strings();
                 PublicIncludePaths = new Strings();
                 PrivateIncludePaths = new Strings();
                 PublicDefinitions = new Strings();
@@ -72,6 +80,7 @@ namespace Sharpmake.Generators.Generic
             public void ReadConfiguration(Project.Configuration config)
             {
                 PublicDependencyModules.AddRange(config.ResolvedPublicDependencies.Select(it => it.Project.Name));
+                PrivateDependencyModules.AddRange(config.ResolvedPrivateDependencies.Select(it => it.Project.Name));
                 PublicIncludePaths.AddRange(config.IncludePaths);
                 PrivateIncludePaths.AddRange(config.IncludePrivatePaths);
                 PublicDefinitions.AddRange(config.ExportDefines);
@@ -86,9 +95,21 @@ namespace Sharpmake.Generators.Generic
             public OrderedDictionary ToDictionary()
             {
                 var resDict = new OrderedDictionary();
+                resDict.Add("SourcePath", SourcePath);
+
+                if (!IgnoreDefaults || !SourceExtensions.All(new Project().SourceFilesExtensions.Contains))
+                {
+                    resDict.Add("SourceExtensions", SourceExtensions);
+                }
+
                 if (!IgnoreDefaults || PublicDependencyModules.Count != 0)
                 {
                     resDict.Add("PublicDependencyModules", PublicDependencyModules);
+                }
+                
+                if (!IgnoreDefaults || PrivateDependencyModules.Count != 0)
+                {
+                    resDict.Add("PrivateDependencyModules", PrivateDependencyModules);
                 }
 
                 if (!IgnoreDefaults || PublicIncludePaths.Count != 0)
@@ -264,7 +285,7 @@ namespace Sharpmake.Generators.Generic
                     if (!info.Contains(proj.Project.Name))
                     {
                         info.Add(proj.Project.Name, new Dictionary<string, List<object>>());
-                        _projectsInfo.Add(proj.Project.Name, new RiderProjectInfo(proj.Project.Name));
+                        _projectsInfo.Add(proj.Project.Name, new RiderProjectInfo(proj.Project));
                     }
                     
                     var riderProjInfo = _projectsInfo[proj.Project.Name];

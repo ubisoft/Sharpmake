@@ -45,7 +45,10 @@ The following is the mapping of Sharpmake properties to Rider Json.
 ### Modules info
 | Sharpmake | Rider Json |
 | --------- | ---------- |
+| ``Project.SourceRootPath`` | ``SourcePath`` |
+| ``Project.SourceFilesExtensions`` | ``SourceExtensions`` |
 | ``Project.Configuration.ResolvedPublicDependencies`` | ``PublicDependencyModules`` |
+| ``Project.Configuration.ResolvedPrivateDependencies`` | ``PrivateDependencyModules`` |
 | ``Project.Configuration.IncludePaths`` | ``PublicIncludePaths`` |
 | ``Project.Configuration.IncludePrivatePaths`` | ``PrivateIncludePaths`` |
 | ``Project.Configuration.ExportDefines`` | ``PublicDefinitions`` |
