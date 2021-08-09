@@ -16,6 +16,8 @@ namespace Sharpmake.Generators.Generic
     {
         public static string SolutionName = null;   
         public static string OutputPath = "";
+        public static bool Minimize = false;
+        public static bool IgnoreDefaults = false;
         
         /// <summary>
         /// Callback which should be added to <see cref="Builder.EventPostGeneration"/> in order to generate Rider project model.
@@ -84,11 +86,31 @@ namespace Sharpmake.Generators.Generic
             public OrderedDictionary ToDictionary()
             {
                 var resDict = new OrderedDictionary();
-                resDict.Add("PublicDependencyModules", PublicDependencyModules);
-                resDict.Add("PublicIncludePaths", PublicIncludePaths);
-                resDict.Add("PrivateIncludePaths", PrivateIncludePaths);
-                resDict.Add("PublicDefinitions", PublicDefinitions);
-                resDict.Add("PrivateDefinitions", PrivateDefinitions);
+                if (!IgnoreDefaults || PublicDependencyModules.Count != 0)
+                {
+                    resDict.Add("PublicDependencyModules", PublicDependencyModules);
+                }
+
+                if (!IgnoreDefaults || PublicIncludePaths.Count != 0)
+                {
+                    resDict.Add("PublicIncludePaths", PublicIncludePaths);
+                }
+
+                if (!IgnoreDefaults || PrivateIncludePaths.Count != 0)
+                {
+                    resDict.Add("PrivateIncludePaths", PrivateIncludePaths);
+                }
+
+                if (!IgnoreDefaults || PublicDefinitions.Count != 0)
+                {
+                    resDict.Add("PublicDefinitions", PublicDefinitions);
+                }
+
+                if (!IgnoreDefaults || PrivateDefinitions.Count != 0)
+                {
+                    resDict.Add("PrivateDefinitions", PrivateDefinitions);
+                }
+                
                 return resDict;
             }
         }
@@ -253,7 +275,10 @@ namespace Sharpmake.Generators.Generic
 
                     projConfig.Add("ProjectConfig", proj.Configuration.Name);
                     projConfig.Add("SolutionConfig", solutionConfig.Name);
-                    projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
+                    if (!IgnoreDefaults)
+                    {
+                        projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
+                    }
 
                     if (!projObject.ContainsKey(proj.Configuration.Platform.ToString()))
                     {
@@ -270,6 +295,7 @@ namespace Sharpmake.Generators.Generic
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
             using (var serializer = new Util.JsonSerializer(writer) { IsOutputFormatted = true })
             {
+                serializer.IsOutputFormatted = !Minimize;
                 serializer.Serialize(info);
                 serializer.Flush();
 
@@ -310,6 +336,7 @@ namespace Sharpmake.Generators.Generic
             var includePaths = new Strings();
             var modules = new OrderedDictionary();
             var toolchain = new OrderedDictionary();
+            var buildCommands = new OrderedDictionary();
             
             toolchain.Add("CppStandard", GetCppStandart(context.Configuration));
             toolchain.Add("bUseRTTI", IsRTTIEnabled(context.Configuration));
@@ -327,20 +354,17 @@ namespace Sharpmake.Generators.Generic
             toolchain.Add("bStrictConformanceMode", IsConformanceMode(context.Configuration));
             toolchain.Add("PrecompiledHeaderAction", GetPchAction(context));
 
-            if (context.Configuration.IsFastBuild)
+            var beforeBuildCommand = context.Configuration.FastBuildCustomActionsBeforeBuildCommand;
+            if (beforeBuildCommand == FileGeneratorUtilities.RemoveLineTag)
             {
-                var beforeBuildCommand = context.Configuration.FastBuildCustomActionsBeforeBuildCommand;
-                if (beforeBuildCommand == FileGeneratorUtilities.RemoveLineTag)
-                {
-                    beforeBuildCommand = "";
-                }
-                
-                using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
-                {
-                    toolchain.Add("BuildCmd", GetBuildCommand(context));
-                    toolchain.Add("ReBuildCmd", GetReBuildCommand(context));
-                    toolchain.Add("CleanCmd", GetCleanCommand(context));
-                }
+                beforeBuildCommand = "";
+            }
+            
+            using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
+            {
+                buildCommands.Add("BuildCmd", GetBuildCommand(context));
+                buildCommands.Add("ReBuildCmd", GetReBuildCommand(context));
+                buildCommands.Add("CleanCmd", GetCleanCommand(context));
             }
 
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
@@ -359,6 +383,12 @@ namespace Sharpmake.Generators.Generic
             info.Add("Configuration", context.Configuration.Name);
             info.Add("Platform", context.Configuration.Platform.ToString());
             info.Add("ToolchainInfo", toolchain);
+            
+            if (context.Configuration.IsFastBuild || !IgnoreDefaults)
+            {
+                info.Add("BuildCommands", buildCommands);
+            }
+            
             info.Add("EnvironmentIncludePaths", includePaths);
             info.Add("EnvironmentDefinitions", platformVcxproj.GetImplicitlyDefinedSymbols(context));
             info.Add("Modules", modules);
@@ -369,6 +399,7 @@ namespace Sharpmake.Generators.Generic
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
             using (var serializer = new Util.JsonSerializer(writer) { IsOutputFormatted = true })
             {
+                serializer.IsOutputFormatted = !Minimize;
                 serializer.Serialize(info);
                 serializer.Flush();
 
@@ -486,6 +517,11 @@ namespace Sharpmake.Generators.Generic
 
         private string GetBuildCommand(RiderGenerationContext context)
         {
+            if (!context.Configuration.IsFastBuild)
+            {
+                return "";
+            }
+            
             var unresolvedCommand = Template.FastBuildBuildCommand;
             using (context.Resolver.NewScopedParameter("BuildCommand",
                                                        context.FastBuildMakeCommandGenerator.GetCommand(
@@ -498,6 +534,11 @@ namespace Sharpmake.Generators.Generic
         
         private string GetReBuildCommand(RiderGenerationContext context)
         {
+            if (!context.Configuration.IsFastBuild)
+            {
+                return "";
+            }
+            
             var unresolvedCommand = Template.FastBuildReBuildCommand;
             using (context.Resolver.NewScopedParameter("RebuildCommand",
                                                        context.FastBuildMakeCommandGenerator.GetCommand(
@@ -510,6 +551,11 @@ namespace Sharpmake.Generators.Generic
         
         private string GetCleanCommand(RiderGenerationContext context)
         {
+            if (!context.Configuration.IsFastBuild)
+            {
+                return "";
+            }
+            
             var unresolvedOutput = Template.FastBuildCleanCommand;
             
             using (context.Resolver.NewScopedParameter("IntermediateDirectory", context.Options["IntermediateDirectory"])) 
