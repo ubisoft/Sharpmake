@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ namespace Sharpmake
 
                 // Sysroot
                 options["SDKRoot"] = "macosx";
-                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk";
+                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
                 Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
                 if (customSdkRoot != null)
                 {
@@ -77,6 +77,21 @@ namespace Sharpmake
                     options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                     cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
+            }
+
+            public override void SelectLinkerOptions(IGenerationContext context)
+            {
+                base.SelectLinkerOptions(context);
+
+                var options = context.Options;
+                var cmdLineOptions = context.CommandLineOptions;
+                var conf = context.Configuration;
+
+                // Sysroot
+                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+                if (customSdkRoot != null)
+                    cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
             }
         }
     }

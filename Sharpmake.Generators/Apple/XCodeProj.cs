@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -191,8 +191,8 @@ namespace Sharpmake.Generators.Apple
             WriteSection<ProjectFile>(configurations[0], fileGenerator);
             WriteSection<ProjectFrameworksBuildPhase>(configurations[0], fileGenerator);
             WriteSection<ProjectFolder>(configurations[0], fileGenerator);
-            WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
             WriteSection<ProjectLegacyTarget>(configurations[0], fileGenerator);
+            WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
             WriteSection<ProjectMain>(configurations[0], fileGenerator);
             WriteSection<ProjectReferenceProxy>(configurations[0], fileGenerator);
             WriteSection<ProjectResourcesBuildPhase>(configurations[0], fileGenerator);
@@ -404,9 +404,6 @@ namespace Sharpmake.Generators.Apple
 
                 _projectItems.Add(targetOutputFile);
 
-                var projectOutputBuildFile = new ProjectBuildFile(targetOutputFile);
-                _projectItems.Add(projectOutputBuildFile);
-
                 ProjectTarget target;
                 if (!firstConf.IsFastBuild)
                 {
@@ -559,6 +556,7 @@ namespace Sharpmake.Generators.Apple
 
         private static void FillCompilerOptions(IGenerationContext context, IPlatformVcxproj platformVcxproj)
         {
+            platformVcxproj.SelectPrecompiledHeaderOptions(context);
             platformVcxproj.SelectCompilerOptions(context);
         }
 
@@ -600,14 +598,14 @@ namespace Sharpmake.Generators.Apple
                     continue;
 
                 item.Build = !configuration.ResolvedSourceFilesBuildExclude.Contains(item.FullPath);
-                item.Source = project.SourceFilesCompileExtensions.Contains(item.Extension) || (String.Compare(item.Extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (String.Compare(item.Extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
+                item.Source = project.SourceFilesCompileExtensions.Contains(item.Extension) || (string.Compare(item.Extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(item.Extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
 
                 if (item.Source)
                 {
                     if (item.Build)
                     {
-                        ProjectFile fileItem = (ProjectFile)item;
-                        ProjectBuildFile buildFileItem = new ProjectBuildFile(fileItem);
+                        var fileItem = (ProjectFile)item;
+                        var buildFileItem = new ProjectBuildFile(fileItem);
                         _projectItems.Add(buildFileItem);
                         _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
                     }
@@ -635,8 +633,8 @@ namespace Sharpmake.Generators.Apple
                 item.Build = true;
                 item.Source = true;
 
-                ProjectFile fileItem = (ProjectFile)item;
-                ProjectBuildFile buildFileItem = new ProjectBuildFile(fileItem);
+                var fileItem = (ProjectFile)item;
+                var buildFileItem = new ProjectBuildFile(fileItem);
                 _projectItems.Add(buildFileItem);
                 _resourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
             }
@@ -717,7 +715,7 @@ namespace Sharpmake.Generators.Apple
         private void WriteSection<ProjectItemType>(Project.Configuration configuration, IFileGenerator fileGenerator)
             where ProjectItemType : ProjectItem
         {
-            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType);
+            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType).OrderBy(item => item.Uid, StringComparer.Ordinal);
             if (projectItems.Any())
             {
                 ProjectItem firstItem = projectItems.First();
@@ -1128,42 +1126,73 @@ namespace Sharpmake.Generators.Apple
             {
                 switch (_extension)
                 {
-                    case "": return "\"compiled.mach-o.executable\"";
-                    case ".c": return "sourcecode.c.c";
-                    case ".cpp": return "sourcecode.cpp.cpp";
-                    case ".h": return "sourcecode.c.h";
-                    case ".hpp": return "sourcecode.c.h";
-                    case ".s": return "sourcecode.asm";
-                    case ".m": return "sourcecode.c.objc";
-                    case ".j": return "sourcecode.c.objc";
-                    case ".mm": return "sourcecode.cpp.objcpp";
+                    case "":
+                        return "\"compiled.mach-o.executable\"";
+                    case ".c":
+                        return "sourcecode.c.c";
+                    case ".cpp":
+                        return "sourcecode.cpp.cpp";
+                    case ".h":
+                        return "sourcecode.c.h";
+                    case ".hpp":
+                        return "sourcecode.c.h";
+                    case ".s":
+                        return "sourcecode.asm";
+                    case ".m":
+                        return "sourcecode.c.objc";
+                    case ".j":
+                        return "sourcecode.c.objc";
+                    case ".mm":
+                        return "sourcecode.cpp.objcpp";
 
-                    case ".xcodeproj": return "\"wrapper.pb-project\"";
-                    case ".framework": return "wrapper.framework";
-                    case ".bundle": return "\"wrapper.plug-in\"";
-                    case ".nib": return "wrapper.nib";
-                    case ".app": return "wrapper.application";
-                    case ".xctest": return "wrapper.cfbundle";
-                    case ".dylib": return "\"compiled.mach-o.dylib\"";
+                    case ".xcodeproj":
+                        return "\"wrapper.pb-project\"";
+                    case ".framework":
+                        return "wrapper.framework";
+                    case ".bundle":
+                        return "\"wrapper.plug-in\"";
+                    case ".nib":
+                        return "wrapper.nib";
+                    case ".app":
+                        return "wrapper.application";
+                    case ".xctest":
+                        return "wrapper.cfbundle";
+                    case ".dylib":
+                        return "\"compiled.mach-o.dylib\"";
 
-                    case ".txt": return "text";
-                    case ".plist": return "text.plist.xml";
-                    case ".ico": return "text";
-                    case ".rtf": return "text.rtf";
-                    case ".strings": return "text.plist.strings";
-                    case ".json": return "text.json";
+                    case ".txt":
+                        return "text";
+                    case ".plist":
+                        return "text.plist.xml";
+                    case ".ico":
+                        return "text";
+                    case ".rtf":
+                        return "text.rtf";
+                    case ".strings":
+                        return "text.plist.strings";
+                    case ".json":
+                        return "text.json";
 
-                    case ".a": return "archive.ar";
+                    case ".a":
+                        return "archive.ar";
 
-                    case ".png": return "image.png";
-                    case ".tiff": return "image.tiff";
+                    case ".png":
+                        return "image.png";
+                    case ".tiff":
+                        return "image.tiff";
 
-                    case ".ipk": return "file.ipk";
-                    case ".pem": return "file.pem";
-                    case ".loc8": return "file.loc8";
-                    case ".metapreload": return "file.metapreload";
-                    case ".gf": return "file.gf";
-                    case ".xib": return "file.xib";
+                    case ".ipk":
+                        return "file.ipk";
+                    case ".pem":
+                        return "file.pem";
+                    case ".loc8":
+                        return "file.loc8";
+                    case ".metapreload":
+                        return "file.metapreload";
+                    case ".gf":
+                        return "file.gf";
+                    case ".xib":
+                        return "file.xib";
                 }
 
                 return "\"?\"";
@@ -1260,37 +1289,11 @@ namespace Sharpmake.Generators.Apple
             }
 
             public ProjectOutputFile(Project.Configuration conf, string name = null)
-                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + GetFilePrefix(conf.Output) + conf.TargetFileFullName + GetFileExtension(conf))
+                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + conf.TargetFileFullNameWithExtension)
             {
                 Name = name ?? conf.Project.Name + " " + conf.Name;
                 BuildableName = System.IO.Path.GetFileName(FullPath);
                 _conf = conf;
-            }
-
-            private static string GetFilePrefix(Project.Configuration.OutputType outputType)
-            {
-                return (outputType == Project.Configuration.OutputType.Lib || outputType == Project.Configuration.OutputType.Dll) ? "lib" : "";
-            }
-
-            public static string GetFileExtension(Project.Configuration conf)
-            {
-                switch (conf.Output)
-                {
-                    case Project.Configuration.OutputType.Dll:
-                        return ".dylib";
-                    case Project.Configuration.OutputType.Lib:
-                        return ".a";
-                    case Project.Configuration.OutputType.Exe:
-                        return ""; // Mac executable
-                    case Project.Configuration.OutputType.IosApp:
-                        return ".app";
-                    case Project.Configuration.OutputType.IosTestBundle:
-                        return ".xctest";
-                    case Project.Configuration.OutputType.None:
-                        return "";
-                    default:
-                        throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
-                }
             }
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.BUILT_PRODUCTS_DIR; } }
@@ -1412,7 +1415,8 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectBuildFile : ProjectItem
         {
-            public ProjectBuildFile(ProjectFileBase file) : base(ItemSection.PBXBuildFile, file.Name)
+            public ProjectBuildFile(ProjectFileBase file)
+                : base(ItemSection.PBXBuildFile, file.Name)
             {
                 File = file;
             }
@@ -1504,7 +1508,7 @@ namespace Sharpmake.Generators.Apple
                 }
             }
 
-            public String script;
+            public string script;
 
             public ProjectShellScriptBuildPhase(uint buildActionMask)
                 : base(ItemSection.PBXShellScriptBuildPhase, "ShellScrips", buildActionMask)
@@ -1572,7 +1576,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectNativeTarget NativeTarget { get { return _target; } }
             public ProjectContainerProxy Proxy { get { return _proxy; } }
             public ProjectReference ProjectReference { get { return _projectReference; } }
-            public String TargetIdentifier
+            public string TargetIdentifier
             {
                 get
                 {
@@ -1636,11 +1640,11 @@ namespace Sharpmake.Generators.Apple
 
             public ProjectResourcesBuildPhase ResourcesBuildPhase { get; set; }
             public ProjectSourcesBuildPhase SourcesBuildPhase { get; set; }
-            public String SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
+            public string SourceBuildPhaseUID { get { return SourcesBuildPhase?.Uid ?? RemoveLineTag; } }
             public ProjectFrameworksBuildPhase FrameworksBuildPhase { get; set; }
             public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPreBuildPhases { get; set; }
             public UniqueList<ProjectShellScriptBuildPhase> ShellScriptPostBuildPhases { get; set; }
-            public String ShellScriptPreBuildPhaseUIDs
+            public string ShellScriptPreBuildPhaseUIDs
             {
                 get
                 {
@@ -1650,7 +1654,7 @@ namespace Sharpmake.Generators.Apple
                     return RemoveLineTag;
                 }
             }
-            public String ShellScriptPostBuildPhaseUIDs
+            public string ShellScriptPostBuildPhaseUIDs
             {
                 get
                 {
@@ -1835,12 +1839,12 @@ namespace Sharpmake.Generators.Apple
                 {
                     ProjectNativeTarget testHostTarget = testHostTargetDependency.NativeTarget;
 
-                    // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration. 
-                    // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app) 
+                    // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration.
+                    // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app)
                     // that match the unit tests bundle ProjectBuildConfiguration.
                     Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
 
-                    testHostParam = String.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, ProjectOutputFile.GetFileExtension(testConfig));
+                    testHostParam = string.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, testConfig.Output);
                 }
 
                 resolverParameters.Add("testHost", testHostParam);

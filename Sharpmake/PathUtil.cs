@@ -65,7 +65,7 @@ namespace Sharpmake
 
         public static List<string> PathGetRelative(string sourceFullPath, Strings destFullPaths, bool ignoreCase = false)
         {
-            List<String> result = new List<string>(destFullPaths.Count);
+            List<string> result = new List<string>(destFullPaths.Count);
 
             foreach (string destFullPath in destFullPaths.Values)
             {

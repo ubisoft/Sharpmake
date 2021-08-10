@@ -632,8 +632,10 @@ namespace Sharpmake
         {
             switch (modifier)
             {
-                case PropertyModifier.None: return input;
-                case PropertyModifier.Lower: return input.ToLowerInvariant();
+                case PropertyModifier.None:
+                    return input;
+                case PropertyModifier.Lower:
+                    return input.ToLowerInvariant();
                 default:
                     throw new NotSupportedException($"Don't know how to apply modifier {modifier} to '{input}'");
             }
@@ -723,7 +725,7 @@ namespace Sharpmake
                         }
 
                         throw new NotFoundException(
-                            $"Cannot find path '{nameChunk}' in parameter path '{memberPath}'.",
+                            $"Cannot find path '{nameChunk}' in parameter path '{memberPath}'",
                             possibleArguments
                         );
                     }
@@ -733,7 +735,12 @@ namespace Sharpmake
                 name += _pathSeparator + nameChunk;
             }
 
-            return parameter == null ? "null" : ApplyModifier(modifier, parameter.ToString());
+            if (parameter == null)
+            {
+                throw new NotFoundException(parameterName + name + " is null, please set a proper value for sharpmake to resolve it");
+            }
+
+            return ApplyModifier(modifier, parameter.ToString());
         }
 
         private static bool CanWriteFieldValue(FieldInfo fieldInfo)

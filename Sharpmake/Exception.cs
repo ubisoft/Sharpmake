@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2019 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ namespace Sharpmake
             : base(message)
         { }
         public Error(string message, params object[] args)
-            : base(String.Format(message, args))
+            : base(string.Format(message, args))
         { }
         public Error(Exception innerException)
             : base("Sharpmake Error", innerException)
         { }
         public Error(Exception innerException, string message, params object[] args)
-            : base(String.Format(message, args), innerException)
+            : base(string.Format(message, args), innerException)
         { }
 
         public static void Valid(bool condition)
@@ -62,13 +62,13 @@ namespace Sharpmake
             : base(message)
         { }
         public InternalError(string message, params object[] args)
-            : base(String.Format(message, args))
+            : base(string.Format(message, args))
         { }
         public InternalError(Exception innerException)
             : base("Sharpmake Internal Error", innerException)
         { }
         public InternalError(Exception innerException, string message, params object[] args)
-            : base(String.Format(message, args), innerException)
+            : base(string.Format(message, args), innerException)
         { }
 
         protected InternalError(SerializationInfo info, StreamingContext context)

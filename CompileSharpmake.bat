@@ -7,12 +7,6 @@
 
 setlocal enabledelayedexpansion
 
-:: Clear previous run status
-COLOR
-
-: set batch file directory as current
-pushd "%~dp0"
-
 set VSWHERE="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if not exist %VSWHERE% (
     echo ERROR: Cannot determine the location of the vswhere command Common Tools folder.
@@ -36,7 +30,7 @@ call !VSMSBUILDCMD!
 if %errorlevel% NEQ 0 goto error
 
 if "%~1" == "" (
-    call :BuildSharpmake "Sharpmake.sln" "Debug" "Any CPU"
+    call :BuildSharpmake "%~dp0Sharpmake.sln" "Debug" "Any CPU"
 ) else (
     call :BuildSharpmake %1 %2 %3
 )
@@ -50,7 +44,7 @@ goto success
 :BuildSharpmake
 echo Compiling %~1 in "%~2|%~3"...
 
-set MSBUILD_CMD=msbuild -t:build -restore "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3"
+set MSBUILD_CMD=msbuild -clp:Summary -t:rebuild -restore "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3" /maxcpucount /p:CL_MPCount=%NUMBER_OF_PROCESSORS%
 echo %MSBUILD_CMD%
 %MSBUILD_CMD%
 set ERROR_CODE=%errorlevel%
@@ -62,18 +56,14 @@ goto success
 
 @REM -----------------------------------------------------------------------
 :success
-COLOR 2F
 set ERROR_CODE=0
 goto end
 
 @REM -----------------------------------------------------------------------
 :error
-COLOR 4F
 set ERROR_CODE=1
 goto end
 
 @REM -----------------------------------------------------------------------
 :end
-:: restore caller current directory
-popd
 exit /b %ERROR_CODE%

@@ -233,7 +233,7 @@ namespace Sharpmake
             _readOnly = false;
         }
 
-        protected void SetProperty<T>(ref T Property, T value, [CallerFilePath] string sourceFilePath = "", [CallerMemberName]string propertyName = "")
+        protected void SetProperty<T>(ref T Property, T value, [CallerFilePath] string sourceFilePath = "", [CallerMemberName] string propertyName = "")
         {
             if (_readOnly)
                 throw new Error(Util.GetCurrentSharpmakeCallerInfo() + "Cannot change {0} property \"{1}\" during configuration", Path.GetFileNameWithoutExtension(sourceFilePath), propertyName);

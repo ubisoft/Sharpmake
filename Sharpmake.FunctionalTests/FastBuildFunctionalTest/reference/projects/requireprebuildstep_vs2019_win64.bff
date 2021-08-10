@@ -22,19 +22,19 @@ Unity( 'RequirePreBuildStep_FastBuildUnitys_unity' )
 //=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
             + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -101,7 +101,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe'
@@ -112,10 +112,10 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -173,21 +173,28 @@ Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
             + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -255,7 +262,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects' 
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe'
@@ -266,10 +273,10 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executabl
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -327,21 +334,28 @@ Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
             + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -408,7 +422,7 @@ ObjectList( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\requireprebuildstep.exe'
@@ -419,10 +433,10 @@ Executable( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -480,21 +494,28 @@ Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64' )
 
 
 //=================================================================================================================
+Alias( 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'RequirePreBuildStep_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
 ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\requireprebuildstep\'
 
     .CompilerExtraOptions   = ''
             // General options
             // ---------------------------
             + ' /I".\$_CURRENT_BFF_DIR_$\generated"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\include"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\um"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\winrt"'
-            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
             + ' /Zi'
             + ' /nologo'
             + ' /W4'
@@ -562,7 +583,7 @@ ObjectList( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects' )
 //=================================================================================================================
 Executable( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable' )
 {
-     Using( .win64Config )
+    Using( .win64Config )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\requireprebuildstep\'
     .Libraries              = 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_objects'
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\requireprebuildstep.exe'
@@ -573,10 +594,10 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.28.29333\atlmfc\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
                             // ---------------------------
                             + ' "kernel32.lib"'
@@ -628,6 +649,13 @@ Executable( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable' )
 
 //=================================================================================================================
 Alias( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_LibraryDependency' )
 {
     .Targets = 'RequirePreBuildStep_Release_FastBuild_vs2019_win64_Executable'
 }

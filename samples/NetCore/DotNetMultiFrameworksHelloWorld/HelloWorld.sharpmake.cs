@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Sharpmake;
 using System;
+using Sharpmake;
 namespace NetCore
 {
     namespace DotNetMultiFrameworksHelloWorld
@@ -120,7 +120,7 @@ namespace NetCore
             [Configure]
             public void ConfigureAll(Configuration conf, ITarget target)
             {
-                conf.SolutionFileName = String.Format("{0}.{1}",
+                conf.SolutionFileName = string.Format("{0}.{1}",
                                                       Name,
                                                       "[target.DevEnv]");
                 conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";

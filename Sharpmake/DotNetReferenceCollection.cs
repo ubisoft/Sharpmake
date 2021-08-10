@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 Ubisoft Entertainment
+﻿// Copyright (c) 2018, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,18 +45,25 @@ namespace Sharpmake
 
         public int CompareTo(DotNetReference other)
         {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
+            if (ReferenceEquals(this, other))
+                return 0;
+            if (ReferenceEquals(null, other))
+                return 1;
             var includeComparison = string.Compare(Include, other.Include, StringComparison.Ordinal);
-            if (includeComparison != 0) return includeComparison;
+            if (includeComparison != 0)
+                return includeComparison;
             var linkFolderComparison = string.Compare(LinkFolder, other.LinkFolder, StringComparison.Ordinal);
-            if (linkFolderComparison != 0) return linkFolderComparison;
+            if (linkFolderComparison != 0)
+                return linkFolderComparison;
             var specificVersionComparison = Nullable.Compare(SpecificVersion, other.SpecificVersion);
-            if (specificVersionComparison != 0) return specificVersionComparison;
+            if (specificVersionComparison != 0)
+                return specificVersionComparison;
             var hintPathComparison = string.Compare(HintPath, other.HintPath, StringComparison.Ordinal);
-            if (hintPathComparison != 0) return hintPathComparison;
+            if (hintPathComparison != 0)
+                return hintPathComparison;
             var privateComparison = Nullable.Compare(Private, other.Private);
-            if (privateComparison != 0) return privateComparison;
+            if (privateComparison != 0)
+                return privateComparison;
             return Nullable.Compare(EmbedInteropTypes, other.EmbedInteropTypes);
         }
     }
@@ -109,7 +116,7 @@ namespace Sharpmake
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex));
 
             if (arrayIndex + _references.Count >= array.Length)
-                throw new ArgumentException(String.Format("Array too small : {0} expect minimum {1}", array.Length, arrayIndex + _references.Count), nameof(array));
+                throw new ArgumentException(string.Format("Array too small : {0} expect minimum {1}", array.Length, arrayIndex + _references.Count), nameof(array));
 
             int i = 0;
             foreach (DotNetReference dotNetReference in _references)

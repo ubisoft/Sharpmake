@@ -85,6 +85,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FakeFileTree.cs" />
     <Compile Include="FastBuildSettings.cs" />
+    <Compile Include="FileListFilter.cs" />
     <Compile Include="FileSystemStringComparer.cs" />
     <Compile Include="GeneratedAssemblyConfig.cs" />
     <Compile Include="GenerationOutput.cs" />
@@ -135,7 +136,7 @@
     <Compile Include="VariableAssignment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.10.0" />
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="2.3.2262-g94fae01e" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

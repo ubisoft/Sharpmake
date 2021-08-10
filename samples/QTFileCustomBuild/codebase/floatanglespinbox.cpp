@@ -4,7 +4,10 @@
 FloatAngleSpinBox::FloatAngleSpinBox(float* valueRef,QWidget *parent)
     : QDoubleSpinBox(parent), m_valueRef(valueRef)
 {
-    CONNECT_DOUBLE_SPINBOX(this, this, OnValueChanged);
+    connect(
+        this, qOverload<double>(&QDoubleSpinBox::valueChanged),
+        this, &FloatAngleSpinBox::OnValueChanged
+    );
 }
 
 void FloatAngleSpinBox::RefreshValue()

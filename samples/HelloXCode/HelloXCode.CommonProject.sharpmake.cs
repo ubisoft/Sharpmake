@@ -38,12 +38,15 @@ namespace HelloXCode
             IsTargetFileNameToLower = false;
 
             SourceRootPath = @"[project.RootPath]\[project.Name]";
+            AdditionalSourceRootPaths.Add(Globals.ExternalDirectory);
         }
 
         [ConfigurePriority(ConfigurePriorities.All)]
         [Configure]
         public virtual void ConfigureAll(Configuration conf, CommonTarget target)
         {
+            conf.IncludePaths.Add(Globals.ExternalDirectory);
+
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
             if (target.DevEnv != DevEnv.xcode4ios)
                 conf.ProjectFileName += "_[target.DevEnv]";
@@ -72,6 +75,7 @@ namespace HelloXCode
         [Configure(Platform.mac)]
         public virtual void ConfigureMac(Configuration conf, CommonTarget target)
         {
+            conf.Options.Add(Options.XCode.Compiler.OnlyActiveArch.Enable);
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////

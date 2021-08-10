@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace Sharpmake.Generators.VisualStudio
 {
@@ -132,35 +132,36 @@ namespace Sharpmake.Generators.VisualStudio
         {
             string key = Path.GetFullPath(projectFile).ToLower();
             Lazy<string> guid = s_projectGUIDS.GetOrAdd(key, new Lazy<string>(() =>
-           {
-               if (!File.Exists(key))
-               {
-                   throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
-               }
+            {
+                if (!File.Exists(key))
+                {
+                    throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
+                }
 
-               var projectFileInfo = new FileInfo(projectFile);
-               using (StreamReader projectFileStream = projectFileInfo.OpenText())
-               {
-                   string line = projectFileStream.ReadLine();
-                   while (line != null)
-                   {
-                       Match match = s_projectGuidRegex.Match(line);
-                       if (match.Success)
-                       {
-                           return match.Groups["GUID"].ToString().ToUpper();
-                       }
-                       line = projectFileStream.ReadLine();
-                   }
-               }
+                var projectFileInfo = new FileInfo(projectFile);
+                using (StreamReader projectFileStream = projectFileInfo.OpenText())
+                {
+                    string line = projectFileStream.ReadLine();
+                    while (line != null)
+                    {
+                        Match match = s_projectGuidRegex.Match(line);
+                        if (match.Success)
+                        {
+                            return match.Groups["GUID"].ToString().ToUpper();
+                        }
+                        line = projectFileStream.ReadLine();
+                    }
+                }
 
-               return null;
-           }));
+                return null;
+            }));
 
             return guid.Value;
         }
 
         private static readonly ConcurrentDictionary<string, string> s_projectTypeGUIDS = new ConcurrentDictionary<string, string>();
 
+        // ReadTypeGuidFromProjectFile is currently just looking at the file extension to associate a type.
         public static string ReadTypeGuidFromProjectFile(string projectFile)
         {
             string filenameLC = Path.GetFullPath(projectFile).ToLower();
@@ -171,10 +172,18 @@ namespace Sharpmake.Generators.VisualStudio
             string fileExt = Path.GetExtension(filenameLC);
             switch (fileExt)
             {
-                case Vcxproj.ProjectExtension: guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper(); break;
-                case CSproj.ProjectExtension: guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper(); break;
-                case Pyproj.ProjectExtension: guid = ProjectTypeGuids.Python.ToString().ToUpper(); break;
-                case Androidproj.ProjectExtension: guid = ProjectTypeGuids.Android.ToString().ToUpper(); break;
+                case Vcxproj.ProjectExtension:
+                    guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper();
+                    break;
+                case CSproj.ProjectExtension:
+                    guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper();
+                    break;
+                case Pyproj.ProjectExtension:
+                    guid = ProjectTypeGuids.Python.ToString().ToUpper();
+                    break;
+                case Androidproj.ProjectExtension:
+                    guid = ProjectTypeGuids.Android.ToString().ToUpper();
+                    break;
                 default:
                     throw new Error("Unknown file extension {0} : unable to detect file type GUID [{1}]", fileExt, projectFile);
             }
@@ -284,12 +293,15 @@ namespace Sharpmake.Generators.VisualStudio
             // write solution header
             switch (devEnv)
             {
-                case DevEnv.vs2010: fileGenerator.Write(Template.Solution.HeaderBeginVs2010); break;
-                case DevEnv.vs2012: fileGenerator.Write(Template.Solution.HeaderBeginVs2012); break;
-                case DevEnv.vs2013: fileGenerator.Write(Template.Solution.HeaderBeginVs2013); break;
-                case DevEnv.vs2015: fileGenerator.Write(Template.Solution.HeaderBeginVs2015); break;
-                case DevEnv.vs2017: fileGenerator.Write(Template.Solution.HeaderBeginVs2017); break;
-                case DevEnv.vs2019: fileGenerator.Write(Template.Solution.HeaderBeginVs2019); break;
+                case DevEnv.vs2015:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2015);
+                    break;
+                case DevEnv.vs2017:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2017);
+                    break;
+                case DevEnv.vs2019:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2019);
+                    break;
                 default:
                     Console.WriteLine("Unsupported DevEnv for solution " + solutionConfigurations[0].Target.GetFragment<DevEnv>());
                     break;
@@ -390,7 +402,7 @@ namespace Sharpmake.Generators.VisualStudio
                         if (buildDepsGuids.Any())
                         {
                             fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
-                            foreach (string guid in buildDepsGuids)
+                            foreach (string guid in buildDepsGuids.SortedValues)
                             {
                                 using (fileGenerator.Declare("projectDependencyGuid", guid))
                                     fileGenerator.Write(Template.Solution.ProjectDependency);
@@ -840,15 +852,16 @@ namespace Sharpmake.Generators.VisualStudio
 
         private IEnumerable<Solution.ResolvedProject> GetResolvedProjectsFromPaths(IEnumerable<string> paths)
         {
-            return paths.Select(p =>
+            return paths.Select(p => GetResolvedProjectFromPath(p));
+        }
+
+        private Solution.ResolvedProject GetResolvedProjectFromPath(string path)
+        {
+            return new Solution.ResolvedProject
             {
-                var resolvedProject = new Solution.ResolvedProject
-                {
-                    ProjectFile = p,
-                    ProjectName = Path.GetFileNameWithoutExtension(p)
-                };
-                return resolvedProject;
-            });
+                ProjectFile = path,
+                ProjectName = Path.GetFileNameWithoutExtension(path)
+            };
         }
 
         private List<Solution.ResolvedProject> ResolveReferencesByPath(List<Solution.ResolvedProject> solutionProjects, Strings referencedProjectPaths)
@@ -856,15 +869,35 @@ namespace Sharpmake.Generators.VisualStudio
             // solution's referenced projects
             var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
 
-            // user's projects references
-            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath).Distinct();
-            resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(projectByPath));
-
             foreach (Solution.ResolvedProject resolvedProject in resolvedPathReferences)
             {
                 resolvedProject.UserData["Guid"] = ReadGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["TypeGuid"] = ReadTypeGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
+            }
+
+            // user's projects references
+            var projectRefByPathInfos = solutionProjects
+                                            .SelectMany(p => p.Configurations)
+                                            .SelectMany(c => c.ProjectReferencesByPath.ProjectsInfos)
+                                            .Distinct();
+
+            foreach (var projectRefByPathInfo in projectRefByPathInfos)
+            {
+                var resolvedProject = GetResolvedProjectFromPath(projectRefByPathInfo.projectFilePath);
+
+                var projectGuid = projectRefByPathInfo.projectGuid;
+                if (projectGuid == Guid.Empty)
+                    projectGuid = new Guid(ReadGuidFromProjectFile(projectRefByPathInfo.projectFilePath));
+                resolvedProject.UserData["Guid"] = projectGuid.ToString("D").ToUpperInvariant();
+
+                var projectTypeGuid = projectRefByPathInfo.projectTypeGuid;
+                if (projectTypeGuid == Guid.Empty)
+                    projectTypeGuid = new Guid(ReadTypeGuidFromProjectFile(projectRefByPathInfo.projectFilePath)); // currently, just use the extension
+                resolvedProject.UserData["TypeGuid"] = projectTypeGuid.ToString("D").ToUpperInvariant();
+
+                resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
+                resolvedPathReferences.Add(resolvedProject);
             }
 
             return resolvedPathReferences;

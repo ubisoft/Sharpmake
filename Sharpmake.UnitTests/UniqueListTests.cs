@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using System.Threading;
+using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {

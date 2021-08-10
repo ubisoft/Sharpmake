@@ -135,12 +135,27 @@ namespace Sharpmake
                     {
                         if (context.DevelopmentEnvironmentsRange.MinDevEnv != context.DevelopmentEnvironmentsRange.MaxDevEnv)
                             throw new Error("Different vs versions not supported in the same vcxproj");
-                        var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
+                        DevEnv devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
 
-                        var llvmInstallDir = llvmToolsets[0] == Options.Vc.General.PlatformToolset.ClangCL ? Settings.LLVMInstallDirVsEmbedded(devEnv) : Settings.LLVMInstallDir;
-                        using (resolver.NewScopedParameter("custompropertyname", "LLVMInstallDir"))
-                        using (resolver.NewScopedParameter("custompropertyvalue", llvmInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
-                            return resolver.Resolve(Vcxproj.Template.Project.CustomProperty);
+                        string llvmProperties = string.Empty;
+
+                        // LLVMInstallDir
+                        {
+                            string llvmInstallDir = llvmToolsets[0] == Options.Vc.General.PlatformToolset.ClangCL ? Settings.LLVMInstallDirVsEmbedded(devEnv) : Settings.LLVMInstallDir;
+                            using (resolver.NewScopedParameter("custompropertyname", "LLVMInstallDir"))
+                            using (resolver.NewScopedParameter("custompropertyvalue", llvmInstallDir.TrimEnd(Util._pathSeparators))) // trailing separator will be added by LLVM.Cpp.Common.props
+                                llvmProperties += resolver.Resolve(Vcxproj.Template.Project.CustomProperty);
+                        }
+
+                        // LLVMToolsVersion is ClangCL specific
+                        if (llvmToolsets[0] == Options.Vc.General.PlatformToolset.ClangCL)
+                        {
+                            using (resolver.NewScopedParameter("custompropertyname", "LLVMToolsVersion"))
+                            using (resolver.NewScopedParameter("custompropertyvalue", Settings.ClangVersionVsEmbedded(devEnv)))
+                                llvmProperties += resolver.Resolve(Vcxproj.Template.Project.CustomProperty);
+                        }
+
+                        return llvmProperties;
                     }
                     else
                     {

@@ -59,19 +59,19 @@ namespace Sharpmake.Application
 
         public static void LogWrite(string message)
         {
-            string prefix = String.Empty;
+            string prefix = string.Empty;
 
             if (DebugEnable)
             {
                 TimeSpan span = DateTime.Now - s_startTime;
-                prefix = String.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
+                prefix = string.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
                 message = prefix + message;
             }
 
             Console.Write(message);
             if (Debugger.IsAttached)
             {
-                message = message.Replace(prefix + Util.CallerInfoTag, String.Empty);
+                message = message.Replace(prefix + Util.CallerInfoTag, string.Empty);
                 Trace.Write(message);
             }
         }
@@ -97,7 +97,7 @@ namespace Sharpmake.Application
             {
                 TimeSpan span = DateTime.Now - s_startTime;
 
-                string prefix = String.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
+                string prefix = string.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
                 message = prefix + message;
 
                 Console.Write(message);
@@ -169,7 +169,18 @@ namespace Sharpmake.Application
         {
             if (CommandLine.ContainParameter("breakintodebugger"))
             {
-                System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
+                }
+                else
+                {
+                    Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
+                    while (Console.ReadKey(true).Key != ConsoleKey.Enter)
+                    {
+                        Console.WriteLine("Press ENTER to continue");
+                    }
+                }
                 Debugger.Break();
             }
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).
@@ -675,7 +686,7 @@ namespace Sharpmake.Application
             ++nested;
             foreach (var dependent in method.Dependents.OrderBy(x => x.Method.ToString()))
             {
-                set.Add(String.Format("[{0}]->[{1}]", dependent, method));
+                set.Add(string.Format("[{0}]->[{1}]", dependent, method));
 
                 if (dependent.Dependents.Any())
                     RecursivePrintMethodInfo(dependent, set, nested);

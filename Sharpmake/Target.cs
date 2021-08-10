@@ -30,21 +30,6 @@ namespace Sharpmake
     public enum DevEnv
     {
         /// <summary>
-        /// Visual Studio 2010.
-        /// </summary>
-        vs2010 = 1 << 0,
-
-        /// <summary>
-        /// Visual Studio 2012
-        /// </summary>
-        vs2012 = 1 << 1,
-
-        /// <summary>
-        /// Visual Studio 2013
-        /// </summary>
-        vs2013 = 1 << 2,
-
-        /// <summary>
         /// Visual Studio 2015
         /// </summary>
         vs2015 = 1 << 3,
@@ -78,7 +63,14 @@ namespace Sharpmake
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
-        VisualStudio = vs2010 | vs2012 | vs2013 | vs2015 | vs2017 | vs2019
+        VisualStudio = vs2015 | vs2017 | vs2019,
+
+        [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
+        vs2010 = -1,
+        [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
+        vs2012 = -1,
+        [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
+        vs2013 = -1,
     }
 
     // Mandatory
@@ -88,20 +80,14 @@ namespace Sharpmake
         win32 = 1 << 0,
         win64 = 1 << 1,
         anycpu = 1 << 2,
-        x360 = 1 << 3,
-        durango = 1 << 4,
-        ps3 = 1 << 5,
-        ps3spu = 1 << 6,
-        orbis = 1 << 7,
-        wii = 1 << 8,
-        wiiu = 1 << 9,
-        nx = 1 << 10,
-        nvshield = 1 << 11,
-        ctr = 1 << 12,
-        ios = 1 << 13,
-        android = 1 << 14,
-        linux = 1 << 15,
-        mac = 1 << 16,
+        durango = 1 << 3,
+        orbis = 1 << 4,
+        nx = 1 << 5,
+        ctr = 1 << 6,
+        ios = 1 << 7,
+        android = 1 << 8,
+        linux = 1 << 9,
+        mac = 1 << 10,
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
@@ -112,6 +98,19 @@ namespace Sharpmake
         _reserved3 = 1 << 28,
         _reserved2 = 1 << 29,
         _reserved1 = 1 << 30,
+
+        [Obsolete]
+        x360 = -1,
+        [Obsolete]
+        ps3 = -1,
+        [Obsolete]
+        ps3spu = -1,
+        [Obsolete]
+        wii = -1,
+        [Obsolete]
+        wiiu = -1,
+        [Obsolete]
+        nvshield = -1,
     }
 
     [Fragment, Flags]
@@ -459,7 +458,7 @@ namespace Sharpmake
             }
         }
 
-        public bool AndMask(Object fragmentMask)
+        public bool AndMask(object fragmentMask)
         {
             FieldInfo[] fragmentFields = GetType().GetFields();
 

@@ -181,6 +181,20 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum UseWpf
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
+            public enum UseWindowsForms
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)
@@ -517,7 +531,6 @@ namespace Sharpmake
 
             public enum AutoGenerateBindingRedirects
             {
-                [DevEnvVersion(minimum = DevEnv.vs2013)]
                 Enabled,
                 [Default]
                 Disabled

@@ -109,8 +109,23 @@ Compiler( '[fastbuildCompilerName]' )
     .ExtraFiles             = [fastBuildExtraFiles]
     .CompilerFamily         = '[fastBuildCompilerFamily]'
     .UseRelativePaths_Experimental = [fastBuildCompilerUseRelativePaths]
-    [fastBuildVS2012EnumBugWorkaround]
 [fastBuildCompilerAdditionalSettings]
+}
+";
+
+                internal static string ResourceCompilerSettings = @"
+Compiler( '[fastBuildResourceCompilerName]' )
+{
+    .Executable             = '[fastBuildResourceCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
+                internal static string MasmCompilerSettings = @"
+Compiler( '[fastBuildMasmCompilerName]' )
+{
+    .Executable             = '[fastBuildMasmCompiler]'
+    .CompilerFamily         = 'custom'
 }
 ";
 
@@ -120,7 +135,7 @@ Compiler( '[fastbuildCompilerName]' )
     Using( [fastBuildUsing] )
     .BinPath                = '[fastBuildBinPath]'
     .LinkerPath             = '[fastBuildLinkerPath]'
-    .ResourceCompiler       = '[fastBuildResourceCompiler]'
+    .ResourceCompiler       = '[fastBuildResourceCompilerName]'
     .Compiler               = '[fastBuildCompilerName]'
     .Librarian              = '[fastBuildLibrarian]'
     .Linker                 = '[fastBuildLinker]'
@@ -193,6 +208,7 @@ Compiler( '[fastbuildCompilerName]' )
                             + ' [cmdLineOptions.FixedBaseAddress]'
                             + ' [cmdLineOptions.ImportLibrary]'
                             + ' [cmdLineOptions.TargetMachine]'
+                            + ' [cmdLineOptions.LinkerCreateHotPatchableImage]'
                             + ' /errorReport:queue'
                             + ' [cmdLineOptions.ModuleDefinitionFile]'
                             // Additional linker options
@@ -368,7 +384,7 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.EnableEnhancedInstructionSet]'
             + ' [cmdLineOptions.FloatingPointModel]'
             + ' [cmdLineOptions.FloatingPointExceptions]'
-            + ' [cmdLineOptions.CreateHotpatchableImage]'
+            + ' [cmdLineOptions.CompilerCreateHotpatchableImage]'
             + ' [cmdLineOptions.SupportJustMyCode]'
             + ' [cmdLineOptions.SpectreMitigation]'
             // Language options
@@ -455,7 +471,6 @@ Library( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
     [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
-
 ";
 
                 public static string EndSection = "}\n\n";
@@ -468,6 +483,16 @@ Alias( '[fastBuildOutputFileShortName]' )
 }
 
 ";
+
+                public static string TargetForLibraryDependencySection = @"
+//=================================================================================================================
+Alias( '[fastBuildOutputFileShortName]_LibraryDependency' )
+{
+    .Targets = [fastBuildTargetLibraryDependencies]
+}
+
+";
+
                 public static string CopyFileSection = @"
 //=================================================================================================================
 Copy( '[fastBuildCopyAlias]' )
@@ -483,7 +508,7 @@ Copy( '[fastBuildCopyAlias]' )
 //=================================================================================================================
 [fastBuildOutputType]( '[fastBuildOutputFileShortName]_[fastBuildOutputType]' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
     .Libraries              = [fastBuildProjectDependencies]
     .PreBuildDependencies   = [fastBuildBuildOnlyDependencies]
@@ -498,7 +523,7 @@ Copy( '[fastBuildCopyAlias]' )
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_resources' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
@@ -506,7 +531,7 @@ ObjectList( '[fastBuildOutputFileShortName]_resources' )
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 
@@ -514,7 +539,7 @@ ObjectList( '[fastBuildOutputFileShortName]_embedded' )
 //=================================================================================================================
 ObjectList( '[fastBuildOutputFileShortName]_objects' )
 {
-     [fastBuildUsingPlatformConfig]
+    [fastBuildUsingPlatformConfig]
     .Intermediate           = '[cmdLineOptions.IntermediateDirectory]\'
 ";
 

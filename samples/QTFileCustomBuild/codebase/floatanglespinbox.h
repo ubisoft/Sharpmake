@@ -1,7 +1,6 @@
-#ifndef __FLOATANGLESPINBOX_H__
-#define __FLOATANGLESPINBOX_H__
+#pragma once
 
-#include <QtGui/QDoubleSpinBox>
+#include <QtWidgets/QDoubleSpinBox>
 
 class FloatAngleSpinBox : public QDoubleSpinBox
 {
@@ -20,5 +19,3 @@ protected:
 
     float* m_valueRef;
 };
-
-#endif //__FLOATANGLESPINBOX_H__

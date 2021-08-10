@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace HelloWorld
+{
+    public static class Util
+    {
+        public static void LogConfiguration()
+        {
+            Console.WriteLine("Release!");
+        }
+    }
+}

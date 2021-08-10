@@ -238,16 +238,21 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public bool Equals(ItemGroupItem other)
                 {
-                    if (ReferenceEquals(null, other)) return false;
-                    if (ReferenceEquals(this, other)) return true;
+                    if (ReferenceEquals(null, other))
+                        return false;
+                    if (ReferenceEquals(this, other))
+                        return true;
                     return string.Equals(Include, other.Include);
                 }
 
                 public override bool Equals(object obj)
                 {
-                    if (ReferenceEquals(null, obj)) return false;
-                    if (ReferenceEquals(this, obj)) return true;
-                    if (obj.GetType() != GetType()) return false;
+                    if (ReferenceEquals(null, obj))
+                        return false;
+                    if (ReferenceEquals(this, obj))
+                        return true;
+                    if (obj.GetType() != GetType())
+                        return false;
                     return Equals((ItemGroupItem)obj);
                 }
 
@@ -662,23 +667,30 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public int CompareTo(ItemTemplate other)
                 {
-                    if (ReferenceEquals(this, other)) return 0;
-                    if (ReferenceEquals(null, other)) return 1;
+                    if (ReferenceEquals(this, other))
+                        return 0;
+                    if (ReferenceEquals(null, other))
+                        return 1;
                     return string.Compare(_template, other._template, StringComparison.OrdinalIgnoreCase);
                 }
 
                 public bool Equals(ItemTemplate other)
                 {
-                    if (ReferenceEquals(null, other)) return false;
-                    if (ReferenceEquals(this, other)) return true;
+                    if (ReferenceEquals(null, other))
+                        return false;
+                    if (ReferenceEquals(this, other))
+                        return true;
                     return string.Equals(_template, other._template, StringComparison.OrdinalIgnoreCase);
                 }
 
                 public override bool Equals(object obj)
                 {
-                    if (ReferenceEquals(null, obj)) return false;
-                    if (ReferenceEquals(this, obj)) return true;
-                    if (obj.GetType() != this.GetType()) return false;
+                    if (ReferenceEquals(null, obj))
+                        return false;
+                    if (ReferenceEquals(this, obj))
+                        return true;
+                    if (obj.GetType() != this.GetType())
+                        return false;
                     return Equals((ItemTemplate)obj);
                 }
 
@@ -1086,7 +1098,7 @@ namespace Sharpmake.Generators.VisualStudio
                 configurationNameMapping[projectUniqueName] = conf;
 
                 // set generator information
-                conf.GeneratorSetGeneratedInformation("exe", "exe", "dll", "pdb");
+                conf.GeneratorSetOutputFullExtensions(".exe", ".exe", ".dll", ".pdb");
             }
 
             string outputType;
@@ -1107,12 +1119,24 @@ namespace Sharpmake.Generators.VisualStudio
             string projectTypeGuids = RemoveLineTag;
             switch (project.ProjectTypeGuids)
             {
-                case CSharpProjectType.Test: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.CSharpTestProject); break;
-                case CSharpProjectType.Vsix: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VsixProject); break;
-                case CSharpProjectType.Vsto: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VstoProject); break;
-                case CSharpProjectType.Wpf: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WpfProject); break;
-                case CSharpProjectType.Wcf: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WcfProject); break;
-                case CSharpProjectType.AspNetMvc5: projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.AspNetMvc5Project); break;
+                case CSharpProjectType.Test:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.CSharpTestProject);
+                    break;
+                case CSharpProjectType.Vsix:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VsixProject);
+                    break;
+                case CSharpProjectType.Vsto:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.VstoProject);
+                    break;
+                case CSharpProjectType.Wpf:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WpfProject);
+                    break;
+                case CSharpProjectType.Wcf:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.WcfProject);
+                    break;
+                case CSharpProjectType.AspNetMvc5:
+                    projectTypeGuids = ProjectTypeGuids.ToOption(ProjectTypeGuids.AspNetMvc5Project);
+                    break;
             }
 
             var resolver = new Resolver();
@@ -1149,21 +1173,18 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 Write(Template.Project.ProjectBeginNetCore, writer, resolver);
 
-                targetFrameworkString = String.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
+                targetFrameworkString = string.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
             }
             else
             {
                 var framework = projectFrameworks.Single().Item1;
                 targetFrameworkString = Util.GetDotNetTargetString(framework);
 
-                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv, framework)))
+                using (resolver.NewScopedParameter("toolsVersion", Util.GetToolVersionString(devenv)))
                 {
                     // xml begin header
                     switch (devenv)
                     {
-                        case DevEnv.vs2010:
-                        case DevEnv.vs2012:
-                        case DevEnv.vs2013:
                         case DevEnv.vs2015:
                             Write(Template.Project.ProjectBegin, writer, resolver);
                             break;
@@ -1201,7 +1222,7 @@ namespace Sharpmake.Generators.VisualStudio
             string projectConfigurationCondition = Template.Project.DefaultProjectConfigurationCondition;
             if (isNetCoreProjectSchema)
             {
-                netCoreEnableDefaultItems = "false";
+                netCoreEnableDefaultItems = project.EnableDefaultItems.ToString().ToLowerInvariant();
                 targetFrameworkVersionString = "TargetFramework";
                 projectPropertyGuid = RemoveLineTag;
                 if (projectFrameworks.Count() > 1)
@@ -1390,21 +1411,24 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
 
-                foreach (var projectFileName in conf.ProjectReferencesByPath)
+                foreach (var projectReferenceInfo in conf.ProjectReferencesByPath.ProjectsInfos)
                 {
-                    string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectFileName);
+                    string projectFullFileNameWithExtension = Util.GetCapitalizedPath(projectReferenceInfo.projectFilePath);
                     string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized,
                                                                         projectFullFileNameWithExtension);
-                    string projectGuid = Sln.ReadGuidFromProjectFile(projectFileName);
+                    var projectGuid = projectReferenceInfo.projectGuid;
+                    if (projectGuid == Guid.Empty)
+                        projectGuid = new Guid(Sln.ReadGuidFromProjectFile(projectReferenceInfo.projectFilePath));
+
                     itemGroups.ProjectReferences.Add(new ItemGroups.ProjectReference
                     {
                         Include = relativeToProjectFile,
-                        Name = Path.GetFileNameWithoutExtension(projectFileName),
+                        Name = Path.GetFileNameWithoutExtension(projectReferenceInfo.projectFilePath),
                         Private =
                             project.DependenciesCopyLocal.HasFlag(
                                 Project.DependenciesCopyLocalTypes
                                              .ProjectReferences),
-                        Project = new Guid(projectGuid),
+                        Project = projectGuid,
                     });
                 }
             }
@@ -2407,13 +2431,17 @@ namespace Sharpmake.Generators.VisualStudio
             switch (reference.Type)
             {
                 case DotNetReference.ReferenceType.Project:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.ProjectReferences; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.ProjectReferences;
+                    break;
                 case DotNetReference.ReferenceType.DotNet:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetReferences; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetReferences;
+                    break;
                 case DotNetReference.ReferenceType.DotNetExtensions:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetExtensions; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.DotNetExtensions;
+                    break;
                 case DotNetReference.ReferenceType.External:
-                    typeToCheck = Project.DependenciesCopyLocalTypes.ExternalReferences; break;
+                    typeToCheck = Project.DependenciesCopyLocalTypes.ExternalReferences;
+                    break;
             }
 
             bool? isPrivate = projectDependenciesCopyLocal.HasFlag(typeToCheck);
@@ -2469,9 +2497,8 @@ namespace Sharpmake.Generators.VisualStudio
                         itemGroups.Nones.Add(new ItemGroups.None { Include = include });
                     }
                 }
-                // packages.config: Default in vs2013, vs2012, and vs2010
-                else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig
-                        || (project.NuGetReferenceType == Project.NuGetPackageMode.VersionDefault && devenv <= DevEnv.vs2013))
+                // packages.config: only if manually chosen
+                else if (project.NuGetReferenceType == Project.NuGetPackageMode.PackageConfig)
                 {
                     var packagesConfig = new PackagesConfig();
                     packagesConfig.Generate(_builder, project, configurations, _projectPath, generatedFiles, skipFiles);
@@ -3414,6 +3441,18 @@ namespace Sharpmake.Generators.VisualStudio
             options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
             options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
             options["ProductVersion"] = Options.StringOption.Get<Options.CSharp.ProductVersion>(conf);
+
+            SelectOption
+            (
+                Options.Option(Options.CSharp.UseWpf.Enabled, () => { options["UseWpf"] = "true"; }),
+                Options.Option(Options.CSharp.UseWpf.Disabled, () => { options["UseWpf"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+                Options.Option(Options.CSharp.UseWindowsForms.Enabled, () => { options["UseWindowsForms"] = "true"; }),
+                Options.Option(Options.CSharp.UseWindowsForms.Disabled, () => { options["UseWindowsForms"] = RemoveLineTag; })
+            );
 
             // concat defines, don't add options.Defines since they are automatically added by VS
             Strings defines = new Strings();

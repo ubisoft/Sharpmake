@@ -85,19 +85,27 @@ namespace Sharpmake
                 var conf = context.Configuration;
                 var devEnv = context.DevelopmentEnvironment;
 
-                // vs2012 and vs2013 do not support overriding windows kits using the underlying variables
-                // so we need to change the VC++ directories path.
                 // We need to override the executable path for vs2015 because WindowsKit UAP.props does not
                 // correctly set the WindowsSDK_ExecutablePath to the bin folder of its current version.
-                if ((devEnv == DevEnv.vs2012 || devEnv == DevEnv.vs2013 || devEnv == DevEnv.vs2015) && !KitsRootPaths.UsesDefaultKitRoot(devEnv))
+                if (devEnv == DevEnv.vs2015 && !KitsRootPaths.UsesDefaultKitRoot(devEnv))
                 {
-                    var options = context.Options;
-                    options["ExecutablePath"] = devEnv.GetWindowsExecutablePath(conf.Platform);
-                    if (devEnv != DevEnv.vs2015)
+                    context.Options["ExecutablePath"] = devEnv.GetWindowsExecutablePath(conf.Platform);
+                }
+
+                Options.Vc.General.PlatformToolset platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                if (Options.Vc.General.PlatformToolset.LLVM == platformToolset)
+                {
+                    Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                    if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset))
+                        platformToolset = overridenPlatformToolset;
+
+                    devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? devEnv;
+
+                    context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + devEnv.GetWindowsExecutablePath(conf.Platform);
+                    if (Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable)
                     {
-                        options["IncludePath"] = devEnv.GetWindowsIncludePath();
-                        options["LibraryPath"] = devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
-                        options["ExcludePath"] = devEnv.GetWindowsIncludePath();
+                        context.Options["IncludePath"] = ClangForWindows.GetWindowsClangIncludePath() + ";" + devEnv.GetWindowsIncludePath();
+                        context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
                     }
                 }
 

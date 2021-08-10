@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using NUnit.Framework;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
 {
@@ -118,8 +118,7 @@ namespace Sharpmake.UnitTests
 
             obj = new FieldClass();
             obj.String = "[p1.NullObject]";
-            resolver.Resolve(obj);
-            Assert.That(obj.String, Is.EqualTo("null"));
+            Assert.Throws<Error>(() => resolver.Resolve(obj));
         }
 
         [Test]

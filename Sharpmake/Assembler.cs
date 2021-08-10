@@ -221,7 +221,7 @@ namespace Sharpmake
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     string parametersName = parameters[i].Name;
-                    string parametersType = (parameters[i].ParameterType == typeof(Object)) ? "Object" : parameters[i].ParameterType.FullName;
+                    string parametersType = (parameters[i].ParameterType == typeof(object)) ? "Object" : parameters[i].ParameterType.FullName;
 
                     writer.Write("{0}{1} {2}", i == 0 ? "" : ", ", parametersType, parametersName);
                 }

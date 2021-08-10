@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Sharpmake
     .LinkerOptions          = '-o ""%2"" ""%1""[outputTypeArgument]'
                             // Library Search Path
                             // ---------------------------
+                            + ' [cmdLineOptions.SysLibRoot]'
                             + ' [cmdLineOptions.AdditionalLibraryDirectories]'
                             // Libraries
                             // ---------------------------
@@ -56,6 +57,7 @@ namespace Sharpmake
     // ---------------------
     .CompilerOptimizations = ''
             + ' [cmdLineOptions.OptimizationLevel]'
+            + ' [cmdLineOptions.GenerateDebuggingSymbols]'
 ";
     }
 }

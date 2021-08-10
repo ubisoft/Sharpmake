@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,18 +17,20 @@ namespace Sharpmake
 {
     public enum CompilerFamily
     {
-        Auto,
-        MSVC,
-        Clang,
-        GCC,
-        SNC,
-        CodeWarriorWii,
-        GreenHillsWiiU,
-        CudaNVCC,
-        QtRCC,
-        VBCC,
-        OrbisWavePsslc,
-        ClangCl
+        Auto, // Auto detect compiler based on executable path
+        MSVC, // Microsoft and compatible compilers
+        Clang, // Clang and compatible compilers
+        GCC, // GCC and compatible compilers
+        SNC, // SNC and compatible compilers
+        CodeWarriorWii, // CodeWarrior compiler for the Wii
+        GreenHillsWiiU, // GreenHills compiler for the Wii U
+        CudaNVCC, // NVIDIA's CUDA compiler
+        QtRCC, // Qt's resource compiler
+        VBCC, // vbcc compiler
+        OrbisWavePsslc, // orbis wave psslc shader compiler
+        ClangCl, // Clang in MSVC cl-compatible mode
+        CSharp, // C# compiler
+        Custom, // Any custom compiler
     }
 
     public interface IFastBuildCompilerKey

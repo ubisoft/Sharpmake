@@ -23,7 +23,7 @@ using Sharpmake;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("Sharpmake.CommonPlatforms")]
-[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2017")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2017-2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -44,6 +44,6 @@ using Sharpmake;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("0.16.0.0")]
+[assembly: AssemblyVersion("0.17.1.*")]
 
 [assembly: SharpmakeExtension]

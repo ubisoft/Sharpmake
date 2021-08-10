@@ -113,6 +113,18 @@ namespace SharpmakeGen
             Name = "Sharpmake";
 
             AddTargets(Common.GetDefaultTargets());
+
+            ExtraItems[".github"] = new Strings {
+                @".github\workflows\actions.yml"
+            };
+
+            ExtraItems["BatchFiles"] = new Strings {
+                "bootstrap.bat",
+                "CompileSharpmake.bat",
+                "GenerateMdbFiles.bat",
+                "UpdateSamplesOutput.bat",
+                "visualstudio.sharpmake.bat"
+            };
         }
 
         [Configure]

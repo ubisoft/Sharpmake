@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2020 Ubisoft Entertainment
+// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ namespace Sharpmake
     {
         // cppPlatformFolders (pre-vs2019)
         private static readonly ConcurrentDictionary<Tuple<DevEnv, string>, string> s_cppPlatformFolders = new ConcurrentDictionary<Tuple<DevEnv, string>, string>();
+        private static bool s_overrideGlobalVCTargetsPath = false;
 
         /// <summary>
         /// Allows overwriting the MSBuild platform folder used for a known sharpmake platform and Visual Studio version.
@@ -163,6 +164,16 @@ namespace Sharpmake
             if (s_additionalVCTargetsPath.TryGetValue(key, out value))
                 return value;
             return null; // No override found
+        }
+
+        public static void SetOverrideGlobalVCTargetsPath(bool overrideGlobalVCTargetsPath)
+        {
+            s_overrideGlobalVCTargetsPath = overrideGlobalVCTargetsPath;
+        }
+
+        public static bool IsOverridingGlobalVCTargetsPath()
+        {
+            return s_overrideGlobalVCTargetsPath;
         }
     }
 }

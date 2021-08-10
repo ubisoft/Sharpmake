@@ -415,7 +415,7 @@ namespace Sharpmake.Generators.Generic
                 switch (conf.Platform)
                 {
                     case Platform.linux:
-                        conf.GeneratorSetGeneratedInformation("elf", "elf", "so", "pdb");
+                        conf.GeneratorSetOutputFullExtensions(".elf", ".elf", ".so", ".pdb");
                         break;
                     default:
                         break;
@@ -559,18 +559,19 @@ namespace Sharpmake.Generators.Generic
             #region Linker
 
             // OutputFile
-            options["OutputFile"] = FormatOutputFileName(conf).Replace(" ", @"\ ");
+            options["OutputFile"] = conf.TargetFileFullNameWithExtension.Replace(" ", @"\ ");
 
             // DependenciesLibraryFiles
-            OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
-            PathMakeUnix(dependenciesLibraryFiles);
-            dependenciesLibraryFiles.InsertPrefix("-l");
+            var dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
+            FixupLibraryNames(dependenciesLibraryFiles);
+            dependenciesLibraryFiles.InsertPrefix("-l:");
             dependenciesLibraryFiles.Sort();
             options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
 
             // LibraryFiles
             OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
-            libraryFiles.InsertPrefix("-l");
+            FixupLibraryNames(libraryFiles);
+            libraryFiles.InsertPrefix("-l:");
             libraryFiles.Sort();
             options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
 
@@ -590,14 +591,15 @@ namespace Sharpmake.Generators.Generic
             {
                 switch (depConf.Output)
                 {
-                    case Project.Configuration.OutputType.None: continue;
+                    case Project.Configuration.OutputType.None:
+                        continue;
                     case Project.Configuration.OutputType.Lib:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
-                        deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
+                        deps.Add(Path.Combine(depConf.TargetLibraryPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);
                         break;
                     case Project.Configuration.OutputType.Dll:
                     default:
-                        deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
+                        deps.Add(Path.Combine(depConf.TargetPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);
                         break;
                 }
             }
@@ -695,11 +697,20 @@ namespace Sharpmake.Generators.Generic
                 return Util.PathGetRelative(projectFileInfo.DirectoryName, conf.TargetPath);
         }
 
-        private static string FormatOutputFileName(Project.Configuration conf)
+        private static void FixupLibraryNames(IList<string> paths)
         {
-            string outputExtension = !string.IsNullOrEmpty(conf.OutputExtension) ? "." + conf.OutputExtension : "";
-            string targetNamePrefix = (conf.Output == Project.Configuration.OutputType.Lib || conf.Output == Project.Configuration.OutputType.Dll) ? "lib" : "";
-            return (targetNamePrefix + conf.TargetFileFullName + outputExtension);
+            for (int i = 0; i < paths.Count; ++i)
+            {
+                string libraryName = PathMakeUnix(paths[i]);
+                // We've got two kinds of way of listing a library:
+                // - With a filename without extension we must add the potential prefix and potential extension.
+                // - With a filename with a static or shared lib extension (eg. .a/.so), we shouldn't touch it as it's already set by the script.
+                string extension = Path.GetExtension(libraryName).ToLowerInvariant();
+                if (extension != ".a" && extension != ".so")
+                    paths[i] = "lib" + libraryName + ".a";
+                else
+                    paths[i] = libraryName;
+            }
         }
 
         #endregion

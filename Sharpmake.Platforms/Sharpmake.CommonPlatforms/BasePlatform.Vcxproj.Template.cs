@@ -54,7 +54,7 @@ namespace Sharpmake
       <EnableEnhancedInstructionSet>[options.EnableEnhancedInstructionSet]</EnableEnhancedInstructionSet>
       <FloatingPointModel>[options.FloatingPointModel]</FloatingPointModel>
       <FloatingPointExceptions>[options.FloatingPointExceptions]</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <CreateHotpatchableImage>[options.CompilerCreateHotpatchableImage]</CreateHotpatchableImage>
       <ConformanceMode>[options.ConformanceMode]</ConformanceMode>
       <DisableLanguageExtensions>[options.DisableLanguageExtensions]</DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>[options.TreatWChar_tAsBuiltInType]</TreatWChar_tAsBuiltInType>
@@ -138,6 +138,7 @@ namespace Sharpmake
       <GenerateWindowsMetadata>[options.GenerateWindowsMetadata]</GenerateWindowsMetadata>
       <WindowsMetadataFile>[options.WindowsMetadataFile]</WindowsMetadataFile>
       <TreatLinkerWarningAsErrors>[options.TreatLinkerWarningAsErrors]</TreatLinkerWarningAsErrors>
+      <CreateHotPatchableImage>[options.LinkerCreateHotPatchableImage]</CreateHotPatchableImage>
     </Link>
 ";
 
@@ -174,7 +175,6 @@ namespace Sharpmake
     <ConfigurationType>[options.ConfigurationType]</ConfigurationType>
     <UseDebugLibraries>[options.UseDebugLibraries]</UseDebugLibraries>
     <PreferredToolArchitecture>[options.PreferredToolArchitecture]</PreferredToolArchitecture>
-    <_IsNativeEnvironment>[options._IsNativeEnvironment]</_IsNativeEnvironment>
     <CharacterSet>[options.CharacterSet]</CharacterSet>
     <UseOfMfc>[options.UseOfMfc]</UseOfMfc>
     <CLRSupport>[clrSupport]</CLRSupport>
@@ -263,7 +263,6 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMak
     <NMakeOutput>[options.OutputFile]</NMakeOutput>
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
-    <TargetFileName>[options.OutputFileName].exe</TargetFileName>
   </PropertyGroup>
 ";
 

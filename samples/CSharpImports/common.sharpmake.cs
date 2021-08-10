@@ -22,9 +22,12 @@ namespace Common
         {
             switch (env)
             {
-                case DevEnv.vs2015: return "2015";
-                case DevEnv.vs2017: return "2017";
-                default: return "";
+                case DevEnv.vs2015:
+                    return "2015";
+                case DevEnv.vs2017:
+                    return "2017";
+                default:
+                    return "";
             }
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ namespace Sharpmake
             public List<ResolvedProject> Dependencies = new List<ResolvedProject>();
 
             // User data, may be use by generator to attach user data
-            public Dictionary<string, Object> UserData = new Dictionary<string, Object>();
+            public Dictionary<string, object> UserData = new Dictionary<string, object>();
         }
 
         public Dictionary<string, List<Solution.Configuration>> SolutionFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
@@ -146,7 +146,7 @@ namespace Sharpmake
             }
         }
 
-        internal static Solution CreateProject(Type solutionType, List<Object> fragmentMasks)
+        internal static Solution CreateProject(Type solutionType, List<object> fragmentMasks)
         {
             Solution solution;
             try
@@ -210,13 +210,14 @@ namespace Sharpmake
                     // If the solution provides the folder, the configuration should be ignored
                     if (string.IsNullOrEmpty(resolvedProject.SolutionFolderOverride))
                     {
+                        var confSolutionFolder = resolvedProjectConf.GetSolutionFolder(Name);
                         // Folder must all be the same for all config, else will be emptied.
                         if (string.IsNullOrEmpty(resolvedProject.SolutionFolder) &&
-                            !string.IsNullOrEmpty(resolvedProjectConf.SolutionFolder))
+                            !string.IsNullOrEmpty(confSolutionFolder))
                         {
-                            resolvedProject.SolutionFolder = resolvedProjectConf.SolutionFolder;
+                            resolvedProject.SolutionFolder = confSolutionFolder;
                         }
-                        else if (resolvedProject.SolutionFolder != resolvedProjectConf.SolutionFolder)
+                        else if (resolvedProject.SolutionFolder != confSolutionFolder)
                         {
                             resolvedProject.SolutionFolder = "";
                         }
