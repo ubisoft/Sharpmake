@@ -1272,19 +1272,7 @@ namespace Sharpmake
 
         public static string GetToolVersionString(DevEnv env)
         {
-            switch (env)
-            {
-                case DevEnv.vs2015:
-                case DevEnv.vs2017:
-                case DevEnv.vs2019:
-                    return env.GetVisualProjectToolsVersionString();
-                case DevEnv.xcode4ios:
-                    throw new NotSupportedException("XCode does not support Tool Version. ");
-                case DevEnv.eclipse:
-                    throw new NotSupportedException("Eclipse does not support Tool Version. ");
-                default:
-                    throw new NotImplementedException(string.Format("ToolVersion not set for Visual Studio {0}", env));
-            }
+            return env.GetVisualProjectToolsVersionString();
         }
 
         public enum FileCopyDestReadOnlyPolicy : byte
@@ -1351,11 +1339,13 @@ namespace Sharpmake
                 extension = ".androidproj";
             else
             {
-                switch (conf.Target.GetFragment<DevEnv>())
+                DevEnv devEnv = conf.Target.GetFragment<DevEnv>();
+                switch (devEnv)
                 {
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
+                    case DevEnv.vs2022:
                         {
                             extension = ".vcxproj";
                         }
@@ -1371,7 +1361,7 @@ namespace Sharpmake
                         return ".make";
 
                     default:
-                        throw new NotImplementedException("GetProjectFileExtension called with unknown DevEnv: " + conf.Target.GetFragment<DevEnv>());
+                        throw new NotImplementedException("GetProjectFileExtension called with unknown DevEnv: " + devEnv);
                 }
             }
             return extension;

@@ -45,25 +45,30 @@ namespace Sharpmake
         vs2019 = 1 << 5,
 
         /// <summary>
+        /// Visual Studio 2022
+        /// </summary>
+        vs2022 = 1 << 6,
+
+        /// <summary>
         /// iOS project with Xcode.
         /// </summary>
-        xcode4ios = 1 << 6,
+        xcode4ios = 1 << 7,
 
         /// <summary>
         /// Eclipse.
         /// </summary>
-        eclipse = 1 << 7,
+        eclipse = 1 << 8,
 
         /// <summary>
         /// GNU Makefiles.
         /// </summary>
-        make = 1 << 8,
+        make = 1 << 9,
 
         /// <summary>
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
-        VisualStudio = vs2015 | vs2017 | vs2019,
+        VisualStudio = vs2015 | vs2017 | vs2019 | vs2022,
 
         [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
         vs2010 = -1,

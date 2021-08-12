@@ -983,7 +983,7 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.EnableAsan.Enable, () => { context.Options["EnableASAN"] = "true"; context.CommandLineOptions["EnableASAN"] = "/fsanitize=address"; })
             );
 
-            if (context.DevelopmentEnvironment == DevEnv.vs2017 || context.DevelopmentEnvironment == DevEnv.vs2019)
+            if (context.DevelopmentEnvironment.IsVisualStudio() && context.DevelopmentEnvironment >= DevEnv.vs2017)
             {
                 //Options.Vc.Compiler.DefineCPlusPlus. See: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
                 //    Disable                                 /Zc:__cplusplus-
@@ -1143,20 +1143,14 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectPreferredToolArchitecture(IGenerationContext context)
         {
-            switch (context.DevelopmentEnvironment)
+            if (context.DevelopmentEnvironment.IsVisualStudio())
             {
-                case DevEnv.vs2015:
-                case DevEnv.vs2017:
-                case DevEnv.vs2019:
-                    {
-                        context.SelectOption
-                        (
-                        Options.Option(Options.Vc.General.PreferredToolArchitecture.Default, () => { context.Options["PreferredToolArchitecture"] = FileGeneratorUtilities.RemoveLineTag; }),
-                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x86, () => { context.Options["PreferredToolArchitecture"] = "x86"; }),
-                        Options.Option(Options.Vc.General.PreferredToolArchitecture.x64, () => { context.Options["PreferredToolArchitecture"] = "x64"; })
-                        );
-                    }
-                    break;
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.General.PreferredToolArchitecture.Default, () => { context.Options["PreferredToolArchitecture"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.Vc.General.PreferredToolArchitecture.x86, () => { context.Options["PreferredToolArchitecture"] = "x86"; }),
+                Options.Option(Options.Vc.General.PreferredToolArchitecture.x64, () => { context.Options["PreferredToolArchitecture"] = "x64"; })
+                );
             }
         }
 
@@ -2100,17 +2094,12 @@ namespace Sharpmake.Generators.VisualStudio
         private static void SelectGenerateDebugInformationOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             //GenerateDebugInformation="false"
-            //    VS2012-VS2013
-            //    GenerateDebugInformation.Enable         GenerateDebugInformation="true"           /DEBUG
-            //    GenerateDebugInformation.Disable        GenerateDebugInformation="false"
-            //    (GenerateFullProgramDatabaseFile is ignored, there can only be full pdb files)
-            //
             //    VS2015
             //    GenerateDebugInformation.Enable         GenerateDebugInformation="true"           /DEBUG
             //    GenerateDebugInformation.EnableFastLink GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
             //    Disable                                 GenerateDebugInformation="No"
             //
-            //    VS2017-VS2019
+            //    VS2017-VS2022
             //    Enable                                  GenerateDebugInformation="true"           /DEBUG
             //    EnableFastLink                          GenerateDebugInformation="DebugFastLink"  /DEBUG:FASTLINK
             //    Disable                                 GenerateDebugInformation="No"
@@ -2140,7 +2129,7 @@ namespace Sharpmake.Generators.VisualStudio
                 else
                 {
                     if (isMicrosoftPlatform && forceFullPDB &&
-                         ((context.DevelopmentEnvironment == DevEnv.vs2017) || (context.DevelopmentEnvironment == DevEnv.vs2019)))
+                         (context.DevelopmentEnvironment.IsVisualStudio() && context.DevelopmentEnvironment >= DevEnv.vs2017))
                     {
                         context.Options["LinkerGenerateDebugInformation"] = "DebugFull";
                         context.CommandLineOptions["LinkerGenerateDebugInformation"] = "/DEBUG:FULL";

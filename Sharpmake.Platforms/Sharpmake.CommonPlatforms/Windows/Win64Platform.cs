@@ -142,17 +142,6 @@ namespace Sharpmake
                         case Options.Vc.General.PlatformToolset.Default:
                             compilerDevEnv = devEnv;
                             break;
-                        case Options.Vc.General.PlatformToolset.v140:
-                        case Options.Vc.General.PlatformToolset.v140_xp:
-                            compilerDevEnv = DevEnv.vs2015;
-                            break;
-                        case Options.Vc.General.PlatformToolset.v141:
-                        case Options.Vc.General.PlatformToolset.v141_xp:
-                            compilerDevEnv = DevEnv.vs2017;
-                            break;
-                        case Options.Vc.General.PlatformToolset.v142:
-                            compilerDevEnv = DevEnv.vs2019;
-                            break;
                         case Options.Vc.General.PlatformToolset.LLVM:
                         case Options.Vc.General.PlatformToolset.ClangCL:
 
@@ -166,7 +155,8 @@ namespace Sharpmake
 
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            compilerDevEnv = platformToolset.GetDefaultDevEnvForToolset();
+                            break;
                     }
 
                     if (compilerDevEnv.HasValue)
@@ -198,81 +188,77 @@ namespace Sharpmake
                             @"$ExecutableRootPath$\1033\clui.dll"
                         );
 
-                        switch (compilerDevEnv)
+                        if (compilerDevEnv.Value.IsVisualStudio())
                         {
-                            case DevEnv.vs2015:
-                            case DevEnv.vs2017:
-                            case DevEnv.vs2019:
-                                {
-                                    string systemDllPath = FastBuildSettings.SystemDllRoot;
-                                    if (systemDllPath == null)
-                                    {
-                                        var windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(compilerDevEnv.Value);
-                                        string redistDirectory;
-                                        if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0)
-                                            redistDirectory = @"Redist\ucrt\DLLs\x64\";
-                                        else
-                                            redistDirectory = $@"Redist\{windowsTargetPlatformVersion.ToVersionString()}\ucrt\DLLs\x64\";
+                            string systemDllPath = FastBuildSettings.SystemDllRoot;
+                            if (systemDllPath == null)
+                            {
+                                var windowsTargetPlatformVersion = KitsRootPaths.GetWindowsTargetPlatformVersionForDevEnv(compilerDevEnv.Value);
+                                string redistDirectory;
+                                if (windowsTargetPlatformVersion <= Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17134_0)
+                                    redistDirectory = @"Redist\ucrt\DLLs\x64\";
+                                else
+                                    redistDirectory = $@"Redist\{windowsTargetPlatformVersion.ToVersionString()}\ucrt\DLLs\x64\";
 
-                                        systemDllPath = Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10), redistDirectory);
-                                    }
+                                systemDllPath = Path.Combine(KitsRootPaths.GetRoot(KitsRootEnum.KitsRoot10), redistDirectory);
+                            }
 
-                                    if (!Path.IsPathRooted(systemDllPath))
-                                        systemDllPath = Util.SimplifyPath(Path.Combine(projectRootPath, systemDllPath));
+                            if (!Path.IsPathRooted(systemDllPath))
+                                systemDllPath = Util.SimplifyPath(Path.Combine(projectRootPath, systemDllPath));
 
-                                    extraFiles.Add(
-                                        @"$ExecutableRootPath$\msobj140.dll",
-                                        @"$ExecutableRootPath$\mspft140.dll",
-                                        @"$ExecutableRootPath$\mspdb140.dll"
-                                    );
+                            extraFiles.Add(
+                                @"$ExecutableRootPath$\msobj140.dll",
+                                @"$ExecutableRootPath$\mspft140.dll",
+                                @"$ExecutableRootPath$\mspdb140.dll"
+                            );
 
-                                    if (compilerDevEnv.Value == DevEnv.vs2015)
-                                    {
-                                        extraFiles.Add(
-                                            @"$ExecutableRootPath$\vcvars64.bat",
-                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\concrt140.dll"),
-                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\msvcp140.dll"),
-                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\vccorlib140.dll"),
-                                            Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\vcruntime140.dll"),
-                                            Path.Combine(systemDllPath, "ucrtbase.dll")
-                                        );
-                                    }
-                                    else
-                                    {
-                                        extraFiles.Add(
-                                            @"$ExecutableRootPath$\mspdbcore.dll",
-                                            @"$ExecutableRootPath$\msvcdis140.dll",
-                                            @"$ExecutableRootPath$\msvcp140.dll",
-                                            @"$ExecutableRootPath$\pgodb140.dll",
-                                            @"$ExecutableRootPath$\vcruntime140.dll",
-                                            Path.Combine(platformToolSetPath, @"Auxiliary\Build\vcvars64.bat")
-                                        );
-                                    }
+                            if (compilerDevEnv.Value == DevEnv.vs2015)
+                            {
+                                extraFiles.Add(
+                                    @"$ExecutableRootPath$\vcvars64.bat",
+                                    Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\concrt140.dll"),
+                                    Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\msvcp140.dll"),
+                                    Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\vccorlib140.dll"),
+                                    Path.Combine(platformToolSetPath, @"redist\x64\Microsoft.VC140.CRT\vcruntime140.dll"),
+                                    Path.Combine(systemDllPath, "ucrtbase.dll")
+                                );
+                            }
+                            else
+                            {
+                                extraFiles.Add(
+                                    @"$ExecutableRootPath$\mspdbcore.dll",
+                                    @"$ExecutableRootPath$\msvcdis140.dll",
+                                    @"$ExecutableRootPath$\msvcp140.dll",
+                                    @"$ExecutableRootPath$\pgodb140.dll",
+                                    @"$ExecutableRootPath$\vcruntime140.dll",
+                                    Path.Combine(platformToolSetPath, @"Auxiliary\Build\vcvars64.bat")
+                                );
+                            }
 
-                                    if (compilerDevEnv.Value == DevEnv.vs2019)
-                                    {
-                                        Version toolsVersion = compilerDevEnv.Value.GetVisualStudioVCToolsVersion();
+                            if (compilerDevEnv.Value >= DevEnv.vs2019)
+                            {
+                                Version toolsVersion = compilerDevEnv.Value.GetVisualStudioVCToolsVersion();
 
-                                        if (toolsVersion >= new Version("14.22.27905")) // 16.3.2
-                                            extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
+                                if (toolsVersion >= new Version("14.22.27905")) // 16.3.2
+                                    extraFiles.Add(@"$ExecutableRootPath$\tbbmalloc.dll");
 
-                                        if (toolsVersion >= new Version("14.25.28610")) // 16.5
-                                            extraFiles.Add(@"$ExecutableRootPath$\vcruntime140_1.dll");
+                                if (toolsVersion >= new Version("14.25.28610")) // 16.5
+                                    extraFiles.Add(@"$ExecutableRootPath$\vcruntime140_1.dll");
 
-                                        if (toolsVersion >= new Version("14.28.29333")) // 16.8
-                                            extraFiles.Add(@"$ExecutableRootPath$\msvcp140_atomic_wait.dll");
-                                    }
+                                if (toolsVersion >= new Version("14.28.29333")) // 16.8
+                                    extraFiles.Add(@"$ExecutableRootPath$\msvcp140_atomic_wait.dll");
+                            }
 
-                                    try
-                                    {
-                                        foreach (string p in Util.DirectoryGetFiles(systemDllPath, "api-ms-win-*.dll"))
-                                            extraFiles.Add(p);
-                                    }
-                                    catch { }
-                                }
-                                break;
-                            default:
-                                throw new NotImplementedException("This devEnv (" + compilerDevEnv.Value + ") is not supported!");
+                            try
+                            {
+                                foreach (string p in Util.DirectoryGetFiles(systemDllPath, "api-ms-win-*.dll"))
+                                    extraFiles.Add(p);
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            throw new NotImplementedException("This devEnv (" + compilerDevEnv.Value + ") is not supported!");
                         }
                     }
 
@@ -439,14 +425,15 @@ namespace Sharpmake
                             }
                             break;
                         case DevEnv.vs2019:
+                        case DevEnv.vs2022:
                             {
                                 // Note1: _PlatformFolder override is deprecated starting with vs2019, so we write AdditionalVCTargetsPath instead
-                                // Note2: MSBuildGlobalSettings.SetCppPlatformFolder for vs2019 is no more the valid way to handle it. Older buildtools packages can anyway contain it, and need upgrade.
+                                // Note2: MSBuildGlobalSettings.SetCppPlatformFolder for vs2019 and above is no more the valid way to handle it.
 
                                 if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, Platform.win64)))
-                                    throw new Error("SetCppPlatformFolder is not supported by VS2019 correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
+                                    throw new Error($"SetCppPlatformFolder is not supported by {devEnv}: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
 
-                                // vs2019 use AdditionalVCTargetsPath
+                                // vs2019 and up use AdditionalVCTargetsPath
                                 string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, Platform.win64);
                                 if (!string.IsNullOrEmpty(additionalVCTargetsPath))
                                 {

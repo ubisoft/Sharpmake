@@ -726,8 +726,6 @@ namespace Sharpmake.Generators.FastBuild
                                     case Options.Vc.General.PlatformToolset.LLVM:
                                     case Options.Vc.General.PlatformToolset.ClangCL:
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        // TODO: figure out what version number to put there
-                                        // maybe use the DevEnv value
                                         string mscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
                                         if (string.IsNullOrEmpty(mscVer))
                                         {
@@ -745,6 +743,9 @@ namespace Sharpmake.Generators.FastBuild
                                                     case Options.Vc.General.PlatformToolset.v142:
                                                         mscVer = "1920";
                                                         break;
+                                                    case Options.Vc.General.PlatformToolset.v143:
+                                                        mscVer = "1930";
+                                                        break;
                                                     default:
                                                         throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
                                                 }
@@ -758,6 +759,9 @@ namespace Sharpmake.Generators.FastBuild
                                                         break;
                                                     case DevEnv.vs2019:
                                                         mscVer = "1920";
+                                                        break;
+                                                    case DevEnv.vs2022:
+                                                        mscVer = "1930";
                                                         break;
                                                     default:
                                                         throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());

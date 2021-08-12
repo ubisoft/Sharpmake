@@ -1190,6 +1190,7 @@ namespace Sharpmake.Generators.VisualStudio
                             break;
                         case DevEnv.vs2017:
                         case DevEnv.vs2019:
+                        case DevEnv.vs2022:
                             Write(Template.Project.ProjectBeginVs2017, writer, resolver);
                             break;
                         default:
