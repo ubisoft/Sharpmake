@@ -432,7 +432,7 @@ namespace Sharpmake.Generators.VisualStudio
                     if (appLibConf.Output != Project.Configuration.OutputType.Dll)
                         throw new Error("Cannot use configuration \"{0}\" as app lib for package configuration \"{1}\". Output type must be set to dynamic library.", appLibConf, conf);
 
-                    options["AndroidAppLibName"] = appLibConf.TargetFileFullName;
+                    options["AndroidAppLibName"] = appLibConf.TargetFilePrefix + appLibConf.TargetFileName + appLibConf.TargetFileSuffix;
                 }
                 else
                 {
