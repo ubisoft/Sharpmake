@@ -375,6 +375,7 @@ namespace Sharpmake
 
                 if (platformToolset.IsLLVMToolchain() && Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
                 {
+                    // when using clang-cl, mark MSVC includes, so they are properly recognized
                     includePrefix = "/clang:-isystem";
 
                     Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
@@ -387,8 +388,14 @@ namespace Sharpmake
                     string clangIncludePath = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.GetWindowsClangIncludePath(devEnv) : ClangForWindows.GetWindowsClangIncludePath();
                     includes.Add(new IncludeWithPrefix(includePrefix, clangIncludePath));
                 }
+                else
+                {
+                    // this option is mandatory when using /external:I with msvc, so if the user has selected it
+                    // we consider that the vcxproj supports ExternalIncludePath
+                    if (Options.HasOption<Options.Vc.General.ExternalWarningLevel>(context.Configuration))
+                        includePrefix = "/external:I";
+                }
 
-                // when using clang-cl, mark MSVC includes, so they are properly recognized
                 IEnumerable<string> msvcIncludePaths = EnumerateSemiColonSeparatedString(devEnv.GetWindowsIncludePath());
                 includes.AddRange(msvcIncludePaths.Select(path => new IncludeWithPrefix(includePrefix, path)));
 

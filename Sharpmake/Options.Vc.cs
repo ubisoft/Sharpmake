@@ -300,6 +300,82 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Treat Files Included with Angle Brackets as External
+                /// </summary>
+                /// <remarks>
+                /// Specifies whether to treat files included with angle brackets as external.   (/external:anglebrackets)
+                /// </remarks>
+                public enum TreatAngleIncludeAsExternal
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                /// <summary>
+                /// External Header Warning Level
+                /// </summary>
+                /// <remarks>
+                /// Select how strict you want the compiler to be about code errors in external headers.     (/external:W0 - /external:W4)
+                /// </remarks>
+                public enum ExternalWarningLevel
+                {
+                    /// <summary>
+                    /// Turn Off All Warnings
+                    /// </summary>
+                    /// <remarks>
+                    /// Level 0 disables all warnings.
+                    /// </remarks>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Level0,
+
+                    /// <summary>
+                    /// Level 1 displays severe warnings. Level 1 is the default warning level at the command line.
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Level1,
+
+                    /// <summary>
+                    /// Level 2 displays all level 1 warnings and warnings less severe than level 1.
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Level2,
+
+                    /// <summary>
+                    /// Level 3 displays all level 2 warnings and all other warnings recommended for production purposes.
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Level3,
+
+                    /// <summary>
+                    /// Level 4 displays all level 3 warnings plus informational warnings, which in most cases can be safely ignored.
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Level4,
+
+                    /// <summary>
+                    /// Inherit Project Warning Level
+                    /// </summary>
+                    [Default]
+                    InheritWarningLevel
+                }
+
+                /// <summary>
+                /// Template Diagnostics in External Headers
+                /// </summary>
+                /// <remarks>
+                /// Specifies whether to evaluate warning level across template instantiation chain.   (/external:templates-)
+                /// </remarks>
+                public enum ExternalTemplatesDiagnostics
+                {
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                /// <summary>
                 /// Enable Managed Incremental Build
                 /// </summary>
                 /// <remarks>
@@ -1135,7 +1211,7 @@ namespace Sharpmake
                 /// C++ Language Standard
                 /// </summary>
                 /// <remarks>
-                /// Determines the C++ language standard the compiler will enforce. It is recommended to use the latest version when possible. (/std:c++14, /std:c++17, /std:c++latest)
+                /// Determines the C++ language standard the compiler will enforce. It is recommended to use the latest version when possible. (/std:c++14, /std:c++17, /std:c++20, /std:c++latest)
                 /// </remarks>
                 public enum CppLanguageStandard
                 {

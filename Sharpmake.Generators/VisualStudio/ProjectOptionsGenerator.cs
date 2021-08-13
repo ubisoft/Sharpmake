@@ -382,6 +382,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             // Compiler section
 
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.TranslateIncludes.Enable, () => { context.Options["TranslateIncludes"] = "true"; context.CommandLineOptions["TranslateIncludes"] = "/translateInclude"; }),
+            Options.Option(Options.Vc.General.TranslateIncludes.Disable, () => { context.Options["TranslateIncludes"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["TranslateIncludes"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
             //Options.Vc.General.CommonLanguageRuntimeSupport.
             context.SelectOption
             (
@@ -416,12 +422,46 @@ namespace Sharpmake.Generators.VisualStudio
             optionsContext.PlatformVcxproj.SelectApplicationFormatOptions(context);
             optionsContext.PlatformVcxproj.SelectBuildType(context);
 
-            context.Options["ExecutablePath"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["IncludePath"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["LibraryPath"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["ExcludePath"] = FileGeneratorUtilities.RemoveLineTag;
-            context.Options["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            // Visual C++ Directories
+            {
+                // Path to use when searching for executable files while building a VC++ project.  Corresponds to environment variable PATH.
+                context.Options["ExecutablePath"] = FileGeneratorUtilities.RemoveLineTag;
 
+                // Path to use when searching for include files while building a VC++ project.  Corresponds to environment variable INCLUDE.
+                context.Options["IncludePath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Vs2019+: Path to treat as external/system during compilation and skip in build up-to-date check.
+                context.Options["ExternalIncludePath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Path to use when searching for metadata files while building a VC++ project. Corresponds to environment variable LIBPATH.
+                context.Options["ReferencePath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Path to use when searching for library files while building a VC++ project.  Corresponds to environment variable LIB.
+                context.Options["LibraryPath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Path to use when searching for winmd metadata files while building a VC++ project. Gets concatenated with 'Reference Directories' into LIBPATH.
+                context.Options["LibraryWPath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Path to use when searching for source files to use for Intellisense.
+                context.Options["SourcePath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Path to skip when searching for scan dependencies.
+                context.Options["ExcludePath"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // One or more directories to automatically add to the include path in the referencing projects.
+                context.Options["PublicIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Specifies if directories or all project header files should be automatically added to the include path in the referencing projects.
+                context.Options["AllProjectIncludesArePublic"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // One or more this project directories containing c++ module and/or header unit sources to make automatically available in the referencing projects.
+                context.Options["PublicModuleDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+
+                // Specifies if all project modules and header units should be automatically available in the referencing projects.
+                context.Options["AllProjectBMIsArePublic"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            context.Options["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             optionsContext.PlatformVcxproj.SetupSdkOptions(context);
 
             bool writeResourceCompileTag = optionsContext.PlatformVcxproj.GetResourceIncludePaths(context).Any();
@@ -457,9 +497,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectDebugInformationOption(context, optionsContext);
 
-            //Options.Vc.General.UseDebugLibraries.
-            //    Disable                                 WarnAsError="false"
-            //    Enable                                  WarnAsError="true"                              /WX
             context.SelectOption
             (
             Options.Option(Options.Vc.General.UseDebugLibraries.Disabled, () => { context.Options["UseDebugLibraries"] = "false"; }),
@@ -504,6 +541,22 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.TreatAngleIncludeAsExternal.Disable, () => { context.Options["TreatAngleIncludeAsExternal"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["TreatAngleIncludeAsExternal"] = FileGeneratorUtilities.RemoveLineTag; })
             );
 
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.ExternalWarningLevel.Level0, () => { context.Options["ExternalWarningLevel"] = "TurnOffAllWarnings"; context.CommandLineOptions["ExternalWarningLevel"] = "/external:W0"; }),
+            Options.Option(Options.Vc.General.ExternalWarningLevel.Level1, () => { context.Options["ExternalWarningLevel"] = "Level1"; context.CommandLineOptions["ExternalWarningLevel"] = "/external:W1"; }),
+            Options.Option(Options.Vc.General.ExternalWarningLevel.Level2, () => { context.Options["ExternalWarningLevel"] = "Level2"; context.CommandLineOptions["ExternalWarningLevel"] = "/external:W2"; }),
+            Options.Option(Options.Vc.General.ExternalWarningLevel.Level3, () => { context.Options["ExternalWarningLevel"] = "Level3"; context.CommandLineOptions["ExternalWarningLevel"] = "/external:W3"; }),
+            Options.Option(Options.Vc.General.ExternalWarningLevel.Level4, () => { context.Options["ExternalWarningLevel"] = "Level4"; context.CommandLineOptions["ExternalWarningLevel"] = "/external:W4"; }),
+            Options.Option(Options.Vc.General.ExternalWarningLevel.InheritWarningLevel, () => { context.Options["ExternalWarningLevel"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["ExternalWarningLevel"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.ExternalTemplatesDiagnostics.Enable, () => { context.Options["ExternalTemplatesDiagnostics"] = "true"; context.CommandLineOptions["ExternalTemplatesDiagnostics"] = "/external:templates-"; }),
+            Options.Option(Options.Vc.General.ExternalTemplatesDiagnostics.Disable, () => { context.Options["ExternalTemplatesDiagnostics"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["ExternalTemplatesDiagnostics"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
+
             context.Options["TrackFileAccess"] = FileGeneratorUtilities.RemoveLineTag;
 
             if (context.DevelopmentEnvironment.IsVisualStudio())
@@ -511,7 +564,6 @@ namespace Sharpmake.Generators.VisualStudio
                 SelectPreferredToolArchitecture(context);
                 SelectPlatformToolsetOption(context, optionsContext);
             }
-
 
             // Compiler.SuppressStartupBanner
             context.CommandLineOptions["SuppressStartupBanner"] = "/nologo";
