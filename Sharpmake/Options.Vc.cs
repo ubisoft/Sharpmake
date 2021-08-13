@@ -83,6 +83,7 @@ namespace Sharpmake
                     v10_0_17763_0, // 1809, October 2018 Update
                     v10_0_18362_0, // 1903, May 2019 Update
                     v10_0_19041_0, // 2004, May 2020 Update
+                    v10_0_20348_0, // 2104/21H1
                     Latest,        // latest available in host machine
                 }
 
