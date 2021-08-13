@@ -175,6 +175,7 @@ namespace Sharpmake
     <ConfigurationType>[options.ConfigurationType]</ConfigurationType>
     <UseDebugLibraries>[options.UseDebugLibraries]</UseDebugLibraries>
     <PreferredToolArchitecture>[options.PreferredToolArchitecture]</PreferredToolArchitecture>
+    <TranslateIncludes>[options.TranslateIncludes]</TranslateIncludes>
     <CharacterSet>[options.CharacterSet]</CharacterSet>
     <UseOfMfc>[options.UseOfMfc]</UseOfMfc>
     <CLRSupport>[clrSupport]</CLRSupport>

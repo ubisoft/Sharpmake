@@ -88,6 +88,19 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Translate Includes to Imports
+                /// </summary>
+                /// <remarks>
+                /// Enables the compiler to translate #include directives into import directives for the available header units.  (/translateInclude)
+                /// </remarks>
+                public enum TranslateIncludes
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                /// <summary>
                 /// Character Set
                 /// </summary>
                 /// <remarks>

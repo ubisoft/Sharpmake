@@ -498,6 +498,11 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.General.DiagnosticsFormat.ColumnInfo, () => { context.Options["DiagnosticsFormat"] = "Column"; context.CommandLineOptions["DiagnosticsFormat"] = "/diagnostics:column"; })
             );
 
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.TreatAngleIncludeAsExternal.Enable, () => { context.Options["TreatAngleIncludeAsExternal"] = "true"; context.CommandLineOptions["TreatAngleIncludeAsExternal"] = "/external:anglebrackets"; }),
+            Options.Option(Options.Vc.General.TreatAngleIncludeAsExternal.Disable, () => { context.Options["TreatAngleIncludeAsExternal"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["TreatAngleIncludeAsExternal"] = FileGeneratorUtilities.RemoveLineTag; })
+            );
 
             context.Options["TrackFileAccess"] = FileGeneratorUtilities.RemoveLineTag;
 

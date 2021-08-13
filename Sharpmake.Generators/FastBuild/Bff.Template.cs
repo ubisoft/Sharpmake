@@ -411,6 +411,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
             + ' /errorReport:queue'
             // Character Set
             // ---------------------------
+            + ' [cmdLineOptions.TranslateIncludes]'
             + ' [cmdLineOptions.CharacterSet]'
             // Additional compiler options
             //--------------------------
