@@ -1143,6 +1143,12 @@ namespace Sharpmake
                     [DevEnvVersion(minimum = DevEnv.vs2017)]
                     CPP17,
 
+                    /// <summary>
+                    /// ISO C++20 Standard
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    CPP20,
+
                     GNU98,
                     GNU11,
                     [DevEnvVersion(minimum = DevEnv.vs2015)]
