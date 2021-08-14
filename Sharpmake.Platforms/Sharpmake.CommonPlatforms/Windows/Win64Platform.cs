@@ -365,6 +365,17 @@ namespace Sharpmake
                 context.Options["AdditionalDependencies"] += ";%(AdditionalDependencies)";
             }
 
+            protected override IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)
+            {
+                var includePaths = new OrderableStrings();
+                includePaths.AddRange(context.Configuration.IncludePrivatePaths);
+                includePaths.AddRange(context.Configuration.IncludePaths);
+                includePaths.AddRange(context.Configuration.DependenciesIncludePaths);
+
+                includePaths.Sort();
+                return includePaths;
+            }
+
             protected override IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefixImpl(IGenerationContext context)
             {
                 var includes = new List<IncludeWithPrefix>();
