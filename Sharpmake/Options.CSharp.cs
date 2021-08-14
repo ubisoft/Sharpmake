@@ -433,7 +433,8 @@ namespace Sharpmake
                 Level2,
                 Level3,
                 [Default]
-                Level4
+                Level4,
+                Level5
             }
 
             public enum DebugSymbols

@@ -3218,7 +3218,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.WarningLevel.Level1, () => { options["WarningLevel"] = "1"; }),
             Options.Option(Options.CSharp.WarningLevel.Level2, () => { options["WarningLevel"] = "2"; }),
             Options.Option(Options.CSharp.WarningLevel.Level3, () => { options["WarningLevel"] = "3"; }),
-            Options.Option(Options.CSharp.WarningLevel.Level4, () => { options["WarningLevel"] = "4"; })
+            Options.Option(Options.CSharp.WarningLevel.Level4, () => { options["WarningLevel"] = "4"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level5, () => { options["WarningLevel"] = "5"; })
             );
 
             // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/configure-language-version#c-language-version-reference
