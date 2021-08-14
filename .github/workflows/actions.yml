@@ -286,6 +286,15 @@ jobs:
           dotnet "projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\HelloWorldMultiFrameworks.dll"
           & "projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\net461\HelloWorldMultiFrameworks.exe"
 
+      - name: NetCore/DotNetOSMultiFrameworksHelloWorld ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/NetCore/DotNetOSMultiFrameworksHelloWorld'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\temp\solutions\OSMultiFrameworksHelloWorldSolution.sln "${{ matrix.configuration }}" "Any CPU"
+          & "codebase\temp\bin\anycpu_${{ matrix.configuration }}\net5.0-windows\HelloWorldExe.exe"
+          & "codebase\temp\bin\anycpu_${{ matrix.configuration }}\net472\HelloWorldExe.exe"
+
       - name: PackageReferences ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         working-directory: 'samples/PackageReferences'

@@ -172,22 +172,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public string ResolveCondition(Resolver resolver)
                 {
-                    var targetFrameworks = TargetFrameworks.Select(tuple =>
-                    {
-                        var dotNetFramework = tuple.Item1;
-                        var dotNetOS = tuple.Item2;
-                        var dotNetOSVersion = tuple.Item3;
-
-                        if (dotNetOS == DotNetOS.Default)
-                        {
-                            if (!string.IsNullOrEmpty(dotNetOSVersion))
-                                throw new Error();
-                            return dotNetFramework.ToFolderName();
-                        }
-
-                        return dotNetFramework.ToFolderName() + "-" + dotNetOS.ToString() + dotNetOSVersion;
-                    });
-                    using (resolver.NewScopedParameter("targetFramework", string.Join(";", targetFrameworks)))
+                    string targetFrameworks = GetTargetFrameworksString(TargetFrameworks.ToArray());
+                    using (resolver.NewScopedParameter("targetFramework", targetFrameworks))
                     {
                         return resolver.Resolve(Template.ItemGroups.ItemGroupTargetFrameworkCondition);
                     }
@@ -1065,16 +1051,18 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
-            var projectFrameworks = configurations.Select(
+            var projectFrameworksPerConf = configurations.ToDictionary(
+                conf => conf,
                 conf =>
                 {
                     var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                     DotNetOS dotNetOS;
-                    if (!conf.Target.TryGetFragment<DotNetOS>(out dotNetOS))
+                    if (!conf.Target.TryGetFragment(out dotNetOS))
                         dotNetOS = DotNetOS.Default;
                     return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
                 }
-            ).Distinct().ToList();
+            );
+            var projectFrameworks = projectFrameworksPerConf.Values.Distinct().ToList();
             itemGroups.SetTargetFrameworks(projectFrameworks);
 
             // valid that 2 conf name in the same project don't have the same name
@@ -1172,8 +1160,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (isNetCoreProjectSchema)
             {
                 Write(Template.Project.ProjectBeginNetCore, writer, resolver);
-
-                targetFrameworkString = string.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
+                targetFrameworkString = GetTargetFrameworksString(projectFrameworks.ToArray());
             }
             else
             {
@@ -1360,7 +1347,7 @@ namespace Sharpmake.Generators.VisualStudio
                 using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 using (resolver.NewScopedParameter("project", project))
-                using (resolver.NewScopedParameter("targetFramework", conf.Target.GetFragment<DotNetFramework>().ToFolderName()))
+                using (resolver.NewScopedParameter("targetFramework", GetTargetFrameworksString(projectFrameworksPerConf[conf])))
                 using (resolver.NewScopedParameter("projectConfigurationCondition", projectConfigurationCondition))
                 using (resolver.NewScopedParameter("target", conf.Target))
                 using (resolver.NewScopedParameter("options", options[conf]))
@@ -1578,6 +1565,24 @@ namespace Sharpmake.Generators.VisualStudio
                 skipFiles.Add(projectFileInfo.FullName);
 
             writer.Close();
+        }
+
+        private static string GetTargetFrameworksString(params Tuple<DotNetFramework, DotNetOS, string>[] projectFrameworks)
+        {
+            return string.Join(";", projectFrameworks.Select(tuple => {
+                var dotNetFramework = tuple.Item1;
+                var dotNetOS = tuple.Item2;
+                var dotNetOSVersion = tuple.Item3;
+
+                if (dotNetOS == DotNetOS.Default || dotNetOS == 0)
+                {
+                    if (!string.IsNullOrEmpty(dotNetOSVersion))
+                        throw new Error($"Can't set a {nameof(dotNetOSVersion)} ({dotNetOSVersion}) with {nameof(dotNetOS)} set to Default");
+                    return dotNetFramework.ToFolderName();
+                }
+
+                return dotNetFramework.ToFolderName() + "-" + dotNetOS.ToString() + dotNetOSVersion;
+            }));
         }
 
         public void AddPreImportCustomProperties(Dictionary<string, string> properties, CSharpProject cSharpProject, string projectPath)
