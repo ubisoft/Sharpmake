@@ -91,18 +91,11 @@ namespace Sharpmake.Application
             DebugWrite(string.Format(format, args));
         }
 
-        public static void DebugWrite(string message)
+        public static void DebugWrite(string msg)
         {
             if (DebugEnable)
             {
-                TimeSpan span = DateTime.Now - s_startTime;
-
-                string prefix = string.Format("[{0:00}:{1:00}] ", span.Minutes, span.Seconds);
-                message = prefix + message;
-
-                Console.Write(message);
-                if (Debugger.IsAttached)
-                    Trace.Write(message);
+                LogWrite(msg);
             }
         }
 
@@ -125,9 +118,7 @@ namespace Sharpmake.Application
         public static void WarningWrite(string msg)
         {
             Interlocked.Increment(ref s_warningCount);
-            Console.Write(msg);
-            if (Debugger.IsAttached)
-                Trace.Write(msg);
+            LogWrite("[WARNING]" + msg);
         }
 
         public static void WarningWriteLine(string format, params object[] args)
@@ -148,9 +139,7 @@ namespace Sharpmake.Application
         public static void ErrorWrite(string msg)
         {
             Interlocked.Increment(ref s_errorCount);
-            Console.Write(msg);
-            if (Debugger.IsAttached)
-                Trace.Write(msg);
+            LogWrite("[ERROR]" + msg);
         }
 
         public static void ErrorWriteLine(string format, params object[] args)
