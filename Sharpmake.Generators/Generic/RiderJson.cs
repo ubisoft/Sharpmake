@@ -12,10 +12,11 @@ namespace Sharpmake.Generators.Generic
     /// <summary>
     /// Generator for Rider project model json files.
     /// </summary>
-    public partial class RiderJson : IProjectGenerator
+    public partial class RiderJson : IProjectGenerator, ISolutionGenerator
     {
         public static string SolutionName = null;   
-        public static string OutputPath = "";
+        public static string RiderFolderPath = "";
+        public static string SolutionFilePath = "";
         public static bool Minimize = false;
         public static bool IgnoreDefaults = false;
         
@@ -26,12 +27,12 @@ namespace Sharpmake.Generators.Generic
         {
             var builder = Builder.Instance;
             var solution = solutions.FirstOrDefault(it => it.Name == SolutionName) ?? solutions.First();
-            var riderFolder = Path.Combine(solution.SharpmakeCsPath, OutputPath, ".Rider");
+            var riderFolder = Path.Combine(solution.SharpmakeCsPath, RiderFolderPath, ".Rider");
             var generator = new RiderJson();
             var configs = solution.Configurations.ToList();
             
             // Do not move. Acquires all the information about projects for later usage in "Modules" sections.
-            generator.Generate(builder, configs, Path.Combine(riderFolder, "root.json"), new List<string>(),
+            generator.Generate(builder, solution, configs, Path.Combine(solution.SharpmakeCsPath, SolutionFilePath, solution.Name + ".rdjson"), new List<string>(),
                                new List<string>());
             
             foreach (var project in projects)
@@ -273,25 +274,27 @@ namespace Sharpmake.Generators.Generic
         /// Generates "root.json" file for <see cref="SolutionName"/> solution.
         /// Also gathers information about projects for later usage in "Modules" section.
         /// </summary>
-        public void Generate(Builder builder, List<Solution.Configuration> configurations, string rootFile, List<string> generatedFiles,
+        public void Generate(Builder builder, Solution solution, List<Solution.Configuration> configurations, string solutionFile, List<string> generatedFiles,
             List<string> skipFiles)
         {
             var info = new OrderedDictionary();
+            info.Add("ProjectFolderPath", Path.Combine(solution.SharpmakeCsPath, RiderFolderPath, ".Rider"));
+            var projects = new OrderedDictionary();
  
             foreach (var solutionConfig in configurations)
             {
                 foreach (var proj in solutionConfig.IncludedProjectInfos)
                 {
-                    if (!info.Contains(proj.Project.Name))
+                    if (!projects.Contains(proj.Project.Name))
                     {
-                        info.Add(proj.Project.Name, new Dictionary<string, List<object>>());
+                        projects.Add(proj.Project.Name, new Dictionary<string, List<object>>());
                         _projectsInfo.Add(proj.Project.Name, new RiderProjectInfo(proj.Project));
                     }
                     
                     var riderProjInfo = _projectsInfo[proj.Project.Name];
                     riderProjInfo.ReadConfiguration(proj.Configuration);
                     
-                    var projObject = info[riderProjInfo.Name] as Dictionary<string, List<object>>;
+                    var projObject = projects[riderProjInfo.Name] as Dictionary<string, List<object>>;
                     var projConfig = new Dictionary<string, string>();
 
                     projConfig.Add("ProjectConfig", proj.Configuration.Name);
@@ -309,8 +312,10 @@ namespace Sharpmake.Generators.Generic
                     projObject[proj.Configuration.Platform.ToString()].Add(projConfig);
                 }
             }
+            
+            info.Add("Projects", projects);
 
-            var file = new FileInfo(rootFile);
+            var file = new FileInfo(solutionFile);
 
             using (var stream = new MemoryStream())
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))

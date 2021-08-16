@@ -179,7 +179,8 @@ namespace RiderJson
 
             args.Builder.EventPostGeneration += Sharpmake.Generators.Generic.RiderJson.PostGenerationCallback;
             Sharpmake.Generators.Generic.RiderJson.SolutionName = "Sol1";
-            Sharpmake.Generators.Generic.RiderJson.OutputPath = "projects";
+            Sharpmake.Generators.Generic.RiderJson.RiderFolderPath = "projects";
+            Sharpmake.Generators.Generic.RiderJson.SolutionFilePath = "projects";
 
             args.Generate<FirstSolution>();
             args.Generate<SecondSolution>();
