@@ -2,6 +2,8 @@
 {
     public partial class RiderJson
     {
+
+        // See Sharpmake.BasePlatform.GenerateProjectConfigurationFastBuildMakeFile()
         public static class Template
         {
             public static string FastBuildBuildCommand = @"cd $(SolutionDir)
