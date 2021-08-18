@@ -752,6 +752,14 @@ namespace Sharpmake
         }
 
         /// <summary>
+        /// This method will remove all the masks that were added, if any
+        /// </summary>
+        public void ClearFragmentMasks()
+        {
+            _fragmentMasks = null;
+        }
+
+        /// <summary>
         /// The global fragment mask will add the mask or and it with previously existing masks
         /// </summary>
         /// <param name="masks"></param>

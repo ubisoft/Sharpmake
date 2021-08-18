@@ -130,6 +130,11 @@ namespace Sharpmake
             Targets.ClearTargets();
         }
 
+        public void ClearFragmentMasks()
+        {
+            Targets.ClearFragmentMasks();
+        }
+
         private static bool FilterMethodForTarget(MethodInfo configure, ITarget target)
         {
             Configure configureAttribute = ConfigureCollection.GetConfigureAttribute(configure, inherit: true);
