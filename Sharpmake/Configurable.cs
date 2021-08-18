@@ -122,7 +122,14 @@ namespace Sharpmake
 
         public void AddFragmentMask(params object[] masks)
         {
-            Targets.AddFragmentMask(masks);
+            try
+            {
+                Targets.AddFragmentMask(masks);
+            }
+            catch (Error e)
+            {
+                throw new Error("Error adding mask to class {0}: {1}", Util.ToNiceTypeName(GetType()), e.Message);
+            }
         }
 
         public void ClearTargets()

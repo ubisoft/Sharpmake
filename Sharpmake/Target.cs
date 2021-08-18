@@ -730,10 +730,25 @@ namespace Sharpmake
 
         public void AddFragmentMask(params object[] masks)
         {
+            var fragmentTypes = TargetType.GetFields();
+
             foreach (var mask in masks)
             {
                 Type maskType = mask.GetType();
                 ITarget.ValidFragmentType(maskType);
+                if (!fragmentTypes.Any(fragmentType => fragmentType.FieldType == maskType))
+                {
+                    throw new Error(
+                        "Fragment mask type '{0}' is not present in this target, here is the list of valid types:\n- {1}",
+                        maskType,
+                        string.Join(
+                            "\n- ",
+                            fragmentTypes
+                                .Select(fragmentType => Util.ToNiceTypeName(fragmentType.FieldType))
+                                .OrderBy(type => type, StringComparer.InvariantCultureIgnoreCase)
+                        )
+                    );
+                }
 
                 List<int> maskValues;
                 if (_fragmentMasks == null || !_fragmentMasks.TryGetValue(maskType, out maskValues))
