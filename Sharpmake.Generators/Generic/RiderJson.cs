@@ -364,7 +364,7 @@ namespace Sharpmake.Generators.Generic
             var includePaths = new Strings();
             var modules = new OrderedDictionary();
             var toolchain = new OrderedDictionary();
-            var buildCommands = new OrderedDictionary();
+            var buildInfo = new OrderedDictionary();
             
             toolchain.Add("CppStandard", GetCppStandart(context.Configuration));
             toolchain.Add("bUseRTTI", IsRTTIEnabled(context.Configuration));
@@ -391,9 +391,11 @@ namespace Sharpmake.Generators.Generic
             using (context.Resolver.NewScopedParameter("ProjectDir", context.Configuration.ProjectPath))
             using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
             {
-                buildCommands.Add("BuildCmd", GetBuildCommand(context));
-                buildCommands.Add("ReBuildCmd", GetReBuildCommand(context));
-                buildCommands.Add("CleanCmd", GetCleanCommand(context));
+                var targetPath = Path.Combine(context.Configuration.TargetPath, context.Configuration.TargetFileFullNameWithExtension);
+                buildInfo.Add("TargetPath", targetPath);
+                buildInfo.Add("BuildCmd", GetBuildCommand(context));
+                buildInfo.Add("ReBuildCmd", GetReBuildCommand(context));
+                buildInfo.Add("CleanCmd", GetCleanCommand(context));
             }
 
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
@@ -415,7 +417,7 @@ namespace Sharpmake.Generators.Generic
             
             if (context.Configuration.IsFastBuild || !IgnoreDefaults)
             {
-                info.Add("BuildCommands", buildCommands);
+                info.Add("BuildInfo", buildInfo);
             }
             
             info.Add("EnvironmentIncludePaths", includePaths);

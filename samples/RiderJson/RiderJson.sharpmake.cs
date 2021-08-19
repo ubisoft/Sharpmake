@@ -12,7 +12,7 @@ namespace RiderJson
                            DevEnv.vs2019,
                            Optimization.Debug | Optimization.Release,
                            OutputType.Lib,
-                           Blob.NoBlob,
+                           Blob.FastBuildUnitys,
                            BuildSystem.FastBuild | BuildSystem.MSBuild));
         }
 
@@ -23,8 +23,8 @@ namespace RiderJson
             conf.Name = "[target.Optimization] [target.BuildSystem]";
             conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]_[target.Optimization]_[target.DevEnv]";
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
-            conf.IsBlobbed = target.Blob != Blob.NoBlob;
-            conf.FastBuildBlobbed = conf.IsBlobbed;
+            conf.IsBlobbed = target.Blob == Blob.Blob;
+            conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
             conf.AdditionalCompilerOptions.Add("/FS");
         }
     }
@@ -112,7 +112,7 @@ namespace RiderJson
                            DevEnv.vs2019,
                            Optimization.Debug | Optimization.Release,
                            OutputType.Lib,
-                           Blob.NoBlob,
+                           Blob.FastBuildUnitys,
                            BuildSystem.FastBuild | BuildSystem.MSBuild));
         }
 
