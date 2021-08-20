@@ -150,7 +150,7 @@ namespace Sharpmake.Generators.Generic
             public Builder Builder { get; }
             public Project Project { get; }
             public Project.Configuration Configuration { get; }
-            public string ProjectDirectory { get; }
+            public string ProjectDirectory { get; set; }
             public string ProjectFileName { get; }
             public string ProjectPath { get; }
             
@@ -352,8 +352,13 @@ namespace Sharpmake.Generators.Generic
                 }
                 
                 var context = new RiderGenerationContext(builder, project, config, projectFile);
+                
+                // Hack to generate correct OutputDirectory options.
+                context.ProjectDirectory = Path.Combine(project.SharpmakeCsPath, SolutionFilePath);
                 var projectOptionsGen = new ProjectOptionsGenerator();
                 projectOptionsGen.GenerateOptions(context);
+                context.ProjectDirectory = Path.Combine(project.SharpmakeCsPath, RiderFolderPath, ".Rider");
+                
                 GenerateConfiguration(context, generatedFiles, skipFiles);
             }
         }
