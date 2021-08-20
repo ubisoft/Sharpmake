@@ -393,6 +393,7 @@ namespace Sharpmake.Generators.Generic
                 beforeBuildCommand = "";
             }
             
+            using (context.Resolver.NewScopedParameter("SolutionDir", Path.Combine(context.Project.SharpmakeCsPath, SolutionFilePath)))
             using (context.Resolver.NewScopedParameter("ProjectDir", context.Configuration.ProjectPath))
             using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
             {
@@ -564,7 +565,9 @@ namespace Sharpmake.Generators.Generic
                                                            FastBuildMakeCommandGenerator.BuildType.Build,
                                                            context.Configuration, context.FastBuildArguments)))
             {
-                return context.Resolver.Resolve(unresolvedCommand).Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\");
+                return context.Resolver.Resolve(unresolvedCommand)
+                    .Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\")
+                    .Replace("$(SolutionName)", SolutionName);
             }
         }
         
@@ -581,7 +584,9 @@ namespace Sharpmake.Generators.Generic
                                                            FastBuildMakeCommandGenerator.BuildType.Rebuild,
                                                            context.Configuration, context.FastBuildArguments)))
             {
-                return context.Resolver.Resolve(unresolvedCommand).Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\");
+                return context.Resolver.Resolve(unresolvedCommand)
+                    .Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\")
+                    .Replace("$(SolutionName)", SolutionName);
             }
         }
         

@@ -6,11 +6,11 @@
         // See Sharpmake.BasePlatform.GenerateProjectConfigurationFastBuildMakeFile()
         public static class Template
         {
-            public static string FastBuildBuildCommand = @"cd $(SolutionDir)
+            public static string FastBuildBuildCommand = @"cd [SolutionDir]
 [BeforeBuildCommand]
 [BuildCommand]";
             
-            public static string FastBuildReBuildCommand = @"cd $(SolutionDir)
+            public static string FastBuildReBuildCommand = @"cd [SolutionDir]
 [BeforeBuildCommand]
 [RebuildCommand]";
             
@@ -18,6 +18,8 @@
 del ""[IntermediateDirectory]\*.obj"" >NUL 2>NUL
 del ""[IntermediateDirectory]\*.a"" >NUL 2>NUL
 del ""[IntermediateDirectory]\*.lib"" >NUL 2>NUL
+del ""[IntermediateDirectory]\*.pch"" >NUL 2>NUL
+del ""[IntermediateDirectory]\*.pdb"" >NUL 2>NUL
 del ""[OutputDirectory]\[TargetFileFullName].exe"" >NUL 2>NUL
 del ""[OutputDirectory]\[TargetFileFullName].elf"" >NUL 2>NUL
 del ""[OutputDirectory]\[TargetFileFullName].exp"" >NUL 2>NUL
