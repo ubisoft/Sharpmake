@@ -26,6 +26,7 @@ namespace RiderJson
             conf.IsBlobbed = target.Blob == Blob.Blob;
             conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
             conf.AdditionalCompilerOptions.Add("/FS");
+            conf.Options.Add(Options.Vc.Compiler.CppLanguageStandard.CPP17);
         }
     }
 

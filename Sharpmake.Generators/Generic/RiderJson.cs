@@ -92,11 +92,9 @@ namespace Sharpmake.Generators.Generic
             /// <summary>
             /// Returns OrderedDictionary for json serialization
             /// </summary>
-            /// <returns></returns>
             public OrderedDictionary ToDictionary()
             {
-                var resDict = new OrderedDictionary();
-                resDict.Add("SourcePath", SourcePath);
+                var resDict = new OrderedDictionary { { "SourcePath", SourcePath } };
 
                 if (!IgnoreDefaults || !SourceExtensions.All(new Project().SourceFilesExtensions.Contains))
                 {
@@ -140,7 +138,7 @@ namespace Sharpmake.Generators.Generic
         /// <summary>
         /// Maps projects information for later usage in "Modules" section.
         /// </summary>
-        private Dictionary<string, RiderProjectInfo> _projectsInfo = new Dictionary<string, RiderProjectInfo>();
+        private readonly Dictionary<string, RiderProjectInfo> _projectsInfo = new Dictionary<string, RiderProjectInfo>();
 
         /// <summary>
         /// Helper class for storing all the project-related information.
@@ -276,11 +274,10 @@ namespace Sharpmake.Generators.Generic
         /// Generates "root.json" file for <see cref="SolutionName"/> solution.
         /// Also gathers information about projects for later usage in "Modules" section.
         /// </summary>
-        public void Generate(Builder builder, Solution solution, List<Solution.Configuration> configurations, string solutionFile, List<string> generatedFiles,
-            List<string> skipFiles)
+        public void Generate(Builder builder, Solution solution, List<Solution.Configuration> configurations, string solutionFile,
+            List<string> generatedFiles, List<string> skipFiles)
         {
-            var info = new OrderedDictionary();
-            info.Add("ProjectFolderPath", Path.Combine(solution.SharpmakeCsPath, RiderFolderPath, ".Rider"));
+            var info = new OrderedDictionary { { "ProjectFolderPath", Path.Combine(solution.SharpmakeCsPath, RiderFolderPath, ".Rider") } };
             var projects = new OrderedDictionary();
  
             foreach (var solutionConfig in configurations)
@@ -351,10 +348,12 @@ namespace Sharpmake.Generators.Generic
                     continue;
                 }
                 
-                var context = new RiderGenerationContext(builder, project, config, projectFile);
-                
-                // Hack to generate correct OutputDirectory options.
-                context.ProjectDirectory = Path.Combine(project.SharpmakeCsPath, SolutionFilePath);
+                var context = new RiderGenerationContext(builder, project, config, projectFile)
+                {
+                    // Hack to generate correct OutputDirectory options.
+                    ProjectDirectory = Path.Combine(project.SharpmakeCsPath, SolutionFilePath)
+                };
+
                 var projectOptionsGen = new ProjectOptionsGenerator();
                 projectOptionsGen.GenerateOptions(context);
                 context.ProjectDirectory = Path.Combine(project.SharpmakeCsPath, RiderFolderPath, ".Rider");
@@ -370,22 +369,22 @@ namespace Sharpmake.Generators.Generic
             var modules = new OrderedDictionary();
             var toolchain = new OrderedDictionary();
             var buildInfo = new OrderedDictionary();
-            
-            toolchain.Add("CppStandard", GetCppStandart(context.Configuration));
-            toolchain.Add("bUseRTTI", IsRTTIEnabled(context.Configuration));
-            toolchain.Add("bUseExceptions", IsExceptionEnabled(context.Configuration));
-            toolchain.Add("bIsBuildingLibrary", context.Configuration.Output == Project.Configuration.OutputType.Dll
-                                                || context.Configuration.Output == Project.Configuration.OutputType.Lib);
+
+            toolchain.Add("CppStandard", context.GetCppStandard());
+            toolchain.Add("Architecture", context.GetArchitecture());
+            toolchain.Add("bUseRTTI", context.IsRttiEnabled());
+            toolchain.Add("bUseExceptions", context.IsExceptionEnabled());
+            toolchain.Add("bIsBuildingLibrary", context.Configuration.Output == Project.Configuration.OutputType.Lib);
             toolchain.Add("bIsBuildingDll", context.Configuration.Output == Project.Configuration.OutputType.Dll);
             toolchain.Add("Configuration", context.Configuration.Name);
-            toolchain.Add("bOptimizeCode", IsOptimizationEnabled(context.Configuration));
-            toolchain.Add("bUseInlining", IsInliningEnabled(context.Configuration));
-            toolchain.Add("bUseUnity", IsBlob(context.Configuration));
-            toolchain.Add("bCreateDebugInfo", IsDebugInfo(context.Configuration));
-            toolchain.Add("bUseAVX", IsAvx(context.Configuration));
+            toolchain.Add("bOptimizeCode", context.IsOptimizationEnabled());
+            toolchain.Add("bUseInlining", context.IsInliningEnabled());
+            toolchain.Add("bUseUnity", context.IsBlob());
+            toolchain.Add("bCreateDebugInfo", context.IsDebugInfo());
+            toolchain.Add("bUseAVX", context.IsAvx());
             toolchain.Add("Compiler", context.Configuration.Compiler.ToString());
-            toolchain.Add("bStrictConformanceMode", IsConformanceMode(context.Configuration));
-            toolchain.Add("PrecompiledHeaderAction", GetPchAction(context));
+            toolchain.Add("bStrictConformanceMode", context.IsConformanceMode());
+            toolchain.Add("PrecompiledHeaderAction", context.GetPchAction());
 
             var beforeBuildCommand = context.Configuration.FastBuildCustomActionsBeforeBuildCommand;
             if (beforeBuildCommand == FileGeneratorUtilities.RemoveLineTag)
@@ -448,107 +447,6 @@ namespace Sharpmake.Generators.Generic
                 {
                     skipFiles.Add(Path.Combine(file.DirectoryName, file.Name));
                 }
-            }
-        }
-
-        private string GetCppStandart(Project.Configuration config)
-        {
-            string res = "Default";
-
-            var stdOptions = new List<object>(); 
-            stdOptions.AddRange(Options.GetObjects<Options.Vc.Compiler.CppLanguageStandard>(config).Select(it => it as object));
-            stdOptions.AddRange(Options.GetObjects<Options.Clang.Compiler.CppLanguageStandard>(config).Select(it => it as object));
-            stdOptions.AddRange(Options.GetObjects<Options.Makefile.Compiler.CppLanguageStandard>(config).Select(it => it as object));
-            stdOptions.AddRange(Options.GetObjects<Options.XCode.Compiler.CppLanguageStandard>(config).Select(it => it as object));
-            stdOptions.AddRange(Options.GetObjects<Options.Android.Compiler.CppLanguageStandard>(config).Select(it => it as object));
-
-            if (stdOptions.Count > 0)
-            {
-                res = stdOptions.First().ToString();
-            }
-            
-            return res;
-        }
-        
-        private bool IsRTTIEnabled(Project.Configuration config)
-        {
-            return !config.CheckOptions(Options.Vc.Compiler.RTTI.Disable,
-                         Options.Makefile.Compiler.Rtti.Disable,
-                         Options.XCode.Compiler.RTTI.Disable,
-                         Options.Clang.Compiler.Rtti.Disable);
-        }
-        
-        private bool IsExceptionEnabled(Project.Configuration config)
-        {
-            return !config.CheckOptions(Options.Vc.Compiler.Exceptions.Disable,
-                                        Options.Makefile.Compiler.Exceptions.Disable,
-                                        Options.XCode.Compiler.Exceptions.Disable,
-                                        Options.Clang.Compiler.Exceptions.Disable,
-                                        Options.Android.Compiler.Exceptions.Disable);
-        }
-        
-        private bool IsOptimizationEnabled(Project.Configuration config)
-        {
-            return !config.CheckOptions(Options.Vc.Compiler.Optimization.Disable,
-                                        Options.Makefile.Compiler.OptimizationLevel.Disable,
-                                        Options.XCode.Compiler.OptimizationLevel.Disable,
-                                        Options.Clang.Compiler.OptimizationLevel.Disable);
-        }
-        
-        private bool IsInliningEnabled(Project.Configuration config)
-        {
-            return !config.CheckOptions(Options.Vc.Compiler.Inline.Disable);
-        }
-        
-        private bool IsBlob(Project.Configuration config)
-        {
-            return config.IsBlobbed || config.FastBuildBlobbed;
-        }
-        
-        private bool IsDebugInfo(Project.Configuration config)
-        {
-            return !config.CheckOptions(Options.Vc.General.DebugInformation.Disable,
-                                        Options.Makefile.Compiler.GenerateDebugInformation.Disable,
-                                        Options.XCode.Compiler.GenerateDebuggingSymbols.Disable,
-                                        Options.Clang.Compiler.GenerateDebugInformation.Disable,
-                                        Options.Android.Compiler.DebugInformationFormat.None);
-        }
-        
-        private bool IsAvx(Project.Configuration config)
-        {
-            return config.CheckOptions(Options.Vc.Compiler.EnhancedInstructionSet.AdvancedVectorExtensions,
-                                       Options.Vc.Compiler.EnhancedInstructionSet.AdvancedVectorExtensions2,
-                                       Options.Vc.Compiler.EnhancedInstructionSet.AdvancedVectorExtensions512);
-        }
-        
-        private bool IsConformanceMode(Project.Configuration config)
-        {
-            return config.CheckOptions(Options.Vc.Compiler.ConformanceMode.Enable);
-        }
-
-        private string GetPchAction(RiderGenerationContext context)
-        {
-            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
-
-            if (!Options.HasOption<Options.Vc.SourceFile.PrecompiledHeader>(context.Configuration))
-            {
-                if (platformVcxproj.HasPrecomp(context))
-                {
-                    return "Include";
-                }
-
-                return "None";
-            }
-            
-            var pchOption = Options.GetObject<Options.Vc.SourceFile.PrecompiledHeader>(context.Configuration);
-            switch (pchOption)
-            {
-                case Options.Vc.SourceFile.PrecompiledHeader.UsePrecompiledHeader:
-                    return "Include";
-                case Options.Vc.SourceFile.PrecompiledHeader.CreatePrecompiledHeader:
-                    return "Create";
-                default:
-                    return "None";
             }
         }
 
