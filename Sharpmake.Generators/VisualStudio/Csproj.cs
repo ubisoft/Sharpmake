@@ -1569,7 +1569,8 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static string GetTargetFrameworksString(params Tuple<DotNetFramework, DotNetOS, string>[] projectFrameworks)
         {
-            return string.Join(";", projectFrameworks.Select(tuple => {
+            return string.Join(";", projectFrameworks.Select(tuple =>
+            {
                 var dotNetFramework = tuple.Item1;
                 var dotNetOS = tuple.Item2;
                 var dotNetOSVersion = tuple.Item3;

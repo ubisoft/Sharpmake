@@ -124,7 +124,6 @@ namespace Sharpmake
                             context.Options["ExternalIncludePath"] = systemIncludesString;
                         else
                             context.Options["ExternalIncludePath"] += ";" + systemIncludesString;
-
                     }
                     else
                     {
