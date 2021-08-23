@@ -506,6 +506,8 @@ namespace Sharpmake
             includePaths.AddRange(context.Configuration.IncludePrivatePaths);
             includePaths.AddRange(context.Configuration.IncludePaths);
             includePaths.AddRange(context.Configuration.DependenciesIncludePaths);
+            includePaths.AddRange(context.Configuration.IncludeSystemPaths);
+            includePaths.AddRange(context.Configuration.DependenciesIncludeSystemPaths);
 
             includePaths.Sort();
             return includePaths;

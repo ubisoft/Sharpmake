@@ -45,25 +45,30 @@ namespace Sharpmake
         vs2019 = 1 << 5,
 
         /// <summary>
+        /// Visual Studio 2022
+        /// </summary>
+        vs2022 = 1 << 6,
+
+        /// <summary>
         /// iOS project with Xcode.
         /// </summary>
-        xcode4ios = 1 << 6,
+        xcode4ios = 1 << 7,
 
         /// <summary>
         /// Eclipse.
         /// </summary>
-        eclipse = 1 << 7,
+        eclipse = 1 << 8,
 
         /// <summary>
         /// GNU Makefiles.
         /// </summary>
-        make = 1 << 8,
+        make = 1 << 9,
 
         /// <summary>
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
-        VisualStudio = vs2015 | vs2017 | vs2019,
+        VisualStudio = vs2015 | vs2017 | vs2019 | vs2022,
 
         [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
         vs2010 = -1,
@@ -725,10 +730,25 @@ namespace Sharpmake
 
         public void AddFragmentMask(params object[] masks)
         {
+            var fragmentTypes = TargetType.GetFields();
+
             foreach (var mask in masks)
             {
                 Type maskType = mask.GetType();
                 ITarget.ValidFragmentType(maskType);
+                if (!fragmentTypes.Any(fragmentType => fragmentType.FieldType == maskType))
+                {
+                    throw new Error(
+                        "Fragment mask type '{0}' is not present in this target, here is the list of valid types:\n- {1}",
+                        maskType,
+                        string.Join(
+                            "\n- ",
+                            fragmentTypes
+                                .Select(fragmentType => Util.ToNiceTypeName(fragmentType.FieldType))
+                                .OrderBy(type => type, StringComparer.InvariantCultureIgnoreCase)
+                        )
+                    );
+                }
 
                 List<int> maskValues;
                 if (_fragmentMasks == null || !_fragmentMasks.TryGetValue(maskType, out maskValues))
@@ -744,6 +764,14 @@ namespace Sharpmake
 
                 maskValues.Add((int)mask);
             }
+        }
+
+        /// <summary>
+        /// This method will remove all the masks that were added, if any
+        /// </summary>
+        public void ClearFragmentMasks()
+        {
+            _fragmentMasks = null;
         }
 
         /// <summary>

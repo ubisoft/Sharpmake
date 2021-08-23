@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ namespace HelloLinux
             // this tells the shared lib loader to look in the exe dir
             // note: because we write in makefiles we double the $ to escape it
             conf.AdditionalLinkerOptions.Add("-Wl,-rpath='$$ORIGIN'");
+
+            conf.LibraryFiles.Add("libuuid.so");
 
             conf.AddPrivateDependency<Dll1Project>(target);
             conf.AddPrivateDependency<StaticLib2Project>(target);

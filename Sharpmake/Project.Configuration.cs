@@ -2351,6 +2351,7 @@ namespace Sharpmake
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesBuildExclude);
                 Util.ResolvePath(Project.SourceRootPath, ref IncludePaths);
                 Util.ResolvePath(Project.SourceRootPath, ref IncludePrivatePaths);
+                Util.ResolvePath(Project.SourceRootPath, ref IncludeSystemPaths);
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExclude);
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExcludeFolders);
                 Util.ResolvePath(Project.SourceRootPath, ref ConsumeWinRTExtensions);

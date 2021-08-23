@@ -203,6 +203,8 @@ namespace Sharpmake
                     return "15.0";
                 case DevEnv.vs2019:
                     return "16.0";
+                case DevEnv.vs2022:
+                    return "17.0";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -218,6 +220,8 @@ namespace Sharpmake
                     return 15;
                 case DevEnv.vs2019:
                     return 16;
+                case DevEnv.vs2022:
+                    return 17;
                 default:
                     throw new NotImplementedException("DevEnv " + visualVersion + " not recognized!");
             }
@@ -238,6 +242,8 @@ namespace Sharpmake
                     return "v141";
                 case DevEnv.vs2019:
                     return "v142";
+                case DevEnv.vs2022:
+                    return "v143";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -253,6 +259,8 @@ namespace Sharpmake
                     return "2017";
                 case DevEnv.vs2019:
                     return "2019";
+                case DevEnv.vs2022:
+                    return "2022";
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }
@@ -280,6 +288,9 @@ namespace Sharpmake
         private static readonly ConcurrentDictionary<Tuple<DevEnv, bool>, string> s_visualStudioDirectories = new ConcurrentDictionary<Tuple<DevEnv, bool>, string>();
         public static string GetVisualStudioDir(this DevEnv visualVersion, bool ignoreVisualStudioPathOverride = false)
         {
+            if (!visualVersion.IsVisualStudio())
+                throw new Error($"{visualVersion} is not a visual studio version!");
+
             // TODO: Replace Tuple with ValueTuple once we support C# 8 because ValueTuple is
             //       allocated on the stack. That should be faster here.
             string visualStudioDirectory = s_visualStudioDirectories.GetOrAdd(Tuple.Create(visualVersion, ignoreVisualStudioPathOverride), devEnv =>
@@ -295,17 +306,21 @@ namespace Sharpmake
                 string installDir = Util.GetVisualStudioInstallPathFromQuery(visualVersion);
                 if (string.IsNullOrEmpty(installDir))
                 {
-                    switch (visualVersion)
+                    // try again but this time including previews
+                    installDir = Util.GetVisualStudioInstallPathFromQuery(visualVersion, allowPrereleaseVersions: true);
+                    if (string.IsNullOrEmpty(installDir)) // arbitrary fallback
                     {
-                        case DevEnv.vs2017:
-                        case DevEnv.vs2019:
+                        if (visualVersion > DevEnv.vs2015)
+                        {
                             installDir = @"Microsoft Visual Studio\" + GetVSYear(visualVersion) + @"\Professional";
-                            break;
-                        default:
+                        }
+                        else
+                        {
                             installDir = string.Format(@"Microsoft Visual Studio {0}", visualVersion.GetVisualVersionString());
-                            break;
+                        }
+                        string rootDir = Environment.GetFolderPath(visualVersion < DevEnv.vs2022 ? Environment.SpecialFolder.ProgramFilesX86 : Environment.SpecialFolder.ProgramFiles);
+                        installDir = Path.Combine(rootDir, installDir);
                     }
-                    installDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), installDir);
                 }
                 return Util.SimplifyPath(installDir);
             });
@@ -321,6 +336,8 @@ namespace Sharpmake
                     return "14.10.25017";
                 case DevEnv.vs2019:
                     return "14.20.27404";
+                case DevEnv.vs2022:
+                    return "14.30.30423"; // from Preview3
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized for default compiler version");
             }
@@ -329,19 +346,20 @@ namespace Sharpmake
         private static readonly ConcurrentDictionary<DevEnv, string> s_visualStudioVCRootPathCache = new ConcurrentDictionary<DevEnv, string>();
         public static string GetVisualStudioVCRootPath(this DevEnv visualVersion)
         {
+            if (!visualVersion.IsVisualStudio())
+                throw new Error($"{visualVersion} is not a visual studio version!");
+
             string visualStudioVCRootPath = s_visualStudioVCRootPathCache.GetOrAdd(visualVersion, devEnv =>
             {
                 string vsDir = visualVersion.GetVisualStudioDir();
-                switch (visualVersion)
+                if (visualVersion > DevEnv.vs2015)
                 {
-                    case DevEnv.vs2015:
-                        return Path.Combine(vsDir, "VC");
-
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                        return Path.Combine(vsDir, @"VC\Tools\MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
+                    return Path.Combine(vsDir, @"VC\Tools\MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
                 }
-                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+                else
+                {
+                    return Path.Combine(vsDir, "VC");
+                }
             });
 
             return visualStudioVCRootPath;
@@ -350,31 +368,48 @@ namespace Sharpmake
         private static readonly ConcurrentDictionary<DevEnv, Version> s_visualStudioVCToolsVersionCache = new ConcurrentDictionary<DevEnv, Version>();
         public static Version GetVisualStudioVCToolsVersion(this DevEnv visualVersion)
         {
+            if (!visualVersion.IsVisualStudio())
+                throw new Error($"{visualVersion} is not a visual studio version!");
+
             Version version = s_visualStudioVCToolsVersionCache.GetOrAdd(visualVersion, devEnv =>
             {
-                string vsDir = visualVersion.GetVisualStudioDir();
-                switch (visualVersion)
+                string versionString = visualVersion.GetDefaultCompilerVersion(); // default fallback
+                try
                 {
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                        string versionString = visualVersion.GetDefaultCompilerVersion(); // default fallback
-                        try
-                        {
-                            string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
-                            if (File.Exists(toolchainFile))
-                            {
-                                using (StreamReader file = new StreamReader(toolchainFile))
-                                    versionString = file.ReadLine().Trim();
-                            }
-                        }
-                        catch { }
-
-                        return new Version(versionString);
+                    string toolchainFile = Path.Combine(visualVersion.GetVisualStudioDir(), "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
+                    if (File.Exists(toolchainFile))
+                    {
+                        using (StreamReader file = new StreamReader(toolchainFile))
+                            versionString = file.ReadLine().Trim();
+                    }
                 }
-                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+                catch { }
+
+                return new Version(versionString);
             });
 
             return version;
+        }
+
+        /// <summary>
+        /// Will return the name of the root directory in MSBuild under Microsoft/VC for a particular devenv,
+        /// since it uses yet another versioning pattern than the toolchain
+        /// </summary>
+        /// <param name="visualVersion">The visual studio version to convert</param>
+        /// <returns>The name of the directory for that version</returns>
+        public static string GetMSBuildVCDirVersion(this DevEnv visualVersion)
+        {
+            switch (visualVersion)
+            {
+                case DevEnv.vs2017:
+                    return "v150";
+                case DevEnv.vs2019:
+                    return "v160";
+                case DevEnv.vs2022:
+                    return "v170";
+                default:
+                    throw new Error("DevEnv " + visualVersion + " not supported!");
+            }
         }
 
         public static string GetVCTargetsPath(this DevEnv visualVersion)
@@ -390,7 +425,8 @@ namespace Sharpmake
                 case DevEnv.vs2017:
                     return Path.Combine(visualVersion.GetVisualStudioDir(), @"Common7\IDE\VC\VCTargets");
                 case DevEnv.vs2019:
-                    return Path.Combine(visualVersion.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\v160");
+                case DevEnv.vs2022:
+                    return Path.Combine(visualVersion.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\", visualVersion.GetMSBuildVCDirVersion());
                 default:
                     throw new ArgumentOutOfRangeException(nameof(visualVersion), visualVersion, null);
             }
@@ -404,6 +440,8 @@ namespace Sharpmake
                     return "14.16.27012";
                 case DevEnv.vs2019:
                     return "14.24.28127";
+                case DevEnv.vs2022:
+                    return "14.30.30423"; // from Preview3
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized for default compiler version");
             }
@@ -415,25 +453,19 @@ namespace Sharpmake
             Version version = s_visualStudioVCRedistVersionCache.GetOrAdd(visualVersion, devEnv =>
             {
                 string vsDir = visualVersion.GetVisualStudioDir();
-                switch (visualVersion)
+                string versionString = visualVersion.GetDefaultRedistVersion(); // default fallback
+                try
                 {
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                        string versionString = visualVersion.GetDefaultRedistVersion(); // default fallback
-                        try
-                        {
-                            string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCRedistVersion.default.txt");
-                            if (File.Exists(toolchainFile))
-                            {
-                                using (StreamReader file = new StreamReader(toolchainFile))
-                                    versionString = file.ReadLine().Trim();
-                            }
-                        }
-                        catch { }
-
-                        return new Version(versionString);
+                    string toolchainFile = Path.Combine(vsDir, "VC", "Auxiliary", "Build", "Microsoft.VCRedistVersion.default.txt");
+                    if (File.Exists(toolchainFile))
+                    {
+                        using (StreamReader file = new StreamReader(toolchainFile))
+                            versionString = file.ReadLine().Trim();
+                    }
                 }
-                throw new ArgumentOutOfRangeException("VS version not recognized " + visualVersion);
+                catch { }
+
+                return new Version(versionString);
             });
 
             return version;
@@ -450,6 +482,7 @@ namespace Sharpmake
                     }
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
+                case DevEnv.vs2022:
                     {
                         string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
                         string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
@@ -602,7 +635,7 @@ namespace Sharpmake
         {
             string visualStudioVCDir = Util.EnsureTrailingSeparator(visualVersion.GetVisualStudioVCRootPath());
             string subDir = platform == Platform.win64 ? @"\amd64" : "";
-            if ((visualVersion == DevEnv.vs2017) || (visualVersion == DevEnv.vs2019))
+            if (visualVersion.IsVisualStudio() && visualVersion >= DevEnv.vs2017)
                 subDir = platform == Platform.win64 ? @"\x64" : @"\x86";
 
             string visualStudioLib = string.Format(@"{0}lib{1};{0}atlmfc\lib{1};", visualStudioVCDir, subDir);
@@ -697,6 +730,8 @@ namespace Sharpmake
                     return "10.0.18362.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0:
                     return "10.0.19041.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_20348_0:
+                    return "10.0.20348.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
                     return "$(LatestTargetPlatformVersion)";
                 default:
@@ -714,6 +749,8 @@ namespace Sharpmake
                     return visualVersion == DevEnv.vs2017;
                 case Options.Vc.General.PlatformToolset.v142:
                     return visualVersion == DevEnv.vs2019;
+                case Options.Vc.General.PlatformToolset.v143:
+                    return visualVersion == DevEnv.vs2022;
                 case Options.Vc.General.PlatformToolset.v140_xp:
                 case Options.Vc.General.PlatformToolset.v141_xp:
                 case Options.Vc.General.PlatformToolset.LLVM:
@@ -739,6 +776,8 @@ namespace Sharpmake
                     return DevEnv.vs2017;
                 case Options.Vc.General.PlatformToolset.v142:
                     return DevEnv.vs2019;
+                case Options.Vc.General.PlatformToolset.v143:
+                    return DevEnv.vs2022;
                 case Options.Vc.General.PlatformToolset.LLVM:
                 case Options.Vc.General.PlatformToolset.ClangCL:
                     return null;
@@ -762,6 +801,10 @@ namespace Sharpmake
                 case DevEnv.vs2019:
                     vcTargetsPathKey = "VCTargetsPath16";
                     vcRootPathKey = "VCInstallDir_160";
+                    break;
+                case DevEnv.vs2022:
+                    vcTargetsPathKey = "VCTargetsPath17";
+                    vcRootPathKey = "VCInstallDir_160"; // LCTODO: Preview3 still uses 160!!!
                     break;
                 default:
                     throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
@@ -796,6 +839,7 @@ namespace Sharpmake
                 case DevEnv.vs2015:
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
+                case DevEnv.vs2022:
                     return true;
                 default:
                     return false;
@@ -823,7 +867,7 @@ namespace Sharpmake
             if (devEnv == other)
                 return true;
 
-            // VS2017 and VS2019 are guaranteed by Microsoft to be ABI-compatible with VS2015 for C++.
+            // VS2017/VS2019/VS2022 are guaranteed by Microsoft to be ABI-compatible with VS2015 for C++.
             if (devEnv.IsAbiCompatibleWithVS2015() && other.IsAbiCompatibleWithVS2015())
                 return true;
 

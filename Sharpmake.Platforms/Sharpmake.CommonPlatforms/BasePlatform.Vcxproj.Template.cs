@@ -175,6 +175,7 @@ namespace Sharpmake
     <ConfigurationType>[options.ConfigurationType]</ConfigurationType>
     <UseDebugLibraries>[options.UseDebugLibraries]</UseDebugLibraries>
     <PreferredToolArchitecture>[options.PreferredToolArchitecture]</PreferredToolArchitecture>
+    <TranslateIncludes>[options.TranslateIncludes]</TranslateIncludes>
     <CharacterSet>[options.CharacterSet]</CharacterSet>
     <UseOfMfc>[options.UseOfMfc]</UseOfMfc>
     <CLRSupport>[clrSupport]</CLRSupport>
@@ -185,6 +186,9 @@ namespace Sharpmake
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
+    <TreatAngleIncludeAsExternal>[options.TreatAngleIncludeAsExternal]</TreatAngleIncludeAsExternal>
+    <ExternalWarningLevel>[options.ExternalWarningLevel]</ExternalWarningLevel>
+    <ExternalTemplatesDiagnostics>[options.ExternalTemplatesDiagnostics]</ExternalTemplatesDiagnostics>
   </PropertyGroup>
 ";
 
@@ -207,8 +211,16 @@ namespace Sharpmake
     <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
     <ExecutablePath>[options.ExecutablePath]</ExecutablePath>
     <IncludePath>[options.IncludePath]</IncludePath>
+    <ExternalIncludePath>[options.ExternalIncludePath]</ExternalIncludePath>
+    <ReferencePath>[options.ReferencePath]</ReferencePath>
     <LibraryPath>[options.LibraryPath]</LibraryPath>
+    <LibraryWPath>[options.LibraryWPath]</LibraryWPath>
+    <SourcePath>[options.SourcePath]</SourcePath>
     <ExcludePath>[options.ExcludePath]</ExcludePath>
+    <PublicIncludeDirectories>[options.PublicIncludeDirectories]</PublicIncludeDirectories>
+    <AllProjectIncludesArePublic>[options.AllProjectIncludesArePublic]</AllProjectIncludesArePublic>
+    <PublicModuleDirectories>[options.PublicModuleDirectories]</PublicModuleDirectories>
+    <AllProjectBMIsArePublic>[options.AllProjectBMIsArePublic]</AllProjectBMIsArePublic>
     <DisableFastUpToDateCheck>[options.DisableFastUpToDateCheck]</DisableFastUpToDateCheck>
     <EnableManagedIncrementalBuild>[options.EnableManagedIncrementalBuild]</EnableManagedIncrementalBuild>
     <UseClangCl>[options.UseClangCl]</UseClangCl>

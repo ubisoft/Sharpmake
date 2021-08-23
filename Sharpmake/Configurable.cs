@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -122,12 +122,24 @@ namespace Sharpmake
 
         public void AddFragmentMask(params object[] masks)
         {
-            Targets.AddFragmentMask(masks);
+            try
+            {
+                Targets.AddFragmentMask(masks);
+            }
+            catch (Error e)
+            {
+                throw new Error("Error adding mask to class {0}: {1}", Util.ToNiceTypeName(GetType()), e.Message);
+            }
         }
 
         public void ClearTargets()
         {
             Targets.ClearTargets();
+        }
+
+        public void ClearFragmentMasks()
+        {
+            Targets.ClearFragmentMasks();
         }
 
         private static bool FilterMethodForTarget(MethodInfo configure, ITarget target)
