@@ -202,7 +202,7 @@ namespace Sharpmake
                 /// <summary>
                 /// Sets up the library paths when adding a dependency on a static library.
                 /// </summary>
-                /// <param name="configuration">The <see cref="Configuration"/> instance on which to 
+                /// <param name="configuration">The <see cref="Configuration"/> instance on which to
                 ///        set the paths.</param>
                 /// <param name="dependencySetting">The <see cref="DependencySetting"/> bitflags
                 ///        that specify the properties of the dependency relationship.</param>
@@ -383,7 +383,7 @@ namespace Sharpmake
 
                 /// <summary>
                 /// When the <c>FASTBUILD_DEOPTIMIZE_OBJECT</c> token is specified,
-                /// deoptimize files with writable status. 
+                /// deoptimize files with writable status.
                 /// </summary>
                 /// <remarks>
                 /// This is useful when using Perforce, since files that have not been modified are
@@ -458,7 +458,7 @@ namespace Sharpmake
             /// <remarks>
             /// This setting is provided for libraries, because they are usually intermediate
             /// artifacts during the compilation process and do not need to be in the final output
-            /// directory unless it's necessary. 
+            /// directory unless it's necessary.
             /// <para>
             /// The default is <c>false</c>. Setting this to <c>true</c> will force the generators
             /// to copy the library artifacts.
@@ -1858,7 +1858,7 @@ namespace Sharpmake
                 /// on a different input file that also depends on the real input file.
                 /// <para>
                 /// FASTBuild is key based, not file based. So it can have two different operations on the same file.
-                /// If you need support for FASTBuild, you can make two different custom build rules with one specific to BFF 
+                /// If you need support for FASTBuild, you can make two different custom build rules with one specific to BFF
                 /// and the other excluding BFF.
                 /// </para>
                 /// </remarks>
@@ -1873,7 +1873,7 @@ namespace Sharpmake
                     /// </summary>
                     ExcludeBFF,
                     /// <summary>
-                    /// The custom build step is specific to BFF 
+                    /// The custom build step is specific to BFF
                     /// </summary>
                     BFFOnly
                 };
@@ -2351,6 +2351,7 @@ namespace Sharpmake
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesBuildExclude);
                 Util.ResolvePath(Project.SourceRootPath, ref IncludePaths);
                 Util.ResolvePath(Project.SourceRootPath, ref IncludePrivatePaths);
+                Util.ResolvePath(Project.SourceRootPath, ref IncludeSystemPaths);
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExclude);
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExcludeFolders);
                 Util.ResolvePath(Project.SourceRootPath, ref ConsumeWinRTExtensions);

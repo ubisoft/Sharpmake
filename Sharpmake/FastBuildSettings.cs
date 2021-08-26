@@ -146,7 +146,7 @@ namespace Sharpmake
         /// be found in the same folder as link.exe, and if not add the path
         /// to one in the global settings Environment section, in the PATH variable
         /// </summary>
-        public static bool SetPathToResourceCompilerInEnvironment = false;
+        public static bool SetPathToResourceCompilerInEnvironment = true;
 
         /// <summary>
         /// This is used to activate a workaround in fastbuild for the VS2012 preprocessor enum bug. 

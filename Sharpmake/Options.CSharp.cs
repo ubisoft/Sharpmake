@@ -181,6 +181,20 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum UseWpf
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
+            public enum UseWindowsForms
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)
@@ -419,7 +433,8 @@ namespace Sharpmake
                 Level2,
                 Level3,
                 [Default]
-                Level4
+                Level4,
+                Level5
             }
 
             public enum DebugSymbols

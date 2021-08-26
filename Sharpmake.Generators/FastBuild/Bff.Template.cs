@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Sharpmake.Generators.FastBuild
 {
     public partial class Bff
@@ -113,13 +111,29 @@ Compiler( '[fastbuildCompilerName]' )
 }
 ";
 
+                internal static string ResourceCompilerSettings = @"
+Compiler( '[fastBuildResourceCompilerName]' )
+{
+    .Executable             = '[fastBuildResourceCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
+                internal static string MasmCompilerSettings = @"
+Compiler( '[fastBuildMasmCompilerName]' )
+{
+    .Executable             = '[fastBuildMasmCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
                 public static string CompilerConfiguration = @"
 [fastBuildConfigurationName] =
 [
     Using( [fastBuildUsing] )
     .BinPath                = '[fastBuildBinPath]'
     .LinkerPath             = '[fastBuildLinkerPath]'
-    .ResourceCompiler       = '[fastBuildResourceCompiler]'
+    .ResourceCompiler       = '[fastBuildResourceCompilerName]'
     .Compiler               = '[fastBuildCompilerName]'
     .Librarian              = '[fastBuildLibrarian]'
     .Linker                 = '[fastBuildLinker]'
@@ -318,20 +332,14 @@ Compiler( '[fastbuildCompilerName]' )
 
                 public static string MasmCompilerExtraOptions = @"
     .CompilerExtraOptions   = ''
-            // General options
-            // ---------------------------
             + ' /nologo'
             + ' /W3'
             + ' /errorReport:queue'
-            // Preprocessor options
-            // ---------------------------
             + ' [cmdLineOptions.PreprocessorDefinitions]'
 ";
 
                 public static string CPPCompilerExtraOptions = @"
     .CompilerExtraOptions   = ''
-            // General options
-            // ---------------------------
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
             + ' [cmdLineOptions.DebugInformationFormat]'
@@ -340,22 +348,17 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.SuppressStartupBanner]'
             + ' [cmdLineOptions.WarningLevel]'
             + ' [cmdLineOptions.TreatWarningAsError]'
+            + ' [cmdLineOptions.ExternalWarningLevel]'
             + ' [cmdLineOptions.DiagnosticsFormat]'
             + ' [cmdLineOptions.EnableASAN]'
             + ' [fastBuildCompileAsC]'
-            // Multi-threaded build is already handled by FASTBuild
-            // + ' [cmdLineOptions.MultiProcessorCompilation]'
             + ' [cmdLineOptions.ConfigurationType]'
-            // Preprocessor options
-            // ---------------------------
             + ' [cmdLineOptions.PreprocessorDefinitions]'
             + ' [cmdLineOptions.UndefinePreprocessorDefinitions]'
             + ' [cmdLineOptions.UndefineAllPreprocessorDefinitions]'
             + ' [cmdLineOptions.IgnoreStandardIncludePath]'
             + ' [cmdLineOptions.GeneratePreprocessedFile]'
             + ' [cmdLineOptions.KeepComments]'
-            // Code Generation options
-            // ---------------------------
             + ' [cmdLineOptions.StringPooling]'
             + ' [cmdLineOptions.MinimalRebuild]'
             + ' [cmdLineOptions.ExceptionHandling]'
@@ -371,8 +374,6 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.CompilerCreateHotpatchableImage]'
             + ' [cmdLineOptions.SupportJustMyCode]'
             + ' [cmdLineOptions.SpectreMitigation]'
-            // Language options
-            // ---------------------------
             + ' [cmdLineOptions.DisableLanguageExtensions]'
             + ' [cmdLineOptions.TreatWChar_tAsBuiltInType]'
             + ' [cmdLineOptions.ForceConformanceInForLoopScope]'
@@ -382,29 +383,22 @@ Compiler( '[fastbuildCompilerName]' )
             + ' [cmdLineOptions.LanguageStandard_C]'
             + ' [cmdLineOptions.LanguageStandard]'
             + ' [cmdLineOptions.ConformanceMode]'
-            // Output Files options
-            // ---------------------------
             + ' [cmdLineOptions.CompilerProgramDatabaseFile]'
-            // Advanced options
-            // ---------------------------
             + ' [cmdLineOptions.CallingConvention]'
             + ' [cmdLineOptions.DisableSpecificWarnings]'
             + ' [cmdLineOptions.ForcedIncludeFiles]'
             + ' [fastBuildSourceFileType]'
             + ' [fastBuildAdditionalCompilerOptionsFromCode]'
             + ' /errorReport:queue'
-            // Character Set
-            // ---------------------------
+            + ' [cmdLineOptions.TranslateIncludes]'
+            + ' [cmdLineOptions.TreatAngleIncludeAsExternal]'
+            + ' [cmdLineOptions.ExternalTemplatesDiagnostics]'
             + ' [cmdLineOptions.CharacterSet]'
-            // Additional compiler options
-            //--------------------------
             + ' [options.AdditionalCompilerOptions]'
             + ' [fastBuildCompilerForceUsing]'
 ";
                 public static string CPPCompilerOptimizationOptions =
 @"
-    // Optimizations options
-    // ---------------------
     .CompilerOptimizations = ''
             + ' [cmdLineOptions.Optimization]'
             + ' [cmdLineOptions.InlineFunctionExpansion]'

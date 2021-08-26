@@ -126,11 +126,12 @@ namespace Sharpmake
                     {
                         case DevEnv.vs2017:
                         case DevEnv.vs2019:
+                        case DevEnv.vs2022:
                             {
                                 // _PlatformFolder override is not enough for android, we need to know the AdditionalVCTargetsPath
                                 // Note that AdditionalVCTargetsPath is not officially supported by vs2017, but we use the variable anyway for convenience and consistency
                                 if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, SharpmakePlatform)))
-                                    throw new Error("SetCppPlatformFolder is not supported by AndroidPlatform correctly: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
+                                    throw new Error($"SetCppPlatformFolder is not supported by {devEnv}: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
 
                                 string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
                                 if (!string.IsNullOrEmpty(additionalVCTargetsPath))
@@ -183,7 +184,7 @@ namespace Sharpmake
                 base.GenerateProjectPlatformSdkDirectoryDescription(context, generator);
 
                 var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
-                if (devEnv == DevEnv.vs2019)
+                if (devEnv.IsVisualStudio() && devEnv >= DevEnv.vs2019)
                 {
                     string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
                     if (!string.IsNullOrEmpty(additionalVCTargetsPath))
@@ -196,7 +197,7 @@ namespace Sharpmake
                 base.GeneratePostDefaultPropsImport(context, generator);
 
                 var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
-                if (devEnv == DevEnv.vs2017 || devEnv == DevEnv.vs2019)
+                if (devEnv.IsVisualStudio() && devEnv >= DevEnv.vs2017)
                 {
                     // in case we've written an additional vc targets path, we need to set a couple of properties to avoid a warning
                     if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform)))

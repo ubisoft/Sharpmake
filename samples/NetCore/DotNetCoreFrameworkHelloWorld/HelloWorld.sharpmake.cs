@@ -61,6 +61,15 @@ namespace NetCore
                 conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
                 conf.ProjectPath = @"[project.RootPath]";
 
+                if (target.Framework.HasFlag(DotNetFramework.netcore3_1))
+                {
+                    conf.Options.Add(Options.CSharp.UseWpf.Enabled);
+                }
+                else
+                {
+                    conf.Options.Add(Options.CSharp.UseWindowsForms.Enabled);
+                }
+
                 conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
             }
         }

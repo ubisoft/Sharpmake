@@ -562,14 +562,15 @@ namespace Sharpmake.Generators.Generic
             options["OutputFile"] = conf.TargetFileFullNameWithExtension.Replace(" ", @"\ ");
 
             // DependenciesLibraryFiles
-            OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
-            PathMakeUnix(dependenciesLibraryFiles);
+            var dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
+            FixupLibraryNames(dependenciesLibraryFiles);
             dependenciesLibraryFiles.InsertPrefix("-l:");
             dependenciesLibraryFiles.Sort();
             options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
 
             // LibraryFiles
             OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
+            FixupLibraryNames(libraryFiles);
             libraryFiles.InsertPrefix("-l:");
             libraryFiles.Sort();
             options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
@@ -694,6 +695,22 @@ namespace Sharpmake.Generators.Generic
                 return Util.PathGetRelative(projectFileInfo.DirectoryName, conf.TargetLibraryPath);
             else
                 return Util.PathGetRelative(projectFileInfo.DirectoryName, conf.TargetPath);
+        }
+
+        private static void FixupLibraryNames(IList<string> paths)
+        {
+            for (int i = 0; i < paths.Count; ++i)
+            {
+                string libraryName = PathMakeUnix(paths[i]);
+                // We've got two kinds of way of listing a library:
+                // - With a filename without extension we must add the potential prefix and potential extension.
+                // - With a filename with a static or shared lib extension (eg. .a/.so), we shouldn't touch it as it's already set by the script.
+                string extension = Path.GetExtension(libraryName).ToLowerInvariant();
+                if (extension != ".a" && extension != ".so")
+                    paths[i] = "lib" + libraryName + ".a";
+                else
+                    paths[i] = libraryName;
+            }
         }
 
         #endregion

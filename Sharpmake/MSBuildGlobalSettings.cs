@@ -95,7 +95,7 @@ namespace Sharpmake
         }
 
 
-        // additionalVCTargetsPath (vs2019)
+        // additionalVCTargetsPath (vs2019+)
         private static readonly ConcurrentDictionary<Tuple<DevEnv, string>, string> s_additionalVCTargetsPath = new ConcurrentDictionary<Tuple<DevEnv, string>, string>();
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Sharpmake
 
         /// <summary>
         /// Allows setting MSBuild vc target path used for a custom platform passed as a string and Visual Studio version.
-        /// This is typically used if you want to add platform specific files with vs2019 as the older way of doing it through _PlatformFolder is deprecated.
+        /// This is typically used if you want to add platform specific files with vs2019+ as the older way of doing it through _PlatformFolder is deprecated.
         /// </summary>
         /// <param name="devEnv">Visual studio version affected</param>
         /// <param name="platform">Platform affected</param>
@@ -140,7 +140,7 @@ namespace Sharpmake
 
         /// <summary>
         /// Get the MSBuild Additional VC targets path used for a known sharpmake platform and Visual studio version.
-        /// This is typically used if you want to add platform specific files with vs2019 as the older way of doing it through _PlatformFolder is deprecated.
+        /// This is typically used if you want to add platform specific files with vs2019+ as the older way of doing it through _PlatformFolder is deprecated.
         /// </summary>
         /// <param name="devEnv">Visual studio version affected</param>
         /// <param name="platform">Platform affected</param>
@@ -152,7 +152,7 @@ namespace Sharpmake
 
         /// <summary>
         /// Get the MSBuild Additional VC targets path used for a custom platform passed as a string and Visual studio version.
-        /// This is typically used if you want to add platform specific files with vs2019 as the older way of doing it through _PlatformFolder is deprecated.
+        /// This is typically used if you want to add platform specific files with vs2019+ as the older way of doing it through _PlatformFolder is deprecated.
         /// </summary>
         /// <param name="devEnv">Visual studio version affected</param>
         /// <param name="platform">Platform affected</param>

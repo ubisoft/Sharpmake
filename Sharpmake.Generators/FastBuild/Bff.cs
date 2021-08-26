@@ -261,6 +261,7 @@ namespace Sharpmake.Generators.FastBuild
             int configIndex = 0;
 
             var defaultTuple = GetDefaultTupleConfig();
+            var allFileCustomBuild = new Dictionary<string, Project.Configuration.CustomFileBuildStepData>();
 
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
@@ -725,8 +726,6 @@ namespace Sharpmake.Generators.FastBuild
                                     case Options.Vc.General.PlatformToolset.LLVM:
                                     case Options.Vc.General.PlatformToolset.ClangCL:
                                         // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        // TODO: figure out what version number to put there
-                                        // maybe use the DevEnv value
                                         string mscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
                                         if (string.IsNullOrEmpty(mscVer))
                                         {
@@ -744,6 +743,9 @@ namespace Sharpmake.Generators.FastBuild
                                                     case Options.Vc.General.PlatformToolset.v142:
                                                         mscVer = "1920";
                                                         break;
+                                                    case Options.Vc.General.PlatformToolset.v143:
+                                                        mscVer = "1930";
+                                                        break;
                                                     default:
                                                         throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
                                                 }
@@ -757,6 +759,9 @@ namespace Sharpmake.Generators.FastBuild
                                                         break;
                                                     case DevEnv.vs2019:
                                                         mscVer = "1920";
+                                                        break;
+                                                    case DevEnv.vs2022:
+                                                        mscVer = "1930";
                                                         break;
                                                     default:
                                                         throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());
@@ -941,6 +946,30 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildResourceFiles = UtilityMethods.FBuildFormatList(fastbuildResourceFilesList, 30);
                             fastBuildEmbeddedResources = UtilityMethods.FBuildFormatList(fastbuildEmbeddedResourceFilesList, 30);
                         }
+
+                        var fileCustomBuildKeys = new Strings();
+                        UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
+                            key =>
+                            {
+                                if (!allFileCustomBuild.TryGetValue(key.Description, out var alreadyRegistered))
+                                {
+                                    allFileCustomBuild.Add(key.Description, key);
+                                    bffGenerator.Write(Template.ConfigurationFile.GenericExecutableSection);
+                                }
+                                else if (key.Executable != alreadyRegistered.Executable ||
+                                        key.KeyInput != alreadyRegistered.KeyInput ||
+                                        key.Output != alreadyRegistered.Output ||
+                                        key.ExecutableArguments != alreadyRegistered.ExecutableArguments)
+                                {
+                                    throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExecutableSection)));
+                                }
+
+                                fileCustomBuildKeys.Add(key.Description);
+
+                                return false;
+                            });
+
+                        fastBuildBuildOnlyDependencies.AddRange(fileCustomBuildKeys);
 
                         Strings fastBuildPreBuildDependencies = new Strings();
                         var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
@@ -1244,24 +1273,6 @@ namespace Sharpmake.Generators.FastBuild
 
                                             bffGenerator.Write(Template.ConfigurationFile.EndSection);
 
-                                            var fileCustomBuildKeys = new Strings();
-                                            UtilityMethods.WriteConfigCustomBuildStepsAsGenericExecutable(context.ProjectDirectoryCapitalized, bffGenerator, context.Project, conf,
-                                                key =>
-                                                {
-                                                    if (!fileCustomBuildKeys.Contains(key))
-                                                    {
-                                                        fileCustomBuildKeys.Add(key);
-                                                        bffGenerator.Write(Template.ConfigurationFile.GenericExecutableSection);
-                                                    }
-                                                    else
-                                                    {
-                                                        throw new Exception(string.Format("Command key '{0}' duplicates another command.  Command is:\n{1}", key, bffGenerator.Resolver.Resolve(Template.ConfigurationFile.GenericExecutableSection)));
-                                                    }
-                                                    return false;
-                                                });
-
-                                            fastBuildProjectDependencies.AddRange(fileCustomBuildKeys);
-
                                             // Resolve node name of the prebuild dependency for PostBuildEvents.
                                             string resolvedSectionNodeIdentifier;
                                             if (beginSectionType == Template.ConfigurationFile.ObjectListBeginSection)
@@ -1444,18 +1455,10 @@ namespace Sharpmake.Generators.FastBuild
                 var resourceDirs = new List<string>();
                 resourceDirs.AddRange(resourceIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
 
-                if (Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
-                    Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable)
-                {
-                    // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
-                    // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
-                    var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, defaultCmdLineIncludePrefix));
-                    resourceDirs.AddRange(platformIncludePathsDefaultPrefix);
-                }
-                else
-                {
-                    resourceDirs.AddRange(platformIncludePathsPrefixed);
-                }
+                // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
+                // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
+                var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, defaultCmdLineIncludePrefix));
+                resourceDirs.AddRange(platformIncludePathsDefaultPrefix);
 
                 if (resourceDirs.Any())
                     context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", resourceDirs);

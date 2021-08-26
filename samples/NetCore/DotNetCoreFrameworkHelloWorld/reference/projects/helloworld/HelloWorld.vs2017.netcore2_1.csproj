@@ -10,6 +10,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <EnableDefaultItems>true</EnableDefaultItems>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>

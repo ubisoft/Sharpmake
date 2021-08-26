@@ -449,9 +449,9 @@ namespace Sharpmake.UnitTests
         [Test]
         public void GetToolVersionStringException()
         {
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.xcode4ios));
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.eclipse));
-            Assert.Catch<NotImplementedException>(() => Util.GetToolVersionString(DevEnv.make));
+            Assert.Catch<Error>(() => Util.GetToolVersionString(DevEnv.xcode4ios));
+            Assert.Catch<Error>(() => Util.GetToolVersionString(DevEnv.eclipse));
+            Assert.Catch<Error>(() => Util.GetToolVersionString(DevEnv.make));
         }
 
         /// <summary>

@@ -92,15 +92,46 @@ namespace Sharpmake
                     context.Options["ExecutablePath"] = devEnv.GetWindowsExecutablePath(conf.Platform);
                 }
 
+                Options.Vc.General.PlatformToolset platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(conf);
+                if (Options.Vc.General.PlatformToolset.LLVM == platformToolset)
+                {
+                    Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                    if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset))
+                        platformToolset = overridenPlatformToolset;
+
+                    devEnv = platformToolset.GetDefaultDevEnvForToolset() ?? devEnv;
+
+                    context.Options["ExecutablePath"] = ClangForWindows.GetWindowsClangExecutablePath() + ";" + devEnv.GetWindowsExecutablePath(conf.Platform);
+                    if (Options.GetObject<Options.Vc.LLVM.UseClangCl>(conf) == Options.Vc.LLVM.UseClangCl.Enable)
+                    {
+                        context.Options["IncludePath"] = ClangForWindows.GetWindowsClangIncludePath() + ";" + devEnv.GetWindowsIncludePath();
+                        context.Options["LibraryPath"] = ClangForWindows.GetWindowsClangLibraryPath() + ";" + devEnv.GetWindowsLibraryPath(conf.Platform, Util.IsDotNet(conf) ? conf.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?));
+                    }
+                }
+
                 var systemIncludes = new OrderableStrings(conf.DependenciesIncludeSystemPaths);
                 systemIncludes.AddRange(conf.IncludeSystemPaths);
                 if (systemIncludes.Count > 0)
                 {
                     systemIncludes.Sort();
-                    if (context.Options["IncludePath"] == FileGeneratorUtilities.RemoveLineTag)
-                        context.Options["IncludePath"] = "$(VC_IncludePath);$(WindowsSDK_IncludePath);" + systemIncludes.JoinStrings(";");
+                    string systemIncludesString = Util.PathGetRelative(context.ProjectDirectory, systemIncludes).JoinStrings(";");
+
+                    // this option is mandatory when using /external:I with msvc, so if the user has selected it
+                    // we consider that the vcxproj supports ExternalIncludePath
+                    if (Options.HasOption<Options.Vc.General.ExternalWarningLevel>(conf))
+                    {
+                        if (context.Options["ExternalIncludePath"] == FileGeneratorUtilities.RemoveLineTag)
+                            context.Options["ExternalIncludePath"] = systemIncludesString;
+                        else
+                            context.Options["ExternalIncludePath"] += ";" + systemIncludesString;
+                    }
                     else
-                        context.Options["IncludePath"] += ";" + systemIncludes.JoinStrings(";");
+                    {
+                        if (context.Options["IncludePath"] == FileGeneratorUtilities.RemoveLineTag)
+                            context.Options["IncludePath"] = "$(VC_IncludePath);$(WindowsSDK_IncludePath);" + systemIncludesString;
+                        else
+                            context.Options["IncludePath"] += ";" + systemIncludesString;
+                    }
                 }
             }
             #endregion

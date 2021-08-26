@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ namespace HelloLinux
 
             conf.Defines.Add("UTIL_DLL_EXPORT");
             conf.ExportDefines.Add("UTIL_DLL_IMPORT");
+
+            conf.LibraryFiles.Add("m");
 
             conf.IncludePaths.Add(SourceRootPath);
 

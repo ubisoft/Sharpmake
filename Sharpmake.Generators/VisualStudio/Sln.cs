@@ -302,9 +302,11 @@ namespace Sharpmake.Generators.VisualStudio
                 case DevEnv.vs2019:
                     fileGenerator.Write(Template.Solution.HeaderBeginVs2019);
                     break;
-                default:
-                    Console.WriteLine("Unsupported DevEnv for solution " + solutionConfigurations[0].Target.GetFragment<DevEnv>());
+                case DevEnv.vs2022:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2022);
                     break;
+                default:
+                    throw new Error($"Unsupported DevEnv {devEnv} for solution {solution.Name}");
             }
 
             SolutionFolder masterBffFolder = null;

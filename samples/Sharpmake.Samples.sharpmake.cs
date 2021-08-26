@@ -118,6 +118,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class CustomBuildStepProject : SampleProject
+    {
+        public CustomBuildStepProject()
+        {
+            Name = "CustomBuildStep";
+        }
+    }
+
+    [Generate]
     public class DotNetCoreFrameworkHelloWorldProject : SampleProject
     {
         public DotNetCoreFrameworkHelloWorldProject()
@@ -151,6 +160,17 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class DotNetOSMultiFrameworksHelloWorldProject : SampleProject
+    {
+        public DotNetOSMultiFrameworksHelloWorldProject()
+        {
+            Name = "DotNetOSMultiFrameworksHelloWorld";
+            SharpmakeMainFile = "HelloWorld.sharpmake.cs";
+            SourceRootPath = @"[project.SharpmakeCsPath]\NetCore\[project.Name]";
+        }
+    }
+
+    [Generate]
     public class FastBuildSimpleExecutable : SampleProject
     {
         public FastBuildSimpleExecutable()
@@ -166,6 +186,25 @@ namespace SharpmakeGen.Samples
         {
             Name = "HelloClangCl";
             SharpmakeMainFile = "HelloClangCl.Main.sharpmake.cs";
+
+            // This one is special, we have .sharpmake.cs files in the codebase
+            SourceFilesExcludeRegex.Remove(@"\\codebase\\");
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
+    public class HelloEventsProject : SampleProject
+    {
+        public HelloEventsProject()
+        {
+            Name = "HelloEvents";
+            SharpmakeMainFile = "HelloEvents.Main.sharpmake.cs";
 
             // This one is special, we have .sharpmake.cs files in the codebase
             SourceFilesExcludeRegex.Remove(@"\\codebase\\");
