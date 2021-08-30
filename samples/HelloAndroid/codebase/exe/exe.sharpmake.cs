@@ -127,6 +127,17 @@ namespace HelloAndroid
 
             DirectoryCopyResourceFiles(GradleAppRootPath, Path.Combine(AndroidPackageProjectsPath, Name + "/app"));
 
+            string srcAppGradleFile = Path.Combine(AndroidPackageProjectsPath, Name + "/app/build.app.gradle.template");
+            string destAppGradleFile = Path.Combine(AndroidPackageProjectsPath, Name + "/app/build.gradle.template");
+
+            if (File.Exists(destAppGradleFile))
+            {
+                File.Delete(destAppGradleFile);
+            }
+
+            // rename gradle template file in app folder
+            File.Move(srcAppGradleFile, destAppGradleFile);
+
             string MainFolderPath = Path.Combine(AndroidPackageProjectsPath, Name + "/app/src/main");
             if (!Directory.Exists(MainFolderPath))
             {
