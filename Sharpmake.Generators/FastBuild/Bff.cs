@@ -392,9 +392,9 @@ namespace Sharpmake.Generators.FastBuild
                         bool useObjectLists = confUseLibraryDependencyInputs;
 
                         string fastBuildOutputFileShortName = GetShortProjectName(project, conf);
-                        var fastBuildProjectDependencies = new List<string>();
-                        var fastBuildBuildOnlyDependencies = new List<string>();
-                        var fastBuildProjectExeUtilityDependencyList = new List<string>();
+                        var fastBuildProjectDependencies = new Strings();
+                        var fastBuildBuildOnlyDependencies = new Strings();
+                        var fastBuildProjectExeUtilityDependencyList = new Strings();
 
                         bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig && isOutputTypeLib;
 
@@ -509,8 +509,8 @@ namespace Sharpmake.Generators.FastBuild
 
                         Strings preBuildTargets = new Strings();
 
-                        var fastBuildTargetSubTargets = new List<string>();
-                        var fastBuildTargetLibraryDependencies = new List<string>();
+                        var fastBuildTargetSubTargets = new Strings();
+                        var fastBuildTargetLibraryDependencies = new Strings();
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
                             {
@@ -1027,9 +1027,9 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildResourceFiles", fastBuildResourceFiles))
                                     using (bffGenerator.Declare("fastBuildEmbeddedResources", fastBuildEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildPrecompiledSourceFile", fastBuildPrecompiledSourceFile))
-                                    using (bffGenerator.Declare("fastBuildProjectDependencies", UtilityMethods.FBuildFormatList(fastBuildProjectDependencies, 30)))
-                                    using (bffGenerator.Declare("fastBuildBuildOnlyDependencies", UtilityMethods.FBuildFormatList(fastBuildBuildOnlyDependencies, 30)))
-                                    using (bffGenerator.Declare("fastBuildPreBuildTargets", UtilityMethods.FBuildFormatList(fastBuildPreBuildDependencies.ToList(), 28)))
+                                    using (bffGenerator.Declare("fastBuildProjectDependencies", UtilityMethods.FBuildFormatList(fastBuildProjectDependencies.Values, 30)))
+                                    using (bffGenerator.Declare("fastBuildBuildOnlyDependencies", UtilityMethods.FBuildFormatList(fastBuildBuildOnlyDependencies.Values, 30)))
+                                    using (bffGenerator.Declare("fastBuildPreBuildTargets", UtilityMethods.FBuildFormatList(fastBuildPreBuildDependencies.Values, 28)))
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
@@ -1298,9 +1298,9 @@ namespace Sharpmake.Generators.FastBuild
                                             if (isLastSubConfig)
                                             {
                                                 string genLibName = "'" + fastBuildOutputFileShortName + "_" + outputType + "'";
-                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
+                                                using (bffGenerator.Declare("fastBuildTargetSubTargets", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets.Values, 15)))
                                                 using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
-                                                using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies, 15)))
+                                                using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", mustGenerateLibrary ? genLibName : UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies.Values, 15)))
                                                 {
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                                     bffGenerator.Write(Template.ConfigurationFile.TargetForLibraryDependencySection);
@@ -1313,8 +1313,8 @@ namespace Sharpmake.Generators.FastBuild
                                     {
                                         // Write Target Alias
                                         using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
-                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets, 15)))
-                                        using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies, 15)))
+                                        using (bffGenerator.Declare("fastBuildTargetSubTargets", UtilityMethods.FBuildFormatList(fastBuildTargetSubTargets.Values, 15)))
+                                        using (bffGenerator.Declare("fastBuildTargetLibraryDependencies", UtilityMethods.FBuildFormatList(fastBuildTargetLibraryDependencies.Values, 15)))
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.TargetSection);
                                             if (!project.IsFastBuildAll)
