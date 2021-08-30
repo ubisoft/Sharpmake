@@ -26,10 +26,8 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_obj
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
-            // General options
-            // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -38,45 +36,27 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_obj
             + ' /nologo'
             + ' /W4'
             + ' /WX-'
-            // Multi-threaded build is already handled by FASTBuild
-            // + ' /MP'
-            // Preprocessor options
-            // ---------------------------
             + ' /D"WIN64"'
             + ' /D"_CONSOLE"'
             + ' /D"_DEBUG"'
-            // Code Generation options
-            // ---------------------------
             + ' /GF'
             + ' /MTd'
             + ' /GS'
             + ' /Gy-'
             + ' /fp:fast'
             + ' /fp:except-'
-            // Language options
-            // ---------------------------
             + ' /Zc:wchar_t'
             + ' /Zc:forScope'
             + ' /Zc:inline'
             + ' /GR-'
             + ' /openmp-'
-            // Output Files options
-            // ---------------------------
             + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
-            // Advanced options
-            // ---------------------------
             + ' /Gd'
             + ' /TP'
             + ' /errorReport:queue'
-            // Character Set
-            // ---------------------------
             + ' /D"_MBCS"'
-            // Additional compiler options
-            //--------------------------
             + ' /FS /Zc:__cplusplus'
 
-    // Optimizations options
-    // ---------------------
     .CompilerOptimizations = ''
             + ' /Od'
             + ' /Ob1'
@@ -109,8 +89,8 @@ Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64_Exe
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
@@ -195,10 +175,8 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_o
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
-            // General options
-            // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -207,45 +185,27 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_o
             + ' /nologo'
             + ' /W4'
             + ' /WX-'
-            // Multi-threaded build is already handled by FASTBuild
-            // + ' /MP'
-            // Preprocessor options
-            // ---------------------------
             + ' /D"NDEBUG"'
             + ' /D"WIN64"'
             + ' /D"_CONSOLE"'
-            // Code Generation options
-            // ---------------------------
             + ' /GF'
             + ' /MT'
             + ' /GS-'
             + ' /Gy'
             + ' /fp:fast'
             + ' /fp:except-'
-            // Language options
-            // ---------------------------
             + ' /Zc:wchar_t'
             + ' /Zc:forScope'
             + ' /Zc:inline'
             + ' /GR-'
             + ' /openmp-'
-            // Output Files options
-            // ---------------------------
             + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
-            // Advanced options
-            // ---------------------------
             + ' /Gd'
             + ' /TP'
             + ' /errorReport:queue'
-            // Character Set
-            // ---------------------------
             + ' /D"_MBCS"'
-            // Additional compiler options
-            //--------------------------
             + ' /FS /Zc:__cplusplus'
 
-    // Optimizations options
-    // ---------------------
     .CompilerOptimizations = ''
             + ' /Ox'
             + ' /Ob2'
@@ -279,8 +239,8 @@ Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64_E
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
@@ -365,10 +325,8 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects' )
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
-            // General options
-            // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -377,45 +335,27 @@ ObjectList( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_objects' )
             + ' /nologo'
             + ' /W4'
             + ' /WX-'
-            // Multi-threaded build is already handled by FASTBuild
-            // + ' /MP'
-            // Preprocessor options
-            // ---------------------------
             + ' /D"WIN64"'
             + ' /D"_CONSOLE"'
             + ' /D"_DEBUG"'
-            // Code Generation options
-            // ---------------------------
             + ' /GF'
             + ' /MTd'
             + ' /GS'
             + ' /Gy-'
             + ' /fp:fast'
             + ' /fp:except-'
-            // Language options
-            // ---------------------------
             + ' /Zc:wchar_t'
             + ' /Zc:forScope'
             + ' /Zc:inline'
             + ' /GR-'
             + ' /openmp-'
-            // Output Files options
-            // ---------------------------
             + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
-            // Advanced options
-            // ---------------------------
             + ' /Gd'
             + ' /TP'
             + ' /errorReport:queue'
-            // Character Set
-            // ---------------------------
             + ' /D"_MBCS"'
-            // Additional compiler options
-            //--------------------------
             + ' /FS /Zc:__cplusplus'
 
-    // Optimizations options
-    // ---------------------
     .CompilerOptimizations = ''
             + ' /Od'
             + ' /Ob1'
@@ -448,8 +388,8 @@ Executable( 'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64_Executable
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
@@ -534,10 +474,8 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects'
     .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildcopysinglefiletest\'
 
     .CompilerExtraOptions   = ''
-            // General options
-            // ---------------------------
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -546,45 +484,27 @@ ObjectList( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_objects'
             + ' /nologo'
             + ' /W4'
             + ' /WX-'
-            // Multi-threaded build is already handled by FASTBuild
-            // + ' /MP'
-            // Preprocessor options
-            // ---------------------------
             + ' /D"NDEBUG"'
             + ' /D"WIN64"'
             + ' /D"_CONSOLE"'
-            // Code Generation options
-            // ---------------------------
             + ' /GF'
             + ' /MT'
             + ' /GS-'
             + ' /Gy'
             + ' /fp:fast'
             + ' /fp:except-'
-            // Language options
-            // ---------------------------
             + ' /Zc:wchar_t'
             + ' /Zc:forScope'
             + ' /Zc:inline'
             + ' /GR-'
             + ' /openmp-'
-            // Output Files options
-            // ---------------------------
             + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildcopysinglefiletest\postbuildcopysinglefiletest_compiler.pdb"'
-            // Advanced options
-            // ---------------------------
             + ' /Gd'
             + ' /TP'
             + ' /errorReport:queue'
-            // Character Set
-            // ---------------------------
             + ' /D"_MBCS"'
-            // Additional compiler options
-            //--------------------------
             + ' /FS /Zc:__cplusplus'
 
-    // Optimizations options
-    // ---------------------
     .CompilerOptimizations = ''
             + ' /Ox'
             + ' /Ob2'
@@ -618,8 +538,8 @@ Executable( 'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64_Executab
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
