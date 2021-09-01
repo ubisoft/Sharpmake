@@ -1,3 +1,6 @@
+pushd C:\Android\android-sdk\ndk-bundle
+dir /b /s
+popd
 @echo off
 :: Batch arguments:
 :: %~1 Main sharpmake file
