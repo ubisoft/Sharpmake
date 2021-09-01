@@ -258,6 +258,8 @@ jobs:
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
           cd codebase/temp/projects/exepackaging
           ls
+          cd app
+          ls
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
           
