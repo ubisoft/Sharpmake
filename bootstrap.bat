@@ -1,6 +1,3 @@
-pushd D:\a\Sharpmake\Sharpmake\samples\HelloAndroid\codebase\temp\projects\exepackaging
-dir /b /s
-popd
 @echo off
 :: Batch arguments:
 :: %~1 Main sharpmake file
