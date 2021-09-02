@@ -1,0 +1,80 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion = 29
+    buildToolsVersion = "29.0.2"
+
+    defaultConfig.with {
+        applicationId = "com.libexepackaging"
+        minSdkVersion = 21
+        targetSdkVersion = 30
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+	flavorDimensions "version"
+    productFlavors {
+		create("arm8Debug_NoBlob_arm64_v8a") {
+            ndk.abiFilters.add("arm64-v8a")
+        }
+		create("arm8Release_NoBlob_arm64_v8a") {
+            ndk.abiFilters.add("arm64-v8a")
+        }
+		create("x86-64Debug_NoBlob_x86_64") {
+            ndk.abiFilters.add("x86_64")
+        }
+		create("x86-64Release_NoBlob_x86_64") {
+            ndk.abiFilters.add("x86_64")
+        }
+        create("all")
+    }
+	
+	applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+			def folder = "${variant.name}"
+			
+			if(folder.length() > 26) {
+				def arm8NewName = "app-" + folder.substring(0,4) + "-" + variant.buildType.name + ".apk"
+				def x86NewName = "app-" + folder.substring(0,6) + "-" + variant.buildType.name + ".apk"
+				if(folder.substring(0, 9) == "arm8Debug")
+				{
+					output.outputFileName = "../../ARM8/Debug_NoBlob_arm64_v8a/" + arm8NewName
+				}
+				else if (folder.substring(0, 11) == "arm8Release")
+				{
+					output.outputFileName = "../../ARM8/Release_NoBlob_arm64_v8a/" + arm8NewName
+				}
+				else if (folder.substring(0, 11) == "x86-64Debug")
+				{
+					output.outputFileName = "../../x86-64/Debug_NoBlob_x86_64/" + x86NewName
+				}
+				else if (folder.substring(0, 13) == "x86-64Release")
+				{
+					output.outputFileName = "../../x86-64/Release_NoBlob_x86_64/" + x86NewName
+				}
+				println output.outputFileName
+			}
+        }
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    
+}
