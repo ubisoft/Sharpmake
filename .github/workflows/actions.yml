@@ -259,7 +259,7 @@ jobs:
           cd codebase/temp/projects/exepackaging
           ls
           ./gradlew
-          ./gradlew task
+          ./gradlew task --all
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
           
