@@ -256,7 +256,7 @@ jobs:
         working-directory: 'samples/HelloAndroid'
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:COMPILE_BATCH “codebase\temp\projects\static lib2\static lib2_android_vs2019.vcxproj” "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
+          & $env:COMPILE_BATCH “codebase\temp\projects\static lib2\static lib2_android_vs2019.vcxproj” "${{ matrix.configuration }}_NoBlob" "arm64"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
           
