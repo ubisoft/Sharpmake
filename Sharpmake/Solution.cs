@@ -146,7 +146,7 @@ namespace Sharpmake
             }
         }
 
-        internal static Solution CreateProject(Type solutionType, List<object> fragmentMasks)
+        internal static Solution CreateSolution(Type solutionType, List<object> fragmentMasks)
         {
             Solution solution;
             try
