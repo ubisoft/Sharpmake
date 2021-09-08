@@ -256,7 +256,6 @@ jobs:
         working-directory: 'samples/HelloAndroid'
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
           
