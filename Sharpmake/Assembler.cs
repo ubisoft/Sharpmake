@@ -193,7 +193,7 @@ namespace Sharpmake
             // the temp files and deleting them.
             // eg. "C:\\fastbuild-work\\85f7d472c25d494ca09f2ea7fe282d50"
             //string sourceTmpFile = Path.GetTempFileName();
-            string sourceTmpFile = Path.Combine(Path.GetTempPath(), (Guid.NewGuid().ToString("N") + ".tmp"));
+            string sourceTmpFile = Path.Combine(Path.GetTempPath(), (Guid.NewGuid().ToString("N") + ".tmp.sharpmake.cs"));
 
             Type delegateType = typeof(TDelegate);
 

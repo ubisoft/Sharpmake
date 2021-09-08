@@ -1798,7 +1798,7 @@ namespace Sharpmake
             }
         }
 
-        internal void Resolve(Builder builder, bool skipInvalidPath)
+        internal virtual void Resolve(Builder builder, bool skipInvalidPath)
         {
             if (Resolved)
                 return;
@@ -2424,6 +2424,18 @@ namespace Sharpmake
             : base(targetType, configurationType, isInternal)
         {
             InitCSharpSpecifics();
+        }
+
+        internal override void Resolve(Builder builder, bool skipInvalidPath)
+        {
+            base.Resolve(builder, skipInvalidPath);
+
+            if (!string.IsNullOrEmpty(ApplicationIcon))
+                Util.ResolvePath(SourceRootPath, ref ApplicationIcon);
+            if (!string.IsNullOrEmpty(ApplicationManifest))
+                Util.ResolvePath(SourceRootPath, ref ApplicationManifest);
+            if (!string.IsNullOrEmpty(ApplicationSplashScreen))
+                Util.ResolvePath(SourceRootPath, ref ApplicationSplashScreen);
         }
 
         public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)

@@ -27,7 +27,7 @@ Settings
 //=================================================================================================================
 Compiler( 'Compiler-x64-vs2019' )
 {
-    .ExecutableRootPath     = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\HostX64\x64'
+    .ExecutableRootPath     = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64'
     .Executable             = '$ExecutableRootPath$\cl.exe'
     .ExtraFiles             = {
                                 '$ExecutableRootPath$\1033\clui.dll',
@@ -100,8 +100,8 @@ Compiler( 'RC.win64Config' )
 
 .win64Config =
 [
-    .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64'
-    .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64'
+    .BinPath                = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64'
+    .LinkerPath             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64'
     .ResourceCompiler       = 'RC.win64Config'
     .Compiler               = 'Compiler-x64-vs2019'
     .Librarian              = '$LinkerPath$\lib.exe'
@@ -110,7 +110,7 @@ Compiler( 'RC.win64Config' )
 
 Compiler( 'ML.win64ConfigMasm' )
 {
-    .Executable             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64\ml64.exe'
+    .Executable             = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\ml64.exe'
     .CompilerFamily         = 'custom'
 }
 

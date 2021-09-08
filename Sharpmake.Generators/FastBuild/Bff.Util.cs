@@ -159,7 +159,7 @@ namespace Sharpmake.Generators.FastBuild
                 using (resolver.NewScopedParameter("fastBuildPrebuildWorkingPath", UtilityMethods.GetNormalizedPathForBuildStep(rootPath, bffFilePath, WorkingPath)))
                 using (resolver.NewScopedParameter("fastBuildPrebuildUseStdOutAsOutput", UseStdOutAsOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildPrebuildAlwaysShowOutput", AlwaysShowOutput ? "true" : FileGeneratorUtilities.RemoveLineTag))
-                using (resolver.NewScopedParameter("fastBuildExecPreBuildDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.ToList(), 26) : FileGeneratorUtilities.RemoveLineTag))
+                using (resolver.NewScopedParameter("fastBuildExecPreBuildDependencies", Dependencies.Count > 0 ? UtilityMethods.FBuildFormatList(Dependencies.Values, 26) : FileGeneratorUtilities.RemoveLineTag))
                 using (resolver.NewScopedParameter("fastBuildExecAlways", ExecAlways ? "true" : FileGeneratorUtilities.RemoveLineTag))
                 {
                     return resolver.Resolve(Bff.Template.ConfigurationFile.GenericExecutableSection);
