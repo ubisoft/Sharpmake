@@ -3426,9 +3426,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.ProduceReferenceAssembly.Disabled, () => { options["ProduceReferenceAssembly"] = RemoveLineTag; })
             );
 
-
             SelectOption
-			(
+            (
             Options.Option(Options.CSharp.IsPublishable.Enabled, () => { options["IsPublishable"] = RemoveLineTag; }),
             Options.Option(Options.CSharp.IsPublishable.Disabled, () => { options["IsPublishable"] = "false"; })
             );
