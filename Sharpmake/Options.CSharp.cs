@@ -546,6 +546,17 @@ namespace Sharpmake
                 Disabled,
                 Enabled
             }
+
+            /// <summary>
+            /// Controls whether the project is published when running a publish command
+            /// Only affects processes that use the Publish target, such as the dotnet sdk projects
+            public enum IsPublishable
+            /// </summary>
+            {
+                Disabled,
+                [Default]
+                Enabled
+            }
         }
     }
 }
