@@ -546,6 +546,16 @@ namespace Sharpmake
                 Disabled,
                 Enabled
             }
+			
+            /// <summary>
+            /// Controls whether the project is published when running a publish command
+            /// </summary>
+            public enum IsPublishable
+            {
+                Disabled,
+                [Default]
+                Enabled
+            }			
         }
     }
 }
