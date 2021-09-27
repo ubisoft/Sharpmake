@@ -831,7 +831,7 @@ namespace Sharpmake
 
         public void ReportGenerated(Type t, GenerationOutput output)
         {
-            var generationOutput = _generationReport.GetValueOrAdd(t, new GenerationOutput());
+            var generationOutput = _generationReport.GetOrAdd(t, new GenerationOutput());
             generationOutput.Merge(output);
         }
 
