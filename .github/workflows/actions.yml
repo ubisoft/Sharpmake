@@ -13,8 +13,7 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  variables:
-    REMOVE_BUILD_TOOL_VERSION: "31.0.0"
+  remove_android_build_tool_version: "31.0.0"
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -258,7 +257,7 @@ jobs:
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
           #Installed Build Tools revision 31.0.0 is corrupted. Need to remove and install again using the SDK Manager.
-          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;$REMOVE_BUILD_TOOL_VERSION' 
+          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;${remove_android_build_tool_version}' 
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
           
