@@ -682,8 +682,8 @@ namespace Sharpmake
                 !type.IsDefined(typeof(Export), false))
                     throw new Error("cannot generate solution type without [Sharpmake.Generate], [Sharpmake.Compile] or [Sharpmake.Export] attribute: {0}", type.Name);
 
-                // Create the project instance
-                Solution solution = Solution.CreateProject(type, Arguments.FragmentMasks);
+                // Create the solution instance
+                Solution solution = Solution.CreateSolution(type, Arguments.FragmentMasks);
 
                 // Pre event
                 EventPreSolutionConfigure?.Invoke(solution);
@@ -831,7 +831,7 @@ namespace Sharpmake
 
         public void ReportGenerated(Type t, GenerationOutput output)
         {
-            var generationOutput = _generationReport.GetValueOrAdd(t, new GenerationOutput());
+            var generationOutput = _generationReport.GetOrAdd(t, new GenerationOutput());
             generationOutput.Merge(output);
         }
 

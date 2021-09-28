@@ -275,6 +275,7 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMak
     <NMakeOutput>[options.OutputFile]</NMakeOutput>
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
   </PropertyGroup>
 ";
 
@@ -288,6 +289,7 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMak
     <NMakeOutput>[conf.CustomBuildSettings.OutputFile]</NMakeOutput>
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
   </PropertyGroup>
 ";
     }
