@@ -20,7 +20,7 @@ namespace HelloAndroid
     [Sharpmake.Generate]
     public class HelloAndroidSolution : CommonSolution
     {
-        public string GradleRootPath = Path.Combine(Path.Combine(Globals.TmpDirectory, @"..\.."), "gradle/root");
+        public string GradleRootPath = Path.Combine(Globals.TmpDirectory, @"..\..\gradle\root");
 
         public HelloAndroidSolution()
         {
@@ -36,7 +36,7 @@ namespace HelloAndroid
             base.ConfigureAll(conf, target);
 
             conf.AddProject<ExePackaging>(target);
-            conf.StartupProject = conf.GetProject(typeof(ExePackaging));
+            conf.SetStartupProject<ExePackaging>();
         }
     }
 }

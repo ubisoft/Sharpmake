@@ -62,7 +62,7 @@ namespace HelloAndroid
 
         public string ResourceRootPath = Path.Combine(ProjectRootPath, "resources");
 
-        public string GradleAppRootPath = Path.Combine(ProjectRootPath, "gradle/app");
+        public string GradleAppRootPath = Path.Combine(ProjectRootPath, @"gradle\app");
 
         public static readonly string AndroidPackageProjectsPath = Path.Combine(Globals.TmpDirectory, @"projects");
 
@@ -88,6 +88,7 @@ namespace HelloAndroid
 
             AddTargets(CommonTarget.GetAndroidTargets());
 
+            //plaugin and gradle version are taken from https://gitlab-ncsa.ubisoft.org/Sharpmake/sharpmake/-/merge_requests/230
             GradlePlugin = "gradle:4.1.3";
             GradleVersion = "6.5";
 

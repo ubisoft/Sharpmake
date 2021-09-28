@@ -11,9 +11,10 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
- 
 
 jobs:
+  variables:
+    REMOVE_BUILD_TOOL_VERSION: "31.0.0"
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -232,7 +233,7 @@ jobs:
 
       - name: HelloWorld ${{ matrix.configuration }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/HelloWorld'
+        working-directory: 'samples/HelloWorld' 
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloWorld.sharpmake.cs')"
           & $env:COMPILE_BATCH projects\helloworld_vs2019_win32.sln "${{ matrix.configuration }}" "Win32"
@@ -256,7 +257,8 @@ jobs:
         working-directory: 'samples/HelloAndroid'
         run: |
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
+          #Installed Build Tools revision 31.0.0 is corrupted. Need to remove and install again using the SDK Manager.
+          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;$REMOVE_BUILD_TOOL_VERSION' 
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
           
