@@ -416,17 +416,18 @@ namespace Sharpmake.Generators.FastBuild
                                 if (isExport)
                                     continue;
 
-                                string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
-
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
+                                    string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
                                     if (!dependenciesInfo.IgnoredLibraryNames.Contains(depProjConfig.TargetFileFullNameWithExtension))
                                         fastBuildProjectDependencies.Add(shortProjectName + "_LibraryDependency");
+                                    fastBuildBuildOnlyDependencies.Add(shortProjectName);
                                 }
-
-                                if (!depProjConfig.IsExcludedFromBuild)
-                                    fastBuildProjectExeUtilityDependencyList.Add(shortProjectName);
+                                else if (!depProjConfig.IsExcludedFromBuild)
+                                {
+                                    fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                }
                             }
 
                             orderedProjectDeps = UtilityMethods.GetOrderedFlattenedBuildOnlyDependencies(conf);
@@ -439,8 +440,15 @@ namespace Sharpmake.Generators.FastBuild
                                 if (isExport)
                                     continue;
 
-                                string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
-                                fastBuildProjectExeUtilityDependencyList.Add(shortProjectName);
+                                if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
+                                    depProjConfig.Output != Project.Configuration.OutputType.Utility)
+                                {
+                                    fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                }
+                                else
+                                {
+                                    fastBuildProjectExeUtilityDependencyList.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
+                                }
                             }
                         }
 
