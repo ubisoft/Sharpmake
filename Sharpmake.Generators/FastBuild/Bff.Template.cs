@@ -548,7 +548,7 @@ Test( '[fastBuildTest]' )
   .TestWorkingDir        = '[fastBuildTestWorkingDir]'
   .TestTimeOut           =  [fastBuildTestTimeOut]
   .TestAlwaysShowOutput  =  [fastBuildTestAlwaysShowOutput]
-  .PreBuildDependencies  = [fastBuildTestPreBuildDependencies]
+  .TestInput             = [fastBuildTestPreBuildDependencies]
 }
 
 ";
