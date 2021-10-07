@@ -254,9 +254,8 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: 'samples/HelloAndroid'
         run: | #Installed Build Tools revision 31.0.0 is corrupted. Need to remove and install again using the SDK Manager.
-          & echo "REMOVE_ANDROID_BUILD_TOOL_VERSION=31.0.0" >> $GITHUB_ENV
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;${{ env.REMOVE_ANDROID_BUILD_TOOL_VERSION }}' 
+          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0' 
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
             
