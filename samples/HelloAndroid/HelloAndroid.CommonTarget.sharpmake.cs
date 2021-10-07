@@ -81,6 +81,8 @@ namespace HelloAndroid
                     nameParts.Add(BuildSystem.ToString());
                 }
 
+                //using underscore to join different name parts because gradle is not able to parse
+                //the names properly if we use space to join them
                 return string.Join("_", nameParts);
             }
         }

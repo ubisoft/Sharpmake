@@ -88,9 +88,10 @@ namespace HelloAndroid
 
             AddTargets(CommonTarget.GetAndroidTargets());
 
-            //plaugin and gradle version are taken from https://gitlab-ncsa.ubisoft.org/Sharpmake/sharpmake/-/merge_requests/230
-            GradlePlugin = "gradle:4.1.3";
-            GradleVersion = "6.5";
+            //the plugin and gradle version are good and stable version to be used with Android libraries,
+            //we don't want to use the default version on VS(ver. 0.4.0 and 2.8 respectively) since it is quite old
+            GradlePlugin = "gradle:4.2.0";
+            GradleVersion = "6.7.1";
 
             // Path to the Gradle template files
             GradleTemplateFiles.Add(@"app\src\main\AndroidManifest.xml.template");
