@@ -14,9 +14,6 @@ namespace Sharpmake.Generators.Generic
     /// </summary>
     public partial class RiderJson : IProjectGenerator, ISolutionGenerator
     {
-        public static string SolutionName = null;   
-        public static string RiderFolderPath = "";
-        public static string SolutionFilePath = "";
         public static bool Minimize = false;
         public static bool IgnoreDefaults = false;
         
@@ -26,21 +23,31 @@ namespace Sharpmake.Generators.Generic
         public static void PostGenerationCallback(List<Project> projects, List<Solution> solutions)
         {
             var builder = Builder.Instance;
-            var solution = solutions.FirstOrDefault(it => it.Name == SolutionName) ?? solutions.First();
-            var riderFolder = Path.Combine(solution.SharpmakeCsPath, RiderFolderPath, ".Rider");
             var generator = new RiderJson();
-            var configs = solution.Configurations.ToList();
-            
-            // Do not move. Acquires all the information about projects for later usage in "Modules" sections.
-            generator.Generate(builder, solution, configs, Path.Combine(solution.SharpmakeCsPath, SolutionFilePath, solution.Name + ".rdjson"), new List<string>(),
-                               new List<string>());
-            
-            foreach (var project in projects)
-            {
-                generator.Generate(builder, project, project.Configurations.ToList(), Path.Combine(riderFolder, project.Name),
-                                   new List<string>(), new List<string>());
-            }
 
+            var generatedFiles = new List<string>();
+            var skipFiles = new List<string>();
+            
+            foreach (var solution in solutions)
+            {
+                foreach (var solutionFileEntry in solution.SolutionFilesMapping)
+                {
+                    generator._projectsInfo.Clear();
+                    var solutionFolder = Path.GetDirectoryName(solutionFileEntry.Key);
+                    generator.Generate(builder, solution, solutionFileEntry.Value,
+                        Path.Combine(solutionFileEntry.Key + ".rdjson"), generatedFiles, skipFiles);
+
+                    var solutionFileName = Path.GetFileName(solutionFileEntry.Key);
+                    
+                    foreach (var projectInfo in solutionFileEntry.Value.SelectMany(solutionConfig =>
+                        solutionConfig.IncludedProjectInfos))
+                    {
+                        generator.Generate(builder, projectInfo.Project,
+                            new List<Project.Configuration> {projectInfo.Configuration},
+                            Path.Combine(solutionFolder, $".{solutionFileName}"), generatedFiles, skipFiles);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -152,6 +159,8 @@ namespace Sharpmake.Generators.Generic
             public string ProjectFileName { get; }
             public string ProjectPath { get; }
             
+            public string SolutionName { get; }
+            
             public Resolver Resolver { get; }
             
             public DevEnv DevelopmentEnvironment { get; }
@@ -165,7 +174,7 @@ namespace Sharpmake.Generators.Generic
             public string FastBuildArguments { get; }
             
             public RiderGenerationContext(Builder builder, Project project, Project.Configuration configuration,
-                string projectPath)
+                string projectPath, string solutionName)
             {
                 Builder = builder;
                 Resolver = new Resolver();
@@ -184,6 +193,8 @@ namespace Sharpmake.Generators.Generic
                 ProjectSourceCapitalized = Util.GetCapitalizedPath(Project.SourceRootPath);
                 DevelopmentEnvironment = configuration.Target.GetFragment<DevEnv>();
 
+                SolutionName = solutionName;
+                
                 Options = new Options.ExplicitOptions();
                 CommandLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
 
@@ -269,17 +280,16 @@ namespace Sharpmake.Generators.Generic
                 return fastBuildCommandLineOptions;
             }
         }
-
+        
         /// <summary>
-        /// Generates "root.json" file for <see cref="SolutionName"/> solution.
+        /// Generates "<solutionName>.rdjson" file for <paramref name="solution"/>.
         /// Also gathers information about projects for later usage in "Modules" section.
         /// </summary>
         public void Generate(Builder builder, Solution solution, List<Solution.Configuration> configurations, string solutionFile,
             List<string> generatedFiles, List<string> skipFiles)
         {
-            var info = new OrderedDictionary { { "ProjectFolderPath", Path.Combine(solution.SharpmakeCsPath, RiderFolderPath, ".Rider") } };
             var projects = new OrderedDictionary();
- 
+
             foreach (var solutionConfig in configurations)
             {
                 foreach (var proj in solutionConfig.IncludedProjectInfos)
@@ -312,8 +322,6 @@ namespace Sharpmake.Generators.Generic
                 }
             }
             
-            info.Add("Projects", projects);
-
             var file = new FileInfo(solutionFile);
 
             using (var stream = new MemoryStream())
@@ -321,7 +329,7 @@ namespace Sharpmake.Generators.Generic
             using (var serializer = new Util.JsonSerializer(writer) { IsOutputFormatted = true })
             {
                 serializer.IsOutputFormatted = !Minimize;
-                serializer.Serialize(info);
+                serializer.Serialize(projects);
                 serializer.Flush();
 
                 if (builder.Context.WriteGeneratedFile(null, file, stream))
@@ -347,16 +355,18 @@ namespace Sharpmake.Generators.Generic
                 {
                     continue;
                 }
-                
-                var context = new RiderGenerationContext(builder, project, config, projectFile)
+
+                var solutionDir = Path.GetDirectoryName(projectFile);
+                var context = new RiderGenerationContext(builder, project, config, projectFile, Path.GetFileName(projectFile).Substring(1))
                 {
                     // Hack to generate correct OutputDirectory options.
-                    ProjectDirectory = Path.Combine(project.SharpmakeCsPath, SolutionFilePath)
+                    ProjectDirectory = solutionDir,
+                    
                 };
 
                 var projectOptionsGen = new ProjectOptionsGenerator();
                 projectOptionsGen.GenerateOptions(context);
-                context.ProjectDirectory = Path.Combine(project.SharpmakeCsPath, RiderFolderPath, ".Rider");
+                context.ProjectDirectory = projectFile; //Path.Combine(project.SharpmakeCsPath, RiderFolderPath, ".Rider");
                 
                 GenerateConfiguration(context, generatedFiles, skipFiles);
             }
@@ -392,7 +402,7 @@ namespace Sharpmake.Generators.Generic
                 beforeBuildCommand = "";
             }
             
-            using (context.Resolver.NewScopedParameter("SolutionDir", Path.Combine(context.Project.SharpmakeCsPath, SolutionFilePath)))
+            using (context.Resolver.NewScopedParameter("SolutionDir", context.ProjectDirectory))
             using (context.Resolver.NewScopedParameter("ProjectDir", context.Configuration.ProjectPath))
             using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
             {
@@ -429,7 +439,7 @@ namespace Sharpmake.Generators.Generic
             info.Add("EnvironmentDefinitions", platformVcxproj.GetImplicitlyDefinedSymbols(context));
             info.Add("Modules", modules);
             
-            var file = new FileInfo($"{context.ProjectPath}_{context.Configuration.Platform}_{context.Configuration.Name}.json");
+            var file = new FileInfo(Path.Combine(context.ProjectPath, $"{context.Project.Name}_{context.Configuration.Platform}_{context.Configuration.Name}.json"));
 
             using (var stream = new MemoryStream())
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
@@ -456,7 +466,7 @@ namespace Sharpmake.Generators.Generic
             {
                 return "";
             }
-
+            
             var unresolvedCommand = Template.FastBuildBuildCommand;
             using (context.Resolver.NewScopedParameter("BuildCommand",
                                                        context.FastBuildMakeCommandGenerator.GetCommand(
@@ -465,7 +475,7 @@ namespace Sharpmake.Generators.Generic
             {
                 return context.Resolver.Resolve(unresolvedCommand)
                     .Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\")
-                    .Replace("$(SolutionName)", SolutionName);
+                    .Replace("$(SolutionName)", context.SolutionName);
             }
         }
         
@@ -484,7 +494,7 @@ namespace Sharpmake.Generators.Generic
             {
                 return context.Resolver.Resolve(unresolvedCommand)
                     .Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\")
-                    .Replace("$(SolutionName)", SolutionName);
+                    .Replace("$(SolutionName)", context.SolutionName);
             }
         }
         

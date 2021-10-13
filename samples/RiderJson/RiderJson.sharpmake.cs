@@ -9,7 +9,7 @@ namespace RiderJson
         {
             AddTargets(new Target(
                            Platform.win64,
-                           DevEnv.vs2019,
+                           DevEnv.vs2017 | DevEnv.vs2019,
                            Optimization.Debug | Optimization.Release,
                            OutputType.Lib,
                            Blob.FastBuildUnitys,
@@ -19,7 +19,7 @@ namespace RiderJson
         [Configure]
         public virtual void ConfigureAll(Configuration conf, Target target)
         {
-            conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.ProjectPath = @"[project.SharpmakeCsPath]\projects\[target.DevEnv]";
             conf.Name = "[target.Optimization] [target.BuildSystem]";
             conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]_[target.Optimization]_[target.DevEnv]";
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
@@ -110,7 +110,7 @@ namespace RiderJson
         {
             AddTargets(new Target(
                            Platform.win64,
-                           DevEnv.vs2019,
+                           DevEnv.vs2019 | DevEnv.vs2017,
                            Optimization.Debug | Optimization.Release,
                            OutputType.Lib,
                            Blob.FastBuildUnitys,
@@ -121,7 +121,7 @@ namespace RiderJson
         public virtual void ConfigureAll(Configuration conf, Target target)
         {
             conf.Name = @"[solution.Name] [target.Optimization] [target.BuildSystem]";
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
+            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\[target.DevEnv]";
         }
     }
     
@@ -177,11 +177,6 @@ namespace RiderJson
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(rootDir, @"..\..\..\tools\FastBuild");
             FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeFastBuildDir, "Windows-x64", "FBuild.exe");
-
-            args.Builder.EventPostGeneration += Sharpmake.Generators.Generic.RiderJson.PostGenerationCallback;
-            Sharpmake.Generators.Generic.RiderJson.SolutionName = "Sol1";
-            Sharpmake.Generators.Generic.RiderJson.RiderFolderPath = "projects";
-            Sharpmake.Generators.Generic.RiderJson.SolutionFilePath = "projects";
 
             args.Generate<FirstSolution>();
             args.Generate<SecondSolution>();

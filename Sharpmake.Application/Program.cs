@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Sharpmake.Generators;
+using Sharpmake.Generators.Generic;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Application
@@ -656,6 +657,11 @@ namespace Sharpmake.Application
                     throw new Error("Sharpmake has nothing to generate!" + Environment.NewLine
                         + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
                 builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
+
+                if (parameters.GenerateRdJson)
+                {
+                    builder.EventPostGeneration += RiderJson.PostGenerationCallback;
+                }
 
                 // Call all configuration's methods and resolve project/solution member's values
                 using (Builder.Instance.CreateProfilingScope("Build"))
