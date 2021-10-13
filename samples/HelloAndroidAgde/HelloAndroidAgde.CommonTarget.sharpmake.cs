@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Sharpmake;
 
-namespace HelloAndroid
+namespace HelloAndroidAgde
 {
     using AndroidBuildTargets = Sharpmake.Android.AndroidBuildTargets;
 
@@ -44,7 +44,6 @@ namespace HelloAndroid
         public Blob Blob;
         public BuildSystem BuildSystem;
         public AndroidBuildTargets AndroidBuildTargets = AndroidBuildTargets.arm64_v8a | AndroidBuildTargets.x86_64;
-        public Android.AndroidBuildType androidBuildType = Android.AndroidBuildType.Ant;
 
         public CommonTarget() { }
 
@@ -70,16 +69,13 @@ namespace HelloAndroid
                 var nameParts = new List<string>();
 
                 nameParts.Add(Optimization.ToString());
-                if (Blob == Blob.NoBlob)
-                {
-                    nameParts.Add(Blob.ToString());
-                }
+
                 if (BuildSystem == BuildSystem.FastBuild)
                 {
                     nameParts.Add(BuildSystem.ToString());
                 }
 
-                return string.Join(" ", nameParts);
+                return string.Join("_", nameParts);
             }
         }
 
@@ -138,7 +134,7 @@ namespace HelloAndroid
         public static CommonTarget[] GetAndroidTargets()
         {
             var defaultTarget = new CommonTarget(
-                Platform.android,
+                Platform.agde,
                 DevEnv.vs2019,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,

@@ -93,6 +93,7 @@ namespace Sharpmake
         android = 1 << 8,
         linux = 1 << 9,
         mac = 1 << 10,
+        agde = 1 << 11,      // Android Game Development Extension
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
