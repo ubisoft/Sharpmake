@@ -29,7 +29,7 @@ namespace NetCore
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_6_1 | DotNetFramework.netstandard2_0)
+                    DotNetFramework.v4_6_1 | DotNetFramework.netstandard2_0 | DotNetFramework.net5_0)
             };
 
             public HelloWorldLib()
@@ -60,6 +60,11 @@ namespace NetCore
                 if (target.GetFragment<DotNetFramework>().IsDotNetStandard())
                 {
                     conf.ReferencesByNuGetPackage.Add("System.Text.Encoding.CodePages", "4.5.0");
+                }
+
+                if (target.GetFragment<DotNetFramework>().IsDotNetCore())
+                {
+                    conf.DotNetOSVersion = DotNetOS.windows;
                 }
             }
         }
