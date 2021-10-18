@@ -1058,7 +1058,7 @@ namespace Sharpmake.Generators.VisualStudio
                     var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                     DotNetOS dotNetOS;
                     if (!conf.Target.TryGetFragment(out dotNetOS))
-                        dotNetOS = DotNetOS.Default;
+                        dotNetOS = conf.DotNetOSVersion;
                     return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
                 }
             );

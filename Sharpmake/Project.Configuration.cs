@@ -2279,6 +2279,12 @@ namespace Sharpmake
             public bool PreferRelativePaths = true;
 
             /// <summary>
+            /// Configuration OS version if not defined as Target fragment.
+            /// </summary>
+            /// <remarks>This allow adding OS version to specific DotNetFramework during configuration without altering Target's matching system</remarks>
+            public DotNetOS DotNetOSVersion = DotNetOS.Default;
+
+            /// <summary>
             /// Optional OS version at the end of the TargetFramework, for example, net5.0-ios13.0.
             /// </summary>
             /// <remarks>C# only, will throw if the target doesn't have a non-default DotNetOS fragment</remarks>
