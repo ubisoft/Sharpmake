@@ -660,7 +660,7 @@ namespace Sharpmake.Application
 
                 if (parameters.GenerateRdJson)
                 {
-                    builder.EventPostGeneration += RiderJson.PostGenerationCallback;
+                    builder.EventPostGenerationReport += RiderJson.PostGenerationCallback;
                 }
 
                 // Call all configuration's methods and resolve project/solution member's values

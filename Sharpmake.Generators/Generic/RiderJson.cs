@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -20,13 +21,12 @@ namespace Sharpmake.Generators.Generic
         /// <summary>
         /// Callback which should be added to <see cref="Builder.EventPostGeneration"/> in order to generate Rider project model.
         /// </summary>
-        public static void PostGenerationCallback(List<Project> projects, List<Solution> solutions)
+        public static void PostGenerationCallback(List<Project> projects, List<Solution> solutions, ConcurrentDictionary<Type, GenerationOutput> generationReport)
         {
             var builder = Builder.Instance;
             var generator = new RiderJson();
-
-            var generatedFiles = new List<string>();
-            var skipFiles = new List<string>();
+            
+            builder.LogWriteLine("      RdJson files generated:");
             
             foreach (var solution in solutions)
             {
@@ -34,17 +34,24 @@ namespace Sharpmake.Generators.Generic
                 {
                     generator._projectsInfo.Clear();
                     var solutionFolder = Path.GetDirectoryName(solutionFileEntry.Key);
+
+                    var generationOutput = generationReport[solution.GetType()];
+                    var fileWithExtension = Path.Combine(solutionFileEntry.Key + ".rdjson");
+                    
                     generator.Generate(builder, solution, solutionFileEntry.Value,
-                        Path.Combine(solutionFileEntry.Key + ".rdjson"), generatedFiles, skipFiles);
+                        fileWithExtension, generationOutput.Generated, generationOutput.Skipped);
+                    
+                    builder.LogWriteLine("          {0,5}", fileWithExtension);
 
                     var solutionFileName = Path.GetFileName(solutionFileEntry.Key);
                     
                     foreach (var projectInfo in solutionFileEntry.Value.SelectMany(solutionConfig =>
                         solutionConfig.IncludedProjectInfos))
                     {
+                        var projectOutput = generationReport[projectInfo.Project.GetType()];
                         generator.Generate(builder, projectInfo.Project,
                             new List<Project.Configuration> {projectInfo.Configuration},
-                            Path.Combine(solutionFolder, $".{solutionFileName}"), generatedFiles, skipFiles);
+                            Path.Combine(solutionFolder, $".{solutionFileName}"), projectOutput.Generated, projectOutput.Skipped);
                     }
                 }
             }
