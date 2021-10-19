@@ -11,7 +11,6 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
-  REMOVE_ANDROID_BUILD_TOOLS_VERSION: 31.0.0
 
 jobs:
   build:
@@ -97,6 +96,7 @@ jobs:
     env:
       SHARPMAKE_EXE: ${{ github.workspace }}/tmp/bin/release/Sharpmake.Application.exe
       COMPILE_BATCH: ${{ github.workspace }}/CompileSharpmake.bat
+      REMOVE_ANDROID_BUILD_TOOLS_VERSION: 31.0.0
 
     steps:
       - name: Checkout the repo
