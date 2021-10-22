@@ -27,12 +27,30 @@ namespace Sharpmake.Generators.Generic
             var generator = new RiderJson();
             
             builder.LogWriteLine("      RdJson files generated:");
+
+            foreach (var project in projects)
+            {
+                foreach (var config in project.Configurations)
+                {
+                    if (!generator._projectsInfo.ContainsKey(config.Target))
+                    {
+                        generator._projectsInfo.Add(config.Target, new Dictionary<string, RiderProjectInfo>());
+                    }
+
+                    if (!generator._projectsInfo[config.Target].ContainsKey(project.Name))
+                    {
+                        generator._projectsInfo[config.Target].Add(project.Name, new RiderProjectInfo(project));
+                    }
+                    
+                    var riderProjInfo = generator._projectsInfo[config.Target][project.Name];
+                    riderProjInfo.ReadConfiguration(config);
+                }
+            }
             
             foreach (var solution in solutions)
             {
                 foreach (var solutionFileEntry in solution.SolutionFilesMapping)
                 {
-                    generator._projectsInfo.Clear();
                     var solutionFolder = Path.GetDirectoryName(solutionFileEntry.Key);
 
                     var generationOutput = generationReport[solution.GetType()];
@@ -152,7 +170,8 @@ namespace Sharpmake.Generators.Generic
         /// <summary>
         /// Maps projects information for later usage in "Modules" section.
         /// </summary>
-        private readonly Dictionary<string, RiderProjectInfo> _projectsInfo = new Dictionary<string, RiderProjectInfo>();
+        private readonly Dictionary<ITarget, Dictionary<string, RiderProjectInfo>> _projectsInfo
+            = new Dictionary<ITarget, Dictionary<string, RiderProjectInfo>>();
 
         /// <summary>
         /// Helper class for storing all the project-related information.
@@ -304,13 +323,9 @@ namespace Sharpmake.Generators.Generic
                     if (!projects.Contains(proj.Project.Name))
                     {
                         projects.Add(proj.Project.Name, new Dictionary<string, List<object>>());
-                        _projectsInfo.Add(proj.Project.Name, new RiderProjectInfo(proj.Project));
                     }
-
-                    var riderProjInfo = _projectsInfo[proj.Project.Name];
-                    riderProjInfo.ReadConfiguration(proj.Configuration);
                     
-                    var projObject = projects[riderProjInfo.Name] as Dictionary<string, List<object>>;
+                    var projObject = projects[proj.Project.Name] as Dictionary<string, List<object>>;
                     var projConfig = new Dictionary<string, string>();
 
                     projConfig.Add("ProjectConfig", proj.Configuration.Name);
@@ -353,22 +368,16 @@ namespace Sharpmake.Generators.Generic
         /// <summary>
         /// Generates all <paramref name="project"/>-related configuration files.
         /// </summary>
-        public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile, List<string> generatedFiles,
-            List<string> skipFiles)
+        public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile,
+            List<string> generatedFiles, List<string> skipFiles)
         {
             foreach (var config in configurations)
             {
-                if (!_projectsInfo.ContainsKey(project.Name) || !_projectsInfo[project.Name].Configurations.Contains(config.Name))
-                {
-                    continue;
-                }
-
                 var solutionDir = Path.GetDirectoryName(projectFile);
                 var context = new RiderGenerationContext(builder, project, config, projectFile, Path.GetFileName(projectFile).Substring(1))
                 {
                     // Hack to generate correct OutputDirectory options.
                     ProjectDirectory = solutionDir,
-                    
                 };
 
                 var projectOptionsGen = new ProjectOptionsGenerator();
@@ -423,12 +432,18 @@ namespace Sharpmake.Generators.Generic
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
             includePaths.AddRange(platformVcxproj.GetPlatformIncludePaths(context));
 
-            var curProjectInfo = _projectsInfo[context.Project.Name];
+            var curProjectInfo = _projectsInfo[context.Configuration.Target][context.Project.Name];
             modules.Add(curProjectInfo.Name, curProjectInfo.ToDictionary());
-
-            foreach (var dependency in context.Configuration.ResolvedDependencies.Select(it => it.ProjectName))
+            
+            foreach (var dependency in context.Configuration.ResolvedDependencies)
             {
-                var dependencyInfo = _projectsInfo[dependency];
+                // Dependencies can contain projects with the same names. They will share same project info.
+                if (modules.Contains(dependency.Project.Name))
+                {
+                    continue;
+                }
+                
+                var dependencyInfo = _projectsInfo[dependency.Target][dependency.Project.Name];
                 modules.Add(dependencyInfo.Name, dependencyInfo.ToDictionary());
             }
 
