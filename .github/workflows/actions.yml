@@ -253,7 +253,8 @@ jobs:
       - name: HelloAndroid ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         working-directory: 'samples/HelloAndroid'
-        env: REMOVE_ANDROID_BUILD_TOOLS_VERSION: 31.0.0
+        env: 
+            REMOVE_ANDROID_BUILD_TOOLS_VERSION: 31.0.0
         run: | #Installed Build Tools revision 31.0.0 is corrupted. Need to remove and install again using the SDK Manager.
           & $env:SHARPMAKE_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
           & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall "build-tools;${{ env.REMOVE_ANDROID_BUILD_TOOLS_VERSION }}"
