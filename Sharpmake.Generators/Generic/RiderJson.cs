@@ -412,21 +412,20 @@ namespace Sharpmake.Generators.Generic
             toolchain.Add("bStrictConformanceMode", context.IsConformanceMode());
             toolchain.Add("PrecompiledHeaderAction", context.GetPchAction());
 
-            var beforeBuildCommand = context.Configuration.FastBuildCustomActionsBeforeBuildCommand;
-            if (beforeBuildCommand == FileGeneratorUtilities.RemoveLineTag)
-            {
-                beforeBuildCommand = "";
-            }
-            
             using (context.Resolver.NewScopedParameter("SolutionDir", context.ProjectDirectory))
             using (context.Resolver.NewScopedParameter("ProjectDir", context.Configuration.ProjectPath))
-            using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
             {
                 var targetPath = Path.Combine(context.Configuration.TargetPath, context.Configuration.TargetFileFullNameWithExtension);
                 buildInfo.Add("TargetPath", targetPath);
-                buildInfo.Add("BuildCmd", GetBuildCommand(context));
-                buildInfo.Add("ReBuildCmd", GetReBuildCommand(context));
-                buildInfo.Add("CleanCmd", GetCleanCommand(context));
+
+                var commands = GetBuildCommands(context);
+
+                if (commands.Build != "" || !IgnoreDefaults)
+                    buildInfo.Add("BuildCmd", commands.Build);
+                if (commands.Rebuild != "" || !IgnoreDefaults)
+                    buildInfo.Add("ReBuildCmd", commands.Rebuild);
+                if (commands.Clean != "" || !IgnoreDefaults)
+                    buildInfo.Add("CleanCmd", commands.Clean);
             }
 
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
@@ -451,12 +450,8 @@ namespace Sharpmake.Generators.Generic
             info.Add("Configuration", context.Configuration.Name);
             info.Add("Platform", context.Configuration.Platform.ToString());
             info.Add("ToolchainInfo", toolchain);
-            
-            if (context.Configuration.IsFastBuild || !IgnoreDefaults)
-            {
-                info.Add("BuildInfo", buildInfo);
-            }
-            
+            info.Add("BuildInfo", buildInfo);
+
             info.Add("EnvironmentIncludePaths", includePaths);
             info.Add("EnvironmentDefinitions", platformVcxproj.GetImplicitlyDefinedSymbols(context));
             info.Add("Modules", modules);
@@ -482,58 +477,92 @@ namespace Sharpmake.Generators.Generic
             }
         }
 
-        private string GetBuildCommand(RiderGenerationContext context)
+        private struct BuildCommands
         {
-            if (!context.Configuration.IsFastBuild)
+            public string Build;
+            public string Rebuild;
+            public string Clean;
+        }
+
+        private BuildCommands GetBuildCommands(RiderGenerationContext context)
+        {
+            if (context.Configuration.IsFastBuild)
             {
-                return "";
+                var beforeBuildCommand = context.Configuration.FastBuildCustomActionsBeforeBuildCommand;
+                if (beforeBuildCommand == FileGeneratorUtilities.RemoveLineTag)
+                {
+                    beforeBuildCommand = "";
+                }
+                
+                using (context.Resolver.NewScopedParameter("BeforeBuildCommand", beforeBuildCommand))
+                {
+                    return new BuildCommands
+                    {
+                        Build = GetFastBuildCommand(context, FastBuildMakeCommandGenerator.BuildType.Build),
+                        Rebuild = GetFastBuildCommand(context, FastBuildMakeCommandGenerator.BuildType.Rebuild),
+                        Clean = GetFastBuildClean(context)
+                    };
+                }
             }
-            
+
+            if (context.Configuration.CustomBuildSettings != null)
+            {
+                var buildSettings = context.Configuration.CustomBuildSettings;
+                return new BuildCommands
+                {
+                    Build = buildSettings.BuildCommand,
+                    Rebuild = buildSettings.RebuildCommand,
+                    Clean = buildSettings.CleanCommand
+                };
+            }
+
+            using (context.Resolver.NewScopedParameter("ProjectFile", context.Configuration.ProjectFullFileNameWithExtension.Replace(" ", "%20")))
+            using (context.Resolver.NewScopedParameter("ConfigurationName", context.Configuration.Name.Replace(" ", "%20")))
+            using (context.Resolver.NewScopedParameter("PlatformName", 
+                Util.GetPlatformString(context.Configuration.Platform, context.Project, context.Configuration.Target).Replace(" ", "%20")))
+            {
+                return new BuildCommands
+                {
+                    Build = GetMsBuildCommand(context, "Build"),
+                    Rebuild = GetMsBuildCommand(context, "Rebuild"),
+                    Clean = GetMsBuildCommand(context, "Clean")
+                };
+            }
+        }
+        
+        private string GetFastBuildCommand(RiderGenerationContext context, FastBuildMakeCommandGenerator.BuildType commandType)
+        {
             var unresolvedCommand = Template.FastBuildBuildCommand;
             using (context.Resolver.NewScopedParameter("BuildCommand",
-                                                       context.FastBuildMakeCommandGenerator.GetCommand(
-                                                           FastBuildMakeCommandGenerator.BuildType.Build,
-                                                           context.Configuration, context.FastBuildArguments)))
+                context.FastBuildMakeCommandGenerator.GetCommand(
+                    commandType,
+                    context.Configuration, context.FastBuildArguments)))
             {
                 return context.Resolver.Resolve(unresolvedCommand)
                     .Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\")
                     .Replace("$(SolutionName)", context.SolutionName);
             }
         }
-        
-        private string GetReBuildCommand(RiderGenerationContext context)
+
+        private string GetFastBuildClean(RiderGenerationContext context)
         {
-            if (!context.Configuration.IsFastBuild)
-            {
-                return "";
-            }
-            
-            var unresolvedCommand = Template.FastBuildReBuildCommand;
-            using (context.Resolver.NewScopedParameter("RebuildCommand",
-                                                       context.FastBuildMakeCommandGenerator.GetCommand(
-                                                           FastBuildMakeCommandGenerator.BuildType.Rebuild,
-                                                           context.Configuration, context.FastBuildArguments)))
-            {
-                return context.Resolver.Resolve(unresolvedCommand)
-                    .Replace("$(ProjectDir)", context.Configuration.ProjectPath + "\\")
-                    .Replace("$(SolutionName)", context.SolutionName);
-            }
-        }
-        
-        private string GetCleanCommand(RiderGenerationContext context)
-        {
-            if (!context.Configuration.IsFastBuild)
-            {
-                return "";
-            }
-            
             var unresolvedOutput = Template.FastBuildCleanCommand;
-            
+        
             using (context.Resolver.NewScopedParameter("IntermediateDirectory", context.Options["IntermediateDirectory"])) 
             using (context.Resolver.NewScopedParameter("OutputDirectory", context.Options["OutputDirectory"]))
             using (context.Resolver.NewScopedParameter("TargetFileFullName", context.Configuration.TargetFileFullName))
             {
                 return context.Resolver.Resolve(unresolvedOutput);
+            }
+        }
+
+        private string GetMsBuildCommand(RiderGenerationContext context, string buildCommand)
+        {
+            var unresolvedCommand = Template.MsBuildBuildCommand;
+
+            using (context.Resolver.NewScopedParameter("Command", buildCommand))
+            {
+                return context.Resolver.Resolve(unresolvedCommand);
             }
         }
     }
