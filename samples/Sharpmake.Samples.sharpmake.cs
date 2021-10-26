@@ -258,6 +258,26 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class HelloAndroidAgdeProject : SampleProject
+    {
+        public HelloAndroidAgdeProject()
+        {
+            Name = "HelloAndroidAgde";
+            SharpmakeMainFile = "HelloAndroidAgde.Main.sharpmake.cs";
+
+            // This one is special, we have .sharpmake.cs files in the codebase
+            SourceFilesExcludeRegex.Remove(@"\\codebase\\");
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
     public class HelloWorldProject : SampleProject
     {
         public HelloWorldProject()

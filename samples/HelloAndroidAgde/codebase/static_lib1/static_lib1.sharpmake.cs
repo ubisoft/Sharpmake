@@ -14,7 +14,7 @@
 
 using Sharpmake;
 
-namespace HelloAndroid
+namespace HelloAndroidAgde
 {
     [Sharpmake.Generate]
     public class StaticLib1Project : CommonProject

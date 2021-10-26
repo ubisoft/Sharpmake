@@ -250,6 +250,14 @@ jobs:
           cd codebase/temp/bin/mac_${{ matrix.configuration }}
           DYLD_LIBRARY_PATH=. ./exe
           
+      - name: HelloAndroidAgde ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/HelloAndroidAgde'
+        run: |
+          & $env:SHARPMAKE_EXE "/sources('HelloAndroidAgde.main.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\temp\projects\HelloAndroidAgde_agde_vs2019.sln "${{ matrix.configuration }}" "arm64_v8a"
+          & $env:COMPILE_BATCH codebase\temp\projects\HelloAndroidAgde_agde_vs2019.sln "${{ matrix.configuration }}" 
+          
       - name: HelloAndroid ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         working-directory: 'samples/HelloAndroid'

@@ -61,6 +61,38 @@ namespace Sharpmake
 
                 return int.TryParse(valueString, out apiValue);
             }
+
+            private static string NdkVersion = string.Empty;
+            public static string GetNdkVersion(string ndkPath)
+            {
+                if (!NdkVersion.Equals(string.Empty))
+                    return NdkVersion;
+
+                if (string.IsNullOrEmpty(ndkPath))
+                    return NdkVersion;
+
+                string srcPropertiesFile = Path.Combine(ndkPath, "source.properties");
+                if (!File.Exists(srcPropertiesFile))
+                    return string.Empty;
+
+                using (StreamReader sr = new StreamReader(srcPropertiesFile))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line.StartsWith("Pkg.Revision"))
+                        {
+                            int pos = line.IndexOf("=");
+                            if (-1 != pos)
+                            {
+                                NdkVersion = line.Substring(pos + 1).Trim();
+                            }
+                            break;
+                        }
+                    }
+                }
+                return NdkVersion;
+            }
         }
     }
 }
