@@ -207,9 +207,6 @@ namespace Sharpmake.Generators.Generic
 
                 FileInfo fileInfo = new FileInfo(projectPath);
                 ProjectPath = fileInfo.FullName;
-                ProjectDirectory = Path.GetDirectoryName(ProjectPath);
-                ProjectFileName = Path.GetFileName(ProjectPath);
-                
                 ProjectDirectory = Path.GetDirectoryName(fileInfo.FullName);
                 ProjectFileName = fileInfo.Name;
                 Project = project;
@@ -373,17 +370,11 @@ namespace Sharpmake.Generators.Generic
         {
             foreach (var config in configurations)
             {
-                var solutionDir = Path.GetDirectoryName(projectFile);
-                var context = new RiderGenerationContext(builder, project, config, projectFile, Path.GetFileName(projectFile).Substring(1))
-                {
-                    // Hack to generate correct OutputDirectory options.
-                    ProjectDirectory = solutionDir,
-                };
+                var context = new RiderGenerationContext(builder, project, config, projectFile,
+                        Path.GetFileName(projectFile).Substring(1));
 
                 var projectOptionsGen = new ProjectOptionsGenerator();
                 projectOptionsGen.GenerateOptions(context);
-                context.ProjectDirectory = projectFile; //Path.Combine(project.SharpmakeCsPath, RiderFolderPath, ".Rider");
-                
                 GenerateConfiguration(context, generatedFiles, skipFiles);
             }
         }
