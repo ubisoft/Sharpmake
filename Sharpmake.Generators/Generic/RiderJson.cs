@@ -507,10 +507,10 @@ namespace Sharpmake.Generators.Generic
                 };
             }
 
-            using (context.Resolver.NewScopedParameter("ProjectFile", context.Configuration.ProjectFullFileNameWithExtension.Replace(" ", "%20")))
-            using (context.Resolver.NewScopedParameter("ConfigurationName", context.Configuration.Name.Replace(" ", "%20")))
+            using (context.Resolver.NewScopedParameter("ProjectFile", context.Configuration.ProjectFullFileNameWithExtension))
+            using (context.Resolver.NewScopedParameter("ConfigurationName", context.Configuration.Name))
             using (context.Resolver.NewScopedParameter("PlatformName", 
-                Util.GetPlatformString(context.Configuration.Platform, context.Project, context.Configuration.Target).Replace(" ", "%20")))
+                Util.GetPlatformString(context.Configuration.Platform, context.Project, context.Configuration.Target)))
             {
                 return new BuildCommands
                 {
@@ -538,6 +538,11 @@ namespace Sharpmake.Generators.Generic
         private string GetFastBuildClean(RiderGenerationContext context)
         {
             var unresolvedOutput = Template.FastBuildCleanCommand;
+            if (context.Options["IntermediateDirectory"] == FileGeneratorUtilities.RemoveLineTag
+                || context.Options["OutputDirectory"] == FileGeneratorUtilities.RemoveLineTag)
+            {
+                return "";
+            }
         
             using (context.Resolver.NewScopedParameter("IntermediateDirectory", context.Options["IntermediateDirectory"])) 
             using (context.Resolver.NewScopedParameter("OutputDirectory", context.Options["OutputDirectory"]))

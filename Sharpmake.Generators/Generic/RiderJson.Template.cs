@@ -23,7 +23,7 @@ del ""[OutputDirectory]\[TargetFileFullName].ilk"" >NUL 2>NUL
 del ""[OutputDirectory]\[TargetFileFullName].lib"" >NUL 2>NUL
 del ""[OutputDirectory]\[TargetFileFullName].pdb"" >NUL 2>NUL";
 
-            public static string MsBuildBuildCommand = @"$(MsBuildPath) [ProjectFile] -t:[Command] -p:Configuration=[ConfigurationName] -p:Platform=[PlatformName]";
+            public static string MsBuildBuildCommand = @"$(MsBuildPath) ""[ProjectFile]"" -t:[Command] -p:Configuration=""[ConfigurationName]"" -p:Platform=""[PlatformName]""";
         }
     }
 }
