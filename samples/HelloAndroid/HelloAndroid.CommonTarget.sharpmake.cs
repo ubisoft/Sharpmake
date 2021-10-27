@@ -44,7 +44,7 @@ namespace HelloAndroid
         public Blob Blob;
         public BuildSystem BuildSystem;
         public AndroidBuildTargets AndroidBuildTargets = AndroidBuildTargets.arm64_v8a | AndroidBuildTargets.x86_64;
-        public Android.AndroidBuildType androidBuildType = Android.AndroidBuildType.Ant;
+        public Android.AndroidBuildType AndroidBuildType = Android.AndroidBuildType.Gradle;
 
         public CommonTarget() { }
 
@@ -53,7 +53,8 @@ namespace HelloAndroid
             DevEnv devEnv,
             Optimization optimization,
             Blob blob,
-            BuildSystem buildSystem
+            BuildSystem buildSystem,
+            Android.AndroidBuildType androidBuildType
         )
         {
             Platform = platform;
@@ -61,6 +62,7 @@ namespace HelloAndroid
             Optimization = optimization;
             Blob = blob;
             BuildSystem = buildSystem;
+            AndroidBuildType = androidBuildType;
         }
 
         public override string Name
@@ -79,7 +81,9 @@ namespace HelloAndroid
                     nameParts.Add(BuildSystem.ToString());
                 }
 
-                return string.Join(" ", nameParts);
+                //using underscore to join different name parts because gradle is not able to parse
+                //the names properly if we use space to join them
+                return string.Join("_", nameParts);
             }
         }
 
@@ -142,7 +146,8 @@ namespace HelloAndroid
                 DevEnv.vs2019,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
-                BuildSystem.Default
+                BuildSystem.Default,
+                Android.AndroidBuildType.Gradle
             );
 
             // make a fastbuild version of the target
