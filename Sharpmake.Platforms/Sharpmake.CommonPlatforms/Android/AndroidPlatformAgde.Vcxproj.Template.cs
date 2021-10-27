@@ -55,6 +55,8 @@ namespace Sharpmake
     <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
     <LinkTimeOptimization>[options.LinkTimeOptimization]</LinkTimeOptimization>
     <ClangLinkType>[options.ClangLinkType]</ClangLinkType>
+    <CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
+    <CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
   </PropertyGroup>
 ";
 
@@ -105,7 +107,6 @@ namespace Sharpmake
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
-      <CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
     </ClCompile>
 ";
 
