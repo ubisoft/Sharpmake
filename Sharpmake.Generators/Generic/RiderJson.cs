@@ -317,12 +317,16 @@ namespace Sharpmake.Generators.Generic
             {
                 foreach (var proj in solutionConfig.IncludedProjectInfos)
                 {
-                    if (!projects.Contains(proj.Project.Name))
+                    var solutionFolder = string.IsNullOrEmpty(proj.SolutionFolder)
+                        ? proj.Configuration.GetSolutionFolder(solution.Name)
+                        : proj.SolutionFolder;
+                    var projectEntry = solutionFolder + (solutionFolder.EndsWith("/") ? "" : "/") + proj.Project.Name;
+                    if (!projects.Contains(projectEntry))
                     {
-                        projects.Add(proj.Project.Name, new Dictionary<string, List<object>>());
+                        projects.Add(projectEntry, new Dictionary<string, List<object>>());
                     }
                     
-                    var projObject = projects[proj.Project.Name] as Dictionary<string, List<object>>;
+                    var projObject = projects[projectEntry] as Dictionary<string, List<object>>;
                     var projConfig = new Dictionary<string, string>();
 
                     projConfig.Add("ProjectConfig", proj.Configuration.Name);
