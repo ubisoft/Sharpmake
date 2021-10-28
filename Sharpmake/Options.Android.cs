@@ -209,6 +209,19 @@ namespace Sharpmake
 
             public static class Compiler
             {
+                public enum CLanguageStandard
+                {
+                    [Default]
+                    Default,
+                    C89,
+                    C99,
+                    C11,
+                    C17,
+                    GNU_C99,
+                    GNU_C11,
+                    GNU_C17
+                }
+
                 public enum CppLanguageStandard
                 {
                     [Default]

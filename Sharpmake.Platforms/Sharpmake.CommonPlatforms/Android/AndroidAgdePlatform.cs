@@ -350,6 +350,18 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
+                Options.Option(Options.Android.Compiler.CLanguageStandard.Default, () => { options["CppLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C89, () => { options["CppLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C99, () => { options["CppLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C11, () => { options["CppLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C17, () => { options["CppLanguageStandard"] = "c17"; cmdLineOptions["CppLanguageStandard"] = "-std=c17"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
+                );
+
+                context.SelectOption
+                (
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Default, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "cpp98"; cmdLineOptions["CppLanguageStandard"] = "-std=c++98"; }),
                 Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
