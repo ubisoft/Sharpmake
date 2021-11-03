@@ -66,6 +66,11 @@ namespace Sharpmake.Generators.Generic
                     foreach (var projectInfo in solutionFileEntry.Value.SelectMany(solutionConfig =>
                         solutionConfig.IncludedProjectInfos))
                     {
+                        if (projectInfo.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Generate)
+                        {
+                            continue;
+                        }
+                        
                         var projectOutput = generationReport[projectInfo.Project.GetType()];
                         generator.Generate(builder, projectInfo.Project,
                             new List<Project.Configuration> {projectInfo.Configuration},
