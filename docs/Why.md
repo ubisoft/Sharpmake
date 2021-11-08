@@ -21,7 +21,7 @@ In 2011, after evaluation of different solutions like Premake and CMake, the tea
 > * Support for C# solutions (and projects?)
 > * Generate project for a sub set of files to use from SubmitAssistant.
 
-After an evaluation of Premake and CMake (remember it was in their state in 2011), the conclusion was that developping Sharpmake was worth it on Assassin's Creed.
+After an evaluation of Premake and CMake (remember it was in their state in 2011), the conclusion was that developing Sharpmake was worth it on Assassin's Creed.
 
 Premake and CMake have been used for years at Ubisoft and over the years different productions and products inside Ubisoft switched from them to Sharpmake.  This is typically not imposed at all, since Ubisoft is extremely bottom-up; it's even the opposite, for a lot of projects, using something external can be considered better (since maintained by more people).  For productions, Sharpmake became the natural choice for multiple reasons:
 * Support for consoles, even those unannounced to public.
@@ -30,7 +30,7 @@ Premake and CMake have been used for years at Ubisoft and over the years differe
 * Fast generation.
 * C# .csproj support.  Support for mixing with .vcxproj in same generated .sln.
 * Both C++ and C# programmers are comfortable editing .sharpmake.cs files.
-* Intellisence and debugging for .sharpmake.cs files.
+* Intellisense and debugging for .sharpmake.cs files.
 
 At the beginning of 2017, serious discussions were made inside Ubisoft to finally make Sharpmake open-source.  While legal discussions were made, a few developers improved Sharpmake to isolate platform implementation in single .dll files, easing isolation of platforms under NDA.  On September 22th 2017, Sharpmake was finally pushed on Github.
 
