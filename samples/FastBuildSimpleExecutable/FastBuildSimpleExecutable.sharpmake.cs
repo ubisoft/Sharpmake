@@ -57,6 +57,9 @@ namespace FastBuild
         {
             conf.IsFastBuild = true;
             conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
+
+            // Force writing to pdb from different cl.exe process to go through the pdb server
+            conf.AdditionalCompilerOptions.Add("/FS");
         }
     }
 
