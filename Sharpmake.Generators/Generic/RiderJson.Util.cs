@@ -31,6 +31,16 @@ namespace Sharpmake.Generators.Generic
             public const string Vs22 = "VisualStudio2022";
         }
 
+        public static string GetQualifiedName(this Project project)
+        {
+            if (project.SharpmakeProjectType == Project.ProjectTypeAttribute.Generate)
+            {
+                return project.Name;
+            }
+            
+            return $"{project.FullClassName}@{project.Name}";
+        }
+
         public static string GetCompiler(this IGenerationContext context)
         {
             if (context.Configuration.Platform.IsUsingClang())

@@ -95,7 +95,7 @@ namespace Sharpmake.Generators.Generic
             public Strings PrivateIncludePaths { get; }
             public Strings PublicDefinitions { get; }
             public Strings PrivateDefinitions { get; }
-            public Strings Configurations { get; }
+
 
             public RiderProjectInfo(Project project)
             {
@@ -109,7 +109,6 @@ namespace Sharpmake.Generators.Generic
                 PrivateIncludePaths = new Strings();
                 PublicDefinitions = new Strings();
                 PrivateDefinitions = new Strings();
-                Configurations = new Strings();
             }
 
             /// <summary>
@@ -117,13 +116,12 @@ namespace Sharpmake.Generators.Generic
             /// </summary>
             public void ReadConfiguration(Project.Configuration config)
             {
-                PublicDependencyModules.AddRange(config.ResolvedPublicDependencies.Select(it => it.Project.Name));
-                PrivateDependencyModules.AddRange(config.ResolvedPrivateDependencies.Select(it => it.Project.Name));
+                PublicDependencyModules.AddRange(config.ResolvedPublicDependencies.Select(it => it.Project.GetQualifiedName()));
+                PrivateDependencyModules.AddRange(config.ResolvedPrivateDependencies.Select(it => it.Project.GetQualifiedName()));
                 PublicIncludePaths.AddRange(config.IncludePaths);
                 PrivateIncludePaths.AddRange(config.IncludePrivatePaths);
                 PublicDefinitions.AddRange(config.ExportDefines);
                 PrivateDefinitions.AddRange(config.Defines);
-                Configurations.Add(config.Name);
             }
 
             /// <summary>
@@ -440,14 +438,9 @@ namespace Sharpmake.Generators.Generic
             
             foreach (var dependency in context.Configuration.ResolvedDependencies)
             {
-                // Dependencies can contain projects with the same names. They will share same project info.
-                if (modules.Contains(dependency.Project.Name))
-                {
-                    continue;
-                }
-                
+                var projectName = dependency.Project.GetQualifiedName();
                 var dependencyInfo = _projectsInfo[dependency.Target][dependency.Project.Name];
-                modules.Add(dependencyInfo.Name, dependencyInfo.ToDictionary());
+                modules.Add(projectName, dependencyInfo.ToDictionary());
             }
 
             info.Add("Name", context.Configuration.ProjectName);
