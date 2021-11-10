@@ -21,6 +21,38 @@ namespace Sharpmake.Generators.Generic
             public const string Create = "Create";
         }
 
+        private static class Compiler
+        {
+            public const string Unknown = "Unknown";
+            public const string Clang = "Clang";
+            public const string Vs15 = "VisualStudio2015";
+            public const string Vs17 = "VisualStudio2017";
+            public const string Vs19 = "VisualStudio2019";
+            public const string Vs22 = "VisualStudio2022";
+        }
+
+        public static string GetCompiler(this IGenerationContext context)
+        {
+            if (context.Configuration.Platform.IsUsingClang())
+            {
+                return Compiler.Clang;
+            }
+
+            switch (context.Configuration.Compiler)
+            {
+                case DevEnv.vs2015:
+                    return Compiler.Vs15;
+                case DevEnv.vs2017:
+                    return Compiler.Vs17;
+                case DevEnv.vs2019:
+                    return Compiler.Vs19;
+                case DevEnv.vs2022:
+                    return Compiler.Vs22;
+                default:
+                    return Compiler.Unknown;
+            }
+        }
+
         public static string GetCppStandard(this IGenerationContext context)
         {
             var res = CppLanguageStandard.Default;

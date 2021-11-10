@@ -392,10 +392,12 @@ namespace Sharpmake.Generators.Generic
         {
             var info = new OrderedDictionary();
             var includePaths = new Strings();
+            var defines = new Strings();
             var modules = new OrderedDictionary();
             var toolchain = new OrderedDictionary();
             var buildInfo = new OrderedDictionary();
 
+            toolchain.Add("Compiler", context.GetCompiler());
             toolchain.Add("CppStandard", context.GetCppStandard());
             toolchain.Add("Architecture", context.GetArchitecture());
             toolchain.Add("bUseRTTI", context.IsRttiEnabled());
@@ -408,7 +410,6 @@ namespace Sharpmake.Generators.Generic
             toolchain.Add("bUseUnity", context.IsBlob());
             toolchain.Add("bCreateDebugInfo", context.IsDebugInfo());
             toolchain.Add("bUseAVX", context.IsAvx());
-            toolchain.Add("Compiler", context.Configuration.Compiler.ToString());
             toolchain.Add("bStrictConformanceMode", context.IsConformanceMode());
             toolchain.Add("PrecompiledHeaderAction", context.GetPchAction());
 
@@ -431,6 +432,9 @@ namespace Sharpmake.Generators.Generic
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
             includePaths.AddRange(platformVcxproj.GetPlatformIncludePaths(context));
 
+            defines.AddRange(platformVcxproj.GetImplicitlyDefinedSymbols(context));
+            defines.AddRange(context.Options.ExplicitDefines);
+            
             var curProjectInfo = _projectsInfo[context.Configuration.Target][context.Project.Name];
             modules.Add(curProjectInfo.Name, curProjectInfo.ToDictionary());
             
@@ -453,7 +457,7 @@ namespace Sharpmake.Generators.Generic
             info.Add("BuildInfo", buildInfo);
 
             info.Add("EnvironmentIncludePaths", includePaths);
-            info.Add("EnvironmentDefinitions", platformVcxproj.GetImplicitlyDefinedSymbols(context));
+            info.Add("EnvironmentDefinitions", defines);
             info.Add("Modules", modules);
             
             var file = new FileInfo(Path.Combine(context.ProjectPath, $"{context.Project.Name}_{context.Configuration.Platform}_{context.Configuration.Name}.json"));
