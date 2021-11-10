@@ -86,8 +86,6 @@ namespace Sharpmake.Generators.Generic
         private class RiderProjectInfo
         {
             public string Name { get; }
-            public string SourcePath { get; }
-            public Strings SourceExtensions { get; }
 
             public Strings PublicDependencyModules { get; }
             public Strings PrivateDependencyModules { get; }
@@ -100,9 +98,7 @@ namespace Sharpmake.Generators.Generic
             public RiderProjectInfo(Project project)
             {
                 Name = project.Name;
-                SourceExtensions = project.SourceFilesExtensions;
-                SourcePath = project.SourceRootPath;
-                
+
                 PublicDependencyModules = new Strings();
                 PrivateDependencyModules = new Strings();
                 PublicIncludePaths = new Strings();
@@ -129,12 +125,7 @@ namespace Sharpmake.Generators.Generic
             /// </summary>
             public OrderedDictionary ToDictionary()
             {
-                var resDict = new OrderedDictionary { { "SourcePath", SourcePath } };
-
-                if (!IgnoreDefaults || !SourceExtensions.All(new Project().SourceFilesExtensions.Contains))
-                {
-                    resDict.Add("SourceExtensions", SourceExtensions);
-                }
+                var resDict = new OrderedDictionary();
 
                 if (!IgnoreDefaults || PublicDependencyModules.Count != 0)
                 {
@@ -398,9 +389,9 @@ namespace Sharpmake.Generators.Generic
             toolchain.Add("Compiler", context.GetCompiler());
             toolchain.Add("CppStandard", context.GetCppStandard());
             toolchain.Add("Architecture", context.GetArchitecture());
+            toolchain.Add("OutputType", context.GetOutputType());
             toolchain.Add("bUseRTTI", context.IsRttiEnabled());
             toolchain.Add("bUseExceptions", context.IsExceptionEnabled());
-            toolchain.Add("bIsBuildingLibrary", context.Configuration.Output == Project.Configuration.OutputType.Lib);
             toolchain.Add("bIsBuildingDll", context.Configuration.Output == Project.Configuration.OutputType.Dll);
             toolchain.Add("Configuration", context.Configuration.Name);
             toolchain.Add("bOptimizeCode", context.IsOptimizationEnabled());
@@ -452,6 +443,9 @@ namespace Sharpmake.Generators.Generic
             info.Add("EnvironmentIncludePaths", includePaths);
             info.Add("EnvironmentDefinitions", defines);
             info.Add("Modules", modules);
+            
+            info.Add("RootPath", context.Project.SourceRootPath);
+            info.Add("SourceFiles", context.Project.ResolvedSourceFiles);
             
             var file = new FileInfo(Path.Combine(context.ProjectPath, $"{context.Project.Name}_{context.Configuration.Platform}_{context.Configuration.Name}.json"));
 

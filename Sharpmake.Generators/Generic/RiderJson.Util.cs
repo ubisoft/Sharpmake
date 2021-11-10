@@ -31,6 +31,13 @@ namespace Sharpmake.Generators.Generic
             public const string Vs22 = "VisualStudio2022";
         }
 
+        private static class OutputType
+        {
+            public const string Exe = "Exe";
+            public const string Lib = "Lib";
+            public const string Utility = "Utility";
+        }
+
         public static string GetQualifiedName(this Project project)
         {
             if (project.SharpmakeProjectType == Project.ProjectTypeAttribute.Generate)
@@ -147,6 +154,21 @@ namespace Sharpmake.Generators.Generic
             }
 
             return architecture.ToLower();
+        }
+
+        public static string GetOutputType(this IGenerationContext context)
+        {
+            if (context.Project is FastBuildAllProject || context.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
+            {
+                return OutputType.Utility;
+            }
+
+            if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
+            {
+                return OutputType.Lib;
+            }
+
+            return OutputType.Exe;
         }
         
         public static bool IsRttiEnabled(this IGenerationContext context)
