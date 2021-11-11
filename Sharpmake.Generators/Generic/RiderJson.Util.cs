@@ -50,7 +50,10 @@ namespace Sharpmake.Generators.Generic
 
         public static string GetCompiler(this IGenerationContext context)
         {
-            if (context.Configuration.Platform.IsUsingClang())
+            var toolset = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration);
+            if (toolset == Options.Vc.General.PlatformToolset.ClangCL
+                || toolset == Options.Vc.General.PlatformToolset.LLVM
+                || context.Configuration.Platform.IsUsingClang())
             {
                 return Compiler.Clang;
             }
