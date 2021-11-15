@@ -196,10 +196,11 @@ namespace Sharpmake
         Default = 1 << 0,
         android = 1 << 1,
         ios = 1 << 2,
-        macos = 1 << 3,
-        tvos = 1 << 4,
-        watchos = 1 << 5,
-        windows = 1 << 6
+        maccatalyst = 1 << 3,
+        macos = 1 << 4,
+        tvos = 1 << 5,
+        watchos = 1 << 6,
+        windows = 1 << 7
     }
 
     // Optional
