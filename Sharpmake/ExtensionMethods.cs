@@ -1,11 +1,11 @@
 // Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -94,6 +94,8 @@ namespace Sharpmake
                     return "netstandard2.1";
                 case DotNetFramework.net5_0:
                     return "net5.0";
+                case DotNetFramework.net6_0:
+                    return "net6.0";
                 case DotNetFramework.all_netframework:
                 case DotNetFramework.all_netcore:
                 case DotNetFramework.all_netstandard:
@@ -141,6 +143,8 @@ namespace Sharpmake
                     return "netcoreapp3.1";
                 case DotNetFramework.net5_0:
                     return "net5.0";
+                case DotNetFramework.net6_0:
+                    return "net6.0";
                 case DotNetFramework.netstandard1_0:
                     return "netstandard1.0";
                 case DotNetFramework.netstandard1_1:
