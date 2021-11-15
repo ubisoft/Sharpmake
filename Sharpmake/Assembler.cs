@@ -706,6 +706,8 @@ namespace Sharpmake
                     return LanguageVersion.CSharp8;
                 case Options.CSharp.LanguageVersion.CSharp9:
                     return LanguageVersion.CSharp9;
+                case Options.CSharp.LanguageVersion.CSharp10:
+                    return LanguageVersion.CSharp10;
                 default:
                     throw new NotImplementedException($"Don't know how to convert sharpmake option {languageVersion} to language version");
             }
