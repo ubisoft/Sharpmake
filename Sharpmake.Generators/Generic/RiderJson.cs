@@ -127,36 +127,13 @@ namespace Sharpmake.Generators.Generic
             {
                 var resDict = new OrderedDictionary();
 
-                if (!IgnoreDefaults || PublicDependencyModules.Count != 0)
-                {
-                    resDict.Add("PublicDependencyModules", PublicDependencyModules);
-                }
-                
-                if (!IgnoreDefaults || PrivateDependencyModules.Count != 0)
-                {
-                    resDict.Add("PrivateDependencyModules", PrivateDependencyModules);
-                }
+                resDict.AddIfCondition("PublicDependencyModules", PublicDependencyModules, PublicDependencyModules.Count != 0);
+                resDict.AddIfCondition("PrivateDependencyModules", PrivateDependencyModules, PrivateDependencyModules.Count != 0);
+                resDict.AddIfCondition("PublicIncludePaths", PublicIncludePaths, PublicIncludePaths.Count != 0);
+                resDict.AddIfCondition("PrivateIncludePaths", PrivateIncludePaths, PrivateIncludePaths.Count != 0);
+                resDict.AddIfCondition("PublicDefinitions", PublicDefinitions, PublicDefinitions.Count != 0);
+                resDict.AddIfCondition("PrivateDefinitions", PrivateDefinitions, PrivateDefinitions.Count != 0);
 
-                if (!IgnoreDefaults || PublicIncludePaths.Count != 0)
-                {
-                    resDict.Add("PublicIncludePaths", PublicIncludePaths);
-                }
-
-                if (!IgnoreDefaults || PrivateIncludePaths.Count != 0)
-                {
-                    resDict.Add("PrivateIncludePaths", PrivateIncludePaths);
-                }
-
-                if (!IgnoreDefaults || PublicDefinitions.Count != 0)
-                {
-                    resDict.Add("PublicDefinitions", PublicDefinitions);
-                }
-
-                if (!IgnoreDefaults || PrivateDefinitions.Count != 0)
-                {
-                    resDict.Add("PrivateDefinitions", PrivateDefinitions);
-                }
-                
                 return resDict;
             }
         }
@@ -325,10 +302,7 @@ namespace Sharpmake.Generators.Generic
 
                     projConfig.Add("ProjectConfig", proj.Configuration.Name);
                     projConfig.Add("SolutionConfig", solutionConfig.Name);
-                    if (!IgnoreDefaults)
-                    {
-                        projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
-                    }
+                    projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
 
                     if (!projObject.ContainsKey(proj.Configuration.Platform.ToString()))
                     {
@@ -386,21 +360,21 @@ namespace Sharpmake.Generators.Generic
             var toolchain = new OrderedDictionary();
             var buildInfo = new OrderedDictionary();
 
-            toolchain.Add("Compiler", context.GetCompiler());
-            toolchain.Add("CppStandard", context.GetCppStandard());
-            toolchain.Add("Architecture", context.GetArchitecture());
-            toolchain.Add("OutputType", context.GetOutputType());
-            toolchain.Add("bUseRTTI", context.IsRttiEnabled());
-            toolchain.Add("bUseExceptions", context.IsExceptionEnabled());
-            toolchain.Add("bIsBuildingDll", context.Configuration.Output == Project.Configuration.OutputType.Dll);
+            toolchain.AddIfNotDefault("Compiler", context.GetCompiler(), RiderJsonUtil.Compiler.Default);
+            toolchain.AddIfNotDefault("CppStandard", context.GetCppStandard(), RiderJsonUtil.CppLanguageStandard.Default);
+            toolchain.AddIfNotDefault("Architecture", context.GetArchitecture(), "x64");
+            toolchain.AddIfNotDefault("OutputType", context.GetOutputType(), RiderJsonUtil.OutputType.Default);
+            toolchain.AddIfNotDefault("bUseRTTI", context.IsRttiEnabled(), false);
+            toolchain.AddIfNotDefault("bUseExceptions", context.IsExceptionEnabled(), true);
+            toolchain.AddIfNotDefault("bIsBuildingDll", context.Configuration.Output == Project.Configuration.OutputType.Dll, false);
             toolchain.Add("Configuration", context.Configuration.Name);
-            toolchain.Add("bOptimizeCode", context.IsOptimizationEnabled());
-            toolchain.Add("bUseInlining", context.IsInliningEnabled());
-            toolchain.Add("bUseUnity", context.IsBlob());
-            toolchain.Add("bCreateDebugInfo", context.IsDebugInfo());
-            toolchain.Add("bUseAVX", context.IsAvx());
-            toolchain.Add("bStrictConformanceMode", context.IsConformanceMode());
-            toolchain.Add("PrecompiledHeaderAction", context.GetPchAction());
+            toolchain.AddIfNotDefault("bOptimizeCode", context.IsOptimizationEnabled(), false);
+            toolchain.AddIfNotDefault("bUseInlining", context.IsInliningEnabled(), false);
+            toolchain.AddIfNotDefault("bUseUnity", context.IsBlob(), false);
+            toolchain.AddIfNotDefault("bCreateDebugInfo", context.IsDebugInfo(), false);
+            toolchain.AddIfNotDefault("bUseAVX", context.IsAvx(), false);
+            toolchain.AddIfNotDefault("bStrictConformanceMode", context.IsConformanceMode(), false);
+            toolchain.AddIfNotDefault("PrecompiledHeaderAction", context.GetPchAction(), RiderJsonUtil.PchAction.Default);
 
             using (context.Resolver.NewScopedParameter("SolutionDir", context.ProjectDirectory))
             using (context.Resolver.NewScopedParameter("ProjectDir", context.Configuration.ProjectPath))
@@ -410,12 +384,9 @@ namespace Sharpmake.Generators.Generic
 
                 var commands = GetBuildCommands(context);
 
-                if (commands.Build != "" || !IgnoreDefaults)
-                    buildInfo.Add("BuildCmd", commands.Build);
-                if (commands.Rebuild != "" || !IgnoreDefaults)
-                    buildInfo.Add("ReBuildCmd", commands.Rebuild);
-                if (commands.Clean != "" || !IgnoreDefaults)
-                    buildInfo.Add("CleanCmd", commands.Clean);
+                buildInfo.AddIfNotDefault("BuildCmd", commands.Build, "");
+                buildInfo.AddIfNotDefault("ReBuildCmd", commands.Rebuild, "");
+                buildInfo.AddIfNotDefault("CleanCmd", commands.Clean, "");
             }
 
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);

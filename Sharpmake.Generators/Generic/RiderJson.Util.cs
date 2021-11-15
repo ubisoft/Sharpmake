@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using Sharpmake.Generators.VisualStudio;
 
@@ -6,22 +7,25 @@ namespace Sharpmake.Generators.Generic
 {
     public static class RiderJsonUtil
     {
-        private static class CppLanguageStandard
+        public static class CppLanguageStandard
         {
             public const string Cpp14 = "Cpp14";
             public const string Cpp17 = "Cpp17";
             public const string Latest = "Latest";
-            public const string Default = "Default";
+            
+            public const string Default = Cpp14;
         }
 
-        private static class PchAction
+        public static class PchAction
         {
             public const string None = "None";
             public const string Include = "Include";
             public const string Create = "Create";
+
+            public const string Default = None;
         }
 
-        private static class Compiler
+        public static class Compiler
         {
             public const string Unknown = "Unknown";
             public const string Clang = "Clang";
@@ -29,13 +33,17 @@ namespace Sharpmake.Generators.Generic
             public const string Vs17 = "VisualStudio2017";
             public const string Vs19 = "VisualStudio2019";
             public const string Vs22 = "VisualStudio2022";
+
+            public const string Default = Unknown;
         }
 
-        private static class OutputType
+        public static class OutputType
         {
             public const string Exe = "Exe";
             public const string Lib = "Lib";
             public const string Utility = "Utility";
+
+            public const string Default = Exe;
         }
 
         public static string GetQualifiedName(this Project project)
@@ -46,6 +54,18 @@ namespace Sharpmake.Generators.Generic
             }
             
             return $"{project.FullClassName}@{project.Name}";
+        }
+        
+        public static void AddIfCondition(this IDictionary dict, string key, object value, bool condition)
+        {
+            if (!RiderJson.IgnoreDefaults || condition)
+            {
+                dict.Add(key, value);
+            }
+        }
+        public static void AddIfNotDefault(this IDictionary dict, string key, object value, object defaultValue)
+        {
+            dict.AddIfCondition(key, value, !defaultValue.Equals(value));
         }
 
         public static string GetCompiler(this IGenerationContext context)

@@ -1,5 +1,4 @@
-﻿
-#include <iostream>
+﻿#include <iostream>
 
 #include <function2.hpp>
 

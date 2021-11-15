@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Sharpmake.Generators.Generic;
 
 namespace Sharpmake.Application
 {
@@ -363,9 +364,11 @@ ex: /forcecleanup( ""sharpmakeautocleanupdb.bin"" ")]
             }
 
             [CommandLine.Option("rdjson", @"Generate Rider project files")]
-            public void CommandLineGenerateRdJson()
+            public void CommandLineGenerateRdJson(bool minimize = false, bool ignoreDefaults = false)
             {
                 GenerateRdJson = true;
+                RiderJson.Minimize = minimize;
+                RiderJson.IgnoreDefaults = ignoreDefaults;
             }
 
             public void Validate()

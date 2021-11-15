@@ -41,6 +41,7 @@ namespace RiderJson
             conf.PrecompHeader = "precomp.hpp";
             conf.PrecompSource = "precomp.cpp";
             conf.Defines.Add("LIBRARY_COMPILE");
+            conf.SolutionFolder = "Libs/";
 
             conf.Output = Configuration.OutputType.Lib;
         }
@@ -120,7 +121,7 @@ namespace RiderJson
         [Configure]
         public virtual void ConfigureAll(Configuration conf, Target target)
         {
-            conf.Name = @"[solution.Name] [target.Optimization] [target.BuildSystem]";
+            conf.Name = @"[target.Optimization] [target.BuildSystem]";
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\[target.DevEnv]";
         }
     }
