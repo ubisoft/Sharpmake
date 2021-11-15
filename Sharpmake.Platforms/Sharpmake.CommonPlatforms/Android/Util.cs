@@ -62,14 +62,14 @@ namespace Sharpmake
                 return int.TryParse(valueString, out apiValue);
             }
 
-            private static string NdkVersion = string.Empty;
+            private static string s_ndkVersion = string.Empty;
             public static string GetNdkVersion(string ndkPath)
             {
-                if (!NdkVersion.Equals(string.Empty))
-                    return NdkVersion;
+                if (!s_ndkVersion.Equals(string.Empty))
+                    return s_ndkVersion;
 
                 if (string.IsNullOrEmpty(ndkPath))
-                    return NdkVersion;
+                    return s_ndkVersion;
 
                 string srcPropertiesFile = Path.Combine(ndkPath, "source.properties");
                 if (!File.Exists(srcPropertiesFile))
@@ -85,13 +85,13 @@ namespace Sharpmake
                             int pos = line.IndexOf("=");
                             if (-1 != pos)
                             {
-                                NdkVersion = line.Substring(pos + 1).Trim();
+                                s_ndkVersion = line.Substring(pos + 1).Trim();
                             }
                             break;
                         }
                     }
                 }
-                return NdkVersion;
+                return s_ndkVersion;
             }
         }
     }

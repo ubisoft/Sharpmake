@@ -177,6 +177,6 @@ namespace HelloAndroid
                 }
                 Util.ForceCopy(srcFile, destFile);
             }
-        }  
+        }
     }
 }
