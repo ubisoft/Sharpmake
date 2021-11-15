@@ -183,18 +183,18 @@ namespace Sharpmake
         [CompositeFragment]
         all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
 
-        [Obsolete("Please use at least .net framework 3.5.", error: false)]
-        v2 = v3_5,
-        [Obsolete("Please use at least .net framework 3.5.", error: false)]
-        v3 = v3_5,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
-        v4_0 = v4_5_2,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
-        v4_5 = v4_5_2,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
-        v4_5clientprofile = v4_5_2,
-        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
-        v4_5_1 = v4_5_2,
+        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        v2,
+        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        v3,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_0,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5clientprofile,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5_1,
     }
 
     // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms
