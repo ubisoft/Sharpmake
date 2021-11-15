@@ -148,7 +148,7 @@ Test( 'Test_postbuildtestexecution_exe_FD148C16' )
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
-  .PreBuildDependencies  = 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+  .TestInput             = 'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
 }
 
 
@@ -299,7 +299,7 @@ Test( 'Test_postbuildtestexecution_exe_A4801F4C' )
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
-  .PreBuildDependencies  = 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+  .TestInput             = 'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64_Executable'
 }
 
 
@@ -449,7 +449,7 @@ Test( 'Test_postbuildtestexecution_exe_75D592BF' )
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
-  .PreBuildDependencies  = 'PostBuildTestExecution_Debug_FastBuild_vs2019_win64_Executable'
+  .TestInput             = 'PostBuildTestExecution_Debug_FastBuild_vs2019_win64_Executable'
 }
 
 
@@ -600,7 +600,7 @@ Test( 'Test_postbuildtestexecution_exe_BBAD16BB' )
   .TestExecutable        = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildtestexecution.exe'
   .TestOutput            = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\test_execution_output.txt'
   .TestAlwaysShowOutput  =  true
-  .PreBuildDependencies  = 'PostBuildTestExecution_Release_FastBuild_vs2019_win64_Executable'
+  .TestInput             = 'PostBuildTestExecution_Release_FastBuild_vs2019_win64_Executable'
 }
 
 

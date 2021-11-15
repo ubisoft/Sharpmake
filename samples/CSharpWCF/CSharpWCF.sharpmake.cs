@@ -40,7 +40,7 @@ namespace CSharpWCF
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_5
+                    DotNetFramework.v4_5_2
                 )
             );
         }
@@ -90,7 +90,7 @@ namespace CSharpWCF
                     OutputType.Dll,
                     Blob.NoBlob,
                     BuildSystem.MSBuild,
-                    DotNetFramework.v4_5
+                    DotNetFramework.v4_5_2
                 )
             );
         }
@@ -137,7 +137,7 @@ namespace CSharpWCF
             OutputType.Dll,
             Blob.NoBlob,
             BuildSystem.MSBuild,
-            DotNetFramework.v4_5));
+            DotNetFramework.v4_5_2));
         }
 
         [Configure()]

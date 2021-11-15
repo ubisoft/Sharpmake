@@ -182,19 +182,12 @@ namespace Sharpmake
                     "InstallationFolder",
                     $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX {dotNetFramework.ToVersionString()} Tools\");
             }
-            else if (dotNetFramework >= DotNetFramework.v4_5_1) // Note: .Net 4.5.2 lacks a NETFX tools release, so we use the previous version
+            else if (dotNetFramework >= DotNetFramework.v4_5_2) // Note: .Net 4.5.2 lacks a NETFX tools release, so we use the previous version
             {
                 netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
                     $@"{microsoftSdksRegistryKeyString}\Windows\v8.1A\WinSDK-NetFx40Tools-x86",
                     "InstallationFolder",
                     $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\");
-            }
-            else if (dotNetFramework >= DotNetFramework.v4_0)
-            {
-                netFxToolsDir = Util.GetRegistryLocalMachineSubKeyValue(
-                    $@"{microsoftSdksRegistryKeyString}\Windows\v8.0A\WinSDK-NetFx40Tools-x86",
-                    "InstallationFolder",
-                    $@"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\bin\NETFX 4.0 Tools\");
             }
             else if (dotNetFramework >= DotNetFramework.v3_5)
             {

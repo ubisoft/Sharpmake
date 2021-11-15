@@ -144,49 +144,55 @@ namespace Sharpmake
     [Fragment, Flags]
     public enum DotNetFramework
     {
+        v3_5 = 1 << 0,
+        v3_5clientprofile = 1 << 1,
+        v4_5_2 = 1 << 2,
+        v4_6 = 1 << 3,
+        v4_6_1 = 1 << 4,
+        v4_6_2 = 1 << 5,
+        v4_7 = 1 << 6,
+        v4_7_1 = 1 << 7,
+        v4_7_2 = 1 << 8,
+        v4_8 = 1 << 9,
+
+        netcore1_0 = 1 << 10,
+        netcore1_1 = 1 << 11,
+        netcore2_0 = 1 << 12,
+        netcore2_1 = 1 << 13,
+        netcore2_2 = 1 << 14,
+        netcore3_0 = 1 << 15,
+        netcore3_1 = 1 << 16,
+        net5_0 = 1 << 17,
+
+        netstandard1_0 = 1 << 18,
+        netstandard1_1 = 1 << 19,
+        netstandard1_2 = 1 << 20,
+        netstandard1_3 = 1 << 21,
+        netstandard1_4 = 1 << 22,
+        netstandard1_5 = 1 << 23,
+        netstandard1_6 = 1 << 24,
+        netstandard2_0 = 1 << 25,
+        netstandard2_1 = 1 << 26,
+
+        [CompositeFragment]
+        all_netframework = v3_5 | v3_5clientprofile | v4_5_2 | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
+        [CompositeFragment]
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0,
+        [CompositeFragment]
+        all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
+
         [Obsolete("Please use at least .net framework 3.5.", error: false)]
         v2 = v3_5,
         [Obsolete("Please use at least .net framework 3.5.", error: false)]
         v3 = v3_5,
-
-        v3_5 = 1 << 0,
-        v3_5clientprofile = 1 << 1,
-        v4_0 = 1 << 2,
-        v4_5 = 1 << 3,
-        v4_5_1 = 1 << 4,
-        v4_5_2 = 1 << 5,
-        v4_5clientprofile = 1 << 6,
-        v4_6 = 1 << 7,
-        v4_6_1 = 1 << 8,
-        v4_6_2 = 1 << 9,
-        v4_7 = 1 << 10,
-        v4_7_1 = 1 << 11,
-        v4_7_2 = 1 << 12,
-        v4_8 = 1 << 13,
-        netcore1_0 = 1 << 14,
-        netcore1_1 = 1 << 15,
-        netcore2_0 = 1 << 16,
-        netcore2_1 = 1 << 17,
-        netcore2_2 = 1 << 18,
-        netcore3_0 = 1 << 19,
-        netcore3_1 = 1 << 20,
-        net5_0 = 1 << 21,
-        netstandard1_0 = 1 << 22,
-        netstandard1_1 = 1 << 23,
-        netstandard1_2 = 1 << 24,
-        netstandard1_3 = 1 << 25,
-        netstandard1_4 = 1 << 26,
-        netstandard1_5 = 1 << 27,
-        netstandard1_6 = 1 << 28,
-        netstandard2_0 = 1 << 29,
-        netstandard2_1 = 1 << 30,
-
-        [CompositeFragment]
-        all_netframework = v3_5 | v3_5clientprofile | v4_0 | v4_5 | v4_5_1 | v4_5_2 | v4_5clientprofile | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
-        [CompositeFragment]
-        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0,
-        [CompositeFragment]
-        all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1
+        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
+        v4_0 = v4_5_2,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
+        v4_5 = v4_5_2,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
+        v4_5clientprofile = v4_5_2,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: false)]
+        v4_5_1 = v4_5_2,
     }
 
     // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms

@@ -44,16 +44,8 @@ namespace Sharpmake
                     return "3.5";
                 case DotNetFramework.v3_5clientprofile:
                     return "3.5";
-                case DotNetFramework.v4_0:
-                    return "4.0";
-                case DotNetFramework.v4_5:
-                    return "4.5";
-                case DotNetFramework.v4_5_1:
-                    return "4.5.1";
                 case DotNetFramework.v4_5_2:
                     return "4.5.2";
-                case DotNetFramework.v4_5clientprofile:
-                    return "4.5";
                 case DotNetFramework.v4_6:
                     return "4.6";
                 case DotNetFramework.v4_6_1:
@@ -117,12 +109,6 @@ namespace Sharpmake
             {
                 case DotNetFramework.v3_5:
                     return "net35";
-                case DotNetFramework.v4_0:
-                    return "net40";
-                case DotNetFramework.v4_5:
-                    return "net45";
-                case DotNetFramework.v4_5_1:
-                    return "net451";
                 case DotNetFramework.v4_5_2:
                     return "net452";
                 case DotNetFramework.v4_6:

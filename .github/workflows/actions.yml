@@ -171,7 +171,7 @@ jobs:
         working-directory: 'samples/CSharpWCF'
         run: |
           & $env:SHARPMAKE_EXE "/sources('CSharpWCF.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\CSharpWCFSolution.vs2015.v4_5.sln "${{ matrix.configuration }}" "Any CPU"
+          & $env:COMPILE_BATCH codebase\CSharpWCFSolution.vs2015.v4_5_2.sln "${{ matrix.configuration }}" "Any CPU"
 
       - name: FastBuildSimpleExecutable ${{ matrix.configuration }}
         if: runner.os == 'Windows'

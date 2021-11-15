@@ -45,7 +45,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /TP'
             + ' /errorReport:queue'
             + ' /D"_MBCS"'
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     .CompilerOptimizations = ''
             + ' /Od'
@@ -182,7 +182,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /TP'
             + ' /errorReport:queue'
             + ' /D"_MBCS"'
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     .CompilerOptimizations = ''
             + ' /Ox'
