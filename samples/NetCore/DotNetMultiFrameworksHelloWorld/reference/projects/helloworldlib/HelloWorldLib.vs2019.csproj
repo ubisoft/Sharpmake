@@ -7,12 +7,24 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HelloWorldLib</RootNamespace>
     <AssemblyName>HelloWorldLib</AssemblyName>
-    <TargetFrameworks>net461;net5.0-windows;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;net472;net5.0-windows;netstandard2.0</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net461'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>output\anycpu\debug</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net472'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -60,6 +72,18 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net472'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>output\anycpu\release</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net5.0-windows'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>false</DebugSymbols>
@@ -85,7 +109,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <ItemGroup Condition="'$(TargetFramework)'=='net461'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net461' OR '$(TargetFramework)'=='net472'">
     <Reference Include="System">
       <Private>False</Private>
     </Reference>

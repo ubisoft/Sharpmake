@@ -172,11 +172,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public string ResolveCondition(Resolver resolver)
                 {
-                    string targetFrameworks = GetTargetFrameworksString(TargetFrameworks.ToArray());
-                    using (resolver.NewScopedParameter("targetFramework", targetFrameworks))
+                    return string.Join(" OR ", TargetFrameworks.Select(targetFramework =>
                     {
-                        return resolver.Resolve(Template.ItemGroups.ItemGroupTargetFrameworkCondition);
-                    }
+                        using (resolver.NewScopedParameter("targetFramework", GetTargetFrameworksString(targetFramework)))
+                        {
+                            return resolver.Resolve(Template.ItemGroups
+                                .ItemGroupTargetFrameworkCondition);
+                        }
+                    }));
                 }
 
                 public string Resolve(Resolver resolver)
