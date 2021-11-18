@@ -40,6 +40,7 @@ namespace Sharpmake.Generators.FastBuild
             public Dictionary<string, Strings> BffIncludeToDependencyIncludes = new Dictionary<string, Strings>();
             public readonly Dictionary<string, CompilerSettings> CompilerSettings = new Dictionary<string, CompilerSettings>();
             public readonly Strings AllConfigsSections = new Strings(); // All Configs section when running with a source file filter
+            public readonly HashSet<string> WrittenAdditionalPropertyGroups = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         }
 
         private class ConfigurationsPerBff : IEnumerable<Solution.Configuration>
@@ -702,6 +703,30 @@ namespace Sharpmake.Generators.FastBuild
                     extraOptions.Any())
                 {
                     fastBuildCompilerAdditionalSettings = string.Join(Environment.NewLine, extraOptions.Select(option => "    " + option));
+                }
+
+                // Check if we got a dependent custom property group referenced by the compiler section
+                if (FastBuildSettings.AdditionalCompilerPropertyGroups.TryGetValue(compiler.Key, out string extraCompilerPropertyGroupName))
+                {
+                    if (FastBuildSettings.AdditionalPropertyGroups.TryGetValue(extraCompilerPropertyGroupName, out List<string> extraPropertySection) &&
+                        extraPropertySection.Any())
+                    {
+                        // Only write each section once.
+                        if (masterBffInfo.WrittenAdditionalPropertyGroups.Add(extraCompilerPropertyGroupName))
+                        {
+                            
+                            string section = UtilityMethods.FBuildFormatList(extraPropertySection, 0, UtilityMethods.FBuildFormatListOptions.None);
+                            masterBffGenerator.Write(Environment.NewLine);
+                            masterBffGenerator.Write(extraCompilerPropertyGroupName);
+                            masterBffGenerator.Write(Environment.NewLine);
+                            masterBffGenerator.Write(section);
+                            masterBffGenerator.Write(Environment.NewLine);
+                        }
+                    }
+                    else
+                    {
+                        Builder.Instance.LogErrorLine("Additional property group '{0}' is not registered or empty", extraCompilerPropertyGroupName);                        
+                    }
                 }
 
                 using (masterBffGenerator.Declare("fastbuildCompilerName", compiler.Key))

@@ -183,5 +183,15 @@ namespace Sharpmake
         /// Additional settings to add to the Compiler node, keyed by compiler name.
         /// </summary>
         public static readonly IDictionary<string, IList<string>> AdditionalCompilerSettings = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Additional Section referred by a compiler node, keyed by compiler name
+        /// </summary>
+        public static readonly IDictionary<string, string> AdditionalCompilerPropertyGroups = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Additional custom property groups. Only those referred will be written to the bff files.
+        /// </summary>
+        public static readonly IDictionary<string, List<string>> AdditionalPropertyGroups = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
     }
 }
