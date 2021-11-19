@@ -595,7 +595,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static Guid BuildGuid(string value)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider provider = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            var provider = System.Security.Cryptography.MD5.Create();
             byte[] md5 = provider.ComputeHash(Encoding.ASCII.GetBytes(value));
             return new Guid(md5);
         }
