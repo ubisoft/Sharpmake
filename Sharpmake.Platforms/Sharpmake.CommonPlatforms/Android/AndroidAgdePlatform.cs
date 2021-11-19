@@ -147,6 +147,7 @@ namespace Sharpmake
 
                 using (generator.Declare("androidApplicationModule", Options.GetOptionValue("androidApplicationModule", context.ProjectConfigurationOptions.Values)))
                 using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
                 using (generator.Declare("androidNdkVersion", Options.GetOptionValue("androidNdkVersion", context.ProjectConfigurationOptions.Values)))
                 using (generator.Declare("androidMinSdkVersion", Options.GetOptionValue("androidMinSdkVersion", context.ProjectConfigurationOptions.Values)))
                 using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
@@ -176,20 +177,7 @@ namespace Sharpmake
                 {
                     string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
                     if (!string.IsNullOrEmpty(additionalVCTargetsPath))
-                        generator.WriteVerbatim(_projectImportAppTypeProps);
-                }
-            }
-
-            public override void GeneratePostDefaultPropsImport(IVcxprojGenerationContext context, IFileGenerator generator)
-            {
-                base.GeneratePostDefaultPropsImport(context, generator);
-
-                var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
-                if (devEnv.IsVisualStudio() && devEnv >= DevEnv.vs2017)
-                {
-                    // in case we've written an additional vc targets path, we need to set a couple of properties to avoid a warning
-                    if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform)))
-                        generator.WriteVerbatim(_postImportAppTypeProps);
+                        generator.WriteVerbatim(_projectPropertySheets);
                 }
             }
 
