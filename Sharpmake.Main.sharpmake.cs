@@ -67,7 +67,7 @@ namespace SharpmakeGen
                 CustomProperties.Add("Deterministic", "false");
 
                 if (excludeSharpmakeFiles)
-                    SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");
+                    NoneExtensions.Add(".sharpmake.cs");
             }
 
             [Configure]

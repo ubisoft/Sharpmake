@@ -88,6 +88,9 @@
     <Compile Include="Windows\Win64Platform.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Sharpmake.CommonPlatforms.sharpmake.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Sharpmake.Generators\Sharpmake.Generators.csproj">
       <Project>{844f66de-b015-340e-720a-8e158b517e93}</Project>
       <Name>Sharpmake.Generators</Name>
