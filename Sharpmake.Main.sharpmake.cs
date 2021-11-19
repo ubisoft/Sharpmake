@@ -114,17 +114,14 @@ namespace SharpmakeGen
 
             AddTargets(Common.GetDefaultTargets());
 
-            ExtraItems[".github"] = new Strings {
-                @".github\workflows\actions.yml"
-            };
+            var githubFiles = Util.DirectoryGetFiles(Path.Combine(Globals.AbsoluteRootPath, ".github"));
+            ExtraItems[".github"] = new Strings { githubFiles };
 
-            ExtraItems["BatchFiles"] = new Strings {
-                "bootstrap.bat",
-                "CompileSharpmake.bat",
-                "GenerateMdbFiles.bat",
-                "UpdateSamplesOutput.bat",
-                "visualstudio.sharpmake.bat"
-            };
+            var batchFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.bat", SearchOption.TopDirectoryOnly);
+            ExtraItems["BatchFiles"] = new Strings { batchFiles };
+
+            var pythonFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.py", SearchOption.TopDirectoryOnly);
+            ExtraItems["PythonFiles"] = new Strings { pythonFiles };
         }
 
         [Configure]
