@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Sharpmake
 {
@@ -148,14 +149,25 @@ namespace Sharpmake
             else
             {
                 bool foundReference = false;
-                foreach (string candidateReferenceLocation in EnumerateReferencePathCandidates(sourceFilePath, reference))
+                foundReference = Assembler.DefaultReferences.Any(
+                    defaultReference => FileSystemStringComparer.StaticCompare(defaultReference, reference) == 0
+                );
+
+                if (!foundReference)
                 {
-                    if (Util.FileExists(candidateReferenceLocation))
+                    foreach (string candidateReferenceLocation in EnumerateReferencePathCandidates(sourceFilePath, reference))
                     {
-                        context.AddReference(candidateReferenceLocation);
-                        foundReference = true;
-                        break;
+                        if (Util.FileExists(candidateReferenceLocation))
+                        {
+                            context.AddReference(candidateReferenceLocation);
+                            foundReference = true;
+                            break;
+                        }
                     }
+                }
+                else if(Builder.Instance.Diagnostics)
+                {
+                    Util.LogWrite("{0}({1}): Warning: Reference '{2}' is redundant and can be removed since it is in the default reference list.", sourceFilePath.FullName, lineNumber, reference);
                 }
 
                 if (!foundReference)
