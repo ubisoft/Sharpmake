@@ -23,25 +23,33 @@ namespace Sharpmake
 
             private const string _projectDescriptionPlatformSpecific =
 @"    <AndroidNdkDirectory>[ndkRoot]</AndroidNdkDirectory>
-      <AndroidNdkVersion>[androidNdkVersion]</AndroidNdkVersion>
-      <AndroidSdk>[androidHome]</AndroidSdk>
-      <AndroidMinSdkVersion>[androidMinSdkVersion]</AndroidMinSdkVersion>
-      <AndroidEnablePackaging>[androidEnablePackaging]</AndroidEnablePackaging>
-      <AndroidGradleBuildDir>[androidGradleBuildDir]</AndroidGradleBuildDir>
-      <AndroidApplicationModule>[androidApplicationModule]</AndroidApplicationModule>
+    <AndroidNdkVersion>[androidNdkVersion]</AndroidNdkVersion>
+    <AndroidSdk>[androidHome]</AndroidSdk>
+    <AndroidMinSdkVersion>[androidMinSdkVersion]</AndroidMinSdkVersion>
+    <AndroidEnablePackaging>[androidEnablePackaging]</AndroidEnablePackaging>
+    <AndroidGradleBuildDir>[androidGradleBuildDir]</AndroidGradleBuildDir>
+    <AndroidApplicationModule>[androidApplicationModule]</AndroidApplicationModule>
+    <VS_JavaHome>[javaHome]</VS_JavaHome>
+    <PlatformToolset>Clang</PlatformToolset>
 ";
 
-            private const string _projectImportAppTypeProps =
-                @"  <Import Project=""$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\Default.props"" />
-  <Import Project=""$(AdditionalVCTargetsPath)Application Type\$(ApplicationType)\$(ApplicationTypeRevision)\Default.props"" />
-";
-
-            // Workaround for app type props not overridable Microsoft.Cpp.Default.props
-            private const string _postImportAppTypeProps =
-                @"  <PropertyGroup>
-    <_ApplicationTypeDefaultPropsFound>true</_ApplicationTypeDefaultPropsFound>
-    <_ApplicationTypeRevisionDefaultPropsFound>true</_ApplicationTypeRevisionDefaultPropsFound>
-  </PropertyGroup>
+            private const string _projectPropertySheets =
+@"  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-arm64-v8a'"" Label=""PropertySheets"">
+    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-arm64-v8a\Platform.default.props"" />
+    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-arm64-v8a\PlatformToolsets\Clang\Toolset.props"" />
+  </ImportGroup>
+  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-armeabi-v7a'"" Label=""PropertySheets"">
+    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-armeabi-v7a\Platform.default.props"" />
+    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-armeabi-v7a\PlatformToolsets\Clang\Toolset.props"" />
+  </ImportGroup>
+  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-x86'"" Label=""PropertySheets"">
+    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-x86\Platform.default.props"" />
+    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-x86\PlatformToolsets\Clang\Toolset.props"" />
+  </ImportGroup>
+  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-x86_64'"" Label=""PropertySheets"">
+    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-x86_64\Platform.default.props"" />
+    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-x86_64\PlatformToolsets\Clang\Toolset.props"" />
+  </ImportGroup>
 ";
 
             private const string _projectConfigurationsGeneralTemplate =
@@ -51,7 +59,6 @@ namespace Sharpmake
     <PlatformToolset>[options.PlatformToolset]</PlatformToolset>
     <UseOfStl>[options.UseOfStl]</UseOfStl>
     <ThumbMode>[options.ThumbMode]</ThumbMode>
-    <AndroidAPILevel>[options.AndroidAPILevel]</AndroidAPILevel>
     <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
     <LinkTimeOptimization>[options.LinkTimeOptimization]</LinkTimeOptimization>
     <ClangLinkType>[options.ClangLinkType]</ClangLinkType>
