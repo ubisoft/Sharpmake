@@ -35,7 +35,7 @@ call :UpdateRef samples PackageReferences           PackageReferences.sharpmake.
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable
+call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable\projects
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SimpleExeLibDependency      SimpleExeLibDependency.sharpmake.cs        reference         SimpleExeLibDependency
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error

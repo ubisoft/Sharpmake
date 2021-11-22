@@ -145,8 +145,11 @@ def build_with_fastbuild(root_dir, test_dir):
     if not os.path.isfile(fastBuildPath):
         return -1
 
-    cmd_line = fastBuildPath + " All-Configs -monitor -nosummaryonerror -clean -config " + test_dir + ".bff"
     working_dir = os.path.join(root_dir, test_dir, "projects")
+    fdbFile = os.path.join(working_dir, test_dir + ".windows.fdb")
+    if os.path.isfile(fdbFile):
+        os.remove(fdbFile)
+    cmd_line = fastBuildPath + " All-Configs -monitor -nosummaryonerror -clean -config " + test_dir + ".bff"
 
     os.chdir(working_dir)
     write_line(cmd_line)

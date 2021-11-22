@@ -50,6 +50,7 @@ namespace FastBuild
         {
             conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.Options.Add(Options.Vc.Compiler.Exceptions.Enable);
         }
 
         [Configure(BuildSystem.FastBuild)]
