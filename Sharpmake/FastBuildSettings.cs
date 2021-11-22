@@ -182,7 +182,8 @@ namespace Sharpmake
         /// <summary>
         /// Additional settings to add to the Compiler node, keyed by compiler name.
         /// </summary>
-        public static readonly IDictionary<string, IList<string>> AdditionalCompilerSettings = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+        /// 
+        public static readonly IDictionary<string, List<string>> AdditionalCompilerSettings = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Additional Section referred by a compiler node, keyed by compiler name

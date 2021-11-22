@@ -699,7 +699,7 @@ namespace Sharpmake.Generators.FastBuild
                 }
 
                 string fastBuildCompilerAdditionalSettings = FileGeneratorUtilities.RemoveLineTag;
-                if (FastBuildSettings.AdditionalCompilerSettings.TryGetValue(compiler.Key, out IList<string> extraOptions) &&
+                if (FastBuildSettings.AdditionalCompilerSettings.TryGetValue(compiler.Key, out List<string> extraOptions) &&
                     extraOptions.Any())
                 {
                     fastBuildCompilerAdditionalSettings = string.Join(Environment.NewLine, extraOptions.Select(option => "    " + option));
