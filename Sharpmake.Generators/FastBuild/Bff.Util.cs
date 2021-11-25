@@ -519,7 +519,7 @@ namespace Sharpmake.Generators.FastBuild
 
         internal static string GetFastBuildCopyAlias(string sourceFileName, string destinationFolder)
         {
-            string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetHashCode().ToString("X8"));
+            string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetDeterministicHashCode().ToString("X8"));
             return fastBuildCopyAlias;
         }
 

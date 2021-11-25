@@ -65,6 +65,35 @@ namespace Sharpmake
         }
 
         /// <summary>
+        /// This method will return a deterministic hash for a string.
+        /// </summary>
+        /// <remarks>
+        /// With net core the regular GetHashCode() is now
+        /// seeded for security reasons.
+        /// </remarks>
+        /// <see href="https://andrewlock.net/why-is-string-gethashcode-different-each-time-i-run-my-program-in-net-core/"/>
+        /// <param name="str">The input string</param>
+        /// <returns>A deterministic hash</returns>
+        public static int GetDeterministicHashCode(this string str)
+        {
+            unchecked
+            {
+                int hash1 = (5381 << 16) + 5381;
+                int hash2 = hash1;
+
+                for (int i = 0; i < str.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ str[i];
+                    if (i == str.Length - 1)
+                        break;
+                    hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
+                }
+
+                return hash1 + (hash2 * 1566083941);
+            }
+        }
+
+        /// <summary>
         /// Finds the first occurrence of directive and returns the 
         /// requested param value. Ex:
         /// GetTextTemplateDirectiveParam(ttPath, "output", "extension")

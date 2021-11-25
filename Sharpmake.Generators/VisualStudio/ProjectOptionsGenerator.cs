@@ -2045,12 +2045,12 @@ namespace Sharpmake.Generators.VisualStudio
                             cEvent.ExecutableInputFileArgumentOption +
                             cEvent.ExecutableOtherArguments
                           ).
-                        GetHashCode().ToString("X8");
+                        GetDeterministicHashCode().ToString("X8");
                 }
                 else
                 {
                     execName = @"Exec_" + extractName(cEvent.ExecutableFile);
-                    execName += "_" + (execName).GetHashCode().ToString("X8");
+                    execName += "_" + (execName).GetDeterministicHashCode().ToString("X8");
                 }
 
                 return execName;
@@ -2064,11 +2064,11 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    copyName = "Copy_" + (conf.TargetFileFullName + sourcePath + destinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (conf.TargetFileFullName + sourcePath + destinationPath).GetDeterministicHashCode().ToString("X8");
                 }
                 else
                 {
-                    copyName = "Copy_" + (sourcePath + destinationPath).GetHashCode().ToString("X8");
+                    copyName = "Copy_" + (sourcePath + destinationPath).GetDeterministicHashCode().ToString("X8");
                 }
 
                 return copyName;
@@ -2081,12 +2081,12 @@ namespace Sharpmake.Generators.VisualStudio
 
                 if (isPostBuildCustomActionWithSpecificName)
                 {
-                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (tEvent.TestArguments + normalizedConfTargetPath + conf.TargetFileFullName).GetHashCode().ToString("X8");
+                    testName = "Test_" + extractName(tEvent.TestExecutable) + "_" + (tEvent.TestArguments + normalizedConfTargetPath + conf.TargetFileFullName).GetDeterministicHashCode().ToString("X8");
                 }
                 else
                 {
                     testName = "Test_" + extractName(tEvent.TestExecutable);
-                    testName += "_" + (testName + tEvent.TestArguments).GetHashCode().ToString("X8");
+                    testName += "_" + (testName + tEvent.TestArguments).GetDeterministicHashCode().ToString("X8");
                 }
 
                 return testName;

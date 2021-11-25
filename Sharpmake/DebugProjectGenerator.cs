@@ -148,7 +148,9 @@ namespace Sharpmake
         {
             string displayName = assemblyInfo.DebugProjectName;
             if (string.IsNullOrEmpty(displayName))
-                displayName = isSetupProject ? "sharpmake_debug" : $"sharpmake_package_{assemblyInfo.Id.GetHashCode():X8}";
+            {
+                displayName = isSetupProject ? "sharpmake_debug" : $"sharpmake_package_{assemblyInfo.Id.GetDeterministicHashCode():X8}";
+            }
 
             Type generatedProject;
             if (visited.TryGetValue(assemblyInfo.Id, out generatedProject))
