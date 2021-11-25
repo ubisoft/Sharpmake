@@ -825,13 +825,22 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildCompilerForceUsing = builderForceUsingFiles.ToString();
                         }
 
-                        if (isOutputTypeExeOrDll && conf.PostBuildStampExe != null)
+                        if (isOutputTypeExeOrDll && (conf.PostBuildStampExe != null || conf.PostBuildStampExes.Any()))
                         {
-                            fastBuildStampExecutable = CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, conf.PostBuildStampExe.ExecutableFile, true));
-                            fastBuildStampArguments = string.Format("{0} {1} {2}",
-                                conf.PostBuildStampExe.ExecutableInputFileArgumentOption,
-                                conf.PostBuildStampExe.ExecutableOutputFileArgumentOption,
-                                conf.PostBuildStampExe.ExecutableOtherArguments);
+                            List<string> fastbuildStampExecutableList = new List<string>();
+                            List<string> fastBuildStampArgumentsList = new List<string>();
+
+                            foreach (var stampExe in conf.PostBuildStampExes.Prepend(conf.PostBuildStampExe).Where(x => x != null))
+                            {
+                                fastbuildStampExecutableList.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, stampExe.ExecutableFile, true)));
+                                fastBuildStampArgumentsList.Add(string.Format("{0} {1} {2}",
+                                    stampExe.ExecutableInputFileArgumentOption,
+                                    stampExe.ExecutableOutputFileArgumentOption,
+                                    stampExe.ExecutableOtherArguments));
+                            }
+
+                            fastBuildStampExecutable = UtilityMethods.FBuildFormatList(fastbuildStampExecutableList, 30);
+                            fastBuildStampArguments = UtilityMethods.FBuildFormatList(fastBuildStampArgumentsList, 30);
                         }
 
                         bool linkObjects = false;

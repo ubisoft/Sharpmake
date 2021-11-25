@@ -68,8 +68,11 @@ class FunctionalTest(object):
 
 
 class FastBuildFunctionalTest(FunctionalTest):
-    def __init__(self):
-        super(FastBuildFunctionalTest, self).__init__("FastBuildFunctionalTest", "FastBuildFunctionalTest.sharpmake.cs")
+    def __init__(self, enable_multi_stamping = False):
+        extra_args = []
+        if enable_multi_stamping:
+            extra_args.append("/enableLinkerMultiStamp(true)")
+        super(FastBuildFunctionalTest, self).__init__("FastBuildFunctionalTest", "FastBuildFunctionalTest.sharpmake.cs", extra_args)
 
     def verifyCustomBuildEventsInTargetDir(self, targetDir):
         #verify copied files exist
@@ -91,7 +94,19 @@ class FastBuildFunctionalTest(FunctionalTest):
         if file_content != "Test successful.":
             write_line("Incorrect output of test node execution: {}...".format(file_content))
             return 1
-        
+
+        #verify post build stamper modified the executable correctly
+        test_output = os.path.join(targetDir, "postbuildstamptest.exe")
+        f = open(test_output, "rb")
+        if f.mode != "rb":
+            write_line("Unable to open file {}...".format(test_output))
+            return 1
+
+        file_content = f.read()
+        if not file_content.endswith(b"_Stamp_Message"):
+            write_line("Incorrect stamping for file {}...".format(test_output))
+            return 1
+
         return 0
 
     def verifyCustomBuildEvents(self, projectDir):
@@ -130,12 +145,6 @@ class SharpmakePackageFunctionalTest(FunctionalTest):
         return 0
 
 
-funcTests = [
-    FastBuildFunctionalTest(),
-    NoAllFastBuildProjectFunctionalTest(),
-    SharpmakePackageFunctionalTest()
-]
-
 
 def build_with_fastbuild(root_dir, test_dir):
     entry_path = os.getcwd()
@@ -158,8 +167,9 @@ def build_with_fastbuild(root_dir, test_dir):
 
 def find_sharpmake_path():
     optim_tokens = ["debug", "release"]
+    target = "Sharpmake.Application.exe"
     for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, "Sharpmake.Application.exe"))
+        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, target))
         if os.path.isfile(path):
             return path
 
@@ -210,7 +220,7 @@ def pause(timeout=None):
                     if stop_waiting:
                         break
 
-def launch_functional_tests():
+def launch_functional_tests(funcTests):
     entry_path = os.getcwd()
     try:
         # Change directory to the path of this.
@@ -234,6 +244,23 @@ def launch_functional_tests():
     finally:
         os.chdir(entry_path)
 
-black_bg()
-exit_code = launch_functional_tests()
-sys.exit(exit_code)
+
+if __name__ == "__main__":
+    enable_multi_stamping = False
+
+    for arg in sys.argv[1:]:
+        if arg == "--enable_multi_stamping":
+            enable_multi_stamping = True
+        else:
+            write_line("Unknown argument: {}".format(arg))
+            sys.exit(1)
+
+    funcTests = [
+        FastBuildFunctionalTest(enable_multi_stamping),
+        NoAllFastBuildProjectFunctionalTest(),
+        SharpmakePackageFunctionalTest()
+    ]
+
+    black_bg()
+    exit_code = launch_functional_tests(funcTests)
+    sys.exit(exit_code)
