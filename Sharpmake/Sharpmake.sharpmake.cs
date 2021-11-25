@@ -26,6 +26,11 @@ namespace SharpmakeGen
 
             conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "4.0.1");
             conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "3.0.4492");
+
+            if (target.Framework.IsDotNetFramework())
+            {
+                conf.ReferencesByNuGetPackage.Add("System.Text.Json", "6.0.0");
+            }
         }
     }
 }
