@@ -29,7 +29,7 @@ namespace SharpmakeGen
 
             if (target.Framework.IsDotNetFramework())
             {
-                conf.ReferencesByNuGetPackage.Add("System.Text.Json", "6.0.0");
+                conf.ReferencesByNuGetPackage.Add("System.Text.Json", "5.0.2");
             }
         }
     }
