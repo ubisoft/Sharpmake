@@ -344,14 +344,14 @@ namespace Sharpmake
         /// <remarks>
         /// - Auto cleanup is disabled by default and must be enabled explicitly.
         /// - You can have many auto cleanup database by setting the AutoCleanupDBSuffix to a string that identify your sharpmake running context.
-        /// This is useful when you execute sharpmake with more than one setup configuration. For example on ACE, we have two setups:
+        /// This is useful when you execute sharpmake with more than one setup configuration. For example on one project, we have two setups:
         /// - Engine and Tools and both are running different scripts but have the same .sharpmake file entry point. In that case we would
         /// set the suffix with different value depending on the context we are running sharpmake with.
         /// - Generally you should also disable the cleanup when running with changelist filters(used typically by Submit Assistant).
         /// </remarks>
         ///
         /// <example>
-        /// This is the way the auto-cleanup is configured on ACE. This code is in our main.
+        /// This is the way the auto-cleanup is configured on one of our projects, this code is in the main.
         /// Util.AutoCleanupDBPath = sharpmakeFileDirectory;
         /// Util.FilesAutoCleanupActive = Arguments.Filter != Filter.Changelist && arguments.Builder.BlobOnly == false;
         /// if (Arguments.GenerateTools)
