@@ -163,7 +163,7 @@ def find_sharpmake_path():
         if os.path.isfile(path):
             return path
 
-    raise IOError("Cannot find " + target)
+    raise IOError("Cannot find Sharpmake.Application.exe")
 
 def write_line(str):
     print(str)
