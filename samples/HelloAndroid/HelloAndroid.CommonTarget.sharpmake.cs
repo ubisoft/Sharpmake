@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Sharpmake;
 
+[module: Sharpmake.Reference("Sharpmake.CommonPlatforms.dll")]
+
 namespace HelloAndroid
 {
     using AndroidBuildTargets = Sharpmake.Android.AndroidBuildTargets;

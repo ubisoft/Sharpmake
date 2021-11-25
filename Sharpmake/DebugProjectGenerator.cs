@@ -62,7 +62,6 @@ namespace Sharpmake
 
             public virtual void AddReferences(Project.Configuration conf, IEnumerable<string> additionalReferences = null)
             {
-                conf.ReferencesByPath.Add(Assembler.DefaultReferences);
                 if (additionalReferences != null)
                 {
                     conf.ReferencesByPath.AddRange(additionalReferences);
@@ -180,12 +179,6 @@ namespace Sharpmake
 
             // Add references
             var references = new HashSet<string>();
-            if (assemblyInfo.UseDefaultReferences)
-            {
-                foreach (string defaultReference in Assembler.DefaultReferences)
-                    references.Add(Assembler.GetAssemblyDllPath(defaultReference));
-            }
-
             foreach (var assemblerRef in assemblyInfo.References)
             {
                 if (!assemblyInfo.SourceReferences.ContainsKey(assemblerRef))
@@ -334,6 +327,15 @@ namespace Sharpmake
             conf.DefaultOption = target.Optimization == Optimization.Debug ? Options.DefaultTarget.Debug : Options.DefaultTarget.Release;
 
             conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
+
+            // suppress assembly redirect warnings
+            // cf. https://github.com/dotnet/roslyn/issues/19640
+            conf.Options.Add(
+                new Options.CSharp.SuppressWarning(
+                    "CS1701",
+                    "CS1702"
+                )
+            );
 
             conf.Defines.Add(_projectInfo.Defines.ToArray());
 

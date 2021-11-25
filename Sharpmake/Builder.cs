@@ -518,6 +518,12 @@ namespace Sharpmake
             string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
             return Assembly.LoadFrom(generatorsAssembly);
         });
+        private readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
+        {
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.CommonPlatforms.dll";
+            return Assembly.LoadFrom(generatorsAssembly);
+        });
 
         private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, BuilderCompileErrorBehavior compileErrorBehavior)
         {
@@ -528,14 +534,12 @@ namespace Sharpmake
         {
             Assembler assembler = new Assembler(Defines);
 
-            // Add currently loaded assemblies
-            assembler.Assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies());
-
             // Add sharpmake assembly
             assembler.Assemblies.Add(_sharpmakeAssembly.Value);
 
-            // Add generators assembly to be able to reference them from .sharpmake.cs files
+            // Add generators and common platforms assemblies to be able to reference them from .sharpmake.cs files
             assembler.Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
+            assembler.Assemblies.Add(_sharpmakeCommonPlatformsAssembly.Value);
 
             // Add attribute parsers
             if (parsers != null)

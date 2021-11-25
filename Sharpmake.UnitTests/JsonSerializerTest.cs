@@ -116,7 +116,10 @@ namespace Sharpmake.UnitTests
             // Change culture to a non-json compatible format
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("da-DK");
             // As illustration
+#if NETFRAMEWORK
+            // in dotnet core we pass InvariantGlobalization, so this test doesn't apply anymore
             Assert.That((-13.37).ToString(), Is.EqualTo("-13,37"));
+#endif
 
             _serializer.Serialize(-13.37);
             Assert.That(_writer.ToString(), Is.EqualTo("-13.37"));

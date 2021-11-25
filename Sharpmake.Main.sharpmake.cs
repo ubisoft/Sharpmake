@@ -66,6 +66,10 @@ namespace SharpmakeGen
                 // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
                 CustomProperties.Add("Deterministic", "true");
 
+                // Enable Globalization Invariant Mode
+                // https://github.com/dotnet/runtime/blob/master/docs/design/features/globalization-invariant-mode.md
+                CustomProperties.Add("InvariantGlobalization", "true");
+
                 if (excludeSharpmakeFiles)
                     NoneExtensions.Add(".sharpmake.cs");
             }

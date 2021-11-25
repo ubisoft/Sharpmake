@@ -130,10 +130,6 @@ namespace Sharpmake
 
             // Try in the current working directory
             yield return Util.PathGetAbsolute(Directory.GetCurrentDirectory(), reference);
-
-            // Try using .net framework locations
-            foreach (string frameworkDirectory in Assembler.EnumeratePathToDotNetFramework())
-                yield return Path.Combine(Path.Combine(frameworkDirectory, reference));
         }
 
         public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)

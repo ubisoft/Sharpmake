@@ -24,13 +24,22 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
+#if NETFRAMEWORK
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net472;
+#else
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net50;
+#endif
 
 namespace Sharpmake
 {
     public class Assembler
     {
         public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
+#if NETFRAMEWORK
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
+#else
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net5_0;
+#endif
 
         /// <summary>
         /// Extra user assembly to use while compiling
@@ -56,9 +65,10 @@ namespace Sharpmake
 
         public bool UseDefaultParsers = true;
 
+        [Obsolete("Default references are always used.")]
         public bool UseDefaultReferences = true;
 
-        public static readonly string[] DefaultReferences = { "System.dll", "System.Core.dll" };
+        public static readonly string[] DefaultReferences = BasicReferenceAssemblies.References.All.Select(r => r.FileName).ToArray();
 
         private class AssemblyInfo : IAssemblyInfo
         {
@@ -113,7 +123,6 @@ namespace Sharpmake
             ParameterInfo delegateReturnInfos = delegateMethodInfo.ReturnParameter;
 
             Assembler assembler = new Assembler();
-            assembler.UseDefaultReferences = false;
             assembler.Assemblies.AddRange(assemblies);
 
             Assembly assembly = assembler.BuildAssembly(fileInfo.FullName);
@@ -180,7 +189,6 @@ namespace Sharpmake
             where TDelegate : class
         {
             Assembler assembler = new Assembler();
-            assembler.UseDefaultReferences = false;
             assembler.Assemblies.AddRange(assemblies);
 
             const string className = "AssemblerBuildFunction_Class";
@@ -394,12 +402,6 @@ namespace Sharpmake
         {
             HashSet<string> references = new HashSet<string>();
 
-            if (UseDefaultReferences)
-            {
-                foreach (string defaultReference in DefaultReferences)
-                    references.Add(GetAssemblyDllPath(defaultReference));
-            }
-
             foreach (string assemblyFile in _references)
                 references.Add(assemblyFile);
 
@@ -432,24 +434,37 @@ namespace Sharpmake
             return Compile(builderContext, syntaxTrees, libraryFile, references);
         }
 
-        private Assembly Compile(IBuilderContext builderContext, IEnumerable<SyntaxTree> syntaxTrees, string libraryFile, HashSet<string> references)
+        private Assembly Compile(IBuilderContext builderContext, IEnumerable<SyntaxTree> syntaxTrees, string libraryFile, HashSet<string> fileReferences)
         {
             // Add references
-            var portableExecutableReferences = new List<PortableExecutableReference>();
+            var metadataReferences = new List<MetadataReference>();
 
-            foreach (var reference in references.Where(r => !string.IsNullOrEmpty(r)))
+            foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r)))
             {
-                portableExecutableReferences.Add(MetadataReference.CreateFromFile(reference));
+                metadataReferences.Add(MetadataReference.CreateFromFile(reference));
             }
+
+            metadataReferences.AddRange(BasicReferenceAssemblies.All);
+
+            // suppress assembly redirect warnings
+            // cf. https://github.com/dotnet/roslyn/issues/19640
+            var noWarn = new List<KeyValuePair<string, ReportDiagnostic>>
+            {
+                new KeyValuePair<string, ReportDiagnostic>("CS1701", ReportDiagnostic.Suppress),
+                new KeyValuePair<string, ReportDiagnostic>("CS1702", ReportDiagnostic.Suppress),
+            };
 
             // Compile
             var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 optimizationLevel: (builderContext == null || builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
-                warningLevel: 4
+                warningLevel: 4,
+                specificDiagnosticOptions: noWarn,
+                deterministic: true
             );
+
             var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
-            var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, portableExecutableReferences, compilationOptions);
+            var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilationOptions);
             string pdbFilePath = libraryFile != null ? Path.ChangeExtension(libraryFile, ".pdb") : null;
 
             using (var dllStream = new MemoryStream())
@@ -528,7 +543,6 @@ namespace Sharpmake
             var assemblyInfo = new AssemblyInfo()
             {
                 Id = string.Join(";", sources),
-                UseDefaultReferences = UseDefaultReferences
             };
 
             var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
@@ -549,7 +563,6 @@ namespace Sharpmake
             var assemblyInfo = new AssemblyInfo()
             {
                 Id = string.Join(";", sources),
-                UseDefaultReferences = UseDefaultReferences
             };
 
             var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
@@ -667,9 +680,10 @@ namespace Sharpmake
             }
         }
 
+        [Obsolete]
         public static IEnumerable<string> EnumeratePathToDotNetFramework()
         {
-            yield return Path.GetDirectoryName(typeof(object).Assembly.Location);
+            yield break;
         }
 
         private static LanguageVersion ConvertSharpmakeOptionToLanguageVersion(Options.CSharp.LanguageVersion languageVersion)
@@ -713,6 +727,7 @@ namespace Sharpmake
             }
         }
 
+        [Obsolete]
         public static string GetAssemblyDllPath(string fileName)
         {
             foreach (string frameworkDirectory in EnumeratePathToDotNetFramework())

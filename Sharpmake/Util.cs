@@ -23,6 +23,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -1093,8 +1096,13 @@ namespace Sharpmake
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
+#if NET5_0_OR_GREATER
+            if (!OperatingSystem.IsWindows())
+                return false;
+#else
             if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
                 return false;
+#endif
 
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
@@ -1622,11 +1630,17 @@ namespace Sharpmake
             return (x << r) | (x >> (32 - r));
         }
 
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }
 
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static string[] GetRegistryLocalMachineSubKeyNames(string path)
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(path);
@@ -1651,7 +1665,11 @@ namespace Sharpmake
 
             string key = string.Empty;
 
+#if NET5_0_OR_GREATER
+            if (OperatingSystem.IsWindows())
+#else
             if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+#endif
             {
                 try
                 {
