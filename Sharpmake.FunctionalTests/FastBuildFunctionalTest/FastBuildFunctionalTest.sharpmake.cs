@@ -544,9 +544,9 @@ namespace SharpmakeGen.FunctionalTests
             FastBuildSettings.WriteAllConfigsSection = true;
 
             // This is just to insure that we are able to generate some custom property section when referenced from a Compiler section
-            FastBuildSettings.AdditionalPropertyGroups.Add("function TestCustomProperties()", new List<string>{ "Print('Hello Custom Property')", "Print('Hello Custom Property2')"});
+            FastBuildSettings.AdditionalPropertyGroups.Add("function TestCustomProperties()", new List<string> { "Print('Hello Custom Property')", "Print('Hello Custom Property2')" });
             FastBuildSettings.AdditionalCompilerPropertyGroups.Add("Compiler-x64-vs2019", "function TestCustomProperties()");
-            FastBuildSettings.AdditionalCompilerSettings.Add("Compiler-x64-vs2019", new List<string>{ "TestCustomProperties()" });
+            FastBuildSettings.AdditionalCompilerSettings.Add("Compiler-x64-vs2019", new List<string> { "TestCustomProperties()" });
 
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
 

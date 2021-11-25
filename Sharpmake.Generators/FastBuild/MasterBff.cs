@@ -714,7 +714,6 @@ namespace Sharpmake.Generators.FastBuild
                         // Only write each section once.
                         if (masterBffInfo.WrittenAdditionalPropertyGroups.Add(extraCompilerPropertyGroupName))
                         {
-                            
                             string section = UtilityMethods.FBuildFormatList(extraPropertySection, 0, UtilityMethods.FBuildFormatListOptions.None);
                             masterBffGenerator.Write(Environment.NewLine);
                             masterBffGenerator.Write(extraCompilerPropertyGroupName);
@@ -725,7 +724,7 @@ namespace Sharpmake.Generators.FastBuild
                     }
                     else
                     {
-                        Builder.Instance.LogErrorLine("Additional property group '{0}' is not registered or empty", extraCompilerPropertyGroupName);                        
+                        Builder.Instance.LogErrorLine("Additional property group '{0}' is not registered or empty", extraCompilerPropertyGroupName);
                     }
                 }
 

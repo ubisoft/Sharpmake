@@ -165,7 +165,7 @@ namespace Sharpmake
                         }
                     }
                 }
-                else if(Builder.Instance.Diagnostics)
+                else if (Builder.Instance.Diagnostics)
                 {
                     Util.LogWrite("{0}({1}): Warning: Reference '{2}' is redundant and can be removed since it is in the default reference list.", sourceFilePath.FullName, lineNumber, reference);
                 }
