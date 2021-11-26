@@ -1829,7 +1829,10 @@ namespace Sharpmake
             public Dictionary<string, BuildStepBase> EventPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public Dictionary<string, BuildStepBase> EventCustomPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>(); // <path to file, destination directory>
+
             public BuildStepExecutable PostBuildStampExe = null;
+            public List<BuildStepExecutable> PostBuildStampExes = new List<BuildStepExecutable>();
+
             public BuildStepTest PostBuildStepTest = null;
 
             public List<string> CustomBuildStep = new List<string>();
@@ -2458,6 +2461,12 @@ namespace Sharpmake
                     foreach (KeyValuePair<string, BuildStepBase> eventPair in eventDictionary)
                         eventPair.Value.Resolve(resolver);
                 }
+
+                if (PostBuildStampExe != null && PostBuildStampExes.Any())
+                    throw new Error("Incoherent settings for {0} : both PostBuildStampExe and PostBuildStampExes have values, they are mutually exclusive.", ToString());
+
+                foreach (var stampExe in PostBuildStampExes)
+                    stampExe.Resolve(resolver);
 
                 if (PostBuildStampExe != null)
                     PostBuildStampExe.Resolve(resolver);

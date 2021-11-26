@@ -23,6 +23,17 @@ using Sharpmake.Generators.FastBuild;
 
 namespace SharpmakeGen.FunctionalTests
 {
+    public static class FunctionalTestArguments
+    {
+        public static bool EnableLinkerMultiStamp = false;
+
+        [CommandLine.Option("enableLinkerMultiStamp", @"Allow more than one post-build stamper for one executable. Default value: false. ex: /enableLinkerMultiStamp(<true|false>)")]
+        public static void CommandLineEnableLinkerMultiStamp(bool value)
+        {
+            EnableLinkerMultiStamp = value;
+        }
+    }
+
     [DebuggerDisplay("\"{Platform}_{DevEnv}\" {Name}")]
     public class Target : Sharpmake.ITarget
     {
@@ -490,6 +501,58 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class PostBuildStamper : CommonExeProject
+    {
+        public PostBuildStamper()
+        {
+            SourceRootPath = @"[project.RootPath]\codebase\PostBuildStampTest";
+        }
+    }
+
+    [Generate]
+    public class PostBuildStampTest : CommonExeProject
+    {
+        public PostBuildStampTest()
+        {
+        }
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPublicDependency<PostBuildStamper>(target);
+
+            if (FunctionalTestArguments.EnableLinkerMultiStamp)
+            {
+                conf.PostBuildStampExes = new List<Configuration.BuildStepExecutable>
+                {
+                    new Configuration.BuildStepExecutable(
+                        @"[conf.TargetPath]\PostBuildStamper.exe",
+                        @"",
+                        @"[conf.TargetPath]\[conf.TargetFileName].exe",
+                        @"_Stamp",
+                        useStdOutAsOutput : true),
+
+                    new Configuration.BuildStepExecutable(
+                        @"[conf.TargetPath]\PostBuildStamper.exe",
+                        @"",
+                        @"[conf.TargetPath]\[conf.TargetFileName].exe",
+                        @"_Message",
+                        useStdOutAsOutput : true)
+                };
+            }
+            else
+            {
+                conf.PostBuildStampExe = new Configuration.BuildStepExecutable(
+                    @"[conf.TargetPath]\PostBuildStamper.exe",
+                    @"",
+                    @"[conf.TargetPath]\[conf.TargetFileName].exe",
+                    @"_Stamp_Message",
+                    useStdOutAsOutput: true);
+            }
+        }
+    }
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -516,6 +579,7 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<PostBuildCopyDirTest>(target);
             conf.AddProject<PostBuildExecuteTest>(target);
             conf.AddProject<PostBuildTestExecution>(target);
+            conf.AddProject<PostBuildStampTest>(target);
             conf.AddProject<ExplicitlyOrderedPostBuildTest>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
@@ -536,6 +600,8 @@ namespace SharpmakeGen.FunctionalTests
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
+            CommandLine.ExecuteOnType(typeof(FunctionalTestArguments));
+
             FileInfo fileInfo = Util.GetCurrentSharpmakeFileInfo();
             string sharpmakeRootDirectory = Util.SimplifyPath(Path.Combine(fileInfo.DirectoryName, "..", ".."));
 

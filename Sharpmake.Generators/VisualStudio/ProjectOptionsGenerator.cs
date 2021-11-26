@@ -1926,18 +1926,20 @@ namespace Sharpmake.Generators.VisualStudio
                             )
                         );
                     }
-                    if (context.Configuration.PostBuildStampExe != null)
+                    if (context.Configuration.PostBuildStampExe != null || context.Configuration.PostBuildStampExes.Any())
                     {
                         // NO, first, execute stamp !
-                        context.Configuration.EventPostBuild.Insert(0,
-                            string.Format(
+                        var stampEnumerator = context.Configuration.PostBuildStampExes.Prepend(context.Configuration.PostBuildStampExe).Where(x => x != null);
+                        List<string> stampStrings = stampEnumerator.Select(
+                            stampExe => string.Format(
                                 "{0} {1} {2} {3}",
-                                Util.SimplifyPath(Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PostBuildStampExe.ExecutableFile)),
-                                context.Configuration.PostBuildStampExe.ExecutableInputFileArgumentOption,
-                                context.Configuration.PostBuildStampExe.ExecutableOutputFileArgumentOption,
-                                context.Configuration.PostBuildStampExe.ExecutableOtherArguments
-                            )
-                        );
+                                Util.SimplifyPath(Util.PathGetRelative(context.ProjectDirectory, stampExe.ExecutableFile)),
+                                stampExe.ExecutableInputFileArgumentOption,
+                                stampExe.ExecutableOutputFileArgumentOption,
+                                stampExe.ExecutableOtherArguments
+                            )).ToList();
+
+                        context.Configuration.EventPostBuild.InsertRange(0, stampStrings);
                     }
                 }
             }

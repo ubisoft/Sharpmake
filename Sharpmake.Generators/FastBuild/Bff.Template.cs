@@ -493,8 +493,8 @@ Copy( '[fastBuildCopyAlias]' )
     .LinkerAssemblyResources = { [fastBuildObjectListEmbeddedResources] }
     .LinkerOutput           = '[fastBuildLinkerOutputFile]'
     .LinkerLinkObjects      = [fastBuildLinkerLinkObjects]
-    .LinkerStampExe         = '[fastBuildStampExecutable]'
-    .LinkerStampExeArgs     = '[fastBuildStampArguments]'
+    .LinkerStampExe         = [fastBuildStampExecutable]
+    .LinkerStampExeArgs     = [fastBuildStampArguments]
 ";
 
                 public static string ResourcesBeginSection = @"
