@@ -9,6 +9,7 @@
     <AssemblyName>Sharpmake.Generators</AssemblyName>
     <TargetFramework>net472</TargetFramework>
     <FileAlignment>512</FileAlignment>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -25,7 +26,6 @@
     <OutputPath>..\tmp\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.generators</BaseIntermediateOutputPath>
-    <DocumentationFile>..\tmp\bin\debug\sharpmake.generators.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -42,7 +42,6 @@
     <OutputPath>..\tmp\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.generators</BaseIntermediateOutputPath>
-    <DocumentationFile>..\tmp\bin\release\sharpmake.generators.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

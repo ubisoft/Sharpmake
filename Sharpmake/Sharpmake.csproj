@@ -9,6 +9,7 @@
     <AssemblyName>Sharpmake</AssemblyName>
     <TargetFramework>net472</TargetFramework>
     <FileAlignment>512</FileAlignment>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -26,7 +27,6 @@
     <OutputPath>..\tmp\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake</BaseIntermediateOutputPath>
-    <DocumentationFile>..\tmp\bin\debug\sharpmake.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -44,7 +44,6 @@
     <OutputPath>..\tmp\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake</IntermediateOutputPath>
     <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake</BaseIntermediateOutputPath>
-    <DocumentationFile>..\tmp\bin\release\sharpmake.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
