@@ -30,9 +30,19 @@ call !VSMSBUILDCMD!
 if %errorlevel% NEQ 0 goto error
 
 if "%~1" == "" (
-    call :BuildSharpmake "%~dp0Sharpmake.sln" "Debug" "Any CPU"
+    call :BuildSharpmakeDotnet "%~dp0Sharpmake.sln" "Debug" "Any CPU"
 ) else (
-    call :BuildSharpmake %1 %2 %3
+    call :BuildSharpmakeDotnet %1 %2 %3
+)
+
+if %errorlevel% EQU 0 goto success
+
+echo Compilation with dotnet failed, falling back to the old way using MSBuild
+
+if "%~1" == "" (
+    call :BuildSharpmakeMSBuild "%~dp0Sharpmake.sln" "Debug" "Any CPU"
+) else (
+    call :BuildSharpmakeMSBuild %1 %2 %3
 )
 
 if %errorlevel% NEQ 0 goto error
@@ -40,8 +50,23 @@ if %errorlevel% NEQ 0 goto error
 goto success
 
 @REM -----------------------------------------------------------------------
-:: Build Sharpmake using specified arguments
-:BuildSharpmake
+:: Build Sharpmake with dotnet using specified arguments
+:BuildSharpmakeDotnet
+echo Compiling %~1 in "%~2|%~3"...
+
+set DOTNET_BUILD_CMD=dotnet build "%~1" -nologo -v m -c "%~2"
+echo %DOTNET_BUILD_CMD%
+%DOTNET_BUILD_CMD%
+set ERROR_CODE=%errorlevel%
+if %ERROR_CODE% NEQ 0 (
+    echo ERROR: Failed to compile %~1 in "%~2|%~3".
+    goto end
+)
+goto success
+
+@REM -----------------------------------------------------------------------
+:: Build Sharpmake with MSBuild using specified arguments
+:BuildSharpmakeMSBuild
 echo Compiling %~1 in "%~2|%~3"...
 
 set MSBUILD_CMD=msbuild -clp:Summary -t:rebuild -restore "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3" /maxcpucount /p:CL_MPCount=%NUMBER_OF_PROCESSORS%

@@ -2,7 +2,8 @@
 :: Batch arguments:
 :: %~1 Main sharpmake file
 :: %~2 Target(Normally should be Debug or Release)
-:: if none are passed, defaults to Sharpmake.Main.sharpmake.cs and Debug
+:: %~3 Framework (net472 or net5.0)
+:: if none are passed, defaults to Sharpmake.Main.sharpmake.cs in Debug with net5.0
 
 setlocal enabledelayedexpansion
 
@@ -17,7 +18,12 @@ if not "%~2" == "" (
     set SHARPMAKE_OPTIM=%~2
 )
 
-set SHARPMAKE_EXECUTABLE=tmp\bin\%SHARPMAKE_OPTIM%\Sharpmake.Application.exe
+set SHARPMAKE_FRAMEWORK=net5.0
+if not "%~3" == "" (
+    set SHARPMAKE_FRAMEWORK=%~3
+)
+
+set SHARPMAKE_EXECUTABLE=tmp\bin\%SHARPMAKE_OPTIM%\%SHARPMAKE_FRAMEWORK%\Sharpmake.Application.exe
 
 call CompileSharpmake.bat Sharpmake.Application/Sharpmake.Application.csproj %SHARPMAKE_OPTIM% AnyCPU
 if %errorlevel% NEQ 0 goto error

@@ -4,6 +4,7 @@
 #
 # This script supports Python 3.
 
+import argparse
 import os.path
 import platform
 import sys
@@ -23,16 +24,11 @@ class FunctionalTest(object):
         else:
             self.project_root = project_root
 
-    def run_test(self):
+    def run_test(self, sharpmake_path):
         entry_path = os.getcwd()
         try:
             pwd = os.path.join(entry_path, "Sharpmake.FunctionalTests")
             os.chdir(pwd)
-
-            # Detects the path of the Sharpmake executable
-            sharpmake_path = find_sharpmake_path()
-
-            write_line("Using sharpmake " + sharpmake_path)
 
             # Builds the command line argument list.
             sources = "/sources(@\'{}\')".format(os.path.join(self.directory, self.script_name))
@@ -68,7 +64,7 @@ class FunctionalTest(object):
 
 
 class FastBuildFunctionalTest(FunctionalTest):
-    def __init__(self, enable_multi_stamping = False):
+    def __init__(self, enable_multi_stamping):
         extra_args = []
         if enable_multi_stamping:
             extra_args.append("/enableLinkerMultiStamp(true)")
@@ -165,15 +161,28 @@ def build_with_fastbuild(root_dir, test_dir):
     write_line("Working dir: " + working_dir)
     return os.system(cmd_line)
 
-def find_sharpmake_path():
-    optim_tokens = ["debug", "release"]
-    target = "Sharpmake.Application.exe"
-    for optim_token in optim_tokens:
-        path = os.path.abspath(os.path.join("..", "tmp", "bin", optim_token, target))
-        if os.path.isfile(path):
-            return path
+def find_sharpmake_path(root_directory, sharpmake_exe):
+    if sharpmake_exe is not None:
+        if not os.path.isfile(sharpmake_exe):
+            raise IOError("Cannot find " + sharpmake_exe)
 
-    raise IOError("Cannot find Sharpmake.Application.exe")
+        if os.path.isabs(sharpmake_exe):
+            return sharpmake_exe
+        else:
+            return os.path.abspath(sharpmake_exe)
+
+    optim_tokens = ["debug", "Debug", "release", "Release"]
+    target = "Sharpmake.Application.exe"
+
+    for optim_token in optim_tokens:
+        dir_path = os.path.abspath(os.path.join("tmp", "bin", optim_token))
+        for root, dirs, files in os.walk(dir_path):
+            for framework_dir in dirs:
+                path = os.path.join(dir_path, framework_dir, target)
+                if os.path.isfile(path):
+                    return path
+
+    raise IOError("Cannot find " + target)
 
 def write_line(str):
     print(str)
@@ -187,7 +196,7 @@ def red_bg():
 def green_bg():
     if os.name == "nt":
         os.system("color 2F")
-        
+
 def black_bg():
     if os.name == "nt":
         os.system("color 0F")
@@ -220,17 +229,22 @@ def pause(timeout=None):
                     if stop_waiting:
                         break
 
-def launch_functional_tests(funcTests):
+def launch_functional_tests(funcTests, sharpmake_exe):
     entry_path = os.getcwd()
     try:
+        root_directory = os.path.dirname(os.path.realpath(__file__))
+
+        # Detects the path of the Sharpmake executable
+        sharpmake_path = find_sharpmake_path(root_directory, sharpmake_exe)
+        write_line("Using sharpmake " + sharpmake_path)
+
         # Change directory to the path of this.
-        pwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(pwd)
+        os.chdir(root_directory)
 
         # Run each test. Break and exit on error.
         for test in funcTests:
             write_line("Functional test on {}...".format(test.directory))
-            exit_code = test.run_test()
+            exit_code = test.run_test(sharpmake_path)
             if exit_code != 0:
                 red_bg()
                 write_line("Test failed.")
@@ -244,23 +258,19 @@ def launch_functional_tests(funcTests):
     finally:
         os.chdir(entry_path)
 
-
 if __name__ == "__main__":
-    enable_multi_stamping = False
 
-    for arg in sys.argv[1:]:
-        if arg == "--enable_multi_stamping":
-            enable_multi_stamping = True
-        else:
-            write_line("Unknown argument: {}".format(arg))
-            sys.exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--enable_multi_stamping", action='store_true')
+    parser.add_argument("--sharpmake_exe")
+    args = parser.parse_args()
 
     funcTests = [
-        FastBuildFunctionalTest(enable_multi_stamping),
+        FastBuildFunctionalTest(args.enable_multi_stamping),
         NoAllFastBuildProjectFunctionalTest(),
         SharpmakePackageFunctionalTest()
     ]
 
     black_bg()
-    exit_code = launch_functional_tests(funcTests)
+    exit_code = launch_functional_tests(funcTests, args.sharpmake_exe)
     sys.exit(exit_code)

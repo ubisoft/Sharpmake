@@ -35,7 +35,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
-                    framework: Assembler.SharpmakeDotNetFramework
+                    framework: DotNetFramework.v4_7_2 | DotNetFramework.net5_0
                 )
             );
             return result.ToArray();
@@ -43,6 +43,8 @@ namespace SharpmakeGen
 
         public abstract class SharpmakeBaseProject : CSharpProject
         {
+            public string DefaultProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
+
             protected SharpmakeBaseProject(
                 bool excludeSharpmakeFiles = true,
                 bool generateXmlDoc = true
@@ -57,9 +59,6 @@ namespace SharpmakeGen
                 // Use the new csproj style
                 ProjectSchema = CSharpProjectSchema.NetCore;
 
-                // prevents output dir to have a framework subfolder
-                CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
-
                 // we need to disable determinism while because we are using wildcards in assembly versions
                 // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
                 CustomProperties.Add("Deterministic", "true");
@@ -72,11 +71,25 @@ namespace SharpmakeGen
                     NoneExtensions.Add(".sharpmake.cs");
             }
 
+            public override void PostResolve()
+            {
+                base.PostResolve();
+
+                // retrieve the path of the csproj, could have changed from the default
+                // note that we ensure that it is identical between confs
+                string projectPath = Configurations.Select(conf => conf.ProjectPath).Distinct().Single();
+
+                // we set this property to fix the nuget restore behavior which was different
+                // between visual studio and command line, since this var was not initialized
+                // at the same time, leading to the restore being done in different locations
+                CustomProperties.Add("MSBuildProjectExtensionsPath", Util.PathGetRelative(projectPath, DefaultProjectPath));
+            }
+
             [Configure]
             public virtual void ConfigureAll(Configuration conf, Target target)
             {
                 conf.ProjectFileName = "[project.Name]";
-                conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
+                conf.ProjectPath = DefaultProjectPath;
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
                 conf.TargetPath = Path.Combine(Globals.OutputRootPath, "[lower:target.Optimization]");
 
