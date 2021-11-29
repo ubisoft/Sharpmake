@@ -121,6 +121,9 @@ namespace SharpmakeGen
             var githubFiles = Util.DirectoryGetFiles(Path.Combine(Globals.AbsoluteRootPath, ".github"));
             ExtraItems[".github"] = new Strings { githubFiles };
 
+            var bashFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.sh", SearchOption.TopDirectoryOnly);
+            ExtraItems["BashFiles"] = new Strings { bashFiles };
+
             var batchFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.bat", SearchOption.TopDirectoryOnly);
             ExtraItems["BatchFiles"] = new Strings { batchFiles };
 
