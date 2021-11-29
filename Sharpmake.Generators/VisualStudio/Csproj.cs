@@ -1256,6 +1256,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
             using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
+            using (resolver.NewScopedParameter("GenerateDocumentationFile", project.GenerateDocumentationFile ? "true" : RemoveLineTag))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }

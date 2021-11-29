@@ -2338,6 +2338,11 @@ namespace Sharpmake
 
         public const string DefaultImportProject = @"$(MSBuildBinPath)\Microsoft.CSharp.targets";
 
+        /// <summary>
+        /// Generate a file containing API documentation.
+        /// </summary>
+        public bool GenerateDocumentationFile = false;
+
         [Resolver.Resolvable]
         public class CustomTargetElement
         {
