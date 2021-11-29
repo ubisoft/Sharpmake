@@ -87,7 +87,7 @@ class MyProject : Project
     [Configure]
     public void Configure(Configuration conf, Target target)
     {
-        if (target.Optimization == Optimation.Debug)
+        if (target.Optimization == Optimization.Debug)
             conf.Defines.Add("UBI_DEBUG");
         ...
     }
