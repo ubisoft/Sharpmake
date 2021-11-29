@@ -14,6 +14,8 @@ namespace SharpmakeGen
         {
             Name = "Sharpmake.Application";
             ApplicationManifest = "app.manifest";
+
+            NoneFiles.Add(Path.Combine(Globals.AbsoluteRootPath, "Sharpmake.Main.sharpmake.cs"));
         }
 
         public override void ConfigureAll(Configuration conf, Target target)

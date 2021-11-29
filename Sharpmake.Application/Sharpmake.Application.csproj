@@ -66,6 +66,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Sharpmake.Main.sharpmake.cs">
+      <Link>Resources\Sharpmake.Main.sharpmake.cs</Link>
+    </None>
     <None Include="Sharpmake.Application.sharpmake.cs" />
     <None Include="app.config" />
     <None Include="app.manifest" />
