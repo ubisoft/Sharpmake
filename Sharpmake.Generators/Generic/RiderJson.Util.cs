@@ -63,6 +63,7 @@ namespace Sharpmake.Generators.Generic
                 dict.Add(key, value);
             }
         }
+        
         public static void AddIfNotDefault(this IDictionary dict, string key, object value, object defaultValue)
         {
             dict.AddIfCondition(key, value, !defaultValue.Equals(value));

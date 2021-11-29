@@ -359,6 +359,7 @@ namespace Sharpmake.Generators.Generic
             var modules = new OrderedDictionary();
             var toolchain = new OrderedDictionary();
             var buildInfo = new OrderedDictionary();
+            var sourceFilesInfo = new OrderedDictionary();
 
             toolchain.AddIfNotDefault("Compiler", context.GetCompiler(), RiderJsonUtil.Compiler.Default);
             toolchain.AddIfNotDefault("CppStandard", context.GetCppStandard(), RiderJsonUtil.CppLanguageStandard.Default);
@@ -405,6 +406,20 @@ namespace Sharpmake.Generators.Generic
                 modules.Add(projectName, dependencyInfo.ToDictionary());
             }
 
+            var sourceRoots = new Strings {context.Project.SourceRootPath};
+            sourceRoots.AddRange(context.Project.AdditionalSourceRootPaths);
+            sourceFilesInfo.Add("SourceRoots", sourceRoots);
+            sourceFilesInfo.AddIfCondition("SourceFilesFilters", context.Project.SourceFilesFilters ?? new Strings(), 
+                context.Project.SourceFilesFilters != null);
+            sourceFilesInfo.AddIfCondition("SourceFiltersRegex",
+                context.Project.SourceFilesIncludeRegex.Concat(context.Project.SourceFilesFiltersRegex), 
+                context.Project.SourceFilesIncludeRegex.Count > 0 || context.Project.SourceFilesFiltersRegex.Count > 0);
+            sourceFilesInfo.AddIfCondition("ExcludeRegex", context.Project.SourceFilesExcludeRegex,
+                context.Project.SourceFilesExclude.Count > 0);
+            sourceFilesInfo.Add("SourceExtensions", context.Project.SourceFilesExtensions);
+            sourceFilesInfo.Add("SourceFiles", context.Project.ResolvedSourceFiles);
+            sourceFilesInfo.Add("ExcludedFiles", context.Project.SourceFilesExclude);
+
             info.Add("Name", context.Configuration.ProjectName);
             info.Add("Configuration", context.Configuration.Name);
             info.Add("Platform", context.Configuration.Platform.ToString());
@@ -414,9 +429,7 @@ namespace Sharpmake.Generators.Generic
             info.Add("EnvironmentIncludePaths", includePaths);
             info.Add("EnvironmentDefinitions", defines);
             info.Add("Modules", modules);
-            
-            info.Add("RootPath", context.Project.SourceRootPath);
-            info.Add("SourceFiles", context.Project.ResolvedSourceFiles);
+            info.Add("SourceInfo", sourceFilesInfo);
             
             var file = new FileInfo(Path.Combine(context.ProjectPath, $"{context.Project.Name}_{context.Configuration.Platform}_{context.Configuration.Name}.json"));
 
