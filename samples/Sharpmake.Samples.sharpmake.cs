@@ -21,6 +21,8 @@ namespace SharpmakeGen.Samples
             );
 
             DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
+
+            CustomProperties.Add("CopyLocalLockFileAssemblies", "false");
         }
 
         public override void ConfigureAll(Configuration conf, Target target)
