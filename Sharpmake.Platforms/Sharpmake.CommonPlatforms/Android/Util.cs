@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,6 +60,38 @@ namespace Sharpmake
                 string valueString = apiString.Substring(8);
 
                 return int.TryParse(valueString, out apiValue);
+            }
+
+            private static string s_ndkVersion = string.Empty;
+            public static string GetNdkVersion(string ndkPath)
+            {
+                if (!s_ndkVersion.Equals(string.Empty))
+                    return s_ndkVersion;
+
+                if (string.IsNullOrEmpty(ndkPath))
+                    return s_ndkVersion;
+
+                string srcPropertiesFile = Path.Combine(ndkPath, "source.properties");
+                if (!File.Exists(srcPropertiesFile))
+                    return string.Empty;
+
+                using (StreamReader sr = new StreamReader(srcPropertiesFile))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line.StartsWith("Pkg.Revision"))
+                        {
+                            int pos = line.IndexOf("=");
+                            if (-1 != pos)
+                            {
+                                s_ndkVersion = line.Substring(pos + 1).Trim();
+                            }
+                            break;
+                        }
+                    }
+                }
+                return s_ndkVersion;
             }
         }
     }

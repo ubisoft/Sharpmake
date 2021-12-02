@@ -146,7 +146,7 @@ namespace Sharpmake
             }
         }
 
-        internal static Solution CreateProject(Type solutionType, List<object> fragmentMasks)
+        internal static Solution CreateSolution(Type solutionType, List<object> fragmentMasks)
         {
             Solution solution;
             try
@@ -547,7 +547,7 @@ namespace Sharpmake
                 if (!generateFastBuildAll)
                     continue;
 
-                builder.LogWriteLine("    extra FastBuildAll project added to solution " + Path.GetFileName(solutionFile.Key));
+                builder.LogWriteLine("    extra FastBuildAll project '" + FastBuildAllProjectName + "' added to solution " + Path.GetFileName(solutionFile.Key));
 
                 // Use the target type from the first solution configuration, as they all should have the same anyway
                 var firstSolutionConf = projectsToBuildPerSolutionConfig.First().Item1;

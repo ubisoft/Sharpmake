@@ -32,7 +32,7 @@ class Target : Sharpmake.ITarget
 }
 ```
 
-The idea behind fragments is that they can multiply your number of targets.  You can combine the bits of fragment values to describre multiple targets easily:
+The idea behind fragments is that they can multiply your number of targets.  You can combine the bits of fragment values to describe multiple targets easily:
 
 ```csharp
 new Target(
@@ -87,7 +87,7 @@ class MyProject : Project
     [Configure]
     public void Configure(Configuration conf, Target target)
     {
-        if (target.Optimization == Optimation.Debug)
+        if (target.Optimization == Optimization.Debug)
             conf.Defines.Add("UBI_DEBUG");
         ...
     }

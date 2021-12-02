@@ -416,6 +416,7 @@ namespace Sharpmake
                 CSharp7_3,
                 CSharp8,
                 CSharp9,
+                CSharp10,
             }
 
             // Disable warning MSB3270 when disabled
@@ -433,7 +434,8 @@ namespace Sharpmake
                 Level2,
                 Level3,
                 [Default]
-                Level4
+                Level4,
+                Level5
             }
 
             public enum DebugSymbols
@@ -543,6 +545,17 @@ namespace Sharpmake
             {
                 [Default]
                 Disabled,
+                Enabled
+            }
+
+            /// <summary>
+            /// Controls whether the project is published when running a publish command
+            /// Only affects processes that use the Publish target, such as the dotnet sdk projects
+            /// </summary>
+            public enum IsPublishable
+            {
+                Disabled,
+                [Default]
                 Enabled
             }
         }

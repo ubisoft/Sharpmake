@@ -191,14 +191,10 @@ namespace Sharpmake
             Dictionary<string, List<MethodInfo>> optionsNameMethodMapping = GetMethodsMapping(type, isStatic);
 
             // use to not call more than one for method with parameter overloading...
-            HashSet<string> executedMethods = new HashSet<string>();
+            var executedMethods = new HashSet<string>();
 
-            // tell to use all loaded assembly
-            List<Assembly> assemblies = new List<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
-
-            // in case of scripted c#, associated assembly may not be loaded in the current application domain.
-            if (!assemblies.Contains(type.Assembly))
-                assemblies.Add(type.Assembly);
+            // use associated assembly
+            var assemblies = new List<Assembly> { type.Assembly };
 
             foreach (Parameter parameter in parameters)
             {

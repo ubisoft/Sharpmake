@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2018, 2020-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -84,6 +84,25 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// This is applicable for AGDE only
+                /// The full path to the directory containing the top-level build.gradle file.
+                /// </summary>
+                public class AndroidGradleBuildDir : PathOption
+                {
+                    public AndroidGradleBuildDir(string androidGradleBuildDir)
+                       : base(androidGradleBuildDir) { }
+                }
+
+                /// <summary>
+                /// Output Apk name for AGDE project which can be set per configuration.
+                /// </summary>
+                public class AndroidApkName : StringOption
+                {
+                    public AndroidApkName(string androidApkName)
+                       : base(androidApkName) { }
+                }
+
+                /// <summary>
                 /// Verbosity of the tasks (vcxproj only)
                 /// At the time of this writing, this only control if on build env variables values are printed
                 /// </summary>
@@ -157,6 +176,29 @@ namespace Sharpmake
                     LibCpp_Shared
                 }
 
+                // This is applicable for AGDE only
+                // Link time optimization, may also be required for some sanitizers.
+                public enum LinkTimeOptimization
+                {
+                    [Default(DefaultTarget.Debug)]
+                    None,
+                    [Default(DefaultTarget.Release)]
+                    LinkTimeOptimization,
+                    ThinLinkTimeOptimization
+                }
+
+                // This is applicable for AGDE only
+                // Set the flag '-fuse-ld=' which specifies which linker to use.
+                public enum ClangLinkType
+                {
+                    None,
+                    DeferToNdk,
+                    gold,
+                    [Default]
+                    lld,
+                    bfd
+                }
+
                 public enum WarningLevel
                 {
                     TurnOffAllWarnings,
@@ -167,6 +209,19 @@ namespace Sharpmake
 
             public static class Compiler
             {
+                public enum CLanguageStandard
+                {
+                    [Default]
+                    Default,
+                    C89,
+                    C99,
+                    C11,
+                    C17,
+                    GNU_C99,
+                    GNU_C11,
+                    GNU_C17
+                }
+
                 public enum CppLanguageStandard
                 {
                     [Default]

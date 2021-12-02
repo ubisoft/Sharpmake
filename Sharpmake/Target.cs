@@ -45,25 +45,30 @@ namespace Sharpmake
         vs2019 = 1 << 5,
 
         /// <summary>
+        /// Visual Studio 2022
+        /// </summary>
+        vs2022 = 1 << 6,
+
+        /// <summary>
         /// iOS project with Xcode.
         /// </summary>
-        xcode4ios = 1 << 6,
+        xcode4ios = 1 << 7,
 
         /// <summary>
         /// Eclipse.
         /// </summary>
-        eclipse = 1 << 7,
+        eclipse = 1 << 8,
 
         /// <summary>
         /// GNU Makefiles.
         /// </summary>
-        make = 1 << 8,
+        make = 1 << 9,
 
         /// <summary>
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
-        VisualStudio = vs2015 | vs2017 | vs2019,
+        VisualStudio = vs2015 | vs2017 | vs2019 | vs2022,
 
         [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
         vs2010 = -1,
@@ -88,6 +93,7 @@ namespace Sharpmake
         android = 1 << 8,
         linux = 1 << 9,
         mac = 1 << 10,
+        agde = 1 << 11,      // Android Game Development Extension
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
@@ -138,49 +144,57 @@ namespace Sharpmake
     [Fragment, Flags]
     public enum DotNetFramework
     {
-        [Obsolete("Please use at least .net framework 3.5.", error: false)]
-        v2 = v3_5,
-        [Obsolete("Please use at least .net framework 3.5.", error: false)]
-        v3 = v3_5,
-
         v3_5 = 1 << 0,
         v3_5clientprofile = 1 << 1,
-        v4_0 = 1 << 2,
-        v4_5 = 1 << 3,
-        v4_5_1 = 1 << 4,
-        v4_5_2 = 1 << 5,
-        v4_5clientprofile = 1 << 6,
-        v4_6 = 1 << 7,
-        v4_6_1 = 1 << 8,
-        v4_6_2 = 1 << 9,
-        v4_7 = 1 << 10,
-        v4_7_1 = 1 << 11,
-        v4_7_2 = 1 << 12,
-        v4_8 = 1 << 13,
-        netcore1_0 = 1 << 14,
-        netcore1_1 = 1 << 15,
-        netcore2_0 = 1 << 16,
-        netcore2_1 = 1 << 17,
-        netcore2_2 = 1 << 18,
-        netcore3_0 = 1 << 19,
-        netcore3_1 = 1 << 20,
-        net5_0 = 1 << 21,
-        netstandard1_0 = 1 << 22,
-        netstandard1_1 = 1 << 23,
-        netstandard1_2 = 1 << 24,
-        netstandard1_3 = 1 << 25,
-        netstandard1_4 = 1 << 26,
-        netstandard1_5 = 1 << 27,
-        netstandard1_6 = 1 << 28,
-        netstandard2_0 = 1 << 29,
-        netstandard2_1 = 1 << 30,
+        v4_5_2 = 1 << 2,
+        v4_6 = 1 << 3,
+        v4_6_1 = 1 << 4,
+        v4_6_2 = 1 << 5,
+        v4_7 = 1 << 6,
+        v4_7_1 = 1 << 7,
+        v4_7_2 = 1 << 8,
+        v4_8 = 1 << 9,
+
+        netcore1_0 = 1 << 10,
+        netcore1_1 = 1 << 11,
+        netcore2_0 = 1 << 12,
+        netcore2_1 = 1 << 13,
+        netcore2_2 = 1 << 14,
+        netcore3_0 = 1 << 15,
+        netcore3_1 = 1 << 16,
+
+        net5_0 = 1 << 17,
+        net6_0 = 1 << 18,
+
+        netstandard1_0 = 1 << 19,
+        netstandard1_1 = 1 << 20,
+        netstandard1_2 = 1 << 21,
+        netstandard1_3 = 1 << 22,
+        netstandard1_4 = 1 << 23,
+        netstandard1_5 = 1 << 24,
+        netstandard1_6 = 1 << 25,
+        netstandard2_0 = 1 << 26,
+        netstandard2_1 = 1 << 27,
 
         [CompositeFragment]
-        all_netframework = v3_5 | v3_5clientprofile | v4_0 | v4_5 | v4_5_1 | v4_5_2 | v4_5clientprofile | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
+        all_netframework = v3_5 | v3_5clientprofile | v4_5_2 | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
         [CompositeFragment]
-        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0,
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0,
         [CompositeFragment]
-        all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1
+        all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
+
+        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        v2,
+        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        v3,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_0,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5clientprofile,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5_1,
     }
 
     // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms
@@ -190,10 +204,11 @@ namespace Sharpmake
         Default = 1 << 0,
         android = 1 << 1,
         ios = 1 << 2,
-        macos = 1 << 3,
-        tvos = 1 << 4,
-        watchos = 1 << 5,
-        windows = 1 << 6
+        maccatalyst = 1 << 3,
+        macos = 1 << 4,
+        tvos = 1 << 5,
+        watchos = 1 << 6,
+        windows = 1 << 7
     }
 
     // Optional
@@ -725,10 +740,25 @@ namespace Sharpmake
 
         public void AddFragmentMask(params object[] masks)
         {
+            var fragmentTypes = TargetType.GetFields();
+
             foreach (var mask in masks)
             {
                 Type maskType = mask.GetType();
                 ITarget.ValidFragmentType(maskType);
+                if (!fragmentTypes.Any(fragmentType => fragmentType.FieldType == maskType))
+                {
+                    throw new Error(
+                        "Fragment mask type '{0}' is not present in this target, here is the list of valid types:\n- {1}",
+                        maskType,
+                        string.Join(
+                            "\n- ",
+                            fragmentTypes
+                                .Select(fragmentType => Util.ToNiceTypeName(fragmentType.FieldType))
+                                .OrderBy(type => type, StringComparer.InvariantCultureIgnoreCase)
+                        )
+                    );
+                }
 
                 List<int> maskValues;
                 if (_fragmentMasks == null || !_fragmentMasks.TryGetValue(maskType, out maskValues))
@@ -744,6 +774,14 @@ namespace Sharpmake
 
                 maskValues.Add((int)mask);
             }
+        }
+
+        /// <summary>
+        /// This method will remove all the masks that were added, if any
+        /// </summary>
+        public void ClearFragmentMasks()
+        {
+            _fragmentMasks = null;
         }
 
         /// <summary>

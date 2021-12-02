@@ -55,6 +55,11 @@ VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
 ";
 
+                public static string HeaderBeginVs2022 =
+@"Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+";
+
                 public static string ProjectBegin =
 @"Project(""{[projectTypeGuid]}"") = ""[projectName]"", ""[projectFile]"", ""{[projectGuid]}""
 ";

@@ -518,6 +518,12 @@ namespace Sharpmake
             string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
             return Assembly.LoadFrom(generatorsAssembly);
         });
+        private readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
+        {
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.CommonPlatforms.dll";
+            return Assembly.LoadFrom(generatorsAssembly);
+        });
 
         private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, BuilderCompileErrorBehavior compileErrorBehavior)
         {
@@ -528,14 +534,12 @@ namespace Sharpmake
         {
             Assembler assembler = new Assembler(Defines);
 
-            // Add currently loaded assemblies
-            assembler.Assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies());
-
             // Add sharpmake assembly
             assembler.Assemblies.Add(_sharpmakeAssembly.Value);
 
-            // Add generators assembly to be able to reference them from .sharpmake.cs files
+            // Add generators and common platforms assemblies to be able to reference them from .sharpmake.cs files
             assembler.Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
+            assembler.Assemblies.Add(_sharpmakeCommonPlatformsAssembly.Value);
 
             // Add attribute parsers
             if (parsers != null)
@@ -682,8 +686,8 @@ namespace Sharpmake
                 !type.IsDefined(typeof(Export), false))
                     throw new Error("cannot generate solution type without [Sharpmake.Generate], [Sharpmake.Compile] or [Sharpmake.Export] attribute: {0}", type.Name);
 
-                // Create the project instance
-                Solution solution = Solution.CreateProject(type, Arguments.FragmentMasks);
+                // Create the solution instance
+                Solution solution = Solution.CreateSolution(type, Arguments.FragmentMasks);
 
                 // Pre event
                 EventPreSolutionConfigure?.Invoke(solution);
@@ -831,7 +835,7 @@ namespace Sharpmake
 
         public void ReportGenerated(Type t, GenerationOutput output)
         {
-            var generationOutput = _generationReport.GetValueOrAdd(t, new GenerationOutput());
+            var generationOutput = _generationReport.GetOrAdd(t, new GenerationOutput());
             generationOutput.Merge(output);
         }
 

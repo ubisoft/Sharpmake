@@ -50,6 +50,7 @@ namespace FastBuild
         {
             conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
+            conf.Options.Add(Options.Vc.Compiler.Exceptions.Enable);
         }
 
         [Configure(BuildSystem.FastBuild)]
@@ -57,6 +58,9 @@ namespace FastBuild
         {
             conf.IsFastBuild = true;
             conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
+
+            // Force writing to pdb from different cl.exe process to go through the pdb server
+            conf.AdditionalCompilerOptions.Add("/FS");
         }
     }
 

@@ -216,9 +216,9 @@ namespace Sharpmake.Generators.VisualStudio
             switch (devEnv)
             {
                 case DevEnv.vs2017:
-                    return Path.Combine(devEnv.GetVisualStudioDir(), @"Common7\IDE\VC\VCTargets\");
                 case DevEnv.vs2019:
-                    return Path.Combine(devEnv.GetVisualStudioDir(), @"MSBuild\Microsoft\VC\v160\");
+                case DevEnv.vs2022:
+                    return devEnv.GetVCTargetsPath();
                 default:
                     throw new NotImplementedException("VCTargetsPath redirection for " + devEnv);
             }
@@ -230,6 +230,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 case DevEnv.vs2017:
                 case DevEnv.vs2019:
+                case DevEnv.vs2022:
                     return Path.Combine(devEnv.GetVisualStudioDir(), @"MSBuild\");
                 default:
                     throw new NotImplementedException("MSBuildExtensionsPath redirection for " + devEnv);
@@ -727,6 +728,9 @@ namespace Sharpmake.Generators.VisualStudio
             // Fill include dirs
             var includePaths = platformVcxproj.GetIncludePaths(context);
             context.Options["AdditionalIncludeDirectories"] = includePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, includePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+
+            var platformIncludePaths = platformVcxproj.GetPlatformIncludePaths(context);
+            context.Options["AdditionalPlatformIncludeDirectories"] = platformIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, platformIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
 
             // Fill resource include dirs
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);

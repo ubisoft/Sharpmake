@@ -20,6 +20,8 @@ namespace SharpmakeGen
 
                 DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
 
+                CustomProperties.Add("CopyLocalLockFileAssemblies", "false");
+
                 AddTargets(Common.GetDefaultTargets());
             }
 

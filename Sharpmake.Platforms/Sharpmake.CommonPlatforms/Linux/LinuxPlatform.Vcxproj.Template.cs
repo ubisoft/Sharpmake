@@ -145,7 +145,14 @@ del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" >NU
 del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].lib"" >NUL 2>NUL
 del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL
 del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName]"" >NUL 2>NUL</CleanCommandLine>
+<NMakeIncludeSearchPath>$(NMakeIncludeSearchPath);[options.AdditionalPlatformIncludeDirectories]</NMakeIncludeSearchPath>
 </PropertyGroup>
+<ItemDefinitionGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+<ClCompile>
+<CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
+<CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
+</ClCompile>
+</ItemDefinitionGroup>
     ";
 
             private const string _projectDescriptionPlatformSpecific =

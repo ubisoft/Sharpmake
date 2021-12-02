@@ -449,9 +449,9 @@ namespace Sharpmake.UnitTests
         [Test]
         public void GetToolVersionStringException()
         {
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.xcode4ios));
-            Assert.Catch<Exception>(() => Util.GetToolVersionString(DevEnv.eclipse));
-            Assert.Catch<NotImplementedException>(() => Util.GetToolVersionString(DevEnv.make));
+            Assert.Catch<Error>(() => Util.GetToolVersionString(DevEnv.xcode4ios));
+            Assert.Catch<Error>(() => Util.GetToolVersionString(DevEnv.eclipse));
+            Assert.Catch<Error>(() => Util.GetToolVersionString(DevEnv.make));
         }
 
         /// <summary>
@@ -966,10 +966,10 @@ namespace Sharpmake.UnitTests
         {
             ITarget target1 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v3_5);
             ITarget target2 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Release, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v3_5);
-            ITarget target3 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v4_5);
+            ITarget target3 = new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug, OutputType.Dll, Blob.Blob, BuildSystem.FastBuild, DotNetFramework.v4_5_2);
 
             Assert.True(Util.MakeDifferenceString(target1, target2).Length == 0);
-            Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"net35\" and \"net45\""));
+            Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"net35\" and \"net452\""));
             Assert.True(Util.MakeDifferenceString(target1, target3).Contains("\"Release\" and \"Debug\""));
         }
 

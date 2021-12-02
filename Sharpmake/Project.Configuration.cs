@@ -903,7 +903,7 @@ namespace Sharpmake
             /// Both <see cref="PrecompHeader"/> and <see cref="PrecompSource"/> must be <c>null</c> if
             /// the project doesn't have precompiled headers.
             /// <para>
-            /// Sharpmake assumes that a relative path here is relative to <see cref="Project.SourceRootPath"/>.
+            /// Sharpmake assumes that a relative path here is relative to <see cref="SourceRootPath"/>.
             /// If that isn't correct, you must use an absolute path.
             /// </para>
             /// </remarks>
@@ -919,7 +919,7 @@ namespace Sharpmake
             /// the project doesn't have precompiled headers.
             /// <para>
             /// Sharpmake assumes that any relative path entered here is relative to
-            /// <see cref="Project.SourceRootPath"/>. If that isn't correct, you must use an absolute path.
+            /// <see cref="SourceRootPath"/>. If that isn't correct, you must use an absolute path.
             /// </para>
             /// <note>
             /// The source files must manually include this header or you will have
@@ -1837,7 +1837,10 @@ namespace Sharpmake
             public Dictionary<string, BuildStepBase> EventPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public Dictionary<string, BuildStepBase> EventCustomPostBuildExecute = new Dictionary<string, BuildStepBase>();
             public HashSet<KeyValuePair<string, string>> EventPostBuildCopies = new HashSet<KeyValuePair<string, string>>(); // <path to file, destination directory>
+
             public BuildStepExecutable PostBuildStampExe = null;
+            public List<BuildStepExecutable> PostBuildStampExes = new List<BuildStepExecutable>();
+
             public BuildStepTest PostBuildStepTest = null;
 
             public List<string> CustomBuildStep = new List<string>();
@@ -2005,7 +2008,7 @@ namespace Sharpmake
             public FileCustomBuild CustomBuildForAllIncludes = null;
 
             /// <summary>
-            /// Gets the <see cref="Project"/> that this <see cref="Project.Configuration"/>
+            /// Gets the <see cref="Project"/> that this <see cref="Configuration"/>
             /// belongs to.
             /// </summary>
             /// <remarks>
@@ -2287,6 +2290,12 @@ namespace Sharpmake
             public bool PreferRelativePaths = true;
 
             /// <summary>
+            /// Configuration OS version if not defined as Target fragment.
+            /// </summary>
+            /// <remarks>This allow adding OS version to specific DotNetFramework during configuration without altering Target's matching system</remarks>
+            public DotNetOS DotNetOSVersion = DotNetOS.Default;
+
+            /// <summary>
             /// Optional OS version at the end of the TargetFramework, for example, net5.0-ios13.0.
             /// </summary>
             /// <remarks>C# only, will throw if the target doesn't have a non-default DotNetOS fragment</remarks>
@@ -2359,6 +2368,7 @@ namespace Sharpmake
                 Util.ResolvePath(Project.SourceRootPath, ref SourceFilesBuildExclude);
                 Util.ResolvePath(Project.SourceRootPath, ref IncludePaths);
                 Util.ResolvePath(Project.SourceRootPath, ref IncludePrivatePaths);
+                Util.ResolvePath(Project.SourceRootPath, ref IncludeSystemPaths);
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExclude);
                 Util.ResolvePath(Project.SourceRootPath, ref PrecompSourceExcludeFolders);
                 Util.ResolvePath(Project.SourceRootPath, ref ConsumeWinRTExtensions);
@@ -2459,6 +2469,12 @@ namespace Sharpmake
                     foreach (KeyValuePair<string, BuildStepBase> eventPair in eventDictionary)
                         eventPair.Value.Resolve(resolver);
                 }
+
+                if (PostBuildStampExe != null && PostBuildStampExes.Any())
+                    throw new Error("Incoherent settings for {0} : both PostBuildStampExe and PostBuildStampExes have values, they are mutually exclusive.", ToString());
+
+                foreach (var stampExe in PostBuildStampExes)
+                    stampExe.Resolve(resolver);
 
                 if (PostBuildStampExe != null)
                     PostBuildStampExe.Resolve(resolver);

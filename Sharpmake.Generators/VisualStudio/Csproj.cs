@@ -172,25 +172,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public string ResolveCondition(Resolver resolver)
                 {
-                    var targetFrameworks = TargetFrameworks.Select(tuple =>
+                    return string.Join(" OR ", TargetFrameworks.Select(targetFramework =>
                     {
-                        var dotNetFramework = tuple.Item1;
-                        var dotNetOS = tuple.Item2;
-                        var dotNetOSVersion = tuple.Item3;
-
-                        if (dotNetOS == DotNetOS.Default)
+                        using (resolver.NewScopedParameter("targetFramework", GetTargetFrameworksString(targetFramework)))
                         {
-                            if (!string.IsNullOrEmpty(dotNetOSVersion))
-                                throw new Error();
-                            return dotNetFramework.ToFolderName();
+                            return resolver.Resolve(Template.ItemGroups
+                                .ItemGroupTargetFrameworkCondition);
                         }
-
-                        return dotNetFramework.ToFolderName() + "-" + dotNetOS.ToString() + dotNetOSVersion;
-                    });
-                    using (resolver.NewScopedParameter("targetFramework", string.Join(";", targetFrameworks)))
-                    {
-                        return resolver.Resolve(Template.ItemGroups.ItemGroupTargetFrameworkCondition);
-                    }
+                    }));
                 }
 
                 public string Resolve(Resolver resolver)
@@ -1065,16 +1054,18 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
-            var projectFrameworks = configurations.Select(
+            var projectFrameworksPerConf = configurations.ToDictionary(
+                conf => conf,
                 conf =>
                 {
                     var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                     DotNetOS dotNetOS;
-                    if (!conf.Target.TryGetFragment<DotNetOS>(out dotNetOS))
-                        dotNetOS = DotNetOS.Default;
+                    if (!conf.Target.TryGetFragment(out dotNetOS))
+                        dotNetOS = conf.DotNetOSVersion;
                     return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
                 }
-            ).Distinct().ToList();
+            );
+            var projectFrameworks = projectFrameworksPerConf.Values.Distinct().ToList();
             itemGroups.SetTargetFrameworks(projectFrameworks);
 
             // valid that 2 conf name in the same project don't have the same name
@@ -1172,8 +1163,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (isNetCoreProjectSchema)
             {
                 Write(Template.Project.ProjectBeginNetCore, writer, resolver);
-
-                targetFrameworkString = string.Join(";", projectFrameworks.Select(tuple => tuple.Item1.ToFolderName()));
+                targetFrameworkString = GetTargetFrameworksString(projectFrameworks.ToArray());
             }
             else
             {
@@ -1190,6 +1180,7 @@ namespace Sharpmake.Generators.VisualStudio
                             break;
                         case DevEnv.vs2017:
                         case DevEnv.vs2019:
+                        case DevEnv.vs2022:
                             Write(Template.Project.ProjectBeginVs2017, writer, resolver);
                             break;
                         default:
@@ -1265,6 +1256,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
             using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
+            using (resolver.NewScopedParameter("GenerateDocumentationFile", project.GenerateDocumentationFile ? "true" : RemoveLineTag))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }
@@ -1359,7 +1351,7 @@ namespace Sharpmake.Generators.VisualStudio
                 using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 using (resolver.NewScopedParameter("project", project))
-                using (resolver.NewScopedParameter("targetFramework", conf.Target.GetFragment<DotNetFramework>().ToFolderName()))
+                using (resolver.NewScopedParameter("targetFramework", GetTargetFrameworksString(projectFrameworksPerConf[conf])))
                 using (resolver.NewScopedParameter("projectConfigurationCondition", projectConfigurationCondition))
                 using (resolver.NewScopedParameter("target", conf.Target))
                 using (resolver.NewScopedParameter("options", options[conf]))
@@ -1577,6 +1569,25 @@ namespace Sharpmake.Generators.VisualStudio
                 skipFiles.Add(projectFileInfo.FullName);
 
             writer.Close();
+        }
+
+        private static string GetTargetFrameworksString(params Tuple<DotNetFramework, DotNetOS, string>[] projectFrameworks)
+        {
+            return string.Join(";", projectFrameworks.Select(tuple =>
+            {
+                var dotNetFramework = tuple.Item1;
+                var dotNetOS = tuple.Item2;
+                var dotNetOSVersion = tuple.Item3;
+
+                if (dotNetOS == DotNetOS.Default || dotNetOS == 0)
+                {
+                    if (!string.IsNullOrEmpty(dotNetOSVersion))
+                        throw new Error($"Can't set a {nameof(dotNetOSVersion)} ({dotNetOSVersion}) with {nameof(dotNetOS)} set to Default");
+                    return dotNetFramework.ToFolderName();
+                }
+
+                return dotNetFramework.ToFolderName() + "-" + dotNetOS.ToString() + dotNetOSVersion;
+            }));
         }
 
         public void AddPreImportCustomProperties(Dictionary<string, string> properties, CSharpProject cSharpProject, string projectPath)
@@ -3217,7 +3228,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.WarningLevel.Level1, () => { options["WarningLevel"] = "1"; }),
             Options.Option(Options.CSharp.WarningLevel.Level2, () => { options["WarningLevel"] = "2"; }),
             Options.Option(Options.CSharp.WarningLevel.Level3, () => { options["WarningLevel"] = "3"; }),
-            Options.Option(Options.CSharp.WarningLevel.Level4, () => { options["WarningLevel"] = "4"; })
+            Options.Option(Options.CSharp.WarningLevel.Level4, () => { options["WarningLevel"] = "4"; }),
+            Options.Option(Options.CSharp.WarningLevel.Level5, () => { options["WarningLevel"] = "5"; })
             );
 
             // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/configure-language-version#c-language-version-reference
@@ -3237,7 +3249,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.LanguageVersion.CSharp7_2, () => { options["LanguageVersion"] = "7.2"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp7_3, () => { options["LanguageVersion"] = "7.3"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp8, () => { options["LanguageVersion"] = "8.0"; }),
-            Options.Option(Options.CSharp.LanguageVersion.CSharp9, () => { options["LanguageVersion"] = "9.0"; })
+            Options.Option(Options.CSharp.LanguageVersion.CSharp9, () => { options["LanguageVersion"] = "9.0"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp10, () => { options["LanguageVersion"] = "10.0"; })
             );
 
             SelectOption(
@@ -3416,6 +3429,12 @@ namespace Sharpmake.Generators.VisualStudio
             (
             Options.Option(Options.CSharp.ProduceReferenceAssembly.Enabled, () => { options["ProduceReferenceAssembly"] = "True"; }),
             Options.Option(Options.CSharp.ProduceReferenceAssembly.Disabled, () => { options["ProduceReferenceAssembly"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+            Options.Option(Options.CSharp.IsPublishable.Enabled, () => { options["IsPublishable"] = RemoveLineTag; }),
+            Options.Option(Options.CSharp.IsPublishable.Disabled, () => { options["IsPublishable"] = "false"; })
             );
 
             options["AssemblyOriginatorKeyFile"] = Options.PathOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf, RemoveLineTag, _projectPath);
