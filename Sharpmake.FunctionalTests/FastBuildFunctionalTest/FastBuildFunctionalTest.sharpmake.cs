@@ -553,6 +553,28 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class SimpleLib : CommonProject
+    {
+        public SimpleLib()
+        {
+
+        }
+    }
+
+    [Generate]
+    public class SimpleExeWithLib : CommonExeProject
+    {
+        public SimpleExeWithLib()
+        {
+        }
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.AddPublicDependency<SimpleLib>(target);
+        }
+    }
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -581,6 +603,7 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<PostBuildTestExecution>(target);
             conf.AddProject<PostBuildStampTest>(target);
             conf.AddProject<ExplicitlyOrderedPostBuildTest>(target);
+            conf.AddProject<SimpleExeWithLib>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {
