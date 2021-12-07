@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B4CE3300-E079-DBD7-8FC9-DF8F3F96F776}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>FastBuildSimpleExecutable</RootNamespace>
+    <ProjectName>FastBuildSimpleExecutable</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>output\win64\debug\</OutDir>
+    <IntDir>obj\win64\debug\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" FastBuildSimpleExecutable_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean FastBuildSimpleExecutable_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" >NUL 2>NUL
+del "obj\win64\debug\*.obj" >NUL 2>NUL
+del "obj\win64\debug\*.a" >NUL 2>NUL
+del "obj\win64\debug\*.lib" >NUL 2>NUL
+del "output\win64\debug\fastbuildsimpleexecutable.exe" >NUL 2>NUL
+del "output\win64\debug\fastbuildsimpleexecutable.elf" >NUL 2>NUL
+del "output\win64\debug\fastbuildsimpleexecutable.exp" >NUL 2>NUL
+del "output\win64\debug\fastbuildsimpleexecutable.ilk" >NUL 2>NUL
+del "output\win64\debug\fastbuildsimpleexecutable.lib" >NUL 2>NUL
+del "output\win64\debug\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\win64\debug\fastbuildsimpleexecutable.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>output\win64\release\</OutDir>
+    <IntDir>obj\win64\release\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" FastBuildSimpleExecutable_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean FastBuildSimpleExecutable_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" >NUL 2>NUL
+del "obj\win64\release\*.obj" >NUL 2>NUL
+del "obj\win64\release\*.a" >NUL 2>NUL
+del "obj\win64\release\*.lib" >NUL 2>NUL
+del "output\win64\release\fastbuildsimpleexecutable.exe" >NUL 2>NUL
+del "output\win64\release\fastbuildsimpleexecutable.elf" >NUL 2>NUL
+del "output\win64\release\fastbuildsimpleexecutable.exp" >NUL 2>NUL
+del "output\win64\release\fastbuildsimpleexecutable.ilk" >NUL 2>NUL
+del "output\win64\release\fastbuildsimpleexecutable.lib" >NUL 2>NUL
+del "output\win64\release\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\win64\release\fastbuildsimpleexecutable.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\codebase\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fastbuildsimpleexecutable_vs2019_win64.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

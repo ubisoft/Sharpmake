@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Sharpmake
 {
-    public class DependencyTracker
+    internal class DependencyTracker
     {
         public static DependencyTracker Instance { get; private set; } = new DependencyTracker();
 
@@ -157,10 +157,10 @@ namespace Sharpmake
             return p.FindConfiguration(config);
         }
 
-        private TrackedConfiguration FindConfiguration(Type project, ITarget config)
+        private TrackedConfiguration FindConfiguration(Type project, ITarget target)
         {
             TrackedProject p = _projects[project.ToString()];
-            return p.FindConfiguration(config);
+            return p.FindConfiguration(target);
         }
 
         private delegate void ResetVisitDelegate();

@@ -7,9 +7,8 @@ namespace SharpmakeGen.Platforms
 {
     public abstract class PlatformProject : Common.SharpmakeBaseProject
     {
-        public PlatformProject()
+        protected PlatformProject()
         {
-            SourceRootPath = @"[project.RootPath]\Sharpmake.Platforms\[project.Name]";
             AssemblyName = "[project.Name]";
             RootNamespace = "Sharpmake";
         }

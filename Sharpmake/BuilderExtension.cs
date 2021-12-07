@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ namespace Sharpmake
 
             _builder.ExecuteEntryPointInAssemblies<EntryPoint>(extensionAssembly);
 
-            foreach (Type classType in extensionAssembly.GetTypes())
+            foreach (Type classType in extensionAssembly.GetTypes().Where(t => t.IsVisible))
             {
                 foreach (MethodInfo methodInfo in classType.GetMethods().Where(m => m.GetCustomAttributes<BuilderEventAttribute>().Any()))
                 {

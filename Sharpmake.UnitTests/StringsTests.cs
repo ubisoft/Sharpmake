@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,52 +13,130 @@
 // limitations under the License.
 
 using NUnit.Framework;
-using Sharpmake;
 
 namespace Sharpmake.UnitTests
 {
-    internal class OrderableStringsTests
+    internal static class StringsTests
     {
+        /// <summary>
+        ///     Verify if the <c>Strings</c> is returned to a string object
+        /// </summary>
         [Test]
-        public static void TestStableSortWithNoOrder()
+        public static void TestToString()
         {
-            OrderableStrings strings = new OrderableStrings();
-            strings.Add("b");
-            strings.Add("c");
-            strings.Add("a");
-            strings.Add("d");
+            Strings strings = new Strings("aa", "bb", "cc");
 
-            strings.StableSort();
-
-            // Verify order is the expected one
-            Assert.AreEqual(strings[0], "b");
-            Assert.AreEqual(strings[1], "c");
-            Assert.AreEqual(strings[2], "a");
-            Assert.AreEqual(strings[3], "d");
+            Assert.AreEqual("aa,bb,cc", strings.ToString());
         }
 
+        /// <summary>
+        ///     Verify if the returned characters are lowered
+        /// </summary>
         [Test]
-        public static void TestStableSortWithOrder()
+        public static void TestToLower()
         {
-            OrderableStrings strings = new OrderableStrings();
-            strings.Add("b");
-            strings.Add("c", 1);
-            strings.Add("a");
-            strings.Add("d", -1);
-            strings.Add("e");
-            strings.Add("g", 2);
-            strings.Add("f", -2);
+            Strings strings = new Strings("TEST", "AA", "BB", "CC");
+            Strings expectedStrings = new Strings("test", "aa", "bb", "cc");
 
-            strings.StableSort();
+            strings.ToLower();
 
-            // Verify order is the expected one
-            Assert.AreEqual(strings[0], "f");
-            Assert.AreEqual(strings[1], "d");
-            Assert.AreEqual(strings[2], "b");
-            Assert.AreEqual(strings[3], "a");
-            Assert.AreEqual(strings[4], "e");
-            Assert.AreEqual(strings[5], "c");
-            Assert.AreEqual(strings[6], "g");
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the prefix and suffix were added to the <c>Strings</c>
+        /// </summary>
+        [Test]
+        public static void TestInsertPrefixSuffix()
+        {
+            Strings strings = new Strings("test", "aa", "bb", "cc");
+            Strings expectedStrings = new Strings("atestb", "aaab", "abbb", "accb");
+
+            strings.InsertPrefixSuffix("a", "b");
+
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the string when absent or the original string
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixAbsent()
+        {
+            Strings strings = new Strings("test", "aa", "cc", "ppp");
+            Strings expectedStrings = new Strings("test", "aat", "cct", "pppt");
+
+            strings.InsertSuffix("t", true);
+
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the strings if it's absent or not
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixOnlyIfAbsentFalse()
+        {
+            Strings strings = new Strings("test", "ahhh", "abc", "jjjj");
+            Strings expectedStrings = new Strings("testto", "ahhhto", "abcto", "jjjjto");
+
+            strings.InsertSuffix("to", false);
+
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the strings
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffix()
+        {
+            Strings strings = new Strings("test", "abc", "alll", "efgh");
+            Strings expecteStrings = new Strings("testt", "abct", "alllt", "efght");
+
+            strings.InsertSuffix("t");
+
+            Assert.AreEqual(expecteStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the prefix was added to the strings
+        /// </summary>
+        [Test]
+        public static void TestInsertPrefix()
+        {
+            Strings strings = new Strings("test", "defg", "klm", "qrst");
+            Strings expectedStrings = new Strings("abctest", "abcdefg", "abcklm", "abcqrst");
+
+            strings.InsertPrefix("abc");
+
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the prefix and suffix were added to the strings
+        /// </summary>
+        [Test]
+        public static void TestJoinStringsPrefixSuffix()
+        {
+            Strings strings1 = new Strings("test", "test-no-escape");
+            Strings strings2 = new Strings("<escape-test1>", "&escape-test2&");
+
+            Assert.AreEqual("prefixtestsuffixprefixtest-no-escapesuffix", strings1.JoinStrings("", "prefix", "suffix", false));
+            Assert.AreEqual("a&amp;escape-test2&amp;ba&lt;escape-test1&gt;b", strings2.JoinStrings("", "a", "b", true));
+        }
+
+        /// <summary>
+        ///     Verify if the prefix were added to the strings
+        /// </summary>
+        [Test]
+        public static void TestJoinStringsPrefix()
+        {
+            Strings strings1 = new Strings("test", "-escape");
+            Strings strings3 = new Strings("<escape-test>", "&escape-test&");
+
+            Assert.AreEqual("prefix-escapeprefixtest", strings1.JoinStrings("", "prefix", false));
+            Assert.AreEqual("1&amp;escape-test&amp;1&lt;escape-test&gt;", strings3.JoinStrings("", "1", true));
         }
     }
 }

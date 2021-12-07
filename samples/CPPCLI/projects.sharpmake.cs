@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,9 @@ namespace CLR_SharpmakeTest
         public virtual void ConfigureAll(Configuration conf, Target target)
         {
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects\";
-            conf.ProjectFileName = @"[project.Name].[target.DevEnv].[target.Platform].[target.Framework]";
-            conf.IntermediatePath = @"[conf.ProjectPath]\temp\[target.DevEnv]\[target.Platform]\[target]";
+            conf.ProjectFileName = @"[project.Name].[target.DevEnv].[target.Framework]";
+            conf.IntermediatePath = @"[conf.ProjectPath]\temp\[project.Name]\[target.DevEnv]\[target.Framework]\[conf.Name]";
+
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
             if (target.Optimization == Optimization.Debug)
                 conf.Options.Add(Options.Vc.Compiler.RuntimeLibrary.MultiThreadedDebugDLL);
@@ -58,7 +59,8 @@ namespace CLR_SharpmakeTest
         {
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
             conf.ProjectFileName = @"[project.Name].[target.DevEnv].[target.Framework]";
-            conf.IntermediatePath = @"[conf.ProjectPath]\temp\[target.DevEnv]\[target.Framework]\[target]";
+            conf.TargetPath = @"[conf.ProjectPath]\output\[target.DevEnv]\[target.Framework]\[conf.Name]";
+            conf.IntermediatePath = @"[conf.ProjectPath]\temp\[project.Name]\[target.DevEnv]\[target.Framework]\[conf.Name]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
             if (target.Optimization == Optimization.Debug)
                 conf.Options.Add(Options.Vc.Compiler.RuntimeLibrary.MultiThreadedDebugDLL);
@@ -99,12 +101,21 @@ namespace CLR_SharpmakeTest
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
-            conf.ReferencesByName.Add("System", "System.Data", "System.Xml");
-            conf.ReferencesByPath.Add(@"..\..\..\..\..\external\MySql\v2.0\MySql.Data.Entity.dll");
+
+            conf.ReferencesByName.Add(
+                "System",
+                "System.Data",
+                "System.Xml"
+            );
+
             conf.AddPrivateDependency<OtherCSharpProj>(target, DependencySetting.OnlyBuildOrder);
             conf.AddPrivateDependency<TheEmptyCPPProject>(target);
+
+            // Force full pdb otherwise we get this message: /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
+            conf.Options.Add(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable);
         }
     }
+
     [Sharpmake.Generate]
     public class TheEmptyCPPProject : CommonProject
     {

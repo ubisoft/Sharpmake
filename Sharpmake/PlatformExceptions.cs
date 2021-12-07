@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ namespace Sharpmake
     }
 
     /// <summary>
-    /// Exception thrown when <see cref="PlatformRegistry"/> is unable to instanciate an interface
+    /// Exception thrown when <see cref="PlatformRegistry"/> is unable to instantiate an interface
     /// implementation object. This is usually because the type has no constructor, or the
     /// constructor threw an exception.
     /// </summary>
@@ -62,7 +62,7 @@ namespace Sharpmake
     public class PlatformImplementationCreationException : Exception
     {
         internal PlatformImplementationCreationException(Type type, Exception innerException)
-            : base($"Failed to instanciate platform implementation type {type.Name}. Check the inner exception for details.", innerException)
+            : base($"Failed to instantiate platform implementation type {type.Name}. Check the inner exception for details.", innerException)
         { }
 
         protected PlatformImplementationCreationException(SerializationInfo info, StreamingContext context)

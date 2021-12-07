@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\codebase\MixCppAndCExe\hello_c.c" />
+    <ClCompile Include="..\codebase\MixCppAndCExe\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\codebase\MixCppAndCExe\hello_c.h" />
+  </ItemGroup>
+</Project>

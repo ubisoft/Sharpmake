@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
 using System.Linq;
 
 namespace Sharpmake
@@ -25,6 +27,26 @@ namespace Sharpmake
                 {
                     Enable,
                     [Default]
+                    Disable
+                }
+
+                public enum ClangEnableModules
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum OnlyActiveArch
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+                public enum ClangAnalyzerLocalizabilityNonlocalized
+                {
+                    [Default]
+                    Enable,
                     Disable
                 }
 
@@ -57,22 +79,32 @@ namespace Sharpmake
                     GNU11
                 }
 
-                public class CodeSignEntitlements
+                public class CodeSignEntitlements : StringOption
                 {
-                    public string Value;
-                    public CodeSignEntitlements(string value)
+                    public CodeSignEntitlements(string value) : base(value)
                     {
-                        Value = value;
                     }
                 }
 
-                public class CodeSigningIdentity
+                public class CodeSigningIdentity : StringOption
                 {
-                    public string Value;
-                    public CodeSigningIdentity(string value)
+                    public CodeSigningIdentity(string value) : base(value)
                     {
-                        Value = value;
                     }
+                }
+
+                public class ProductBundleIdentifier : StringOption
+                {
+                    public ProductBundleIdentifier(string value) : base(value) { }
+                }
+
+                public enum EnableGpuFrameCaptureMode
+                {
+                    [Default]
+                    AutomaticallyEnable,
+                    MetalOnly,
+                    OpenGLOnly,
+                    Disable
                 }
 
                 public enum CppLanguageStandard
@@ -81,9 +113,11 @@ namespace Sharpmake
                     [Default]
                     CPP11,
                     CPP14,
+                    CPP17,
                     GNU98,
                     GNU11,
-                    GNU14
+                    GNU14,
+                    GNU17
                 }
 
                 public enum DeadStrip
@@ -108,6 +142,13 @@ namespace Sharpmake
                     public DevelopmentTeam(string value) : base(value) { }
                 }
 
+                public enum ProvisioningStyle
+                {
+                    [Default]
+                    Automatic,
+                    Manual
+                }
+
                 public enum DeploymentPostProcessing
                 {
                     [Default]
@@ -122,12 +163,19 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum EnableBitcode
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Exceptions
                 {
+                    [Default]
                     Disable,
                     Enable,
                     EnableCpp,
-                    [Default]
                     EnableObjC,
                 }
 
@@ -154,7 +202,7 @@ namespace Sharpmake
 
                 public abstract class Frameworks : Strings
                 {
-                    public Frameworks(params string[] paths)
+                    protected Frameworks(params string[] paths)
                         : base(paths)
                     { }
                 }
@@ -215,8 +263,8 @@ namespace Sharpmake
 
                 public enum LibraryStandard
                 {
-                    [Default]
                     CppStandard,
+                    [Default]
                     LibCxx
                 }
 
@@ -236,6 +284,13 @@ namespace Sharpmake
                     G4,
                     [Default]
                     G5,
+                }
+
+                public enum GccNoCommonBlocks
+                {
+                    [Default]
+                    Enable,
+                    Disable
                 }
 
                 // Optimization
@@ -265,12 +320,10 @@ namespace Sharpmake
                     Enable
                 }
 
-                public class ProvisioningProfile
+                public class ProvisioningProfile : StringOption
                 {
-                    public string ProfileName;
-                    public ProvisioningProfile(string profileName)
+                    public ProvisioningProfile(string profileName) : base(profileName)
                     {
-                        ProfileName = profileName;
                     }
                 }
 
@@ -311,6 +364,13 @@ namespace Sharpmake
                     { }
                 }
 
+                public enum StrictObjCMsgSend
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum StripDebugSymbolsDuringCopy
                 {
                     [Default]
@@ -318,13 +378,28 @@ namespace Sharpmake
                     Disable
                 }
 
-                public class TargetedDeviceFamily
+                [Flags]
+                public enum TargetedDeviceFamily
                 {
-                    public string Value;
-                    public TargetedDeviceFamily(string value)
+                    [Default]
+                    Ios = 1 << 0,
+                    Ipad = 1 << 1,
+
+                    IosAndIpad = Ios | Ipad
+                }
+
+                public class AssetCatalogCompilerAppIconName : StringOption
+                {
+                    public AssetCatalogCompilerAppIconName(string value) : base(value)
                     {
-                        Value = value;
                     }
+                }
+
+                public enum Testability
+                {
+                    [Default]
+                    Enable,
+                    Disable
                 }
 
                 public class ValidArchs
@@ -336,10 +411,24 @@ namespace Sharpmake
                     }
                 }
 
+                public enum ObjCWeakReferences
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Warning64To32BitConversion
                 {
                     Enable,
                     [Default]
+                    Disable
+                }
+
+                public enum WarningBlockCaptureAutoReleasing
+                {
+                    [Default]
+                    Enable,
                     Disable
                 }
 
@@ -350,7 +439,21 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningComma
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum WarningConstantConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningDeprecatedObjCImplementations
                 {
                     [Default]
                     Enable,
@@ -386,7 +489,42 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningInfiniteRecursion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum WarningIntConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningNonLiteralNullConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningObjCImplicitRetainSelf
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningObjCLiteralConversion
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningRangeLoopAnalysis
                 {
                     [Default]
                     Enable,
@@ -408,6 +546,20 @@ namespace Sharpmake
                     Disable
                 }
 
+                public enum WarningStrictPrototypes
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
+                public enum WarningSuspiciousMove
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum WarningUndeclaredSelector
                 {
                     Enable,
@@ -419,6 +571,13 @@ namespace Sharpmake
                 {
                     Enable,
                     [Default]
+                    Disable
+                }
+
+                public enum WarningUnreachableCode
+                {
+                    [Default]
+                    Enable,
                     Disable
                 }
 
@@ -441,6 +600,16 @@ namespace Sharpmake
                     Enable,
                     [Default]
                     Disable
+                }
+            }
+
+            public static class Linker
+            {
+                public enum StripLinkedProduct
+                {
+                    Disable,
+                    [Default]
+                    Enable
                 }
             }
         }

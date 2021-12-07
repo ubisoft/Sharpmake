@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,10 +46,14 @@ namespace Sharpmake.Application
             public string[] Assemblies = new string[0];
             public HashSet<string> Defines = new HashSet<string>();
             public InputType Input = InputType.Undefined;
+            public string ProfileFile = null;
             public bool Exit = false;
             public bool BlobOnly = false;
             public bool CleanBlobsOnly = false;
             public bool Multithreaded = true;
+            public bool RegexMatchCacheEnabled = true;
+            // Default capacity based on a big project numbers
+            public int RegexMatchCacheInitialCapacity = (1 << 20) + 1;
             public bool SkipInvalidPath = false;
             public bool DebugLog = false;
             public bool Debug = false;
@@ -57,7 +61,6 @@ namespace Sharpmake.Application
             public bool WriteFiles = true;
             public bool DumpDependency = false;
             private bool _testOptionValid = true;
-            public bool ProfileOutput = false;
             internal TestOptions TestOption;
             internal bool RegressionDiff = true;
             public DirectoryInfo OutputDirectory;
@@ -65,6 +68,7 @@ namespace Sharpmake.Application
             public DirectoryInfo RemapRoot;
             public string MutexSuffix = string.Empty;
             public bool GenerateDebugSolution = false;
+            public bool GenerateDebugSolutionOnly = false;
             public string DebugSolutionStartArguments = string.Empty;
 
             [CommandLine.Option("sources", @"sharpmake sources files: ex: /sources( ""project1.sharpmake"", ""..\..\project2.sharpmake"" )")]
@@ -92,6 +96,12 @@ namespace Sharpmake.Application
                     DebugWriteLine("  " + define);
             }
 
+            [CommandLine.Option("profile", @"Profile file used to activate and output profiling: ex: /profile( @""D:\profile.json"" )")]
+            public void SetProfileFile(string profileFile)
+            {
+                ProfileFile = profileFile;
+            }
+
             [CommandLine.Option("projectlogfiles", @"log files contained in a project for debug purpose: ex: /projectlogfiles( ""s:\p4\ac\dev\sharpmake\projects\win32\system\system.vcproj"" )")]
             public void ProjectLogFiles(string projectFile)
             {
@@ -105,10 +115,10 @@ namespace Sharpmake.Application
                 BlobOnly = true;
             }
 
-            [CommandLine.Option("waitfordebugger", @"Trigger a debugger break")]
-            public void CommandLineWaitForDebugger()
+            [CommandLine.Option("breakintodebugger", @"Trigger a debugger break at the beginning of the program.")]
+            public void CommandLineBreakIntoDebugger()
             {
-                System.Diagnostics.Debugger.Break();
+                // Validated in the main for priority
             }
 
             [CommandLine.Option("cleanblobsonly", @"Only clean blob and work blob files: ex: /cleanblobsonly")]
@@ -123,6 +133,18 @@ namespace Sharpmake.Application
                 Multithreaded = value;
             }
 
+            [CommandLine.Option("regexMatchCache", @"Enables/disables regex match cache optimization. Might improve performance on large projects. Enabled by default. ex: /regexMatchCache(false)")]
+            public void CommandLineRegexMatchCacheEnabled(bool value)
+            {
+                RegexMatchCacheEnabled = value;
+            }
+
+            [CommandLine.Option("regexMatchCacheInitialCapacity", @"Initial capacity of regex match cache. Should be set to a value higher or equal to the size which the cache is expected to reach over a run, otherwise performance might suffer. ex: /regexMatchCacheInitialCapacity(1048577)")]
+            public void CommandLineRegexMatchCacheInitialCapacity(int value)
+            {
+                RegexMatchCacheInitialCapacity = value;
+            }
+
             [CommandLine.Option("DumpDependency", @"Dump projects dependencies in dot format: ex: /DumpDependency")]
             public void CommandLineDumpDependency()
             {
@@ -133,12 +155,6 @@ namespace Sharpmake.Application
             public void CommandLineDebugLog(bool value)
             {
                 DebugLog = value;
-            }
-
-            [CommandLine.Option("profileoutput", @"Write profiling information ( slow ): ex: /profileoutput(<true|false>)")]
-            public void CommandLineProfileOutput(bool value)
-            {
-                ProfileOutput = value;
             }
 
             [CommandLine.Option("diagnostics", @"Output more errors and warnings (slow): ex: /diagnostics")]
@@ -166,7 +182,7 @@ namespace Sharpmake.Application
             }
 
             [CommandLine.Option("test", @"Validates .sharpmake input so it respect a minimal coding standard.
-Regression: tests if the dir provided in ouput is equal to the reference dir after a generation. returns -1 if different
+Regression: tests if the dir provided in output is equal to the reference dir after a generation. returns -1 if different
 QuickConfigure: tests if the configure methods are reversible. returns -1 if it is not reversible
 Configure: tests if the configure methods are reversible, track the problems. return -1 if it is not reversible
 (validates configure order): ex: /test(<""Regression""|""QuickConfigure""|""Configure"">)")]
@@ -316,6 +332,13 @@ of the project generated by /generateDebugSolution. ex: /debugSolutionStartArgum
                 DebugSolutionStartArguments = arguments;
             }
 
+            [CommandLine.Option("generateDebugSolutionOnly", @"Generate debug solution only (don't generate solution/project from user code).: /generateDebugSolutionOnly")]
+            public void CommandLineGenerateDebugSolutionOnly()
+            {
+                CommandLineGenerateDebugSolution();
+                GenerateDebugSolutionOnly = true;
+            }
+
             [CommandLine.Option("forcecleanup", @"Path to an autocleanup db.
 If this is set, all the files listed in the DB will be removed, and sharpmake will exit.
 ex: /forcecleanup( ""tmp/sharpmakeautocleanupdb.bin"" ")]
@@ -386,9 +409,9 @@ ex: /forcecleanup( ""tmp/sharpmakeautocleanupdb.bin"" ")]
                 foreach (string define in defines)
                 {
                     if (!defineValidationRegex.IsMatch(define))
-                        throw new Error("error: invalid define '{0}', a define must be a single word");
+                        throw new Error("error: invalid define '{0}', a define must be a single word", define);
                     if (uniqueDefines.Contains(define))
-                        throw new Error("error: define '{0}' already defined");
+                        throw new Error("error: define '{0}' already defined", define);
                     uniqueDefines.Add(define);
                 }
                 return uniqueDefines;

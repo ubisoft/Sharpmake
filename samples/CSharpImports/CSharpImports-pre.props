@@ -1,0 +1,7 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Include="..\..\codebase\CSharpImports\Debug.csharp">
+      <Link>Debug.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

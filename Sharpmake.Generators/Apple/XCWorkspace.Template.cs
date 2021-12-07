@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Sharpmake.Generators.Apple
 {
     public partial class XCWorkspace
     {
-        private class Template
+        private static class Template
         {
             public static string Header =
 @"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -28,15 +28,23 @@ namespace Sharpmake.Generators.Apple
             public static string ProjectReference = "\t<FileRef\n\t\tlocation = \"group:[projectName].xcodeproj\">\n\t</FileRef>\n";
 
             public static string ProjectReferenceAbsolute =
-@"   <FileRef
-      location = ""absolute:[projectPath]"">
-   </FileRef>
+@"[indent]    <FileRef
+[indent]        location = ""absolute:[projectPath]"">
+[indent]    </FileRef>
 ";
 
             public static string ProjectReferenceRelative =
-@"   <FileRef
-      location = ""group:[projectName].xcodeproj"">
-   </FileRef>
+@"[indent]    <FileRef
+[indent]        location = ""group:[projectName].xcodeproj"">
+[indent]    </FileRef>
+";
+            public static string GroupBegin =
+@"[indent]    <Group
+[indent]        location = ""container:""
+[indent]        name = ""[folderName]"">
+";
+            public static string GroupEnd =
+@"[indent]    </Group>
 ";
         }
     }

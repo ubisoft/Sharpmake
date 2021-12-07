@@ -5,7 +5,10 @@
 FloatCosAngleSpinBox::FloatCosAngleSpinBox(float* valueRef,QWidget *parent)
     : QDoubleSpinBox(parent), m_valueRef(valueRef)
 {
-    CONNECT_DOUBLE_SPINBOX(this, this, OnValueChanged);
+    connect(
+        this, qOverload<double>(&QDoubleSpinBox::valueChanged),
+        this, &FloatCosAngleSpinBox::OnValueChanged
+    );
 }
 
 // Updates the UI field (in degrees) from the reference value (a cosine).

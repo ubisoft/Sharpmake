@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,13 +52,7 @@ namespace Sharpmake.Generators.FastBuild
         /// </summary>
         string CppConfigName(Configuration conf);
 
-        /// <summary>
-        /// Gets whether a library prefix (usually `lib`) is required on that platform when
-        /// building libraries.
-        /// </summary>
-        /// <param name="conf">The <see cref="Configuration"/> under which the check is requested.</param>
-        /// <returns>`true` if a prefix is required, `false` otherwise.</returns>
-        bool AddLibPrefix(Configuration conf);
+        void SelectPreprocessorDefinitionsBff(IBffGenerationContext context);
 
         /// <summary>
         /// Setups extra linker settings for linking with that platform.
@@ -67,9 +61,6 @@ namespace Sharpmake.Generators.FastBuild
         /// <param name="configuration">The project configuration</param>
         /// <param name="fastBuildOutputFile">The file name of the build output.</param>
         void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile);
-
-        [Obsolete("Use " + nameof(SetupExtraLinkerSettings) + " and pass the conf")]
-        void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration.OutputType outputType, string fastBuildOutputFile);
 
         /// <summary>
         /// Get the extra list of build steps to execute for this platform.

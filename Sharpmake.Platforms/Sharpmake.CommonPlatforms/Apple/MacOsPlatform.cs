@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,81 +12,87 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Sharpmake.Generators;
+using Sharpmake.Generators.FastBuild;
+using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake
 {
-    public static class Apple
+    public static partial class Apple
     {
         [PlatformImplementation(Platform.mac,
             typeof(IPlatformDescriptor),
+            typeof(IFastBuildCompilerSettings),
+            typeof(IPlatformBff),
+            typeof(IClangPlatformBff),
+            typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
-        public sealed class MacOsPlatform : IPlatformDescriptor, Project.Configuration.IConfigurationTasks
+        public sealed class MacOsPlatform : BaseApplePlatform
         {
-            #region IPlatformDescriptor implementation.
-            public string SimplePlatformString => "Mac";
-            public bool IsMicrosoftPlatform => false;
-            public bool IsPcPlatform => true;
-            public bool IsUsingClang => true;
-            public bool HasDotNetSupport => false; // maybe? (.NET Core)
-            public bool HasSharedLibrarySupport => true;
-            public bool HasPrecompiledHeaderSupport => true;
+            public override Platform SharpmakePlatform => Platform.mac;
 
-            public EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] variables)
-            {
-                return new EnvironmentVariableResolver(variables);
-            }
-            #endregion
+            public override string SimplePlatformString => "Mac";
 
-            #region Project.Configuration.IConfigurationTasks implementation.
-            public void SetupDynamicLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            public override string BffPlatformDefine => "APPLE_OSX";
+
+            public override string CConfigName(Configuration conf)
             {
-                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+                return ".osxConfig";
             }
 
-            public void SetupStaticLibraryPaths(Project.Configuration configuration, DependencySetting dependencySetting, Project.Configuration dependency)
+            public override string CppConfigName(Configuration conf)
             {
-                DefaultPlatform.SetupLibraryPaths(configuration, dependencySetting, dependency);
+                return ".osxppConfig";
             }
 
-            public string GetDefaultOutputExtension(Project.Configuration.OutputType outputType)
+            public override void SelectCompilerOptions(IGenerationContext context)
             {
-                switch (outputType)
+                base.SelectCompilerOptions(context);
+
+                var options = context.Options;
+                var cmdLineOptions = context.CommandLineOptions;
+                var conf = context.Configuration;
+
+                // Sysroot
+                options["SDKRoot"] = "macosx";
+                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+                if (customSdkRoot != null)
                 {
-                    // Using the Unix extensions since Darwin is a Unix implementation and the
-                    // executables Mac users interact with are actually bundles. If this causes
-                    // issues, see if using .app for executables and .dylib/.framework for
-                    // libraries work better. iOS is Darwin/Cocoa so assuming that the same goes
-                    // for it.
-                    case Project.Configuration.OutputType.Exe:
-                    case Project.Configuration.OutputType.IosApp:
-                    case Project.Configuration.OutputType.IosTestBundle:
-                        return string.Empty;
-                    case Project.Configuration.OutputType.Lib:
-                        return "a";
-                    case Project.Configuration.OutputType.Dll:
-                        return "so";
+                    options["SDKRoot"] = customSdkRoot.Value;
+                    cmdLineOptions["SDKRoot"] = $"-isysroot {customSdkRoot.Value}";
+                }
 
-                    // .NET remains the same on all platforms. (Mono loads .exe and .dll regardless
-                    // of platforms, and I assume the same about .NET Core.)
-                    case Project.Configuration.OutputType.DotNetConsoleApp:
-                    case Project.Configuration.OutputType.DotNetWindowsApp:
-                        return "exe";
-                    case Project.Configuration.OutputType.DotNetClassLibrary:
-                        return "dll";
+                // Target
+                options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
 
-                    case Project.Configuration.OutputType.None:
-                        return string.Empty;
-                    default:
-                        return outputType.ToString().ToLower();
+                var macOsDeploymentTarget = Options.GetObject<Options.XCode.Compiler.MacOSDeploymentTarget>(conf);
+                if (macOsDeploymentTarget != null)
+                {
+                    options["MacOSDeploymentTarget"] = macOsDeploymentTarget.MinimumVersion;
+                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag; // TODO: find what to write here
+                }
+                else
+                {
+                    options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
 
-            public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
+            public override void SelectLinkerOptions(IGenerationContext context)
             {
-                yield break;
+                base.SelectLinkerOptions(context);
+
+                var options = context.Options;
+                var cmdLineOptions = context.CommandLineOptions;
+                var conf = context.Configuration;
+
+                // Sysroot
+                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+                if (customSdkRoot != null)
+                    cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
             }
-            #endregion
         }
     }
 }

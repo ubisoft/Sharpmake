@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,9 +24,8 @@ namespace Sharpmake.Generators
         string ProjectDirectory { get; }
         DevEnv DevelopmentEnvironment { get; }
 
-        // The setter on those two should not be there.
-        Options.ExplicitOptions Options { get; set; }
-        IDictionary<string, string> CommandLineOptions { get; set; }
+        Options.ExplicitOptions Options { get; }
+        IDictionary<string, string> CommandLineOptions { get; }
 
         string ProjectDirectoryCapitalized { get; }
         string ProjectSourceCapitalized { get; }

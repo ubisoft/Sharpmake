@@ -1,0 +1,58 @@
+
+//=================================================================================================================
+// fastbuildfunctionaltest.bff FASTBuild config file
+//=================================================================================================================
+#once
+
+#define WIN64
+
+//=================================================================================================================
+// Global Configuration include
+//=================================================================================================================
+#include "fastbuildfunctionaltest-globalsettings.bff"
+
+//=================================================================================================================
+// FASTBuild custom section
+//=================================================================================================================
+
+//=================================================================================================================
+Exec( 'GenerateHeader' )
+{
+  .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\..\codebase\requireprebuildstep\execute.bat'
+  .ExecInput            = '.\$_CURRENT_BFF_DIR_$\..\codebase\requireprebuildstep\main.cpp'
+  .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\generated\header_generated_by_prebuild_step.h'
+  .ExecArguments        = 'echo #define PREBUILD_GENERATED_DEFINE() 0 > generated\header_generated_by_prebuild_step.h'
+}
+
+
+//=================================================================================================================
+// fastbuildfunctionaltest.bff .bff includes
+//=================================================================================================================
+#include ".\explicitlyorderedpostbuildtest_vs2019_win64.bff"
+#include ".\mixcppandcexe_vs2019_win64.bff"
+#include ".\postbuildcopydirtest_vs2019_win64.bff"
+#include ".\postbuildcopysinglefiletest_vs2019_win64.bff"
+#include ".\postbuildexecutetest_vs2019_win64.bff"
+#include ".\postbuildtestexecution_vs2019_win64.bff"
+#include ".\requireprebuildstep_vs2019_win64.bff"
+#include ".\spanmultiplesrcdirsfbunityexclude_vs2019_win64.bff"
+#include ".\spanmultiplesrcdirsfbunityinclude_vs2019_win64.bff"
+#include ".\useprecompexe_vs2019_win64.bff"
+#include ".\spanmultiplesrcdirsfbnoblobexclude_vs2019_win64.bff"
+#include ".\spanmultiplesrcdirsfbnoblobinclude_vs2019_win64.bff"
+#include ".\fastbuildfunctionaltest_all.bff"
+
+
+//=================================================================================================================
+// All Configs Alias
+//=================================================================================================================
+Alias( 'All-Configs' )
+{
+    .Targets =
+    {
+        'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64',
+        'FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64',
+        'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64',
+        'FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64'
+    }
+}

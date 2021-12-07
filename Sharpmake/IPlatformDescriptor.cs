@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ namespace Sharpmake
         /// Gets a simple string that describes the platform.
         /// </summary>
         string SimplePlatformString { get; }
+
+        string GetPlatformString(ITarget target);
 
         /// <summary>
         /// Gets whether this is a proprietary platform owned by Microsoft Corporation.

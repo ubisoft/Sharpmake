@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -23,17 +24,17 @@ namespace Sharpmake
 {
     /// <summary>
     /// Resolver
-    /// 
+    ///
     /// Resolver is a search and replace engine of property and member, it's actually may
     /// resolve Object, List<string> and string. To be resolved, an object must have [Resolvable] attribute.
     /// Supported type of parameters is: Object and Map
-    /// 
+    ///
     /// ex:
     ///     class Foo
     ///     {
     ///         public int Value = 1;
     ///     }
-    ///      
+    ///
     ///     void Test()
     ///     {
     ///         Foo foo = new Foo();
@@ -43,12 +44,12 @@ namespace Sharpmake
     ///         resolver.SetParameter("foo", foo);
     ///
     ///         Console.WriteLine(resolver.Resolve(str));
-    ///         
+    ///
     ///         // Output: "foo.Value = 1"
     ///     }
-    ///     
+    ///
     /// Object must have [Resolvable] attribute to be resolved, ex:
-    /// 
+    ///
     ///     [Resolvable]
     ///     class C1
     ///     {
@@ -73,9 +74,9 @@ namespace Sharpmake
     ///         Console.WriteLine(c1.Str);
     ///         // Output: "c2.Int = 2"
     ///     }
-    /// 
+    ///
     /// Example of Dictionary<string, T>
-    /// 
+    ///
     ///     [Resolvable]
     ///     class C1
     ///     {
@@ -102,6 +103,77 @@ namespace Sharpmake
     /// </summary>
     public class Resolver
     {
+        private class TypeWrapper
+        {
+            public List<MemberInfo> MemberInfos;
+
+            public TypeWrapper(Type type)
+            {
+                if (!type.IsDefined(typeof(Resolvable), true))
+                    return;
+
+                MemberInfo[] memberInfos = type.GetMembers();
+
+                foreach (MemberInfo memberInfo in memberInfos)
+                {
+                    if (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property)
+                        continue;
+
+                    if (memberInfo.IsDefined(typeof(SkipResolveOnMember), false))
+                        continue;
+
+                    Type memberType = null;
+                    if (memberInfo.MemberType == MemberTypes.Field)
+                    {
+                        FieldInfo fieldInfo = memberInfo as FieldInfo;
+                        Type fieldType = fieldInfo.FieldType;
+                        if (fieldType.IsClass ||
+                            (CanWriteFieldValue(fieldInfo) &&
+                             (fieldType == typeof(string) ||
+                              fieldType == typeof(Strings) ||
+                              fieldType.IsAssignableFrom(typeof(IList<string>)))))
+                        {
+                            memberType = fieldInfo.FieldType;
+                        }
+                    }
+                    else if (memberInfo.MemberType == MemberTypes.Property)
+                    {
+                        PropertyInfo propertyInfo = memberInfo as PropertyInfo;
+                        Type propertyType = propertyInfo.PropertyType;
+                        if (propertyInfo.CanRead &&
+                            (propertyType.IsClass ||
+                             propertyType == typeof(Strings) ||
+                             (propertyType == typeof(string) && propertyInfo.CanWrite) ||
+                             propertyType.IsAssignableFrom(typeof(IList<string>))))
+                        {
+                            memberType = propertyType;
+                        }
+                    }
+                    if (memberType != null)
+                    {
+                        if (MemberInfos == null)
+                        {
+                            MemberInfos = new List<MemberInfo>(memberInfos.Length);
+                        }
+                        MemberInfos.Add(memberInfo);
+                    }
+                }
+            }
+        }
+
+        static private ConcurrentDictionary<Type, TypeWrapper> s_typeWrappers = new ConcurrentDictionary<Type, TypeWrapper>();
+
+        private TypeWrapper GetTypeWrapper(Type type)
+        {
+            return s_typeWrappers.GetOrAdd(type, (key) =>
+            {
+                var wrapper = new TypeWrapper(type);
+                if (wrapper.MemberInfos == null || wrapper.MemberInfos.Count == 0)
+                    return null;
+                return wrapper;
+            });
+        }
+
         [System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
         public class Resolvable : Attribute
         {
@@ -184,7 +256,7 @@ namespace Sharpmake
         public class ScopedParameterGroup : IDisposable
         {
             private readonly Resolver _resolver;
-            private string[] _names;
+            private readonly string[] _names;
 
             public ScopedParameterGroup(Resolver resolver, params VariableAssignment[] assignments)
             {
@@ -223,14 +295,26 @@ namespace Sharpmake
             ResolveObject(null, obj, fallbackValue);
         }
 
+        public void Resolve(ref Strings strs)
+        {
+        }
+
         public virtual string Resolve(string str)
         {
             return Resolve(str, null);
         }
 
-        // Note: The method doesn't use regex as this was slower with regexes(mainly due to MT contention)
         public string Resolve(string str, object fallbackValue = null)
         {
+            bool wasChanged;
+            return Resolve(str, fallbackValue, out wasChanged);
+        }
+
+        // Note: The method doesn't use regex as this was slower with regexes(mainly due to MT contention)
+        public string Resolve(string str, object fallbackValue, out bool wasChanged)
+        {
+            wasChanged = false;
+
             // Early out
             if (str == null)
                 return str;
@@ -284,7 +368,8 @@ namespace Sharpmake
                         if (!(currentChar >= 'a' && currentChar <= 'z' ||
                             currentChar >= 'A' && currentChar <= 'Z' ||
                             currentChar >= '0' && currentChar <= '9' ||
-                            currentChar == '.' || currentChar == '_'
+                            currentChar == '.' || currentChar == '_' ||
+                            currentChar == ':'
                             ))
                         {
                             isValidMember = false;
@@ -302,7 +387,23 @@ namespace Sharpmake
 
                     if (isValidMember && !isEscaped)
                     {
-                        string resolveResult = GetMemberStringValue(str.Substring(memberStartIndex, endMatch - memberStartIndex), fallbackValue == null) ?? fallbackValue?.ToString();
+                        bool throwIfNotFound = fallbackValue == null;
+
+                        string resolveResult;
+                        try
+                        {
+                            resolveResult = GetMemberStringValue(str.Substring(memberStartIndex, endMatch - memberStartIndex), throwIfNotFound) ?? fallbackValue?.ToString();
+                        }
+                        catch (NotFoundException e)
+                        {
+                            throw new Error(
+                                "Error: {0} in '{1}'\n{2}",
+                                e.Message,
+                                str,
+                                e.Arguments
+                            );
+                        }
+
                         if (resolveResult == null)
                         {
                             // Resolve failed.
@@ -327,6 +428,7 @@ namespace Sharpmake
 
                 builder.Append(str, currentSearchIndex, strLength - currentSearchIndex);
                 str = builder.ToString();
+                wasChanged = true;
                 builder.Clear();
 
                 if (nbrReplacements == 0)
@@ -342,6 +444,7 @@ namespace Sharpmake
                 if (beginStr.Length != 1)
                     continue;
                 string escapedStr = beginStr + beginStr;
+                wasChanged = true;
                 str = str.Replace(escapedStr, beginStr);
             }
 
@@ -349,6 +452,7 @@ namespace Sharpmake
             {
                 string endStr = string.Empty + endChar;
                 string escapedStr = endStr + endStr;
+                wasChanged = true;
                 str = str.Replace(escapedStr, endStr);
             }
 
@@ -400,13 +504,13 @@ namespace Sharpmake
         private Dictionary<string, ResolveStatus> _resolveStatusFields = new Dictionary<string, ResolveStatus>();
         private List<string> _resolvingObjectPath = new List<string>();
         private Dictionary<string, RefCountedSymbol> _parameters = new Dictionary<string, RefCountedSymbol>();
-        private HashSet<object> _resolvedObject = new HashSet<object>();
+        private readonly HashSet<object> _resolvedObject = new HashSet<object>();
 
         public char[] _pathEndCharacters = { ']' };
 
         public string[] _pathBeginStrings = { "[" };
 
-        public char _pathSeparator = '.';
+        public const char _pathSeparator = '.';
 
         private void Reset()
         {
@@ -455,44 +559,112 @@ namespace Sharpmake
             return _resolveStatusFields.TryGetValue(pathName, out status) ? status : ResolveStatus.UnResolved;
         }
 
-        private static ConcurrentDictionary<string, KeyValuePair<FieldInfo, PropertyInfo>> s_typeFieldPropertyCache = new ConcurrentDictionary<string, KeyValuePair<FieldInfo, PropertyInfo>>();
+        private static ConcurrentDictionary<Tuple<Type, string>, Tuple<FieldInfo, PropertyInfo>> s_typeFieldPropertyCache = new ConcurrentDictionary<Tuple<Type, string>, Tuple<FieldInfo, PropertyInfo>>();
 
         private static void GetFieldInfoOrPropertyInfo(Type type, string name, out FieldInfo fieldInfo, out PropertyInfo propertyInfo)
         {
-            // build a unique name
-            string uniqueName = type.FullName + name;
+            var key = new Tuple<Type, string>(type, name);
 
-            var value = s_typeFieldPropertyCache.GetOrAdd(uniqueName, keyname =>
+            var value = s_typeFieldPropertyCache.GetOrAdd(key, keyArg =>
             {
                 FieldInfo field = type.GetField(name);
                 PropertyInfo property = (field == null) ? type.GetProperty(name) : null;
-                return new KeyValuePair<FieldInfo, PropertyInfo>(field, property);
+                return new Tuple<FieldInfo, PropertyInfo>(field, property);
             });
 
-            fieldInfo = value.Key;
-            propertyInfo = value.Value;
+            fieldInfo = value.Item1;
+            propertyInfo = value.Item2;
         }
 
+        [Serializable]
+        private class NotFoundException : Exception
+        {
+            private IEnumerable<string> _arguments;
+            public string Arguments
+            {
+                get
+                {
+                    if (_arguments == null)
+                        return string.Empty;
+
+                    if (!_arguments.Any())
+                        return "The list of arguments that can be used is *Empty*";
+
+                    return "The list of arguments that can be used is:\n- " + string.Join("\n- ", _arguments.OrderBy(x => x, StringComparer.InvariantCultureIgnoreCase));
+                }
+            }
+
+            public NotFoundException(string message, IEnumerable<string> arguments = null)
+                : base(message)
+            {
+                _arguments = arguments;
+            }
+        }
+
+        private enum PropertyModifier
+        {
+            None,
+            Lower
+        }
+
+        private static readonly char[] s_modifierNameSplitter = new[] { ':' };
+        private static string ExtractNameAndModifier(string rawInput, out PropertyModifier modifier)
+        {
+            string[] chunks = rawInput.Split(s_modifierNameSplitter);
+
+            if (chunks.Length < 2)
+            {
+                modifier = PropertyModifier.None;
+                return rawInput;
+            }
+            else if (chunks.Length == 2)
+            {
+                modifier = (PropertyModifier)Enum.Parse(typeof(PropertyModifier), chunks[0], true);
+                return chunks[1];
+            }
+            else
+            {
+                throw new NotSupportedException($"{chunks.Length - 1} modifiers were found in '{rawInput}', only one is supported.");
+            }
+        }
+
+        private static string ApplyModifier(PropertyModifier modifier, string input)
+        {
+            switch (modifier)
+            {
+                case PropertyModifier.None:
+                    return input;
+                case PropertyModifier.Lower:
+                    return input.ToLowerInvariant();
+                default:
+                    throw new NotSupportedException($"Don't know how to apply modifier {modifier} to '{input}'");
+            }
+        }
+
+        private static readonly char[] s_memberPathSplitter = new[] { _pathSeparator };
         private string GetMemberStringValue(string memberPath, bool throwIfNotFound)
         {
-            string[] names = memberPath.Split(new[] { _pathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            string[] names = memberPath.Split(s_memberPathSplitter);
 
             if (names.Length == 0)
             {
                 if (throwIfNotFound)
-                    throw new Exception("Cannot find unnamed parameter");
+                    throw new NotFoundException("Cannot find unnamed parameter");
                 return null;
             }
 
-            string parameterName = names[0];
-            // get the paramters...
+            PropertyModifier modifier = PropertyModifier.None;
+            string parameterName = ExtractNameAndModifier(names[0], out modifier);
+
+            // get the parameters...
             if (!IsCaseSensitive)
                 parameterName = parameterName.ToLowerInvariant();
             RefCountedSymbol refCountedReference;
             if (!_parameters.TryGetValue(parameterName, out refCountedReference))
             {
                 if (throwIfNotFound)
-                    throw new Exception("Cannot resolve parameter " + names[0]);
+                    throw new NotFoundException($"Cannot resolve parameter '{parameterName}'.", _parameters.Keys);
+
                 return null;
             }
             object parameter = refCountedReference.Value;
@@ -502,44 +674,73 @@ namespace Sharpmake
             {
                 bool found = false;
 
+                string nameChunk = names[i];
 
+                Type parameterType = parameter.GetType();
                 FieldInfo fieldInfo;
                 PropertyInfo propertyInfo;
-                GetFieldInfoOrPropertyInfo(parameter.GetType(), names[i], out fieldInfo, out propertyInfo);
+                GetFieldInfoOrPropertyInfo(parameterType, nameChunk, out fieldInfo, out propertyInfo);
 
                 if (fieldInfo != null)
                 {
                     parameter = fieldInfo.GetValue(parameter);
                     found = true;
                 }
-                else
+                else if (propertyInfo != null)
                 {
-                    if (propertyInfo != null)
+                    parameter = propertyInfo.GetValue(parameter, null);
+                    found = true;
+                }
+
+                // IDictionary support
+                if (!found && i == names.Length - 1 && parameter is IDictionary)
+                {
+                    var dictionary = parameter as IDictionary;
+                    if (dictionary.Contains(nameChunk))
                     {
-                        parameter = propertyInfo.GetValue(parameter, null);
+                        parameter = dictionary[nameChunk];
                         found = true;
                     }
                 }
 
-                // IDictionary support 
-                if (!found && i == names.Length - 1 && parameter is IDictionary)
-                {
-                    IDictionary dictionaty = parameter as IDictionary;
-                    if (dictionaty.Contains(names[i]))
-                        return dictionaty[names[i]].ToString();
-                }
-
-                name += _pathSeparator + names[i];
-
                 if (!found)
                 {
                     if (throwIfNotFound)
-                        throw new Exception("Cannot find path: " + name + " in parameter path " + memberPath);
+                    {
+                        string currentPath = parameterName + name + _pathSeparator;
+
+                        // get all public fields
+                        var possibleArguments = parameterType.GetFields().Select(f => currentPath + f.Name);
+
+                        // all public properties
+                        possibleArguments = possibleArguments.Concat(parameterType.GetProperties().Select(p => currentPath + p.Name));
+
+                        // and dictionary keys, if they are strings
+                        var dictionary = parameter as IDictionary;
+                        if (dictionary != null)
+                        {
+                            var keysAsStrings = ((IDictionary)parameter).Keys as IEnumerable<string>;
+                            if (keysAsStrings != null)
+                                possibleArguments = possibleArguments.Concat(keysAsStrings.Select(k => currentPath + k));
+                        }
+
+                        throw new NotFoundException(
+                            $"Cannot find path '{nameChunk}' in parameter path '{memberPath}'",
+                            possibleArguments
+                        );
+                    }
                     return null;
                 }
+
+                name += _pathSeparator + nameChunk;
             }
 
-            return parameter == null ? "null" : parameter.ToString();
+            if (parameter == null)
+            {
+                throw new NotFoundException(parameterName + name + " is null, please set a proper value for sharpmake to resolve it");
+            }
+
+            return ApplyModifier(modifier, parameter.ToString());
         }
 
         private static bool CanWriteFieldValue(FieldInfo fieldInfo)
@@ -551,9 +752,6 @@ namespace Sharpmake
 
         private void ResolveMember(string objectPath, object obj, MemberInfo memberInfo, object fallbackValue)
         {
-            if (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property)
-                return;
-
             string memberPath;
             if (objectPath != null)
                 memberPath = objectPath + _pathSeparator + memberInfo.Name;
@@ -561,9 +759,6 @@ namespace Sharpmake
                 memberPath = memberInfo.Name;
 
             if (GetResolveStatus(memberPath) == ResolveStatus.Resolved)
-                return;
-
-            if (memberInfo.IsDefined(typeof(SkipResolveOnMember), false))
                 return;
 
             if (memberInfo.MemberType == MemberTypes.Field)
@@ -579,7 +774,10 @@ namespace Sharpmake
                         {
                             SetResolving(memberPath);
                             string value = fieldValue as string;
-                            fieldInfo.SetValue(obj, Resolve(value, fallbackValue));
+                            bool wasChanged;
+                            value = Resolve(value, fallbackValue, out wasChanged);
+                            if (wasChanged)
+                                fieldInfo.SetValue(obj, value);
                             SetResolved(memberPath);
                         }
                     }
@@ -594,8 +792,10 @@ namespace Sharpmake
                             {
                                 foreach (string value in values.Values)
                                 {
-                                    string newValue = Resolve(value, fallbackValue);
-                                    values.UpdateValue(value, newValue);
+                                    bool wasChanged;
+                                    string newValue = Resolve(value, fallbackValue, out wasChanged);
+                                    if (wasChanged)
+                                        values.UpdateValue(value, newValue);
                                 }
                             }
 
@@ -610,7 +810,23 @@ namespace Sharpmake
                             IList<string> values = fieldValue as IList<string>;
 
                             for (int i = 0; i < values.Count; ++i)
-                                values[i] = Resolve(values[i], fallbackValue);
+                            {
+                                bool wasChanged;
+                                string value = Resolve(values[i], fallbackValue, out wasChanged);
+                                if (wasChanged)
+                                    values[i] = value;
+                            }
+
+                            SetResolved(memberPath);
+                        }
+                    }
+                    else if (fieldValue is HashSet<KeyValuePair<string, string>>)
+                    {
+                        if (CanWriteFieldValue(fieldInfo))
+                        {
+                            SetResolving(memberPath);
+
+                            ResolveKeyPairHashSet((HashSet<KeyValuePair<string, string>>)fieldValue, fallbackValue);
 
                             SetResolved(memberPath);
                         }
@@ -664,11 +880,41 @@ namespace Sharpmake
 
                             SetResolved(memberPath);
                         }
+                        else if (propertyValue is HashSet<KeyValuePair<string, string>>)
+                        {
+                            SetResolving(memberPath);
+
+                            ResolveKeyPairHashSet((HashSet<KeyValuePair<string, string>>)propertyValue, fallbackValue);
+
+                            SetResolved(memberPath);
+                        }
                         else if (propertyInfo.PropertyType.IsClass)
                         {
                             ResolveObject(memberPath, propertyValue, fallbackValue);
                         }
                     }
+                }
+            }
+        }
+
+        private void ResolveKeyPairHashSet(HashSet<KeyValuePair<string, string>> values, object fallbackValue)
+        {
+            // Empty check to prevent a useless memory allocation in .ToList()
+            if (values.Count == 0)
+                return;
+
+            foreach (var keyValuePair in values.ToList())
+            {
+                bool keyChanged;
+                bool valueChanged;
+
+                string key = Resolve(keyValuePair.Key, fallbackValue, out keyChanged);
+                string value = Resolve(keyValuePair.Value, fallbackValue, out valueChanged);
+
+                if (keyChanged || valueChanged)
+                {
+                    values.Remove(keyValuePair);
+                    values.Add(new KeyValuePair<string, string>(key, value));
                 }
             }
         }
@@ -679,9 +925,6 @@ namespace Sharpmake
             if (_resolvedObject.Add(obj) == false)
                 return;
 
-            if (!obj.GetType().IsDefined(typeof(Resolvable), true))
-                return;
-
             if (objectPath != null)
             {
                 if (GetResolveStatus(objectPath) == ResolveStatus.Resolved)
@@ -690,15 +933,14 @@ namespace Sharpmake
                 SetResolving(objectPath);
             }
 
-            MemberInfo[] memberInfos = obj.GetType().GetMembers();
+            var typeWrapper = GetTypeWrapper(obj.GetType());
+            if (typeWrapper == null)
+                return;
 
-            foreach (MemberInfo memberInfo in memberInfos)
+            foreach (MemberInfo memberInfo in typeWrapper.MemberInfos)
             {
                 ResolveMember(objectPath, obj, memberInfo, fallbackValue);
             }
-
-            if (objectPath != null)
-                SetResolved(objectPath);
         }
 
         #endregion

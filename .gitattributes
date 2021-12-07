@@ -15,3 +15,6 @@
 *.bat text eof=crlf
 *.reg text eof=crlf
 *.csproj text eof=crlf
+
+# Declare files that must keep lf 
+*.sh text eof=lf

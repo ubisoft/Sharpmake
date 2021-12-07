@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,21 +30,6 @@ namespace Sharpmake
     public enum DevEnv
     {
         /// <summary>
-        /// Visual Studio 2010.
-        /// </summary>
-        vs2010 = 1 << 0,
-
-        /// <summary>
-        /// Visual Studio 2012
-        /// </summary>
-        vs2012 = 1 << 1,
-
-        /// <summary>
-        /// Visual Studio 2013
-        /// </summary>
-        vs2013 = 1 << 2,
-
-        /// <summary>
         /// Visual Studio 2015
         /// </summary>
         vs2015 = 1 << 3,
@@ -60,48 +45,55 @@ namespace Sharpmake
         vs2019 = 1 << 5,
 
         /// <summary>
+        /// Visual Studio 2022
+        /// </summary>
+        vs2022 = 1 << 6,
+
+        /// <summary>
         /// iOS project with Xcode.
         /// </summary>
-        xcode4ios = 1 << 6,
+        xcode4ios = 1 << 7,
 
         /// <summary>
         /// Eclipse.
         /// </summary>
-        eclipse = 1 << 7,
+        eclipse = 1 << 8,
 
         /// <summary>
         /// GNU Makefiles.
         /// </summary>
-        make = 1 << 8,
+        make = 1 << 9,
 
         /// <summary>
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
-        VisualStudio = vs2010 | vs2012 | vs2013 | vs2015 | vs2017 | vs2019
+        VisualStudio = vs2015 | vs2017 | vs2019 | vs2022,
+
+        [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
+        vs2010 = -1,
+        [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
+        vs2012 = -1,
+        [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
+        vs2013 = -1,
     }
 
     // Mandatory
     [Fragment, Flags]
     public enum Platform
     {
-        win32      = 1 << 0,
-        win64      = 1 << 1,
-        anycpu     = 1 << 2,
-        x360       = 1 << 3,
-        durango    = 1 << 4,
-        ps3        = 1 << 5,
-        ps3spu     = 1 << 6,
-        orbis      = 1 << 7,
-        wii        = 1 << 8,
-        wiiu       = 1 << 9,
-        nx         = 1 << 10,
-        nvshield   = 1 << 11,
-        ctr        = 1 << 12,
-        ios        = 1 << 13,
-        android    = 1 << 14,
-        linux      = 1 << 15,
-        mac        = 1 << 16,
+        win32 = 1 << 0,
+        win64 = 1 << 1,
+        anycpu = 1 << 2,
+        durango = 1 << 3,
+        orbis = 1 << 4,
+        nx = 1 << 5,
+        ctr = 1 << 6,
+        ios = 1 << 7,
+        android = 1 << 8,
+        linux = 1 << 9,
+        mac = 1 << 10,
+        agde = 1 << 11,      // Android Game Development Extension
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
@@ -112,6 +104,19 @@ namespace Sharpmake
         _reserved3 = 1 << 28,
         _reserved2 = 1 << 29,
         _reserved1 = 1 << 30,
+
+        [Obsolete]
+        x360 = -1,
+        [Obsolete]
+        ps3 = -1,
+        [Obsolete]
+        ps3spu = -1,
+        [Obsolete]
+        wii = -1,
+        [Obsolete]
+        wiiu = -1,
+        [Obsolete]
+        nvshield = -1,
     }
 
     [Fragment, Flags]
@@ -139,21 +144,71 @@ namespace Sharpmake
     [Fragment, Flags]
     public enum DotNetFramework
     {
-        v2 = 1 << 0,
-        v3 = 1 << 1,
-        v3_5 = 1 << 2,
-        v3_5clientprofile = 1 << 3,
-        v4_0 = 1 << 4,
-        v4_5 = 1 << 5,
-        v4_5_1 = 1 << 6,
-        v4_5_2 = 1 << 7,
-        v4_5clientprofile = 1 << 8,
-        v4_6 = 1 << 9,
-        v4_6_1 = 1 << 10,
-        v4_6_2 = 1 << 11,
-        v4_7 = 1 << 12,
-        v4_7_1 = 1 << 13,
-        v4_7_2 = 1 << 14,
+        v3_5 = 1 << 0,
+        v3_5clientprofile = 1 << 1,
+        v4_5_2 = 1 << 2,
+        v4_6 = 1 << 3,
+        v4_6_1 = 1 << 4,
+        v4_6_2 = 1 << 5,
+        v4_7 = 1 << 6,
+        v4_7_1 = 1 << 7,
+        v4_7_2 = 1 << 8,
+        v4_8 = 1 << 9,
+
+        netcore1_0 = 1 << 10,
+        netcore1_1 = 1 << 11,
+        netcore2_0 = 1 << 12,
+        netcore2_1 = 1 << 13,
+        netcore2_2 = 1 << 14,
+        netcore3_0 = 1 << 15,
+        netcore3_1 = 1 << 16,
+
+        net5_0 = 1 << 17,
+        net6_0 = 1 << 18,
+
+        netstandard1_0 = 1 << 19,
+        netstandard1_1 = 1 << 20,
+        netstandard1_2 = 1 << 21,
+        netstandard1_3 = 1 << 22,
+        netstandard1_4 = 1 << 23,
+        netstandard1_5 = 1 << 24,
+        netstandard1_6 = 1 << 25,
+        netstandard2_0 = 1 << 26,
+        netstandard2_1 = 1 << 27,
+
+        [CompositeFragment]
+        all_netframework = v3_5 | v3_5clientprofile | v4_5_2 | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
+        [CompositeFragment]
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0,
+        [CompositeFragment]
+        all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
+
+        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        v2,
+        [Obsolete("Please use at least .net framework 3.5.", error: true)]
+        v3,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_0,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5clientprofile,
+        [Obsolete("Please use at least .net framework 4.5.2.", error: true)]
+        v4_5_1,
+    }
+
+    // https://docs.microsoft.com/en-us/dotnet/standard/frameworks#net-5-os-specific-tfms
+    [Fragment, Flags]
+    public enum DotNetOS
+    {
+        Default = 1 << 0,
+        android = 1 << 1,
+        ios = 1 << 2,
+        maccatalyst = 1 << 3,
+        macos = 1 << 4,
+        tvos = 1 << 5,
+        watchos = 1 << 6,
+        windows = 1 << 7
     }
 
     // Optional
@@ -228,23 +283,21 @@ namespace Sharpmake
         public string GetTargetString()
         {
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
+
+            var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
+            var nonZeroValues = fieldInfoValues.Where(f => ((int)f) != 0);
             string result = string.Join(
                 "_",
-                fieldInfos.Select(
-                    f => s_cachedFieldValueToString.GetOrAdd(
-                        f.GetValue(this),
-                        value =>
-                        {
-                            if (value is Platform)
-                            {
-                                var platform = (Platform)value;
-                                if (platform >= Platform._reserved9)
-                                    return Util.GetSimplePlatformString(platform).ToLower();
-                            }
-                            return value.ToString();
-                        }
-                    )
-                )
+                nonZeroValues.Select(f => s_cachedFieldValueToString.GetOrAdd(f, value =>
+                {
+                    if (value is Platform)
+                    {
+                        var platform = (Platform)value;
+                        if (platform >= Platform._reserved9)
+                            return Util.GetPlatformString(platform, null, this).ToLower();
+                    }
+                    return value.ToString();
+                }))
             );
             return result;
         }
@@ -294,11 +347,13 @@ namespace Sharpmake
 
         public int CompareTo(ITarget other)
         {
-            if (GetType() != other.GetType())
+            var thisType = GetType();
+            var otherType = other.GetType();
+            if (thisType != otherType)
             {
-                int cmp = GetType().FullName.CompareTo(other.GetType().FullName);
+                int cmp = string.Compare(thisType.FullName, otherType.FullName, StringComparison.Ordinal);
                 if (cmp == 0)
-                    throw new Exception("Two different types cannot have same name: " + GetType().FullName);
+                    throw new Exception("Two different types cannot have same name: " + thisType.FullName);
                 return cmp;
             }
 
@@ -308,7 +363,7 @@ namespace Sharpmake
             if (other._valueCache == null)
                 other._valueCache = other.GetTargetString();
 
-            return _valueCache.CompareTo(other._valueCache);
+            return string.Compare(_valueCache, other._valueCache, StringComparison.Ordinal);
         }
 
 
@@ -340,37 +395,50 @@ namespace Sharpmake
 
         public T GetFragment<T>()
         {
+            T value;
+            if (TryGetFragment(out value))
+                return value;
+            throw new Exception("cannot find fragment value of type " + typeof(T).FullName + " in object " + GetType().FullName);
+        }
+
+        public bool TryGetFragment<T>(out T value)
+        {
             FieldInfo[] fragments = GetType().GetFields();
+            var tType = typeof(T);
             foreach (FieldInfo fragment in fragments)
             {
-                if (fragment.FieldType == typeof(T))
+                if (tType.IsAssignableFrom(fragment.FieldType))
                 {
-                    return (T)fragment.GetValue(this);
+                    value = (T)fragment.GetValue(this);
+                    return true;
                 }
             }
-            throw new Exception("cannot find fragment value of type " + typeof(T).FullName + " in object " + GetType().FullName);
+            value = default(T);
+            return false;
         }
 
         public void SetFragment<T>(T value)
         {
             FieldInfo[] fragments = GetType().GetFields();
+            var valueType = value.GetType();
             foreach (FieldInfo fragment in fragments)
             {
-                if (fragment.FieldType == typeof(T))
+                if (fragment.FieldType.IsAssignableFrom(valueType))
                 {
                     fragment.SetValue(this, value);
                     return;
                 }
             }
-            throw new Exception("cannot find fragment value of type " + typeof(T).FullName + " in object " + GetType().FullName);
+            throw new Exception("cannot find fragment value of type " + valueType.FullName + " in object " + GetType().FullName);
         }
 
         public bool TestFragment<T>(T value)
         {
             FieldInfo[] fragments = GetType().GetFields();
+            var valueType = value.GetType();
             foreach (FieldInfo fragment in fragments)
             {
-                if (fragment.FieldType == typeof(T))
+                if (valueType.IsAssignableFrom(fragment.FieldType))
                     return Util.FlagsTest<T>((T)fragment.GetValue(this), value);
             }
             return false;
@@ -379,12 +447,8 @@ namespace Sharpmake
         public bool HaveFragment<T>()
         {
             FieldInfo[] fragments = GetType().GetFields();
-            foreach (FieldInfo fragment in fragments)
-            {
-                if (fragment.FieldType == typeof(T))
-                    return true;
-            }
-            return false;
+            var tType = typeof(T);
+            return fragments.Any(fragment => fragment.FieldType == tType);
         }
 
         public void SetFragments(params object[] values)
@@ -409,17 +473,18 @@ namespace Sharpmake
             }
         }
 
-        public bool AndMask(Object fragmentMask)
+        public bool AndMask(object fragmentMask)
         {
             FieldInfo[] fragmentFields = GetType().GetFields();
 
+            var fragmentMaskType = fragmentMask.GetType();
             foreach (FieldInfo fragmentField in fragmentFields)
             {
-                if (fragmentField.FieldType == fragmentMask.GetType())
+                if (fragmentMaskType.IsAssignableFrom(fragmentField.FieldType))
                 {
                     int targetValue = (int)fragmentField.GetValue(this);
                     int maskValue = (int)fragmentMask;
-                    if ((targetValue & maskValue) != targetValue)
+                    if ((targetValue == 0) || (targetValue & maskValue) != targetValue)
                     {
                         return false;
                     }
@@ -485,7 +550,7 @@ namespace Sharpmake
                         if (field.FieldType.IsDefined(typeof(Fragment), false))
                             results.Add(field);
                     }
-                    results.Sort((l, r) => l.FieldType.FullName.CompareTo(r.FieldType.FullName));
+                    results.Sort((l, r) => string.Compare(l.FieldType.FullName, r.FieldType.FullName, StringComparison.Ordinal));
 
                     return results.ToArray();
                 });
@@ -574,8 +639,11 @@ namespace Sharpmake
 
                 for (int i = 0; i < enumFields.Length; ++i)
                 {
-                    // GetFields() does not gurantee order; filter out the enum's special name field
+                    // GetFields() does not guarantee order; filter out the enum's special name field
                     if (enumFields[i].Attributes.HasFlag(FieldAttributes.SpecialName))
+                        continue;
+
+                    if (enumFields[i].GetCustomAttribute<ObsoleteAttribute>() != null)
                         continue;
 
                     // combinations of fragments are not actual fragments so skip them
@@ -596,8 +664,11 @@ namespace Sharpmake
                     {
                         for (int j = 0; j < enumFields.Length; ++j)
                         {
-                            // GetFields() does not gurantee order; filter out the enum's special name field
+                            // GetFields() does not guarantee order; filter out the enum's special name field
                             if (enumFields[j].Attributes.HasFlag(FieldAttributes.SpecialName))
+                                continue;
+
+                            if (enumFields[j].GetCustomAttribute<ObsoleteAttribute>() != null)
                                 continue;
 
                             if (i != j)
@@ -606,7 +677,7 @@ namespace Sharpmake
 
                                 if (enumFieldValue == jEnumFieldValue)
                                 {
-                                    throw new Error("2 enum field with he same value found in {0} fragment: {1}={2} and {3}={4}",
+                                    throw new Error("2 enum fields with the same value found in {0} fragment: {1}={2} and {3}={4}",
                                                         enumType.FullName,
                                                         enumFields[i].Name,
                                                         enumFieldValue,
@@ -669,10 +740,25 @@ namespace Sharpmake
 
         public void AddFragmentMask(params object[] masks)
         {
+            var fragmentTypes = TargetType.GetFields();
+
             foreach (var mask in masks)
             {
                 Type maskType = mask.GetType();
                 ITarget.ValidFragmentType(maskType);
+                if (!fragmentTypes.Any(fragmentType => fragmentType.FieldType == maskType))
+                {
+                    throw new Error(
+                        "Fragment mask type '{0}' is not present in this target, here is the list of valid types:\n- {1}",
+                        maskType,
+                        string.Join(
+                            "\n- ",
+                            fragmentTypes
+                                .Select(fragmentType => Util.ToNiceTypeName(fragmentType.FieldType))
+                                .OrderBy(type => type, StringComparer.InvariantCultureIgnoreCase)
+                        )
+                    );
+                }
 
                 List<int> maskValues;
                 if (_fragmentMasks == null || !_fragmentMasks.TryGetValue(maskType, out maskValues))
@@ -690,6 +776,42 @@ namespace Sharpmake
             }
         }
 
+        /// <summary>
+        /// This method will remove all the masks that were added, if any
+        /// </summary>
+        public void ClearFragmentMasks()
+        {
+            _fragmentMasks = null;
+        }
+
+        /// <summary>
+        /// The global fragment mask will add the mask or and it with previously existing masks
+        /// </summary>
+        /// <param name="masks"></param>
+        internal void SetGlobalFragmentMask(params object[] masks)
+        {
+            foreach (var mask in masks)
+            {
+                Type maskType = mask.GetType();
+                ITarget.ValidFragmentType(maskType);
+
+                List<int> maskValues;
+                if (_fragmentMasks == null || !_fragmentMasks.TryGetValue(maskType, out maskValues))
+                {
+                    if (_fragmentMasks == null)
+                        _fragmentMasks = new Dictionary<Type, List<int>>();
+
+                    maskValues = new List<int> { (int)mask };
+                    _fragmentMasks.Add(maskType, maskValues);
+                }
+                else
+                {
+                    for (int i = 0; i < maskValues.Count; ++i)
+                        maskValues[i] &= (int)mask;
+                }
+            }
+        }
+
         internal void ClearTargets()
         {
             _targetPossibilities.Clear();
@@ -701,12 +823,21 @@ namespace Sharpmake
 
             var fragments = TargetType.GetFields();
 
-            var cachedPossibilities = _targetPossibilities.Select(tp =>
+            var selectCP = _targetPossibilities.Select(tp =>
             {
-                var cachedPossibility = fragments.Select(f => BuildFilteredFragmentMask(f, (int)f.GetValue(tp))).ToArray();
+                var tuples = fragments.Select(f =>
+                {
+                    int value = (int)f.GetValue(tp);
+                    return Tuple.Create(value, BuildFilteredFragmentMask(f, value));
+                });
+                var filtered = tuples.Where(f =>
+                {
+                    return f.Item1 == 0 || f.Item2 != 0;
+                });
+                var cachedPossibility = filtered.Select(f => f.Item2).ToArray();
                 return cachedPossibility;
-            })
-            .Where(x => x.All(y => y != 0)) // Filtered out by the _fragmentMasks
+            });
+            var cachedPossibilities = selectCP.Where(f => f.Length == fragments.Length) // Filtered out by the _fragmentMasks
             .ToArray();
 
             //int[] masks;
@@ -718,7 +849,7 @@ namespace Sharpmake
                 bool configValid = IncrementCurrent(fragments, cachedPossibility, current);
                 while (configValid)
                 {
-                    GenerateConfiguration(fragments, current.Cast<int>().ToArray());
+                    GenerateConfiguration(fragments, current);
                     configValid = IncrementCurrent(fragments, cachedPossibility, current);
                 }
             }
@@ -726,14 +857,14 @@ namespace Sharpmake
 
         private readonly Dictionary<string, ITarget> _addedTargets = new Dictionary<string, ITarget>();
 
-        private void GenerateConfiguration(FieldInfo[] fragments, int[] current)
+        private void GenerateConfiguration(FieldInfo[] fragments, int?[] current)
         {
             ITarget target = Activator.CreateInstance(TargetType) as ITarget;
 
             for (int i = 0; i < fragments.Length; ++i)
-                fragments[i].SetValue(target, current[i]);
+                fragments[i].SetValue(target, current[i] ?? 0);
 
-            string targetKey = target.GetType().FullName + "__" + target;
+            string targetKey = target.GetType().FullName + "__" + target.GetTargetString();
             if (!_addedTargets.ContainsKey(targetKey))
             {
                 _addedTargets.Add(targetKey, target);
@@ -741,7 +872,7 @@ namespace Sharpmake
             }
         }
 
-        private int BuildFilteredFragmentMask(FieldInfo fragment, int optionalMask = int.MaxValue)
+        private int BuildFilteredFragmentMask(FieldInfo fragment, int optionalMask)
         {
             int mask = 0;
 
@@ -750,7 +881,7 @@ namespace Sharpmake
 
             foreach (FieldInfo enumField in enumFields)
             {
-                // GetFields() does not gurantee order; filter out the enum's special name field
+                // GetFields() does not guarantee order; filter out the enum's special name field
                 if (enumField.Attributes.HasFlag(FieldAttributes.SpecialName))
                     continue;
 
@@ -843,8 +974,8 @@ namespace Sharpmake
                         for (int k = j + 1; k < fragments.Length; ++k)
                         {
                             nextState = GetNextBit(null, masks[k], out next);
-                            Trace.Assert(nextState == NextBitState.Initialized);
-                            current[k] = next;
+                            if (nextState == NextBitState.Initialized)
+                                current[k] = next;
                         }
                     }
 

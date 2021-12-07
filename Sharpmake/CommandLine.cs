@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.IO;
 
 namespace Sharpmake
 {
@@ -156,7 +156,7 @@ namespace Sharpmake
                             else
                                 parametersName[i] = parameter.Name;
                         }
-                        help.WriteLine("({0})", String.Join(", ", parametersName));
+                        help.WriteLine("({0})", string.Join(", ", parametersName));
                         if (option.Description.Length != 0)
                             help.WriteLine("\t{0}", option.Description.Replace(Environment.NewLine, Environment.NewLine + "\t"));
                     }
@@ -191,14 +191,10 @@ namespace Sharpmake
             Dictionary<string, List<MethodInfo>> optionsNameMethodMapping = GetMethodsMapping(type, isStatic);
 
             // use to not call more than one for method with parameter overloading...
-            HashSet<string> executedMethods = new HashSet<string>();
+            var executedMethods = new HashSet<string>();
 
-            // tell to use all loaded assembly
-            List<Assembly> assemblies = new List<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
-
-            // in case of scripted c#, associated assembly may not be loaded in the current application domain.
-            if (!assemblies.Contains(type.Assembly))
-                assemblies.Add(type.Assembly);
+            // use associated assembly
+            var assemblies = new List<Assembly> { type.Assembly };
 
             foreach (Parameter parameter in parameters)
             {
@@ -217,43 +213,27 @@ namespace Sharpmake
 
                             if (isStatic)
                             {
-                                string executeCode = String.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
+                                string executeCode = string.Format("{0}.{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action execute = Assembler.BuildDelegate<Action>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
-                                try
-                                {
-                                    execute();
-                                }
-                                catch (TargetInvocationException e)
-                                {
-                                    if (e.InnerException != null)
-                                        throw (e.InnerException);
-                                }
+                                execute();
                             }
                             else
                             {
-                                string executeCode = String.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
+                                string executeCode = string.Format("((global::{0})obj).{1}({2});", type.FullName.Replace("+", "."), methodInfo.Name, parameter.Args);
                                 Action<object> execute = Assembler.BuildDelegate<Action<object>>(executeCode, type.Namespace, DefaultNamespaces.ToArray(), assemblies.ToArray());
 
-                                try
-                                {
-                                    execute(instance);
-                                }
-                                catch (TargetInvocationException e)
-                                {
-                                    if (e.InnerException != null)
-                                        throw (e.InnerException);
-                                }
+                                execute(instance);
                             }
                             executedMethods.Add(uniqueExecutedMethodName);
                         }
                         catch (Error e)
                         {
                             string[] parametersName = methodInfo.GetParameters().Select((ParameterInfo p) => p.ToString()).ToArray();
-                            errors.Append(String.Format("Command line option '/{0}' have invalid parameters '({1})', maybe not compatible with '({2})'" + Environment.NewLine + "\t",
+                            errors.Append(string.Format("Command line option '/{0}' have invalid parameters '({1})', maybe not compatible with '({2})'" + Environment.NewLine + "\t",
                                 parameter.Name,
                                 parameter.Args,
-                                String.Join(", ", parametersName)));
+                                string.Join(", ", parametersName)));
 
                             errors.Append(e.Message + Environment.NewLine);
                         }
@@ -299,9 +279,9 @@ namespace Sharpmake
             public override string ToString()
             {
                 if (ArgsCount == 0)
-                    return String.Format("/{0}", Name);
+                    return string.Format("/{0}", Name);
 
-                return String.Format("/{0}({1})", Name, Args);
+                return string.Format("/{0}({1})", Name, Args);
             }
         }
 
@@ -398,7 +378,7 @@ namespace Sharpmake
 
                 parameter.Args = builder.ToString().Trim();
 
-                if (!String.IsNullOrEmpty(parameter.Args))
+                if (!string.IsNullOrEmpty(parameter.Args))
                     ++parameter.ArgsCount;
 
                 // skip ')'

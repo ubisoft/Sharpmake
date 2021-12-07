@@ -82,7 +82,7 @@ projects.
 
 ## Introduction
 -------------------------------------------------------------------------------
-Sharpmake is an Ubisoft-developped solution to generate *.vcxproj*, *.vcproj*,
+Sharpmake is an Ubisoft-developed solution to generate *.vcxproj*, *.vcproj*,
 *.sln*, and *.csproj* files, as well as potentially more formats. Sharpmake
 was developed to generate files very quickly and allow users to easily
 generate multiple solutions and projects according to project and user
@@ -108,7 +108,7 @@ powerful language to use within the scripts. The scripts use the Sharpmake API
 directly, facilitating the override and expansion of the API, which is
 important for sharing Sharpmake across projects. The nature of C# makes it
 very easy to write everything once. Sharpmake's "include" system is also very
-scaleable.
+scalable.
 
 #### Accessible for Many Programmers
 The use of C#, including well-known concepts like C# attributes and C#
@@ -247,7 +247,10 @@ namespace HelloWorld
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\generated";
             conf.AddProject<HelloWorldProject>(target);
         }
- 
+    }
+
+    public static class Main
+    {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
@@ -389,7 +392,7 @@ CommandLine.ExecuteOnObject(Arguments);
 
 The `CommandLine.ExecuteOnObject` will automatically search for the
 `CommandLine.Option` attribute and parse options according to the
-correcponding method signature.
+corresponding method signature.
 
 Of course, any C# code can be executed in the `Main`, not just solution
 building.
@@ -680,7 +683,7 @@ custom target types. Custom target types must have 2 public fields for
 
 
 ### Configure Attribute
-As previously stated, it's possible to verride the configuration for any
+As previously stated, it's possible to override the configuration for any
 fragment value. The `[Sharpmake.Configure]` attribute is passed a list of
 values where the associated method should be called. For example, this code is
 in the project base class of our game engine:
@@ -1487,7 +1490,10 @@ namespace CSharpHelloWorld
  
             conf.AddProject<HelloWorld>(target);
         }
- 
+    }
+
+    public static class Main
+    {
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {

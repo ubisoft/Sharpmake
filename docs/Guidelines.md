@@ -174,13 +174,13 @@ Multiple Configure functions can also be used, and Sharpmake is offering a featu
 
 ```csharp
 [Configure(Platform.win32 | Platform.win64)]
-void ConfigurePs4(Configuration conf, Target target)
+void ConfigureWindows(Configuration conf, Target target)
 {
     ...
 }
 
-[Configure(Platform.ps4)]
-void ConfigurePs4(Configuration conf, Target target)
+[Configure(Platform.orbis)]
+void ConfigureOrbis(Configuration conf, Target target)
 {
     ...
 }
@@ -192,7 +192,7 @@ void ConfigureDurango(Configuration conf, Target target)
 }
 ```
 
-If doing multiple Configure functions, it is strongly recommanded to avoid depending on Configure methods execution order.  If you do, the attribute ```[ConfigureOrder]``` can be used.  Sharpmake is using the order of declaration in the class as much as possible, but then changing a Configure method from virtual to override with code moved in a base class can change the execution order.  Many programmers are completely surprised when simply moving code around is changing the produced result.  For these reasons it is suggested that different Configure functions work on different and independent things.
+If doing multiple Configure functions, it is strongly recommended to avoid depending on Configure methods execution order.  If you do, the attribute ```[ConfigureOrder]``` can be used.  Sharpmake is using the order of declaration in the class as much as possible, but then changing a Configure method from virtual to override with code moved in a base class can change the execution order.  Many programmers are completely surprised when simply moving code around is changing the produced result.  For these reasons it is suggested that different Configure functions work on different and independent things.
 
 ### Dependency System
 
@@ -294,7 +294,7 @@ class Perforce : CommonProject
     }
 ```
 
-This is much better, even if the Is-A relationship is slightly incorrect.  At least this technique is easier to maintain.  It can be used for any combinaison of fragments and can be useful to minimize multiplying the number of base classes.  Another example:
+This is much better, even if the Is-A relationship is slightly incorrect.  At least this technique is easier to maintain.  It can be used for any combination of fragments and can be useful to minimize multiplying the number of base classes.  Another example:
 
 ```csharp
 class MyBaseProject : Project

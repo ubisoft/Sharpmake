@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,12 +29,13 @@ namespace Sharpmake
     /// </remarks>
     public class FileSystemStringComparer : IComparer<string>, IEqualityComparer<string>
     {
+        public static FileSystemStringComparer Default { get; } = new FileSystemStringComparer();
+
         private static readonly bool s_hostOsIsCaseSensitive;
 
         static FileSystemStringComparer()
         {
-            var operatingSystemFamily = Environment.OSVersion.Platform;
-            s_hostOsIsCaseSensitive = (operatingSystemFamily == PlatformID.MacOSX || operatingSystemFamily == PlatformID.Unix);
+            s_hostOsIsCaseSensitive = Util.IsRunningOnUnix();
         }
 
         private readonly object _comparer;         // Using System::Object as the type because this can be both IComparer or IEqualityComparer.
@@ -69,6 +70,11 @@ namespace Sharpmake
         public int GetHashCode(string obj)
         {
             return ((IEqualityComparer<string>)_comparer).GetHashCode(obj);
+        }
+
+        public static int StaticCompare(string x, string y)
+        {
+            return Default.Compare(x, y);
         }
     }
 }

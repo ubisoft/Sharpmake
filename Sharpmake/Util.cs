@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.Win32;
@@ -31,12 +37,8 @@ namespace Sharpmake
 {
     public static partial class Util
     {
-        public static readonly char UnixSeparator = '/';
-        public static readonly char WindowsSeparator = '\\';
-
-        public static readonly bool UsesUnixSeparator = Path.DirectorySeparatorChar == UnixSeparator;
-
-        public static readonly char OtherSeparator = UsesUnixSeparator ? Util.WindowsSeparator : Util.UnixSeparator;
+        public const string DoubleQuotes = @"""";
+        public const string EscapedDoubleQuotes = @"\""";
 
         // A better type name (for generic classes)
         public static string ToNiceTypeName(this Type type)
@@ -67,19 +69,37 @@ namespace Sharpmake
             return ((intValue & intflag) == intflag);
         }
 
-        public static void PathMakeStandard(IList<string> paths)
+        /// <summary>
+        /// This method will return a deterministic hash for a string.
+        /// </summary>
+        /// <remarks>
+        /// With net core the regular GetHashCode() is now
+        /// seeded for security reasons.
+        /// </remarks>
+        /// <see href="https://andrewlock.net/why-is-string-gethashcode-different-each-time-i-run-my-program-in-net-core/"/>
+        /// <param name="str">The input string</param>
+        /// <returns>A deterministic hash</returns>
+        public static int GetDeterministicHashCode(this string str)
         {
-            for (int i = 0; i < paths.Count; ++i)
-                paths[i] = PathMakeStandard(paths[i]);
-        }
+            unchecked
+            {
+                int hash1 = (5381 << 16) + 5381;
+                int hash2 = hash1;
 
-        public static string PathMakeStandard(string path)
-        {
-            return PathMakeStandard(path, !Util.IsRunningInMono());
+                for (int i = 0; i < str.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ str[i];
+                    if (i == str.Length - 1)
+                        break;
+                    hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
+                }
+
+                return hash1 + (hash2 * 1566083941);
+            }
         }
 
         /// <summary>
-        /// Finds the first occurence of directive and returns the 
+        /// Finds the first occurrence of directive and returns the 
         /// requested param value. Ex:
         /// GetTextTemplateDirectiveParam(ttPath, "output", "extension")
         /// will match:
@@ -103,648 +123,6 @@ namespace Sharpmake
             return null;
         }
 
-        public static string PathMakeStandard(string path, bool forceToLower)
-        {
-            // cleanup the path by replacing the other separator by the correct one for this OS
-            // then trim every trailing separators
-            var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
-            return forceToLower ? standardPath.ToLower() : standardPath;
-        }
-
-        public static string EnsureTrailingSeparator(string path)
-        {
-            // return the path passed in with only one trailing separator
-            return path.TrimEnd(OtherSeparator).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-        }
-
-        public static bool PathIsSame(string path1, string path2)
-        {
-            return PathMakeStandard(path1).Equals(PathMakeStandard(path2), StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static List<string> PathGetRelative(string sourceFullPath, Strings destFullPaths, bool ignoreCase = false)
-        {
-            List<String> result = new List<string>(destFullPaths.Count);
-
-            foreach (string destFullPath in destFullPaths.Values)
-            {
-                result.Add(PathGetRelative(sourceFullPath, destFullPath, ignoreCase));
-            }
-            return result;
-        }
-
-        public static OrderableStrings PathGetRelative(string sourceFullPath, OrderableStrings destFullPaths, bool ignoreCase = false)
-        {
-            OrderableStrings result = new OrderableStrings(destFullPaths);
-
-            for (int i = 0; i < result.Count; ++i)
-            {
-                result[i] = PathGetRelative(sourceFullPath, result[i], ignoreCase);
-            }
-            return result;
-        }
-
-        public static OrderableStrings PathGetRelative(string sourceFullPath, IEnumerable<string> destFullPaths, bool ignoreCase = false)
-        {
-            OrderableStrings result = new OrderableStrings(destFullPaths);
-
-            for (int i = 0; i < result.Count; ++i)
-            {
-                result[i] = PathGetRelative(sourceFullPath, result[i], ignoreCase);
-            }
-            return result;
-        }
-
-        public static readonly char[] _pathSeparators = { Util.WindowsSeparator, Util.UnixSeparator };
-        internal static readonly char[] WildcardCharacters = { '*', '?' };
-
-        public static void PathSplitFileNameFromPath(string fileFullPath, out string fileName, out string pathName)
-        {
-            string[] fileFullPathParts = fileFullPath.Split(_pathSeparators, StringSplitOptions.RemoveEmptyEntries);
-
-            fileName = "";
-            pathName = "";
-
-            for (int i = 0; i < fileFullPathParts.Length; ++i)
-            {
-                if (i == fileFullPathParts.Length - 1)
-                {
-                    fileName = fileFullPathParts[i];
-                }
-                else
-                {
-                    pathName += fileFullPathParts[i] + Path.DirectorySeparatorChar;
-                }
-            }
-
-            pathName = pathName.TrimEnd(Path.DirectorySeparatorChar);
-        }
-
-        public static string RegexPathCombine(params string[] parts)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < parts.Length; ++i)
-            {
-                stringBuilder.Append(parts[i]);
-                if (i != (parts.Length - 1))
-                {
-                    stringBuilder.Append(System.Text.RegularExpressions.Regex.Escape(Path.DirectorySeparatorChar.ToString()));
-                }
-            }
-            return stringBuilder.ToString();
-        }
-
-        public static string GetConvertedRelativePath(
-            string absolutePath,
-            string relativePath,
-            string newRelativeToFullPath,
-            bool ignoreCase,
-            string rootPath = null
-        )
-        {
-            string tmpAbsolute = PathGetAbsolute(absolutePath, relativePath);
-            string newRelativePath = PathGetRelative(newRelativeToFullPath, tmpAbsolute, ignoreCase);
-
-            if (rootPath != null)
-            {
-                string cleanPath = Util.SimplifyPath(rootPath);
-                if (!tmpAbsolute.StartsWith(cleanPath, StringComparison.OrdinalIgnoreCase))
-                    return tmpAbsolute;
-            }
-
-            return newRelativePath;
-        }
-
-        private sealed unsafe class PathHelper
-        {
-            public static readonly int MaxPath = 260;
-            private int _capacity;
-
-            // Array of stack members.
-            private char* _buffer;
-            private int _bufferLength;
-
-            public PathHelper(char* buffer, int length)
-            {
-                _buffer = buffer;
-                _capacity = length;
-                _bufferLength = 0;
-            }
-
-            // This method is called when we find a .. in the path.
-            public bool RemoveLastDirectory(int lowestRemovableIndex)
-            {
-                if (Length == 0)
-                    return false;
-
-                Trace.Assert(_buffer[_bufferLength - 1] == Path.DirectorySeparatorChar);
-
-                int lastSlash = -1;
-
-                for (int i = _bufferLength - 2; i >= lowestRemovableIndex; i--)
-                {
-                    if (_buffer[i] == Path.DirectorySeparatorChar)
-                    {
-                        lastSlash = i;
-                        break;
-                    }
-                }
-
-                if (lastSlash == -1)
-                {
-                    if (lowestRemovableIndex == 0)
-                    {
-                        _bufferLength = 0;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-                // Truncate the path.
-                _bufferLength = lastSlash;
-
-                return true;
-            }
-
-            public void Append(char value)
-            {
-                if (Length + 1 >= _capacity)
-                    throw new PathTooLongException("Path too long:");
-
-                if (value == Path.DirectorySeparatorChar)
-                {
-                    // Skipping consecutive backslashes.
-                    if (_bufferLength > 0 && _buffer[_bufferLength - 1] == Path.DirectorySeparatorChar)
-                        return;
-                }
-
-                // Important note: Must imcrement _bufferLength at the same time as writing into it as otherwise if
-                // you are stepping in the debugger and ToString() is implicitely called by the debugger this could truncate the string
-                // before the increment takes place
-                _buffer[_bufferLength++] = value;
-            }
-
-            // Append a substring path component to the 
-            public void Append(string str, int substStringIndex, int subStringLength)
-            {
-                if (Length + subStringLength >= _capacity)
-                    throw new PathTooLongException("Path too long:");
-
-                Trace.Assert(substStringIndex < str.Length);
-                Trace.Assert(substStringIndex + subStringLength <= str.Length);
-
-
-                int endLoop = substStringIndex + subStringLength;
-                for (int i = substStringIndex; i < endLoop; ++i)
-                {
-                    // Important note: Must imcrement _bufferLength at the same time as writing into it as otherwise if
-                    // you are stepping in the debugger and ToString() is implicitely called by the debugger this could truncate the string
-                    // before the increment takes place
-                    char value = str[i];
-                    _buffer[_bufferLength++] = value;
-                }
-            }
-
-            public void RemoveChar(int index)
-            {
-                Debug.Assert(index < _bufferLength);
-                for (int i = index; i < _bufferLength - 1; ++i)
-                {
-                    _buffer[i] = _buffer[i + 1];
-                }
-                --_bufferLength;
-            }
-
-            public override string ToString()
-            {
-                return new string(_buffer, 0, _bufferLength);
-            }
-
-            public int Length
-            {
-                get
-                {
-                    return _bufferLength;
-                }
-            }
-
-            internal char this[int index]
-            {
-                get
-                {
-                    Debug.Assert(index < _bufferLength);
-                    return _buffer[index];
-                }
-            }
-        };
-
-        private static ConcurrentDictionary<string, string> s_cachedSimplifiedPaths = new ConcurrentDictionary<string, string>();
-
-        public static unsafe string SimplifyPath(string path)
-        {
-            if (path.Length == 0)
-                return string.Empty;
-
-            if (path == ".")
-                return path;
-
-            string simplifiedPath = s_cachedSimplifiedPaths.GetOrAdd(path, s =>
-            {
-                // First construct a path helper to help with the conversion
-                char* arrayPtr = stackalloc char[PathHelper.MaxPath];
-                PathHelper pathHelper = new PathHelper(arrayPtr, PathHelper.MaxPath);
-
-                int index = 0;
-                int pathLength = path.Length;
-                int numDot = 0;
-                int lowestRemovableIndex = 0;
-                for (; index < pathLength; ++index)
-                {
-                    char currentChar = path[index];
-                    if (currentChar == OtherSeparator)
-                        currentChar = Path.DirectorySeparatorChar;
-
-                    if (currentChar == '.')
-                    {
-                        ++numDot;
-                        if (numDot > 2)
-                        {
-                            throw new ArgumentException($"Invalid path format: {path}");
-                        }
-                    }
-                    else
-                    {
-                        if (numDot == 1)
-                        {
-                            if (currentChar == Path.DirectorySeparatorChar)
-                            {
-                                // Path starts a path of the format .\
-                                numDot = 0;
-                                continue;
-                            }
-                            else
-                            {
-                                pathHelper.Append('.');
-                            }
-                            numDot = 0;
-                            pathHelper.Append(currentChar);
-                        }
-                        else if (numDot == 2)
-                        {
-                            if (currentChar != Path.DirectorySeparatorChar)
-                                throw new ArgumentException($"Invalid path format: {path}");
-
-                            // Path contains a path of the format ..\
-                            bool success = pathHelper.RemoveLastDirectory(lowestRemovableIndex);
-                            if (!success)
-                            {
-                                pathHelper.Append('.');
-                                pathHelper.Append('.');
-                                lowestRemovableIndex = pathHelper.Length;
-                            }
-                            numDot = 0;
-                            if (pathHelper.Length > 0)
-                                pathHelper.Append(currentChar);
-                        }
-                        else
-                        {
-                            if (Util.IsRunningInMono() &&
-                                index == 0 && currentChar == Path.DirectorySeparatorChar && Path.IsPathRooted(path))
-                                pathHelper.Append(currentChar);
-
-                            if (currentChar != Path.DirectorySeparatorChar || pathHelper.Length > 0)
-                                pathHelper.Append(currentChar);
-                        }
-                    }
-                }
-                if (numDot == 2)
-                {
-                    // Path contains a path of the format \..\
-                    if (!pathHelper.RemoveLastDirectory(lowestRemovableIndex))
-                    {
-                        pathHelper.Append('.');
-                        pathHelper.Append('.');
-                    }
-                }
-
-                return pathHelper.ToString();
-            });
-
-            return simplifiedPath;
-        }
-
-
-        // Note: This method assumes that SimplifyPath has been called for the argument.
-        internal static unsafe void SplitStringUsingStack(string path, char separator, int* splitIndexes, int* splitLengths, ref int splitElementsUsedCount, int splitArraySize)
-        {
-            int lastSeparatorIndex = -1;
-            int pathLength = path.Length;
-            for (int index = 0; index < pathLength; ++index)
-            {
-                char currentChar = path[index];
-
-                if (currentChar == separator)
-                {
-                    if (splitElementsUsedCount == splitArraySize)
-                        throw new Exception("Too much path separators");
-
-                    int startIndex = lastSeparatorIndex + 1;
-                    int length = index - startIndex;
-                    if (length > 0)
-                    {
-                        splitIndexes[splitElementsUsedCount] = startIndex;
-                        splitLengths[splitElementsUsedCount] = length;
-                        lastSeparatorIndex = index;
-                        ++splitElementsUsedCount;
-                    }
-                }
-            }
-
-            if (lastSeparatorIndex < pathLength - 1)
-            {
-                int startIndex = lastSeparatorIndex + 1;
-                splitIndexes[splitElementsUsedCount] = startIndex;
-                splitLengths[splitElementsUsedCount] = pathLength - startIndex;
-                ++splitElementsUsedCount;
-            }
-        }
-
-        public static unsafe string PathGetRelative(string sourceFullPath, string destFullPath, bool ignoreCase = false)
-        {
-            sourceFullPath = SimplifyPath(sourceFullPath);
-            destFullPath = SimplifyPath(destFullPath);
-
-            int* sourcePathIndexes = stackalloc int[128];
-            int* sourcePathLengths = stackalloc int[128];
-            int sourcePathNbrElements = 0;
-            SplitStringUsingStack(sourceFullPath, Path.DirectorySeparatorChar, sourcePathIndexes, sourcePathLengths, ref sourcePathNbrElements, 128);
-
-            int* destPathIndexes = stackalloc int[128];
-            int* destPathLengths = stackalloc int[128];
-            int destPathNbrElements = 0;
-            SplitStringUsingStack(destFullPath, Path.DirectorySeparatorChar, destPathIndexes, destPathLengths, ref destPathNbrElements, 128);
-
-            int samePathCounter = 0;
-
-            // Find out common path length.
-            //StringComparison comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            int maxPathLength = Math.Min(sourcePathNbrElements, destPathNbrElements);
-            for (int i = 0; i < maxPathLength; i++)
-            {
-                int sourceLength = sourcePathLengths[i];
-                if (sourceLength != destPathLengths[i])
-                    break;
-
-                if (string.Compare(sourceFullPath, sourcePathIndexes[i], destFullPath, destPathIndexes[i], sourceLength, StringComparison.OrdinalIgnoreCase) != 0)
-                    break;
-
-                samePathCounter++;
-            }
-
-            if (samePathCounter == 0)
-                return destFullPath;
-
-            if (sourcePathNbrElements == destPathNbrElements && sourcePathNbrElements == samePathCounter)
-                return ".";
-
-            char* arrayPtr = stackalloc char[PathHelper.MaxPath];
-            PathHelper pathHelper = new PathHelper(arrayPtr, PathHelper.MaxPath);
-
-            for (int i = samePathCounter; i < sourcePathNbrElements; i++)
-            {
-                if (pathHelper.Length > 0)
-                    pathHelper.Append(Path.DirectorySeparatorChar);
-                pathHelper.Append('.');
-                pathHelper.Append('.');
-            }
-
-            for (int i = samePathCounter; i < destPathNbrElements; i++)
-            {
-                if (pathHelper.Length > 0)
-                    pathHelper.Append(Path.DirectorySeparatorChar);
-                pathHelper.Append(destFullPath, destPathIndexes[i], destPathLengths[i]);
-            }
-
-            return pathHelper.ToString();
-        }
-
-
-        public static List<string> PathGetAbsolute(string sourceFullPath, Strings destFullPaths)
-        {
-            List<string> result = new List<string>(destFullPaths.Count);
-
-            foreach (string destFullPath in destFullPaths.Values)
-            {
-                result.Add(PathGetAbsolute(sourceFullPath, destFullPath));
-            }
-            return result;
-        }
-
-        private static ConcurrentDictionary<string, string> s_cachedCombinedToAbsolute = new ConcurrentDictionary<string, string>();
-
-        public static string PathGetAbsolute(string absolutePath, string relativePath)
-        {
-            if (string.IsNullOrEmpty(relativePath))
-                return absolutePath;
-
-            // Handle environment variables and string that contains more than 1 path
-            if (relativePath.StartsWith("$", StringComparison.Ordinal) || relativePath.Count(x => x == ';') > 1)
-                return relativePath;
-
-            string cleanRelative = SimplifyPath(relativePath);
-            if (Path.IsPathRooted(cleanRelative))
-                return cleanRelative;
-
-            string resultPath = s_cachedCombinedToAbsolute.GetOrAdd(string.Format("{0}|{1}", absolutePath, relativePath), combined =>
-            {
-                string firstPart = PathMakeStandard(absolutePath);
-                if (firstPart.Last() == Path.VolumeSeparatorChar)
-                    firstPart += Path.DirectorySeparatorChar;
-
-                string result = Path.Combine(firstPart, cleanRelative);
-                return Path.GetFullPath(result);
-            });
-
-            return resultPath;
-        }
-
-        public static void ResolvePath(string root, ref Strings paths)
-        {
-            List<string> sortedPaths = paths.Values;
-            foreach (string path in sortedPaths)
-            {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
-                paths.UpdateValue(path, resolvedPath);
-            }
-        }
-
-        public static void ResolvePath(string root, ref OrderableStrings paths)
-        {
-            for (int i = 0; i < paths.Count; ++i)
-            {
-                string resolvedPath = Util.PathGetAbsolute(root, Util.PathMakeStandard(paths[i]));
-                i = paths.SetOrRemoveAtIndex(i, resolvedPath);
-            }
-            paths.Sort();
-        }
-
-        public static void ResolvePath(string root, ref String path)
-        {
-            path = Util.PathGetAbsolute(root, Util.PathMakeStandard(path));
-        }
-
-        /// <summary>
-        /// Gets the absolute path up to the intersection of two specified absolute paths.
-        /// </summary>
-        /// <param name="absPathA">First absolute path.</param>
-        /// <param name="absPathB">Second absolute path.</param>
-        /// <returns>Returns an absolute path up to the intersection of both specified paths.</returns>
-        public static string GetPathIntersection(string absPathA, string absPathB)
-        {
-            var builder = new StringBuilder();
-
-            string stdPathA = PathMakeStandard(absPathA);
-            string stdPathB = PathMakeStandard(absPathB);
-
-            string[] pathTokensA = stdPathA.Split(Path.DirectorySeparatorChar);
-            string[] pathTokensB = stdPathB.Split(Path.DirectorySeparatorChar);
-
-            int maxPossibleCommonChunks = Math.Min(pathTokensA.Length, pathTokensB.Length);
-            for (int i = 0; i < maxPossibleCommonChunks; ++i)
-            {
-                if (pathTokensA[i] != pathTokensB[i])
-                    break;
-
-                builder.Append(pathTokensA[i] + Path.DirectorySeparatorChar);
-            }
-
-            return builder.ToString();
-        }
-
-        private static string GetProperFilePathCapitalization(string filename)
-        {
-            StringBuilder builder = new StringBuilder();
-            FileInfo fileInfo = new FileInfo(filename);
-            DirectoryInfo dirInfo = fileInfo.Directory;
-            GetProperDirectoryCapitalization(dirInfo, null, ref builder);
-            string properFileName = fileInfo.Name;
-            foreach (var fsInfo in dirInfo.EnumerateFileSystemInfos())
-            {
-                if (((fsInfo.Attributes & FileAttributes.Directory) != FileAttributes.Directory)
-                    && string.Compare(fsInfo.Name, fileInfo.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    properFileName = fsInfo.Name;
-                    break;
-                }
-            }
-
-            return Path.Combine(builder.ToString(), properFileName);
-        }
-
-        private static ConcurrentDictionary<string, string> s_capitalizedPaths = new ConcurrentDictionary<string, string>();
-
-        private static void GetProperDirectoryCapitalization(DirectoryInfo dirInfo, DirectoryInfo childInfo, ref StringBuilder pathBuilder)
-        {
-            string lowerPath = dirInfo.FullName.ToLower();
-            string capitalizedPath;
-            if (s_capitalizedPaths.TryGetValue(lowerPath, out capitalizedPath))
-            {
-                pathBuilder.Append(capitalizedPath);
-            }
-            else
-            {
-                if (dirInfo.Parent != null)
-                {
-                    GetProperDirectoryCapitalization(dirInfo.Parent, dirInfo, ref pathBuilder);
-                }
-                else
-                {
-                    // Make root drive always uppercase
-                    pathBuilder.Append(dirInfo.Name.ToUpper());
-                }
-            }
-            s_capitalizedPaths.TryAdd(lowerPath, pathBuilder.ToString());
-
-            if (childInfo != null)
-            {
-                // Note: Avoid double directory separator when at the root.
-                if (dirInfo.Parent != null)
-                    pathBuilder.Append(Path.DirectorySeparatorChar);
-                bool appendChild = true;
-                if (dirInfo.Exists)
-                {
-                    var resultDirs = dirInfo.GetDirectories(childInfo.Name, SearchOption.TopDirectoryOnly);
-                    if (resultDirs.Length > 0)
-                    {
-                        pathBuilder.Append(resultDirs[0].Name);
-                        appendChild = false;
-                    }
-                    else
-                    {
-                        foreach (var fsInfo in dirInfo.EnumerateFileSystemInfos())
-                        {
-                            if (string.Compare(fsInfo.Name, childInfo.Name, StringComparison.OrdinalIgnoreCase) == 0)
-                            {
-                                pathBuilder.Append(fsInfo.Name);
-                                appendChild = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (appendChild)
-                    pathBuilder.Append(childInfo.Name);
-            }
-        }
-
-        public static OrderableStrings PathGetCapitalized(OrderableStrings fullPaths)
-        {
-            OrderableStrings result = new OrderableStrings(fullPaths);
-
-            for (int i = 0; i < result.Count; ++i)
-            {
-                result[i] = GetCapitalizedPath(result[i]);
-            }
-            return result;
-        }
-
-        public static string GetCapitalizedPath(string path)
-        {
-            if (CountFakeFiles() > 0)
-                return path;
-
-            // Don't touch paths starting with ..
-            if (path.StartsWith("..", StringComparison.Ordinal))
-                return path;
-            string pathLC = path.ToLower();
-            string capitalizedPath;
-            if (s_capitalizedPaths.TryGetValue(pathLC, out capitalizedPath))
-            {
-                return capitalizedPath;
-            }
-
-            if (File.Exists(path))
-            {
-                capitalizedPath = GetProperFilePathCapitalization(path);
-            }
-            else
-            {
-                StringBuilder pathBuilder = new StringBuilder();
-                DirectoryInfo dirInfo = new DirectoryInfo(path);
-                GetProperDirectoryCapitalization(dirInfo, null, ref pathBuilder);
-
-                capitalizedPath = pathBuilder.ToString();
-            }
-            s_capitalizedPaths.TryAdd(pathLC, capitalizedPath);
-            return capitalizedPath;
-        }
-
-        [System.Runtime.InteropServices.DllImport("msvcrt.dll", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
-        private static extern int memcmp(byte[] b1, byte[] b2, long count);
-
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
             const int BufferSize = 4096;
@@ -765,7 +143,7 @@ namespace Sharpmake
                 if (count1 == 0)
                     return true;
 
-                if (memcmp(buffer1, buffer2, count1) != 0)
+                if (!buffer1.SequenceEqual(buffer2))
                     return false;
             }
         }
@@ -882,7 +260,17 @@ namespace Sharpmake
         public static HashSet<string> FilesToBeExplicitlyRemovedFromDB = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         public static HashSet<string> FilesAutoCleanupIgnoredEndings = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private const string s_filesAutoCleanupDBPrefix = "sharpmakeautocleanupdb";
-        private enum DBVersion { Version = 2 };
+        private enum DBVersion { Version = 3 };
+
+        private static JsonSerializerOptions GetCleanupDatabaseJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
+                AllowTrailingCommas = true,
+                PropertyNamingPolicy = null,
+                WriteIndented = false,
+            };
+        }
 
         private static Dictionary<string, DateTime> ReadCleanupDatabase(string databaseFilename)
         {
@@ -901,6 +289,16 @@ namespace Sharpmake
                         {
                             // Read the list of files.
                             IFormatter formatter = new BinaryFormatter();
+                            string dbAsJson = binReader.ReadString();
+
+                            var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(dbAsJson, GetCleanupDatabaseJsonSerializerOptions());
+                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+                        }
+#if NETFRAMEWORK
+                        else if (version == 2)
+                        {
+                            // Read the list of files.
+                            IFormatter formatter = new BinaryFormatter();
                             var tmpDbFiles = (Dictionary<string, DateTime>)formatter.Deserialize(readStream);
                             dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
                         }
@@ -911,11 +309,16 @@ namespace Sharpmake
                             DateTime now = DateTime.Now;
                             dbFiles = dbFilesV1.ToDictionary(kvp => kvp.Key, kvp => now);
                         }
+#endif
+                        else
+                        {
+                            LogWrite("Warning: found cleanup database in incompatible format v{0}, skipped.", version);
+                        }
 
                         readStream.Close();
                     }
                 }
-                catch (SerializationException)
+                catch
                 {
                     // File is likely corrupted.
                     // This is no big deal except that cleanup won't occur.
@@ -944,14 +347,14 @@ namespace Sharpmake
         /// <remarks>
         /// - Auto cleanup is disabled by default and must be enabled explicitly.
         /// - You can have many auto cleanup database by setting the AutoCleanupDBSuffix to a string that identify your sharpmake running context.
-        /// This is useful when you execute sharpmake with more than one setup configuration. For example on ACE, we have two setups:
+        /// This is useful when you execute sharpmake with more than one setup configuration. For example on one project, we have two setups:
         /// - Engine and Tools and both are running different scripts but have the same .sharpmake file entry point. In that case we would
         /// set the suffix with different value depending on the context we are running sharpmake with.
         /// - Generally you should also disable the cleanup when running with changelist filters(used typically by Submit Assistant).
         /// </remarks>
         ///
         /// <example>
-        /// This is the way the auto-cleanup is configured on ACE. This code is in our main.
+        /// This is the way the auto-cleanup is configured on one of our projects, this code is in the main.
         /// Util.AutoCleanupDBPath = sharpmakeFileDirectory;
         /// Util.FilesAutoCleanupActive = Arguments.Filter != Filter.Changelist && arguments.Builder.BlobOnly == false;
         /// if (Arguments.GenerateTools)
@@ -1054,11 +457,11 @@ namespace Sharpmake
                     // Write version number
                     int version = (int)DBVersion.Version;
                     binWriter.Write(version);
-                    binWriter.Flush();
 
                     // Write the list of files.
-                    IFormatter formatter = new BinaryFormatter();
-                    formatter.Serialize(writeStream, newDbFiles);
+                    string dbAsJson = System.Text.Json.JsonSerializer.Serialize(newDbFiles, GetCleanupDatabaseJsonSerializerOptions());
+                    binWriter.Write(dbAsJson);
+                    binWriter.Flush();
                 }
             }
             else
@@ -1075,6 +478,16 @@ namespace Sharpmake
             return Path.Combine(WinFormSubTypesDbPath, $@"{s_winFormSubTypesDbPrefix}.bin");
         }
 
+        private static JsonSerializerOptions GetCsprojSubTypesJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
+                AllowTrailingCommas = true,
+                PropertyNamingPolicy = null,
+                WriteIndented = false,
+            };
+        }
+
         public static void SerializeAllCsprojSubTypes(object allCsProjSubTypes)
         {
             // If DbPath is not specify, do not save C# subtypes information
@@ -1087,9 +500,11 @@ namespace Sharpmake
             string winFormSubTypesDbFullPath = GetWinFormSubTypeDbPath();
 
             using (Stream writeStream = new FileStream(winFormSubTypesDbFullPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (BinaryWriter binWriter = new BinaryWriter(writeStream))
             {
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                binaryFormatter.Serialize(writeStream, allCsProjSubTypes);
+                string csprojSubTypesAsJson = System.Text.Json.JsonSerializer.Serialize(allCsProjSubTypes, GetCsprojSubTypesJsonSerializerOptions());
+                binWriter.Write(csprojSubTypesAsJson);
+                binWriter.Flush();
             }
         }
 
@@ -1103,9 +518,10 @@ namespace Sharpmake
             try
             {
                 using (Stream readStream = new FileStream(winFormSubTypesDbFullPath, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (BinaryReader binReader = new BinaryReader(readStream))
                 {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    return binaryFormatter.Deserialize(readStream);
+                    string csprojSubTypesAsJson = binReader.ReadString();
+                    return System.Text.Json.JsonSerializer.Deserialize<object>(csprojSubTypesAsJson, GetCsprojSubTypesJsonSerializerOptions());
                 }
             }
             catch
@@ -1251,7 +667,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static Guid BuildGuid(string value)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider provider = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            var provider = System.Security.Cryptography.MD5.Create();
             byte[] md5 = provider.ComputeHash(Encoding.ASCII.GetBytes(value));
             return new Guid(md5);
         }
@@ -1337,7 +753,7 @@ namespace Sharpmake
                     return 1;
                 }
                 // Both are still going, compare current elements
-                int comparison = Comparer.Default.Compare(iterator1.Current.ToString(), iterator2.Current.ToString());
+                int comparison = string.CompareOrdinal(iterator1.Current.ToString(), iterator2.Current.ToString());
                 // If elements are non-equal, we're done
                 if (comparison != 0)
                 {
@@ -1345,6 +761,7 @@ namespace Sharpmake
                 }
             }
         }
+
         public static string JoinStrings(ICollection<string> container, string separator, bool escapeXml = false)
         {
             return JoinStrings(container, separator, "", "", escapeXml);
@@ -1460,10 +877,14 @@ namespace Sharpmake
                 return sb.ToString();
             }
 
-            private static bool IsNumber(object o)
+            private static bool IsFloat(object o)
             {
-                return o is float || o is double || o is decimal ||
-                       o is sbyte || o is short || o is int || o is long ||
+                return o is float || o is double || o is decimal;
+            }
+
+            private static bool IsInteger(object o)
+            {
+                return o is sbyte || o is short || o is int || o is long ||
                        o is byte || o is ushort || o is uint || o is ulong;
             }
 
@@ -1509,7 +930,16 @@ namespace Sharpmake
                 {
                     SerializeArray((IEnumerable)value);
                 }
-                else if (value is bool || IsNumber(value))
+                else if (value is bool)
+                {
+                    _writer.Write(value.ToString().ToLower());
+                }
+                else if (IsFloat(value))
+                {
+                    // This *should* be safe without Escaping
+                    _writer.Write(Convert.ToDouble(value).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (IsInteger(value))
                 {
                     // This *should* be safe without Escaping
                     _writer.Write(EscapeJson(value.ToString().ToLower()));
@@ -1597,9 +1027,13 @@ namespace Sharpmake
                     Directory.Delete(source);
                 }
 
-                success = CreateSymbolicLink(source, target,
-                    (isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : SYMBOLIC_LINK_FLAG_FILE)
-                    | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);
+                int releaseId = int.Parse(GetRegistryLocalMachineSubKeyValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "0"));
+
+                int flags = isDirectory ? SYMBOLIC_LINK_FLAG_DIRECTORY : SYMBOLIC_LINK_FLAG_FILE;
+                if (releaseId >= 1703) // Verify that the Windows build is equal or above 1703, as SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE was introduced at that version. Using it on older version will cause an error 87 and symlinks won't be created
+                    flags |= SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
+
+                success = CreateSymbolicLink(source, target, flags);
             }
             catch { }
             return success;
@@ -1653,35 +1087,23 @@ namespace Sharpmake
             return s_isVisualStudio2015Installed.Value;
         }
 
-        private static bool? s_isVisualStudio2013Installed = null;
-        public static bool IsVisualStudio2013Installed()
-        {
-            if (!s_isVisualStudio2013Installed.HasValue)
-                s_isVisualStudio2013Installed = IsVisualStudioInstalled(DevEnv.vs2013);
-
-            return s_isVisualStudio2013Installed.Value;
-        }
-
-        private static bool? s_isVisualStudio2012Installed = null;
-        public static bool IsVisualStudio2012Installed()
-        {
-            if (!s_isVisualStudio2012Installed.HasValue)
-                s_isVisualStudio2012Installed = IsVisualStudioInstalled(DevEnv.vs2012);
-
-            return s_isVisualStudio2012Installed.Value;
-        }
-
-        private static bool? s_isVisualStudio2010Installed = null;
-        public static bool IsVisualStudio2010Installed()
-        {
-            if (!s_isVisualStudio2010Installed.HasValue)
-                s_isVisualStudio2010Installed = IsVisualStudioInstalled(DevEnv.vs2010);
-
-            return s_isVisualStudio2010Installed.Value;
-        }
+        [Obsolete("Sharpmake doesn't support vs2013 anymore.")]
+        public static bool IsVisualStudio2013Installed() => false;
+        [Obsolete("Sharpmake doesn't support vs2012 anymore.")]
+        public static bool IsVisualStudio2012Installed() => false;
+        [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
+        public static bool IsVisualStudio2010Installed() => false;
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
+#if NET5_0_OR_GREATER
+            if (!OperatingSystem.IsWindows())
+                return false;
+#else
+            if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+                return false;
+#endif
+
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
                 Environment.Is64BitProcess ? @"\Wow6432Node" : string.Empty
@@ -1820,7 +1242,7 @@ namespace Sharpmake
                         }
                     } while (fetched > 0);
                 }
-                catch (COMException)
+                catch (System.Runtime.InteropServices.COMException)
                 {
                     // Ignore
                 }
@@ -1834,11 +1256,10 @@ namespace Sharpmake
         /// The supported visual studio products, in order by priority in which Sharpmake will choose them.
         /// We want to block products like the standalone Team Explorer, which is in the Visual Studio
         /// family yet isn't a variant of Visual Studio proper.
-        /// 
+        ///
         /// The list of Product IDs can be found here: https://docs.microsoft.com/en-us/visualstudio/install/workload-and-component-ids
         /// </summary>
-        public static readonly string[] s_supportedVisualStudioProducts = new[]
-        {
+        private static readonly string[] s_supportedVisualStudioProducts = {
             "Microsoft.VisualStudio.Product.Enterprise",
             "Microsoft.VisualStudio.Product.Professional",
             "Microsoft.VisualStudio.Product.Community",
@@ -1862,8 +1283,12 @@ namespace Sharpmake
             }
         }
 
-        public static List<VsInstallation> GetVisualStudioInstallationsFromQuery(DevEnv visualVersion, bool allowPrereleaseVersions = false,
-            string[] requiredComponents = null, string[] requiredWorkloads = null)
+        public static List<VsInstallation> GetVisualStudioInstallationsFromQuery(
+            DevEnv visualVersion,
+            bool allowPrereleaseVersions = false,
+            string[] requiredComponents = null,
+            string[] requiredWorkloads = null
+        )
         {
             // Fetch all installed products
             var installedVersions = GetVisualStudioInstalledVersions();
@@ -1873,6 +1298,7 @@ namespace Sharpmake
 
             var candidates = installedVersions.Where(i =>
                     i.Version.Major == majorVersion
+                    && (!i.IsPrerelease || allowPrereleaseVersions)
                     && s_supportedVisualStudioProducts.Contains(i.ProductID, StringComparer.OrdinalIgnoreCase)
                     && (requiredComponents == null || !requiredComponents.Except(i.Components).Any())
                     && (requiredWorkloads == null || !requiredWorkloads.Except(i.Workloads).Any()))
@@ -1881,11 +1307,18 @@ namespace Sharpmake
             return candidates;
         }
 
-        public static string GetVisualStudioInstallPathFromQuery(DevEnv visualVersion, bool allowPrereleaseVersions = false,
-            string[] requiredComponents = null, string[] requiredWorkloads = null)
+        public static string GetVisualStudioInstallPathFromQuery(
+            DevEnv visualVersion,
+            bool allowPrereleaseVersions = false,
+            string[] requiredComponents = null,
+            string[] requiredWorkloads = null
+        )
         {
+            if (IsRunningOnUnix())
+                return null;
+
             var vsInstallations = GetVisualStudioInstallationsFromQuery(visualVersion, allowPrereleaseVersions, requiredComponents, requiredWorkloads);
-            VsInstallation priorityInstallation = vsInstallations.FirstOrDefault(i => allowPrereleaseVersions || !i.IsPrerelease);
+            VsInstallation priorityInstallation = vsInstallations.FirstOrDefault();
             return priorityInstallation != null ? SimplifyPath(priorityInstallation.InstallationPath) : null;
         }
 
@@ -1902,37 +1335,36 @@ namespace Sharpmake
         public static string GetDotNetTargetString(DotNetFramework framework)
         {
             string version = framework.ToVersionString();
-            return string.IsNullOrEmpty(version)
-                ? String.Empty
-                : String.Format("v{0}", version);
+            if (string.IsNullOrEmpty(version))
+                return string.Empty;
+
+            return string.Format("v{0}", version);
         }
 
+        [Obsolete("Use " + nameof(GetToolVersionString) + " without the second argument.")]
         public static string GetToolVersionString(DevEnv env, DotNetFramework desiredFramework)
         {
-            switch (env)
-            {
-                case DevEnv.vs2010:
-                    if (desiredFramework > DotNetFramework.v4_5clientprofile)
-                        throw new Exception(string.Format("The target framework ({0}) isn't supported in the target environment({1})", desiredFramework, env));
-                    return DotNetFramework.v4_0.ToVersionString(); //"Both Visual Studio 2010 and Visual Studio 2012 use a ToolsVersion of 4.0" ref:http://msdn.microsoft.com/en-us/LIbrary/bb383796%28v=vs.110%29.aspx
-                case DevEnv.vs2012:
-                    return DotNetFramework.v4_0.ToVersionString();
-                case DevEnv.vs2013:
-                    return DotNetFramework.v4_5.ToVersionString();
-                case DevEnv.vs2015:
-                case DevEnv.vs2017:
-                case DevEnv.vs2019:
-                    return env.GetVisualProjectToolsVersionString();
-                case DevEnv.xcode4ios:
-                    throw new NotSupportedException("XCode does not support Tool Version. ");
-                case DevEnv.eclipse:
-                    throw new NotSupportedException("Eclipse does not support Tool Version. ");
-                default:
-                    throw new NotImplementedException(String.Format("ToolVersion not set for Visual Studio {0}", env));
-            }
+            return GetToolVersionString(env);
+        }
+
+        public static string GetToolVersionString(DevEnv env)
+        {
+            return env.GetVisualProjectToolsVersionString();
+        }
+
+        public enum FileCopyDestReadOnlyPolicy : byte
+        {
+            Preserve,
+            SetReadOnly,
+            UnsetReadOnly
         }
 
         public static void ForceCopy(string source, string destination)
+        {
+            ForceCopy(source, destination, FileCopyDestReadOnlyPolicy.Preserve);
+        }
+
+        public static void ForceCopy(string source, string destination, FileCopyDestReadOnlyPolicy destinationReadOnlyPolicy)
         {
             if (File.Exists(destination))
             {
@@ -1942,6 +1374,20 @@ namespace Sharpmake
             }
 
             File.Copy(source, destination, true);
+
+            if (destinationReadOnlyPolicy != FileCopyDestReadOnlyPolicy.Preserve)
+            {
+                FileAttributes attributes = File.GetAttributes(destination);
+                if (destinationReadOnlyPolicy == FileCopyDestReadOnlyPolicy.SetReadOnly)
+                {
+                    attributes |= FileAttributes.ReadOnly;
+                }
+                else
+                {
+                    attributes &= ~FileAttributes.ReadOnly;
+                }
+                File.SetAttributes(destination, attributes);
+            }
         }
 
         public static bool IsDotNet(Project.Configuration conf)
@@ -1956,7 +1402,7 @@ namespace Sharpmake
         public static bool IsCpp(Project.Configuration conf)
         {
             string extension = Path.GetExtension(conf.ProjectFullFileNameWithExtension);
-            return (String.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
+            return (string.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public static string GetProjectFileExtension(Project.Configuration conf)
@@ -1970,14 +1416,13 @@ namespace Sharpmake
                 extension = ".androidproj";
             else
             {
-                switch (conf.Target.GetFragment<DevEnv>())
+                DevEnv devEnv = conf.Target.GetFragment<DevEnv>();
+                switch (devEnv)
                 {
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
+                    case DevEnv.vs2022:
                         {
                             extension = ".vcxproj";
                         }
@@ -1993,7 +1438,7 @@ namespace Sharpmake
                         return ".make";
 
                     default:
-                        throw new NotImplementedException("GetProjectFileExtension called with unknown DevEnv: " + conf.Target.GetFragment<DevEnv>());
+                        throw new NotImplementedException("GetProjectFileExtension called with unknown DevEnv: " + devEnv);
                 }
             }
             return extension;
@@ -2092,17 +1537,20 @@ namespace Sharpmake
             return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.SimplePlatformString ?? platform.ToString();
         }
 
-        public static string GetPlatformString(Platform platform, Project project, bool isForSolution = false)
+        public static string GetPlatformString(Platform platform, Project project, ITarget target, bool isForSolution = false)
         {
             if (project is CSharpProject)
             {
                 switch (platform)
                 {
-                    case Platform.win32: return "x86";
-                    case Platform.win64: return "x64";
-                    case Platform.anycpu: return isForSolution ? "Any CPU" : "AnyCPU";
+                    case Platform.win32:
+                        return "x86";
+                    case Platform.win64:
+                        return "x64";
+                    case Platform.anycpu:
+                        return isForSolution ? "Any CPU" : "AnyCPU";
                     default:
-                        throw new Exception(String.Format("This platform: {0} is not supported", platform));
+                        throw new Exception(string.Format("This platform: {0} is not supported", platform));
                 }
             }
             else if (project is PythonProject)
@@ -2110,7 +1558,7 @@ namespace Sharpmake
                 return isForSolution ? "Any CPU" : "AnyCPU";
             }
 
-            return GetSimplePlatformString(platform);
+            return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetPlatformString(target) ?? platform.ToString();
         }
 
         public static string CallerInfoTag = "CALLER_INFO: ";
@@ -2125,7 +1573,7 @@ namespace Sharpmake
         /// <param name="callerInfo1"></param>
         /// <param name="callerInfo2"></param>
         /// <returns>
-        /// 1.if they are both refering to file edited by sharpmake user (.sharpmake): concatenation of both separated by a line return
+        /// 1.if they are both referring to file edited by sharpmake user (.sharpmake): concatenation of both separated by a line return
         /// 2.if only callerInfo2 refer to file edited by sharpmake user (.sharpmake): callerInfo2
         /// 3.otherwise: callerInfo1
         /// </returns>
@@ -2177,42 +1625,22 @@ namespace Sharpmake
             return cleanMemoryStream;
         }
 
-        /// <summary>
-        /// The input path got its beginning of path matching the inputHeadPath replaced by the replacementHeadPath.
-        /// 
-        /// Throws if the fullInputPath doesn't start with inputHeadPath.
-        /// 
-        /// Function is case insensitive but preserves path casing.
-        /// </summary>
-        /// <param name="fullInputPath">The path to be modified.</param>
-        /// <param name="inputHeadPath">The subpath in the head of fullInputPath to replace.</param>
-        /// <param name="replacementHeadPath">The subpath that will replace the inputHeadPath</param>
-        /// <returns></returns>
-        public static string ReplaceHeadPath(this string fullInputPath, string inputHeadPath, string replacementHeadPath)
+        public static uint Rotl32(uint x, int r)
         {
-            // Normalize paths before comparing and combining them, to prevent false mismatch between '\\' and '/'.
-            fullInputPath = Util.PathMakeStandard(fullInputPath, false);
-            inputHeadPath = Util.PathMakeStandard(inputHeadPath, false);
-            replacementHeadPath = Util.PathMakeStandard(replacementHeadPath, false);
-
-            inputHeadPath = EnsureTrailingSeparator(inputHeadPath);
-
-            if (!fullInputPath.StartsWith(inputHeadPath, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ArgumentException($"The subpath to be replaced '{inputHeadPath}'\n is not found at the beginning of the input path '{fullInputPath}'.");
-            }
-
-            var pathRelativeToOutput = fullInputPath.Substring(inputHeadPath.Length);
-            var modifiedPath = Path.Combine(replacementHeadPath, pathRelativeToOutput);
-
-            return modifiedPath;
+            return (x << r) | (x >> (32 - r));
         }
 
-        public static Object ReadRegistryValue(string key, string value, Object defaultValue = null)
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
+        public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }
 
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static string[] GetRegistryLocalMachineSubKeyNames(string path)
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(path);
@@ -2222,7 +1650,13 @@ namespace Sharpmake
         }
 
         private static ConcurrentDictionary<Tuple<string, string>, string> s_registryCache = new ConcurrentDictionary<Tuple<string, string>, string>();
+
         public static string GetRegistryLocalMachineSubKeyValue(string registrySubKey, string value, string fallbackValue)
+        {
+            return GetRegistryLocalMachineSubKeyValue(registrySubKey, value, fallbackValue, enableLog: true);
+        }
+
+        public static string GetRegistryLocalMachineSubKeyValue(string registrySubKey, string value, string fallbackValue, bool enableLog)
         {
             var subKeyValueTuple = new Tuple<string, string>(registrySubKey, value);
             string registryValue;
@@ -2230,21 +1664,29 @@ namespace Sharpmake
                 return registryValue;
 
             string key = string.Empty;
-            try
+
+#if NET5_0_OR_GREATER
+            if (OperatingSystem.IsWindows())
+#else
+            if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+#endif
             {
-                using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
+                try
                 {
-                    if (localMachineKey != null)
+                    using (RegistryKey localMachineKey = Registry.LocalMachine.OpenSubKey(registrySubKey))
                     {
-                        key = (string)localMachineKey.GetValue(value);
-                        if (string.IsNullOrEmpty(key))
-                            LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                        if (localMachineKey != null)
+                        {
+                            key = (string)localMachineKey.GetValue(value);
+                            if (enableLog && string.IsNullOrEmpty(key))
+                                LogWrite("Value '{0}' under registry subKey '{1}' is not set, fallback to default: '{2}'", value ?? "(Default)", registrySubKey, fallbackValue);
+                        }
+                        else if (enableLog)
+                            LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                     }
-                    else
-                        LogWrite("Registry subKey '{0}' is not found, fallback to default for value '{1}': '{2}'", registrySubKey, value ?? "(Default)", fallbackValue);
                 }
+                catch { }
             }
-            catch { }
 
             if (string.IsNullOrEmpty(key))
                 key = fallbackValue;
@@ -2257,26 +1699,41 @@ namespace Sharpmake
         public class StopwatchProfiler : IDisposable
         {
             private readonly Stopwatch _stopWatch;
-            private readonly Action<long> _disposeAction;
+            private readonly Action<long> _disposeActionDuration;
+            private readonly Action<long, long> _disposeActionStartEnd;
             private readonly long _minThresholdMs;
 
-            public StopwatchProfiler(Action<long> disposeAction)
-                : this(disposeAction, 0)
+            public StopwatchProfiler(Action<long> disposeActionDuration)
+                : this(disposeActionDuration, 0)
             {
             }
 
-            public StopwatchProfiler(Action<long> disposeAction, long minThresholdMs)
+            public StopwatchProfiler(Action<long, long> disposeActionStartEnd)
             {
-                _disposeAction = disposeAction;
+                _disposeActionStartEnd = disposeActionStartEnd;
+                _stopWatch = Stopwatch.StartNew();
+                _minThresholdMs = 0;
+            }
+
+            public StopwatchProfiler(Action<long> disposeActionDuration, long minThresholdMs)
+            {
+                _disposeActionDuration = disposeActionDuration;
                 _stopWatch = Stopwatch.StartNew();
                 _minThresholdMs = minThresholdMs;
             }
 
             public void Dispose()
             {
+                _stopWatch.Stop();
+                if (_disposeActionStartEnd != null)
+                {
+                    long timestamp = Stopwatch.GetTimestamp(); // sadly the stopwatch can't tell us the real start time
+                    _disposeActionStartEnd.Invoke(timestamp - _stopWatch.ElapsedTicks, timestamp);
+                }
+
                 long elapsed = _stopWatch.ElapsedMilliseconds;
                 if (elapsed > _minThresholdMs)
-                    _disposeAction(elapsed);
+                    _disposeActionDuration?.Invoke(elapsed);
             }
         }
 
@@ -2284,15 +1741,18 @@ namespace Sharpmake
         {
             public int Compare(string x, string y)
             {
-                if (x == y) return 0;
+                if (x == y)
+                    return 0;
                 var version = new { First = GetVersion(x), Second = GetVersion(y) };
                 int limit = Math.Max(version.First.Length, version.Second.Length);
                 for (int i = 0; i < limit; i++)
                 {
                     int first = version.First.ElementAtOrDefault(i);
                     int second = version.Second.ElementAtOrDefault(i);
-                    if (first > second) return 1;
-                    if (second > first) return -1;
+                    if (first > second)
+                        return 1;
+                    if (second > first)
+                        return -1;
                 }
                 return 0;
             }
@@ -2314,5 +1774,46 @@ namespace Sharpmake
         // http://www.mono-project.com/docs/faq/technical/#how-can-i-detect-if-am-running-in-mono
         private static readonly bool s_monoRuntimeExists = (Type.GetType("Mono.Runtime") != null);
         public static bool IsRunningInMono() => s_monoRuntimeExists;
+
+        private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        public static bool IsRunningOnUnix() => s_isUnix;
+
+        public static Platform GetExecutingPlatform() => s_executingPlatform;
+
+        private static readonly Platform s_executingPlatform = DetectExecutingPlatform();
+        private static Platform DetectExecutingPlatform()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                switch (RuntimeInformation.OSArchitecture)
+                {
+                    case Architecture.X86:
+                        return Platform.win32;
+                    case Architecture.X64:
+                        return Platform.win64;
+                    default:
+                        throw new NotSupportedException($"{RuntimeInformation.OSArchitecture} Architecture is not supported on Windows");
+                }
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return Platform.mac;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return Platform.linux;
+            }
+
+            LogWrite("Warning: Couldn't determine running platform");
+            return Platform.win64; // arbitrary
+        }
+
+        private static readonly string s_framework = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkName;
+        private static readonly string s_frameworkDisplayName = Assembly.GetEntryAssembly()?.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkDisplayName;
+        private static readonly bool s_isDotNetCore = s_framework != null && !s_framework.StartsWith(".NETFramework");
+        public static string FrameworkDisplayName() => !string.IsNullOrEmpty(s_frameworkDisplayName) ? s_frameworkDisplayName : !string.IsNullOrEmpty(s_framework) ? s_framework : "Unknown";
+        public static bool IsRunningDotNetCore() => s_isDotNetCore;
     }
 }

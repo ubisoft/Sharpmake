@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ using System.Text;
 
 namespace Sharpmake.Generators
 {
-    internal class FileGenerator : IFileGenerator
+    public class FileGenerator : IFileGenerator
     {
         // TODO: Remove usage of MemoryStream in APIs and refactor this to use StreamBuilder
         //       instead.

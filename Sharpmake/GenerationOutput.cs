@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ namespace Sharpmake
         public List<string> Generated = new List<string>();
         public List<string> Skipped = new List<string>();
 
+        private object _lock = new object();
+
         public Exception Exception
         {
             get
@@ -34,7 +36,7 @@ namespace Sharpmake
             set
             {
                 _exception = value;
-                Console.WriteLine(_exception.Message);
+                Util.LogWrite(_exception.Message);
             }
         }
 
@@ -47,10 +49,13 @@ namespace Sharpmake
 
         public void Merge(GenerationOutput other)
         {
-            Generated.AddRange(other.Generated);
-            Skipped.AddRange(other.Skipped);
-            if (_exception == null)
-                _exception = other._exception;
+            lock (_lock)
+            {
+                Generated.AddRange(other.Generated);
+                Skipped.AddRange(other.Skipped);
+                if (_exception == null)
+                    _exception = other._exception;
+            }
         }
     }
 }

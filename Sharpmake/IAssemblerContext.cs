@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sharpmake
 {
@@ -38,7 +34,9 @@ namespace Sharpmake
     {
         ILoadInfo BuildAndLoadSharpmakeFiles(IEnumerable<ISourceAttributeParser> parsers, IEnumerable<IParsingFlowParser> flowParsers, params string[] files);
         ILoadInfo LoadExtension(string file);
+        void AddDefine(string define);
         BuilderCompileErrorBehavior CompileErrorBehavior { get; }
+        bool DebugScripts { get; }
     }
 
     public interface IAssemblerContext
@@ -49,6 +47,7 @@ namespace Sharpmake
         void AddSourceAttributeParser(ISourceAttributeParser parser);
         IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files);
         void SetDebugProjectName(string name);
+        void AddDefine(string define);
     }
 
     public interface IAssemblyInfo

@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sharpmake
 {
@@ -90,7 +88,11 @@ namespace Sharpmake
                 }
                 else
                 {
-                    includeAbsolutePath = Util.GetCapitalizedPath(MatchIncludeInParentPath(includeFilename, sourceFilePath.DirectoryName, matchType));
+                    string matchIncludeInParentPath = MatchIncludeInParentPath(includeFilename, sourceFilePath.DirectoryName, matchType);
+                    if (matchIncludeInParentPath == null)
+                        throw new Error("\t" + sourceFilePath.FullName + "(" + lineNumber + "): error: Sharpmake.Include file not found '{0}'[{1}]. Search started from '{2}'", includeFilename, matchType, sourceFilePath.DirectoryName);
+
+                    includeAbsolutePath = Util.GetCapitalizedPath(matchIncludeInParentPath);
                 }
 
                 if (!Util.FileExists(includeAbsolutePath))
@@ -128,10 +130,6 @@ namespace Sharpmake
 
             // Try in the current working directory
             yield return Util.PathGetAbsolute(Directory.GetCurrentDirectory(), reference);
-
-            // Try using .net framework locations
-            foreach (string frameworkDirectory in Assembler.EnumeratePathToDotNetFramework())
-                yield return Path.Combine(Path.Combine(frameworkDirectory, reference));
         }
 
         public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
@@ -147,14 +145,25 @@ namespace Sharpmake
             else
             {
                 bool foundReference = false;
-                foreach (string candidateReferenceLocation in EnumerateReferencePathCandidates(sourceFilePath, reference))
+                foundReference = Assembler.DefaultReferences.Any(
+                    defaultReference => FileSystemStringComparer.StaticCompare(defaultReference, reference) == 0
+                );
+
+                if (!foundReference)
                 {
-                    if (Util.FileExists(candidateReferenceLocation))
+                    foreach (string candidateReferenceLocation in EnumerateReferencePathCandidates(sourceFilePath, reference))
                     {
-                        context.AddReference(candidateReferenceLocation);
-                        foundReference = true;
-                        break;
+                        if (Util.FileExists(candidateReferenceLocation))
+                        {
+                            context.AddReference(candidateReferenceLocation);
+                            foundReference = true;
+                            break;
+                        }
                     }
+                }
+                else if (Builder.Instance.Diagnostics)
+                {
+                    Util.LogWrite("{0}({1}): Warning: Reference '{2}' is redundant and can be removed since it is in the default reference list.", sourceFilePath.FullName, lineNumber, reference);
                 }
 
                 if (!foundReference)
@@ -174,7 +183,7 @@ namespace Sharpmake
 
     public class PackageAttributeParser : SimpleSourceAttributeParser
     {
-        private readonly Dictionary<string, IAssemblyInfo> _assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, IAssemblyInfo> s_assemblies = new Dictionary<string, IAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
 
         public PackageAttributeParser() : base("Package", 1, "Sharpmake")
         {
@@ -198,14 +207,14 @@ namespace Sharpmake
             }
 
             IAssemblyInfo assemblyInfo;
-            if (_assemblies.TryGetValue(includeAbsolutePath, out assemblyInfo))
+            if (s_assemblies.TryGetValue(includeAbsolutePath, out assemblyInfo))
             {
                 if (assemblyInfo == null)
                     throw new Error($"Circular Sharpmake.Package dependency on {includeFilename}");
                 context.AddReference(assemblyInfo);
                 return;
             }
-            _assemblies[includeAbsolutePath] = null;
+            s_assemblies[includeAbsolutePath] = null;
 
             string[] files;
             if (Util.IsPathWithWildcards(includeFilename))
@@ -223,7 +232,7 @@ namespace Sharpmake
             }
 
             assemblyInfo = context.BuildLoadAndAddReferenceToSharpmakeFilesAssembly(files);
-            _assemblies[includeAbsolutePath] = assemblyInfo;
+            s_assemblies[includeAbsolutePath] = assemblyInfo;
         }
     }
 

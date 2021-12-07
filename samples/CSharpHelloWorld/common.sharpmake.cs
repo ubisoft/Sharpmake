@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,12 @@ namespace Common
         {
             switch (env)
             {
-                case DevEnv.vs2015: return "2015";
-                case DevEnv.vs2017: return "2017";
-                default: return "";
+                case DevEnv.vs2015:
+                    return "2015";
+                case DevEnv.vs2017:
+                    return "2017";
+                default:
+                    return "";
             }
         }
 
@@ -38,7 +41,7 @@ namespace Common
                         OutputType.Dll,
                         Blob.NoBlob,
                         BuildSystem.MSBuild,
-                        DotNetFramework.v4_5),
+                        DotNetFramework.v4_5_2),
             new Target(
                         Platform.anycpu,
                         DevEnv.vs2017,
@@ -115,7 +118,7 @@ namespace Common
 
             // Usually the obj folder created to link files
             // Note: Due to a Visual Studio known Bug
-            // The obj folder might still be created, but should be empty at the end of the build, if removed the rebuild project fonction won't work
+            // The obj folder might still be created, but should be empty at the end of the build, if removed the rebuild project function won't work
             conf.IntermediatePath = @"[project.SharpmakeCsPath]\..\[project.IntermediatePathName]\[project.Name]\[target.DevEnv]\[target.Framework]\[target.Platform]";
             // Visual Studio Default:
             //public static string IntermediatePath = string.Format(@"[conf.ProjectPath]\{0}", IntermediatePathName);

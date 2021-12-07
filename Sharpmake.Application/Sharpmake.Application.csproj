@@ -1,50 +1,88 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake.Application</RootNamespace>
     <AssemblyName>Sharpmake.Application</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworks>net472;net5.0</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <MSBuildProjectExtensionsPath>..\tmp\projects\Sharpmake.Application</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net472'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\debug</OutputPath>
+    <OutputPath>..\tmp\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake.Application</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net5.0'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\tmp\bin\debug</OutputPath>
+    <IntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake.application</BaseIntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net472'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\release</OutputPath>
+    <OutputPath>..\tmp\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake.application</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake.Application</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.application</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net5.0'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\tmp\bin\release</OutputPath>
+    <IntermediateOutputPath>..\tmp\obj\release\sharpmake.application</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake.application</BaseIntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -58,6 +96,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Sharpmake.Main.sharpmake.cs">
+      <Link>Resources\Sharpmake.Main.sharpmake.cs</Link>
+    </None>
+    <None Include="Sharpmake.Application.sharpmake.cs" />
     <None Include="app.config" />
     <None Include="app.manifest" />
   </ItemGroup>
@@ -75,5 +117,5 @@
       <Name>Sharpmake</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

@@ -1,0 +1,13 @@
+#include "precomp.h"
+#include "util_withprecomp_weirdextension.h"
+
+#include <cstdio>
+
+#ifndef PRECOMP_INCLUDED
+#error This file must have included the pch
+#endif
+
+void Util_WithPrecomp_WeirdExtension::StaticUtilityMethod()
+{
+    printf("%s\n", __func__);
+}

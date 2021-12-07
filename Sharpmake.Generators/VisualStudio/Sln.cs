@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace Sharpmake.Generators.VisualStudio
 {
@@ -132,35 +132,36 @@ namespace Sharpmake.Generators.VisualStudio
         {
             string key = Path.GetFullPath(projectFile).ToLower();
             Lazy<string> guid = s_projectGUIDS.GetOrAdd(key, new Lazy<string>(() =>
-           {
-               if (!File.Exists(key))
-               {
-                   throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
-               }
+            {
+                if (!File.Exists(key))
+                {
+                    throw new InvalidOperationException($"Error when reading GUID from project. {projectFile} does not exist");
+                }
 
-               var projectFileInfo = new FileInfo(projectFile);
-               using (StreamReader projectFileStream = projectFileInfo.OpenText())
-               {
-                   string line = projectFileStream.ReadLine();
-                   while (line != null)
-                   {
-                       Match match = s_projectGuidRegex.Match(line);
-                       if (match.Success)
-                       {
-                           return match.Groups["GUID"].ToString().ToUpper();
-                       }
-                       line = projectFileStream.ReadLine();
-                   }
-               }
+                var projectFileInfo = new FileInfo(projectFile);
+                using (StreamReader projectFileStream = projectFileInfo.OpenText())
+                {
+                    string line = projectFileStream.ReadLine();
+                    while (line != null)
+                    {
+                        Match match = s_projectGuidRegex.Match(line);
+                        if (match.Success)
+                        {
+                            return match.Groups["GUID"].ToString().ToUpper();
+                        }
+                        line = projectFileStream.ReadLine();
+                    }
+                }
 
-               return null;
-           }));
+                return null;
+            }));
 
             return guid.Value;
         }
 
         private static readonly ConcurrentDictionary<string, string> s_projectTypeGUIDS = new ConcurrentDictionary<string, string>();
 
+        // ReadTypeGuidFromProjectFile is currently just looking at the file extension to associate a type.
         public static string ReadTypeGuidFromProjectFile(string projectFile)
         {
             string filenameLC = Path.GetFullPath(projectFile).ToLower();
@@ -171,10 +172,18 @@ namespace Sharpmake.Generators.VisualStudio
             string fileExt = Path.GetExtension(filenameLC);
             switch (fileExt)
             {
-                case Vcxproj.ProjectExtension: guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper(); break;
-                case CSproj.ProjectExtension: guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper(); break;
-                case Pyproj.ProjectExtension: guid = ProjectTypeGuids.Python.ToString().ToUpper(); break;
-                case Androidproj.ProjectExtension: guid = ProjectTypeGuids.Android.ToString().ToUpper(); break;
+                case Vcxproj.ProjectExtension:
+                    guid = ProjectTypeGuids.WindowsVisualCpp.ToString().ToUpper();
+                    break;
+                case CSproj.ProjectExtension:
+                    guid = ProjectTypeGuids.WindowsCSharp.ToString().ToUpper();
+                    break;
+                case Pyproj.ProjectExtension:
+                    guid = ProjectTypeGuids.Python.ToString().ToUpper();
+                    break;
+                case Androidproj.ProjectExtension:
+                    guid = ProjectTypeGuids.Android.ToString().ToUpper();
+                    break;
                 default:
                     throw new Error("Unknown file extension {0} : unable to detect file type GUID [{1}]", fileExt, projectFile);
             }
@@ -284,15 +293,20 @@ namespace Sharpmake.Generators.VisualStudio
             // write solution header
             switch (devEnv)
             {
-                case DevEnv.vs2010: fileGenerator.Write(Template.Solution.HeaderBeginVs2010); break;
-                case DevEnv.vs2012: fileGenerator.Write(Template.Solution.HeaderBeginVs2012); break;
-                case DevEnv.vs2013: fileGenerator.Write(Template.Solution.HeaderBeginVs2013); break;
-                case DevEnv.vs2015: fileGenerator.Write(Template.Solution.HeaderBeginVs2015); break;
-                case DevEnv.vs2017: fileGenerator.Write(Template.Solution.HeaderBeginVs2017); break;
-                case DevEnv.vs2019: fileGenerator.Write(Template.Solution.HeaderBeginVs2019); break;
-                default:
-                    Console.WriteLine("Unsupported DevEnv for solution " + solutionConfigurations[0].Target.GetFragment<DevEnv>());
+                case DevEnv.vs2015:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2015);
                     break;
+                case DevEnv.vs2017:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2017);
+                    break;
+                case DevEnv.vs2019:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2019);
+                    break;
+                case DevEnv.vs2022:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2022);
+                    break;
+                default:
+                    throw new Error($"Unsupported DevEnv {devEnv} for solution {solution.Name}");
             }
 
             SolutionFolder masterBffFolder = null;
@@ -373,16 +387,17 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         fileGenerator.Write(Template.Solution.ProjectBegin);
                         Strings buildDepsGuids = new Strings(resolvedProject.Configurations.SelectMany(
-                            c => c.GenericBuildDependencies.Where(
-                                p => (p.Project is FastBuildAllProject) == false || fastBuildAllProjectForSolutionDependency == null || p.Project == fastBuildAllProjectForSolutionDependency.Project
-                            ).Select(
-                                p => p.ProjectGuid ?? ReadGuidFromProjectFile(p.ProjectFullFileNameWithExtension)
+                            c => c.GenericBuildDependencies
+                                .Where(dep => !dep.IsFastBuild)
+                                .Select(p => p.ProjectGuid ?? ReadGuidFromProjectFile(p.ProjectFullFileNameWithExtension)
                             )
                         ));
 
                         if (fastBuildAllProjectForSolutionDependency != null)
                         {
-                            bool writeDependencyToFastBuildAll = resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe);
+                            bool writeDependencyToFastBuildAll = (resolvedProject.Configurations.Any(conf => conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.Exe)) ||
+                                                                 solution.ProjectsDependingOnFastBuildAllForThisSolution.Contains(resolvedProject.Project);
+
                             if (writeDependencyToFastBuildAll)
                                 buildDepsGuids.Add(fastBuildAllProjectForSolutionDependency.UserData["Guid"] as string);
                         }
@@ -390,7 +405,7 @@ namespace Sharpmake.Generators.VisualStudio
                         if (buildDepsGuids.Any())
                         {
                             fileGenerator.Write(Template.Solution.ProjectDependencyBegin);
-                            foreach (string guid in buildDepsGuids)
+                            foreach (string guid in buildDepsGuids.SortedValues)
                             {
                                 using (fileGenerator.Declare("projectDependencyGuid", guid))
                                     fileGenerator.Write(Template.Solution.ProjectDependency);
@@ -426,7 +441,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             fileGenerator.Write(Template.Solution.GlobalBegin);
 
-            // Write source code control informations
+            // Write source code control information
             if (solution.PerforceRootPath != null)
             {
                 List<Solution.ResolvedProject> sccProjects = new List<Solution.ResolvedProject>();
@@ -481,7 +496,12 @@ namespace Sharpmake.Generators.VisualStudio
             // write solution configurations
             string visualStudioExe = GetVisualStudioIdePath(devEnv) + Util.WindowsSeparator + "devenv.com";
 
-            List<string> configurationSectionNames = new List<string>();
+            var configurationSectionNames = new List<string>();
+
+            bool containsMultiDotNetFramework = solutionConfigurations.All(sc => sc.Target.HaveFragment<DotNetFramework>()) &&
+                                                solutionConfigurations.Select(sc => sc.Target.GetFragment<DotNetFramework>()).Distinct().Count() > 1;
+
+            var multiDotNetFrameworkConfigurationNames = new HashSet<string>();
 
             fileGenerator.Write(Template.Solution.GlobalSectionSolutionConfigurationBegin);
             foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
@@ -499,6 +519,14 @@ namespace Sharpmake.Generators.VisualStudio
                     category = solutionConfiguration.PlatformName;
                 }
 
+                if (containsMultiDotNetFramework)
+                {
+                    if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
+                        continue;
+
+                    multiDotNetFrameworkConfigurationNames.Add(configurationName);
+                }
+
                 using (fileGenerator.Declare("configurationName", configurationName))
                 using (fileGenerator.Declare("category", category))
                 {
@@ -514,6 +542,9 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             configurationSectionNames.Sort();
+
+            VerifySectionNamesDuplicates(solutionFileInfo.FullName, solutionConfigurations, configurationSectionNames);
+
             foreach (string configurationSectionName in configurationSectionNames)
                 fileGenerator.Write(configurationSectionName);
 
@@ -525,6 +556,9 @@ namespace Sharpmake.Generators.VisualStudio
             var solutionConfigurationFastBuildBuilt = new Dictionary<Solution.Configuration, List<string>>();
             foreach (Solution.ResolvedProject solutionProject in solutionProjects)
             {
+                if (containsMultiDotNetFramework)
+                    multiDotNetFrameworkConfigurationNames.Clear();
+
                 foreach (Solution.Configuration solutionConfiguration in solutionConfigurations)
                 {
                     ITarget solutionTarget = solutionConfiguration.Target;
@@ -594,10 +628,18 @@ namespace Sharpmake.Generators.VisualStudio
                         category = solutionConfiguration.PlatformName;
                     }
 
+                    if (containsMultiDotNetFramework)
+                    {
+                        if (multiDotNetFrameworkConfigurationNames.Contains(configurationName))
+                            continue;
+
+                        multiDotNetFrameworkConfigurationNames.Add(configurationName);
+                    }
+
                     using (fileGenerator.Declare("solutionConf", solutionConfiguration))
                     using (fileGenerator.Declare("projectGuid", solutionProject.UserData["Guid"]))
                     using (fileGenerator.Declare("projectConf", projectConf))
-                    using (fileGenerator.Declare("projectPlatform", Util.GetPlatformString(projectPlatform, solutionProject.Project, true)))
+                    using (fileGenerator.Declare("projectPlatform", Util.GetPlatformString(projectPlatform, solutionProject.Project, solutionConfiguration.Target, true)))
                     using (fileGenerator.Declare("category", category))
                     using (fileGenerator.Declare("configurationName", configurationName))
                     {
@@ -638,7 +680,7 @@ namespace Sharpmake.Generators.VisualStudio
                 var solutionConfiguration = fb.Key;
                 if (fb.Value.Count == 0)
                     Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has no FastBuild projects to build.");
-                else if (fb.Value.Count > 1)
+                else if (solution.GenerateFastBuildAllProject && fb.Value.Count > 1)
                     Builder.Instance.LogErrorLine($"{solutionFile} - {solutionConfiguration.Name}|{solutionConfiguration.PlatformName} - has more than one FastBuild project to build ({string.Join(";", fb.Value)}).");
             }
 
@@ -691,6 +733,30 @@ namespace Sharpmake.Generators.VisualStudio
             return solutionFileInfo.FullName;
         }
 
+        // Will check that two configurations in the solution do not share the same name
+        private void VerifySectionNamesDuplicates(
+            string solutionFile,
+            IReadOnlyList<Solution.Configuration> solutionConfigurations,
+            List<string> configurationSectionNames
+        )
+        {
+            int count = configurationSectionNames.Count;
+            var distinctSectionNames = configurationSectionNames.Distinct().ToList();
+            if (count != distinctSectionNames.Count)
+            {
+                throw new Error(
+                    "Solution '{0}' contains distinct configurations with the same name, please add something to distinguish them:\n- {1}",
+                    solutionFile,
+                    string.Join(
+                        Environment.NewLine + "- ",
+                        solutionConfigurations.Select(
+                            sc => $"{sc.Name}|{sc.PlatformName} => '{sc}'"
+                        ).OrderBy(name => name)
+                    )
+                );
+            }
+        }
+
         private Solution.Configuration.IncludedProjectInfo ResolveStartupProject(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
         {
             // Set the default startup project.
@@ -705,7 +771,9 @@ namespace Sharpmake.Generators.VisualStudio
                     e.Configuration.Output == Project.Configuration.OutputType.DotNetConsoleApp ||
                     e.Configuration.Output == Project.Configuration.OutputType.DotNetWindowsApp ||
                     e.Configuration.Output == Project.Configuration.OutputType.Exe)
-                .GroupBy(e => e.Configuration.ProjectFullFileName).ToList();
+                .GroupBy(e => e.Configuration.ProjectFileName)
+                .OrderBy(filename => filename.Key, StringComparer.InvariantCultureIgnoreCase)
+                .ToList();
 
             // If there is more than one, set the one with the same name as the solution
             if (executableProjects.Count > 1)
@@ -772,7 +840,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Project.Configuration firstConf = resolvedProject.Configurations.First();
                 if (firstConf.ProjectGuid == null)
                 {
-                    if (!firstConf.Project.GetType().IsDefined(typeof(Compile), false))
+                    if (firstConf.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Compile)
                         throw new Error("cannot read guid from existing project, project must have Compile attribute: {0}", resolvedProject.ProjectFile);
                     firstConf.ProjectGuid = ReadGuidFromProjectFile(resolvedProject.ProjectFile);
                 }
@@ -787,15 +855,16 @@ namespace Sharpmake.Generators.VisualStudio
 
         private IEnumerable<Solution.ResolvedProject> GetResolvedProjectsFromPaths(IEnumerable<string> paths)
         {
-            return paths.Select(p =>
+            return paths.Select(p => GetResolvedProjectFromPath(p));
+        }
+
+        private Solution.ResolvedProject GetResolvedProjectFromPath(string path)
+        {
+            return new Solution.ResolvedProject
             {
-                var resolvedProject = new Solution.ResolvedProject
-                {
-                    ProjectFile = p,
-                    ProjectName = Path.GetFileNameWithoutExtension(p)
-                };
-                return resolvedProject;
-            });
+                ProjectFile = path,
+                ProjectName = Path.GetFileNameWithoutExtension(path)
+            };
         }
 
         private List<Solution.ResolvedProject> ResolveReferencesByPath(List<Solution.ResolvedProject> solutionProjects, Strings referencedProjectPaths)
@@ -803,15 +872,35 @@ namespace Sharpmake.Generators.VisualStudio
             // solution's referenced projects
             var resolvedPathReferences = GetResolvedProjectsFromPaths(referencedProjectPaths).ToList();
 
-            // user's projects references
-            var projectByPath = solutionProjects.SelectMany(p => p.Configurations).SelectMany(c => c.ProjectReferencesByPath).Distinct();
-            resolvedPathReferences.AddRange(GetResolvedProjectsFromPaths(projectByPath));
-
             foreach (Solution.ResolvedProject resolvedProject in resolvedPathReferences)
             {
                 resolvedProject.UserData["Guid"] = ReadGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["TypeGuid"] = ReadTypeGuidFromProjectFile(resolvedProject.ProjectFile);
                 resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
+            }
+
+            // user's projects references
+            var projectRefByPathInfos = solutionProjects
+                                            .SelectMany(p => p.Configurations)
+                                            .SelectMany(c => c.ProjectReferencesByPath.ProjectsInfos)
+                                            .Distinct();
+
+            foreach (var projectRefByPathInfo in projectRefByPathInfos)
+            {
+                var resolvedProject = GetResolvedProjectFromPath(projectRefByPathInfo.projectFilePath);
+
+                var projectGuid = projectRefByPathInfo.projectGuid;
+                if (projectGuid == Guid.Empty)
+                    projectGuid = new Guid(ReadGuidFromProjectFile(projectRefByPathInfo.projectFilePath));
+                resolvedProject.UserData["Guid"] = projectGuid.ToString("D").ToUpperInvariant();
+
+                var projectTypeGuid = projectRefByPathInfo.projectTypeGuid;
+                if (projectTypeGuid == Guid.Empty)
+                    projectTypeGuid = new Guid(ReadTypeGuidFromProjectFile(projectRefByPathInfo.projectFilePath)); // currently, just use the extension
+                resolvedProject.UserData["TypeGuid"] = projectTypeGuid.ToString("D").ToUpperInvariant();
+
+                resolvedProject.UserData["Folder"] = GetSolutionFolder(resolvedProject.SolutionFolder);
+                resolvedPathReferences.Add(resolvedProject);
             }
 
             return resolvedPathReferences;

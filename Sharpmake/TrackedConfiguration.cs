@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,9 +43,9 @@ namespace Sharpmake
         public int CompareTo(TrackedConfiguration other)
         {
             if (_config?.Owner == null)
-                return GetDisplayedName(false).CompareTo(other.GetDisplayedName(false));
+                return string.Compare(GetDisplayedName(false), other.GetDisplayedName(false), StringComparison.Ordinal);
 
-            return _config.ToString().CompareTo(other._config.ToString());
+            return string.Compare(_config.ToString(), other._config.ToString(), StringComparison.Ordinal);
         }
 
         public void AddDependency(
@@ -90,7 +90,7 @@ namespace Sharpmake
 
         public string GetConfigName()
         {
-            return _config?.Target?.ToString() ?? _configOutputType.ToString();
+            return _config?.Target?.GetTargetString() ?? _configOutputType.ToString();
         }
 
         public bool IsNodeVisited()

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,14 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System.Collections.Generic;
 using NUnit.Framework;
 
-using System;
-using System.Collections.Generic;
-
-using Sharpmake;
-
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
     public class ResolverTest
     {
@@ -122,8 +118,7 @@ namespace SharpmakeUnitTests
 
             obj = new FieldClass();
             obj.String = "[p1.NullObject]";
-            resolver.Resolve(obj);
-            Assert.That(obj.String, Is.EqualTo("null"));
+            Assert.Throws<Error>(() => resolver.Resolve(obj));
         }
 
         [Test]
@@ -283,6 +278,23 @@ namespace SharpmakeUnitTests
             resolver.SetParameter("list", list2);
 
             Assert.That(resolver.Resolve("[list]"), Is.EqualTo("animal;brute;copper"));
+        }
+
+        [Test]
+        public void CanResolveStringsToLower()
+        {
+            var obj = new PropertyClass();
+            obj.Value1 = "[obj]";
+            obj.Value2 = "[lower:obj]";
+            obj.Value3 = "[lower:obj.Value1]";
+
+            var resolver = new Resolver();
+            resolver.SetParameter("obj", obj);
+            resolver.Resolve(obj);
+
+            Assert.That(obj.Value1, Is.EqualTo("PropertyClass"));
+            Assert.That(obj.Value2, Is.EqualTo("propertyclass"));
+            Assert.That(obj.Value3, Is.EqualTo("propertyclass"));
         }
     }
 }

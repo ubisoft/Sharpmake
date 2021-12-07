@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectBeginVs2017 =
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""[toolsVersion]"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
-  <Import Project=""$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"" Condition=""Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"" />
+";
+                public static string ProjectBeginNetCore =
+@"<Project>
 ";
 
                 public static string ProjectEnd =
@@ -48,14 +50,16 @@ namespace Sharpmake.Generators.VisualStudio
     <SccProjectName>[sccProjectName]</SccProjectName>
     <SccLocalPath>[sccLocalPath]</SccLocalPath>
     <SccProvider>[sccProvider]</SccProvider>
-    <TargetFrameworkVersion>[targetFramework]</TargetFrameworkVersion>
+    <[targetFrameworkVersionString]>[targetFramework]</[targetFrameworkVersionString]>
     <FileAlignment>[options.FileAlignment]</FileAlignment>
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
+    <IsPublishable>[options.IsPublishable]</IsPublishable>
     <PublishUrl>[options.PublishUrl]</PublishUrl>
     <InstallUrl>[options.InstallUrl]</InstallUrl>
     <ManifestKeyFile>[options.ManifestKeyFile]</ManifestKeyFile>
     <ManifestCertificateThumbprint>[options.ManifestCertificateThumbprint]</ManifestCertificateThumbprint>
+    <GenerateDocumentationFile>[GenerateDocumentationFile]</GenerateDocumentationFile>
     <GenerateManifests>[options.GenerateManifests]</GenerateManifests>
     <SignManifests>[options.SignManifests]</SignManifests>
     <UseVSHostingProcess>[options.UseVSHostingProcess]</UseVSHostingProcess>
@@ -97,12 +101,29 @@ namespace Sharpmake.Generators.VisualStudio
     <VsixType>[options.VsixType]</VsixType>
     <ConcordSDKDir>[options.ConcordSDKDir]</ConcordSDKDir>
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
+    <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
+    <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <GenerateAssemblyInfo>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInfo]</GenerateAssemblyInfo>
+    <GenerateAssemblyConfigurationAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyConfigurationAttribute]</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyDescriptionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyDescriptionAttribute]</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyProductAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyProductAttribute]</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyTitleAttribute]</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyCompanyAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyCompanyAttribute]</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyFileVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyFileVersionAttribute]</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyVersionAttribute]</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInformationalVersionAttribute]</GenerateAssemblyInformationalVersionAttribute>
+    <RestoreProjectStyle>[NugetRestoreProjectStyleString]</RestoreProjectStyle>
+    <ProductVersion>[options.ProductVersion]</ProductVersion>
+    <UseWpf>[options.UseWpf]</UseWpf>
+    <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
   </PropertyGroup>
 ";
 
+                public const string DefaultProjectConfigurationCondition = "'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'";
+                public const string MultiFrameworkProjectConfigurationCondition = "'$(Configuration)|$(Platform)|$(TargetFramework)'=='[conf.Name]|[platformName]|[targetFramework]'";
 
                 public static string ProjectConfigurationsGeneral =
-@"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+@"  <PropertyGroup Condition=""[projectConfigurationCondition]"">
     <PlatformTarget>[platformName]</PlatformTarget>
     <DebugSymbols>[options.DebugSymbols]</DebugSymbols>
     <DebugType>[options.DebugType]</DebugType>
@@ -117,6 +138,7 @@ namespace Sharpmake.Generators.VisualStudio
     <WarningLevel>[options.WarningLevel]</WarningLevel>
     <AllowUnsafeBlocks>[options.AllowUnsafeBlocks]</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>[options.TreatWarningsAsErrors]</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>[options.WarningsNotAsErrors]</WarningsNotAsErrors>
     <CreateVsixContainer>[options.CreateVsixContainer]</CreateVsixContainer>
     <DeployExtension>[options.DeployExtension]</DeployExtension>
     <Prefer32Bit>[options.Prefer32Bit]</Prefer32Bit>
@@ -127,6 +149,7 @@ namespace Sharpmake.Generators.VisualStudio
     <LangVersion>[options.LanguageVersion]</LangVersion>
     <CopyVsixExtensionFiles>[options.CopyVsixExtensionFiles]</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>[options.CopyVsixExtensionLocation]</CopyVsixExtensionLocation>
+    <ProduceReferenceAssembly>[options.ProduceReferenceAssembly]</ProduceReferenceAssembly>
   </PropertyGroup>
 ";
 
@@ -135,6 +158,10 @@ namespace Sharpmake.Generators.VisualStudio
 ";
                 public static string ImportProjectItem =
 @"  <Import Project=""[importProject]"" Condition=""[importCondition]"" />
+";
+
+                public static string ImportProjectSdkItem =
+@"  <Import Project=""[importProject]"" Sdk=""[sdkVersion]"" />
 ";
 
                 public static string VsixConfiguration =
@@ -353,6 +380,12 @@ namespace Sharpmake.Generators.VisualStudio
 @"  <ItemGroup>
 ";
 
+                public static string ItemGroupConditionalBegin =
+@"  <ItemGroup Condition=""[itemGroupCondition]"">
+";
+
+                public static string ItemGroupTargetFrameworkCondition = "'$(TargetFramework)'=='[targetFramework]'";
+
                 public static string ItemGroupEnd =
 @"  </ItemGroup>
 ";
@@ -479,6 +512,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string CompileBegin =
 @"    <Compile Include=""[include]"">
+";
+
+                public static string SimpleCompileWithExclude =
+@"    <Compile Include=""[include]"" Exclude=""[exclude]""/>
+";
+
+                public static string CompileBeginWithExclude =
+@"    <Compile Include=""[include]"" Exclude=""[exclude]"">
 ";
 
                 public static string CompileEnd =

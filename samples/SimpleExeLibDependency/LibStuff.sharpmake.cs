@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,10 +40,16 @@ namespace SimpleExeLibDependency
         [Configure()]
         public void Configure(Configuration conf, Target target)
         {
-            conf.Output = Project.Configuration.OutputType.Lib;
-            conf.IncludePaths.Add("[project.BasePath]");
-            conf.TargetLibraryPath = "[project.BasePath]/lib";
+            conf.Output = Configuration.OutputType.Lib;
             conf.ProjectPath = "[project.SharpmakeCsPath]/projects";
+            conf.TargetLibraryPath = "[project.BasePath]/lib";
+            conf.IntermediatePath = @"[conf.ProjectPath]\obj\[project.Name]\[target.Platform]_[target.Optimization]_[target.DevEnv]";
+
+            conf.Defines.Add("_HAS_EXCEPTIONS=0");
+
+            conf.Options.Add(Options.Vc.Librarian.TreatLibWarningAsErrors.Enable);
+
+            conf.IncludePaths.Add("[project.BasePath]");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@ namespace Sharpmake.Generators.VisualStudio
     {
         private class Template
         {
-            public class Project
+            public static class Project
             {
                 public static string ProjectBegin =
-                @"<?xml version=""1.0"" encoding=""Windows-1252""?>
-<Project ToolsVersion=""4.0"" DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+                @"<Project DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"" ToolsVersion=""4.0"">
 ";
 
                 public static string ProjectEnd =
@@ -39,11 +38,10 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string ProjectDescription =
 @"  <PropertyGroup>
-    <Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{[guid]}</ProjectGuid>
+    <ProjectGuid>[guid]</ProjectGuid>
     <ProjectHome>[projectHome]</ProjectHome>
-    <StartupFile />
+    <StartupFile>[startupFile]</StartupFile>
     <SearchPath>[searchPath]</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -52,10 +50,9 @@ namespace Sharpmake.Generators.VisualStudio
     <InterpreterId>[interpreterId]</InterpreterId>
     <InterpreterVersion>[interpreterVersion]</InterpreterVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=""'$(Configuration)' == 'Debug'"" />
   <PropertyGroup>
     <VisualStudioVersion Condition="" '$(VisualStudioVersion)' == '' "">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+    <PtvsTargetsFile>[ptvsTargetsFile]</PtvsTargetsFile>
   </PropertyGroup>
 ";
 
@@ -84,6 +81,10 @@ namespace Sharpmake.Generators.VisualStudio
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X86</Architecture>
     </Interpreter>
+";
+
+                public static string ImportPythonTools =
+@"  <Import Project=""$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets"" />
 ";
 
                 public static string InterpreterReference =

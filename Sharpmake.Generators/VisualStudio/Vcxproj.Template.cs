@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ namespace Sharpmake.Generators.VisualStudio
 {
     public partial class Vcxproj
     {
-        public static partial class Template
+        public static class Template
         {
             public static class Project
             {
@@ -52,16 +52,12 @@ namespace Sharpmake.Generators.VisualStudio
     <ProjectName>[projectName]</ProjectName>
 ";
 
-                public static string WindowsSDKOverrides =
-@"    <UCRTContentRoot>[UCRTContentRoot]</UCRTContentRoot>
-    <UniversalCRTSdkDir_10>[UniversalCRTSdkDir_10]</UniversalCRTSdkDir_10>
-    <[windowsSdkDirKey]>[windowsSdkDirValue]</[windowsSdkDirKey]>
-    <WindowsSdkDir>$([windowsSdkDirKey])</WindowsSdkDir>
-    <WindowsTargetPlatformVersion>[targetPlatformVersion]</WindowsTargetPlatformVersion>
-";
-
                 public const string DisableRegistryUse =
 @"    <DisableRegistryUse>true</DisableRegistryUse>
+";
+
+                internal const string DisableInstalledVcTargetsUse =
+@"    <DisableInstalledVCTargetsUse>true</DisableInstalledVCTargetsUse>
 ";
 
                 public static string ProjectDescriptionStartPlatformConditional =
@@ -73,7 +69,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ImportCppDefaultProps =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.Default.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.Default.props"" />
 ";
 
                 public static string PropertyGroupStart =
@@ -88,11 +84,24 @@ namespace Sharpmake.Generators.VisualStudio
                 @"    <[custompropertyname]>[custompropertyvalue]</[custompropertyname]>
 ";
 
+                public static string VCOverridesProperties =
+@"    <MSBuildExtensionsPath>[msBuildExtensionsPath]</MSBuildExtensionsPath>
+    <[vcInstallDirKey]>[vcInstallDirValue]</[vcInstallDirKey]>
+";
+
+                public static string VCTargetsPathOverride =
+@"    <[vcTargetsPathKey]>[vcTargetsPath]</[vcTargetsPathKey]>
+";
+
+                public static string VCTargetsPathOverrideConditional =
+@"    <[vcTargetsPathKey] Condition=""'$(VisualStudioVersion)'=='[vsVersion]'"">[vcTargetsPath]</[vcTargetsPathKey]>
+";
+
                 public static string ProjectEnd =
                 @"</Project>";
 
                 public static string ProjectAfterConfigurationsGeneral =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
   <ImportGroup Label=""ExtensionSettings"">
 ";
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
@@ -104,6 +113,11 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectImportedProps =
 @"    <Import Project=""[importedPropsFile]"" />
 ";
+
+                public static string ProjectImportedMasmProps =
+@"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.props"" />
+";
+
                 public static string ProjectConfigurationImportedProps =
 @"    <Import Project=""[importedPropsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
@@ -132,12 +146,16 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectTargetsBegin =
-@"  <Import Project=""$(VCTargetsPath)\Microsoft.Cpp.targets"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
   <ImportGroup Label=""ExtensionTargets"">
 ";
 
                 public static string ProjectTargetsItem =
 @"    <Import Project=""[importedTargetsFile]"" />
+";
+
+                public static string ProjectMasmTargetsItem =
+@"    <Import Project=""[vcTargetsPath]\BuildCustomizations\masm.targets"" />
 ";
 
                 public static string ProjectConfigurationImportedTargets =
@@ -319,6 +337,14 @@ namespace Sharpmake.Generators.VisualStudio
                 @"      <ForcedIncludeFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[options.ForcedIncludeFilesVanilla]</ForcedIncludeFiles>
 ";
 
+                public static string ProjectFilesAdditionalForcedInclude =
+                @"      <ForcedIncludeFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">%(ForcedIncludeFiles);[ForcedIncludeFiles]</ForcedIncludeFiles>
+";
+
+                public static string ProjectFilesAdditionalForcedIncludeVanilla =
+                @"      <ForcedIncludeFiles Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[options.ForcedIncludeFilesVanilla];[ForcedIncludeFiles]</ForcedIncludeFiles>
+";
+
                 public static string ProjectFilesSourceExcludeFromBuild =
                 @"      <ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">true</ExcludedFromBuild>
 ";
@@ -399,7 +425,16 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </ItemGroup>
 ";
 
-                internal static class Filers
+                public const string PlatformFolderOverride =
+@"    <_PlatformFolder>[platformFolder]</_PlatformFolder>
+";
+
+                public const string AdditionalVCTargetsPath =
+                    @"    <AdditionalVCTargetsPath>[additionalVCTargetsPath]</AdditionalVCTargetsPath>
+    <_VCTargetsPathForToolset>$(AdditionalVCTargetsPath)</_VCTargetsPathForToolset>
+";
+
+                internal static class Filters
                 {
                     public static string Begin =
 @"<?xml version=""1.0"" encoding=""utf-8""?>

@@ -30,14 +30,14 @@ namespace CSharpVsix
         /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
-        private readonly Package package;
+        private readonly AsyncPackage package;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HelloWorldCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        private HelloWorldCommand(Package package)
+        private HelloWorldCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             if (package == null)
             {
@@ -46,7 +46,6 @@ namespace CSharpVsix
 
             this.package = package;
 
-            OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, CommandId);
@@ -79,9 +78,10 @@ namespace CSharpVsix
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static void Initialize(Package package)
+        public static async System.Threading.Tasks.Task InitializeAsync(AsyncPackage package)
         {
-            Instance = new HelloWorldCommand(package);
+            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            Instance = new HelloWorldCommand(package, commandService);
         }
 
         /// <summary>

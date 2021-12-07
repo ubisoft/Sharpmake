@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,11 +39,27 @@ namespace Sharpmake
             set { SetProperty(ref _isFileNameToLower, value); }
         }
 
+        public string LowerName
+        {
+            get { return _name.ToLower(); }
+        }
+
         private bool _isTargetFileNameToLower = true;                                         // Makes the ProjectName ToLower or not
         public bool IsTargetFileNameToLower
         {
             get { return _isTargetFileNameToLower; }
             set { SetProperty(ref _isTargetFileNameToLower, value); }
+        }
+
+        private ProjectTypeAttribute _sharpmakeProjectType = ProjectTypeAttribute.Unknown;
+        public ProjectTypeAttribute SharpmakeProjectType
+        {
+            get
+            {
+                Trace.Assert(_sharpmakeProjectType != ProjectTypeAttribute.Unknown);
+                return _sharpmakeProjectType;
+            }
+            internal set { _sharpmakeProjectType = value; }
         }
 
         public string ClassName { get; private set; }                                     // Project Class Name, ex: "MyProject"
@@ -51,7 +68,7 @@ namespace Sharpmake
         public string SharpmakeCsPath { get; private set; }                               // Path of the CsFileName, ex: "c:\dev\MyProject"
         public string SharpmakeCsProjectPath => SharpmakeCsPath;                          // TODO LC: check what is expected
 
-        private string _assemblyName;
+        private string _assemblyName = string.Empty;
         public string AssemblyName
         {
             get { return _assemblyName; }
@@ -79,7 +96,7 @@ namespace Sharpmake
             set { SetProperty(ref _rootPath, value); }
         }
 
-        private DependenciesCopyLocalTypes _dependenciesCopyLocal = DependenciesCopyLocalTypes.Default; //used primarely for the .Net Framework
+        private DependenciesCopyLocalTypes _dependenciesCopyLocal = DependenciesCopyLocalTypes.Default; //used primarily for the .Net Framework
         public DependenciesCopyLocalTypes DependenciesCopyLocal
         {
             get { return _dependenciesCopyLocal; }
@@ -99,7 +116,7 @@ namespace Sharpmake
         public Strings PreFilterSourceFiles { get { return _preFilterSourceFiles; } }
 
 
-        protected internal Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
+        public Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
         public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm");         // File that match this regex compile
         public Strings SourceFilesCPPExtensions = new Strings(".cpp", ".cc");
 
@@ -155,7 +172,60 @@ namespace Sharpmake
         public Strings NoneExtensionsCopyIfNewer = new Strings();
 
         public Strings XResourcesResw = new Strings();
-        public Strings XResourcesImg = new Strings();
+
+        public class XResourcesImgContainer : IEnumerable<string>
+        {
+            /// <summary>
+            /// Adds a new XResourcesImg path, with an optional link
+            /// </summary>
+            /// <param name="path">The path</param>
+            /// <param name="link">An optional link</param>
+            public void Add(string path, string link = null)
+            {
+                _xResourcesImg[path] = link;
+            }
+
+            public int Count => _xResourcesImg.Count;
+
+            public bool IsResolved { get; private set; } = false;
+
+            public IEnumerator<string> GetEnumerator()
+            {
+                return _xResourcesImg.Keys.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return _xResourcesImg.Keys.GetEnumerator();
+            }
+
+            public Dictionary<string, string> GetXResourcesImg() { return _xResourcesImg; }
+
+            internal void Resolve(string sourceRootPath, Resolver resolver)
+            {
+                if (IsResolved)
+                    return;
+
+                if (_xResourcesImg.Any())
+                {
+                    var resolvedDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var xResourcePair in _xResourcesImg)
+                    {
+                        string path = resolver.Resolve(xResourcePair.Key);
+                        Util.ResolvePath(sourceRootPath, ref path);
+                        string link = resolver.Resolve(xResourcePair.Value);
+                        resolvedDictionary.Add(path, link);
+                    }
+                    _xResourcesImg = resolvedDictionary;
+                }
+
+                IsResolved = true;
+            }
+
+            private Dictionary<string, string> _xResourcesImg = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public XResourcesImgContainer XResourcesImg = new XResourcesImgContainer();
 
         public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
         public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
@@ -165,6 +235,7 @@ namespace Sharpmake
 
         public Dictionary<string, string> ExtensionBuildTools = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);  // extension -> tool name
 
+        public Dictionary<string, string> PreImportCustomProperties = new Dictionary<string, string>();      // pre import properties are added before any imports to the project xml as <Key>Value</Key>
         public Dictionary<string, string> CustomProperties = new Dictionary<string, string>();      // custom properties are added to the project xml as <Key>Value</Key>
 
         public Dictionary<string, string> CustomFilterMapping = new Dictionary<string, string>();  /// maps relative source directory to a custom filter path for vcxproj.filter files
@@ -465,7 +536,7 @@ namespace Sharpmake
                         if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.AddMatchFiles, sourceFilesAbsoluteUnsorted[i]))
                             breakMatch = true;
 
-                        // Remove .. occurences from middle of the absolute path.
+                        // Remove .. occurrences from middle of the absolute path.
                         string simplifiedPath = Util.SimplifyPath(sourceFilesAbsoluteUnsorted[i]);
                         files.Add(simplifiedPath); // TODO: remove from sourceFilesRelative if match
                     }
@@ -551,51 +622,63 @@ namespace Sharpmake
         // everything blobbed anyway.
         internal Strings ResolvedNoBlobbedSourceFiles = new Strings();  // all source excluded from by [project.Name]_xyz.blob.cpp
 
-        public Strings GetSourceFilesForConfigurations(IEnumerable<Configuration> configurations)
+        public HashSet<string> GetAllConfigurationBuildExclude(IEnumerable<Configuration> configurations)
         {
-            // Remove blob files ?
-            bool allBlobbed = true;
-            bool allNoBlobbed = true;
-            bool includeBlobbedSourceFiles = true;
-
-            HashSet<string> allConfigurationBuildExclude = new HashSet<string>();
-            allConfigurationBuildExclude.UnionWith(ResolvedSourceFiles);
+            HashSet<string> result = new HashSet<string>();
+            result.UnionWith(ResolvedSourceFiles);
 
             foreach (Project.Configuration conf in configurations)
             {
-                bool isBlobbed = conf.IsBlobbed;
-                allBlobbed &= isBlobbed;
-                allNoBlobbed &= !isBlobbed;
-                includeBlobbedSourceFiles &= conf.IncludeBlobbedSourceFiles;
-                allConfigurationBuildExclude.IntersectWith(conf.ResolvedSourceFilesBuildExclude);
-            }
-
-            Strings result = new Strings();
-            result.AddRange(ResourceFiles);
-
-            if (allBlobbed && !includeBlobbedSourceFiles)
-            {
-                foreach (var entry in _blobPathContents)
-                {
-                    result.AddRange(entry.Value.ResolvedBlobSourceFiles);
-                }
-                result.AddRange(ResolvedNoBlobbedSourceFiles);
-                result.RemoveRange(allConfigurationBuildExclude);
-            }
-            else if (allNoBlobbed)
-            {
-                result.AddRange(ResolvedSourceFiles);
-                foreach (var entry in _blobPathContents)
-                {
-                    result.RemoveRange(entry.Value.ResolvedBlobSourceFiles);
-                }
-            }
-            else
-            {
-                result.AddRange(ResolvedSourceFiles);
+                result.IntersectWith(conf.ResolvedSourceFilesBuildExclude);
             }
 
             return result;
+        }
+
+        public Strings GetSourceFilesForConfigurations(IEnumerable<Configuration> configurations)
+        {
+            using (Builder.Instance.CreateProfilingScope("Project.GetSourceFilesForConfigurations", configurations.Count()))
+            {
+                // Remove blob files ?
+                bool allBlobbed = true;
+                bool allNoBlobbed = true;
+                bool includeBlobbedSourceFiles = true;
+
+                foreach (Project.Configuration conf in configurations)
+                {
+                    bool isBlobbed = conf.IsBlobbed;
+                    allBlobbed &= isBlobbed;
+                    allNoBlobbed &= !isBlobbed;
+                    includeBlobbedSourceFiles &= conf.IncludeBlobbedSourceFiles;
+                }
+
+                Strings result = new Strings();
+                result.AddRange(ResourceFiles);
+
+                if (allBlobbed && !includeBlobbedSourceFiles)
+                {
+                    foreach (var entry in _blobPathContents)
+                    {
+                        result.AddRange(entry.Value.ResolvedBlobSourceFiles);
+                    }
+                    result.AddRange(ResolvedNoBlobbedSourceFiles);
+                    result.RemoveRange(GetAllConfigurationBuildExclude(configurations));
+                }
+                else if (allNoBlobbed)
+                {
+                    result.AddRange(ResolvedSourceFiles);
+                    foreach (var entry in _blobPathContents)
+                    {
+                        result.RemoveRange(entry.Value.ResolvedBlobSourceFiles);
+                    }
+                }
+                else
+                {
+                    result.AddRange(ResolvedSourceFiles);
+                }
+
+                return result;
+            }
         }
 
         internal Strings GetConfigurationsNoBlobSourceFiles(Strings sourceFiles)
@@ -611,7 +694,7 @@ namespace Sharpmake
             // Add all precomp files
             foreach (Configuration conf in Configurations)
             {
-                if (conf.PrecompSource != null)
+                if (!string.IsNullOrEmpty(conf.PrecompSource))
                     precompSource.Add(conf.PrecompSource);
             }
 
@@ -687,6 +770,70 @@ namespace Sharpmake
             }
 
             return noBlobbebSourceFiles;
+        }
+
+        private class RegexResolver
+        {
+            private static ThreadLocal<System.Security.Cryptography.MD5> s_md5Hasher = new ThreadLocal<System.Security.Cryptography.MD5>(() => System.Security.Cryptography.MD5.Create());
+            public RegexResolver()
+            {
+                ConfRegexesHashToAnyConf = new Dictionary<string, Configuration>();
+                ConfToRegexesHash = new Dictionary<Configuration, string>();
+            }
+            public void Register(Project.Configuration conf, Strings str)
+            {
+                string md5 = "";
+                if (str.Count != 0)
+                {
+                    var stream = new MemoryStream(200);
+                    var writer = new BinaryWriter(stream);
+                    writer.Write(str.Count);
+                    foreach (var val in str)
+                        writer.Write(val);
+                    byte[] data = s_md5Hasher.Value.ComputeHash(stream);
+                    md5 = BitConverter.ToString(data);
+                }
+                ConfToRegexesHash[conf] = md5;
+                ConfRegexesHashToAnyConf[md5] = conf;
+            }
+
+            public void Register(Project.Configuration conf, params Strings[] strs)
+            {
+                string md5 = "";
+                bool hasSomeRegexes = false;
+                foreach (var str in strs)
+                {
+                    if (str.Count != 0)
+                    {
+                        hasSomeRegexes = true;
+                        break;
+                    }
+                }
+                if (hasSomeRegexes)
+                {
+                    var stream = new MemoryStream(500);
+                    var writer = new BinaryWriter(stream);
+                    foreach (var str in strs)
+                    {
+                        writer.Write(str.Count);
+                        foreach (var val in str)
+                            writer.Write(val);
+                    }
+                    byte[] buffer = stream.ToArray();
+                    byte[] data = s_md5Hasher.Value.ComputeHash(stream.ToArray());
+                    md5 = BitConverter.ToString(data);
+                }
+                ConfToRegexesHash[conf] = md5;
+                ConfRegexesHashToAnyConf[md5] = conf;
+            }
+
+            public Project.Configuration GetCorrespondingConf(Project.Configuration conf)
+            {
+                return ConfRegexesHashToAnyConf[ConfToRegexesHash[conf]];
+            }
+
+            public Dictionary<string, Configuration> ConfRegexesHashToAnyConf;
+            public Dictionary<Configuration, string> ConfToRegexesHash;
         }
 
         internal virtual void ResolveSourceFiles(Builder builder)
@@ -815,7 +962,8 @@ namespace Sharpmake
                 NoneFilesCopyIfNewer.IntersectWith(SourceFilesFilters);
             }
 
-            AdditionalFiltering(SourceFiles, ref SourceFilesExclude);
+            using (builder.CreateProfilingScope("Project.ResolveSourceFiles:AdditionalFiltering"))
+                AdditionalFiltering(SourceFiles, ref SourceFilesExclude);
 
             // Add source files
             ResolvedSourceFiles.AddRange(SourceFiles);
@@ -847,139 +995,180 @@ namespace Sharpmake
             bool oneBlobbed = false;
             bool fastBuildBlobs = false;
 
-            foreach (Configuration conf in Configurations)
+            var resolvedSourceFilesBuildExclude = new Strings();
+            var resolvedSourceFilesWithCompileAsCOption = new Strings();
+            var resolvedSourceFilesWithCompileAsCPPOption = new Strings();
+            var resolvedSourceFilesWithCompileAsCLROption = new Strings();
+            var compileAsClrFilesExclude = new Strings();
+            var resolvedSourceFilesWithCompileAsNonCLROption = new Strings();
+            var resolvedSourceFilesWithCompileAsWinRTOption = new Strings();
+            var resolvedSourceFilesWithExcludeAsWinRTOption = new Strings();
+            using (builder.CreateProfilingScope("Project.ResolveSourceFiles:ApplyProjectRegexes"))
             {
-                if (conf.IsBlobbed)
-                    oneBlobbed = true;
+                // Do first part that is specific to project to not repeat for each config
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesBuildExclude, sourceFilesBuildExcludeRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsCOption, sourceFilesCompileAsCRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsCPPOption, sourceFilesCompileAsCPPRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsCLROption, sourceFilesCompileAsCLRRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref compileAsClrFilesExclude, sourceFilesCompileAsCLRExcludeRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsNonCLROption, sourceFilesCompileAsNonCLRRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsWinRTOption, sourceFilesCompileAsWinRTRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithExcludeAsWinRTOption, sourceFilesExcludeAsWinRTRegex);
+            }
 
-                if (conf.IsFastBuild && conf.FastBuildBlobbed)
-                    fastBuildBlobs = true;
-
-                conf.ResolvedSourceFilesBuildExclude.AddRange(SourceFilesExclude);
-
-                // add SourceFilesBuildExclude from the project
-                if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, ResolvedSourceFilesBuildExclude))
-                    Debugger.Break();
-                conf.ResolvedSourceFilesBuildExclude.AddRange(ResolvedSourceFilesBuildExclude);
-                if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, conf.SourceFilesBuildExclude))
-                    Debugger.Break();
-                conf.ResolvedSourceFilesBuildExclude.AddRange(conf.SourceFilesBuildExclude);
-                var configSourceFilesBuildExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesBuildExcludeRegex);
-
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesBuildExclude, configSourceFilesBuildExcludeRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                if (SourceFilesBuildExcludeRegex.Count > 0)
+            // Optimization: with projects with huge number of configurations, regexes are the exact same in multiple confs.
+            // Here we group confs with exact same md5 of regexes to do a lot of matching a single time.
+            var md5Hasher = System.Security.Cryptography.MD5.Create();
+            var confRegexesHashToAnyConf = new Dictionary<string, Configuration>();
+            var confToRegexesHash = new Dictionary<Configuration, string>();
+            using (builder.CreateProfilingScope("Project.ResolveSourceFiles:GroupCommonRegexes", Configurations.Count))
+            {
+                foreach (Configuration conf in Configurations)
                 {
-                    if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesBuildExclude, sourceFilesBuildExcludeRegex) &&
-                        DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                        Debugger.Break();
+                    var stream = new MemoryStream(2000);
+                    var writer = new BinaryWriter(stream);
+                    writer.Write(conf.SourceFilesBuildExcludeRegex.Count);
+                    foreach (string val in conf.SourceFilesBuildExcludeRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsCRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsCRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsCPPRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsCPPRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsCLRRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsCLRRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsCLRExcludeRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsCLRExcludeRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsNonCLRRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsNonCLRRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsWinRTRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsWinRTRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesExcludeAsWinRTRegex.Count);
+                    foreach (string val in conf.SourceFilesExcludeAsWinRTRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesFiltersRegex.Count);
+                    foreach (string val in conf.SourceFilesFiltersRegex)
+                        writer.Write(val);
+
+                    byte[] data = md5Hasher.ComputeHash(stream.GetBuffer());
+                    string md5 = BitConverter.ToString(data);
+                    confToRegexesHash[conf] = md5;
+                    confRegexesHashToAnyConf[md5] = conf;
                 }
+            }
 
-                // Resolve files that will be built as C Files 
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCOption, sourceFilesCompileAsCRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                var configSourceFilesCompileAsCRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCRegex);
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCOption, configSourceFilesCompileAsCRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCOption);
-
-                // Resolve files that will be built as CPP Files 
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCPPOption, sourceFilesCompileAsCPPRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                var configSourceFilesCompileAsCPPRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCPPRegex);
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCPPOption, configSourceFilesCompileAsCPPRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCPPOption);
-
-                // Resolve files that will be built as CLR Files 
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCLROption, sourceFilesCompileAsCLRRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                var configSourceFilesCompileAsCLRRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRRegex);
-
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCLROption, configSourceFilesCompileAsCLRRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                // Remove file that match SourceFilesCompileAsCLRExcludeRegex
-                var compileAsClrFilesExclude = new Strings();
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref compileAsClrFilesExclude, sourceFilesCompileAsCLRExcludeRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                var configSourceFilesCompileAsCLRExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRExcludeRegex);
-
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref compileAsClrFilesExclude, configSourceFilesCompileAsCLRExcludeRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                foreach (var excludeSourceFile in compileAsClrFilesExclude)
+            using (builder.CreateProfilingScope("Project.ResolveSourceFiles:ApplyCommonRegexes", confRegexesHashToAnyConf.Count))
+            {
+                foreach (var conf in confRegexesHashToAnyConf.Values)
                 {
-                    conf.ResolvedSourceFilesWithCompileAsCLROption.Remove(excludeSourceFile);
-                }
+                    conf.ResolvedSourceFilesBuildExclude.AddRange(resolvedSourceFilesBuildExclude);
+                    var configSourceFilesBuildExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesBuildExcludeRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesBuildExclude, configSourceFilesBuildExcludeRegex);
 
-                conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCLROption);
+                    // Resolve files that will be built as C Files 
+                    conf.ResolvedSourceFilesWithCompileAsCOption.AddRange(resolvedSourceFilesWithCompileAsCOption);
+                    var configSourceFilesCompileAsCRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCOption, configSourceFilesCompileAsCRegex);
 
-                // Resolve non-CLR files.
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles,
-                    ref conf.ResolvedSourceFilesWithCompileAsNonCLROption, sourceFilesCompileAsNonCLRRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
+                    // Resolve files that will be built as CPP Files 
+                    conf.ResolvedSourceFilesWithCompileAsCPPOption.AddRange(resolvedSourceFilesWithCompileAsCPPOption);
+                    var configSourceFilesCompileAsCPPRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCPPRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCPPOption, configSourceFilesCompileAsCPPRegex);
 
-                var configSourceFilesCompileAsNonCLRRegex =
-                    RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsNonCLRRegex);
+                    // Resolve files that will be built as CLR Files 
+                    conf.ResolvedSourceFilesWithCompileAsCLROption.AddRange(resolvedSourceFilesWithCompileAsCLROption);
+                    var configSourceFilesCompileAsCLRRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCLROption, configSourceFilesCompileAsCLRRegex);
 
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles,
-                    ref conf.ResolvedSourceFilesWithCompileAsNonCLROption, configSourceFilesCompileAsNonCLRRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
+                    // Remove file that match SourceFilesCompileAsCLRExcludeRegex
+                    var configCompileAsClrFilesExclude = new Strings();
+                    configCompileAsClrFilesExclude.AddRange(compileAsClrFilesExclude);
+                    var configSourceFilesCompileAsCLRExcludeRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRExcludeRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref configCompileAsClrFilesExclude, configSourceFilesCompileAsCLRExcludeRegex);
+                    conf.ResolvedSourceFilesWithCompileAsCLROption.RemoveRange(configCompileAsClrFilesExclude);
 
-                conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsNonCLROption);
+                    // Resolve non-CLR files.
+                    conf.ResolvedSourceFilesWithCompileAsNonCLROption.AddRange(resolvedSourceFilesWithCompileAsNonCLROption);
+                    var configSourceFilesCompileAsNonCLRRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsNonCLRRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsNonCLROption, configSourceFilesCompileAsNonCLRRegex);
 
-                // Resolve files that will be built as WinRT Files 
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsWinRTOption, sourceFilesCompileAsWinRTRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
+                    // Resolve files that will be built as WinRT Files 
+                    conf.ResolvedSourceFilesWithCompileAsWinRTOption.AddRange(resolvedSourceFilesWithCompileAsWinRTOption);
+                    var configSourceFilesCompileAsWinRTRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsWinRTRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsWinRTOption, configSourceFilesCompileAsWinRTRegex);
 
-                var configSourceFilesCompileAsWinRTRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsWinRTRegex);
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsWinRTOption, configSourceFilesCompileAsWinRTRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
+                    // Resolve files that will not be built as WinRT Files 
+                    conf.ResolvedSourceFilesWithExcludeAsWinRTOption.AddRange(resolvedSourceFilesWithExcludeAsWinRTOption);
+                    var configSourceFilesExcludeAsWinRTRegex = RegexCache.GetCachedRegexes(conf.SourceFilesExcludeAsWinRTRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithExcludeAsWinRTOption, configSourceFilesExcludeAsWinRTRegex);
 
-                conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsWinRTOption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCOption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCPPOption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsNonCLROption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCLROption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsWinRTOption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithExcludeAsWinRTOption);
 
-                // Resolve files that will not be built as WinRT Files 
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithExcludeAsWinRTOption, sourceFilesExcludeAsWinRTRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                var configSourceFilesExcludeAsWinRTRegex = RegexCache.GetCachedRegexes(conf.SourceFilesExcludeAsWinRTRegex);
-                if (AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithExcludeAsWinRTOption, configSourceFilesExcludeAsWinRTRegex) &&
-                    DebugBreaks.CanBreakOnProjectConfiguration(conf))
-                    Debugger.Break();
-
-                conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithExcludeAsWinRTOption);
-
-                var configSourceFilesFiltersRegex = RegexCache.GetCachedRegexes(conf.SourceFilesFiltersRegex).ToArray();
-                if (conf.SourceFilesFiltersRegex.Count != 0)
-                {
-                    foreach (var sourceFile in SourceFiles)
+                    var configSourceFilesFiltersRegex = RegexCache.GetCachedRegexes(conf.SourceFilesFiltersRegex).ToArray();
+                    if (conf.SourceFilesFiltersRegex.Count != 0)
                     {
-                        if (!configSourceFilesFiltersRegex.Any(regex => regex.Match(sourceFile).Success))
-                            conf.ResolvedSourceFilesBuildExclude.Add(sourceFile);
+                        foreach (var sourceFile in SourceFiles)
+                        {
+                            if (!configSourceFilesFiltersRegex.Any(regex => regex.Match(sourceFile).Success))
+                                conf.ResolvedSourceFilesBuildExclude.Add(sourceFile);
+                        }
+                        Util.ResolvePath(SourceRootPath, ref conf.ResolvedSourceFilesBuildExclude);
                     }
-                    Util.ResolvePath(SourceRootPath, ref conf.ResolvedSourceFilesBuildExclude);
+
+                    // To allow sharing with other configs
+                    conf.ResolvedSourceFilesWithCompileAsCOption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithCompileAsCPPOption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithCompileAsCLROption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithCompileAsNonCLROption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithCompileAsWinRTOption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithExcludeAsWinRTOption.SetReadOnly(true);
+                }
+            }
+
+            using (builder.CreateProfilingScope("Project.ResolveSourceFiles:ApplyRegexesToConfigs", Configurations.Count))
+            {
+                foreach (Configuration conf in Configurations)
+                {
+                    if (conf.IsBlobbed)
+                        oneBlobbed = true;
+
+                    if (conf.IsFastBuild && conf.FastBuildBlobbed)
+                        fastBuildBlobs = true;
+
+                    conf.ResolvedSourceFilesBuildExclude.AddRange(SourceFilesExclude);
+
+                    // add SourceFilesBuildExclude from the project
+                    if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, ResolvedSourceFilesBuildExclude))
+                        Debugger.Break();
+                    conf.ResolvedSourceFilesBuildExclude.AddRange(ResolvedSourceFilesBuildExclude);
+                    if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.Resolving, conf.SourceFilesBuildExclude))
+                        Debugger.Break();
+                    conf.ResolvedSourceFilesBuildExclude.AddRange(conf.SourceFilesBuildExclude);
+
+                    var doneConfWithSameRegexes = confRegexesHashToAnyConf[confToRegexesHash[conf]];
+
+                    if (!Object.ReferenceEquals(doneConfWithSameRegexes, conf))
+                    {
+                        conf.ResolvedSourceFilesBuildExclude.AddRange(doneConfWithSameRegexes.ResolvedSourceFilesBuildExclude);
+
+                        // Copy references here to be faster, these must not be modified from now on
+                        conf.ResolvedSourceFilesWithCompileAsCOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsCOption;
+                        conf.ResolvedSourceFilesWithCompileAsCPPOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsCPPOption;
+                        conf.ResolvedSourceFilesWithCompileAsCLROption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsCLROption;
+                        conf.ResolvedSourceFilesWithCompileAsNonCLROption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsNonCLROption;
+                        conf.ResolvedSourceFilesWithCompileAsWinRTOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsWinRTOption;
+                        conf.ResolvedSourceFilesWithExcludeAsWinRTOption = doneConfWithSameRegexes.ResolvedSourceFilesWithExcludeAsWinRTOption;
+                    }
                 }
             }
 
@@ -1007,7 +1196,12 @@ namespace Sharpmake
                 foreach (var conf in Configurations)
                     conf.ResolvedSourceFilesBlobExclude.AddRange(SourceFilesBlobExclude);
 
-                foreach (string sourceFile in ResolvedSourceFiles)
+                // Use ResolvedSourceFiles sorted by relative paths
+                var sortedResolvedSourceFiles = ResolvedSourceFiles.Zip(resolvedSourceFilesRelative, (file, relFile) => new Tuple<string, string>(file, relFile))
+                                                                   .OrderBy(t => t.Item2, StringComparer.OrdinalIgnoreCase)
+                                                                   .Select(t => t.Item1);
+
+                foreach (string sourceFile in sortedResolvedSourceFiles)
                 {
                     if (DebugBreaks.ShouldBreakOnSourcePath(DebugBreaks.Context.BlobbingResolving, sourceFile))
                         Debugger.Break();
@@ -1086,6 +1280,12 @@ namespace Sharpmake
         }
 
         public virtual bool ResolveFilterPath(string relativePath, out string filterPath)
+        {
+            filterPath = null;
+            return false;
+        }
+
+        public virtual bool ResolveFilterPathForFile(string relativeFilePath, out string filterPath)
         {
             filterPath = null;
             return false;
@@ -1379,22 +1579,22 @@ namespace Sharpmake
         internal bool Resolved { get; private set; }
         public Dictionary<string, List<Project.Configuration>> ProjectFilesMapping { get; } = new Dictionary<string, List<Configuration>>();
 
-        internal static Project CreateProject(Type projectType, List<Object> fragmentMasks)
+        public enum ProjectTypeAttribute
+        {
+            Unknown,
+            Generate,
+            Export,
+            Compile
+        }
+
+        internal static Project CreateProject(Type projectType, List<object> fragmentMasks, ProjectTypeAttribute projectTypeAttribute)
         {
             Project project;
-            try
-            {
-                project = Activator.CreateInstance(projectType) as Project;
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException != null && (e.InnerException is Error || e.InnerException is InternalError))
-                    throw e.InnerException;
 
-                throw new Error(e, "Cannot create instances of type: {0}, make sure it's public", projectType.Name);
-            }
+            project = Activator.CreateInstance(projectType) as Project;
+            project.SharpmakeProjectType = projectTypeAttribute;
 
-            project.Targets.AddFragmentMask(fragmentMasks.ToArray());
+            project.Targets.SetGlobalFragmentMask(fragmentMasks.ToArray());
             project.Targets.BuildTargets();
             return project;
         }
@@ -1450,12 +1650,10 @@ namespace Sharpmake
         {
         }
 
-        public void AfterConfigure()
+        public virtual void AfterConfigure()
         {
             foreach (Project.Configuration conf in Configurations)
             {
-                conf.SetDefaultOutputExtension();
-
                 if (conf.IsFastBuild && SourceFilesFiltersRegex.Count > 0)
                 {
                     if (conf.FastBuildBlobbed)
@@ -1505,17 +1703,13 @@ namespace Sharpmake
                     var includePathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(IncludePathsExcludeFromWarningRegex).ToArray();
                     var libraryPathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(LibraryPathsExcludeFromWarningRegex).ToArray();
 
-                    // check if the files marked as excluded from build still exist
+                    // check if the files marked with specific options still exist
                     foreach (var array in new Dictionary<Strings, string> {
-                            {conf.ResolvedSourceFilesBuildExclude,                nameof(conf.ResolvedSourceFilesBuildExclude)},
-                            {conf.ResolvedSourceFilesBlobExclude,                 nameof(conf.ResolvedSourceFilesBlobExclude)},
                             {conf.ResolvedSourceFilesWithCompileAsCLROption,      nameof(conf.ResolvedSourceFilesWithCompileAsCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsCOption,        nameof(conf.ResolvedSourceFilesWithCompileAsCOption)},
                             {conf.ResolvedSourceFilesWithCompileAsCPPOption,      nameof(conf.ResolvedSourceFilesWithCompileAsCPPOption)},
                             {conf.ResolvedSourceFilesWithCompileAsNonCLROption,   nameof(conf.ResolvedSourceFilesWithCompileAsNonCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithCompileAsWinRTOption)},
-                            {conf.ResolvedSourceFilesWithExcludeAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithExcludeAsWinRTOption)},
-                            {conf.PrecompSourceExclude,                           nameof(conf.PrecompSourceExclude)}
                         })
                     {
                         foreach (string file in array.Key)
@@ -1527,13 +1721,30 @@ namespace Sharpmake
                         }
                     }
 
+                    // check if the files marked as excluded from build still exist
+                    foreach (var array in new Dictionary<Strings, string> {
+                            {conf.ResolvedSourceFilesBuildExclude,                nameof(conf.ResolvedSourceFilesBuildExclude)},
+                            {conf.ResolvedSourceFilesBlobExclude,                 nameof(conf.ResolvedSourceFilesBlobExclude)},
+                            {conf.ResolvedSourceFilesWithExcludeAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithExcludeAsWinRTOption)},
+                            {conf.PrecompSourceExclude,                           nameof(conf.PrecompSourceExclude)}
+                        })
+                    {
+                        foreach (string file in array.Key)
+                        {
+                            if (!File.Exists(file))
+                            {
+                                ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: File contained in {array.Value} doesn't exist: {file}.", onlyWarn: true);
+                            }
+                        }
+                    }
+
 
                     // check if the inclusion paths exist
                     foreach (var includeArray in new[] { conf.IncludePaths, conf.IncludePrivatePaths })
                     {
                         foreach (string folder in includeArray)
                         {
-                            if (!folder.StartsWith("$") && !includePathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
+                            if (!folder.StartsWith("$", StringComparison.Ordinal) && !includePathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
                             {
                                 ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: Folder contained in include paths doesn't exist: {folder}.", true);
                             }
@@ -1548,10 +1759,15 @@ namespace Sharpmake
                     var platformLibraryPaths = configTasks.GetPlatformLibraryPaths(conf);
                     allLibraryPaths.AddRange(platformLibraryPaths);
 
-                    string platformLibExtension = "." + configTasks.GetDefaultOutputExtension(Configuration.OutputType.Lib);
+                    // remove all the rooted files
+                    var allRootedFiles = allLibraryFiles.Where(file => Path.IsPathRooted(file)).ToArray();
+                    allLibraryFiles.RemoveRange(allRootedFiles);
+
+                    string platformLibPrefix = configTasks.GetOutputFileNamePrefix(Configuration.OutputType.Lib);
+                    string platformLibExtension = configTasks.GetDefaultOutputFullExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
-                        if (!folder.StartsWith("$") && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
+                        if (!folder.StartsWith("$", StringComparison.Ordinal) && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
                         {
                             ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: Folder contained in conf.LibraryPaths doesn't exist. Folder: {folder}.", true);
                         }
@@ -1561,14 +1777,17 @@ namespace Sharpmake
                             var toRemove = new List<string>();
                             foreach (string file in allLibraryFiles)
                             {
-                                string path = Path.IsPathRooted(file) ? file : Path.Combine(folder, file);
-                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, "lib" + file + platformLibExtension)))
+                                string path = Path.Combine(folder, file);
+                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, platformLibPrefix + file + platformLibExtension)))
                                     toRemove.Add(file);
                             }
 
                             allLibraryFiles.RemoveRange(toRemove);
                         }
                     }
+
+                    // Add all rooted files that are missing
+                    allLibraryFiles.Add(allRootedFiles.Where(file => !File.Exists(file)).ToArray());
 
                     // everything that remains is a missing library file
                     foreach (string file in allLibraryFiles)
@@ -1579,55 +1798,67 @@ namespace Sharpmake
             }
         }
 
-        internal void Resolve(Builder builder, bool skipInvalidPath)
+        internal virtual void Resolve(Builder builder, bool skipInvalidPath)
         {
             if (Resolved)
                 return;
 
-            // valid work blob parameters, set BlobWorkEnabled to false if 0 work blob specified
-            if (BlobWorkEnabled && BlobWorkFileCount == 0)
-                BlobWorkEnabled = false;
-
-            Resolver resolver = new Resolver();
-            resolver.SetParameter("project", this);
-
-            if (skipInvalidPath)
-                resolver.Resolve(this, fallbackValue: false);
-            else
-                resolver.Resolve(this);
-
-            // Resolve full paths
-            _rootPath = Util.SimplifyPath(RootPath);
-            Util.ResolvePath(SharpmakeCsPath, ref _sourceRootPath);
-            Util.ResolvePath(SourceRootPath, ref SourceFiles);
-            Util.ResolvePath(SourceRootPath, ref SourceFilesExclude);
-            Util.ResolvePath(SourceRootPath, ref SourceFilesBlobExclude);
-            Util.ResolvePath(SourceRootPath, ref SourceFilesBuildExclude);
-            Util.ResolvePath(SharpmakeCsPath, ref _blobPath);
-
-            if (PerforceRootPath != null)
-                Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
-
-            if (SourceFilesFilters != null)
-                Util.ResolvePath(SharpmakeCsPath, ref SourceFilesFilters);
-
-            // Resolve Configuration
-            foreach (Project.Configuration conf in Configurations)
-                conf.Resolve(resolver);
-
-            if (GetType().IsDefined(typeof(Generate), false))
+            using (builder.CreateProfilingScope("ResolveProject"))
             {
-                PreResolveSourceFiles();
-                ResolveSourceFiles(builder);
-            }
-            PostResolve();
+                // valid work blob parameters, set BlobWorkEnabled to false if 0 work blob specified
+                if (BlobWorkEnabled && BlobWorkFileCount == 0)
+                    BlobWorkEnabled = false;
 
-            if (builder.DumpDependencyGraph)
-            {
-                foreach (Project.Configuration conf in Configurations)
-                    DependencyTracker.Instance.UpdateConfiguration(this, conf);
+                Resolver resolver = new Resolver();
+                resolver.SetParameter("project", this);
+
+                if (skipInvalidPath)
+                    resolver.Resolve(this, fallbackValue: false);
+                else
+                    resolver.Resolve(this);
+
+                // Resolve full paths
+                _rootPath = Util.SimplifyPath(RootPath);
+                Util.ResolvePath(SharpmakeCsPath, ref _sourceRootPath);
+                Util.ResolvePath(SharpmakeCsPath, ref AdditionalSourceRootPaths);
+                Util.ResolvePath(SourceRootPath, ref SourceFiles);
+                Util.ResolvePath(SourceRootPath, ref SourceFilesExclude);
+                Util.ResolvePath(SourceRootPath, ref SourceFilesBlobExclude);
+                Util.ResolvePath(SourceRootPath, ref SourceFilesBuildExclude);
+                Util.ResolvePath(SharpmakeCsPath, ref _blobPath);
+
+                if (PerforceRootPath != null)
+                    Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
+
+                if (SourceFilesFilters != null)
+                    Util.ResolvePath(SharpmakeCsPath, ref SourceFilesFilters);
+
+                XResourcesImg.Resolve(SourceRootPath, resolver);
+
+                using (builder.CreateProfilingScope("ResolveConfs (" + Configurations.Count + ")"))
+                {
+                    // Resolve Configuration
+                    foreach (Project.Configuration conf in Configurations)
+                        conf.Resolve(resolver);
+                }
+
+                if (SharpmakeProjectType == ProjectTypeAttribute.Generate)
+                {
+                    using (builder.CreateProfilingScope("PreResolveSourceFiles"))
+                        PreResolveSourceFiles();
+                    using (builder.CreateProfilingScope("ResolveSourceFiles"))
+                        ResolveSourceFiles(builder);
+                }
+                using (builder.CreateProfilingScope("PostResolve"))
+                    PostResolve();
+
+                if (builder.DumpDependencyGraph && !IsFastBuildAll)
+                {
+                    foreach (Configuration conf in Configurations)
+                        DependencyTracker.Instance.UpdateConfiguration(this, conf);
+                }
+                Resolved = true;
             }
-            Resolved = true;
         }
 
         /// <summary>
@@ -1730,19 +1961,6 @@ namespace Sharpmake
         }
 
         #endregion
-
-        #region Deprecated
-        [Obsolete("Use " + nameof(SourceFilesBlobExtensions) + ".")]
-        public Strings SourceFilesBlobExtension => SourceFilesBlobExtensions;
-        [Obsolete("Use " + nameof(ResourceFilesExtensions) + ".")]
-        public Strings ResourceFilesExtension => ResourceFilesExtensions;
-        [Obsolete("Use " + nameof(NatvisFilesExtensions) + ".")]
-        public Strings NatvisFilesExtension => NatvisFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesExtensions) + ".")]
-        protected Strings SourceFilesExtension => SourceFilesExtensions;
-        [Obsolete("Use " + nameof(SourceFilesCompileExtensions) + ".")]
-        protected Strings SourceFilesCompileExtension => SourceFilesCompileExtensions;
-        #endregion
     }
 
     [Sharpmake.Generate]
@@ -1801,8 +2019,10 @@ namespace Sharpmake
         public override bool Equals(object obj)
         {
             ImportProject other = (ImportProject)obj;
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return string.Equals(Project, other.Project) && string.Equals(Condition, other.Condition);
         }
     }
@@ -1849,6 +2069,13 @@ namespace Sharpmake
         public FileType FileType = FileType.File;
     }
 
+    [Resolver.Resolvable]
+    public class GlobSetting
+    {
+        public string Include;
+        public string Exclude;
+    }
+
     public enum CSharpProjectType
     {
         Test,
@@ -1858,6 +2085,22 @@ namespace Sharpmake
         Wcf,
         AspNetMvc5,
         Default
+    }
+
+    public enum CSharpProjectSchema
+    {
+        NetCore,
+        NetFramework,
+        Default
+    }
+
+    public enum NetCoreSdkTypes
+    {
+        Default,
+        Web,
+        Razor,
+        Worker,
+        WindowsDesktop
     }
 
     public class CSharpVstoProject : CSharpProject
@@ -1910,8 +2153,7 @@ namespace Sharpmake
             aspNetProject.ProjectTypeGuids = CSharpProjectType.AspNetMvc5;
             aspNetProject.SourceFilesExtensions.Add(".asax");
 
-            string[] contentExtension = new[]
-            {
+            string[] contentExtension = {
                 ".cshtml", ".js", ".map",
                 ".css", ".scss",
                 ".eot", ".svg", ".ttf", ".woff", ".woff2",
@@ -1974,10 +2216,6 @@ namespace Sharpmake
             this.InitAspNetProject();
         }
 
-        [Obsolete("Not needed anymore, InitAspNetProject() handle it")]
-        public void AddCommonWebExtensions()
-        { }
-
         public void AddDefaultReferences(Configuration conf)
         {
             CSharpProjectExtensions.AddAspNetReferences(conf);
@@ -2019,9 +2257,12 @@ namespace Sharpmake
         public Strings ContentExtension = new Strings();
         public Strings VsctExtension = new Strings(".vsct");
         public CSharpProjectType ProjectTypeGuids = CSharpProjectType.Default;
+        public CSharpProjectSchema ProjectSchema = CSharpProjectSchema.Default;
+        public NetCoreSdkTypes NetCoreSdkType = NetCoreSdkTypes.Default;
         public string ResourcesPath = null;
         public string ContentPath = null;
-        public string ApplicationIcon = String.Empty;
+        public string BaseIntermediateOutputPath = string.Empty;
+        public string ApplicationIcon = string.Empty;
         public string ApplicationManifest = "app.manifest";
         public string ApplicationSplashScreen = string.Empty;
         public string StartupObject = string.Empty;
@@ -2057,6 +2298,17 @@ namespace Sharpmake
         public List<BootstrapperPackage> BootstrapperPackages = new List<BootstrapperPackage>();
         public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
         public List<PublishFile> PublishFiles = new List<PublishFile>();
+        public List<GlobSetting> Globs = new List<GlobSetting>();
+
+        /// <summary>
+        /// If set to true. Will explicit the RestoreProjectStyle in the project file
+        /// </summary>
+        public bool ExplicitNugetRestoreProjectStyle = false;
+
+        /// <summary>
+        /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
+        /// </summary>
+        public bool EnableDefaultItems { get; set; } = false;
 
         public bool IncludeResxAsResources = true;
         public string RootNamespace;
@@ -2064,7 +2316,8 @@ namespace Sharpmake
         public Strings EmbeddedResourceExtensions; // this is used mainly for WinForms, for WPF applications use Resources for embedded and Content for linked
         public List<WebReferenceUrl> WebReferenceUrls = new List<WebReferenceUrl>();
         public List<ComReference> ComReferences = new List<ComReference>();
-        public UniqueList<ImportProject> ImportProjects = new UniqueList<ImportProject>();
+        public List<ImportProject> PreImportProjects = new List<ImportProject>();
+        public List<ImportProject> ImportProjects = new List<ImportProject>();
         public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
         public List<UsingTask> UsingTasks = new List<UsingTask>();
 
@@ -2074,12 +2327,21 @@ namespace Sharpmake
         // writes Pre/Post BuildEvents per configuration instead of one for all, this will make editing events in Visual Studio impossible
         public bool ConfigurationSpecificEvents = false;
 
+        public GeneratedAssemblyConfig GeneratedAssemblyConfig = new GeneratedAssemblyConfig();
+
         // Determines the type of NuGet references generated for this project
         public NuGetPackageMode NuGetReferenceType = NuGetPackageMode.VersionDefault;
 
         public Options.CSharp.RunPostBuildEvent RunPostBuildEvent = Options.CSharp.RunPostBuildEvent.OnBuildSuccess;
 
         public string CodeAnalysisRuleSetFileName;
+
+        public const string DefaultImportProject = @"$(MSBuildBinPath)\Microsoft.CSharp.targets";
+
+        /// <summary>
+        /// Generate a file containing API documentation.
+        /// </summary>
+        public bool GenerateDocumentationFile = false;
 
         [Resolver.Resolvable]
         public class CustomTargetElement
@@ -2125,7 +2387,7 @@ namespace Sharpmake
             IsTargetFileNameToLower = false;
             ResourcesPath = RootPath + @"\Resources\";
             ContentPath = RootPath + @"\Content\";
-            ImportProjects.Add(new ImportProject { Project = @"$(MSBuildBinPath)\Microsoft.CSharp.targets" });
+            ImportProjects.Add(new ImportProject { Project = DefaultImportProject });
             ApplicationDefinitionFilenames.Add("App.xaml", "MainApplication.xaml");
 
             //Default Excludes
@@ -2169,6 +2431,33 @@ namespace Sharpmake
             InitCSharpSpecifics();
         }
 
+        internal override void Resolve(Builder builder, bool skipInvalidPath)
+        {
+            base.Resolve(builder, skipInvalidPath);
+
+            if (!string.IsNullOrEmpty(ApplicationIcon))
+                Util.ResolvePath(SourceRootPath, ref ApplicationIcon);
+            if (!string.IsNullOrEmpty(ApplicationManifest))
+                Util.ResolvePath(SourceRootPath, ref ApplicationManifest);
+            if (!string.IsNullOrEmpty(ApplicationSplashScreen))
+                Util.ResolvePath(SourceRootPath, ref ApplicationSplashScreen);
+        }
+
+        public void AddCSharpSpecificImportProjects(List<ImportProject> importProjects, DevEnv devEnv)
+        {
+            if (ProjectTypeGuids == CSharpProjectType.Vsix)
+            {
+                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets", Condition = @"'$(VSToolsPath)' != ''" });
+            }
+
+            if (ProjectTypeGuids == CSharpProjectType.AspNetMvc5)
+            {
+                importProjects.Add(new ImportProject { Project = @"$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", Condition = "'$(VSToolsPath)' != ''" });
+                importProjects.Add(new ImportProject { Project = @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets", Condition = "false" });
+            }
+        }
+
+
         public override bool IsValidConfigurationOutputType(Configuration.OutputType outputType)
         {
             return (outputType == Configuration.OutputType.DotNetClassLibrary
@@ -2184,12 +2473,12 @@ namespace Sharpmake
             base.ResolveSourceFiles(builder);
 
             //Getting CorrectCaseVersion
-            if (!String.IsNullOrEmpty(ResourcesPath) && Directory.Exists(ResourcesPath))
+            if (!string.IsNullOrEmpty(ResourcesPath) && Directory.Exists(ResourcesPath))
             {
                 ResolvedResourcesFullFileNames = new Strings(GetDirectoryFiles(new DirectoryInfo(ResourcesPath)).Select(GetCapitalizedFile));
             }
 
-            if (!String.IsNullOrEmpty(ContentPath) && Directory.Exists(ContentPath))
+            if (!string.IsNullOrEmpty(ContentPath) && Directory.Exists(ContentPath))
             {
                 ResolvedContentFullFileNames = new Strings(GetDirectoryFiles(new DirectoryInfo(ContentPath)).Select(GetCapitalizedFile));
             }
@@ -2239,14 +2528,15 @@ namespace Sharpmake
 
         protected override void ExcludeOutputFiles()
         {
-            foreach (var conf in Configurations)
+            // Don't put back this, this is pure evil
+            /*foreach (var conf in Configurations)
             {
                 SourceFilesExcludeRegex.Add(conf.TargetPath.Replace("\\", "\\\\"));
                 SourceFilesExcludeRegex.Add(conf.IntermediatePath.Replace("\\", "\\\\"));
-            }
+            }*/
         }
 
-        private List<String> _filteredEmbeddedAssemblies = null;
+        private List<string> _filteredEmbeddedAssemblies = null;
         public virtual string GetLinkFolder(string file)
         {
             if (PreserveLinkFolderPaths)
@@ -2294,13 +2584,6 @@ namespace Sharpmake
 
             return "Resources";
         }
-
-        #region Deprecated
-        [Obsolete("Use " + nameof(NoneExtensions) + ".")]
-        public Strings NoneExtension => NoneExtensions;
-        [Obsolete("Use " + nameof(EmbeddedResourceExtensions) + ".")]
-        public Strings EmbeddedResourceExtension => EmbeddedResourceExtensions;
-        #endregion
     }
 
     public class PythonVirtualEnvironment
@@ -2310,15 +2593,25 @@ namespace Sharpmake
         public Guid Guid;
         public bool IsDefault;
         public Guid BaseInterpreterGuid;
+        public string Version;
 
         public PythonVirtualEnvironment(string name, string path, bool isDefault)
-            : this(name, path, isDefault, default(Guid))
+            : this(name, path, string.Empty, isDefault, default(Guid))
+        { }
+
+        public PythonVirtualEnvironment(string name, string path, string version, bool isDefault)
+            : this(name, path, version, isDefault, default(Guid))
         { }
 
         public PythonVirtualEnvironment(string name, string path, bool isDefault, Guid baseInterpreterGuid)
+            : this(name, path, string.Empty, isDefault, baseInterpreterGuid)
+        { }
+
+        public PythonVirtualEnvironment(string name, string path, string version, bool isDefault, Guid baseInterpreterGuid)
         {
             Name = name;
             Path = path;
+            Version = version;
             Guid = Util.BuildGuid(path);
             IsDefault = isDefault;
             BaseInterpreterGuid = baseInterpreterGuid;
@@ -2342,6 +2635,7 @@ namespace Sharpmake
         public List<PythonEnvironment> Environments = new List<PythonEnvironment>();
         public List<PythonVirtualEnvironment> VirtualEnvironments = new List<PythonVirtualEnvironment>();
         public Strings SearchPaths = new Strings();
+        public string StartupFile = string.Empty;
         public bool IsSourceFilesCaseSensitive = true;
 
         private void InitPythonSpecifics()
@@ -2366,6 +2660,8 @@ namespace Sharpmake
     /// </summary>
     public class AndroidPackageProject : Project
     {
+        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+
         public string AndroidManifest { get; set; } = "AndroidManifest.xml";
 
         public string AntBuildRootDirectory { get; set; } = @"$(OutDir)Package\";
@@ -2374,6 +2670,12 @@ namespace Sharpmake
 
         public string AntProjectPropertiesFile { get; set; } = "project.properties";
 
+        public Strings GradleTemplateFiles = new Strings();
+
+        public string GradlePlugin { get; set; } = RemoveLineTag;
+
+        public string GradleVersion { get; set; } = RemoveLineTag;
+
         /// <summary>
         /// The project type to lookup in the dependencies of the package to be used as the application library.
         /// This library is the first to be loaded when the package is started.
@@ -2381,7 +2683,6 @@ namespace Sharpmake
         /// <remarks>
         /// It is an error if the specified type can't be found in the configuration dependencies.
         /// </remarks>
-
         public Type AppLibType { get; set; }
 
         public AndroidPackageProject() : this(typeof(Target))

@@ -21,7 +21,7 @@ extension mechanism that allows Ubisoft developers to plug these platforms
 back in to compile code that depend on it.
 
 We have pulled the code out simply to comply with our NDA. If you are an
-authorized developper outside of Ubisoft and would like to try Sharpmake to
+authorized developer outside of Ubisoft and would like to try Sharpmake to
 generate projects for one of the platforms listed below, please contact one of
 the Sharpmake maintainers on the GitHub repository at
 https://github.com/UbisoftInc/Sharpmake

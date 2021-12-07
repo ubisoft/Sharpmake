@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ namespace Sharpmake.BuildContext
         public readonly DirectoryInfo Reference;
         public readonly DirectoryInfo RemapRoot;
 
-        private ConcurrentDictionary<string, OutputInfo> _referenceDifferenceMap = new ConcurrentDictionary<string, OutputInfo>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, OutputInfo> _referenceDifferenceMap = new ConcurrentDictionary<string, OutputInfo>(StringComparer.OrdinalIgnoreCase);
 
         public RegressionTest(DirectoryInfo outputDirectory, DirectoryInfo referenceDirectory, DirectoryInfo remapRoot)
             : base(false, true)
@@ -91,7 +91,7 @@ namespace Sharpmake.BuildContext
             RemapRoot = remapRoot;
             FillReferenceMapRecursive(referenceDirectory);
 
-            // delete the ouput directory subfolders and files so all files are generated files
+            // delete the output directory subfolders and files so all files are generated files
             if (Output.Exists)
                 Output.Delete(true);
 

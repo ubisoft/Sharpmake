@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,13 +43,17 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public const string ProjectDescription =
 @"  <PropertyGroup Label=""Globals"">
+    <AndroidBuildType>[androidBuildType]</AndroidBuildType>
     <ProjectGuid>{[guid]}</ProjectGuid>
     <RootNamespace>[projectName]</RootNamespace>
     <MinimumVisualStudioVersion>[toolsVersion]</MinimumVisualStudioVersion>
     <ProjectVersion>1.0</ProjectVersion>
     <ProjectName>[projectName]</ProjectName>
-  </PropertyGroup>
-  <Import Project=""$(AndroidTargetsPath)\Android.Default.props"" />
+    <AndroidTargetsPath>[androidTargetsPath]</AndroidTargetsPath>
+";
+
+                public const string ImportAndroidDefaultProps =
+@"  <Import Project=""$(AndroidTargetsPath)\Android.Default.props"" />
 ";
 
                 // The output directory is converted to a rooted path by prefixing it with $(ProjectDir) to work around
@@ -61,17 +65,20 @@ namespace Sharpmake.Generators.VisualStudio
     <AndroidAPILevel>[options.AndroidAPILevel]</AndroidAPILevel>
     <OutDir>$(ProjectDir)[options.OutputDirectory]\</OutDir>
     <IntDir>[options.IntermediateDirectory]\</IntDir>
+    <TargetName>[options.OutputFile]</TargetName>
+    <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
   </PropertyGroup>
 ";
 
                 public const string ProjectAfterConfigurationsGeneral =
 @"  <Import Project=""$(AndroidTargetsPath)\Android.props"" />
-  <ImportGroup Label=""ExtensionSettings"" />
-    <ImportGroup Label=""Shared"" />
+  <ImportGroup Label=""ExtensionSettings"">
 ";
 
                 public const string ProjectAfterImportedProps =
-@"  <PropertyGroup Label=""UserMacros"" />
+@"  </ImportGroup>
+    <ImportGroup Label=""Shared"" />
+  <PropertyGroup Label=""UserMacros"" />
 ";
 
                 public const string ProjectConfigurationBeginItemDefinition =
@@ -85,7 +92,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public const string AntPackage =
 @"    <AntPackage>
       <WorkingDirectory>[androidPackageDirectory]</WorkingDirectory>
-      <AndroidAppLibName>[options.OutputFile]</AndroidAppLibName>
+      <AndroidAppLibName>[options.AndroidAppLibName]</AndroidAppLibName>
     </AntPackage>
 ";
 
@@ -130,6 +137,21 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public const string ProjectFilesHeader =
 @"    <ClInclude Include=""[file.FileNameProjectRelative]"" />
+";
+
+                public static string ContentSimple =
+@"    <Content Include=""[file.FileNameSourceRelative]"" />
+";
+
+                public static string GradleTemplate =
+@"    <GradleTemplate Include=""[gradleTemplateFile]"" />
+";
+
+                public static string GradlePackage =
+@"    <GradlePackage>
+      <GradlePlugin>[gradlePlugin]</GradlePlugin>
+      <GradleVersion>[gradleVersion]</GradleVersion>
+    </GradlePackage>
 ";
             }
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading;
-using Microsoft.Build.Utilities;
+using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Text;
+#if NETFRAMEWORK
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net472;
+#else
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net50;
+#endif
 
 namespace Sharpmake
 {
     public class Assembler
     {
-        /// <summary>
-        /// Extra user directory to load assembly from using statement detection
-        /// </summary>
-        [Obsolete("AssemblyDirectory is not used anymore")]
-        public List<string> AssemblyDirectory { get { return _assemblyDirectory; } }
+        public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
+#if NETFRAMEWORK
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
+#else
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net5_0;
+#endif
 
         /// <summary>
         /// Extra user assembly to use while compiling
@@ -55,9 +65,10 @@ namespace Sharpmake
 
         public bool UseDefaultParsers = true;
 
+        [Obsolete("Default references are always used.")]
         public bool UseDefaultReferences = true;
 
-        public static readonly string[] DefaultReferences = { "System.dll", "System.Core.dll" };
+        public static readonly string[] DefaultReferences = BasicReferenceAssemblies.References.All.Select(r => r.FileName).ToArray();
 
         private class AssemblyInfo : IAssemblyInfo
         {
@@ -91,8 +102,8 @@ namespace Sharpmake
 
         public IAssemblyInfo BuildAssembly(IBuilderContext context, params string[] sourceFiles)
         {
-            // Alway compile to a physic dll to be able to debug
-            string tmpFile = GetTmpAssemblyFile();
+            // Always compile to a physic dll to be able to debug
+            string tmpFile = GetNextTmpAssemblyFilePath();
             return Build(context, tmpFile, sourceFiles);
         }
 
@@ -111,13 +122,10 @@ namespace Sharpmake
             ParameterInfo[] delegateParameterInfos = delegateMethodInfo.GetParameters();
             ParameterInfo delegateReturnInfos = delegateMethodInfo.ReturnParameter;
 
-            Assembly assembly;
-
             Assembler assembler = new Assembler();
-            assembler.UseDefaultReferences = false;
             assembler.Assemblies.AddRange(assemblies);
 
-            assembly = assembler.BuildAssembly(fileInfo.FullName);
+            Assembly assembly = assembler.BuildAssembly(fileInfo.FullName);
 
             List<MethodInfo> matchMethods = new List<MethodInfo>();
 
@@ -181,7 +189,6 @@ namespace Sharpmake
             where TDelegate : class
         {
             Assembler assembler = new Assembler();
-            assembler.UseDefaultReferences = false;
             assembler.Assemblies.AddRange(assemblies);
 
             const string className = "AssemblerBuildFunction_Class";
@@ -194,7 +201,7 @@ namespace Sharpmake
             // the temp files and deleting them.
             // eg. "C:\\fastbuild-work\\85f7d472c25d494ca09f2ea7fe282d50"
             //string sourceTmpFile = Path.GetTempFileName();
-            string sourceTmpFile = Path.Combine(Path.GetTempPath(), (Guid.NewGuid().ToString("N") + ".tmp"));
+            string sourceTmpFile = Path.Combine(Path.GetTempPath(), (Guid.NewGuid().ToString("N") + ".tmp.sharpmake.cs"));
 
             Type delegateType = typeof(TDelegate);
 
@@ -222,7 +229,7 @@ namespace Sharpmake
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     string parametersName = parameters[i].Name;
-                    string parametersType = (parameters[i].ParameterType == typeof(Object)) ? "Object" : parameters[i].ParameterType.FullName;
+                    string parametersType = (parameters[i].ParameterType == typeof(object)) ? "Object" : parameters[i].ParameterType.FullName;
 
                     writer.Write("{0}{1} {2}", i == 0 ? "" : ", ", parametersType, parametersName);
                 }
@@ -236,10 +243,10 @@ namespace Sharpmake
             }
 
             // build in memory
-            Assembly assembly = assembler.Build(null, null, sourceTmpFile).Assembly;
+            Assembly assembly = assembler.Build(builderContext: null, libraryFile: null, sources: sourceTmpFile).Assembly;
             InternalError.Valid(assembly != null);
 
-            // Try to delete tmp file to prevent polution, but usefull while debugging
+            // Try to delete tmp file to prevent pollution, but useful while debugging
             //if (!System.Diagnostics.Debugger.IsAttached)
             Util.TryDeleteFile(sourceTmpFile);
 
@@ -374,25 +381,26 @@ namespace Sharpmake
             {
                 _assemblyInfo.DebugProjectName = name;
             }
+
+            public void AddDefine(string define)
+            {
+                _builderContext.AddDefine(define);
+            }
         }
 
         private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
         {
             var assemblyInfo = LoadAssemblyInfo(builderContext, sources);
+            HashSet<string> references = GetReferences();
 
+            assemblyInfo.Assembly = Compile(builderContext, assemblyInfo.SourceFiles.ToArray(), libraryFile, references);
+            assemblyInfo.Id = assemblyInfo.Assembly.Location;
+            return assemblyInfo;
+        }
+
+        private HashSet<string> GetReferences()
+        {
             HashSet<string> references = new HashSet<string>();
-
-            Dictionary<string, string> providerOptions = new Dictionary<string, string>();
-            providerOptions.Add("CompilerVersion", "v4.0");
-            CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider(providerOptions);
-
-            CompilerParameters cp = new CompilerParameters();
-
-            if (UseDefaultReferences)
-            {
-                foreach (string defaultReference in DefaultReferences)
-                    references.Add(GetAssemblyDllPath(defaultReference));
-            }
 
             foreach (string assemblyFile in _references)
                 references.Add(assemblyFile);
@@ -403,73 +411,115 @@ namespace Sharpmake
                     references.Add(assembly.Location);
             }
 
-            cp.ReferencedAssemblies.AddRange(references.ToArray());
+            return references;
+        }
 
-            // Generate an library
-            cp.GenerateExecutable = false;
+        private SourceText ReadSourceCode(string path)
+        {
+            using (var stream = File.OpenRead(path))
+                return SourceText.From(stream, Encoding.Default);
+        }
 
-            // Set the level at which the compiler
-            // should start displaying warnings.
-            cp.WarningLevel = 4;
-
-            // Set whether to treat all warnings as errors.
-            cp.TreatWarningsAsErrors = false;
-
-            // Set compiler argument to optimize output.
-            // TODO : figure out why it does not work when uncommenting the following line
-            // cp.CompilerOptions = "/optimize";
-
-            // If any defines are specified, pass them to the CSC.
-            if (_defines.Any())
+        private Assembly Compile(IBuilderContext builderContext, string[] files, string libraryFile, HashSet<string> references)
+        {
+            // Parse all files
+            var syntaxTrees = new ConcurrentBag<SyntaxTree>();
+            var parseOptions = new CSharpParseOptions(ConvertSharpmakeOptionToLanguageVersion(SharpmakeScriptsCSharpVersion), DocumentationMode.None, preprocessorSymbols: _defines);
+            Parallel.ForEach(files, f =>
             {
-                cp.CompilerOptions = "-DEFINE:" + string.Join(",", _defines);
+                var sourceText = ReadSourceCode(f);
+                syntaxTrees.Add(CSharpSyntaxTree.ParseText(sourceText, parseOptions, path: f));
+            });
+
+            return Compile(builderContext, syntaxTrees, libraryFile, references);
+        }
+
+        private Assembly Compile(IBuilderContext builderContext, IEnumerable<SyntaxTree> syntaxTrees, string libraryFile, HashSet<string> fileReferences)
+        {
+            // Add references
+            var metadataReferences = new List<MetadataReference>();
+
+            foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r)))
+            {
+                metadataReferences.Add(MetadataReference.CreateFromFile(reference));
             }
 
-            // Specify the assembly file name to generate
-            if (libraryFile == null)
-            {
-                cp.GenerateInMemory = true;
-                cp.IncludeDebugInformation = false;
-            }
-            else
-            {
-                cp.GenerateInMemory = false;
-                cp.IncludeDebugInformation = true;
-                cp.OutputAssembly = libraryFile;
-            }
+            metadataReferences.AddRange(BasicReferenceAssemblies.All);
 
-            // Notes:
-            // Avoid getting spoiled by environment variables. 
-            // C# will give compilation errors if a LIB variable contains non-existing directories.
-            Environment.SetEnvironmentVariable("LIB", null);
-
-            // Invoke compilation of the source file.
-            CompilerResults cr = provider.CompileAssemblyFromFile(cp, assemblyInfo.SourceFiles.ToArray());
-
-            if (cr.Errors.HasErrors || cr.Errors.HasWarnings)
+            // suppress assembly redirect warnings
+            // cf. https://github.com/dotnet/roslyn/issues/19640
+            var noWarn = new List<KeyValuePair<string, ReportDiagnostic>>
             {
-                string errorMessage = "";
-                foreach (CompilerError ce in cr.Errors)
+                new KeyValuePair<string, ReportDiagnostic>("CS1701", ReportDiagnostic.Suppress),
+                new KeyValuePair<string, ReportDiagnostic>("CS1702", ReportDiagnostic.Suppress),
+            };
+
+            // Compile
+            var compilationOptions = new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary,
+                optimizationLevel: (builderContext == null || builderContext.DebugScripts) ? OptimizationLevel.Debug : OptimizationLevel.Release,
+                warningLevel: 4,
+                specificDiagnosticOptions: noWarn,
+                deterministic: true
+            );
+
+            var assemblyName = libraryFile != null ? Path.GetFileNameWithoutExtension(libraryFile) : $"Sharpmake_{new Random().Next():X8}" + GetHashCode();
+            var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilationOptions);
+            string pdbFilePath = libraryFile != null ? Path.ChangeExtension(libraryFile, ".pdb") : null;
+
+            using (var dllStream = new MemoryStream())
+            using (var pdbStream = new MemoryStream())
+            {
+                EmitResult result = compilation.Emit(
+                    dllStream,
+                    pdbStream,
+                    options: new EmitOptions(
+                        debugInformationFormat: DebugInformationFormat.PortablePdb,
+                        pdbFilePath: pdbFilePath
+                    )
+                );
+
+                bool throwErrorException = builderContext == null || builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException;
+                LogCompilationResult(result, throwErrorException);
+
+                if (result.Success)
                 {
-                    if (ce.IsWarning)
-                        EventOutputWarning?.Invoke(ce + Environment.NewLine);
-                    else
-                        EventOutputError?.Invoke(ce + Environment.NewLine);
+                    if (libraryFile != null)
+                    {
+                        dllStream.Seek(0, SeekOrigin.Begin);
+                        using (var fileStream = new FileStream(libraryFile, FileMode.Create))
+                            dllStream.CopyTo(fileStream);
 
-                    errorMessage += ce + Environment.NewLine;
-                }
+                        pdbStream.Seek(0, SeekOrigin.Begin);
+                        using (var pdbFileStream = new FileStream(pdbFilePath, FileMode.Create))
+                            pdbStream.CopyTo(pdbFileStream);
 
-                if (cr.Errors.HasErrors)
-                {
-                    if (builderContext.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
-                        throw new Error(errorMessage);
-                    return assemblyInfo;
+                        return Assembly.LoadFrom(libraryFile);
+                    }
+
+                    return Assembly.Load(dllStream.GetBuffer(), pdbStream.GetBuffer());
                 }
             }
 
-            assemblyInfo.Assembly = cr.CompiledAssembly;
-            assemblyInfo.Id = assemblyInfo.Assembly.Location;
-            return assemblyInfo;
+            return null;
+        }
+
+        private void LogCompilationResult(EmitResult result, bool throwErrorException)
+        {
+            string errorMessage = "";
+
+            foreach (var diagnostic in result.Diagnostics)
+            {
+                if (diagnostic.Severity == DiagnosticSeverity.Error)
+                    EventOutputError?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+                else // catch everything else as warning
+                    EventOutputWarning?.Invoke("{0}" + Environment.NewLine, diagnostic.ToString());
+
+                errorMessage += diagnostic + Environment.NewLine;
+            }
+
+            if (!result.Success && throwErrorException)
+                throw new Error(errorMessage);
         }
 
         private List<ISourceAttributeParser> ComputeParsers()
@@ -493,7 +543,6 @@ namespace Sharpmake
             var assemblyInfo = new AssemblyInfo()
             {
                 Id = string.Join(";", sources),
-                UseDefaultReferences = UseDefaultReferences
             };
 
             var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
@@ -514,7 +563,6 @@ namespace Sharpmake
             var assemblyInfo = new AssemblyInfo()
             {
                 Id = string.Join(";", sources),
-                UseDefaultReferences = UseDefaultReferences
             };
 
             var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
@@ -607,6 +655,9 @@ namespace Sharpmake
                 {
                     ++lineNumber;
 
+                    if (!string.IsNullOrEmpty(line) && line.StartsWith("namespace", StringComparison.Ordinal))
+                        break;
+
                     // First, update the parsing flow with the current line
                     foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
                     {
@@ -620,9 +671,6 @@ namespace Sharpmake
                     }
 
                     line = reader.ReadLine()?.TrimStart();
-
-                    if (!string.IsNullOrEmpty(line) && line.StartsWith("namespace", StringComparison.Ordinal))
-                        break;
                 }
 
                 foreach (IParsingFlowParser parsingFlowParser in flowParsersList)
@@ -632,16 +680,54 @@ namespace Sharpmake
             }
         }
 
+        [Obsolete]
         public static IEnumerable<string> EnumeratePathToDotNetFramework()
         {
-            for (int i = (int)TargetDotNetFrameworkVersion.VersionLatest; i >= 0; --i)
+            yield break;
+        }
+
+        private static LanguageVersion ConvertSharpmakeOptionToLanguageVersion(Options.CSharp.LanguageVersion languageVersion)
+        {
+            switch (languageVersion)
             {
-                string frameworkDirectory = ToolLocationHelper.GetPathToDotNetFramework((TargetDotNetFrameworkVersion)i);
-                if (frameworkDirectory != null)
-                    yield return frameworkDirectory;
+                case Options.CSharp.LanguageVersion.LatestMajorVersion:
+                    return LanguageVersion.LatestMajor;
+                case Options.CSharp.LanguageVersion.LatestMinorVersion:
+                    return LanguageVersion.Latest;
+                case Options.CSharp.LanguageVersion.Preview:
+                    return LanguageVersion.Preview;
+                case Options.CSharp.LanguageVersion.ISO1:
+                    return LanguageVersion.CSharp1;
+                case Options.CSharp.LanguageVersion.ISO2:
+                    return LanguageVersion.CSharp2;
+                case Options.CSharp.LanguageVersion.CSharp3:
+                    return LanguageVersion.CSharp3;
+                case Options.CSharp.LanguageVersion.CSharp4:
+                    return LanguageVersion.CSharp4;
+                case Options.CSharp.LanguageVersion.CSharp5:
+                    return LanguageVersion.CSharp5;
+                case Options.CSharp.LanguageVersion.CSharp6:
+                    return LanguageVersion.CSharp6;
+                case Options.CSharp.LanguageVersion.CSharp7:
+                    return LanguageVersion.CSharp7;
+                case Options.CSharp.LanguageVersion.CSharp7_1:
+                    return LanguageVersion.CSharp7_1;
+                case Options.CSharp.LanguageVersion.CSharp7_2:
+                    return LanguageVersion.CSharp7_2;
+                case Options.CSharp.LanguageVersion.CSharp7_3:
+                    return LanguageVersion.CSharp7_3;
+                case Options.CSharp.LanguageVersion.CSharp8:
+                    return LanguageVersion.CSharp8;
+                case Options.CSharp.LanguageVersion.CSharp9:
+                    return LanguageVersion.CSharp9;
+                case Options.CSharp.LanguageVersion.CSharp10:
+                    return LanguageVersion.CSharp10;
+                default:
+                    throw new NotImplementedException($"Don't know how to convert sharpmake option {languageVersion} to language version");
             }
         }
 
+        [Obsolete]
         public static string GetAssemblyDllPath(string fileName)
         {
             foreach (string frameworkDirectory in EnumeratePathToDotNetFramework())
@@ -653,25 +739,74 @@ namespace Sharpmake
             return null;
         }
 
-        private static int s_nextTempFile = 0;
+        /// <summary>
+        /// Static constructor called at executable init time
+        /// </summary>
+        static Assembler()
+        {
+            CleanupTmpAssemblies();
+        }
 
-        [System.Diagnostics.DebuggerNonUserCode]
-        private string GetTmpAssemblyFile()
+        /// <summary>
+        /// This method is intended to be called at executable init time. 
+        /// It let us avoid exceptions when executing sharpmake several times in loops(exception can occur in the cs compiler
+        /// when it tries to create pdb files and some already exists. Maybe that previous sharpmake sometimes still has some handles to the file?).
+        /// With this cleanup code active there is no exception anymore on my PC. Previously I had the exception almost 100% on the second or third iteration
+        /// of a stability test(executing sharpmake in loop to insure it always generate the same thing).
+        /// </summary>
+        /// <remarks>
+        /// Was previously having the following exception when running stability tests(on subsequents sharpmake execution runs):
+        /// Unexpected error creating debug information file 'c:\Users\xxxx\AppData\Local\Temp\Sharpmake.Assembler_1.tmp.PDB' -- 'c:\Users\xxxx\AppData\Local\Temp\Sharpmake.Assembler_1.tmp.pdb: The process cannot access the file because it is being used by another process.
+        /// </remarks>
+        private static void CleanupTmpAssemblies()
+        {
+            // Erase any remaining file that has the prefix that will be used for temporary assemblies(dll, pdb, etc...)
+            // This avoids exceptions occurring when executing sharpmake several times in loops(for example when running stability tests)
+            string[] oldTmpFiles = Directory.GetFiles(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + "*.*", SearchOption.TopDirectoryOnly);
+            foreach (string f in oldTmpFiles)
+            {
+                Util.TryDeleteFile(f);
+            }
+        }
+
+        /// <summary>
+        /// Get the base path of temporary assembly files.
+        /// </summary>
+        /// <returns>the base path</returns>
+        private static string GetTmpAssemblyBasePath()
+        {
+            return Path.GetTempPath();
+        }
+
+        /// <summary>
+        /// Get the assembly files common prefixes for all temporary assemblies generated in this process.
+        /// </summary>
+        /// <returns>the prefix</returns>
+        private static string GetTmpAssemblyFilePrefix()
+        {
+            // Now taking into account the working directory when setting the temporary assembly prefix.
+            // That is useful to be able to run several sharpmake concurrently with /sharpmakemutexsuffix otherwise they can cause harm to each others.
+
+            // Note: Util.BuildGuid is converting the argument to a MD5.
+            string md5WorkingDir = Util.BuildGuid(Environment.CurrentDirectory).ToString().ToLower();
+            return $"Sharpmake_Assembly_{md5WorkingDir}_";
+        }
+
+        private static int s_nextTempFile = 0; // Index of last assembly temporary file
+
+        /// <summary>
+        /// Get the next temporary assembly file path.
+        /// </summary>
+        /// <returns>path of next temporary assembly</returns>
+        private string GetNextTmpAssemblyFilePath()
         {
             // try to re use the same file name to not pollute tmp directory
-            string tmpFilePrefix = GetType().FullName + "_";
+            string tmpFileBasePath = GetTmpAssemblyBasePath();
             string tmpFileSuffix = ".tmp.dll";
 
-            while (s_nextTempFile < int.MaxValue)
-            {
-                int currentTempFile = Interlocked.Increment(ref s_nextTempFile);
-                string tmpFile = Path.Combine(Path.GetTempPath(), tmpFilePrefix + currentTempFile + tmpFileSuffix);
-                if (!File.Exists(tmpFile) || Util.TryDeleteFile(tmpFile))
-                {
-                    return tmpFile;
-                }
-            }
-            return null;
+            int currentTempFile = Interlocked.Increment(ref s_nextTempFile);
+            string tmpFile = Path.Combine(GetTmpAssemblyBasePath(), GetTmpAssemblyFilePrefix() + currentTempFile + tmpFileSuffix);
+            return tmpFile;
         }
 
         #endregion

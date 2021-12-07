@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Sharpmake.Generators.Generic
     public partial class MakeProject : IProjectGenerator
     {
         private const string _makefileExtension = ".mk";
-        private const string RemoveLineTag = "REMOVE_LINE_TAG";
+        private const string RemoveLineTag = FileGeneratorUtilities.RemoveLineTag;
 
         private Builder _builder;
 
@@ -96,7 +96,7 @@ namespace Sharpmake.Generators.Generic
             private string _prebuiltStaticLibraries;
             private string _prebuiltStaticLibrariesDebug;
             private string _prebuiltStaticLibrariesRelease;
-            private string _prebuiltStaticLibrariesFinal;
+            private readonly string _prebuiltStaticLibrariesFinal;
 
             public ProjectSettings(Project project, List<Project.Configuration> configurations, Resolver resolver)
             {
@@ -241,7 +241,7 @@ namespace Sharpmake.Generators.Generic
         {
             private Options.AndroidMakefile.PrebuiltStaticLibraries _option;
             private string _armMode;
-            private string _libraryPath;
+            private readonly string _libraryPath;
 
             public PrebuiltStaticLibrary(Project project, Options.AndroidMakefile.PrebuiltStaticLibraries option)
             {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System.Collections.Generic;
-using System.Linq;
 using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.Generic;
@@ -89,7 +88,8 @@ namespace Sharpmake.Generators
             }
             else
             {
-                switch (configurations[0].Target.GetFragment<DevEnv>())
+                DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
+                switch (devEnv)
                 {
                     case DevEnv.make:
                         {
@@ -99,12 +99,10 @@ namespace Sharpmake.Generators
                                 MakefileGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
+                    case DevEnv.vs2022:
                         {
                             VcxprojGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
@@ -113,11 +111,12 @@ namespace Sharpmake.Generators
                     case DevEnv.xcode4ios:
                         {
                             XCodeProjectGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
+                            BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
                     default:
                         {
-                            throw new Error("Generate called with unknown DevEnv: " + configurations[0].Target.GetFragment<DevEnv>());
+                            throw new Error("Generate called with unknown DevEnv: " + devEnv);
                         }
                 }
             }
@@ -133,10 +132,15 @@ namespace Sharpmake.Generators
             if (configurations[0].Platform == Platform.ios || configurations[0].Platform == Platform.mac)
             {
                 XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                if (UtilityMethods.HasFastBuildConfig(configurations))
+                {
+                    MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                }
             }
             else
             {
-                switch (configurations[0].Target.GetFragment<DevEnv>())
+                DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
+                switch (devEnv)
                 {
                     case DevEnv.make:
                         {
@@ -146,12 +150,10 @@ namespace Sharpmake.Generators
                                 MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
-                    case DevEnv.vs2010:
-                    case DevEnv.vs2012:
-                    case DevEnv.vs2013:
                     case DevEnv.vs2015:
                     case DevEnv.vs2017:
                     case DevEnv.vs2019:
+                    case DevEnv.vs2022:
                         {
                             if (UtilityMethods.HasFastBuildConfig(configurations))
                             {
@@ -163,7 +165,7 @@ namespace Sharpmake.Generators
                         }
                     default:
                         {
-                            throw new Error("Generate called with unknown DevEnv: " + configurations[0].Target.GetFragment<DevEnv>());
+                            throw new Error("Generate called with unknown DevEnv: " + devEnv);
                         }
                 }
             }

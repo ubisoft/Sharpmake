@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace Sharpmake.BuildContext
         {
             private IEnumerable<Type> _toGenerate;
 
-            public BaseTestCase(IEnumerable<Type> toGenerate)
+            protected BaseTestCase(IEnumerable<Type> toGenerate)
             {
                 _toGenerate = toGenerate;
             }
@@ -81,10 +81,10 @@ namespace Sharpmake.BuildContext
         /// </summary>
         private class MethodTestCase : BaseTestCase
         {
-            private Type _type;
-            private ConfigurePriority _priority;
+            private readonly Type _type;
+            private readonly ConfigurePriority _priority;
             private IEnumerable<string> _methods;
-            private string _method;
+            private readonly string _method;
             private int _max;
             private int _testIndex = 0;
             private int _min;
@@ -603,7 +603,7 @@ namespace Sharpmake.BuildContext
         {
             foreach (var composite in tests)
             {
-                if (!analyzer.TargetTypes.Any(type => composite.TargetTypes.Contains(type)))
+                if (!analyzer.TargetTypes.Any(composite.TargetTypes.Contains))
                 {
                     composite.Add(analyzer);
                     return;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,15 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System.Linq;
 using NUnit.Framework;
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Sharpmake;
-
-namespace SharpmakeUnitTests
+namespace Sharpmake.UnitTests
 {
     [TestFixture]
     public class PackageReferencesCSharpTests : CSharpTestProjectBuilder
@@ -111,7 +106,6 @@ namespace SharpmakeUnitTests
         {
             public PrivateInheritedPackageReferencesProject() { }
 
-            [Configure()]
             public override void ConfigureAll(Configuration conf, Target target)
             {
                 base.ConfigureAll(conf, target);
@@ -125,7 +119,6 @@ namespace SharpmakeUnitTests
         {
             public PublicInheritedPackageReferencesProject() { }
 
-            [Configure()]
             public override void ConfigureAll(Configuration conf, Target target)
             {
                 base.ConfigureAll(conf, target);

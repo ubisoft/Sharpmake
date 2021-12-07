@@ -1,56 +1,94 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{15F793C7-9E88-64A9-591C-7244FCC6B771}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake</RootNamespace>
     <AssemblyName>Sharpmake</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworks>net472;net5.0</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <RestoreAdditionalProjectSources>https://api.nuget.org/v3/index.json</RestoreAdditionalProjectSources>
+    <MSBuildProjectExtensionsPath>..\tmp\projects\Sharpmake</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net472'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\debug</OutputPath>
+    <OutputPath>..\tmp\bin\debug</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\debug\sharpmake</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Debug\Sharpmake</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\Debug\Sharpmake.xml</DocumentationFile>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
     <NoWarn>1570,1591</NoWarn>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net5.0'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\tmp\bin\debug</OutputPath>
+    <IntermediateOutputPath>..\tmp\obj\debug\sharpmake</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\debug\sharpmake</BaseIntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net472'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\release</OutputPath>
+    <OutputPath>..\tmp\bin\release</OutputPath>
     <IntermediateOutputPath>..\tmp\obj\release\sharpmake</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>..\tmp\obj\Release\Sharpmake</BaseIntermediateOutputPath>
-    <DocumentationFile>..\bin\Release\Sharpmake.xml</DocumentationFile>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake</BaseIntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
     <NoWarn>1570,1591</NoWarn>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.Build.Utilities.v4.0">
-      <Private>True</Private>
-    </Reference>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Release|AnyCPU|net5.0'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\tmp\bin\release</OutputPath>
+    <IntermediateOutputPath>..\tmp\obj\release\sharpmake</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\tmp\obj\release\sharpmake</BaseIntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>618</WarningsNotAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1570,1591</NoWarn>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -81,7 +119,9 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FakeFileTree.cs" />
     <Compile Include="FastBuildSettings.cs" />
+    <Compile Include="FileListFilter.cs" />
     <Compile Include="FileSystemStringComparer.cs" />
+    <Compile Include="GeneratedAssemblyConfig.cs" />
     <Compile Include="GenerationOutput.cs" />
     <Compile Include="GeneratorManager.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -96,12 +136,14 @@
     <Compile Include="Options.Android.cs" />
     <Compile Include="Options.AndroidMakefile.cs" />
     <Compile Include="Options.CSharp.cs" />
+    <Compile Include="Options.Clang.cs" />
     <Compile Include="Options.Makefile.cs" />
     <Compile Include="Options.Vc.cs" />
     <Compile Include="Options.XCode.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="PackageReferences.Template.cs" />
     <Compile Include="PackageReferences.cs" />
+    <Compile Include="PathUtil.cs" />
     <Compile Include="PlatformAttributes.cs" />
     <Compile Include="PlatformEventArgs.cs" />
     <Compile Include="PlatformExceptions.cs" />
@@ -112,7 +154,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferenceAlias.cs" />
     <Compile Include="RegexCache.cs" />
-    <Compile Include="ResharperAnnotations.cs" />
     <Compile Include="Resolver.cs" />
     <Compile Include="SharpmakeExtension.cs" />
     <Compile Include="Solution.Configuration.cs" />
@@ -129,7 +170,19 @@
     <Compile Include="VariableAssignment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" />
+    <None Include="Sharpmake.sharpmake.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+    <PackageReference Include="Basic.Reference.Assemblies.Net472" Version="1.2.4" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="3.0.4492" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
+    <PackageReference Include="Basic.Reference.Assemblies.Net50" Version="1.2.4" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

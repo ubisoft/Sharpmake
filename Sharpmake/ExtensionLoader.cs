@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Security.Policy;
 
 namespace Sharpmake
 {
@@ -97,7 +96,7 @@ namespace Sharpmake
         /// <param name="assemblyPath">The path of the assembly to check whether it's an extension.</param>
         /// <returns>`true` if it is an extension, `false` otherwise.</returns>
         /// <remarks>
-        /// This method will instanciate a remote <see cref="AppDomain"/> if none was created.
+        /// This method will instantiate a remote <see cref="AppDomain"/> if none was created.
         /// </remarks>
         public bool IsExtension(string assemblyPath)
         {
@@ -205,8 +204,8 @@ namespace Sharpmake
             {
                 if (_validator == null)
                 {
-                    _remoteDomain = AppDomain.CreateDomain("ExtensionHelperDomain", new Evidence(AppDomain.CurrentDomain.Evidence));
-                    _validator = _remoteDomain.CreateInstanceAndUnwrap(typeof(ExtensionChecker).Assembly.FullName, typeof(ExtensionChecker).FullName) as ExtensionChecker;
+                    _remoteDomain = AppDomain.CreateDomain("ExtensionHelperDomain");
+                    _validator = _remoteDomain.Load(typeof(ExtensionChecker).Assembly.FullName).CreateInstance(typeof(ExtensionChecker).FullName) as ExtensionChecker;
                 }
             }
         }

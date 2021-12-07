@@ -1,6 +1,6 @@
 # Sharpmake
 
-[![Build status](https://ci.appveyor.com/api/projects/status/5y9eug3x9j078x6i?svg=true)](https://ci.appveyor.com/project/belkiss/sharpmake-36817)
+![build](https://github.com/ubisoft/Sharpmake/workflows/build/badge.svg)
 
 ## Introduction
 Sharpmake is a generator for Visual Studio projects and solutions. It is
@@ -40,11 +40,10 @@ source code also comes with samples that you can study.
 
 
 ## Building Sharpmake
-Building Sharpmake is quite straightforward. Clone the repo on GitHub, open the
+Building Sharpmake is quite straightforward. Clone the repo on GitHub, run the 
+"bootstrap" script (".bat" for Windows, ".sh" for Unix platforms), open the
 solution in Visual Studio and build the solution in *Release*. The binaries
-will be found in the *Sharpmake.Application/bin/Release*. You can run the
-*deploy_binaries.py* script to automatically fetch the binaries and copy them
-in a *Binaries* folder.
+will be found in the *tmp/bin/release* directory.
 
 
 ## More Platforms
@@ -78,7 +77,7 @@ functionality
 
 used toolset for functional tests:
 
-tools\FastBuild\FBuild.exe - v0.97. http://www.fastbuild.org
+tools\FastBuild - v1.04. http://www.fastbuild.org
 
 
 

@@ -1,41 +1,67 @@
 ﻿using System;
 using Sharpmake;
 
-//[module: Sharpmake.Include("*/*FunctionalTest.sharpmake.cs")]
-
 namespace SharpmakeGen
 {
     namespace FunctionalTests
     {
-        [Generate]
-        public abstract class TestProject : Common.SharpmakeBaseProject
+        public abstract class FunctionalTestProject : Common.SharpmakeBaseProject
         {
-            public TestProject()
+            public FunctionalTestProject()
                 : base(excludeSharpmakeFiles: false, generateXmlDoc: false)
             {
-                SourceRootPath = @"[project.RootPath]\Sharpmake.FunctionalTests\[project.Name]";
+                // same a samples, tests are special, the class is here instead of in the subfolder
+                SourceRootPath = @"[project.SharpmakeCsPath]\[project.Name]";
+                SourceFilesExcludeRegex.Add(
+                    @"\\codebase\\",
+                    @"\\projects\\",
+                    @"\\reference\\"
+                );
+
+                DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
+
+                CustomProperties.Add("CopyLocalLockFileAssemblies", "false");
 
                 AddTargets(Common.GetDefaultTargets());
             }
 
             public override void ConfigureAll(Configuration conf, Target target)
-        {
-            base.ConfigureAll(conf, target);
+            {
+                base.ConfigureAll(conf, target);
 
-            conf.SolutionFolder = "FunctionalTests";
+                conf.SolutionFolder = "FunctionalTests";
+                conf.TargetPath = @"[project.RootPath]\tmp\functionaltests\[target.Optimization]\[project.Name]";
 
-            conf.AddPrivateDependency<SharpmakeProject>(target);
-            conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
-            conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
-        }
+                conf.AddPrivateDependency<SharpmakeProject>(target);
+                conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
+                conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+                conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
+
+                conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
+                {
+                    StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
+                    StartProgram = @"[project.RootPath]\tmp\bin\$(Configuration)\$(TargetFramework)\Sharpmake.Application.exe",
+                    StartArguments = "/sources(\"[project.Name].sharpmake.cs\")",
+                    WorkingDirectory = "[project.SourceRootPath]"
+                };
+            }
         }
 
         [Generate]
-        public class FastBuildFunctionalTest : TestProject
+        public class FastBuildFunctionalTest : FunctionalTestProject
         {
             public FastBuildFunctionalTest()
             {
                 Name = "FastBuildFunctionalTest";
+            }
+        }
+
+        [Generate]
+        public class NoAllFastBuildProjectFunctionalTest : FunctionalTestProject
+        {
+            public NoAllFastBuildProjectFunctionalTest()
+            {
+                Name = "NoAllFastBuildProjectFunctionalTest";
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,16 +18,138 @@ using System.Text.RegularExpressions;
 
 namespace Sharpmake
 {
+    // Cache of Regex.Match query results
+    internal class RegexMatchCache
+    {
+        private readonly ConcurrentDictionary<Key, Match> _data;
+
+        /// <param name="capacity">Initial cache capacity. Should not be divisible by a small prime number. Justification here: https://docs.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentdictionary-2.-ctor?view=netcore-3.1. /// </param>
+        public RegexMatchCache(int capacity = 0)
+        {
+            _data = new ConcurrentDictionary<Key, Match>(System.Environment.ProcessorCount, capacity, new KeyEqualityComparer());
+        }
+
+        public bool TryGet(string regex, string toEvaluate, out Match match)
+        {
+            return _data.TryGetValue(new Key(regex, toEvaluate), out match);
+        }
+
+        public void Add(string regex, string toEvaluate, Match match)
+        {
+            _data[new Key(regex, toEvaluate)] = match;
+        }
+
+        public int Count => _data.Count;
+
+        private struct Key
+        {
+            public readonly string RegexStr;
+            public readonly string ToEvaluate;
+
+            public Key(string regexStr, string toEvaluate)
+            {
+                RegexStr = regexStr;
+                ToEvaluate = toEvaluate;
+            }
+
+            public int HashCode => ComputeHashCode(RegexStr, ToEvaluate);
+
+            private static int ComputeHashCode(string regexStr, string toEvaluate)
+            {
+                uint seed = 0u;
+                unchecked
+                {
+                    HashCombine(ref seed, (uint)regexStr.GetHashCode());
+                    HashCombine(ref seed, (uint)toEvaluate.GetHashCode());
+                    return (int)seed;
+                }
+            }
+
+            // Ref: Boost lib, container_hash/hash.hpp
+            private static void HashCombine(ref uint h1, uint k1)
+            {
+                const uint c1 = 0xcc9e2d51;
+                const uint c2 = 0x1b873593;
+
+                k1 *= c1;
+                k1 = Util.Rotl32(k1, 15);
+                k1 *= c2;
+
+                h1 ^= k1;
+                h1 = Util.Rotl32(h1, 13);
+                h1 = h1 * 5 + 0xe6546b64;
+            }
+        }
+
+        private class KeyEqualityComparer : EqualityComparer<Key>
+        {
+            public override bool Equals(Key x, Key y)
+            {
+                return x.RegexStr.Equals(y.RegexStr, System.StringComparison.Ordinal) &&
+                    x.ToEvaluate.Equals(y.ToEvaluate, System.StringComparison.Ordinal);
+            }
+
+            public override int GetHashCode(Key obj)
+            {
+                return obj.HashCode;
+            }
+        }
+    }
+
+    public static class GlobalRegexMatchCache
+    {
+        private static RegexMatchCache s_instance;
+        internal static RegexMatchCache Instance => s_instance;
+
+        /// <param name="capacity">Initial cache capacity. Should not be divisible by a small prime number. Justification here: https://docs.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentdictionary-2.-ctor?view=netcore-3.1. /// </param>
+        public static void Init(int capacity)
+        {
+            s_instance = new RegexMatchCache(capacity);
+        }
+
+        public static void UnInit()
+        {
+            s_instance = null;
+        }
+
+        /// <summary>
+        /// Returns size of cache ( i.e. the number of elements in the cache ).
+        /// </summary>
+        public static int Count => s_instance != null ? s_instance.Count : 0;
+    }
+
     // CachedRegex is used where the same strings are likely to evaluate
     // multiple times.
     internal class CachedRegex
     {
         private readonly Regex _regex;
-        public CachedRegex(Regex regex) { _regex = regex; }
+
+        public CachedRegex(Regex regex)
+        {
+            _regex = regex;
+        }
 
         public Match Match(string toEvaluate)
         {
-            return _regex.Match(toEvaluate);
+            Match match;
+            var regex = _regex;
+            var regexMatchCache = GlobalRegexMatchCache.Instance;
+            if (regexMatchCache == null)
+            {
+                match = regex.Match(toEvaluate);
+            }
+            else
+            {
+                var regexStr = regex.ToString();
+                if (regexMatchCache.TryGet(regexStr, toEvaluate, out match))
+                {
+                    return match;
+                }
+
+                match = regex.Match(toEvaluate);
+                regexMatchCache.Add(regexStr, toEvaluate, match);
+            }
+            return match;
         }
     }
 

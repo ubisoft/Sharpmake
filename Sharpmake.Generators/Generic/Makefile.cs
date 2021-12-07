@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,10 +39,12 @@ namespace Sharpmake.Generators.Generic
             public string FileNameProjectRelative;
             public string FileNameWithoutExtension;
             public string FileExtensionLower;
+            public int FileIndex; // When the file name is used multiple times
 
-            public ProjectFile(string fileName, string projectPathCapitalized, string projectSourceCapitalized)
+            public ProjectFile(string fileName, string projectPathCapitalized, string projectSourceCapitalized, int index)
             {
                 FileName = Project.GetCapitalizedFile(fileName) ?? fileName; // LC TODO can it really return null ???
+                FileIndex = index;
 
                 FileNameProjectRelative = Util.PathGetRelative(projectPathCapitalized, FileName, true);
                 string fileNameSourceRelative = Util.PathGetRelative(projectSourceCapitalized, FileName, true);
@@ -58,6 +61,18 @@ namespace Sharpmake.Generators.Generic
                 else
                 {
                     DirectorySourceRelative = "";
+                }
+            }
+
+            public string GetObjectFileName()
+            {
+                if (FileIndex > 0)
+                {
+                    return FileNameWithoutExtension + FileIndex + ObjectExtension;
+                }
+                else
+                {
+                    return FileNameWithoutExtension + ObjectExtension;
                 }
             }
         }
@@ -134,7 +149,7 @@ namespace Sharpmake.Generators.Generic
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
                 using (fileGenerator.Declare("projectName", resolvedProject.ProjectName))
-                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName), false)))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.ProjectRuleBegin);
@@ -154,7 +169,7 @@ namespace Sharpmake.Generators.Generic
             foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
             {
                 FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
-                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName))))
+                using (fileGenerator.Declare("projectFileDirectory", PathMakeUnix(Util.PathGetRelative(solutionFileInfo.DirectoryName, projectFileInfo.DirectoryName), false)))
                 using (fileGenerator.Declare("projectFileName", projectFileInfo.Name))
                 {
                     fileGenerator.Write(Template.Solution.CleanRuleProject);
@@ -265,8 +280,44 @@ namespace Sharpmake.Generators.Generic
                 // Configurations variables.
                 foreach (Project.Configuration conf in configurations)
                 {
+                    string precompHeader = "";
+                    string precompHeaderOut = "";
+                    string precompIntermediate = "";
+                    string precompCommand = "";
+                    string precompPreBuildCmds = "";
+                    string precompPreLinkCmds = "";
+                    string precompPostBuildCmds = "";
+
+
+                    if (!string.IsNullOrEmpty(conf.PrecompHeader))
+                    {
+                        // Support pch files in sub folders
+                        var pchFile = PathMakeUnix(conf.PrecompHeader);
+                        // Don't make additional subfolder in temp directory
+                        var pchObj = Path.GetFileName(conf.PrecompHeader);
+                        var fileName = Path.Combine(PathMakeUnix(project.SourceRootPath), pchFile);
+                        precompHeader = PathMakeUnix(Util.PathGetRelative(projectFileInfo.DirectoryName, fileName, true));
+                        precompHeaderOut = $"$(OBJDIR)/{pchObj}";
+                        precompIntermediate = $"$(OBJDIR)/{pchObj}.gch";
+                        precompCommand = "-include $(PCHOUT)";
+                    }
+
+                    if (conf.EventPreBuild.Any())
+                        precompPreBuildCmds = conf.EventPreBuild.Aggregate((curr, next) => $"{curr} && {next}");
+                    if (conf.EventPreLink.Any())
+                        precompPreLinkCmds = conf.EventPreLink.Aggregate((curr, next) => $"{curr} && {next}");
+                    if (conf.EventPostBuild.Any())
+                        precompPostBuildCmds = conf.EventPostBuild.Aggregate((curr, next) => $"{curr} && {next}");
+
                     using (fileGenerator.Declare("name", conf.Name.ToLower()))
                     using (fileGenerator.Declare("options", options[conf]))
+                    using (fileGenerator.Declare("precompHeader", precompHeader))
+                    using (fileGenerator.Declare("precompHeaderOut", precompHeaderOut))
+                    using (fileGenerator.Declare("precompIntermediate", precompIntermediate))
+                    using (fileGenerator.Declare("precompCommand", precompCommand))
+                    using (fileGenerator.Declare("precompPreBuildCmds", precompPreBuildCmds))
+                    using (fileGenerator.Declare("precompPreLinkCmds", precompPreLinkCmds))
+                    using (fileGenerator.Declare("precompPostBuildCmds", precompPostBuildCmds))
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationVariables);
                     }
@@ -284,7 +335,7 @@ namespace Sharpmake.Generators.Generic
                             // This support the use case where you have a huge unit tests suite that take too long to compile.
                             // In this case, you just exclude all unit tests from the build and manually uncomment only the unit tests you want to build.
                             using (fileGenerator.Declare("excludeChar", conf.ResolvedSourceFilesBuildExclude.Contains(file.FileName) ? "#" : ""))
-                            using (fileGenerator.Declare("objectFile", file.FileNameWithoutExtension + ObjectExtension))
+                            using (fileGenerator.Declare("objectFile", file.GetObjectFileName()))
                             {
                                 fileGenerator.Write(Template.Project.ObjectsVariableElement);
                             }
@@ -302,9 +353,9 @@ namespace Sharpmake.Generators.Generic
                 // Source file rules
                 // Since we write excluded source files commented. Here we write rules for all files
                 // in case one of the commented out object file is manually uncomment.
-                foreach (ProjectFile file in GetSourceFiles(project, configurations, projectFileInfo))
+                foreach (ProjectFile file in sourceFiles)
                 {
-                    using (fileGenerator.Declare("objectFile", file.FileNameWithoutExtension + ObjectExtension))
+                    using (fileGenerator.Declare("objectFile", file.GetObjectFileName()))
                     using (fileGenerator.Declare("sourceFile", PathMakeUnix(file.FileNameProjectRelative)))
                     {
                         if (file.FileExtensionLower == ".c")
@@ -350,7 +401,7 @@ namespace Sharpmake.Generators.Generic
 
                 // Validate that 2 conf name in the same project and for a given platform don't have the same name.
                 Project.Configuration otherConf;
-                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project);
+                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
                 if (configurationNameMapping.TryGetValue(projectUniqueName, out otherConf))
                 {
                     throw new Error(
@@ -364,7 +415,7 @@ namespace Sharpmake.Generators.Generic
                 switch (conf.Platform)
                 {
                     case Platform.linux:
-                        conf.GeneratorSetGeneratedInformation("elf", "elf", "so", "pdb");
+                        conf.GeneratorSetOutputFullExtensions(".elf", ".elf", ".so", ".pdb");
                         break;
                     default:
                         break;
@@ -392,9 +443,18 @@ namespace Sharpmake.Generators.Generic
             #region Compiler
 
             // Defines
-            Strings defines = new Strings();
-            defines.AddRange(conf.Defines);
-            defines.InsertPrefix("-D");
+            var defines = new Strings();
+            if (conf.DefaultOption == Options.DefaultTarget.Debug)
+                defines.Add("_DEBUG");
+            else // Release
+                defines.Add("NDEBUG");
+
+            foreach (string define in conf.Defines)
+            {
+                if (!string.IsNullOrWhiteSpace(define))
+                    defines.Add(define.Replace(@"""", @"\"""));
+            }
+            defines.InsertPrefixSuffix(@"-D """, @"""");
             options["Defines"] = defines.JoinStrings(" ");
 
             // Includes
@@ -404,6 +464,7 @@ namespace Sharpmake.Generators.Generic
             includePaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, Util.PathGetCapitalized(conf.DependenciesIncludePaths)));
             PathMakeUnix(includePaths);
             includePaths.InsertPrefix("-I");
+            includePaths.Sort();
             options["Includes"] = includePaths.JoinStrings(" ");
 
             if (conf.ForcedIncludes.Count > 0)
@@ -411,6 +472,7 @@ namespace Sharpmake.Generators.Generic
                 OrderableStrings relativeForceIncludes = new OrderableStrings(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.ForcedIncludes));
                 PathMakeUnix(relativeForceIncludes);
                 relativeForceIncludes.InsertPrefix("-include ");
+                relativeForceIncludes.Sort();
                 options["Includes"] += " " + relativeForceIncludes.JoinStrings(" ");
             }
 
@@ -421,18 +483,18 @@ namespace Sharpmake.Generators.Generic
                 // ExtraWarnings
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.ExtraWarnings.Enable, () => { cflags.Append("-Wextra "); }),
-                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.ExtraWarnings.Disable, () => { })
                     );
 
                 // GenerateDebugInformation
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Enable, () => { cflags.Append("-g "); }),
-                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.GenerateDebugInformation.Disable, () => { })
                     );
 
                 // OptimizationLevel
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => { cflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.OptimizationLevel.Disable, () => { }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.Standard, () => { cflags.Append("-O1 "); }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.Full, () => { cflags.Append("-O2 "); }),
                     Options.Option(Options.Makefile.Compiler.OptimizationLevel.FullWithInlining, () => { cflags.Append("-O3 "); }),
@@ -441,7 +503,7 @@ namespace Sharpmake.Generators.Generic
 
                 // Warnings
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => { cflags.Append(""); }),
+                    Options.Option(Options.Makefile.Compiler.Warnings.NormalWarnings, () => { }),
                     Options.Option(Options.Makefile.Compiler.Warnings.MoreWarnings, () => { cflags.Append("-Wall "); }),
                     Options.Option(Options.Makefile.Compiler.Warnings.Disable, () => { cflags.Append("-w "); })
                     );
@@ -449,7 +511,7 @@ namespace Sharpmake.Generators.Generic
                 // WarningsAsErrors
                 SelectOption(conf,
                     Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Enable, () => { cflags.Append("-Werror "); }),
-                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => { cflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.TreatWarningsAsErrors.Disable, () => { })
                     );
 
                 // AdditionalCompilerOptions
@@ -464,13 +526,17 @@ namespace Sharpmake.Generators.Generic
 
                 // CppLanguageStandard
                 SelectOption(conf,
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17, () => { cxxflags.Append("-std=c++17 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14, () => { cxxflags.Append("-std=c++14 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11, () => { cxxflags.Append("-std=c++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default, () => { cxxflags.Append(""); }),
                     Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp98, () => { cxxflags.Append("-std=c++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11, () => { cxxflags.Append("-std=gnu++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp11, () => { cxxflags.Append("-std=c++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp14, () => { cxxflags.Append("-std=c++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp17, () => { cxxflags.Append("-std=c++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Cpp2a, () => { cxxflags.Append("-std=c++2a "); }),
                     Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp98, () => { cxxflags.Append("-std=gnu++98 "); }),
-                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.Default, () => { cxxflags.Append(""); })
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp11, () => { cxxflags.Append("-std=gnu++11 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp14, () => { cxxflags.Append("-std=gnu++14 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp17, () => { cxxflags.Append("-std=gnu++17 "); }),
+                    Options.Option(Options.Makefile.Compiler.CppLanguageStandard.GnuCpp2a, () => { cxxflags.Append("-std=gnu++2a "); })
                     );
 
                 // Exceptions
@@ -493,17 +559,20 @@ namespace Sharpmake.Generators.Generic
             #region Linker
 
             // OutputFile
-            options["OutputFile"] = FormatOutputFileName(conf);
+            options["OutputFile"] = conf.TargetFileFullNameWithExtension.Replace(" ", @"\ ");
 
             // DependenciesLibraryFiles
-            OrderableStrings dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
-            PathMakeUnix(dependenciesLibraryFiles);
-            dependenciesLibraryFiles.InsertPrefix("-l");
+            var dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
+            FixupLibraryNames(dependenciesLibraryFiles);
+            dependenciesLibraryFiles.InsertPrefix("-l:");
+            dependenciesLibraryFiles.Sort();
             options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
 
             // LibraryFiles
             OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
-            libraryFiles.InsertPrefix("-l");
+            FixupLibraryNames(libraryFiles);
+            libraryFiles.InsertPrefix("-l:");
+            libraryFiles.Sort();
             options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
 
             // LibraryPaths
@@ -513,6 +582,7 @@ namespace Sharpmake.Generators.Generic
             libraryPaths.AddRange(Util.PathGetRelative(projectFileInfo.DirectoryName, conf.DependenciesBuiltTargetsLibraryPaths));
             PathMakeUnix(libraryPaths);
             libraryPaths.InsertPrefix("-L");
+            libraryPaths.Sort();
             options["LibraryPaths"] = libraryPaths.JoinStrings(" ");
 
             // Dependencies
@@ -521,19 +591,21 @@ namespace Sharpmake.Generators.Generic
             {
                 switch (depConf.Output)
                 {
-                    case Project.Configuration.OutputType.None: continue;
+                    case Project.Configuration.OutputType.None:
+                        continue;
                     case Project.Configuration.OutputType.Lib:
-                    case Project.Configuration.OutputType.Dll:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
-                        deps.Add(Path.Combine(depConf.TargetLibraryPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
+                        deps.Add(Path.Combine(depConf.TargetLibraryPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);
                         break;
+                    case Project.Configuration.OutputType.Dll:
                     default:
-                        deps.Add(Path.Combine(depConf.TargetPath, FormatOutputFileName(depConf)), depConf.TargetFileOrderNumber);
+                        deps.Add(Path.Combine(depConf.TargetPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);
                         break;
                 }
             }
             var depsRelative = Util.PathGetRelative(projectFileInfo.DirectoryName, deps);
             PathMakeUnix(depsRelative);
+            depsRelative.Sort();
             options["LDDEPS"] = depsRelative.JoinStrings(" ");
 
             // LinkCommand
@@ -541,10 +613,17 @@ namespace Sharpmake.Generators.Generic
             {
                 options["LinkCommand"] = Template.Project.LinkCommandLib;
             }
+            else if (conf.Output == Project.Configuration.OutputType.Dll)
+            {
+                options["LinkCommand"] = Template.Project.LinkCommandDll;
+            }
             else
             {
                 options["LinkCommand"] = Template.Project.LinkCommandExe;
             }
+
+            if (conf.AdditionalLibrarianOptions.Any())
+                throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with Makefile generator");
 
             string linkerAdditionalOptions = conf.AdditionalLinkerOptions.JoinStrings(" ");
             options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
@@ -565,7 +644,10 @@ namespace Sharpmake.Generators.Generic
             List<Project.Configuration> configurations,
             FileInfo projectFileInfo)
         {
+            Dictionary<string, int> fileNamesOccurences = new Dictionary<string, int>();
+
             Strings projectSourceFiles = project.GetSourceFilesForConfigurations(configurations);
+            projectSourceFiles.RemoveRange(project.GetAllConfigurationBuildExclude(configurations));
 
             // Add source files
             List<ProjectFile> allFiles = new List<ProjectFile>();
@@ -573,11 +655,22 @@ namespace Sharpmake.Generators.Generic
 
             foreach (string file in projectSourceFiles)
             {
-                ProjectFile projectFile = new ProjectFile(file, projectFileInfo.DirectoryName, Util.GetCapitalizedPath(project.SourceRootPath));
+                string fileName = Path.GetFileName(file);
+                int fileNameOccurences = 0;
+                if (fileNamesOccurences.TryGetValue(fileName, out fileNameOccurences))
+                {
+                    fileNamesOccurences[fileName] = fileNameOccurences++;
+                }
+                else
+                {
+                    fileNamesOccurences.Add(fileName, fileNameOccurences);
+                }
+
+                ProjectFile projectFile = new ProjectFile(file, projectFileInfo.DirectoryName, Util.GetCapitalizedPath(project.SourceRootPath), fileNameOccurences);
                 allFiles.Add(projectFile);
             }
 
-            allFiles.Sort((l, r) => l.FileNameProjectRelative.CompareTo(r.FileNameProjectRelative));
+            allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, System.StringComparison.OrdinalIgnoreCase));
 
             // type -> files
             foreach (ProjectFile projectFile in allFiles)
@@ -604,20 +697,33 @@ namespace Sharpmake.Generators.Generic
                 return Util.PathGetRelative(projectFileInfo.DirectoryName, conf.TargetPath);
         }
 
-        private static string FormatOutputFileName(Project.Configuration conf)
+        private static void FixupLibraryNames(IList<string> paths)
         {
-            string outputExtension = !string.IsNullOrEmpty(conf.OutputExtension) ? "." + conf.OutputExtension : "";
-            string targetNamePrefix = (conf.Output == Project.Configuration.OutputType.Lib) ? "lib" : "";
-            return (targetNamePrefix + conf.TargetFileFullName + outputExtension);
+            for (int i = 0; i < paths.Count; ++i)
+            {
+                string libraryName = PathMakeUnix(paths[i]);
+                // We've got two kinds of way of listing a library:
+                // - With a filename without extension we must add the potential prefix and potential extension.
+                // - With a filename with a static or shared lib extension (eg. .a/.so), we shouldn't touch it as it's already set by the script.
+                string extension = Path.GetExtension(libraryName).ToLowerInvariant();
+                if (extension != ".a" && extension != ".so")
+                    paths[i] = "lib" + libraryName + ".a";
+                else
+                    paths[i] = libraryName;
+            }
         }
 
         #endregion
 
         #region Utils
 
-        private static string PathMakeUnix(string path)
+        private static string PathMakeUnix(string path, bool escapeSpaces = true)
         {
-            return path.Replace(Util.WindowsSeparator, Util.UnixSeparator).TrimEnd(Util.UnixSeparator);
+            string clean = path.Replace(Util.WindowsSeparator, Util.UnixSeparator).TrimEnd(Util.UnixSeparator);
+            if (escapeSpaces)
+                return clean.Replace(" ", @"\ ");
+
+            return clean;
         }
 
         private static void PathMakeUnix(IList<string> paths)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ namespace Sharpmake
             {
                 get
                 {
-                    return string.IsNullOrEmpty(_platformName) ? Util.GetSimplePlatformString(Platform) : _platformName;
+                    return string.IsNullOrEmpty(_platformName) ? Util.GetPlatformString(Platform, null, Target) : _platformName;
                 }
                 set
                 {
@@ -103,7 +103,7 @@ namespace Sharpmake
 
             public bool IncludeOnlyFilterProject = false;
 
-            public string CompileCommandLine = String.Empty;
+            public string CompileCommandLine = string.Empty;
 
             public void AddProject<TPROJECTTYPE>(
                 ITarget projectTarget,
@@ -166,7 +166,7 @@ namespace Sharpmake
 
                 public override string ToString()
                 {
-                    return String.Format("{0} {1}", Project, Target);
+                    return string.Format("{0} {1}", Project, Target);
                 }
 
                 // either or not to compile this project in the solution
@@ -204,6 +204,11 @@ namespace Sharpmake
                         return includedProjectInfo;
                 }
                 return null;
+            }
+
+            public IncludedProjectInfo GetProject<TPROJECTTYPE>()
+            {
+                return GetProject(typeof(TPROJECTTYPE));
             }
 
             private void AddProjectInternal(Type projectType, ITarget projectTarget, bool inactiveProject, string solutionFolder, string callerInfo)

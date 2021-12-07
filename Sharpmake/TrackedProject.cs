@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace Sharpmake
         private string GetKeyFromConfiguration(Project.Configuration config)
         {
             if (_project != null)
-                return config.ToString().Substring(config.ToString().IndexOf(':') + 1);
+                return config.Target.GetTargetString();
 
             return ProjectString;
         }
@@ -50,7 +50,7 @@ namespace Sharpmake
 
         public int CompareTo(TrackedProject other)
         {
-            return ProjectString.CompareTo(other.ProjectString);
+            return string.Compare(ProjectString, other.ProjectString, StringComparison.Ordinal);
         }
 
         public TrackedConfiguration FindConfiguration(Project.Configuration config)
@@ -58,9 +58,9 @@ namespace Sharpmake
             return Configurations[GetKeyFromConfiguration(config)];
         }
 
-        public TrackedConfiguration FindConfiguration(ITarget config)
+        public TrackedConfiguration FindConfiguration(ITarget target)
         {
-            return Configurations[config.ToString()];
+            return Configurations[target.GetTargetString()];
         }
 
         public bool IsExtern()
@@ -73,7 +73,8 @@ namespace Sharpmake
 
         public void AddConfig(Project.Configuration config)
         {
-            Configurations.Add(config.ToString().Substring(config.ToString().IndexOf(':') + 1), new TrackedConfiguration(this, config));
+            string key = GetKeyFromConfiguration(config);
+            Configurations.Add(key, new TrackedConfiguration(this, config));
         }
 
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Sharpmake
         protected List<T> _values = new List<T>();  // Sorted keys are sorted on demand.
         private bool _readOnly = false;
         private bool _isDirty = false; // Does _values needs to be reconstructed ?
-        private bool _isSorted = false; // Does _values is sorted ?
+        private bool _isSorted = true; // Does _values is sorted ?
         private IComparer<T> _sortComparer = Comparer<T>.Default;
 
         public UniqueList()
@@ -206,8 +206,8 @@ namespace Sharpmake
                 {
                     _values.Clear();
                     _values.AddRange(_hash);
-                    _isDirty = false;
                     _isSorted = false;
+                    _isDirty = false;
                 }
             }
             Debug.Assert(Count == _values.Count);
@@ -219,10 +219,9 @@ namespace Sharpmake
             {
                 if (_isDirty)
                 {
+                    _isSorted = false;
                     _values.Clear();
                     _values.AddRange(_hash);
-                    _isDirty = false;
-                    _isSorted = false;
                 }
 
                 if (!_isSorted)
@@ -230,8 +229,9 @@ namespace Sharpmake
                     _values.Sort(_sortComparer);
                     _isSorted = true;
                 }
+                Debug.Assert(Count == _values.Count);
+                _isDirty = false;
             }
-            Debug.Assert(Count == _values.Count);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

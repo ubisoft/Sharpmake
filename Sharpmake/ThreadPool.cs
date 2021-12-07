@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ namespace Sharpmake
                 for (int i = 0; i < numThread; ++i)
                 {
                     _thread[i] = new Thread(ThreadWork);
-                    _thread[i].Name = String.Format("Tasks Thread #{0,3}", i);
+                    _thread[i].Name = string.Format("Tasks Thread #{0,3}", i);
                     _thread[i].Start(i);
                 }
             }

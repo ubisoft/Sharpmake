@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2019-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Globalization;
+using System.IO;
 using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
@@ -45,8 +45,10 @@ namespace Sharpmake.UnitTests
         {
             _serializer.Dispose();
 
-            Assert.Throws<ObjectDisposedException>(delegate { _writer.Write(string.Empty); });
-            Assert.Throws<ObjectDisposedException>(delegate { _serializer.Serialize(string.Empty); });
+            Assert.Throws<ObjectDisposedException>(delegate
+            { _writer.Write(string.Empty); });
+            Assert.Throws<ObjectDisposedException>(delegate
+            { _serializer.Serialize(string.Empty); });
         }
 
         [Test]
@@ -80,7 +82,8 @@ namespace Sharpmake.UnitTests
         [Test]
         public void SerializeObject()
         {
-            Assert.Throws<ArgumentException>(delegate { _serializer.Serialize(new object()); });
+            Assert.Throws<ArgumentException>(delegate
+            { _serializer.Serialize(new object()); });
         }
 
         [Test]
@@ -103,6 +106,21 @@ namespace Sharpmake.UnitTests
         [Test]
         public void SerializeNegativeDouble()
         {
+            _serializer.Serialize(-13.37);
+            Assert.That(_writer.ToString(), Is.EqualTo("-13.37"));
+        }
+
+        [Test]
+        public void FloatSerializationIsNotCultureDependent()
+        {
+            // Change culture to a non-json compatible format
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("da-DK");
+            // As illustration
+#if NETFRAMEWORK
+            // in dotnet core we pass InvariantGlobalization, so this test doesn't apply anymore
+            Assert.That((-13.37).ToString(), Is.EqualTo("-13,37"));
+#endif
+
             _serializer.Serialize(-13.37);
             Assert.That(_writer.ToString(), Is.EqualTo("-13.37"));
         }
@@ -156,7 +174,8 @@ namespace Sharpmake.UnitTests
                 { 256, "The key is not a string." }
             };
 
-            Assert.Throws<InvalidDataException>(delegate { _serializer.Serialize(dict); });
+            Assert.Throws<InvalidDataException>(delegate
+            { _serializer.Serialize(dict); });
         }
 
         [Test]
@@ -241,7 +260,8 @@ namespace Sharpmake.UnitTests
             first.Add(second);
             second.Add(first);
 
-            Assert.Throws<InvalidDataException>(delegate { _serializer.Serialize(first); });
+            Assert.Throws<InvalidDataException>(delegate
+            { _serializer.Serialize(first); });
         }
 
         [Test]

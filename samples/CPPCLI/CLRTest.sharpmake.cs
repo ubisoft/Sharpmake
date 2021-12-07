@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,12 +27,23 @@ namespace CLR_SharpmakeTest
         public static Target[] CommonTarget = {
             new Target(
                 Platform.win32,
-                DevEnv.vs2015 | DevEnv.vs2017,
+                DevEnv.vs2017,
                 Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
                 BuildSystem.MSBuild,
-                DotNetFramework.v4_5 | DotNetFramework.v4_6_2)};
+                DotNetFramework.v4_6_2
+            ),
+            new Target(
+                Platform.win32,
+                DevEnv.vs2019,
+                Optimization.Debug | Optimization.Release,
+                OutputType.Dll,
+                Blob.NoBlob,
+                BuildSystem.MSBuild,
+                DotNetFramework.v4_7_2
+            )
+        };
     }
 
     [Sharpmake.Generate]
@@ -62,6 +73,9 @@ namespace CLR_SharpmakeTest
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+
             arguments.Generate<TheSolution>();
         }
     }
