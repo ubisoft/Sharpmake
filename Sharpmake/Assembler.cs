@@ -307,14 +307,14 @@ namespace Sharpmake
         private static readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
         private static readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
         {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(_sharpmakeAssembly.Value.Location));
+            string generatorsAssembly = Path.Combine(entryDirectoryInfo.FullName, "Sharpmake.Generators.dll");
             return Assembly.LoadFrom(generatorsAssembly);
         });
         private static readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
         {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.CommonPlatforms.dll";
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(_sharpmakeAssembly.Value.Location));
+            string generatorsAssembly = Path.Combine(entryDirectoryInfo.FullName, "Sharpmake.CommonPlatforms.dll");
             return Assembly.LoadFrom(generatorsAssembly);
         });
 
