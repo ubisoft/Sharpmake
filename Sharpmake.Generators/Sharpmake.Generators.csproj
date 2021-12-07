@@ -128,6 +128,7 @@
     <Compile Include="VisualStudio\Csproj.cs" />
     <Compile Include="VisualStudio\IPlatformVcxproj.cs" />
     <Compile Include="VisualStudio\IVcxprojGenerationContext.cs" />
+    <Compile Include="VisualStudio\LaunchSettingsJson.cs" />
     <Compile Include="VisualStudio\PackagesConfig.Template.cs" />
     <Compile Include="VisualStudio\PackagesConfig.cs" />
     <Compile Include="VisualStudio\ProjectJson.Template.cs" />

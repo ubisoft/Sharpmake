@@ -1340,10 +1340,20 @@ namespace Sharpmake.Generators.VisualStudio
                     Write(Template.Project.ProjectAspNetMvcDescription, writer, resolver);
             }
 
-            // user file
-            string projectFilePath = Path.Combine(projectPath, projectFile) + ProjectExtension;
-            UserFile uf = new UserFile(projectFilePath);
-            uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
+            var additionalNones = new List<string>();
+            if (isNetCoreProjectSchema)
+            {
+                string launchSettingsJson = LaunchSettingsJson.Generate(_builder, project, projectPath, _projectConfigurationList, generatedFiles, skipFiles);
+                if (launchSettingsJson != null)
+                    additionalNones.Add(launchSettingsJson);
+            }
+            else
+            {
+                // old style cproj.user file
+                string projectFilePath = Path.Combine(projectPath, projectFile) + ProjectExtension;
+                UserFile uf = new UserFile(projectFilePath);
+                uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
+            }
 
             // configuration general
             foreach (Project.Configuration conf in _projectConfigurationList)
@@ -1443,7 +1453,7 @@ namespace Sharpmake.Generators.VisualStudio
                     Write(Template.Project.ImportProjectSdkItem, writer, resolver);
             }
 
-            GenerateFiles(project, configurations, itemGroups, generatedFiles, skipFiles);
+            GenerateFiles(project, configurations, itemGroups, additionalNones, generatedFiles, skipFiles);
 
             #region <Choose> section
             Dictionary<string, List<IResolvable>> choiceDict =
@@ -1645,6 +1655,7 @@ namespace Sharpmake.Generators.VisualStudio
             CSharpProject project,
             List<Project.Configuration> configurations,
             ItemGroups itemGroups,
+            IEnumerable<string> additionalNones,
             List<string> generatedFiles,
             List<string> skipFiles
         )
@@ -1781,6 +1792,10 @@ namespace Sharpmake.Generators.VisualStudio
             var remainingResourcesFiles = new List<string>(resolvedResources);
             var remainingEmbeddedResourcesFiles = new List<string>(resolvedEmbeddedResource);
             var remainingNoneFiles = new List<string>(resolvedNoneFiles);
+
+            //add none files from the first part of the generation
+            remainingNoneFiles.AddRange(
+                additionalNones.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))));
 
             #region global file association
             List<FileAssociation> fileAssociations = FullFileNameAssociation(remainingSourcesFiles.Concat(resolvedResources).Concat(resolvedEmbeddedResource).Concat(resolvedNoneFiles));
