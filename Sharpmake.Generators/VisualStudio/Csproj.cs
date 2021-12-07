@@ -1767,7 +1767,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<Regex> exclusionRegexs = project.SourceFilesExcludeRegex.Concat(project.SourceNoneFilesExcludeRegex).Select(p => new Regex(p, RegexOptions.Compiled | RegexOptions.IgnoreCase)).ToList();
             resolvedNoneFiles = resolvedNoneFiles.Where(f =>
             {
-                string filePath = Util.PathGetAbsolute(_projectPath, f);
+                string filePath = Util.PathGetAbsolute(_projectPath, f); // LCTODO: taking the full path is too broad, and can vary depending on the location of the codebase! it needs to be fixed
                 return exclusionRegexs.All(r => !r.IsMatch(filePath));
             }).ToList();
             resolvedNoneFilesAddIfNewer = resolvedNoneFilesAddIfNewer.Where(f =>
