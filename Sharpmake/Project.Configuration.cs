@@ -2845,6 +2845,7 @@ namespace Sharpmake
 
             public VcxprojUserFileSettings VcxprojUserFile = null;
 
+            [Resolver.Resolvable]
             public class CsprojUserFileSettings
             {
                 public enum StartActionSetting
