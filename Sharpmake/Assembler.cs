@@ -123,6 +123,7 @@ namespace Sharpmake
             ParameterInfo delegateReturnInfos = delegateMethodInfo.ReturnParameter;
 
             Assembler assembler = new Assembler();
+            assembler.AddSharpmakeAssemblies();
             assembler.Assemblies.AddRange(assemblies);
 
             Assembly assembly = assembler.BuildAssembly(fileInfo.FullName);
@@ -189,6 +190,7 @@ namespace Sharpmake
             where TDelegate : class
         {
             Assembler assembler = new Assembler();
+            assembler.AddSharpmakeAssemblies();
             assembler.Assemblies.AddRange(assemblies);
 
             const string className = "AssemblerBuildFunction_Class";
@@ -282,6 +284,16 @@ namespace Sharpmake
         internal static event OutputDelegate EventOutputError;
         internal static event OutputDelegate EventOutputWarning;
 
+        internal void AddSharpmakeAssemblies()
+        {
+            // Add sharpmake assembly
+            Assemblies.Add(_sharpmakeAssembly.Value);
+
+            // Add generators and common platforms assemblies to be able to reference them from .sharpmake.cs files
+            Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
+            Assemblies.Add(_sharpmakeCommonPlatformsAssembly.Value);
+        }
+
         #endregion
 
         #region Private
@@ -291,6 +303,20 @@ namespace Sharpmake
         private List<string> _references = new List<string>();
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
         private List<IParsingFlowParser> _parsingFlowParsers = new List<IParsingFlowParser>();
+
+        private static readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
+        private static readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
+        {
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
+            return Assembly.LoadFrom(generatorsAssembly);
+        });
+        private static readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
+        {
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.CommonPlatforms.dll";
+            return Assembly.LoadFrom(generatorsAssembly);
+        });
 
         private static bool IsDelegate(Type delegateType)
         {

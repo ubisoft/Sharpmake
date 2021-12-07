@@ -511,20 +511,6 @@ namespace Sharpmake
             return assemblies;
         }
 
-        private readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
-        private readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
-        {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
-            return Assembly.LoadFrom(generatorsAssembly);
-        });
-        private readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
-        {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.CommonPlatforms.dll";
-            return Assembly.LoadFrom(generatorsAssembly);
-        });
-
         private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, BuilderCompileErrorBehavior compileErrorBehavior)
         {
             return BuildAndLoadAssembly(sharpmakeFiles, new BuilderContext(this, compileErrorBehavior));
@@ -533,13 +519,7 @@ namespace Sharpmake
         private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, IBuilderContext context, IEnumerable<ISourceAttributeParser> parsers = null, IEnumerable<IParsingFlowParser> flowParsers = null)
         {
             Assembler assembler = new Assembler(Defines);
-
-            // Add sharpmake assembly
-            assembler.Assemblies.Add(_sharpmakeAssembly.Value);
-
-            // Add generators and common platforms assemblies to be able to reference them from .sharpmake.cs files
-            assembler.Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
-            assembler.Assemblies.Add(_sharpmakeCommonPlatformsAssembly.Value);
+            assembler.AddSharpmakeAssemblies();
 
             // Add attribute parsers
             if (parsers != null)
