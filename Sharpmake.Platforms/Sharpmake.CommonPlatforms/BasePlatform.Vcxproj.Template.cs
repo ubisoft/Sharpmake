@@ -20,6 +20,9 @@ namespace Sharpmake
       <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
       <CompileAsWinRT>[options.CompileAsWinRT]</CompileAsWinRT>
       <WarningLevel>[options.WarningLevel]</WarningLevel>
+      <TreatAngleIncludeAsExternal>[options.TreatAngleIncludeAsExternal]</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>[options.ExternalWarningLevel]</ExternalWarningLevel>
+      <ExternalTemplatesDiagnostics>[options.ExternalTemplatesDiagnostics]</ExternalTemplatesDiagnostics>
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
@@ -186,9 +189,6 @@ namespace Sharpmake
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
-    <TreatAngleIncludeAsExternal>[options.TreatAngleIncludeAsExternal]</TreatAngleIncludeAsExternal>
-    <ExternalWarningLevel>[options.ExternalWarningLevel]</ExternalWarningLevel>
-    <ExternalTemplatesDiagnostics>[options.ExternalTemplatesDiagnostics]</ExternalTemplatesDiagnostics>
   </PropertyGroup>
 ";
 
