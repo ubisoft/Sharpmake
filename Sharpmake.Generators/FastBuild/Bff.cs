@@ -395,6 +395,7 @@ namespace Sharpmake.Generators.FastBuild
                         var fastBuildProjectDependencies = new Strings();
                         var fastBuildBuildOnlyDependencies = new Strings();
                         var fastBuildProjectExeUtilityDependencyList = new Strings();
+                        var fastBuildTargetSubTargets = new Strings();
 
                         bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig && isOutputTypeLib;
 
@@ -422,7 +423,10 @@ namespace Sharpmake.Generators.FastBuild
                                     string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
                                     if (!dependenciesInfo.IgnoredLibraryNames.Contains(depProjConfig.TargetFileFullNameWithExtension))
                                         fastBuildProjectDependencies.Add(shortProjectName + "_LibraryDependency");
-                                    fastBuildBuildOnlyDependencies.Add(shortProjectName);
+                                    if (depProjConfig.EventPostBuildExecute.Count != 0)
+                                    {
+                                        fastBuildTargetSubTargets.Add(shortProjectName);
+                                    }
                                 }
                                 else if (!depProjConfig.IsExcludedFromBuild)
                                 {
@@ -509,7 +513,6 @@ namespace Sharpmake.Generators.FastBuild
 
                         Strings preBuildTargets = new Strings();
 
-                        var fastBuildTargetSubTargets = new Strings();
                         var fastBuildTargetLibraryDependencies = new Strings();
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
