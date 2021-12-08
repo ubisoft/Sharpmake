@@ -9,6 +9,7 @@
 !Sharpmake.Application/Sharpmake.Application.csproj
 !Sharpmake.Generators/Sharpmake.Generators.csproj
 !Sharpmake.Platforms/Sharpmake.CommonPlatforms/Sharpmake.CommonPlatforms.csproj
+launchsettings.json
 
 # Samples and FunctionalTests generated projects
 samples/*/projects/*
