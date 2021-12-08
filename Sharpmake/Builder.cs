@@ -1006,7 +1006,7 @@ namespace Sharpmake
             }
         }
 
-        private static bool _logUsedConfigurations = false;
+        private static bool s_logUsedConfigurations = false;
         private void LogUnusedProjectConfigurations(List<Project> projects, List<Solution> solutions)
         {
             Trace.Assert(_usedProjectConfigurations != null);
@@ -1038,7 +1038,7 @@ namespace Sharpmake
                             uselessTargets = new List<ITarget>(p.Configurations.Count);
                         uselessTargets.Add(target);
                     }
-                    else if (_logUsedConfigurations)
+                    else if (s_logUsedConfigurations)
                     {
                         if (!foundUnusedConfInProject)
                             debugList.Add(conf.Project.SharpmakeCsFileName + ":          Config WAS used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);

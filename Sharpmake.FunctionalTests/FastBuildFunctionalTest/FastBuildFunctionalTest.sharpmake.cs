@@ -558,7 +558,6 @@ namespace SharpmakeGen.FunctionalTests
     {
         public SimpleLib()
         {
-
         }
     }
 

@@ -287,11 +287,11 @@ namespace Sharpmake
         internal void AddSharpmakeAssemblies()
         {
             // Add sharpmake assembly
-            Assemblies.Add(_sharpmakeAssembly.Value);
+            Assemblies.Add(s_sharpmakeAssembly.Value);
 
             // Add generators and common platforms assemblies to be able to reference them from .sharpmake.cs files
-            Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
-            Assemblies.Add(_sharpmakeCommonPlatformsAssembly.Value);
+            Assemblies.Add(s_sharpmakeGeneratorAssembly.Value);
+            Assemblies.Add(s_sharpmakeCommonPlatformsAssembly.Value);
         }
 
         #endregion
@@ -304,16 +304,16 @@ namespace Sharpmake
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
         private List<IParsingFlowParser> _parsingFlowParsers = new List<IParsingFlowParser>();
 
-        private static readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
-        private static readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
+        private static readonly Lazy<Assembly> s_sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
+        private static readonly Lazy<Assembly> s_sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
         {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(_sharpmakeAssembly.Value.Location));
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(s_sharpmakeAssembly.Value.Location));
             string generatorsAssembly = Path.Combine(entryDirectoryInfo.FullName, "Sharpmake.Generators.dll");
             return Assembly.LoadFrom(generatorsAssembly);
         });
-        private static readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
+        private static readonly Lazy<Assembly> s_sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
         {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(_sharpmakeAssembly.Value.Location));
+            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(s_sharpmakeAssembly.Value.Location));
             string generatorsAssembly = Path.Combine(entryDirectoryInfo.FullName, "Sharpmake.CommonPlatforms.dll");
             return Assembly.LoadFrom(generatorsAssembly);
         });
