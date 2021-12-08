@@ -422,6 +422,7 @@ namespace Sharpmake.Generators.FastBuild
                                     string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
                                     if (!dependenciesInfo.IgnoredLibraryNames.Contains(depProjConfig.TargetFileFullNameWithExtension))
                                         fastBuildProjectDependencies.Add(shortProjectName + "_LibraryDependency");
+                                    fastBuildBuildOnlyDependencies.Add(shortProjectName);
                                 }
                                 else if (!depProjConfig.IsExcludedFromBuild)
                                 {
