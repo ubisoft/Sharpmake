@@ -388,7 +388,11 @@ namespace Sharpmake.Generators.VisualStudio
         {
             string key = string.Empty;
 
+#if NET5_0_OR_GREATER
+            if (OperatingSystem.IsWindows())
+#else
             if (Util.GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+#endif
             {
                 using (RegistryKey subKey = Registry.CurrentUser.OpenSubKey(registrySubKey))
                     key = (string)subKey?.GetValue(value);

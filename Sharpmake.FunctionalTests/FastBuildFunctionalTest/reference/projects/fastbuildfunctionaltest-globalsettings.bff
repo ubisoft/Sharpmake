@@ -24,6 +24,12 @@ Settings
 
 }
 
+function TestCustomProperties()
+{
+    Print('Hello Custom Property')
+    Print('Hello Custom Property2')
+}
+
 //=================================================================================================================
 Compiler( 'Compiler-x64-vs2019' )
 {
@@ -90,6 +96,7 @@ Compiler( 'Compiler-x64-vs2019' )
                                 'C:\Program Files (x86)\Windows Kits\10\Redist\10.0.19041.0\ucrt\DLLs\x64\api-ms-win-crt-utility-l1-1-0.dll'
                             }
     .CompilerFamily         = 'msvc'
+    TestCustomProperties()
 }
 
 Compiler( 'RC.win64Config' )

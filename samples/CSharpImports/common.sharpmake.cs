@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace Common
                         OutputType.Dll,
                         Blob.NoBlob,
                         BuildSystem.MSBuild,
-                        DotNetFramework.v4_5),
+                        DotNetFramework.v4_5_2),
             new Target(
                         Platform.anycpu,
                         DevEnv.vs2017,

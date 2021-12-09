@@ -172,11 +172,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public string ResolveCondition(Resolver resolver)
                 {
-                    string targetFrameworks = GetTargetFrameworksString(TargetFrameworks.ToArray());
-                    using (resolver.NewScopedParameter("targetFramework", targetFrameworks))
+                    return string.Join(" OR ", TargetFrameworks.Select(targetFramework =>
                     {
-                        return resolver.Resolve(Template.ItemGroups.ItemGroupTargetFrameworkCondition);
-                    }
+                        using (resolver.NewScopedParameter("targetFramework", GetTargetFrameworksString(targetFramework)))
+                        {
+                            return resolver.Resolve(Template.ItemGroups
+                                .ItemGroupTargetFrameworkCondition);
+                        }
+                    }));
                 }
 
                 public string Resolve(Resolver resolver)
@@ -1058,7 +1061,7 @@ namespace Sharpmake.Generators.VisualStudio
                     var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
                     DotNetOS dotNetOS;
                     if (!conf.Target.TryGetFragment(out dotNetOS))
-                        dotNetOS = DotNetOS.Default;
+                        dotNetOS = conf.DotNetOSVersion;
                     return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
                 }
             );
@@ -1253,6 +1256,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
             using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
+            using (resolver.NewScopedParameter("GenerateDocumentationFile", project.GenerateDocumentationFile ? "true" : RemoveLineTag))
             {
                 Write(Template.Project.ProjectDescription, writer, resolver);
             }
@@ -1336,10 +1340,20 @@ namespace Sharpmake.Generators.VisualStudio
                     Write(Template.Project.ProjectAspNetMvcDescription, writer, resolver);
             }
 
-            // user file
-            string projectFilePath = Path.Combine(projectPath, projectFile) + ProjectExtension;
-            UserFile uf = new UserFile(projectFilePath);
-            uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
+            var additionalNones = new List<string>();
+            if (isNetCoreProjectSchema)
+            {
+                string launchSettingsJson = LaunchSettingsJson.Generate(_builder, project, projectPath, _projectConfigurationList, generatedFiles, skipFiles);
+                if (launchSettingsJson != null)
+                    additionalNones.Add(launchSettingsJson);
+            }
+            else
+            {
+                // old style cproj.user file
+                string projectFilePath = Path.Combine(projectPath, projectFile) + ProjectExtension;
+                UserFile uf = new UserFile(projectFilePath);
+                uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
+            }
 
             // configuration general
             foreach (Project.Configuration conf in _projectConfigurationList)
@@ -1439,7 +1453,7 @@ namespace Sharpmake.Generators.VisualStudio
                     Write(Template.Project.ImportProjectSdkItem, writer, resolver);
             }
 
-            GenerateFiles(project, configurations, itemGroups, generatedFiles, skipFiles);
+            GenerateFiles(project, configurations, itemGroups, additionalNones, generatedFiles, skipFiles);
 
             #region <Choose> section
             Dictionary<string, List<IResolvable>> choiceDict =
@@ -1641,6 +1655,7 @@ namespace Sharpmake.Generators.VisualStudio
             CSharpProject project,
             List<Project.Configuration> configurations,
             ItemGroups itemGroups,
+            IEnumerable<string> additionalNones,
             List<string> generatedFiles,
             List<string> skipFiles
         )
@@ -1763,7 +1778,7 @@ namespace Sharpmake.Generators.VisualStudio
             List<Regex> exclusionRegexs = project.SourceFilesExcludeRegex.Concat(project.SourceNoneFilesExcludeRegex).Select(p => new Regex(p, RegexOptions.Compiled | RegexOptions.IgnoreCase)).ToList();
             resolvedNoneFiles = resolvedNoneFiles.Where(f =>
             {
-                string filePath = Util.PathGetAbsolute(_projectPath, f);
+                string filePath = Util.PathGetAbsolute(_projectPath, f); // LCTODO: taking the full path is too broad, and can vary depending on the location of the codebase! it needs to be fixed
                 return exclusionRegexs.All(r => !r.IsMatch(filePath));
             }).ToList();
             resolvedNoneFilesAddIfNewer = resolvedNoneFilesAddIfNewer.Where(f =>
@@ -1777,6 +1792,10 @@ namespace Sharpmake.Generators.VisualStudio
             var remainingResourcesFiles = new List<string>(resolvedResources);
             var remainingEmbeddedResourcesFiles = new List<string>(resolvedEmbeddedResource);
             var remainingNoneFiles = new List<string>(resolvedNoneFiles);
+
+            //add none files from the first part of the generation
+            remainingNoneFiles.AddRange(
+                additionalNones.Select(f => Util.PathGetRelative(_projectPathCapitalized, Path.GetFullPath(f))));
 
             #region global file association
             List<FileAssociation> fileAssociations = FullFileNameAssociation(remainingSourcesFiles.Concat(resolvedResources).Concat(resolvedEmbeddedResource).Concat(resolvedNoneFiles));
@@ -3245,7 +3264,8 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.LanguageVersion.CSharp7_2, () => { options["LanguageVersion"] = "7.2"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp7_3, () => { options["LanguageVersion"] = "7.3"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp8, () => { options["LanguageVersion"] = "8.0"; }),
-            Options.Option(Options.CSharp.LanguageVersion.CSharp9, () => { options["LanguageVersion"] = "9.0"; })
+            Options.Option(Options.CSharp.LanguageVersion.CSharp9, () => { options["LanguageVersion"] = "9.0"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp10, () => { options["LanguageVersion"] = "10.0"; })
             );
 
             SelectOption(

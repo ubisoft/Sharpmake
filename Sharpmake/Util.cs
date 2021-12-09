@@ -23,7 +23,12 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+#if NET5_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.Win32;
@@ -62,6 +67,35 @@ namespace Sharpmake
             int intValue = (int)(object)value;
             int intflag = (int)(object)flags;
             return ((intValue & intflag) == intflag);
+        }
+
+        /// <summary>
+        /// This method will return a deterministic hash for a string.
+        /// </summary>
+        /// <remarks>
+        /// With net core the regular GetHashCode() is now
+        /// seeded for security reasons.
+        /// </remarks>
+        /// <see href="https://andrewlock.net/why-is-string-gethashcode-different-each-time-i-run-my-program-in-net-core/"/>
+        /// <param name="str">The input string</param>
+        /// <returns>A deterministic hash</returns>
+        public static int GetDeterministicHashCode(this string str)
+        {
+            unchecked
+            {
+                int hash1 = (5381 << 16) + 5381;
+                int hash2 = hash1;
+
+                for (int i = 0; i < str.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ str[i];
+                    if (i == str.Length - 1)
+                        break;
+                    hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
+                }
+
+                return hash1 + (hash2 * 1566083941);
+            }
         }
 
         /// <summary>
@@ -226,7 +260,17 @@ namespace Sharpmake
         public static HashSet<string> FilesToBeExplicitlyRemovedFromDB = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         public static HashSet<string> FilesAutoCleanupIgnoredEndings = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private const string s_filesAutoCleanupDBPrefix = "sharpmakeautocleanupdb";
-        private enum DBVersion { Version = 2 };
+        private enum DBVersion { Version = 3 };
+
+        private static JsonSerializerOptions GetCleanupDatabaseJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
+                AllowTrailingCommas = true,
+                PropertyNamingPolicy = null,
+                WriteIndented = false,
+            };
+        }
 
         private static Dictionary<string, DateTime> ReadCleanupDatabase(string databaseFilename)
         {
@@ -245,6 +289,16 @@ namespace Sharpmake
                         {
                             // Read the list of files.
                             IFormatter formatter = new BinaryFormatter();
+                            string dbAsJson = binReader.ReadString();
+
+                            var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(dbAsJson, GetCleanupDatabaseJsonSerializerOptions());
+                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+                        }
+#if NETFRAMEWORK
+                        else if (version == 2)
+                        {
+                            // Read the list of files.
+                            IFormatter formatter = new BinaryFormatter();
                             var tmpDbFiles = (Dictionary<string, DateTime>)formatter.Deserialize(readStream);
                             dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
                         }
@@ -254,6 +308,11 @@ namespace Sharpmake
                             ConcurrentDictionary<string, bool> dbFilesV1 = (ConcurrentDictionary<string, bool>)formatter.Deserialize(readStream);
                             DateTime now = DateTime.Now;
                             dbFiles = dbFilesV1.ToDictionary(kvp => kvp.Key, kvp => now);
+                        }
+#endif
+                        else
+                        {
+                            LogWrite("Warning: found cleanup database in incompatible format v{0}, skipped.", version);
                         }
 
                         readStream.Close();
@@ -288,14 +347,14 @@ namespace Sharpmake
         /// <remarks>
         /// - Auto cleanup is disabled by default and must be enabled explicitly.
         /// - You can have many auto cleanup database by setting the AutoCleanupDBSuffix to a string that identify your sharpmake running context.
-        /// This is useful when you execute sharpmake with more than one setup configuration. For example on ACE, we have two setups:
+        /// This is useful when you execute sharpmake with more than one setup configuration. For example on one project, we have two setups:
         /// - Engine and Tools and both are running different scripts but have the same .sharpmake file entry point. In that case we would
         /// set the suffix with different value depending on the context we are running sharpmake with.
         /// - Generally you should also disable the cleanup when running with changelist filters(used typically by Submit Assistant).
         /// </remarks>
         ///
         /// <example>
-        /// This is the way the auto-cleanup is configured on ACE. This code is in our main.
+        /// This is the way the auto-cleanup is configured on one of our projects, this code is in the main.
         /// Util.AutoCleanupDBPath = sharpmakeFileDirectory;
         /// Util.FilesAutoCleanupActive = Arguments.Filter != Filter.Changelist && arguments.Builder.BlobOnly == false;
         /// if (Arguments.GenerateTools)
@@ -398,11 +457,11 @@ namespace Sharpmake
                     // Write version number
                     int version = (int)DBVersion.Version;
                     binWriter.Write(version);
-                    binWriter.Flush();
 
                     // Write the list of files.
-                    IFormatter formatter = new BinaryFormatter();
-                    formatter.Serialize(writeStream, newDbFiles);
+                    string dbAsJson = System.Text.Json.JsonSerializer.Serialize(newDbFiles, GetCleanupDatabaseJsonSerializerOptions());
+                    binWriter.Write(dbAsJson);
+                    binWriter.Flush();
                 }
             }
             else
@@ -419,6 +478,16 @@ namespace Sharpmake
             return Path.Combine(WinFormSubTypesDbPath, $@"{s_winFormSubTypesDbPrefix}.bin");
         }
 
+        private static JsonSerializerOptions GetCsprojSubTypesJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
+                AllowTrailingCommas = true,
+                PropertyNamingPolicy = null,
+                WriteIndented = false,
+            };
+        }
+
         public static void SerializeAllCsprojSubTypes(object allCsProjSubTypes)
         {
             // If DbPath is not specify, do not save C# subtypes information
@@ -431,9 +500,11 @@ namespace Sharpmake
             string winFormSubTypesDbFullPath = GetWinFormSubTypeDbPath();
 
             using (Stream writeStream = new FileStream(winFormSubTypesDbFullPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (BinaryWriter binWriter = new BinaryWriter(writeStream))
             {
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                binaryFormatter.Serialize(writeStream, allCsProjSubTypes);
+                string csprojSubTypesAsJson = System.Text.Json.JsonSerializer.Serialize(allCsProjSubTypes, GetCsprojSubTypesJsonSerializerOptions());
+                binWriter.Write(csprojSubTypesAsJson);
+                binWriter.Flush();
             }
         }
 
@@ -447,9 +518,10 @@ namespace Sharpmake
             try
             {
                 using (Stream readStream = new FileStream(winFormSubTypesDbFullPath, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (BinaryReader binReader = new BinaryReader(readStream))
                 {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    return binaryFormatter.Deserialize(readStream);
+                    string csprojSubTypesAsJson = binReader.ReadString();
+                    return System.Text.Json.JsonSerializer.Deserialize<object>(csprojSubTypesAsJson, GetCsprojSubTypesJsonSerializerOptions());
                 }
             }
             catch
@@ -595,7 +667,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static Guid BuildGuid(string value)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider provider = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            var provider = System.Security.Cryptography.MD5.Create();
             byte[] md5 = provider.ComputeHash(Encoding.ASCII.GetBytes(value));
             return new Guid(md5);
         }
@@ -1024,8 +1096,13 @@ namespace Sharpmake
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
+#if NET5_0_OR_GREATER
+            if (!OperatingSystem.IsWindows())
+                return false;
+#else
             if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
                 return false;
+#endif
 
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
@@ -1553,11 +1630,17 @@ namespace Sharpmake
             return (x << r) | (x >> (32 - r));
         }
 
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }
 
+#if NET5_0_OR_GREATER
+        [SupportedOSPlatform("windows")]
+#endif
         public static string[] GetRegistryLocalMachineSubKeyNames(string path)
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(path);
@@ -1582,7 +1665,11 @@ namespace Sharpmake
 
             string key = string.Empty;
 
+#if NET5_0_OR_GREATER
+            if (OperatingSystem.IsWindows())
+#else
             if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
+#endif
             {
                 try
                 {

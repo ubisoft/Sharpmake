@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using Sharpmake;
 
 namespace HelloAndroid
@@ -19,17 +20,23 @@ namespace HelloAndroid
     [Sharpmake.Generate]
     public class HelloAndroidSolution : CommonSolution
     {
+        public string GradleRootPath = Path.Combine(Globals.TmpDirectory, @"..\..\gradle\root");
+
         public HelloAndroidSolution()
         {
             AddTargets(CommonTarget.GetDefaultTargets());
             Name = "HelloAndroid";
+
+            ExePackaging.DirectoryCopyResourceFiles(GradleRootPath, ExePackaging.AndroidPackageProjectsPath + @"\exepackaging");
         }
+
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
         {
             base.ConfigureAll(conf, target);
 
             conf.AddProject<ExePackaging>(target);
+            conf.SetStartupProject<ExePackaging>();
         }
     }
 }

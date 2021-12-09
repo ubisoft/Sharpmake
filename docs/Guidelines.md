@@ -294,7 +294,7 @@ class Perforce : CommonProject
     }
 ```
 
-This is much better, even if the Is-A relationship is slightly incorrect.  At least this technique is easier to maintain.  It can be used for any combinaison of fragments and can be useful to minimize multiplying the number of base classes.  Another example:
+This is much better, even if the Is-A relationship is slightly incorrect.  At least this technique is easier to maintain.  It can be used for any combination of fragments and can be useful to minimize multiplying the number of base classes.  Another example:
 
 ```csharp
 class MyBaseProject : Project

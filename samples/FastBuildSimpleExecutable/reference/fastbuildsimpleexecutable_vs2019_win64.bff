@@ -30,6 +30,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /D"_CONSOLE"'
             + ' /D"_DEBUG"'
             + ' /GF'
+            + ' /EHsc'
             + ' /MTd'
             + ' /GS'
             + ' /Gy-'
@@ -45,7 +46,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /TP'
             + ' /errorReport:queue'
             + ' /D"_MBCS"'
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     .CompilerOptimizations = ''
             + ' /Od'
@@ -167,6 +168,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /D"WIN64"'
             + ' /D"_CONSOLE"'
             + ' /GF'
+            + ' /EHsc'
             + ' /MT'
             + ' /GS-'
             + ' /Gy'
@@ -182,7 +184,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /TP'
             + ' /errorReport:queue'
             + ' /D"_MBCS"'
-            + ' /Zc:__cplusplus'
+            + ' /FS /Zc:__cplusplus'
 
     .CompilerOptimizations = ''
             + ' /Ox'

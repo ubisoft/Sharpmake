@@ -907,13 +907,13 @@ namespace Sharpmake.Generators.Apple
 
         private static class XCodeProjIdGenerator
         {
-            private static System.Security.Cryptography.SHA1CryptoServiceProvider s_cryptoProvider;
+            private static System.Security.Cryptography.SHA1 s_cryptoProvider;
             private static Dictionary<ProjectItem, string> s_hashRepository;
             private static object s_lockMyself = new object();
 
             static XCodeProjIdGenerator()
             {
-                s_cryptoProvider = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+                s_cryptoProvider = System.Security.Cryptography.SHA1.Create();
                 s_hashRepository = new Dictionary<ProjectItem, string>();
             }
 

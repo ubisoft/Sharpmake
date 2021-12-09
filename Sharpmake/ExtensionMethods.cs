@@ -1,11 +1,11 @@
 // Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,16 +44,8 @@ namespace Sharpmake
                     return "3.5";
                 case DotNetFramework.v3_5clientprofile:
                     return "3.5";
-                case DotNetFramework.v4_0:
-                    return "4.0";
-                case DotNetFramework.v4_5:
-                    return "4.5";
-                case DotNetFramework.v4_5_1:
-                    return "4.5.1";
                 case DotNetFramework.v4_5_2:
                     return "4.5.2";
-                case DotNetFramework.v4_5clientprofile:
-                    return "4.5";
                 case DotNetFramework.v4_6:
                     return "4.6";
                 case DotNetFramework.v4_6_1:
@@ -102,6 +94,8 @@ namespace Sharpmake
                     return "netstandard2.1";
                 case DotNetFramework.net5_0:
                     return "net5.0";
+                case DotNetFramework.net6_0:
+                    return "net6.0";
                 case DotNetFramework.all_netframework:
                 case DotNetFramework.all_netcore:
                 case DotNetFramework.all_netstandard:
@@ -117,12 +111,6 @@ namespace Sharpmake
             {
                 case DotNetFramework.v3_5:
                     return "net35";
-                case DotNetFramework.v4_0:
-                    return "net40";
-                case DotNetFramework.v4_5:
-                    return "net45";
-                case DotNetFramework.v4_5_1:
-                    return "net451";
                 case DotNetFramework.v4_5_2:
                     return "net452";
                 case DotNetFramework.v4_6:
@@ -155,6 +143,8 @@ namespace Sharpmake
                     return "netcoreapp3.1";
                 case DotNetFramework.net5_0:
                     return "net5.0";
+                case DotNetFramework.net6_0:
+                    return "net6.0";
                 case DotNetFramework.netstandard1_0:
                     return "netstandard1.0";
                 case DotNetFramework.netstandard1_1:
@@ -732,6 +722,8 @@ namespace Sharpmake
                     return "10.0.19041.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_20348_0:
                     return "10.0.20348.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_22000_0:
+                    return "10.0.22000.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
                     return "$(LatestTargetPlatformVersion)";
                 default:

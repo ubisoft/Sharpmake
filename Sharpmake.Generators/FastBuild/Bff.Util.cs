@@ -519,7 +519,7 @@ namespace Sharpmake.Generators.FastBuild
 
         internal static string GetFastBuildCopyAlias(string sourceFileName, string destinationFolder)
         {
-            string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetHashCode().ToString("X8"));
+            string fastBuildCopyAlias = string.Format("Copy_{0}_{1}", sourceFileName, (destinationFolder + sourceFileName).GetDeterministicHashCode().ToString("X8"));
             return fastBuildCopyAlias;
         }
 
@@ -641,18 +641,45 @@ namespace Sharpmake.Generators.FastBuild
         }
 
         /// <summary>
+        /// Format list options. Can combine many of them.
+        /// </summary>
+        public enum FBuildFormatListOptions
+        {
+            /// <summary>
+            /// No formatting option
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Quote Items ?
+            /// </summary>
+            QuoteItems = 1 << 0,
+            /// <summary>
+            /// Use single element short format ?
+            /// </summary>
+            UseSingleElementShortFormat = 1 << 1,
+            /// <summary>
+            /// Use Comma between each element ? 
+            /// </summary>
+            UseCommaBetweenElements = 1 << 2,
+        }
+
+        /// <summary>
         /// Build a list of string in the format of BFF array, on multiple lines if needed, indenting using spaceLength spaces.
         /// </summary>
         /// <param name="items">The list of values to put in the BFF array.</param>
         /// <param name="spaceLength">The indentation size, in spaces, in case multiple lines are generated.</param>
+        /// <param name="options">output options</param>
         /// <returns>The formatted string, or <see cref="FileGeneratorUtilities.RemoveLineTag"/> if the list is empty.</returns>
-        public static string FBuildFormatList(List<string> items, int spaceLength)
+        public static string FBuildFormatList(List<string> items, int spaceLength, FBuildFormatListOptions options = FBuildFormatListOptions.QuoteItems | FBuildFormatListOptions.UseSingleElementShortFormat | FBuildFormatListOptions.UseCommaBetweenElements)
         {
             if (items.Count == 0)
                 return FileGeneratorUtilities.RemoveLineTag;
 
-            if (items.Count == 1)
-                return FBuildFormatSingleListItem(items.First());
+            if (options.HasAnyFlag(FBuildFormatListOptions.UseSingleElementShortFormat))
+            {
+                if (items.Count == 1)
+                    return FBuildFormatSingleListItem(items.First());
+            }
 
             //
             // Write all selected items.
@@ -667,8 +694,12 @@ namespace Sharpmake.Generators.FastBuild
             int itemIndex = 0;
             foreach (string item in items)
             {
-                strBuilder.AppendFormat("{0}    '{1}'", indent, item);
-                if (++itemIndex < items.Count)
+                if (options.HasAnyFlag(FBuildFormatListOptions.QuoteItems))
+                    strBuilder.AppendFormat("{0}    '{1}'", indent, item);
+                else
+                    strBuilder.AppendFormat("{0}    {1}", indent, item);
+
+                if (++itemIndex < items.Count && options.HasAnyFlag(FBuildFormatListOptions.UseCommaBetweenElements))
                     strBuilder.AppendLine(",");
                 else
                     strBuilder.AppendLine();

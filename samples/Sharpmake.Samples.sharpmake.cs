@@ -21,6 +21,8 @@ namespace SharpmakeGen.Samples
             );
 
             DependenciesCopyLocal = DependenciesCopyLocalTypes.None;
+
+            CustomProperties.Add("CopyLocalLockFileAssemblies", "false");
         }
 
         public override void ConfigureAll(Configuration conf, Target target)
@@ -37,7 +39,7 @@ namespace SharpmakeGen.Samples
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
             {
                 StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
-                StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\Sharpmake.Application.exe",
+                StartProgram = @"[project.RootPath]\tmp\bin\$(Configuration)\$(TargetFramework)\Sharpmake.Application.exe",
                 StartArguments = "/sources(@'[project.SharpmakeMainFile]')",
                 WorkingDirectory = "[project.SourceRootPath]"
             };
@@ -244,6 +246,26 @@ namespace SharpmakeGen.Samples
         {
             Name = "HelloAndroid";
             SharpmakeMainFile = "HelloAndroid.Main.sharpmake.cs";
+
+            // This one is special, we have .sharpmake.cs files in the codebase
+            SourceFilesExcludeRegex.Remove(@"\\codebase\\");
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
+    public class HelloAndroidAgdeProject : SampleProject
+    {
+        public HelloAndroidAgdeProject()
+        {
+            Name = "HelloAndroidAgde";
+            SharpmakeMainFile = "HelloAndroidAgde.Main.sharpmake.cs";
 
             // This one is special, we have .sharpmake.cs files in the codebase
             SourceFilesExcludeRegex.Remove(@"\\codebase\\");

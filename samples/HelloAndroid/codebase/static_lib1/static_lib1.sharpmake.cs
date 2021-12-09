@@ -52,13 +52,5 @@ namespace HelloAndroid
                     throw new Error("Unexpected optimization " + target.Optimization);
             }
         }
-
-        public override void ConfigureAndroid(Configuration conf, CommonTarget target)
-        {
-            base.ConfigureAndroid(conf, target);
-
-            conf.PrecompHeader = "";
-            conf.PrecompSource = "";
-        }
     }
 }

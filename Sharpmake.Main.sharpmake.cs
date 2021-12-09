@@ -35,7 +35,7 @@ namespace SharpmakeGen
                     Platform.anycpu,
                     DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release,
-                    framework: Assembler.SharpmakeDotNetFramework
+                    framework: DotNetFramework.v4_7_2 | DotNetFramework.net5_0
                 )
             );
             return result.ToArray();
@@ -43,7 +43,7 @@ namespace SharpmakeGen
 
         public abstract class SharpmakeBaseProject : CSharpProject
         {
-            private readonly bool _generateXmlDoc;
+            public string DefaultProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
 
             protected SharpmakeBaseProject(
                 bool excludeSharpmakeFiles = true,
@@ -52,29 +52,44 @@ namespace SharpmakeGen
             {
                 AddTargets(GetDefaultTargets());
 
-                _generateXmlDoc = generateXmlDoc;
+                GenerateDocumentationFile = generateXmlDoc;
 
                 RootPath = Globals.AbsoluteRootPath;
 
                 // Use the new csproj style
                 ProjectSchema = CSharpProjectSchema.NetCore;
 
-                // prevents output dir to have a framework subfolder
-                CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
-
                 // we need to disable determinism while because we are using wildcards in assembly versions
                 // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
-                CustomProperties.Add("Deterministic", "false");
+                CustomProperties.Add("Deterministic", "true");
+
+                // Enable Globalization Invariant Mode
+                // https://github.com/dotnet/runtime/blob/master/docs/design/features/globalization-invariant-mode.md
+                CustomProperties.Add("InvariantGlobalization", "true");
 
                 if (excludeSharpmakeFiles)
-                    SourceFilesExcludeRegex.Add(@".*\.sharpmake.cs");
+                    NoneExtensions.Add(".sharpmake.cs");
+            }
+
+            public override void PostResolve()
+            {
+                base.PostResolve();
+
+                // retrieve the path of the csproj, could have changed from the default
+                // note that we ensure that it is identical between confs
+                string projectPath = Configurations.Select(conf => conf.ProjectPath).Distinct().Single();
+
+                // we set this property to fix the nuget restore behavior which was different
+                // between visual studio and command line, since this var was not initialized
+                // at the same time, leading to the restore being done in different locations
+                CustomProperties.Add("MSBuildProjectExtensionsPath", Util.PathGetRelative(projectPath, DefaultProjectPath));
             }
 
             [Configure]
             public virtual void ConfigureAll(Configuration conf, Target target)
             {
                 conf.ProjectFileName = "[project.Name]";
-                conf.ProjectPath = @"[project.RootPath]\tmp\projects\[project.Name]";
+                conf.ProjectPath = DefaultProjectPath;
                 conf.Output = Configuration.OutputType.DotNetClassLibrary;
                 conf.TargetPath = Path.Combine(Globals.OutputRootPath, "[lower:target.Optimization]");
 
@@ -91,12 +106,11 @@ namespace SharpmakeGen
                     )
                 );
 
-                if (_generateXmlDoc)
+                if (GenerateDocumentationFile)
                 {
-                    conf.XmlDocumentationFile = @"[conf.TargetPath]\[project.AssemblyName].xml";
                     conf.Options.Add(
                         new Options.CSharp.SuppressWarning(
-                            1570, // W1: CS1570: XML comment on 'construct' has badly formed XML — 'reason
+                            1570, // W1: CS1570: XML comment on 'construct' has badly formed XML - 'reason
                             1591  // W4: CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member'
                         )
                     );
@@ -114,17 +128,17 @@ namespace SharpmakeGen
 
             AddTargets(Common.GetDefaultTargets());
 
-            ExtraItems[".github"] = new Strings {
-                @".github\workflows\actions.yml"
-            };
+            var githubFiles = Util.DirectoryGetFiles(Path.Combine(Globals.AbsoluteRootPath, ".github"));
+            ExtraItems[".github"] = new Strings { githubFiles };
 
-            ExtraItems["BatchFiles"] = new Strings {
-                "bootstrap.bat",
-                "CompileSharpmake.bat",
-                "GenerateMdbFiles.bat",
-                "UpdateSamplesOutput.bat",
-                "visualstudio.sharpmake.bat"
-            };
+            var bashFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.sh", SearchOption.TopDirectoryOnly);
+            ExtraItems["BashFiles"] = new Strings { bashFiles };
+
+            var batchFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.bat", SearchOption.TopDirectoryOnly);
+            ExtraItems["BatchFiles"] = new Strings { batchFiles };
+
+            var pythonFiles = Util.DirectoryGetFiles(Globals.AbsoluteRootPath, "*.py", SearchOption.TopDirectoryOnly);
+            ExtraItems["PythonFiles"] = new Strings { pythonFiles };
         }
 
         [Configure]

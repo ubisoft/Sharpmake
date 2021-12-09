@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,7 @@ namespace Sharpmake.UnitTests
         public void Test_NETFXKitsDir_throws_for_old_frameworks()
         {
             Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v3_5));
-            Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_0));
-            Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_5));
+            Assert.Throws<NotImplementedException>(() => KitsRootPaths.GetNETFXKitsDir(DotNetFramework.v4_5_2));
         }
 
         [Test]
