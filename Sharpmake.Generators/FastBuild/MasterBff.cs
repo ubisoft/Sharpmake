@@ -264,7 +264,7 @@ namespace Sharpmake.Generators.FastBuild
                 }
                 else if (FileSystemStringComparer.StaticCompare(pair.sourceBff, bffFullPath) != 0 || pair.sourceNodeIdentifier != fastBuildTargetIdentifier)
                 {
-                    throw new Error("Found identical output from multiple sources!");
+                    throw new Error($"Found identical output '{outputFile}' from multiple sources!");
                 }
             }
 
