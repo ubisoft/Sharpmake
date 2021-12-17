@@ -302,6 +302,9 @@ namespace Sharpmake
             NoneExtensions.Clear();
             VsctExtension.Clear();
 
+            // nor removed
+            SourceFilesExcludeRegex.Clear();
+
             Name = _projectInfo.DisplayName;
 
             // Use the new csproj style
