@@ -217,6 +217,21 @@ jobs:
           & $env:COMPILE_BATCH projects\fastbuildsample_vs2019_win64.sln "${{ matrix.configuration }}" "x64"
           projects\output\win64\${{ matrix.configuration }}\fastbuildsimpleexecutable.exe
 
+      - name: Fixup Android SDK dx.bat and dx.jar
+        if: runner.os == 'Windows'
+        shell: bash
+        run: | # starting with Android SDK 31, DX (which was deprecated) has been replaced by D8, which seems called by the VS gradle. Since it uses the same arguments, we cheat by mklinking d8 to dx
+          ln -s ${ANDROID_HOME}/build-tools/32.0.0/d8.bat ${ANDROID_HOME}/build-tools/32.0.0/dx.bat
+          ln -s ${ANDROID_HOME}/build-tools/32.0.0/lib/d8.jar ${ANDROID_HOME}/build-tools/32.0.0/lib/dx.jar
+
+      - name: HelloAndroid ${{ matrix.configuration }}
+        if: runner.os == 'Windows'
+        working-directory: 'samples/HelloAndroid'
+        run: |
+          & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
+          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
+
       - name: HelloClangCl debug
         if: runner.os == 'Windows' && matrix.configuration == 'debug'
         working-directory: 'samples/HelloClangCl'
@@ -285,17 +300,6 @@ jobs:
           xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_mac
           cd codebase/temp/bin/mac_${{ matrix.configuration }}
           DYLD_LIBRARY_PATH=. ./exe
-
-      - name: HelloAndroid ${{ matrix.configuration }}
-        if: runner.os == 'Windows'
-        working-directory: 'samples/HelloAndroid'
-        env:
-            REMOVE_ANDROID_BUILD_TOOLS_VERSION: 31.0.0
-        run: | #Installed Build Tools revision 31.0.0 is corrupted. Need to remove and install again using the SDK Manager.
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall "build-tools;${{ env.REMOVE_ANDROID_BUILD_TOOLS_VERSION }}"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
 
       - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }}
         if: runner.os == 'Windows'
