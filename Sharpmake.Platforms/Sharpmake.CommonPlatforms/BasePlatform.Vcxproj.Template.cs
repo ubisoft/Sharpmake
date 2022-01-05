@@ -207,6 +207,9 @@ namespace Sharpmake
     <EmbedManifest>[options.EmbedManifest]</EmbedManifest>
     <IgnoreImportLibrary>[options.IgnoreImportLibrary]</IgnoreImportLibrary>
     <RunCodeAnalysis>[options.RunCodeAnalysis]</RunCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>[options.MicrosoftCodeAnalysis]</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>[options.ClangTidyCodeAnalysis]</EnableClangTidyCodeAnalysis>
+    <CAExcludepath>[options.CAexcludePaths];%(CAExcludepath)</CAExcludepath>
     <CustomBuildBeforeTargets>[options.CustomBuildStepBeforeTargets]</CustomBuildBeforeTargets>
     <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
     <ExecutablePath>[options.ExecutablePath]</ExecutablePath>
