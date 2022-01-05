@@ -1384,14 +1384,46 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Linker.IgnoreImportLibrary.Disable, () => { context.Options["IgnoreImportLibrary"] = "false"; })
             );
 
-            //RunCodeAnalysis
-            //    Enable                                  RunCodeAnalysis="true"
-            //    Disable                                 RunCodeAnalysis="false"
-            context.SelectOption
-            (
-            Options.Option(Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable, () => { context.Options["RunCodeAnalysis"] = "true"; }),
-            Options.Option(Options.Vc.CodeAnalysis.RunCodeAnalysis.Disable, () => { context.Options["RunCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag; })
-            );
+            if (Options.GetObject<Options.Vc.CodeAnalysis.RunCodeAnalysis>(context.Configuration) == Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable)
+            {
+                if (context.Configuration.IsFastBuild)
+                    throw new NotImplementedException("Sharpmake does not support code analysis in fastbuild targets yet!");
+
+                //RunCodeAnalysis
+                //    Enable                                  RunCodeAnalysis="true"
+                context.Options["RunCodeAnalysis"] = "true";
+
+                //MicrosoftCodeAnalysis
+                //    Enable                                  MicrosoftCodeAnalysis="true"
+                //    Disable                                 MicrosoftCodeAnalysis="false"
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.CodeAnalysis.MicrosoftCodeAnalysis.Enable, () => { context.Options["MicrosoftCodeAnalysis"] = "true"; }),
+                Options.Option(Options.Vc.CodeAnalysis.MicrosoftCodeAnalysis.Disable, () => { context.Options["MicrosoftCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag; })
+                );
+
+                //ClangTidyCodeAnalysis
+                //    Enable                                  ClangTidyCodeAnalysis="true"
+                //    Disable                                 ClangTidyCodeAnalysis="false"
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.CodeAnalysis.ClangTidyCodeAnalysis.Enable, () => { context.Options["ClangTidyCodeAnalysis"] = "true"; }),
+                Options.Option(Options.Vc.CodeAnalysis.ClangTidyCodeAnalysis.Disable, () => { context.Options["ClangTidyCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag; })
+                );
+
+                //Code analysis excludes paths
+                context.Options["CAexcludePaths"] = string.Join(";", Options.GetObjects<Options.Vc.CodeAnalysis.CodeAnalysisExcludePaths>(context.Configuration).Select(optionPath => optionPath.Path));
+            }
+            else
+            {
+                //RunCodeAnalysis
+                //    Disable                                  nothing
+                context.Options["RunCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["MicrosoftCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["ClangTidyCodeAnalysis"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["CAexcludePaths"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
 
             //UseLibraryDependencyInputs
             //    Enable                                  UseLibraryDependencyInputs="true"

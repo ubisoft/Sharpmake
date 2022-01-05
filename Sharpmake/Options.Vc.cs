@@ -1366,6 +1366,27 @@ namespace Sharpmake
                     [Default]
                     Disable
                 }
+
+                public enum MicrosoftCodeAnalysis
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum ClangTidyCodeAnalysis
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public class CodeAnalysisExcludePaths : PathOption
+                {
+                    public CodeAnalysisExcludePaths(string value)
+                        : base(value)
+                    { }
+                }
             }
 
             public static class Librarian
