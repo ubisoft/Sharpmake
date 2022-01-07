@@ -109,7 +109,20 @@ namespace Sharpmake
         /// <param name="defines"></param>
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
         {
-            FindAllSources(sources, arguments, startArguments, defines);
+            GenerateDebugSolution(sources, null, arguments, startArguments, defines);
+        }
+
+        /// <summary>
+        /// Generates debug projects and solutions
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="solutionPath"></param>
+        /// <param name="arguments"></param>
+        /// <param name="startArguments"></param>
+        /// <param name="defines"></param>
+        internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments, string[] defines)
+        {
+            FindAllSources(sources, solutionPath, arguments, startArguments, defines);
             arguments.Generate<DebugSolution>();
         }
 
@@ -131,10 +144,22 @@ namespace Sharpmake
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
-        private static void FindAllSources(string[] sourcesArguments, Sharpmake.Arguments sharpmakeArguments, string startArguments, string[] defines)
+        private static void FindAllSources(string[] sourcesArguments, string solutionPath, Sharpmake.Arguments sharpmakeArguments, string startArguments, string[] defines)
         {
             MainSources = sourcesArguments;
-            RootPath = Path.GetDirectoryName(sourcesArguments[0]);
+            if (!string.IsNullOrEmpty(solutionPath))
+            {
+                RootPath = solutionPath;
+                if (!Path.IsPathRooted(RootPath))
+                {
+                    RootPath = Path.Combine(Directory.GetCurrentDirectory(), RootPath);
+                }
+                Directory.CreateDirectory(RootPath);
+            }
+            else
+            {
+                RootPath = Path.GetDirectoryName(sourcesArguments[0]);
+            }
 
             Assembler assembler = new Assembler(sharpmakeArguments.Builder.Defines);
             assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
