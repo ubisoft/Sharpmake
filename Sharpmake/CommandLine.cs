@@ -80,7 +80,6 @@ namespace Sharpmake
             {
                 string commandLine = Environment.CommandLine.Remove(0, commandLineArgs[0].Length + 1);
                 commandLine = commandLine.Trim(' ', '\"');
-                commandLine = commandLine.Replace(@"'", @"""");
                 return commandLine;
             }
 
@@ -178,7 +177,7 @@ namespace Sharpmake
         {
             bool isStatic = instance == null;
 
-            Parameter[] parameters = GetParameters(commandLine);
+            Parameter[] parameters = GetParameters(commandLine.Replace(@"'", @""""));
             if (parameters.Length == 0)
                 return;
 
