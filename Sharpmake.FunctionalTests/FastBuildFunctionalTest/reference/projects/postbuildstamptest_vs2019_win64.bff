@@ -84,12 +84,9 @@ Executable( 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable' 
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe'
     .LinkerLinkObjects      = false
     .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Debug_FastBuild_NoBlob_vs2019\PostBuildStamper.exe'
-    .LinkerStampExeArgs     = ' e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_FastBuild_NoBlob_vs2019\PostBuildStampTest.exe _Stamp_Message'
+    .LinkerStampExeArgs     = ' f:\gitlab\anvil\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_FastBuild_NoBlob_vs2019\PostBuildStampTest.exe _Stamp_Message'
 
     .LinkerOptions          = '/OUT:"%2"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -112,6 +109,9 @@ Executable( 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable' 
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -227,12 +227,9 @@ Executable( 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_Executable
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe'
     .LinkerLinkObjects      = false
     .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Release_FastBuild_NoBlob_vs2019\PostBuildStamper.exe'
-    .LinkerStampExeArgs     = ' e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_FastBuild_NoBlob_vs2019\PostBuildStampTest.exe _Stamp_Message'
+    .LinkerStampExeArgs     = ' f:\gitlab\anvil\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_FastBuild_NoBlob_vs2019\PostBuildStampTest.exe _Stamp_Message'
 
     .LinkerOptions          = '/OUT:"%2"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -255,6 +252,9 @@ Executable( 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_Executable
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -369,12 +369,9 @@ Executable( 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_Executable' )
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildstamptest.exe'
     .LinkerLinkObjects      = false
     .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Debug_FastBuild_vs2019\PostBuildStamper.exe'
-    .LinkerStampExeArgs     = ' e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_FastBuild_vs2019\PostBuildStampTest.exe _Stamp_Message'
+    .LinkerStampExeArgs     = ' f:\gitlab\anvil\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_FastBuild_vs2019\PostBuildStampTest.exe _Stamp_Message'
 
     .LinkerOptions          = '/OUT:"%2"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -397,6 +394,9 @@ Executable( 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -512,12 +512,9 @@ Executable( 'PostBuildStampTest_Release_FastBuild_vs2019_win64_Executable' )
     .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildstamptest.exe'
     .LinkerLinkObjects      = false
     .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Release_FastBuild_vs2019\PostBuildStamper.exe'
-    .LinkerStampExeArgs     = ' e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_FastBuild_vs2019\PostBuildStampTest.exe _Stamp_Message'
+    .LinkerStampExeArgs     = ' f:\gitlab\anvil\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_FastBuild_vs2019\PostBuildStampTest.exe _Stamp_Message'
 
     .LinkerOptions          = '/OUT:"%2"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -540,6 +537,9 @@ Executable( 'PostBuildStampTest_Release_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
