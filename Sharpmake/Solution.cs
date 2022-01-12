@@ -629,8 +629,10 @@ namespace Sharpmake
                     // get some settings that are usually global from the first project
                     // we could expose those, if we need to set them specifically for FastBuildAllProject
                     var firstProject = projectConfigsToBuild.First();
+                    projectConf.FastBuildCacheAllowed = firstProject.Configuration.FastBuildCacheAllowed;
                     projectConf.FastBuildCustomArgs = firstProject.Configuration.FastBuildCustomArgs;
                     projectConf.FastBuildCustomActionsBeforeBuildCommand = firstProject.Configuration.FastBuildCustomActionsBeforeBuildCommand;
+                    projectConf.FastBuildDistribution = firstProject.Configuration.FastBuildDistribution;
 
                     // add all the projects to build as private dependencies, and OnlyBuildOrder
                     foreach (Configuration.IncludedProjectInfo projectConfigToBuild in projectConfigsToBuild)
