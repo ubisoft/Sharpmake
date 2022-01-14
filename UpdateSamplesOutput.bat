@@ -7,9 +7,9 @@ COLOR
 call CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
 if %errorlevel% NEQ 0 goto error
 
-set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\[debug|release] & pause & goto error
+set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\net5.0\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\net5.0\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\net5.0\[debug^|release] & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 
