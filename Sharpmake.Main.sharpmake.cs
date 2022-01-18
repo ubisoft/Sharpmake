@@ -59,8 +59,6 @@ namespace SharpmakeGen
                 // Use the new csproj style
                 ProjectSchema = CSharpProjectSchema.NetCore;
 
-                // we need to disable determinism while because we are using wildcards in assembly versions
-                // error CS8357: The specified version string contains wildcards, which are not compatible with determinism
                 CustomProperties.Add("Deterministic", "true");
 
                 // Enable Globalization Invariant Mode
