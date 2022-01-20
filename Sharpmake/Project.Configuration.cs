@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -2841,7 +2841,7 @@ namespace Sharpmake
                 public string RemoteDebuggerCommandArguments = RemoveLineTag;
                 public string RemoteDebuggingMode = RemoveLineTag;
                 public string RemoteDebuggerWorkingDirectory = RemoveLineTag;
-                public bool OverwriteExistingFile = true; 
+                public bool OverwriteExistingFile = true;
                 public string LocalDebuggerAttachString => LocalDebuggerAttach ? "true" : RemoveLineTag;
             }
 
