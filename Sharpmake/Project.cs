@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,12 +82,8 @@ namespace Sharpmake
             set { SetProperty(ref _sourceRootPath, value); }
         }
 
-        private string _perforceRootPath = null;
-        public string PerforceRootPath
-        {
-            get { return _perforceRootPath; }
-            set { SetProperty(ref _perforceRootPath, value); }
-        }
+        [Obsolete("This property is deprecated, scc info shouldn't be stored in the project files anymore", error: true)]
+        public string PerforceRootPath;
 
         private string _rootPath = "";                                                    // RootPath used as key to generate ProjectGuid and as a path helper for finding source files
         public string RootPath
@@ -1826,9 +1822,6 @@ namespace Sharpmake
                 Util.ResolvePath(SourceRootPath, ref SourceFilesBlobExclude);
                 Util.ResolvePath(SourceRootPath, ref SourceFilesBuildExclude);
                 Util.ResolvePath(SharpmakeCsPath, ref _blobPath);
-
-                if (PerforceRootPath != null)
-                    Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
 
                 if (SourceFilesFilters != null)
                     Util.ResolvePath(SharpmakeCsPath, ref SourceFilesFilters);

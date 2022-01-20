@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,9 +47,6 @@ namespace Sharpmake.Generators.VisualStudio
     <AssemblyName>[assemblyName]</AssemblyName>
     <SignAssembly>[options.SignAssembly]</SignAssembly>
     <AssemblyOriginatorKeyFile>[options.AssemblyOriginatorKeyFile]</AssemblyOriginatorKeyFile>
-    <SccProjectName>[sccProjectName]</SccProjectName>
-    <SccLocalPath>[sccLocalPath]</SccLocalPath>
-    <SccProvider>[sccProvider]</SccProvider>
     <[targetFrameworkVersionString]>[targetFramework]</[targetFrameworkVersionString]>
     <FileAlignment>[options.FileAlignment]</FileAlignment>
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>

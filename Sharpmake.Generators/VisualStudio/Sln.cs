@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -440,58 +440,6 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             fileGenerator.Write(Template.Solution.GlobalBegin);
-
-            // Write source code control information
-            if (solution.PerforceRootPath != null)
-            {
-                List<Solution.ResolvedProject> sccProjects = new List<Solution.ResolvedProject>();
-
-                foreach (Solution.ResolvedProject resolvedProject in solutionProjects)
-                {
-                    if (resolvedProject.Project.PerforceRootPath != null)
-                        sccProjects.Add(resolvedProject);
-                    else
-                        _builder.LogWriteLine(@"warning: cannot bind solution {0} to perforce, PerforceRootPath for project '{1}' is not set.", solutionFileInfo.Name, resolvedProject.Project.ClassName);
-                }
-
-                if (sccProjects.Count == solutionProjects.Count)
-                {
-                    using (fileGenerator.Declare("sccNumberOfProjects", sccProjects.Count))
-                    {
-                        fileGenerator.Write(Template.Solution.GlobalSectionSolutionSourceCodeControlBegin);
-                    }
-
-                    for (int i = 0; i < sccProjects.Count; ++i)
-                    {
-                        Solution.ResolvedProject resolvedProject = sccProjects[i];
-
-                        FileInfo projectFileInfo = new FileInfo(resolvedProject.ProjectFile);
-
-                        //SccProjectUniqueName7 = ..\\..\\extern\\techgroup\\framework\\gear\\private\\compilers\\win32\\vc9\\gear_win32_compile.vcproj
-                        string sccProjectUniqueName = Util.PathGetRelative(solutionFileInfo.Directory.FullName, projectFileInfo.FullName).Replace("\\", "\\\\");
-
-                        //SccProjectTopLevelParentUniqueName7 = guildlib.sln
-                        string sccProjectTopLevelParentUniqueName = solutionFileInfo.Name;
-
-                        // sln to perforce file
-                        //SccLocalPath7 = ..\\..\\extern\\techgroup\\framework\\gear
-                        string sccLocalPath = Util.PathGetRelative(solutionPath, resolvedProject.Project.PerforceRootPath).Replace("\\", "\\\\");
-
-                        //SccProjectFilePathRelativizedFromConnection7 = private\\compilers\\win32\\vc9\\
-                        string sccProjectFilePathRelativizedFromConnection = Util.PathGetRelative(resolvedProject.Project.PerforceRootPath, projectFileInfo.DirectoryName).Trim('.', '\\').Replace("\\", "\\\\");
-
-                        using (fileGenerator.Declare("i", i))
-                        using (fileGenerator.Declare("sccProjectUniqueName", sccProjectUniqueName))
-                        using (fileGenerator.Declare("sccProjectTopLevelParentUniqueName", sccProjectTopLevelParentUniqueName))
-                        using (fileGenerator.Declare("sccLocalPath", sccLocalPath))
-                        using (fileGenerator.Declare("sccProjectFilePathRelativizedFromConnection", sccProjectFilePathRelativizedFromConnection))
-                        {
-                            fileGenerator.Write(Template.Solution.GlobalSectionSolutionSourceCodeControlProject);
-                        }
-                    }
-                    fileGenerator.Write(Template.Solution.GlobalSectionSolutionSourceCodeControlEnd);
-                }
-            }
 
             // write solution configurations
             string visualStudioExe = GetVisualStudioIdePath(devEnv) + Util.WindowsSeparator + "devenv.com";

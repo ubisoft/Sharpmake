@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1132,18 +1132,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             var resolver = new Resolver();
 
-            // source control
-
-            string sccProjectName = RemoveLineTag;
-            string sccLocalPath = RemoveLineTag;
-            string sccProvider = RemoveLineTag;
-            if (project.PerforceRootPath != null)
-            {
-                sccProjectName = "Perforce Project";
-                sccLocalPath = Util.PathGetRelative(projectPath, project.PerforceRootPath);
-                sccProvider = "MSSCCI:Perforce SCM";
-            }
-
             _projectPath = projectPath;
             _projectPathCapitalized = Util.GetCapitalizedPath(projectPath);
             _projectConfigurationList = configurations;
@@ -1243,9 +1231,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             using (resolver.NewScopedParameter("project", project))
             using (resolver.NewScopedParameter("guid", projectPropertyGuid))
-            using (resolver.NewScopedParameter("sccProjectName", sccProjectName))
-            using (resolver.NewScopedParameter("sccLocalPath", sccLocalPath))
-            using (resolver.NewScopedParameter("sccProvider", sccProvider))
             using (resolver.NewScopedParameter("options", options[_projectConfigurationList[0]]))
             using (resolver.NewScopedParameter("outputType", outputType))
             using (resolver.NewScopedParameter("targetFramework", targetFrameworkString))

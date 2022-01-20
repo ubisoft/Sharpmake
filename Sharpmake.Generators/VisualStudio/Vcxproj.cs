@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -352,17 +352,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             GenerateConfOptions(context);
 
-            // source control
-            string sccProjectName = FileGeneratorUtilities.RemoveLineTag;
-            string sccLocalPath = FileGeneratorUtilities.RemoveLineTag;
-            string sccProvider = FileGeneratorUtilities.RemoveLineTag;
-            if (context.Project.PerforceRootPath != null)
-            {
-                sccProjectName = "Perforce Project";
-                sccLocalPath = Util.PathGetRelative(context.ProjectDirectory, context.Project.PerforceRootPath);
-                sccProvider = "MSSCCI:Perforce SCM";
-            }
-
             var fileGenerator = new XmlFileGenerator();
 
             // xml begin header
@@ -404,9 +393,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             using (fileGenerator.Declare("projectName", firstConf.ProjectName))
             using (fileGenerator.Declare("guid", firstConf.ProjectGuid))
-            using (fileGenerator.Declare("sccProjectName", sccProjectName))
-            using (fileGenerator.Declare("sccLocalPath", sccLocalPath))
-            using (fileGenerator.Declare("sccProvider", sccProvider))
             using (fileGenerator.Declare("targetFramework", targetFrameworkString))
             using (fileGenerator.Declare("projectKeyword", projectKeyword))
             {

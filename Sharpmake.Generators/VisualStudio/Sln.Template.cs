@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -110,23 +110,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 	EndGlobalSection
 ";
 
-                public static string GlobalSectionSolutionSourceCodeControlBegin =
-@"	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = [sccNumberOfProjects]
-";
+                [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
+                public static string GlobalSectionSolutionSourceCodeControlBegin;
 
-                public static string GlobalSectionSolutionSourceCodeControlProject =
-@"		SccProjectUniqueName[i] = [sccProjectUniqueName]
-		SccProjectTopLevelParentUniqueName[i] = [sccProjectTopLevelParentUniqueName]
-		SccProjectName[i] = Perforce\u0020Project
-		SccLocalPath[i] = [sccLocalPath]
-		SccProvider[i] = MSSCCI:Perforce\u0020SCM
-		SccProjectFilePathRelativizedFromConnection[i] = [sccProjectFilePathRelativizedFromConnection]\\
-";
+                [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
+                public static string GlobalSectionSolutionSourceCodeControlProject;
 
-                public static string GlobalSectionSolutionSourceCodeControlEnd =
-@"	EndGlobalSection
-";
+                [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
+                public static string GlobalSectionSolutionSourceCodeControlEnd;
 
                 public static string GlobalSectionSolutionConfigurationBegin =
 @"	GlobalSection(SolutionConfigurationPlatforms) = preSolution

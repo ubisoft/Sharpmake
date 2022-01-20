@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,12 +69,8 @@ namespace Sharpmake
         /// </summary>
         public Dictionary<string, Strings> ExtraItems = new Dictionary<string, Strings>();
 
-        private string _perforceRootPath = null;
-        public string PerforceRootPath
-        {
-            get { return _perforceRootPath; }
-            set { SetProperty(ref _perforceRootPath, value); }
-        }
+        [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
+        public string PerforceRootPath;
 
         private bool _mergePlatformConfiguration = false;
         public bool MergePlatformConfiguration
@@ -449,9 +445,6 @@ namespace Sharpmake
                 Resolver resolver = new Resolver();
                 resolver.SetParameter("solution", this);
                 resolver.Resolve(this);
-
-                if (PerforceRootPath != null)
-                    Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
 
                 foreach (Solution.Configuration conf in Configurations)
                     conf.Resolve(resolver);
