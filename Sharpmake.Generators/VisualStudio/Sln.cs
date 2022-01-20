@@ -81,10 +81,11 @@ namespace Sharpmake.Generators.VisualStudio
 
     public partial class Sln : ISolutionGenerator
     {
+        public const string SolutionExtension = ".sln";
+
         private readonly List<SolutionFolder> _rootSolutionFolders = new List<SolutionFolder>();
         private readonly List<SolutionFolder> _solutionFolders = new List<SolutionFolder>();
         private Builder _builder;
-        private const string SolutionExtension = ".sln";
 
         private static Regex s_projectGuidRegex = new Regex(
             "(\\s*ProjectGUID=\"\\s*{(?<GUID>([0-9A-Fa-f\\-]+))}\\s*\")| " +
