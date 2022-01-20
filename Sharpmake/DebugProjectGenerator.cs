@@ -97,7 +97,7 @@ namespace Sharpmake
         /// <param name="startArguments"></param>
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments)
         {
-            GenerateDebugSolution(sources, arguments, startArguments, null);
+            GenerateDebugSolution(sources, null, arguments, startArguments);
         }
 
         /// <summary>
@@ -107,9 +107,10 @@ namespace Sharpmake
         /// <param name="arguments"></param>
         /// <param name="startArguments"></param>
         /// <param name="defines"></param>
+        [Obsolete("Defines should be inserted in the Sharpmake.Arguments parameter thus rendering this function useless ", error: true)]
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
         {
-            GenerateDebugSolution(sources, null, arguments, startArguments, defines);
+            GenerateDebugSolution(sources, null, arguments, startArguments);
         }
 
         /// <summary>
@@ -119,10 +120,9 @@ namespace Sharpmake
         /// <param name="solutionPath"></param>
         /// <param name="arguments"></param>
         /// <param name="startArguments"></param>
-        /// <param name="defines"></param>
-        internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments, string[] defines)
+        internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments)
         {
-            FindAllSources(sources, solutionPath, arguments, startArguments, defines);
+            FindAllSources(sources, solutionPath, arguments, startArguments);
             arguments.Generate<DebugSolution>();
         }
 
@@ -144,7 +144,7 @@ namespace Sharpmake
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
-        private static void FindAllSources(string[] sourcesArguments, string solutionPath, Sharpmake.Arguments sharpmakeArguments, string startArguments, string[] defines)
+        private static void FindAllSources(string[] sourcesArguments, string solutionPath, Sharpmake.Arguments sharpmakeArguments, string startArguments)
         {
             MainSources = sourcesArguments;
             if (!string.IsNullOrEmpty(solutionPath))
@@ -165,7 +165,7 @@ namespace Sharpmake
             assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
             IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 
-            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>(), defines);
+            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>(), sharpmakeArguments.Builder.Defines.ToArray());
         }
 
         private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, string startArguments, IDictionary<string, Type> visited, string[] defines)
