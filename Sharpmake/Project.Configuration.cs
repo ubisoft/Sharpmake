@@ -2836,11 +2836,13 @@ namespace Sharpmake
                 public string LocalDebuggerCommandArguments = RemoveLineTag;
                 public string LocalDebuggerEnvironment = RemoveLineTag;
                 public string LocalDebuggerWorkingDirectory = RemoveLineTag;
+                public bool LocalDebuggerAttach = false;
                 public string RemoteDebuggerCommand = RemoveLineTag;
                 public string RemoteDebuggerCommandArguments = RemoveLineTag;
                 public string RemoteDebuggingMode = RemoveLineTag;
                 public string RemoteDebuggerWorkingDirectory = RemoveLineTag;
-                public bool OverwriteExistingFile = true;
+                public bool OverwriteExistingFile = true; 
+                public string LocalDebuggerAttachString => LocalDebuggerAttach ? "true" : RemoveLineTag;
             }
 
             public VcxprojUserFileSettings VcxprojUserFile = null;
