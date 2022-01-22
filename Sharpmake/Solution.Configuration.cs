@@ -101,6 +101,13 @@ namespace Sharpmake
                 }
             }
 
+            /// <summary>
+            /// Experimental: only add to the solution the FastBuild projects that are really needed, or where
+            /// <see cref="Project.Configuration.AddFastBuildProjectToSolutionCallback"/> returned true.
+            /// Set to false to add all of them.
+            /// </summary>
+            public bool IncludeOnlyNeededFastBuildProjects = false;
+
             public bool IncludeOnlyFilterProject = false;
 
             public string CompileCommandLine = string.Empty;

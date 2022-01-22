@@ -177,6 +177,17 @@ namespace Sharpmake
                         projectsWereFiltered = true;
                         continue;
                     }
+                    else if (solutionConfiguration.IncludeOnlyNeededFastBuildProjects)
+                    {
+                        if (!includedProjectInfo.Project.IsFastBuildAll &&
+                            (includedProjectInfo.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.No || includedProjectInfo.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.YesThroughDependency) &&
+                            includedProjectInfo.Configuration.IsFastBuild && !includedProjectInfo.Configuration.DoNotGenerateFastBuild &&
+                            !(includedProjectInfo.Configuration.AddFastBuildProjectToSolutionCallback?.Invoke() ?? false))
+                        {
+                            projectsWereFiltered = true;
+                            continue;
+                        }
+                    }
 
                     ResolvedProject resolvedProject = result.GetValueOrAdd(
                         includedProjectInfo.Configuration.ProjectFullFileName,

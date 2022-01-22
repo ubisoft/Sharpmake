@@ -2156,6 +2156,37 @@ namespace Sharpmake
             // If true, remove the source files from a FastBuild project's associated vcxproj file.
             public bool StripFastBuildSourceFiles = true;
 
+            /// <summary>
+            /// Override this delegate with a method returning a bool letting sharpmake know if it needs to add the
+            /// project containing this FastBuild conf to the solution.
+            /// By default, sharpmake will only add it if the Output is executable, or if <see cref="VcxprojUserFile"/>
+            /// is not null.
+            /// </summary>
+            public Func<bool> AddFastBuildProjectToSolutionCallback => DefaultAddFastBuildProjectToSolution;
+
+            /// <summary>
+            /// Default method returning whether sharpmake will add the project containing this FastBuild conf to the solution
+            /// </summary>
+            public bool DefaultAddFastBuildProjectToSolution()
+            {
+                if (!IsFastBuild)
+                    return true;
+
+                if (Project.IsFastBuildAll)
+                    return true;
+
+                if (!DoNotGenerateFastBuild)
+                {
+                    if (Output == OutputType.Exe)
+                        return true;
+
+                    if (VcxprojUserFile != null)
+                        return true;
+                }
+
+                return false;
+            }
+
             private Dictionary<KeyValuePair<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<KeyValuePair<Type, ITarget>, DependencySetting>();
 
             // These dependencies will not be propagated to other projects that depend on us
