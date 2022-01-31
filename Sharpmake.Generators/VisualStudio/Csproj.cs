@@ -2778,16 +2778,16 @@ namespace Sharpmake.Generators.VisualStudio
         [Serializable]
         public class CsProjSubTypesInfos
         {
-            public string CsProjFullPath;
-            public DateTime LastWriteTime;
-            public List<SubTypeInfo> SubTypeInfos;
+            public string CsProjFullPath { get; set; }
+            public DateTime LastWriteTime { get; set; }
+            public List<SubTypeInfo> SubTypeInfos { get; set; }
 
             [Serializable]
             public class SubTypeInfo
             {
-                public string FileName;
-                public DateTime LastWriteTime;
-                public string SubType;
+                public string FileName { get; set; }
+                public DateTime LastWriteTime { get; set; }
+                public string SubType { get; set; }
             }
         }
 
