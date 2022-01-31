@@ -17,8 +17,11 @@ namespace Sharpmake
     {
         public sealed partial class AndroidPlatform
         {
+            private const string _projectStartPlatformConditionalPart =
+    @"'$(Platform)'=='[platform]'";
+
             private const string _projectStartPlatformConditional =
-    @"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='ARM64' Or '$(Platform)'=='x64' Or '$(Platform)'=='ARM' Or '$(Platform)'=='x86'"">
+    @"  <PropertyGroup Label=""Globals"" Condition=""[condition]"">
 ";
 
             private const string _projectDescriptionPlatformSpecific =

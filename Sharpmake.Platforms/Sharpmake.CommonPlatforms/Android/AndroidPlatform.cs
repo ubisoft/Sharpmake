@@ -111,10 +111,32 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
-                generator.Write(_projectStartPlatformConditional);
+                // When writing android properties section, do not add conditional properties for x64 and x86 if those
+                // android targets are not used. This allows arm only projects to live alongside windows x64/x86 projects in the same file
+                var buildTargets = context.ProjectConfigurationOptions
+                    .Where(conf => conf.Key.Platform == Platform.android && conf.Key.Target.HaveFragment<AndroidBuildTargets>())
+                    .Select(conf => conf.Key.Target.GetFragment<AndroidBuildTargets>())
+                    .Distinct()
+                    .Select(bt =>
+                    {
+                        if (bt == AndroidBuildTargets.arm64_v8a) return "ARM64";
+                        if (bt == AndroidBuildTargets.armeabi_v7a) return "ARM";
+                        if (bt == AndroidBuildTargets.x86) return "x86";
+                        /*if (bt == AndroidBuildTargets.x86_64)*/ return "x64";
+                    })
+                    .Select(bt =>
+                    {
+                        using (generator.Declare("platform", bt))
+                        return generator.Resolver.Resolve(_projectStartPlatformConditionalPart);
+                    });
+
+                using (generator.Declare("condition", string.Join(" OR ", buildTargets)))
+                {
+                    generator.Write(_projectStartPlatformConditional);
+                }
 
                 string applicationType = "Android";
-                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values);
+                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values, Options.Android.General.ApplicationTypeRevision.Default);
 
                 string msBuildPathOverrides = string.Empty;
 
