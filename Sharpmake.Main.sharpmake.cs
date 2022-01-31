@@ -61,6 +61,15 @@ namespace SharpmakeGen
 
                 CustomProperties.Add("Deterministic", "true");
 
+                // PathUtil.cs uses some unsafe blocks
+                CustomProperties.Add("AllowUnsafeBlocks", "true");
+
+                // Adding doc warning suppression here to apply to all configs so it will
+                // take effect when publishing for other platforms not specified in the default configurations
+                // W1: CS1570: XML comment on 'construct' has badly formed XML - 'reason
+                // W4: CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member'
+                CustomProperties.Add("NoWarn", "1570,1591");
+
                 // Enable Globalization Invariant Mode
                 // https://github.com/dotnet/runtime/blob/master/docs/design/features/globalization-invariant-mode.md
                 CustomProperties.Add("InvariantGlobalization", "true");
@@ -103,16 +112,6 @@ namespace SharpmakeGen
                         618 // W1: CS0618: A class member was marked with the Obsolete attribute, such that a warning will be issued when the class member is referenced
                     )
                 );
-
-                if (GenerateDocumentationFile)
-                {
-                    conf.Options.Add(
-                        new Options.CSharp.SuppressWarning(
-                            1570, // W1: CS1570: XML comment on 'construct' has badly formed XML - 'reason
-                            1591  // W4: CS1591: Missing XML comment for publicly visible type or member 'Type_or_Member'
-                        )
-                    );
-                }
             }
         }
     }

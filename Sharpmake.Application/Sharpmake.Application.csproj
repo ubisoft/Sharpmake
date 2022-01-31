@@ -18,6 +18,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Deterministic>true</Deterministic>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1570,1591</NoWarn>
     <InvariantGlobalization>true</InvariantGlobalization>
     <MSBuildProjectExtensionsPath>..\tmp\projects\Sharpmake.Application</MSBuildProjectExtensionsPath>
   </PropertyGroup>
