@@ -737,7 +737,7 @@ namespace Sharpmake
 
             if (parameter == null)
             {
-                throw new NotFoundException(parameterName + name + " is null, please set a proper value for sharpmake to resolve it");
+                throw new NotFoundException(parameterName + name + " is null on target type " + refCountedReference.Value.GetType().Name + ", please set a proper value for sharpmake to resolve it");
             }
 
             return ApplyModifier(modifier, parameter.ToString());
