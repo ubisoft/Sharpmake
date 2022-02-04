@@ -2802,8 +2802,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 if (s_allCachedCsProjSubTypesInfos == null)
                 {
-                    var concurentBagTypes = (ConcurrentBag<CsProjSubTypesInfos>)Util.DeserializeAllCsprojSubTypes();
-                    var listTypes = concurentBagTypes?.ToList();
+                    var listTypes = Util.DeserializeAllCsprojSubTypesJson<List<CsProjSubTypesInfos>>();
                     s_allCachedCsProjSubTypesInfos = listTypes?.Where(p => p != null).ToList() ?? new List<CsProjSubTypesInfos>();
                 }
             }

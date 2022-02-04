@@ -508,12 +508,18 @@ namespace Sharpmake
             }
         }
 
+        [Obsolete("Use DeserializeAllCsprojSubTypesJson<T> with the known type: the original C# class that was serialized isn't known in the json serialization.")]
         public static object DeserializeAllCsprojSubTypes()
+        {
+            return DeserializeAllCsprojSubTypesJson<object>();
+        }
+
+        public static T DeserializeAllCsprojSubTypesJson<T>()
         {
             string winFormSubTypesDbFullPath = GetWinFormSubTypeDbPath();
 
             if (!File.Exists(winFormSubTypesDbFullPath))
-                return null;
+                return default(T);
 
             try
             {
@@ -521,14 +527,14 @@ namespace Sharpmake
                 using (BinaryReader binReader = new BinaryReader(readStream))
                 {
                     string csprojSubTypesAsJson = binReader.ReadString();
-                    return System.Text.Json.JsonSerializer.Deserialize<object>(csprojSubTypesAsJson, GetCsprojSubTypesJsonSerializerOptions());
+                    return System.Text.Json.JsonSerializer.Deserialize<T>(csprojSubTypesAsJson, GetCsprojSubTypesJsonSerializerOptions());
                 }
             }
             catch
             {
                 TryDeleteFile(winFormSubTypesDbFullPath);
             }
-            return null;
+            return default(T);
         }
 
         public static bool TryDeleteFile(string filename, bool removeIfReadOnly = false)
