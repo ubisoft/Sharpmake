@@ -33,7 +33,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>libstuffproject_projectname</TargetName>
     <OutDir>..\libstuff\lib\</OutDir>
-    <IntDir>obj\libstuffproject_projectname\win64_debug_vs2017\</IntDir>
+    <IntDir>obj\LibStuffProject_ProjectName\win64_Debug_vs2017\</IntDir>
     <TargetExt>.lib</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
@@ -86,7 +86,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>obj\libstuffproject_projectname\win64_debug_vs2017\libstuffproject_projectname_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>obj\LibStuffProject_ProjectName\win64_Debug_vs2017\LibStuffProject_ProjectName_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

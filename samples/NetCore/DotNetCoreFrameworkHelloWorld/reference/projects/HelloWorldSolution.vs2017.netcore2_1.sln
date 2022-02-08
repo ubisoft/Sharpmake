@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "helloworld\HelloWorld.vs2017.netcore2_1.csproj", "{FBDAB658-9F80-4FEA-7DA3-5888504E98FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "HelloWorld\HelloWorld.vs2017.netcore2_1.csproj", "{FBDAB658-9F80-4FEA-7DA3-5888504E98FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

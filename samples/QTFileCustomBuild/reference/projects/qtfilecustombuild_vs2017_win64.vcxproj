@@ -54,32 +54,32 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>qtfilecustombuild</TargetName>
-    <OutDir>output\win64\debug\</OutDir>
-    <IntDir>obj\win64\debug\</IntDir>
+    <OutDir>output\win64\Debug\</OutDir>
+    <IntDir>obj\win64\Debug\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win64\debug\qtfilecustombuild.exe</OutputFile>
+    <OutputFile>output\win64\Debug\qtfilecustombuild.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>qtfilecustombuild</TargetName>
-    <OutDir>output\win64\release\</OutDir>
-    <IntDir>obj\win64\release\</IntDir>
+    <OutDir>output\win64\Release\</OutDir>
+    <IntDir>obj\win64\Release\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win64\release\qtfilecustombuild.exe</OutputFile>
+    <OutputFile>output\win64\Release\qtfilecustombuild.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
     <TargetName>qtfilecustombuild</TargetName>
-    <OutDir>output\win64\retail\</OutDir>
-    <IntDir>obj\win64\retail\</IntDir>
+    <OutDir>output\win64\Retail\</OutDir>
+    <IntDir>obj\win64\Retail\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win64\retail\qtfilecustombuild.exe</OutputFile>
+    <OutputFile>output\win64\Retail\qtfilecustombuild.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -129,17 +129,17 @@
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>obj\win64\debug\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
-      <ProgramDatabaseFileName>obj\win64\debug\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
+      <PrecompiledHeaderOutputFile>obj\win64\Debug\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\Debug\QTFileCustomBuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win64\debug\qtfilecustombuild.exe</OutputFile>
+      <OutputFile>output\win64\Debug\qtfilecustombuild.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>..\qt\5.9.2\msvc2017_64\lib</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win64\debug\qtfilecustombuild.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win64\Debug\QTFileCustomBuild.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -164,7 +164,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win64\debug\qtfilecustombuild.map</MapFileName>
+      <MapFileName>output\win64\Debug\qtfilecustombuild.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -215,17 +215,17 @@
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>obj\win64\release\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
-      <ProgramDatabaseFileName>obj\win64\release\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
+      <PrecompiledHeaderOutputFile>obj\win64\Release\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\Release\QTFileCustomBuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win64\release\qtfilecustombuild.exe</OutputFile>
+      <OutputFile>output\win64\Release\qtfilecustombuild.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>..\qt\5.9.2\msvc2017_64\lib</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win64\release\qtfilecustombuild.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win64\Release\QTFileCustomBuild.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -250,7 +250,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win64\release\qtfilecustombuild.map</MapFileName>
+      <MapFileName>output\win64\Release\qtfilecustombuild.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
@@ -301,17 +301,17 @@
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>obj\win64\retail\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
-      <ProgramDatabaseFileName>obj\win64\retail\qtfilecustombuild_compiler.pdb</ProgramDatabaseFileName>
+      <PrecompiledHeaderOutputFile>obj\win64\Retail\QTFileCustomBuild.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win64\Retail\QTFileCustomBuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win64\retail\qtfilecustombuild.exe</OutputFile>
+      <OutputFile>output\win64\Retail\qtfilecustombuild.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>..\qt\5.9.2\msvc2017_64\lib</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win64\retail\qtfilecustombuild.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win64\Retail\QTFileCustomBuild.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -336,7 +336,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win64\retail\qtfilecustombuild.map</MapFileName>
+      <MapFileName>output\win64\Retail\qtfilecustombuild.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

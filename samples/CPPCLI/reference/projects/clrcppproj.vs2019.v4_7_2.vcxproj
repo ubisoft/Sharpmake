@@ -47,22 +47,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>clrcppproj</TargetName>
-    <OutDir>output\win32\debug\</OutDir>
-    <IntDir>temp\clrcppproj\vs2019\v4_7_2\debug\</IntDir>
+    <OutDir>output\win32\Debug\</OutDir>
+    <IntDir>temp\CLRCPPProj\vs2019\v4_7_2\Debug\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\debug\clrcppproj.dll</OutputFile>
+    <OutputFile>output\win32\Debug\clrcppproj.dll</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>clrcppproj</TargetName>
-    <OutDir>output\win32\release\</OutDir>
-    <IntDir>temp\clrcppproj\vs2019\v4_7_2\release\</IntDir>
+    <OutDir>output\win32\Release\</OutDir>
+    <IntDir>temp\CLRCPPProj\vs2019\v4_7_2\Release\</IntDir>
     <TargetExt>.dll</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\release\clrcppproj.dll</OutputFile>
+    <OutputFile>output\win32\Release\clrcppproj.dll</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -110,17 +110,17 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\clrcppproj\vs2019\v4_7_2\debug\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\CLRCPPProj\vs2019\v4_7_2\Debug\CLRCPPProj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
-      <OutputFile>output\win32\debug\clrcppproj.dll</OutputFile>
+      <OutputFile>output\win32\Debug\clrcppproj.dll</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalLibraryDirectories>output\win32\debug</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win32\debug\clrcppproj.pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>output\win32\Debug</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>output\win32\Debug\CLRCPPProj.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -145,7 +145,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\debug\clrcppproj.map</MapFileName>
+      <MapFileName>output\win32\Debug\clrcppproj.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -193,17 +193,17 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>temp\clrcppproj\vs2019\v4_7_2\release\clrcppproj_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>temp\CLRCPPProj\vs2019\v4_7_2\Release\CLRCPPProj_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
-      <OutputFile>output\win32\release\clrcppproj.dll</OutputFile>
+      <OutputFile>output\win32\Release\clrcppproj.dll</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalLibraryDirectories>output\win32\release</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win32\release\clrcppproj.pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>output\win32\Release</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>output\win32\Release\CLRCPPProj.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -228,7 +228,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\release\clrcppproj.map</MapFileName>
+      <MapFileName>output\win32\Release\clrcppproj.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

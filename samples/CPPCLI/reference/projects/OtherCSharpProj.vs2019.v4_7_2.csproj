@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2019\v4_7_2\debug</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2019\v4_7_2\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_7_2\Debug</OutputPath>
+    <IntermediateOutputPath>temp\OtherCSharpProj\vs2019\v4_7_2\Debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,8 +29,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2019\v4_7_2\release</OutputPath>
-    <IntermediateOutputPath>temp\othercsharpproj\vs2019\v4_7_2\release</IntermediateOutputPath>
+    <OutputPath>output\vs2019\v4_7_2\Release</OutputPath>
+    <IntermediateOutputPath>temp\OtherCSharpProj\vs2019\v4_7_2\Release</IntermediateOutputPath>
     <DefineConstants>TRACE;WIN32</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

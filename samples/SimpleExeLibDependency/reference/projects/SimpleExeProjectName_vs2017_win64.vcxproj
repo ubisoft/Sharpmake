@@ -32,12 +32,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>simpleexeprojectname</TargetName>
-    <OutDir>output\win64\debug\</OutDir>
-    <IntDir>obj\simpleexeprojectname\win64_debug_vs2017\</IntDir>
+    <OutDir>output\win64\Debug\</OutDir>
+    <IntDir>obj\SimpleExeProjectName\win64_Debug_vs2017\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win64\debug\simpleexeprojectname.exe</OutputFile>
+    <OutputFile>output\win64\Debug\simpleexeprojectname.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -86,16 +86,16 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>obj\simpleexeprojectname\win64_debug_vs2017\simpleexeprojectname_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>obj\SimpleExeProjectName\win64_Debug_vs2017\SimpleExeProjectName_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win64\debug\simpleexeprojectname.exe</OutputFile>
+      <OutputFile>output\win64\Debug\simpleexeprojectname.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>..\libstuff\lib</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>output\win64\debug\simpleexeprojectname.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win64\Debug\SimpleExeProjectName.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -120,7 +120,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win64\debug\simpleexeprojectname.map</MapFileName>
+      <MapFileName>output\win64\Debug\simpleexeprojectname.map</MapFileName>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
   </ItemDefinitionGroup>
