@@ -30,7 +30,7 @@ namespace SharpmakeGen
             if (target.Framework.IsDotNetFramework())
             {
                 conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net472", "1.2.4");
-                conf.ReferencesByNuGetPackage.Add("System.Text.Json", "5.0.2");
+                conf.ReferencesByNuGetPackage.Add("System.Text.Json", "6.0.2");
             }
             else if (target.Framework.IsDotNetCore())
             {
