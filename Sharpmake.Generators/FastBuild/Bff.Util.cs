@@ -43,6 +43,9 @@ namespace Sharpmake.Generators.FastBuild
             public string UseRelativePaths = FileGeneratorUtilities.RemoveLineTag; // (optional) Use relative paths for generated Unity files
 
             public const string DefaultUnityInputPatternExtension = ".cpp";
+            public const string DefaultUnityOutputPatternExtension = "Unity*.cpp";
+
+            internal string UnityFullOutputPath = string.Empty; // Path to output generated Unity files
 
             public override int GetHashCode()
             {

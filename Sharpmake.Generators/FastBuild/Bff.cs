@@ -1366,10 +1366,35 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             // Write all unity sections together at the beginning of the .bff just after the header.
-            foreach (var unityFile in _unities.Keys.OrderBy(u => u.UnityName))
+            if (_unities.Any())
             {
-                using (bffWholeFileGenerator.Declare("unityFile", unityFile))
-                    bffWholeFileGenerator.Write(Template.ConfigurationFile.UnitySection);
+                foreach (var unityFile in _unities.Keys.OrderBy(u => u.UnityName))
+                {
+                    using (bffWholeFileGenerator.Declare("unityFile", unityFile))
+                        bffWholeFileGenerator.Write(Template.ConfigurationFile.UnitySection);
+
+                    // Record the unities in the autocleanupdb to allow auto removal when they become stale.
+                    // Note that can't record them as 'generated', since they are created by FastBuild and not by us.
+                    int nbUnities = 1;
+                    if (unityFile.UnityNumFiles != FileGeneratorUtilities.RemoveLineTag)
+                    {
+                        if (!int.TryParse(unityFile.UnityNumFiles, out nbUnities))
+                            throw new Error("'{0}' cannot be converted to int!", unityFile.UnityNumFiles);
+                    }
+
+                    string outputPattern = unityFile.UnityOutputPattern == FileGeneratorUtilities.RemoveLineTag ? Sharpmake.Generators.FastBuild.Bff.Unity.DefaultUnityOutputPatternExtension : unityFile.UnityOutputPattern;
+                    int wildcardIndex = outputPattern.IndexOf('*');
+                    if (wildcardIndex == -1)
+                        throw new Error("UnityOutputPattern must include a '*', but none was found in '{0}'!", unityFile.UnityNumFiles);
+
+                    string firstStringChunk = outputPattern.Substring(0, wildcardIndex);
+                    string lastStringChunk = outputPattern.Substring(wildcardIndex + 1);
+                    for (int i = 1; i <= nbUnities; ++i)
+                    {
+                        string fullPath = Path.Combine(unityFile.UnityFullOutputPath, $"{firstStringChunk}{i}{lastStringChunk}");
+                        Util.RecordInAutoCleanupDatabase(fullPath);
+                    }
+                }
             }
 
             // Now combine all the streams.
@@ -1878,6 +1903,7 @@ namespace Sharpmake.Generators.FastBuild
             {
                 // Note that the UnityName and UnityOutputPattern are intentionally left empty: they will be set in the Resolve
                 UnityOutputPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.FastBuildUnityPath, true)),
+                UnityFullOutputPath = Path.Combine(context.ProjectDirectoryCapitalized, conf.FastBuildUnityPath),
                 UnityInputIsolateWritableFiles = conf.FastBuildUnityInputIsolateWritableFiles.ToString().ToLower(),
                 UnityInputIsolateWritableFilesLimit = conf.FastBuildUnityInputIsolateWritableFiles ? conf.FastBuildUnityInputIsolateWritableFilesLimit.ToString() : FileGeneratorUtilities.RemoveLineTag,
                 UnityPCH = conf.PrecompHeader ?? FileGeneratorUtilities.RemoveLineTag,

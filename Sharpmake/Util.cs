@@ -212,10 +212,15 @@ namespace Sharpmake
             return Builder.Instance.Context.WriteGeneratedFile(null, file, stream);
         }
 
+        internal static bool RecordInAutoCleanupDatabase(string fullPath)
+        {
+            return s_writtenFiles.TryAdd(fullPath, DateTime.Now);
+        }
+
         internal static bool FileWriteIfDifferentInternal(FileInfo file, MemoryStream stream, bool bypassAutoCleanupDatabase = false)
         {
             if (!bypassAutoCleanupDatabase)
-                s_writtenFiles.TryAdd(file.FullName, DateTime.Now);
+                RecordInAutoCleanupDatabase(file.FullName);
 
             if (file.Exists)
             {
