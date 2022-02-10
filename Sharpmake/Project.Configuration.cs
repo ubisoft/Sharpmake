@@ -2819,6 +2819,9 @@ namespace Sharpmake
             public Strings ReferencesByName = new Strings();
             public Strings ReferencesByNameExternal = new Strings();
             public Strings ReferencesByPath = new Strings();
+            public Strings InteropReferencesByName = new Strings();
+            public Strings InteropReferencesByNameExternal = new Strings();
+            public Strings InteropReferencesByPath = new Strings();
             public string ConditionalReferencesByPathCondition = string.Empty;
             public Strings ConditionalReferencesByPath = new Strings();
             public Strings ForceUsingFiles = new Strings();

@@ -2286,6 +2286,16 @@ namespace Sharpmake.Generators.VisualStudio
                         };
                         itemGroups.AddReference(dotNetFramework, referencesByName);
                     }
+                    foreach (var str in conf.InteropReferencesByName)
+                    {
+                        var referencesByName = new ItemGroups.Reference
+                        {
+                            Include = str,
+                            Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
+                            EmbedInteropTypes = true
+                        };
+                        itemGroups.AddReference(dotNetFramework, referencesByName);
+                    }
                 }
             }
 
@@ -2298,6 +2308,16 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         Include = str,
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByNameExternal);
+                }
+                foreach (var str in conf.InteropReferencesByNameExternal)
+                {
+                    var referencesByNameExternal = new ItemGroups.Reference
+                    {
+                        Include = str,
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
+                        EmbedInteropTypes = true
                     };
                     itemGroups.AddReference(dotNetFramework, referencesByNameExternal);
                 }
@@ -2314,6 +2334,18 @@ namespace Sharpmake.Generators.VisualStudio
                         SpecificVersion = false,
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                    };
+                    itemGroups.AddReference(dotNetFramework, referencesByPath);
+                }
+                foreach (var str in conf.InteropReferencesByPath.Select(Util.GetCapitalizedPath))
+                {
+                    var referencesByPath = new ItemGroups.Reference
+                    {
+                        Include = Path.GetFileNameWithoutExtension(str),
+                        SpecificVersion = false,
+                        HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
+                        Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                        EmbedInteropTypes = true
                     };
                     itemGroups.AddReference(dotNetFramework, referencesByPath);
                 }
