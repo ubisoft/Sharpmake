@@ -271,7 +271,7 @@ del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCl
       <MapFileName>output\debug_msbuild_vs2019\postbuildstamptest.map</MapFileName>
     </Link>
     <PostBuildEvent>
-      <Command>output\Debug_MSBuild_vs2019\PostBuildStamper.exe  e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
+      <Command>output\Debug_MSBuild_vs2019\PostBuildStamper.exe  e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
@@ -356,7 +356,7 @@ del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCl
       <MapFileName>output\release_msbuild_vs2019\postbuildstamptest.map</MapFileName>
     </Link>
     <PostBuildEvent>
-      <Command>output\Release_MSBuild_vs2019\PostBuildStamper.exe  e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
+      <Command>output\Release_MSBuild_vs2019\PostBuildStamper.exe  e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
