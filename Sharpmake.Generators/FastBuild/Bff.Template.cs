@@ -145,6 +145,9 @@ Compiler( '[fastBuildMasmCompilerName]' )
 
                 public static string LinkerOptions = @"
     .LinkerOptions          = '/OUT:""%2""[dllOption]'
+                            // Input files
+                            // ---------------------------
+                            + ' ""%1""'
                             // General
                             // ---------------------------
                             + ' [cmdLineOptions.ShowProgress]'
@@ -160,9 +163,6 @@ Compiler( '[fastBuildMasmCompilerName]' )
                             + ' [cmdLineOptions.IgnoreDefaultLibraryNames]'
                             + ' [cmdLineOptions.DelayLoadedDLLs]'
                             + ' [cmdLineOptions.EmbedResources]'
-                            // Input files
-                            // ---------------------------
-                            + ' ""%1""'
                             // Manifest
                             // ---------------------------
                             + ' [cmdLineOptions.GenerateManifest]'
