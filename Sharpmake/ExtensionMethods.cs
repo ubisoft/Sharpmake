@@ -25,6 +25,10 @@ namespace Sharpmake
         {
             return platform == Platform.win32 || platform == Platform.win64;
         }
+        public static bool IsMac(this Platform platform)
+        {
+            return platform == Platform.ios || platform == Platform.mac;
+        }
 
         public static bool IsMicrosoft(this Platform platform)
         {

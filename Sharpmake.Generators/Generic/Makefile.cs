@@ -561,19 +561,8 @@ namespace Sharpmake.Generators.Generic
             // OutputFile
             options["OutputFile"] = conf.TargetFileFullNameWithExtension.Replace(" ", @"\ ");
 
-            // DependenciesLibraryFiles
-            var dependenciesLibraryFiles = new OrderableStrings(conf.DependenciesLibraryFiles);
-            FixupLibraryNames(dependenciesLibraryFiles);
-            dependenciesLibraryFiles.InsertPrefix("-l:");
-            dependenciesLibraryFiles.Sort();
-            options["DependenciesLibraryFiles"] = dependenciesLibraryFiles.JoinStrings(" ");
-
             // LibraryFiles
-            OrderableStrings libraryFiles = new OrderableStrings(conf.LibraryFiles);
-            FixupLibraryNames(libraryFiles);
-            libraryFiles.InsertPrefix("-l:");
-            libraryFiles.Sort();
-            options["LibraryFiles"] = libraryFiles.JoinStrings(" ");
+            options["LibraryFiles"] = GenerateLibraryReferences(conf.LibraryFiles, conf);
 
             // LibraryPaths
             OrderableStrings libraryPaths = new OrderableStrings();
@@ -607,6 +596,10 @@ namespace Sharpmake.Generators.Generic
             PathMakeUnix(depsRelative);
             depsRelative.Sort();
             options["LDDEPS"] = depsRelative.JoinStrings(" ");
+
+            // DependenciesLibraryFiles
+            options["DependenciesLibraryFiles"] = GenerateLibraryReferences(conf.DependenciesOtherLibraryFiles, conf, depsRelative);
+
 
             // LinkCommand
             if (conf.Output == Project.Configuration.OutputType.Lib)
@@ -697,20 +690,41 @@ namespace Sharpmake.Generators.Generic
                 return Util.PathGetRelative(projectFileInfo.DirectoryName, conf.TargetPath);
         }
 
-        private static void FixupLibraryNames(IList<string> paths)
+        private static string GenerateLibraryReferences(OrderableStrings paths, Project.Configuration conf, OrderableStrings pathsToMerge = null)
         {
             for (int i = 0; i < paths.Count; ++i)
             {
                 string libraryName = PathMakeUnix(paths[i]);
-                // We've got two kinds of way of listing a library:
-                // - With a filename without extension we must add the potential prefix and potential extension.
-                // - With a filename with a static or shared lib extension (eg. .a/.so), we shouldn't touch it as it's already set by the script.
-                string extension = Path.GetExtension(libraryName).ToLowerInvariant();
-                if (extension != ".a" && extension != ".so")
-                    paths[i] = "lib" + libraryName + ".a";
+                if (File.Exists(libraryName))
+                {
+                    // If this is a full path to an existing file then do nothing, the linker can accept
+                    // it as a direct argument instead of having to go through -l
+                }
+                else if (conf.Platform.IsMac())
+                {
+                    // Mac ld only supports -l<name
+                    paths[i] = "-l" + libraryName;
+                }
                 else
-                    paths[i] = libraryName;
+                {
+                    // We've got two kinds of way of listing a library:
+                    // - With a filename without extension we must add the potential prefix and potential extension.
+                    // - With a filename with a static or shared lib extension (eg. .a/.so), we shouldn't touch it as it's already set by the script.
+                    string extension = Path.GetExtension(libraryName).ToLowerInvariant();
+                    if (extension != ".a" && extension != ".so")
+                        paths[i] = "-l:lib" + libraryName + ".a";
+                    else
+                        paths[i] = "-l:" + libraryName;
+                }
             }
+
+            if (pathsToMerge != null)
+            {
+                paths.AddRange(pathsToMerge);
+            }
+
+            paths.Sort();
+            return paths.JoinStrings(" ");
         }
 
         #endregion
