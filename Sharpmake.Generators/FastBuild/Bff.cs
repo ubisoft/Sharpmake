@@ -718,7 +718,7 @@ namespace Sharpmake.Generators.FastBuild
                             foreach (var refByPath in conf.ReferencesByPath)
                             {
                                 string refByPathCopy = refByPath;
-                                if (refByPath.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                                if (ShouldMakePathRelative(refByPath, context.Project))
                                     refByPathCopy = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, refByPath));
 
                                 fastBuildAdditionalCompilerOptionsFromCode += "/FU\"" + refByPathCopy + "\" ";
@@ -820,7 +820,7 @@ namespace Sharpmake.Generators.FastBuild
                             foreach (var f in conf.ForceUsingFiles.Union(conf.DependenciesForceUsingFiles))
                             {
                                 string file = f;
-                                if (f.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                                if (ShouldMakePathRelative(f, context.Project))
                                     file = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, f));
 
                                 builderForceUsingFiles.AppendFormat(@" /FU""{0}""", file);
@@ -1424,7 +1424,7 @@ namespace Sharpmake.Generators.FastBuild
             // if the include is below the global root, we compute the relative path,
             // otherwise it's probably a system include for which we keep the full path
             string resolvedInclude = resolver.Resolve(include);
-            if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+            if (ShouldMakePathRelative(resolvedInclude, context.Project))
                 resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
             return $@"{prefix}{Util.DoubleQuotes}{resolvedInclude}{Util.DoubleQuotes}";
         }
@@ -1687,7 +1687,7 @@ namespace Sharpmake.Generators.FastBuild
                 if (Path.IsPathRooted(libraryFile))
                 {
                     // if the path is below the global root, we compute the relative path, otherwise we keep the full path
-                    if (libraryFile.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                    if (ShouldMakePathRelative(libraryFile, context.Project))
                         additionalDependencies.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, libraryFile, true)), libraryFiles.GetOrderNumber(i));
                     else
                         additionalDependencies.Add(libraryFile, libraryFiles.GetOrderNumber(i));
@@ -1842,7 +1842,7 @@ namespace Sharpmake.Generators.FastBuild
                 var unityInputRelativePaths = new Strings(unityInputPaths.Select(
                     p =>
                     {
-                        if (p.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                        if (ShouldMakePathRelative(p, context.Project))
                             return CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, p, true));
                         return p;
                     }
@@ -2091,6 +2091,12 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             return confSubConfigs;
+        }
+
+        private static bool ShouldMakePathRelative(string path, Project project)
+        {
+            string rootPath = FastBuildSettings.WorkspaceRoot ?? project.RootPath;
+            return path.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsFileInInputPathList(Strings inputPaths, string path)

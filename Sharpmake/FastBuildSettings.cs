@@ -46,6 +46,12 @@ namespace Sharpmake
         public static string SystemDllRoot = null;
 
         /// <summary>
+        /// Full path under which files and folders are considered part of the workspace and can be expressed as relative to one another.
+        /// If left null, project.RootPath will be used instead.
+        /// </summary>
+        public static string WorkspaceRoot = null;
+
+        /// <summary>
         /// Cache path can be
         /// - a local path
         /// - a network path
