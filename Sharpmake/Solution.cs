@@ -58,6 +58,11 @@ namespace Sharpmake
         public bool FastBuildAllSlnDependencyFromExe = false;
 
         /// <summary>
+        /// Force the generation of a "FastBuildAll" project, even in solutions that don't seem to need one
+        /// </summary>
+        public bool ForceGenerateFastBuildAll = false;
+
+        /// <summary>
         /// In case we've generated a "FastBuildAll" project, this flag will determine if we generate it for all
         /// the configurations, or only the ones that need it
         /// </summary>
@@ -544,7 +549,7 @@ namespace Sharpmake
                         continue;
 
                     // if there's only one project to build, no need for the FastBuildAll
-                    generateFastBuildAll |= fastBuildProjectConfsToBuild.Count > 1;
+                    generateFastBuildAll |= ForceGenerateFastBuildAll || fastBuildProjectConfsToBuild.Count > 1;
                     projectsToBuildPerSolutionConfig.Add(Tuple.Create(solutionConfiguration, fastBuildProjectConfsToBuild));
                 }
 
@@ -562,7 +567,7 @@ namespace Sharpmake
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
 
-                    if (GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                    if (!ForceGenerateFastBuildAll && GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
                         continue;
 
                     var solutionTarget = solutionConf.Target;
@@ -599,7 +604,7 @@ namespace Sharpmake
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
 
-                    if (GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                    if (!ForceGenerateFastBuildAll && GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
                         continue;
 
                     var solutionTarget = solutionConf.Target;
