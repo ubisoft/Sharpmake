@@ -923,6 +923,20 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Linker.StripLinkedProduct.Disable, () => options["StripLinkedProduct"] = "NO"),
                 Options.Option(Options.XCode.Linker.StripLinkedProduct.Enable, () => options["StripLinkedProduct"] = "YES")
             );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Linker.PerformSingleObjectPrelink.Disable, () => options["GenerateMasterObjectFile"] = "NO"),
+                Options.Option(Options.XCode.Linker.PerformSingleObjectPrelink.Enable, () => options["GenerateMasterObjectFile"] = "YES")
+            );
+
+            options["PreLinkedLibraries"] = FileGeneratorUtilities.RemoveLineTag;
+
+            var prelinkedLibrary = Options.XCode.Linker.PrelinkLibraries.Get<Options.XCode.Linker.PrelinkLibraries>(conf);
+            if (!string.IsNullOrEmpty(prelinkedLibrary))
+            {
+                // xcode for some reason does not use arrays for this setting but space separated values
+                options["PreLinkedLibraries"] = prelinkedLibrary;
+            }
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

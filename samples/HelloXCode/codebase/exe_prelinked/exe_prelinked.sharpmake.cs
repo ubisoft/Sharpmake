@@ -16,24 +16,27 @@ using Sharpmake;
 
 namespace HelloXCode
 {
+    /// <summary>
+    /// This project tests the XCode's Pre-Linked libraries feature.
+    /// </summary>
     [Sharpmake.Generate]
-    public class HelloXCodeSolution : CommonSolution
+    public class ExePrelinkedProject : CommonProject
     {
-        public HelloXCodeSolution()
+        public ExePrelinkedProject()
         {
             AddTargets(CommonTarget.GetDefaultTargets());
-            Name = "HelloXCode";
+            Name = "exe_prelinked";
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
         {
             base.ConfigureAll(conf, target);
 
-            conf.AddProject<ExeProject>(target);
-            conf.AddProject<Dll1Project>(target);
-            conf.AddProject<StaticLib1Project>(target);
-            conf.AddProject<StaticLib2Project>(target);
-            conf.AddProject<ExePrelinkedProject>(target);
+            conf.Output = Configuration.OutputType.Exe;
+
+            conf.AddPrivateDependency<StaticPrelinkedLibConsumerProject>(target);
+
+            conf.Defines.Add("CREATION_DATE=\"January 2022\"");
         }
     }
 }
