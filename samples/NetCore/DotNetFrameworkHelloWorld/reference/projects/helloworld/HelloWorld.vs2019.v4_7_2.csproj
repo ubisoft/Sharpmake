@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\vs2019\debug</OutputPath>
-    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <OutputPath>output\vs2019\Debug</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\Debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -29,8 +29,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\vs2019\release</OutputPath>
-    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <OutputPath>output\vs2019\Release</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\Release</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

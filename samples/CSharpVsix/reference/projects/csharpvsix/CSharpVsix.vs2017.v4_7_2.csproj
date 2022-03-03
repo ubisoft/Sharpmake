@@ -10,7 +10,7 @@
     <RootNamespace>CSharpVsix</RootNamespace>
     <AssemblyName>CSharpVsix</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\codebase\csharpvsix\key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\codebase\CSharpVsix\Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{82B43B9B-A64C-4715-B499-D71E9CA2BD60};{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -29,8 +29,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>output\anycpu\debug</OutputPath>
-    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
+    <OutputPath>output\anycpu\Debug</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\Debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <CreateVsixContainer>True</CreateVsixContainer>
@@ -42,8 +42,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>output\anycpu\release</OutputPath>
-    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
+    <OutputPath>output\anycpu\Release</OutputPath>
+    <IntermediateOutputPath>obj\anycpu\Release</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <CreateVsixContainer>True</CreateVsixContainer>

@@ -32,12 +32,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>parentproject</TargetName>
-    <OutDir>output\win32\release\</OutDir>
-    <IntDir>obj\parentproject\win32\release\</IntDir>
+    <OutDir>output\win32\Release\</OutDir>
+    <IntDir>obj\ParentProject\win32\Release\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\release\parentproject.exe</OutputFile>
+    <OutputFile>output\win32\Release\parentproject.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,15 +86,15 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <ProgramDatabaseFileName>obj\parentproject\win32\release\parentproject_compiler.pdb</ProgramDatabaseFileName>
+      <ProgramDatabaseFileName>obj\ParentProject\win32\Release\ParentProject_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win32\release\parentproject.exe</OutputFile>
+      <OutputFile>output\win32\Release\parentproject.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ProgramDatabaseFile>output\win32\release\parentproject.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win32\Release\ParentProject.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -119,7 +119,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\release\parentproject.map</MapFileName>
+      <MapFileName>output\win32\Release\parentproject.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

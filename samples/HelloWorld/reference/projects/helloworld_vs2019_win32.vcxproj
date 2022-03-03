@@ -43,22 +43,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>helloworld</TargetName>
-    <OutDir>output\win32\debug\</OutDir>
-    <IntDir>obj\win32\debug\</IntDir>
+    <OutDir>output\win32\Debug\</OutDir>
+    <IntDir>obj\win32\Debug\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\debug\helloworld.exe</OutputFile>
+    <OutputFile>output\win32\Debug\helloworld.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>helloworld</TargetName>
-    <OutDir>output\win32\release\</OutDir>
-    <IntDir>obj\win32\release\</IntDir>
+    <OutDir>output\win32\Release\</OutDir>
+    <IntDir>obj\win32\Release\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\win32\release\helloworld.exe</OutputFile>
+    <OutputFile>output\win32\Release\helloworld.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -107,16 +107,16 @@
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>obj\win32\debug\HelloWorld.pch</PrecompiledHeaderOutputFile>
-      <ProgramDatabaseFileName>obj\win32\debug\helloworld_compiler.pdb</ProgramDatabaseFileName>
+      <PrecompiledHeaderOutputFile>obj\win32\Debug\HelloWorld.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win32\Debug\HelloWorld_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win32\debug\helloworld.exe</OutputFile>
+      <OutputFile>output\win32\Debug\helloworld.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ProgramDatabaseFile>output\win32\debug\helloworld.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win32\Debug\HelloWorld.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -141,7 +141,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\debug\helloworld.map</MapFileName>
+      <MapFileName>output\win32\Debug\helloworld.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,16 +190,16 @@
       <CompileAs>Default</CompileAs>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>obj\win32\release\HelloWorld.pch</PrecompiledHeaderOutputFile>
-      <ProgramDatabaseFileName>obj\win32\release\helloworld_compiler.pdb</ProgramDatabaseFileName>
+      <PrecompiledHeaderOutputFile>obj\win32\Release\HelloWorld.pch</PrecompiledHeaderOutputFile>
+      <ProgramDatabaseFileName>obj\win32\Release\HelloWorld_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\win32\release\helloworld.exe</OutputFile>
+      <OutputFile>output\win32\Release\helloworld.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ProgramDatabaseFile>output\win32\release\helloworld.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\win32\Release\HelloWorld.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -224,7 +224,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\win32\release\helloworld.map</MapFileName>
+      <MapFileName>output\win32\Release\helloworld.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

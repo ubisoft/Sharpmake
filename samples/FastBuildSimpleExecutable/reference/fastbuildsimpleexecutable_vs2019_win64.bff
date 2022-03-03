@@ -13,11 +13,11 @@
 ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
 {
     Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\Debug\'
 
     .CompilerExtraOptions   = ''
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -41,7 +41,7 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
             + ' /Zc:inline'
             + ' /GR-'
             + ' /openmp-'
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\Debug\FastBuildSimpleExecutable_compiler.pdb"'
             + ' /Gd'
             + ' /TP'
             + ' /errorReport:queue'
@@ -70,9 +70,9 @@ ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
 Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
 {
     Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\Debug\'
     .Libraries              = 'FastBuildSimpleExecutable_Debug_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.exe'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\Debug\fastbuildsimpleexecutable.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -83,8 +83,8 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
@@ -108,8 +108,8 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\Debug\FastBuildSimpleExecutable.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\Debug\fastbuildsimpleexecutable.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'
@@ -151,11 +151,11 @@ Alias( 'FastBuildSimpleExecutable_Debug_win64_LibraryDependency' )
 ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
 {
     Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\Release\'
 
     .CompilerExtraOptions   = ''
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
-            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\include"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
             + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
@@ -179,7 +179,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /Zc:inline'
             + ' /GR-'
             + ' /openmp-'
-            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\Release\FastBuildSimpleExecutable_compiler.pdb"'
             + ' /Gd'
             + ' /TP'
             + ' /errorReport:queue'
@@ -209,9 +209,9 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
 Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
 {
     Using( .win64Config )
-    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\Release\'
     .Libraries              = 'FastBuildSimpleExecutable_Release_win64_objects'
-    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.exe'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\Release\fastbuildsimpleexecutable.exe'
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
@@ -222,8 +222,8 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
                             + ' /NOLOGO'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
-                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\atlmfc\lib\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
                             + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
                             // Input
@@ -247,8 +247,8 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             // Debugging
                             // ---------------------------
                             + ' /DEBUG'
-                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.pdb"'
-                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.map"'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\Release\FastBuildSimpleExecutable.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\Release\fastbuildsimpleexecutable.map"'
                             // System
                             // ---------------------------
                             + ' /SUBSYSTEM:CONSOLE'

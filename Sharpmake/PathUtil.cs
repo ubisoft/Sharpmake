@@ -41,15 +41,9 @@ namespace Sharpmake
 
         public static string PathMakeStandard(string path)
         {
-            return PathMakeStandard(path, !Util.IsRunningOnUnix());
-        }
-
-        public static string PathMakeStandard(string path, bool forceToLower)
-        {
             // cleanup the path by replacing the other separator by the correct one for this OS
             // then trim every trailing separators
-            var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
-            return forceToLower ? standardPath.ToLower() : standardPath;
+            return path.Replace(OtherSeparator, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
         }
 
         public static string EnsureTrailingSeparator(string path)
@@ -797,9 +791,9 @@ namespace Sharpmake
         public static string ReplaceHeadPath(this string fullInputPath, string inputHeadPath, string replacementHeadPath)
         {
             // Normalize paths before comparing and combining them, to prevent false mismatch between '\\' and '/'.
-            fullInputPath = Util.PathMakeStandard(fullInputPath, false);
-            inputHeadPath = Util.PathMakeStandard(inputHeadPath, false);
-            replacementHeadPath = Util.PathMakeStandard(replacementHeadPath, false);
+            fullInputPath = PathMakeStandard(fullInputPath);
+            inputHeadPath = PathMakeStandard(inputHeadPath);
+            replacementHeadPath = PathMakeStandard(replacementHeadPath);
 
             inputHeadPath = EnsureTrailingSeparator(inputHeadPath);
 

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpVsix", "csharpvsix\CSharpVsix.vs2017.v4_7_2.csproj", "{199F07AD-EC4C-BF75-597B-1B2976D1D0ED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpVsix", "CSharpVsix\CSharpVsix.vs2017.v4_7_2.csproj", "{199F07AD-EC4C-BF75-597B-1B2976D1D0ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
