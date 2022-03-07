@@ -47,7 +47,8 @@ namespace HelloXCode
             //  Custom build step - to generate the sub library
             var platform = target.GetPlatform().HasFlag(Platform.mac) ? "mac" : "ios";
             var projPath = Path.Combine(Globals.TmpDirectory, "projects/static_prelinked_lib_consumed");
-            conf.EventPreBuild.Add($"xcodebuild build -scheme static_prelinked_lib_consumed_{platform} -project {projPath}/static_prelinked_lib_consumed_{platform}.xcodeproj");
+            var configuration = target.Optimization.ToString().ToLowerInvariant();
+            conf.EventPreBuild.Add($"xcodebuild build -scheme static_prelinked_lib_consumed_{platform} -project {projPath}/static_prelinked_lib_consumed_{platform}.xcodeproj -configuration {configuration}");
 
             //  Test pre-linked libraries
             var libraryToPrelink = Path.Combine(conf.TargetLibraryPath, "..", "static_prelinked_lib_consumed", "libstatic_prelinked_lib_consumed.a");
