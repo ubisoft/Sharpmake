@@ -622,7 +622,7 @@ namespace Sharpmake
                     Disable,
                     Enable
                 }
-                
+
                 /// <summary>
                 /// List of libraries that need to be included into Single-Object Prelink process.
                 /// Use space separator to include multiple libraries.
