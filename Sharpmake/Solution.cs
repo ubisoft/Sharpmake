@@ -642,6 +642,7 @@ namespace Sharpmake
                     projectConf.FastBuildCustomArgs = firstProject.Configuration.FastBuildCustomArgs;
                     projectConf.FastBuildCustomActionsBeforeBuildCommand = firstProject.Configuration.FastBuildCustomActionsBeforeBuildCommand;
                     projectConf.FastBuildDistribution = firstProject.Configuration.FastBuildDistribution;
+                    projectConf.Options.AddRange(firstProject.Configuration.Options);
 
                     // add all the projects to build as private dependencies, and OnlyBuildOrder
                     foreach (Configuration.IncludedProjectInfo projectConfigToBuild in projectConfigsToBuild)
