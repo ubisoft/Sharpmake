@@ -139,6 +139,25 @@ namespace Sharpmake
 
             public override void SetupSdkOptions(IGenerationContext context)
             {
+                if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
+                {
+                    context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.Configuration.TargetLibraryPath);
+                    context.Options["RemoteBuildOutputs"] = context.Configuration.TargetFileFullNameWithExtension;
+                }
+                else if (context.Configuration.Output != Project.Configuration.OutputType.None)
+                {
+                    context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.Configuration.TargetPath);
+                    context.Options["RemoteBuildOutputs"] = context.Configuration.TargetFileFullNameWithExtension;
+                }
+                else
+                {
+                    context.Options["ProjectDirectory"] = FileGeneratorUtilities.RemoveLineTag;
+                    context.Options["RemoteBuildOutputs"] = FileGeneratorUtilities.RemoveLineTag;
+                }
+
+                context.Options["OutputDirectoryRemote"] = @"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["OutputDirectory"]));
+                context.Options["IntermediateDirectoryRemote"] = @"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["IntermediateDirectory"]));
+
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "true"; }),

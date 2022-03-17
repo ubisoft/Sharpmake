@@ -117,6 +117,7 @@ namespace Sharpmake
         <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
         <RemoteRootDir></RemoteRootDir>
         <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
+        <RemoteBuildOutputs>[options.RemoteBuildOutputs]</RemoteBuildOutputs>
       </PropertyGroup>
 ";
 
@@ -127,6 +128,7 @@ namespace Sharpmake
     <RemoteRootDir>
     </RemoteRootDir>
     <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
+    <RemoteBuildOutputs>[options.RemoteBuildOutputs]</RemoteBuildOutputs>
     <OutDir>[options.OutputDirectoryRemote]</OutDir>
     <IntDir>[options.IntermediateDirectoryRemote]</IntDir>
     <BuildCommandLine>cd [relativeMasterBffPath]
