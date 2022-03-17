@@ -118,7 +118,15 @@ namespace Sharpmake
 
             public override void SetupPlatformToolsetOptions(IGenerationContext context)
             {
-                context.Options["PlatformToolset"] = "Remote_GCC_1_0";
+                context.SelectOption
+                (
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.Default, () => { context.Options["PlatformToolset"] = FileGeneratorUtilities.RemoveLineTag; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.Remote_GCC_1_0, () => { context.Options["PlatformToolset"] = "Remote_GCC_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.Remote_Clang_1_0, () => { context.Options["PlatformToolset"] = "Remote_Clang_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL_1_0, () => { context.Options["PlatformToolset"] = "WSL_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL_Clang_1_0, () => { context.Options["PlatformToolset"] = "WSL_Clang_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL2_1_0, () => { context.Options["PlatformToolset"] = "WSL2_1_0"; })
+                );
             }
 
             public override void SetupPlatformTargetOptions(IGenerationContext context)
