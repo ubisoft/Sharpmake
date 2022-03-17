@@ -773,12 +773,12 @@ namespace Sharpmake
             return path.Substring(0, 1).ToLower() + path.Substring(1);
         }
 
-        internal static string ConvertToUnixSeparators(string path)
+        public static string ConvertToUnixSeparators(string path)
         {
             return path.Replace(WindowsSeparator, UnixSeparator);
         }
 
-        internal static string ConvertToMountedUnixPath(string path)
+        public static string ConvertToMountedUnixPath(string path)
         {
             return s_unixMountPointForWindowsDrives + ConvertToUnixSeparators(DecapitalizeDriveLetter(EnsureTrailingSeparator(path)).Replace(@":", string.Empty));
         }
