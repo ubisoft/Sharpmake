@@ -45,16 +45,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\codebase\spanmultiplesrcdirs\additional_dir;..\codebase\spanmultiplesrcdirs\dir_individual_files</NMakeIncludeSearchPath>
@@ -66,16 +66,16 @@ del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.pdb" >NUL 2
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityexclude.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>..\codebase\spanmultiplesrcdirs\additional_dir;..\codebase\spanmultiplesrcdirs\dir_individual_files</NMakeIncludeSearchPath>
