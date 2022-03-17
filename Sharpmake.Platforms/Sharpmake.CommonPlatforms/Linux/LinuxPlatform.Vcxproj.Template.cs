@@ -47,7 +47,7 @@ namespace Sharpmake
                   <LinkTimeOptimization>[options.LinkTimeOptimization]</LinkTimeOptimization>
                   <InlinedScopes>[options.InlineFunctionDebugInformation]</InlinedScopes>
                 </ClCompile>
-            ";
+";
 
             private const string _projectConfigurationsStaticLinkTemplate =
                             @"    <Link>
@@ -62,7 +62,7 @@ namespace Sharpmake
                   <OutputFile>[options.OutputFile]</OutputFile>
                   <ThinArchive>[options.UseThinArchives]</ThinArchive>
                 </Lib>
-            ";
+";
 
             private const string _projectConfigurationsLinkTemplate =
                     @"    <Link>
@@ -80,7 +80,7 @@ namespace Sharpmake
           <DuplicateStripping>[options.DuplicateStripping]</DuplicateStripping>
           <Addressing>[options.Addressing]</Addressing>
         </Link>
-    ";
+";
 
             private const string _userFileConfigurationGeneralTemplate =
                 @"    <LocalDebuggerCommand>[conf.VcxprojUserFile.LocalDebuggerCommand]</LocalDebuggerCommand>
@@ -93,7 +93,7 @@ namespace Sharpmake
         <RemoteDebuggerWorkingDirectory>[conf.VcxprojUserFile.RemoteDebuggerWorkingDirectory]</RemoteDebuggerWorkingDirectory>
         <AdditionalDebuggerCommands>[conf.AdditionalDebuggerCommands]</AdditionalDebuggerCommands>
         <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
-    ";
+";
 
             private const string _projectConfigurationsGeneral2 =
                 @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
@@ -118,43 +118,44 @@ namespace Sharpmake
         <RemoteRootDir></RemoteRootDir>
         <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
       </PropertyGroup>
-    ";
+";
 
             private const string _projectConfigurationsFastBuildMakefile =
-            @"    <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
-<TargetName>[options.OutputFileName]</TargetName>
-<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
-<RemoteRootDir></RemoteRootDir>
-<RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
-<OutDir>[options.OutputDirectoryRemote]</OutDir>
-<IntDir>[options.IntermediateDirectoryRemote]</IntDir>
-<BuildCommandLine>cd [relativeMasterBffPath]
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <TargetName>[options.OutputFileName]</TargetName>
+    <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
+    <RemoteRootDir>
+    </RemoteRootDir>
+    <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
+    <OutDir>[options.OutputDirectoryRemote]</OutDir>
+    <IntDir>[options.IntermediateDirectoryRemote]</IntDir>
+    <BuildCommandLine>cd [relativeMasterBffPath]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandBuild]</BuildCommandLine>
-<ReBuildCommandLine>cd [relativeMasterBffPath]
+    <ReBuildCommandLine>cd [relativeMasterBffPath]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandRebuild]</ReBuildCommandLine>
-<LocalRemoteCopySources>[options.CopySources]</LocalRemoteCopySources>
-<CleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" >NUL 2>NUL
-del ""$(ProjectDir)[options.IntermediateDirectory]\*.obj"" >NUL 2>NUL
-del ""$(ProjectDir)[options.IntermediateDirectory]\*.a"" >NUL 2>NUL
-del ""$(ProjectDir)[options.IntermediateDirectory]\*.lib"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].exe"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].elf"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].exp"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].lib"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL
-del ""$(ProjectDir)[options.OutputDirectory]\[conf.TargetFileFullName]"" >NUL 2>NUL</CleanCommandLine>
-<NMakeIncludeSearchPath>$(NMakeIncludeSearchPath);[options.AdditionalPlatformIncludeDirectories]</NMakeIncludeSearchPath>
-</PropertyGroup>
-<ItemDefinitionGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
-<ClCompile>
-<CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
-<CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
-</ClCompile>
-</ItemDefinitionGroup>
-    ";
+    <LocalRemoteCopySources>[options.CopySources]</LocalRemoteCopySources>
+    <CleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.obj"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.a"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.lib"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].exe"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].elf"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].exp"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].lib"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName]"" &gt;NUL 2&gt;NUL</CleanCommandLine>
+    <NMakeIncludeSearchPath>$(NMakeIncludeSearchPath);[options.AdditionalPlatformIncludeDirectories]</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <ClCompile>
+      <CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
+      <CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+";
 
             private const string _projectDescriptionPlatformSpecific =
                 @"    <ApplicationType>[applicationType]</ApplicationType>
