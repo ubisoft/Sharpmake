@@ -204,7 +204,6 @@ namespace Sharpmake.Generators.FastBuild
             string projectPath = new FileInfo(projectFile).Directory.FullName;
             var context = new BffGenerationContext(builder, project, projectPath, configurations);
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
-            string fastBuildClrSupport = Util.IsDotNet(firstConf) ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
             Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles;
             using (builder.CreateProfilingScope("BffGenerator.Generate:GetGeneratedFiles"))
@@ -272,6 +271,7 @@ namespace Sharpmake.Generators.FastBuild
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
+                var dotNetConf = Util.IsDotNet(conf);
 
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
@@ -348,9 +348,11 @@ namespace Sharpmake.Generators.FastBuild
                             isUnity = false;
                         }
 
+                        var useClr = dotNetConf && !isCompileAsNonCLRFile || isCompileAsCLRFile;
+                        var fastBuildSubConfigClrSupport = useClr ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
+
                         Trace.Assert(!isCompileAsCPPFile, "Sharpmake-FastBuild : CompiledAsCPP isn't yet supported.");
-                        Trace.Assert(!isCompileAsCLRFile, "Sharpmake-FastBuild : CompiledAsCLR isn't yet supported.");
-                        Trace.Assert(!isCompileAsNonCLRFile, "Sharpmake-FastBuild : !CompiledAsCLR isn't yet supported.");
+                        Trace.Assert(!isCompileAsCLRFile || !isCompileAsNonCLRFile, "Sharpmake-FastBuild : a file cannot be simultaneously compiled with and without the CLR");
 
                         Strings fastBuildCompilerInputPatternList = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
                         Strings fastBuildCompilerInputPatternTransformedList = new Strings(fastBuildCompilerInputPatternList.Select((s) => { return "*" + s; }));
@@ -1034,7 +1036,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("cmdLineOptions", confCmdLineOptions))
                                     using (bffGenerator.Declare("fastBuildUsingPlatformConfig", "Using( " + fastBuildUsingPlatformConfig + " )"))
                                     using (bffGenerator.Declare("fastBuildProjectName", projectName))
-                                    using (bffGenerator.Declare("fastBuildClrSupport", fastBuildClrSupport))
+                                    using (bffGenerator.Declare("fastBuildClrSupport", fastBuildSubConfigClrSupport))
                                     using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
                                     using (bffGenerator.Declare("fastBuildOutputFile", fastBuildOutputFile))
                                     using (bffGenerator.Declare("fastBuildLinkerOutputFile", fastBuildLinkerOutputFile))

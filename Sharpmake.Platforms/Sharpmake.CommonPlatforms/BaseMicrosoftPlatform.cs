@@ -91,7 +91,8 @@ namespace Sharpmake
         public virtual IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
         {
             var dirs = new List<string>();
-            var dotnet = Util.IsDotNet(configuration) ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
+            var hasDotNetDependency = Util.IsDotNet(configuration) || configuration.ResolvedSourceFilesWithCompileAsCLROption.Count > 0;
+            var dotnet = hasDotNetDependency ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
 
             var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(configuration);
             if (platformToolset.IsLLVMToolchain())
