@@ -1248,7 +1248,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!string.IsNullOrEmpty(project.ApplicationIcon))
             {
-                using (resolver.NewScopedParameter("iconpath", project.ApplicationIcon))
+                using (resolver.NewScopedParameter("iconpath", Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(project.ApplicationIcon))))
                     Write(Template.ApplicationIcon, writer, resolver);
             }
 
