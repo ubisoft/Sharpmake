@@ -158,10 +158,12 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
-            ContentFiles = 1 << 2,
+            [Obsolete]
+            ContentFile = 1 << 2,
             Build = 1 << 3,
             Analysers = 1 << 4,
             Native = 1 << 5,
+            ContentFiles = 1 << 6,
             All = Compile | Runtime | ContentFiles | Build | Analysers | Native
         }
 
