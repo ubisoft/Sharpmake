@@ -158,14 +158,14 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
-            ContentFile = 1 << 2,
+            ContentFiles = 1 << 2,
             Build = 1 << 3,
             Analysers = 1 << 4,
             Native = 1 << 5,
-            All = Compile | Runtime | ContentFile | Build | Analysers | Native
+            All = Compile | Runtime | ContentFiles | Build | Analysers | Native
         }
 
         internal const AssetsDependency DefaultPrivateAssets =
-            AssetsDependency.ContentFile | AssetsDependency.Analysers | AssetsDependency.Build;
+            AssetsDependency.ContentFiles | AssetsDependency.Analysers | AssetsDependency.Build;
     }
 }
