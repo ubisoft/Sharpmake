@@ -158,7 +158,7 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
-            [Obsolete("Use 'ContentFiles' insead")]
+            [Obsolete("Use 'ContentFiles' instead")]
             ContentFile = 1 << 2,
             Build = 1 << 3,
             Analysers = 1 << 4,
