@@ -99,16 +99,34 @@ namespace Sharpmake
                     yield break;
                 }
 
-                foreach (var value in (AssetsDependency[])Enum.GetValues(typeof(AssetsDependency)))
+                if (dependency.HasFlag(AssetsDependency.Compile))
                 {
-                    if (!dependency.HasFlag(value) || value == AssetsDependency.All || value == AssetsDependency.None)
-                    {
-                        continue;
-                    }
+                    yield return "compile";
+                }
 
-                    var name = Enum.GetName(typeof(AssetsDependency), value);
-                    // The first letter of assets values are in lower case (example: 'contentFiles')
-                    yield return $"{char.ToLower(name[0])}{name.Substring(1)}";
+                if (dependency.HasFlag(AssetsDependency.Runtime))
+                {
+                    yield return "runtime";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.ContentFiles))
+                {
+                    yield return "contentFiles";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Build))
+                {
+                    yield return "build";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Analysers))
+                {
+                    yield return "analyzers";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Native))
+                {
+                    yield return "native";
                 }
             }
         }
@@ -158,12 +176,12 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
-            [Obsolete("Use 'ContentFiles' instead")]
+            [Obsolete("Use ContentFiles instead")]
             ContentFile = 1 << 2,
+            ContentFiles = 1 << 2,
             Build = 1 << 3,
             Analysers = 1 << 4,
             Native = 1 << 5,
-            ContentFiles = 1 << 6,
             All = Compile | Runtime | ContentFiles | Build | Analysers | Native
         }
 
