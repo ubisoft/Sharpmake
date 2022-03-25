@@ -64,6 +64,7 @@ namespace Sharpmake.Generators.VisualStudio
             internal ItemGroup<Analyzer> Analyzers = new ItemGroup<Analyzer>();
             internal ItemGroup<VSIXSourceItem> VSIXSourceItems = new ItemGroup<VSIXSourceItem>();
             internal ItemGroup<FolderInclude> FolderIncludes = new ItemGroup<FolderInclude>();
+            internal ItemGroup<AssemblyAttribute> AssemblyAttributes = new ItemGroup<AssemblyAttribute>();
 
             internal string Resolve(Resolver resolver)
             {
@@ -92,6 +93,7 @@ namespace Sharpmake.Generators.VisualStudio
                 writer.Write(VSIXSourceItems.Resolve(resolver));
                 writer.Write(FolderIncludes.Resolve(resolver));
                 writer.Write(WCFMetadataStorages.Resolve(resolver));
+                writer.Write(AssemblyAttributes.Resolve(resolver));
 
                 return writer.ToString();
             }
@@ -225,7 +227,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 #region Equality members
 
-                public bool Equals(ItemGroupItem other)
+                public virtual bool Equals(ItemGroupItem other)
                 {
                     if (ReferenceEquals(null, other))
                         return false;
@@ -262,7 +264,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 #endregion
 
-                public int CompareTo(ItemGroupItem other)
+                public virtual int CompareTo(ItemGroupItem other)
                 {
                     return string.CompareOrdinal(Include, other.Include);
                 }
@@ -909,6 +911,56 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     using (resolver.NewScopedParameter("vsixSourceItem", Include))
                         return resolver.Resolve(Template.ItemGroups.VSIXSourceItem);
+                }
+            }
+
+            internal class AssemblyAttribute : ItemGroupItem, IResolvable
+            {
+                public string[] Parameters = Array.Empty<string>();
+
+                public string Resolve(Resolver resolver)
+                {
+                    var writer = new StringWriter();
+
+                    using (resolver.NewScopedParameter("assemblyAttributeName", Include))
+                    {
+                        writer.Write(resolver.Resolve(Template.ItemGroups.AssemblyAttributeBegin));
+
+                        for (var i = 0; i < Parameters.Length; i++)
+                        {
+                            using (resolver.NewScopedParameter("assemblyAttributeParamIndex", i + 1))
+                            using (resolver.NewScopedParameter("assemblyAttributeParamValue", Parameters[i]))
+                            {
+                                writer.Write(resolver.Resolve(Template.ItemGroups.AssemblyAttributeParameter));
+                            }
+                        }
+
+                        writer.Write(resolver.Resolve(Template.ItemGroups.AssemblyAttributeEnd));
+                    }
+
+                    return writer.ToString();
+                }
+
+                public override bool Equals(ItemGroupItem other)
+                {
+                    return base.Equals(other) && CompareTo(other) == 0;
+                }
+
+                public override int GetHashCode()
+                {
+                    return $"{Include}|{string.Join("|", Parameters)}".GetHashCode();
+                }
+
+                public override int CompareTo(ItemGroupItem other)
+                {
+                    if (other is AssemblyAttribute otherAssemblyAttribute)
+                    {
+                        return string.CompareOrdinal(
+                            string.Join("|", Parameters),
+                            string.Join("|", otherAssemblyAttribute.Parameters));
+                    }
+
+                    return base.CompareTo(other);
                 }
             }
 
@@ -2350,6 +2402,10 @@ namespace Sharpmake.Generators.VisualStudio
                 project.WebReferences.Select(str => new ItemGroups.WebReference { Include = str }));
 
             itemGroups.FolderIncludes.AddRange(project.AdditionalFolders.Select(str => new ItemGroups.FolderInclude { Include = str }));
+
+            itemGroups.AssemblyAttributes.AddRange(
+                project.AssemblyAttributes.Select(a =>
+                    new ItemGroups.AssemblyAttribute { Include = a.Include, Parameters = a.Parameters }));
 
             foreach (var url in project.WebReferenceUrls)
             {

@@ -2069,6 +2069,12 @@ namespace Sharpmake
         public string Exclude;
     }
 
+    public class AssemblyAttribute
+    {
+        public string Include;
+        public string[] Parameters = Array.Empty<string>();
+    }
+
     public enum CSharpProjectType
     {
         Test,
@@ -2313,6 +2319,8 @@ namespace Sharpmake
         public List<ImportProject> ImportProjects = new List<ImportProject>();
         public List<CustomTargetElement> CustomTargets = new List<CustomTargetElement>();
         public List<UsingTask> UsingTasks = new List<UsingTask>();
+
+        public List<AssemblyAttribute> AssemblyAttributes = new List<AssemblyAttribute>();
 
         public bool? WcfAutoStart; // Wcf Auto-Start service when debugging
         public string WcfBaseStorage = @"Service References\";
