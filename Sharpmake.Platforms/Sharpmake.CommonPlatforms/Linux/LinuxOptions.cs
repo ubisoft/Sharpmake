@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,10 +28,52 @@ namespace Sharpmake
                     [Default]
                     Disable
                 }
+
+                /// <summary>
+                /// VC Platform Toolset
+                /// </summary>
+                /// <remarks>
+                /// Specifies which build tools will be used for the project in Visual Studio
+                /// </remarks>
+                public enum VcPlatformToolset
+                {
+                    [Default]
+                    Default,
+
+                    /// <summary>
+                    /// GCC for Remote Linux
+                    /// </summary>
+                    Remote_GCC_1_0,
+
+                    /// <summary>
+                    /// Clang for Remote Linux
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Remote_Clang_1_0,
+
+                    /// <summary>
+                    /// GCC for Windows Subsystem for Linux
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    WSL_1_0,
+
+                    /// <summary>
+                    /// Clang for Windows Subsystem for Linux
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    WSL_Clang_1_0,
+
+                    /// <summary>
+                    /// WSL2 Toolset
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2022)]
+                    WSL2_1_0,
+                }
+
                 public enum PlatformRemoteTool
                 {
                     Gpp, //g++
-                    Clang, // Alpine 
+                    Clang, // Alpine
                     [Default]
                     Clang38
                 }

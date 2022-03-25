@@ -92,16 +92,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -112,16 +112,16 @@ del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NM
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\postbuildstamptest\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\postbuildstamptest\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\postbuildstamptest\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\postbuildstamptest\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildstamptest.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildstamptest.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildstamptest.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildstamptest.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildstamptest.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\postbuildstamptest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -144,16 +144,16 @@ del "output\debug_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeClea
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -164,16 +164,16 @@ del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\postbuildstamptest\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\postbuildstamptest\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\postbuildstamptest\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\postbuildstamptest\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildstamptest.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildstamptest.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildstamptest.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildstamptest.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildstamptest.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\postbuildstamptest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -271,7 +271,7 @@ del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCl
       <MapFileName>output\debug_msbuild_vs2019\postbuildstamptest.map</MapFileName>
     </Link>
     <PostBuildEvent>
-      <Command>output\Debug_MSBuild_vs2019\PostBuildStamper.exe  e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
+      <Command>output\Debug_MSBuild_vs2019\PostBuildStamper.exe  e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
@@ -356,7 +356,7 @@ del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" >NUL 2>NUL</NMakeCl
       <MapFileName>output\release_msbuild_vs2019\postbuildstamptest.map</MapFileName>
     </Link>
     <PostBuildEvent>
-      <Command>output\Release_MSBuild_vs2019\PostBuildStamper.exe  e:\gitlab\anvil.sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
+      <Command>output\Release_MSBuild_vs2019\PostBuildStamper.exe  e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

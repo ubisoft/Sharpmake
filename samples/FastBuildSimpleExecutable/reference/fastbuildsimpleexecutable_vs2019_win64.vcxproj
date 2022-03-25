@@ -45,16 +45,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" FastBuildSimpleExecutable_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean FastBuildSimpleExecutable_Debug_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" >NUL 2>NUL
-del "obj\win64\debug\*.obj" >NUL 2>NUL
-del "obj\win64\debug\*.a" >NUL 2>NUL
-del "obj\win64\debug\*.lib" >NUL 2>NUL
-del "output\win64\debug\fastbuildsimpleexecutable.exe" >NUL 2>NUL
-del "output\win64\debug\fastbuildsimpleexecutable.elf" >NUL 2>NUL
-del "output\win64\debug\fastbuildsimpleexecutable.exp" >NUL 2>NUL
-del "output\win64\debug\fastbuildsimpleexecutable.ilk" >NUL 2>NUL
-del "output\win64\debug\fastbuildsimpleexecutable.lib" >NUL 2>NUL
-del "output\win64\debug\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\debug\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "obj\win64\debug\*.obj" &gt;NUL 2&gt;NUL
+del "obj\win64\debug\*.a" &gt;NUL 2&gt;NUL
+del "obj\win64\debug\*.lib" &gt;NUL 2&gt;NUL
+del "output\win64\debug\fastbuildsimpleexecutable.exe" &gt;NUL 2&gt;NUL
+del "output\win64\debug\fastbuildsimpleexecutable.elf" &gt;NUL 2&gt;NUL
+del "output\win64\debug\fastbuildsimpleexecutable.exp" &gt;NUL 2&gt;NUL
+del "output\win64\debug\fastbuildsimpleexecutable.ilk" &gt;NUL 2&gt;NUL
+del "output\win64\debug\fastbuildsimpleexecutable.lib" &gt;NUL 2&gt;NUL
+del "output\win64\debug\fastbuildsimpleexecutable.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\win64\debug\fastbuildsimpleexecutable.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -65,16 +65,16 @@ del "output\win64\debug\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCom
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" FastBuildSimpleExecutable_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean FastBuildSimpleExecutable_Release_win64 -ide -summary -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" >NUL 2>NUL
-del "obj\win64\release\*.obj" >NUL 2>NUL
-del "obj\win64\release\*.a" >NUL 2>NUL
-del "obj\win64\release\*.lib" >NUL 2>NUL
-del "output\win64\release\fastbuildsimpleexecutable.exe" >NUL 2>NUL
-del "output\win64\release\fastbuildsimpleexecutable.elf" >NUL 2>NUL
-del "output\win64\release\fastbuildsimpleexecutable.exp" >NUL 2>NUL
-del "output\win64\release\fastbuildsimpleexecutable.ilk" >NUL 2>NUL
-del "output\win64\release\fastbuildsimpleexecutable.lib" >NUL 2>NUL
-del "output\win64\release\fastbuildsimpleexecutable.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "obj\win64\release\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "obj\win64\release\*.obj" &gt;NUL 2&gt;NUL
+del "obj\win64\release\*.a" &gt;NUL 2&gt;NUL
+del "obj\win64\release\*.lib" &gt;NUL 2&gt;NUL
+del "output\win64\release\fastbuildsimpleexecutable.exe" &gt;NUL 2&gt;NUL
+del "output\win64\release\fastbuildsimpleexecutable.elf" &gt;NUL 2&gt;NUL
+del "output\win64\release\fastbuildsimpleexecutable.exp" &gt;NUL 2&gt;NUL
+del "output\win64\release\fastbuildsimpleexecutable.ilk" &gt;NUL 2&gt;NUL
+del "output\win64\release\fastbuildsimpleexecutable.lib" &gt;NUL 2&gt;NUL
+del "output\win64\release\fastbuildsimpleexecutable.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\win64\release\fastbuildsimpleexecutable.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
