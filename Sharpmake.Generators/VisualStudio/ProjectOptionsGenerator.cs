@@ -175,13 +175,6 @@ namespace Sharpmake.Generators.VisualStudio
                 () => { context.Options["WindowsTargetPlatformVersion"] = FileGeneratorUtilities.RemoveLineTag; },
                 winTargetPlatformVersionOptionActions.ToArray()
             );
-
-            if (context.Configuration.Target.GetPlatform() == Platform.linux)
-            {
-                context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.ProjectDirectoryCapitalized);
-                context.Options["OutputDirectoryRemote"] = (@"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["OutputDirectory"])));
-                context.Options["IntermediateDirectoryRemote"] = (@"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["IntermediateDirectory"])));
-            }
         }
 
         private static void SelectConfigurationTypeOption(IGenerationContext context)

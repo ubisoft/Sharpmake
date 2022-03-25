@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, 2022 Ubisoft Entertainment
+﻿// Copyright (c) 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,28 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.IO;
 using Sharpmake;
 
 namespace HelloXCode
 {
+    /// <summary>
+    /// This project tests the XCode's Pre-Linked libraries feature.
+    /// The library exposes methods and variables that will never be directly linked into EXE file,
+    /// but instead, will be pre-linked in "Consumer" library.
+    /// </summary>
     [Sharpmake.Generate]
-    public class HelloXCodeSolution : CommonSolution
+    public class StaticPrelinkedLibConsumed : CommonProject
     {
-        public HelloXCodeSolution()
+        public StaticPrelinkedLibConsumed()
         {
             AddTargets(CommonTarget.GetDefaultTargets());
-            Name = "HelloXCode";
+            Name = "static_prelinked_lib_consumed";
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
         {
             base.ConfigureAll(conf, target);
 
-            conf.AddProject<ExeProject>(target);
-            conf.AddProject<Dll1Project>(target);
-            conf.AddProject<StaticLib1Project>(target);
-            conf.AddProject<StaticLib2Project>(target);
-            conf.AddProject<ExePrelinkedProject>(target);
+            conf.SolutionFolder = "StaticLibs";
+
+            conf.IncludePaths.Add(SourceRootPath);
         }
     }
 }
