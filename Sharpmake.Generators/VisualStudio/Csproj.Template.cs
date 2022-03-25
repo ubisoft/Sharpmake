@@ -111,6 +111,10 @@ namespace Sharpmake.Generators.VisualStudio
     <GenerateAssemblyInformationalVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInformationalVersionAttribute]</GenerateAssemblyInformationalVersionAttribute>
     <RestoreProjectStyle>[NugetRestoreProjectStyleString]</RestoreProjectStyle>
     <ProductVersion>[options.ProductVersion]</ProductVersion>
+    <FileVersion>[options.FileVersion]</FileVersion>
+    <Version>[options.Version]</Version>
+    <Product>[options.Product]</Product>
+    <Copyright>[options.Copyright]</Copyright>
     <UseWpf>[options.UseWpf]</UseWpf>
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
   </PropertyGroup>
