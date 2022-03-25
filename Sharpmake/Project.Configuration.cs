@@ -486,6 +486,12 @@ namespace Sharpmake
             public bool AllowOutputDllCopy = true;
 
             /// <summary>
+            /// Controls whether the .pdb files of [Export] projects will be copied to dependents.
+            /// The default value is <c>false</c>.
+            /// </summary>
+            public bool AllowExportProjectsToCopyPdbToDependentTargets = false;
+
+            /// <summary>
             /// Gets or sets whether dependent projects will copy their dll debugging database to the
             /// target path of their dependency projects. The default value is <c>true</c>.
             /// </summary>
@@ -3168,7 +3174,8 @@ namespace Sharpmake
                                     {
                                         _resolvedTargetCopyFiles.Add(dependencyDllFullPath);
                                         // Add PDBs only if they exist and the dependency is not an [export] project
-                                        if (!isExport && Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
+                                        if ((!isExport || dependency.AllowExportProjectsToCopyPdbToDependentTargets) &&
+                                            Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
                                         {
                                             if (dependency.CopyLinkerPdbToDependentTargets)
                                                 _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);

@@ -92,16 +92,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\requireprebuildstep\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
@@ -113,16 +113,16 @@ del "output\debug_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</N
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\requireprebuildstep.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\requireprebuildstep.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\requireprebuildstep.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\requireprebuildstep.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\requireprebuildstep\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\requireprebuildstep\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\requireprebuildstep\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\requireprebuildstep\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\requireprebuildstep.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\requireprebuildstep.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\requireprebuildstep.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\requireprebuildstep.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\requireprebuildstep.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\requireprebuildstep.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
@@ -145,16 +145,16 @@ del "output\debug_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCle
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\requireprebuildstep\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>
@@ -166,16 +166,16 @@ del "output\release_fastbuild_noblob_vs2019\requireprebuildstep.pdb" >NUL 2>NUL<
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" RequirePreBuildStep_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean RequirePreBuildStep_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\requireprebuildstep\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\requireprebuildstep\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\requireprebuildstep\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\requireprebuildstep\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\requireprebuildstep.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\requireprebuildstep.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\requireprebuildstep.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\requireprebuildstep.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\requireprebuildstep.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\requireprebuildstep\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\requireprebuildstep\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\requireprebuildstep\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\requireprebuildstep\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\requireprebuildstep.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\requireprebuildstep.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\requireprebuildstep.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\requireprebuildstep.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\requireprebuildstep.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\requireprebuildstep.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\requireprebuildstep.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>generated</NMakeIncludeSearchPath>

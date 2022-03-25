@@ -1252,7 +1252,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!string.IsNullOrEmpty(project.ApplicationIcon))
             {
-                using (resolver.NewScopedParameter("iconpath", project.ApplicationIcon))
+                using (resolver.NewScopedParameter("iconpath", Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(project.ApplicationIcon))))
                     Write(Template.ApplicationIcon, writer, resolver);
             }
 
@@ -2783,16 +2783,16 @@ namespace Sharpmake.Generators.VisualStudio
         [Serializable]
         public class CsProjSubTypesInfos
         {
-            public string CsProjFullPath;
-            public DateTime LastWriteTime;
-            public List<SubTypeInfo> SubTypeInfos;
+            public string CsProjFullPath { get; set; }
+            public DateTime LastWriteTime { get; set; }
+            public List<SubTypeInfo> SubTypeInfos { get; set; }
 
             [Serializable]
             public class SubTypeInfo
             {
-                public string FileName;
-                public DateTime LastWriteTime;
-                public string SubType;
+                public string FileName { get; set; }
+                public DateTime LastWriteTime { get; set; }
+                public string SubType { get; set; }
             }
         }
 
@@ -2807,8 +2807,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 if (s_allCachedCsProjSubTypesInfos == null)
                 {
-                    var concurentBagTypes = (ConcurrentBag<CsProjSubTypesInfos>)Util.DeserializeAllCsprojSubTypes();
-                    var listTypes = concurentBagTypes?.ToList();
+                    var listTypes = Util.DeserializeAllCsprojSubTypesJson<List<CsProjSubTypesInfos>>();
                     s_allCachedCsProjSubTypesInfos = listTypes?.Where(p => p != null).ToList() ?? new List<CsProjSubTypesInfos>();
                 }
             }
