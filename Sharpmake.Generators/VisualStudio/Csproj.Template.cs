@@ -585,6 +585,17 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string EntityDeployEnd =
 @"    </EntityDeploy>
 ";
+                public const string AssemblyAttributeBegin =
+@"  <AssemblyAttribute Include=""[assemblyAttributeName]"">
+";
+
+                public const string AssemblyAttributeParameter =
+@"    <_Parameter[assemblyAttributeParamIndex]>[assemblyAttributeParamValue]</_Parameter[assemblyAttributeParamIndex]>
+";
+
+                public const string AssemblyAttributeEnd =
+@"  </AssemblyAttribute>
+";
             }
 
             public static class UsingTaskElement
