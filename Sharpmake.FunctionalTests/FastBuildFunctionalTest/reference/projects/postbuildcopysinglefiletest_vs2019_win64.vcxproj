@@ -92,16 +92,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -112,16 +112,16 @@ del "output\debug_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.pdb" >NUL 
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildcopysinglefiletest\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -143,16 +143,16 @@ del "output\debug_fastbuild_vs2019\postbuildcopysinglefiletest.pdb" >NUL 2>NUL</
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -163,16 +163,16 @@ del "output\release_fastbuild_noblob_vs2019\postbuildcopysinglefiletest.pdb" >NU
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildcopysinglefiletest\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildcopysinglefiletest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\postbuildcopysinglefiletest.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>

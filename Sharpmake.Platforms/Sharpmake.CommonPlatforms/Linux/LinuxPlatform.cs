@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -118,7 +118,15 @@ namespace Sharpmake
 
             public override void SetupPlatformToolsetOptions(IGenerationContext context)
             {
-                context.Options["PlatformToolset"] = "Remote_GCC_1_0";
+                context.SelectOption
+                (
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.Default, () => { context.Options["PlatformToolset"] = FileGeneratorUtilities.RemoveLineTag; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.Remote_GCC_1_0, () => { context.Options["PlatformToolset"] = "Remote_GCC_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.Remote_Clang_1_0, () => { context.Options["PlatformToolset"] = "Remote_Clang_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL_1_0, () => { context.Options["PlatformToolset"] = "WSL_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL_Clang_1_0, () => { context.Options["PlatformToolset"] = "WSL_Clang_1_0"; }),
+                    Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL2_1_0, () => { context.Options["PlatformToolset"] = "WSL2_1_0"; })
+                );
             }
 
             public override void SetupPlatformTargetOptions(IGenerationContext context)
@@ -131,6 +139,25 @@ namespace Sharpmake
 
             public override void SetupSdkOptions(IGenerationContext context)
             {
+                if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
+                {
+                    context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.Configuration.TargetLibraryPath);
+                    context.Options["RemoteBuildOutputs"] = context.Configuration.TargetFileFullNameWithExtension;
+                }
+                else if (context.Configuration.Output != Project.Configuration.OutputType.None)
+                {
+                    context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.Configuration.TargetPath);
+                    context.Options["RemoteBuildOutputs"] = context.Configuration.TargetFileFullNameWithExtension;
+                }
+                else
+                {
+                    context.Options["ProjectDirectory"] = FileGeneratorUtilities.RemoveLineTag;
+                    context.Options["RemoteBuildOutputs"] = FileGeneratorUtilities.RemoveLineTag;
+                }
+
+                context.Options["OutputDirectoryRemote"] = @"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["OutputDirectory"]));
+                context.Options["IntermediateDirectoryRemote"] = @"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["IntermediateDirectory"]));
+
                 context.SelectOption
                 (
                     Sharpmake.Options.Option(Options.General.CopySources.Enable, () => { context.Options["CopySources"] = "true"; }),
