@@ -585,6 +585,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string EntityDeployEnd =
 @"    </EntityDeploy>
 ";
+                public static string Protobuf =
+@"    <Protobuf Include=""[include]"" GrpcServices=""Both"" />
+";
             }
 
             public static class UsingTaskElement

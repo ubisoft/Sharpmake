@@ -167,6 +167,10 @@ namespace Sharpmake
         public Strings NoneFilesCopyIfNewer = new Strings();
         public Strings NoneExtensionsCopyIfNewer = new Strings();
 
+        // .Net builds support protofiles, https://docs.microsoft.com/en-us/aspnet/core/grpc/dotnet-grpc?view=aspnetcore-5.0
+        public Strings ProtoFiles = new Strings();
+        public Strings ProtoExtensions = new Strings();
+
         public Strings XResourcesResw = new Strings();
 
         public class XResourcesImgContainer : IEnumerable<string>
@@ -898,6 +902,7 @@ namespace Sharpmake
                     AddMatchExtensionFiles(additionalFiles, ref NatvisFiles, NatvisFilesExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref NoneFiles, NoneExtensions);
                     AddMatchExtensionFiles(additionalFiles, ref NoneFilesCopyIfNewer, NoneExtensionsCopyIfNewer);
+                    AddMatchExtensionFiles(additionalFiles, ref ProtoFiles, ProtoExtensions);
                 }
 
                 // Apply Filters 
@@ -931,6 +936,9 @@ namespace Sharpmake
 
                 AddMatchExtensionFiles(files, ref NoneFilesCopyIfNewer, NoneExtensionsCopyIfNewer);
                 Util.ResolvePath(SourceRootPath, ref NoneFilesCopyIfNewer);
+
+                AddMatchExtensionFiles(files, ref ProtoFiles, ProtoExtensions);
+                Util.ResolvePath(SourceRootPath, ref ProtoFiles);
             }
 
             _preFilterSourceFiles.AddRange(SourceFiles);
@@ -956,6 +964,7 @@ namespace Sharpmake
                 NatvisFiles.IntersectWith(SourceFilesFilters);
                 NoneFiles.IntersectWith(SourceFilesFilters);
                 NoneFilesCopyIfNewer.IntersectWith(SourceFilesFilters);
+                ProtoFiles.IntersectWith(SourceFilesFilters);
             }
 
             using (builder.CreateProfilingScope("Project.ResolveSourceFiles:AdditionalFiltering"))
@@ -976,6 +985,8 @@ namespace Sharpmake
                 Debugger.Break();
             if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, NoneFiles), NoneFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
                 Debugger.Break();
+            if (AddMatchFiles(RootPath, Util.PathGetRelative(RootPath, ProtoFiles), ProtoFiles, ref SourceFilesExclude, sourceFilesExcludeRegex))
+                Debugger.Break();
 
             // Remove exclude file
             foreach (string excludeSourceFile in SourceFilesExclude)
@@ -984,6 +995,7 @@ namespace Sharpmake
                 ResourceFiles.Remove(excludeSourceFile);
                 NatvisFiles.Remove(excludeSourceFile);
                 NoneFiles.Remove(excludeSourceFile);
+                ProtoFiles.Remove(excludeSourceFile);
             }
             var resolvedSourceFilesRelative = Util.PathGetRelative(RootPath, ResolvedSourceFiles);
 
@@ -2407,6 +2419,8 @@ namespace Sharpmake
                 ".disco",
                 ".manifest"
             );
+
+            ProtoExtensions.Add(".proto");
         }
 
         public CSharpProject()
