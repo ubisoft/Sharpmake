@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -610,6 +610,29 @@ namespace Sharpmake
                     Disable,
                     [Default]
                     Enable
+                }
+
+                /// <summary>
+                /// Xcode has a setting called Single-Object Prelink, which allows libraries and frameworks to include the necessary symbols 
+                /// from other libraries so that the underlying libraries do not need to be linked against in an application using your framework.
+                /// </summary>
+                public enum PerformSingleObjectPrelink
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
+
+                /// <summary>
+                /// List of libraries that need to be included into Single-Object Prelink process.
+                /// Use space separator to include multiple libraries.
+                /// </summary>
+                public class PrelinkLibraries : PathOption
+                {
+                    public PrelinkLibraries(string path)
+                       : base(path)
+                    {
+                    }
                 }
             }
         }
