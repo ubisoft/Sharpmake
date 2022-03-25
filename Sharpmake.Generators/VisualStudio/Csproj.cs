@@ -613,6 +613,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public bool Private = false;
                 public bool? ReferenceOutputAssembly = true;
                 public string IncludeOutputGroupsInVSIX = null;
+                public string OutputItemType = null;
 
                 public string Resolve(Resolver resolver)
                 {
@@ -622,6 +623,7 @@ namespace Sharpmake.Generators.VisualStudio
                     using (resolver.NewScopedParameter("private", Private.ToString().ToLower()))
                     using (resolver.NewScopedParameter("ReferenceOutputAssembly", ReferenceOutputAssembly))
                     using (resolver.NewScopedParameter("IncludeOutputGroupsInVSIX", IncludeOutputGroupsInVSIX))
+                    using (resolver.NewScopedParameter("OutputItemType", OutputItemType))
                     {
                         var writer = new StringWriter();
 
@@ -634,6 +636,8 @@ namespace Sharpmake.Generators.VisualStudio
                             writer.Write(Template.ItemGroups.ReferenceOutputAssembly);
                         if (IncludeOutputGroupsInVSIX != null)
                             writer.Write(Template.ItemGroups.IncludeOutputGroupsInVSIX);
+                        if (OutputItemType != null)
+                            writer.Write(Template.ItemGroups.OutputItemType);
                         writer.Write(Template.ItemGroups.ProjectReferenceEnd);
                         return resolver.Resolve(writer.ToString());
                     }
@@ -1394,6 +1398,7 @@ namespace Sharpmake.Generators.VisualStudio
                             Project = new Guid(dependencyConfiguration.ProjectGuid),
                             ReferenceOutputAssembly = dependency.ReferenceOutputAssembly,
                             IncludeOutputGroupsInVSIX = includeOutputGroupsInVsix,
+                            OutputItemType = dependency.OutputItemType
                         });
                     }
                 }

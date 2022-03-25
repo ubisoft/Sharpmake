@@ -496,6 +496,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ReferenceOutputAssembly =
 @"      <ReferenceOutputAssembly>[ReferenceOutputAssembly]</ReferenceOutputAssembly>
 ";
+                public static string OutputItemType =
+@"      <OutputItemType>[OutputItemType]</OutputItemType>
+";
                 public static string IncludeOutputGroupsInVSIX =
 @"      <IncludeOutputGroupsInVSIX>[IncludeOutputGroupsInVSIX]</IncludeOutputGroupsInVSIX>
 ";
