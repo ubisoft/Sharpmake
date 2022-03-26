@@ -613,7 +613,7 @@ namespace Sharpmake.Generators.FastBuild
                 //       4) If not, add a PATH environment variable pointing to the rc.exe folder
 
                 List<Platform> microsoftPlatforms = PlatformRegistry.GetAvailablePlatforms<IMicrosoftPlatformBff>().ToList();
-                var resourceCompilerPaths = new Strings();
+                var resourceCompilerPaths = string.Empty;
                 foreach (CompilerSettings setting in masterBffInfo.CompilerSettings.Values)
                 {
                     if (!microsoftPlatforms.Any(x => setting.PlatformFlags.HasFlag(x)))
@@ -630,21 +630,15 @@ namespace Sharpmake.Generators.FastBuild
                             // if so, try to find a rc.exe near it
                             if (!File.Exists(Path.Combine(configuration.LinkerPath, "rc.exe")))
                             {
-                                // if not found, get the folder of the custom
-                                // rc.exe or the default one to add it to PATH
-                                if (configuration.ResourceCompiler != FileGeneratorUtilities.RemoveLineTag)
-                                    resourceCompilerPaths.Add(Path.GetDirectoryName(configuration.ResourceCompiler));
-                                else
-                                    resourceCompilerPaths.Add(defaultResourceCompilerPath);
+                                // if not found, get the folder of the default one to add it to PATH
+                                resourceCompilerPaths = defaultResourceCompilerPath;
                             }
                         }
                     }
                 }
 
-                if (resourceCompilerPaths.Count == 1)
-                    fastBuildPATH = Util.GetCapitalizedPath(resourceCompilerPaths.First());
-                else if (resourceCompilerPaths.Count > 1)
-                    throw new Error("Multiple conflicting resource compilers found in PATH! Please verify your ResourceCompiler settings.");
+                if ( resourceCompilerPaths != string.Empty )
+                    fastBuildPATH = Util.GetCapitalizedPath(resourceCompilerPaths);
             }
 
             var allDevEnv = masterBffInfo.CompilerSettings.Values.Select(s => s.DevEnv).Distinct().ToList();

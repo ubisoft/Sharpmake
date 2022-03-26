@@ -103,6 +103,18 @@ namespace Sharpmake
                     }
                 }
 
+                var resCompilerName = "ResourceCompiler";
+                if ( !masterCompilerSettings.ContainsKey( resCompilerName ) )
+                {  
+                    string resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
+                    string pathName;
+                    string rcName;
+                    Util.PathSplitFileNameFromPath( resCompiler, out rcName, out pathName );
+                    rcName = @"$ExecutableRootPath$\" + rcName;
+                    var resourceCompilerSettings = new CompilerSettings( resCompilerName, Sharpmake.CompilerFamily.Custom, Platform.win64, new Strings(), rcName, pathName, devEnv, new Dictionary<string, CompilerSettings.Configuration>() );
+                    masterCompilerSettings.Add( resCompilerName, resourceCompilerSettings );
+                }
+
                 if (platformToolset != Options.Vc.General.PlatformToolset.Default && !platformToolset.IsDefaultToolsetForDevEnv(devEnv))
                     compilerName += "-" + platformToolset;
                 else
@@ -310,10 +322,6 @@ namespace Sharpmake
                 else if (!fastBuildCompilerSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
                     librarianExe = "lib.exe";
 
-                string resCompiler;
-                if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
-                    resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
-
                 string capitalizedBinPath = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
                 configurations.Add(
                     configName,
@@ -321,7 +329,7 @@ namespace Sharpmake
                         Platform.win64,
                         binPath: capitalizedBinPath,
                         linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
-                        resourceCompiler: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, resCompiler)),
+                        resourceCompiler: "ResourceCompiler",
                         librarian: Path.Combine(@"$LinkerPath$", librarianExe),
                         linker: Path.Combine(@"$LinkerPath$", linkerExe)
                     )
