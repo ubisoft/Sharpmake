@@ -1196,12 +1196,19 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             string netCoreEnableDefaultItems = RemoveLineTag;
+            string defaultItemExcludes = RemoveLineTag;
             string targetFrameworkVersionString = "TargetFrameworkVersion";
             string projectPropertyGuid = configurations[0].ProjectGuid;
             string projectConfigurationCondition = Template.Project.DefaultProjectConfigurationCondition;
             if (isNetCoreProjectSchema)
             {
                 netCoreEnableDefaultItems = project.EnableDefaultItems.ToString().ToLowerInvariant();
+
+                if (project.DefaultItemExcludes.Count > 0)
+                {
+                    defaultItemExcludes = string.Join(";", project.DefaultItemExcludes);
+                }
+
                 targetFrameworkVersionString = "TargetFramework";
                 projectPropertyGuid = RemoveLineTag;
                 if (projectFrameworks.Count() > 1)
@@ -1239,6 +1246,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
+            using (resolver.NewScopedParameter("defaultItemExcludes", defaultItemExcludes))
             using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
             using (resolver.NewScopedParameter("GenerateDocumentationFile", project.GenerateDocumentationFile ? "true" : RemoveLineTag))
