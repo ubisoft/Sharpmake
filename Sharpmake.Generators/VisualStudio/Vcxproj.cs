@@ -384,16 +384,27 @@ namespace Sharpmake.Generators.VisualStudio
 
             string projectKeyword = FileGeneratorUtilities.RemoveLineTag;
             string targetFrameworkString = FileGeneratorUtilities.RemoveLineTag;
+            string targetFrameworkVersionString = FileGeneratorUtilities.RemoveLineTag;
 
             if (clrSupport)
             {
                 projectKeyword = "ManagedCProj";
-                targetFrameworkString = Util.GetDotNetTargetString(firstConf.Target.GetFragment<DotNetFramework>());
+                var dotnetFrameWork = firstConf.Target.GetFragment<DotNetFramework>();
+
+                if (dotnetFrameWork.IsDotNetCore()) // .Net Core and .Net 5.0 have different element than old .Netfx, see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
+                {
+                    targetFrameworkString = dotnetFrameWork.ToVersionString();
+                }
+                else
+                {
+                    targetFrameworkVersionString = Util.GetDotNetTargetString(dotnetFrameWork);
+                }
             }
 
             using (fileGenerator.Declare("projectName", firstConf.ProjectName))
             using (fileGenerator.Declare("guid", firstConf.ProjectGuid))
             using (fileGenerator.Declare("targetFramework", targetFrameworkString))
+            using (fileGenerator.Declare("targetFrameworkVersion", targetFrameworkVersionString))
             using (fileGenerator.Declare("projectKeyword", projectKeyword))
             {
                 fileGenerator.Write(Template.Project.ProjectDescription);
@@ -440,10 +451,20 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     context.Configuration = conf;
 
+                    string clrSupportString = FileGeneratorUtilities.RemoveLineTag;
+
+                    if (!conf.IsFastBuild && clrSupport)
+                    {
+                        var dotnetFrameWork = firstConf.Target.GetFragment<DotNetFramework>();
+
+                        // .Net Core requires "NetCore" instead of "true", see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
+                        clrSupportString = dotnetFrameWork.IsDotNetCore() ? "NetCore" : clrSupport.ToString().ToLower();
+                    }
+
                     using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                    using (fileGenerator.Declare("clrSupport", (conf.IsFastBuild || !clrSupport) ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                    using (fileGenerator.Declare("clrSupport", clrSupportString))
                     {
                         var platformVcxproj = context.PresentPlatforms[conf.Platform];
                         platformVcxproj.GenerateProjectConfigurationGeneral(context, fileGenerator);
@@ -578,12 +599,24 @@ namespace Sharpmake.Generators.VisualStudio
 
                     if (!conf.IsFastBuild)
                     {
+
+                        var compileAsManagedString = FileGeneratorUtilities.RemoveLineTag;
+
+                        var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                        
+                        if (clrSupport && !dotNetFramework.IsDotNetCore())
+                        {
+                            // This needs to be omitted when targeting .Net Core otherwise compilation fails due to internal compiler errors. Only info found is from here: https://stackoverflow.com/a/62773057
+                            compileAsManagedString = "true";
+                        }
+
                         using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                         using (fileGenerator.Declare("conf", conf))
                         using (fileGenerator.Declare("project", conf.Project))
                         using (fileGenerator.Declare("target", conf.Target))
                         using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
                         using (fileGenerator.Declare("clrSupport", !clrSupport ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                        using (fileGenerator.Declare("compileAsManaged", compileAsManagedString))
                         {
                             fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
 
