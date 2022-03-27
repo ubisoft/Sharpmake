@@ -599,15 +599,17 @@ namespace Sharpmake.Generators.VisualStudio
 
                     if (!conf.IsFastBuild)
                     {
-
                         var compileAsManagedString = FileGeneratorUtilities.RemoveLineTag;
 
-                        var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
-                        
-                        if (clrSupport && !dotNetFramework.IsDotNetCore())
+                        if ( clrSupport )
                         {
-                            // This needs to be omitted when targeting .Net Core otherwise compilation fails due to internal compiler errors. Only info found is from here: https://stackoverflow.com/a/62773057
-                            compileAsManagedString = "true";
+                            var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                        
+                            if( !dotNetFramework.IsDotNetCore())
+                            {
+                                // This needs to be omitted when targeting .Net Core otherwise compilation fails due to internal compiler errors. Only info found is from here: https://stackoverflow.com/a/62773057
+                                compileAsManagedString = "true";
+                            }
                         }
 
                         using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
