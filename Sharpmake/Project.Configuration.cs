@@ -2835,6 +2835,9 @@ namespace Sharpmake
             // NuGet packages (only C# for now)
             public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
 
+            // Framework references in C#, see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore?view=aspnetcore-5.0&tabs=visual-studio
+            public Strings FrameworkReferences = new Strings();
+
             public bool? ReferenceOutputAssembly = null;
 
             private List<Configuration> _resolvedDependencies;

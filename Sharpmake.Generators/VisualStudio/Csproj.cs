@@ -41,6 +41,7 @@ namespace Sharpmake.Generators.VisualStudio
         internal class ItemGroups
         {
             internal ItemGroupConditional<TargetFrameworksCondition<Reference>> References = new ItemGroupConditional<TargetFrameworksCondition<Reference>>();
+            internal ItemGroupConditional<TargetFrameworksCondition<FrameworkReference>> FrameworkReferences = new ItemGroupConditional<TargetFrameworksCondition<FrameworkReference>>();
             internal ItemGroup<Service> Services = new ItemGroup<Service>();
             internal ItemGroup<Compile> Compiles = new ItemGroup<Compile>();
             internal ItemGroup<ProjectReference> ProjectReferences = new ItemGroup<ProjectReference>();
@@ -69,6 +70,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 var writer = new StringWriter();
                 writer.Write(References.Resolve(resolver));
+                writer.Write(FrameworkReferences.Resolve(resolver));
                 writer.Write(Services.Resolve(resolver));
                 writer.Write(Compiles.Resolve(resolver));
                 writer.Write(Vscts.Resolve(resolver));
@@ -640,6 +642,18 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            internal class FrameworkReference : ItemGroupItem, IResolvable
+            {
+                /// <inheritdoc />
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.FrameworkReference);
+                    }
+                }
+            }
+
             internal class ItemTemplate : IResolvable, IComparable<ItemTemplate>, IEquatable<ItemTemplate>
             {
                 private readonly string _template;
@@ -940,6 +954,10 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     TargetFrameworks = projectFrameworks
                 };
+                FrameworkReferences.AlwaysTrueElement = new TargetFrameworksCondition<FrameworkReference>()
+                {
+                    TargetFrameworks = projectFrameworks
+                };
                 PackageReferences.AlwaysTrueElement = new TargetFrameworksCondition<ItemTemplate>
                 {
                     TargetFrameworks = projectFrameworks
@@ -954,6 +972,11 @@ namespace Sharpmake.Generators.VisualStudio
             public void AddPackageReference(DotNetFramework dotNetFramework, ItemTemplate itemTemplate)
             {
                 AddTargetFrameworksCondition(PackageReferences, dotNetFramework, itemTemplate);
+            }
+
+            public void AddFrameworkReference(FrameworkReference frameworkReference, DotNetFramework dotNetFramework, DotNetOS dotNetOs, string dotnetOSSuffix)
+            {
+                AddTargetFrameworksCondition(FrameworkReferences, dotNetFramework, frameworkReference);
             }
         }
 
@@ -1040,6 +1063,15 @@ namespace Sharpmake.Generators.VisualStudio
             return (string.IsNullOrEmpty(guidFromProjectFile)) ? RemoveLineTag : guidFromProjectFile;
         }
 
+        private static Tuple<DotNetFramework, DotNetOS, string> GetDotNetFrameworkAndOS( Project.Configuration conf )
+        {
+            var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+            DotNetOS dotNetOS;
+            if (!conf.Target.TryGetFragment(out dotNetOS))
+                dotNetOS = conf.DotNetOSVersion;
+            return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
+        }
+
         private void Generate(
             CSharpProject project,
             List<Project.Configuration> unsortedConfigurations,
@@ -1054,17 +1086,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
-            var projectFrameworksPerConf = configurations.ToDictionary(
-                conf => conf,
-                conf =>
-                {
-                    var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
-                    DotNetOS dotNetOS;
-                    if (!conf.Target.TryGetFragment(out dotNetOS))
-                        dotNetOS = conf.DotNetOSVersion;
-                    return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
-                }
-            );
+            var projectFrameworksPerConf = configurations.ToDictionary( conf => conf, GetDotNetFrameworkAndOS );
             var projectFrameworks = projectFrameworksPerConf.Values.Distinct().ToList();
             itemGroups.SetTargetFrameworks(projectFrameworks);
 
@@ -2391,6 +2413,17 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             GeneratePackageReferences(project, configurations, itemGroups, generatedFiles, skipFiles);
+
+            foreach (var configuration in configurations)
+            {
+                var dotnetTuple = GetDotNetFrameworkAndOS(configuration);
+
+                foreach (var frameworkReference in configuration.FrameworkReferences)
+                {
+                    itemGroups.AddFrameworkReference(new ItemGroups.FrameworkReference { Include = frameworkReference },
+                        dotnetTuple.Item1, dotnetTuple.Item2, dotnetTuple.Item3);
+                }
+            }
 
             itemGroups.Services.AddRange(project.Services.Select(s => new ItemGroups.Service { Include = s }));
 
