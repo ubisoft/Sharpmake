@@ -39,6 +39,7 @@ namespace Sharpmake.Generators.VisualStudio
 @"  <PropertyGroup>
     <Configuration Condition="" '$(Configuration)' == '' "">[options.DefaultConfiguration]</Configuration>
     <Platform Condition="" '$(Platform)' == '' "">[defaultPlatform]</Platform>
+    <Platforms>[defaultPlatform]</Platforms>
     <PlatformTarget Condition="" '$(Platform)' == '' "">[defaultPlatform]</PlatformTarget>
     <ProjectGuid>{[guid]}</ProjectGuid>
     <OutputType>[outputType]</OutputType>
