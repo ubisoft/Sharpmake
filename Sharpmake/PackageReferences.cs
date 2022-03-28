@@ -176,7 +176,7 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
-            [Obsolete("Use ContentFiles instead")]
+            [Obsolete("Use " + nameof(ContentFiles) + " instead")]
             ContentFile = 1 << 2,
             ContentFiles = 1 << 2,
             Build = 1 << 3,
