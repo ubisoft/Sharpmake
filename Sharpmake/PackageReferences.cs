@@ -119,7 +119,7 @@ namespace Sharpmake
                     yield return "build";
                 }
 
-                if (dependency.HasFlag(AssetsDependency.Analysers))
+                if (dependency.HasFlag(AssetsDependency.Analyzers))
                 {
                     yield return "analyzers";
                 }
@@ -180,12 +180,14 @@ namespace Sharpmake
             ContentFile = 1 << 2,
             ContentFiles = 1 << 2,
             Build = 1 << 3,
+            [Obsolete("Use " + nameof(Analyzers) + " instead")]
             Analysers = 1 << 4,
+            Analyzers = 1 << 4,
             Native = 1 << 5,
-            All = Compile | Runtime | ContentFiles | Build | Analysers | Native
+            All = Compile | Runtime | ContentFiles | Build | Analyzers | Native
         }
 
         internal const AssetsDependency DefaultPrivateAssets =
-            AssetsDependency.ContentFiles | AssetsDependency.Analysers | AssetsDependency.Build;
+            AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build;
     }
 }
