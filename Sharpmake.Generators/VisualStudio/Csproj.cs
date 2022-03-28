@@ -60,7 +60,7 @@ namespace Sharpmake.Generators.VisualStudio
             internal ItemGroup<EntityDeploy> EntityDeploys = new ItemGroup<EntityDeploy>();
             internal ItemGroup<WCFMetadataStorage> WCFMetadataStorages = new ItemGroup<WCFMetadataStorage>();
             internal ItemGroup<SplashScreen> AppSplashScreen = new ItemGroup<SplashScreen>();
-            internal ItemGroupConditional<TargetFrameworksCondition<ItemTemplate>> PackageReferences = new ItemGroupConditional<TargetFrameworksCondition<ItemTemplate>>();
+            internal ItemGroup<ItemTemplate> PackageReferences = new ItemGroup<ItemTemplate>();
             internal ItemGroup<Analyzer> Analyzers = new ItemGroup<Analyzer>();
             internal ItemGroup<VSIXSourceItem> VSIXSourceItems = new ItemGroup<VSIXSourceItem>();
             internal ItemGroup<FolderInclude> FolderIncludes = new ItemGroup<FolderInclude>();
@@ -940,20 +940,11 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     TargetFrameworks = projectFrameworks
                 };
-                PackageReferences.AlwaysTrueElement = new TargetFrameworksCondition<ItemTemplate>
-                {
-                    TargetFrameworks = projectFrameworks
-                };
             }
 
             public void AddReference(DotNetFramework dotNetFramework, Reference reference)
             {
                 AddTargetFrameworksCondition(References, dotNetFramework, reference);
-            }
-
-            public void AddPackageReference(DotNetFramework dotNetFramework, ItemTemplate itemTemplate)
-            {
-                AddTargetFrameworksCondition(PackageReferences, dotNetFramework, itemTemplate);
             }
         }
 
@@ -2490,7 +2481,7 @@ namespace Sharpmake.Generators.VisualStudio
                     var resolver = new Resolver();
                     foreach (var packageReference in configuration.ReferencesByNuGetPackage)
                     {
-                        itemGroups.AddPackageReference(dotNetFramework, new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
+                        itemGroups.PackageReferences.Add(new ItemGroups.ItemTemplate(packageReference.Resolve(resolver)));
                     }
                 }
                 // project.json: Default in vs2015
