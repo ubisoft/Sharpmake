@@ -252,6 +252,8 @@ namespace Sharpmake
 
             public override void SelectCompilerOptions(IGenerationContext context)
             {
+                base.SelectCompilerOptions(context);
+
                 var options = context.Options;
                 var cmdLineOptions = context.CommandLineOptions;
                 var conf = context.Configuration;
