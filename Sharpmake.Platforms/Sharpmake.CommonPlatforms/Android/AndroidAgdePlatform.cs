@@ -338,11 +338,11 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.CLanguageStandard.Default, () => { options["CppLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C89, () => { options["CppLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C99, () => { options["CppLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C11, () => { options["CppLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C17, () => { options["CppLanguageStandard"] = "c17"; cmdLineOptions["CppLanguageStandard"] = "-std=c17"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStandard"] = "-std=c17"; }),
                 Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
                 Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
                 Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
