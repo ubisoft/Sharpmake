@@ -292,8 +292,9 @@ namespace Sharpmake
                 Options.Option(Options.Android.General.AndroidAPILevel.Android30, () => { options["androidMinSdkVersion"] = "30"; })
                 );
 
-                context.SelectOption
+                context.SelectOptionWithFallback
                 (
+                () => throw new Error("Android AGDE doesn't support the current Options.Android.General.PlatformToolset"),
                 Options.Option(Options.Android.General.PlatformToolset.Default, () => { options["PlatformToolset"] = RemoveLineTag; })
                 );
 
