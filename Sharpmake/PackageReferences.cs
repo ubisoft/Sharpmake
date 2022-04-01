@@ -128,6 +128,16 @@ namespace Sharpmake
                 {
                     yield return "native";
                 }
+
+                if (dependency.HasFlag(AssetsDependency.BuildMultitargeting))
+                {
+                    yield return "buildMultitargeting";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.BuildTransitive))
+                {
+                    yield return "buildTransitive";
+                }
             }
         }
 
@@ -184,7 +194,9 @@ namespace Sharpmake
             Analysers = 1 << 4,
             Analyzers = 1 << 4,
             Native = 1 << 5,
-            All = Compile | Runtime | ContentFiles | Build | Analyzers | Native
+            BuildMultitargeting = 1 << 6,
+            BuildTransitive = 1 << 7,
+            All = Compile | Runtime | ContentFiles | Build | Analyzers | Native | BuildMultitargeting | BuildTransitive
         }
 
         internal const AssetsDependency DefaultPrivateAssets =
