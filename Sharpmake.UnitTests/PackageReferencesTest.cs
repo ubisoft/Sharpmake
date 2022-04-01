@@ -25,6 +25,17 @@ namespace Sharpmake.UnitTests
         }
 
         [Test]
+        public void PackageReferencesAssetsDependency()
+        {
+            foreach (PackageReferences.AssetsDependency dep in System.Enum.GetValues(typeof(PackageReferences.AssetsDependency)))
+            {
+                var formatted = PackageReferences.PackageReference.GetFormatedAssetsDependency(dep);
+                Assert.AreEqual(1, formatted.Count());
+                Assert.AreEqual(formatted.First().ToLower(), dep.ToString().ToLower());
+            }
+        }
+
+        [Test]
         public void PackageReferencesAdded()
         {
             var project = GetProject<PackageReferencesTestProjects.PublicAndPrivatePackageReferencesProject>();

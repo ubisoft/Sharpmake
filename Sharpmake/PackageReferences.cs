@@ -99,16 +99,34 @@ namespace Sharpmake
                     yield break;
                 }
 
-                foreach (var value in (AssetsDependency[])Enum.GetValues(typeof(AssetsDependency)))
+                if (dependency.HasFlag(AssetsDependency.Compile))
                 {
-                    if (!dependency.HasFlag(value) || value == AssetsDependency.All || value == AssetsDependency.None)
-                    {
-                        continue;
-                    }
+                    yield return "compile";
+                }
 
-                    var name = Enum.GetName(typeof(AssetsDependency), value);
-                    // The first letter of assets values are in lower case (example: 'contentFiles')
-                    yield return $"{char.ToLower(name[0])}{name.Substring(1)}";
+                if (dependency.HasFlag(AssetsDependency.Runtime))
+                {
+                    yield return "runtime";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.ContentFiles))
+                {
+                    yield return "contentFiles";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Build))
+                {
+                    yield return "build";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Analyzers))
+                {
+                    yield return "analyzers";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Native))
+                {
+                    yield return "native";
                 }
             }
         }
@@ -158,14 +176,18 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
+            [Obsolete("Use " + nameof(ContentFiles) + " instead")]
             ContentFile = 1 << 2,
+            ContentFiles = 1 << 2,
             Build = 1 << 3,
+            [Obsolete("Use " + nameof(Analyzers) + " instead")]
             Analysers = 1 << 4,
+            Analyzers = 1 << 4,
             Native = 1 << 5,
-            All = Compile | Runtime | ContentFile | Build | Analysers | Native
+            All = Compile | Runtime | ContentFiles | Build | Analyzers | Native
         }
 
         internal const AssetsDependency DefaultPrivateAssets =
-            AssetsDependency.ContentFile | AssetsDependency.Analysers | AssetsDependency.Build;
+            AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build;
     }
 }
