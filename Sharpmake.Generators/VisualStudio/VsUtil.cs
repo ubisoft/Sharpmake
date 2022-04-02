@@ -30,7 +30,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             // Need to sort by name and platform
             var configurations = new List<Project.Configuration>();
-            configurations.AddRange(unsortedConfigurations.OrderBy(conf => conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)));
+            configurations.AddRange(unsortedConfigurations.OrderBy(conf => conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target), StringComparer.OrdinalIgnoreCase));
 
             // Make sure that all configurations use the same project name,
             // and validate that 2 conf in the same project have a distinct tuple name + platform
