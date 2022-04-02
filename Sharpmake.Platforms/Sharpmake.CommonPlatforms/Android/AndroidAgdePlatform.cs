@@ -145,14 +145,16 @@ namespace Sharpmake
                     }
                 }
 
-                using (generator.Declare("androidApplicationModule", Options.GetOptionValue("androidApplicationModule", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidNdkVersion", Options.GetOptionValue("androidNdkVersion", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidMinSdkVersion", Options.GetOptionValue("androidMinSdkVersion", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidEnablePackaging", Options.GetOptionValue("androidEnablePackaging", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidGradleBuildDir", Options.GetOptionValue("androidGradleBuildDir", context.ProjectConfigurationOptions.Values)))
+                var agdeConfOptions = context.ProjectConfigurationOptions.Where(d => d.Key.Platform == Platform.agde).Select(d => d.Value);
+
+                using (generator.Declare("androidApplicationModule", Options.GetOptionValue("androidApplicationModule", agdeConfOptions)))
+                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", agdeConfOptions)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", agdeConfOptions)))
+                using (generator.Declare("androidNdkVersion", Options.GetOptionValue("androidNdkVersion", agdeConfOptions)))
+                using (generator.Declare("androidMinSdkVersion", Options.GetOptionValue("androidMinSdkVersion", agdeConfOptions)))
+                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", agdeConfOptions)))
+                using (generator.Declare("androidEnablePackaging", Options.GetOptionValue("androidEnablePackaging", agdeConfOptions)))
+                using (generator.Declare("androidGradleBuildDir", Options.GetOptionValue("androidGradleBuildDir", agdeConfOptions)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }

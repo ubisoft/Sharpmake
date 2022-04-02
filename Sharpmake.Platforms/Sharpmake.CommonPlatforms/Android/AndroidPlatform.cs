@@ -114,7 +114,8 @@ namespace Sharpmake
                 generator.Write(_projectStartPlatformConditional);
 
                 string applicationType = "Android";
-                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values);
+                var androidConfOptions = context.ProjectConfigurationOptions.Where(d => d.Key.Platform == SharpmakePlatform).Select(d => d.Value);
+                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", androidConfOptions);
 
                 string msBuildPathOverrides = string.Empty;
 
@@ -160,10 +161,10 @@ namespace Sharpmake
 
                 using (generator.Declare("applicationType", applicationType))
                 using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
-                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("antHome", Options.GetOptionValue("antHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", androidConfOptions)))
+                using (generator.Declare("antHome", Options.GetOptionValue("antHome", androidConfOptions)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", androidConfOptions)))
+                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", androidConfOptions)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
