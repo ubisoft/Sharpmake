@@ -355,12 +355,17 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
+                var linuxConfigurations = context.ProjectConfigurations.Where(c => c.Platform == Platform.linux);
+                string configurationsConditional = string.Join(" or ",
+                    linuxConfigurations.Select(c => $"'$(Configuration)'=='{c.Name}'")
+                );
                 using (generator.Declare("platformName", SimplePlatformString))
+                using (generator.Declare("configurationsConditional", configurationsConditional))
                 using (generator.Declare("applicationType", "Linux"))
                 using (generator.Declare("applicationTypeRevision", "1.0"))
                 using (generator.Declare("targetLinuxPlatform", "Generic"))
                 {
-                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                    generator.Write(_projectStartPlatformConditional);
                     generator.Write(_projectDescriptionPlatformSpecific);
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
