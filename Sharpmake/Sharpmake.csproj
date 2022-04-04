@@ -155,6 +155,7 @@
     <Compile Include="ReferenceAlias.cs" />
     <Compile Include="RegexCache.cs" />
     <Compile Include="Resolver.cs" />
+    <Compile Include="RustProject.cs" />
     <Compile Include="SharpmakeExtension.cs" />
     <Compile Include="Solution.Configuration.cs" />
     <Compile Include="Solution.cs" />
