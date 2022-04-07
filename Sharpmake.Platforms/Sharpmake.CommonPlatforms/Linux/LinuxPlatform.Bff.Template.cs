@@ -47,7 +47,7 @@ namespace Sharpmake
     .CompilerExtraOptions   = ''
             // General options
             // -------------------------
-            + ' [cmdLineOptions.CLangGenerateDebugInformation]'
+            + ' [cmdLineOptions.DebugInformationFormat]'
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
             + ' [cmdLineOptions.PreprocessorDefinitions]'
