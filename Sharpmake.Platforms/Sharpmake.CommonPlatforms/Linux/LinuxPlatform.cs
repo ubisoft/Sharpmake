@@ -190,10 +190,10 @@ namespace Sharpmake
                 var cmdLineOptions = context.CommandLineOptions;
                 var conf = context.Configuration;
 
-                context.SelectOption
-                (
-                Sharpmake.Options.Option(Options.Compiler.GenerateDebugInformation.Enable, () => { options["GenerateDebugInformation"] = "true"; cmdLineOptions["CLangGenerateDebugInformation"] = "-g"; }),
-                Sharpmake.Options.Option(Options.Compiler.GenerateDebugInformation.Disable, () => { options["GenerateDebugInformation"] = "false"; cmdLineOptions["CLangGenerateDebugInformation"] = ""; })
+                context.SelectOption(
+                Sharpmake.Options.Option(Options.Compiler.DebugInformationFormat.None, () => { options["DebugInformationFormat"] = "None"; cmdLineOptions["DebugInformationFormat"] = "-g0"; }),
+                Sharpmake.Options.Option(Options.Compiler.DebugInformationFormat.MinimalDebugInformation, () => { options["DebugInformationFormat"] = "Minimal"; cmdLineOptions["DebugInformationFormat"] = "-g"; }),
+                Sharpmake.Options.Option(Options.Compiler.DebugInformationFormat.FullDebugInformation, () => { options["DebugInformationFormat"] = "FullDebug"; cmdLineOptions["DebugInformationFormat"] = "-g2 -gdwarf-2"; })
                 );
 
                 context.SelectOption
