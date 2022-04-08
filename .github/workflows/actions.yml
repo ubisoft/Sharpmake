@@ -63,14 +63,14 @@ jobs:
 
       - name: Upload sharpmake .net framework release binaries
         if: matrix.configuration == 'release' && matrix.framework == 'net472'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Upload sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.configuration == 'release' && matrix.framework != 'net472'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
