@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
@@ -455,10 +456,70 @@ namespace Sharpmake
                 }
             }
 
+            public override IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
+            {
+                if (configuration.Output == Project.Configuration.OutputType.Exe || configuration.Output == Project.Configuration.OutputType.Dll)
+                {
+                    var stripDebugSymbols = Sharpmake.Options.GetObject<Options.Linker.ShouldStripDebugSymbols>(configuration);
+                    if (stripDebugSymbols == Options.Linker.ShouldStripDebugSymbols.Enable)
+                    {
+                        if (!configuration.IsFastBuild)
+                            throw new NotImplementedException("ShouldStripDebugSymbols.Enable is only supported when using FastBuild");
+                        var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
+
+                        var devEnv = configuration.Target.GetFragment<DevEnv>();
+                        string binPath;
+                        if (!fastBuildSettings.BinPath.TryGetValue(devEnv, out binPath))
+                            binPath = ClangForWindows.GetWindowsClangExecutablePath();
+
+                        string fileFullname = configuration.TargetFileFullNameWithExtension;
+                        string targetFileFullPath = @"[conf.TargetPath]\" + fileFullname;
+                        string targetDebugFileFullPath = targetFileFullPath + ".debug";
+
+                        string objCopySentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".extracted";
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "objcopy.exe"),
+                            targetFileFullPath,
+                            objCopySentinelFile,
+                            string.Join(" ",
+                                "--only-keep-debug",
+                                targetFileFullPath,
+                                targetDebugFileFullPath
+                            ),
+                            useStdOutAsOutput: true
+                        );
+
+                        string strippedSentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".stripped";
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "strip.exe"),
+                            objCopySentinelFile,
+                            strippedSentinelFile,
+                            string.Join(" ",
+                                "--strip-debug",
+                                "--strip-unneeded",
+                                targetFileFullPath
+                            ),
+                            useStdOutAsOutput: true
+                        );
+
+                        string linkedSentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".linked";
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "objcopy.exe"),
+                            strippedSentinelFile,
+                            linkedSentinelFile,
+                            string.Join(" ",
+                                $@"--add-gnu-debuglink=""{targetDebugFileFullPath}""",
+                                targetFileFullPath
+                            ),
+                            useStdOutAsOutput: true
+                        );
+                    }
+                }
+            }
+
             public override void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
             {
                 var devEnv = conf.Target.GetFragment<DevEnv>();
-                var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
 
                 var platform = conf.Target.GetFragment<Platform>();
                 string compilerName = $"Compiler-{Util.GetSimplePlatformString(platform)}-{devEnv}";
@@ -500,8 +561,8 @@ namespace Sharpmake
                             extraFiles.AddRange(userExtraFiles);
                     }
 
-                    var compilerFamily = Sharpmake.CompilerFamily.Clang;
                     var compilerFamilyKey = new FastBuildCompilerKey(devEnv);
+                    CompilerFamily compilerFamily;
                     if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
                         compilerFamily = Sharpmake.CompilerFamily.Clang;
 

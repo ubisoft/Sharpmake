@@ -230,6 +230,20 @@ namespace Sharpmake
 
             public static class Linker
             {
+                /// <summary>
+                /// Strip debug symbols
+                /// </summary>
+                /// <remarks>
+                /// Whether to strip debug symbols into a separate file after a build.
+                /// This may speed up debugger launch times.
+                /// </remarks>
+                public enum ShouldStripDebugSymbols
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Addressing
                 {
                     [Default]
