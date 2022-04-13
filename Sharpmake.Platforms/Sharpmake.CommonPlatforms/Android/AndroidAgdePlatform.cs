@@ -509,7 +509,7 @@ namespace Sharpmake
                 defines.AddRange(context.Options.ExplicitDefines);
                 defines.AddRange(context.Configuration.Defines);
 
-                context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";").Replace(@"""", "");
+                context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
             }
 
             public override bool HasPrecomp(IGenerationContext context)
