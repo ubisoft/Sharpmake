@@ -39,11 +39,12 @@ namespace Sharpmake.Generators.Generic
 
         public static class OutputType
         {
-            public const string Exe = "Exe";
-            public const string Lib = "Lib";
+            public const string Executable = "Executable";
+            public const string DynamicLibrary = "DynamicLinkLibrary";
+            public const string StaticLibrary = "Lib";
             public const string Utility = "Utility";
 
-            public const string Default = Exe;
+            public const string Default = Executable;
         }
 
         public static string GetQualifiedName(this Project project)
@@ -187,12 +188,15 @@ namespace Sharpmake.Generators.Generic
                 return OutputType.Utility;
             }
 
-            if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
+            switch (context.Configuration.Output)
             {
-                return OutputType.Lib;
+                case Project.Configuration.OutputType.Lib:
+                    return OutputType.StaticLibrary;
+                case Project.Configuration.OutputType.Dll:
+                    return OutputType.DynamicLibrary;
+                default:
+                    return OutputType.Executable;
             }
-
-            return OutputType.Exe;
         }
         
         public static bool IsRttiEnabled(this IGenerationContext context)
