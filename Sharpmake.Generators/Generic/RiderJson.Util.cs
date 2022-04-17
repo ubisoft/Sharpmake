@@ -41,7 +41,7 @@ namespace Sharpmake.Generators.Generic
         {
             public const string Executable = "Executable";
             public const string DynamicLibrary = "DynamicLinkLibrary";
-            public const string StaticLibrary = "Lib";
+            public const string StaticLibrary = "StaticLibrary";
             public const string Utility = "Utility";
 
             public const string Default = Executable;
