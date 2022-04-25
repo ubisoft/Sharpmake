@@ -65,7 +65,8 @@ namespace Sharpmake
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.CharUnsigned]'
             + ' [cmdLineOptions.MsExtensions]'
-            + ' [options.ClangCppLanguageStandard]'
+            + ' [cmdLineOptions.CppLanguageStd]'
+            + ' [cmdLineOptions.CLanguageStd]'
             // Additional compiler options
             //--------------------------
             + ' [options.AdditionalCompilerOptions]'
