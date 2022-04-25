@@ -2168,7 +2168,18 @@ namespace Sharpmake
             /// By default, sharpmake will only add it if the Output is executable, or if <see cref="VcxprojUserFile"/>
             /// is not null.
             /// </summary>
-            public Func<bool> AddFastBuildProjectToSolutionCallback => DefaultAddFastBuildProjectToSolution;
+            public Func<bool> AddFastBuildProjectToSolutionCallback
+            {
+                get
+                {
+                    return _addFastBuildProjectToSolutionCallback ?? DefaultAddFastBuildProjectToSolution;
+                }
+                set
+                {
+                    _addFastBuildProjectToSolutionCallback = value;
+                }
+            }
+            private Func<bool> _addFastBuildProjectToSolutionCallback = null;
 
             /// <summary>
             /// Default method returning whether sharpmake will add the project containing this FastBuild conf to the solution
