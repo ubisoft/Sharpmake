@@ -42,14 +42,27 @@ namespace Sharpmake
             return Path.Combine(Settings.LLVMInstallDirVsEmbedded(devEnv), "lib", "clang", Settings.ClangVersionVsEmbedded(devEnv), "include");
         }
 
-        public static string GetWindowsClangLibraryPath()
+        public static string GetWindowsClangLibraryPath(string libFolderName = null)
         {
-            return Path.Combine(Settings.LLVMInstallDir, "lib", "clang", Settings.ClangVersion, "lib", "windows");
+            return GetWindowsClangLibraryPath(Settings.LLVMInstallDir, Settings.ClangVersion, libFolderName);
         }
 
-        public static string GetWindowsClangLibraryPath(DevEnv devEnv)
+        public static string GetWindowsClangLibraryPath(DevEnv devEnv, string libFolderName = null)
         {
-            return Path.Combine(Settings.LLVMInstallDirVsEmbedded(devEnv), "lib", "clang", Settings.ClangVersionVsEmbedded(devEnv), "lib", "windows");
+            return GetWindowsClangLibraryPath(Settings.LLVMInstallDirVsEmbedded(devEnv), Settings.ClangVersionVsEmbedded(devEnv), libFolderName);
+        }
+
+        public static string GetWindowsClangLibraryPath(string llvmInstallDir, string clangVersion, string libFolderName = null)
+        {
+            if (libFolderName == null)
+            {
+                // Starting with LLVM 15, runtime library structure changes.
+                if (System.Version.Parse(clangVersion).Major >= 15)
+                    libFolderName = "x86_64-pc-windows-msvc";
+                else
+                    libFolderName = "windows";
+            }
+            return Path.Combine(llvmInstallDir, "lib", "clang", clangVersion, "lib", libFolderName);
         }
 
         public static class Settings
