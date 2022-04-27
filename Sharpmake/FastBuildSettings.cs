@@ -102,6 +102,11 @@ namespace Sharpmake
         public static bool FastBuildValidateCopyFiles = true;
 
         /// <summary>
+        /// Controls whether FastBuild supports a list of LinkerStamp steps
+        /// </summary>
+        public static bool FastBuildSupportLinkerStampList = false;
+
+        /// <summary>
         /// Allows retention of build state across BFF changes. Requires v0.97
         /// </summary>
         public static bool FastBuildAllowDBMigration = false;

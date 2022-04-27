@@ -71,6 +71,14 @@ namespace Sharpmake.Generators.FastBuild
         IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile);
 
         /// <summary>
+        /// Get the extra list of stamp steps to execute for this platform.
+        /// </summary>
+        /// <param name="configuration">The project configuration</param>
+        /// <param name="fastBuildOutputFile">The file name of the build output.</param>
+        /// <returns>The list of stamp step to execute.</returns>
+        IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile);
+
+        /// <summary>
         /// Get the linker output name for this platform.
         /// </summary>
         /// <param name="outputType">The project output type</param>

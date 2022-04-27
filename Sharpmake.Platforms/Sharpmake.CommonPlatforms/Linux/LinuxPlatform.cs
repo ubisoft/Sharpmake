@@ -459,7 +459,31 @@ namespace Sharpmake
                 }
             }
 
+            public override IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
+            {
+                if (FastBuildSettings.FastBuildSupportLinkerStampList)
+                {
+                    foreach (var step in GetStripDebugSymbolsSteps(configuration, asStampSteps: true))
+                        yield return step;
+                }
+            }
+
             public override IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
+            {
+                if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+                {
+                    foreach (var step in GetStripDebugSymbolsSteps(configuration, asStampSteps: false))
+                        yield return step;
+                }
+            }
+
+            /// <summary>
+            /// Get the list of steps (if any), to strip the exe/dll from debug symbols for FastBuild
+            /// </summary>
+            /// <param name="configuration">The configuration</param>
+            /// <param name="asStampSteps">Indicates if those steps are post build or stamp, the latter being more efficient</param>
+            /// <returns>The list of steps</returns>
+            private IEnumerable<Project.Configuration.BuildStepExecutable> GetStripDebugSymbolsSteps(Project.Configuration configuration, bool asStampSteps)
             {
                 if (configuration.Output == Project.Configuration.OutputType.Exe || configuration.Output == Project.Configuration.OutputType.Dll)
                 {
@@ -482,8 +506,8 @@ namespace Sharpmake
                         string objCopySentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".extracted";
                         yield return new Project.Configuration.BuildStepExecutable(
                             Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "objcopy.exe"),
-                            targetFileFullPath,
-                            objCopySentinelFile,
+                            asStampSteps ? string.Empty : targetFileFullPath,
+                            asStampSteps ? string.Empty : objCopySentinelFile,
                             string.Join(" ",
                                 "--only-keep-debug",
                                 targetFileFullPath,
@@ -495,8 +519,8 @@ namespace Sharpmake
                         string strippedSentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".stripped";
                         yield return new Project.Configuration.BuildStepExecutable(
                             Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "strip.exe"),
-                            objCopySentinelFile,
-                            strippedSentinelFile,
+                            asStampSteps ? string.Empty : objCopySentinelFile,
+                            asStampSteps ? string.Empty : strippedSentinelFile,
                             string.Join(" ",
                                 "--strip-debug",
                                 "--strip-unneeded",
@@ -508,8 +532,8 @@ namespace Sharpmake
                         string linkedSentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".linked";
                         yield return new Project.Configuration.BuildStepExecutable(
                             Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "objcopy.exe"),
-                            strippedSentinelFile,
-                            linkedSentinelFile,
+                            asStampSteps ? string.Empty : strippedSentinelFile,
+                            asStampSteps ? string.Empty : linkedSentinelFile,
                             string.Join(" ",
                                 $@"--add-gnu-debuglink=""{targetDebugFileFullPath}""",
                                 targetFileFullPath
