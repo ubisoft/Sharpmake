@@ -69,7 +69,7 @@ goto success
 :BuildSharpmakeMSBuild
 echo Compiling %~1 in "%~2|%~3"...
 
-set MSBUILD_CMD=msbuild -clp:Summary -t:rebuild -restore "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3" /maxcpucount /p:CL_MPCount=%NUMBER_OF_PROCESSORS%
+set MSBUILD_CMD=msbuild -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3" /maxcpucount /p:CL_MPCount=%NUMBER_OF_PROCESSORS%
 echo %MSBUILD_CMD%
 %MSBUILD_CMD%
 set ERROR_CODE=%errorlevel%
