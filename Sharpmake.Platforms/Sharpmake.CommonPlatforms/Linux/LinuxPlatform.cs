@@ -38,7 +38,7 @@ namespace Sharpmake
             public override bool IsMicrosoftPlatform => false; // No way!
             public override bool IsPcPlatform => true;
             public override bool IsUsingClang => true; // Maybe now? Traditionally GCC but only the GNU project is backing it now.
-            //Used for bff generation in Bff.cs. We might need to use False and implement linux bff generation.
+            public override bool IsLinkerInvokedViaCompiler { get; set; } = false;
             public override bool HasDotNetSupport => false; // Technically false with .NET Core and Mono.
             public override bool HasSharedLibrarySupport => true;
 
@@ -228,6 +228,8 @@ namespace Sharpmake
                 else
                     options["ProcessorNumber"] = processorNumber.Value.ToString();
 
+                string linkerOptionPrefix = conf.Platform.GetLinkerOptionPrefix();
+
                 context.SelectOption
                 (
                 Sharpmake.Options.Option(Options.Compiler.Distributable.Enable, () => { options["Distributable"] = "true"; }),
@@ -299,15 +301,15 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = "-Wl,--enc"; }),
+                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = $"{linkerOptionPrefix}--enc"; }),
                 Sharpmake.Options.Option(Options.Linker.EditAndContinue.Disable, () => { options["EditAndContinue"] = "false"; cmdLineOptions["EditAndContinue"] = FileGeneratorUtilities.RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
                 Sharpmake.Options.Option(Options.Linker.InfoStripping.None, () => { options["InfoStripping"] = "None"; cmdLineOptions["InfoStripping"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-S"; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-s"; })
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = $"{linkerOptionPrefix}-S"; }),
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = $"{linkerOptionPrefix}-s"; })
                 );
 
                 context.SelectOption
@@ -421,6 +423,7 @@ namespace Sharpmake
             public IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; } = new Dictionary<IFastBuildCompilerKey, CompilerFamily>();
             public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, bool> LinkerInvokedViaCompiler { get; set; } = new Dictionary<DevEnv, bool>();
             public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, Strings> ExtraFiles { get; set; } = new Dictionary<DevEnv, Strings>();
             #endregion
@@ -591,6 +594,10 @@ namespace Sharpmake
                     string linkerExe;
                     if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                         linkerExe = "ld.lld.exe";
+
+                    bool isLinkerInvokedViaCompiler;
+                    if (fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(devEnv, out isLinkerInvokedViaCompiler))
+                        IsLinkerInvokedViaCompiler = isLinkerInvokedViaCompiler;
 
                     string librarianExe;
                     if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))

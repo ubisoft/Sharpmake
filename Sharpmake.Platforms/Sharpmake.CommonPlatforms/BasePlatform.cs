@@ -28,6 +28,7 @@ namespace Sharpmake
         public abstract bool IsMicrosoftPlatform { get; }
         public abstract bool IsPcPlatform { get; }
         public abstract bool IsUsingClang { get; }
+        public abstract bool IsLinkerInvokedViaCompiler { get; set; }
         public abstract bool HasDotNetSupport { get; }
         public abstract bool HasSharedLibrarySupport { get; }
         public virtual bool HasPrecompiledHeaderSupport => true;

@@ -30,6 +30,7 @@ namespace Sharpmake
         #region IPlatformDescriptor implementation
         public override bool IsMicrosoftPlatform => true;
         public override bool IsUsingClang => false;
+        public override bool IsLinkerInvokedViaCompiler { get; set; } = false;
         public override bool HasDotNetSupport => true;
         public override bool HasSharedLibrarySupport => true;
         #endregion

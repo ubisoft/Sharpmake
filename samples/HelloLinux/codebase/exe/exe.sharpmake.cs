@@ -36,7 +36,7 @@ namespace HelloLinux
 
             // this tells the shared lib loader to look in the exe dir
             // note: because we write in makefiles we double the $ to escape it
-            conf.AdditionalLinkerOptions.Add("-Wl,-rpath='$$ORIGIN'");
+            conf.AdditionalLinkerOptions.Add($"{conf.Platform.GetLinkerOptionPrefix()}-rpath='$$ORIGIN'");
 
             conf.LibraryFiles.Add("libuuid.so");
 

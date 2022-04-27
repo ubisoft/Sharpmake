@@ -36,6 +36,19 @@ namespace Sharpmake
             return PlatformRegistry.Get<IPlatformDescriptor>(platform).IsUsingClang;
         }
 
+        public static bool IsLinkerInvokedViaCompiler(this Platform platform)
+        {
+            return PlatformRegistry.Get<IPlatformDescriptor>(platform).IsLinkerInvokedViaCompiler;
+        }
+
+        public static string GetLinkerOptionPrefix(this Platform platform)
+        {
+            if (IsUsingClang(platform) && IsLinkerInvokedViaCompiler(platform))
+                return "-Wl,";
+
+            return "";
+        }
+
         public static string ToVersionString(this DotNetFramework framework)
         {
             switch (framework)

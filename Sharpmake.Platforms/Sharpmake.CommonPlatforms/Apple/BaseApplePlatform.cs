@@ -38,6 +38,7 @@ namespace Sharpmake
         public abstract string SimplePlatformString { get; }
         public bool IsMicrosoftPlatform => false;
         public bool IsUsingClang => true;
+        public bool IsLinkerInvokedViaCompiler { get; set; } = false;
         public bool HasDotNetSupport => false; // maybe? (.NET Core)
         public bool HasSharedLibrarySupport => true;
         public bool HasPrecompiledHeaderSupport => true;
@@ -57,6 +58,7 @@ namespace Sharpmake
         public IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; } = new Dictionary<IFastBuildCompilerKey, CompilerFamily>();
         public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
         public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
+        public IDictionary<DevEnv, bool> LinkerInvokedViaCompiler { get; set; } = new Dictionary<DevEnv, bool>();
         public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
         public IDictionary<DevEnv, Strings> ExtraFiles { get; set; } = new Dictionary<DevEnv, Strings>();
         #endregion
@@ -232,6 +234,10 @@ namespace Sharpmake
                 string linkerExe;
                 if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                     linkerExe = "ld";
+
+                bool isLinkerInvokedViaCompiler;
+                if (fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(devEnv, out isLinkerInvokedViaCompiler))
+                    IsLinkerInvokedViaCompiler = isLinkerInvokedViaCompiler;
 
                 string librarianExe;
                 if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
@@ -906,15 +912,6 @@ namespace Sharpmake
             var options = context.Options;
             var cmdLineOptions = context.CommandLineOptions;
             var conf = context.Configuration;
-
-            if (context.Options["GenerateMapFile"] == "true")
-            {
-                string mapFileArg = context.CommandLineOptions["GenerateMapFile"];
-                if (!mapFileArg.StartsWith("-Wl,-Map=", StringComparison.Ordinal))
-                    throw new Error("Map file argument was supposed to start with -Wl,-Map= but it changed! Please update this module!");
-                // since we directly invoke ld and not clang as a linker, we need to remove -Wl,-Map= and pass -map
-                context.CommandLineOptions["GenerateMapFile"] = "-map " + context.CommandLineOptions["GenerateMapFile"].Substring(9);
-            }
 
             // TODO: implement me
             cmdLineOptions["UseThinArchives"] = "";

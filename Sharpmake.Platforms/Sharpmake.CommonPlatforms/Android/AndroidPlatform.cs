@@ -57,6 +57,7 @@ namespace Sharpmake
             public override bool IsMicrosoftPlatform => false;
             public override bool IsPcPlatform => false;
             public override bool IsUsingClang => true;
+            public override bool IsLinkerInvokedViaCompiler { get; set; } = true;
             public override bool HasDotNetSupport => false;
             public override bool HasSharedLibrarySupport => true;
             public override bool HasPrecompiledHeaderSupport => true;
