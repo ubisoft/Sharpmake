@@ -586,8 +586,13 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string EntityDeployEnd =
 @"    </EntityDeploy>
 ";
+
                 public static string FrameworkReference =
 @"    <FrameworkReference Include=""[include]"" />
+";
+
+                public static string Protobuf =
+@"    <Protobuf Include=""[include]"" GrpcServices=""Both"" />
 ";
             }
 

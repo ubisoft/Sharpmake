@@ -65,6 +65,7 @@ namespace Sharpmake.Generators.VisualStudio
             internal ItemGroup<Analyzer> Analyzers = new ItemGroup<Analyzer>();
             internal ItemGroup<VSIXSourceItem> VSIXSourceItems = new ItemGroup<VSIXSourceItem>();
             internal ItemGroup<FolderInclude> FolderIncludes = new ItemGroup<FolderInclude>();
+            internal ItemGroup<Protobuf> Protobufs = new ItemGroup<Protobuf>();
 
             internal string Resolve(Resolver resolver)
             {
@@ -94,6 +95,7 @@ namespace Sharpmake.Generators.VisualStudio
                 writer.Write(VSIXSourceItems.Resolve(resolver));
                 writer.Write(FolderIncludes.Resolve(resolver));
                 writer.Write(WCFMetadataStorages.Resolve(resolver));
+                writer.Write(Protobufs.Resolve(resolver));
 
                 return writer.ToString();
             }
@@ -923,6 +925,18 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     using (resolver.NewScopedParameter("vsixSourceItem", Include))
                         return resolver.Resolve(Template.ItemGroups.VSIXSourceItem);
+                }
+            }
+
+            internal class Protobuf : ItemGroupItem, IResolvable
+            {
+                /// <inheritdoc />
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.Protobuf);
+                    }
                 }
             }
 
@@ -1767,6 +1781,14 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var vsixSourceItem in project.VSIXSourceItems)
             {
                 itemGroups.VSIXSourceItems.Add(new ItemGroups.VSIXSourceItem { Include = vsixSourceItem });
+            }
+
+            foreach (var protoFile in project.ProtoFiles)
+            {
+                itemGroups.Protobufs.Add(new ItemGroups.Protobuf
+                {
+                    Include = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(protoFile))
+                });
             }
 
             HashSet<string> allContents = new HashSet<string>(itemGroups.Contents.Select(c => c.Include));
