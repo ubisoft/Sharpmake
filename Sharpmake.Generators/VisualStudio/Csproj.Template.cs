@@ -100,6 +100,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
     <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <DefaultItemExcludes>[defaultItemExcludes]</DefaultItemExcludes>
     <GenerateAssemblyInfo>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInfo]</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyConfigurationAttribute]</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyDescriptionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyDescriptionAttribute]</GenerateAssemblyDescriptionAttribute>
