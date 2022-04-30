@@ -3522,6 +3522,10 @@ namespace Sharpmake.Generators.VisualStudio
             options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
             options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
             options["ProductVersion"] = Options.StringOption.Get<Options.CSharp.ProductVersion>(conf);
+            options["FileVersion"] = Options.StringOption.Get<Options.CSharp.FileVersion>(conf);
+            options["Version"] = Options.StringOption.Get<Options.CSharp.Version>(conf);
+            options["Product"] = Options.StringOption.Get<Options.CSharp.Product>(conf);
+            options["Copyright"] = Options.StringOption.Get<Options.CSharp.Copyright>(conf);
 
             SelectOption
             (

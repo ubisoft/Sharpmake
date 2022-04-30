@@ -355,6 +355,26 @@ namespace Sharpmake
                 public ProductVersion(string versionString) : base(versionString) { }
             }
 
+            public class FileVersion : StringOption
+            {
+                public FileVersion(string versionString) : base(versionString) { }
+            }
+
+            public class Version : StringOption
+            {
+                public Version(string versionString) : base(versionString) { }
+            }
+
+            public class Product : StringOption
+            {
+                public Product(string product) : base(product) { }
+            }
+
+            public class Copyright : StringOption
+            {
+                public Copyright(string copyright) : base(copyright) { }
+            }
+
             public enum MapFileExtensions
             {
                 Enabled,
