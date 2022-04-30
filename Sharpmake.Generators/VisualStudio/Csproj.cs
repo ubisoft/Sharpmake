@@ -3499,6 +3499,25 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.IsPublishable.Disabled, () => { options["IsPublishable"] = "false"; })
             );
 
+            if (conf.Target.GetFragment<DotNetFramework>().IsDotNetCore())
+            {
+                SelectOption
+                (
+                Options.Option(Options.CSharp.PublishSingleFile.Enabled, () => { options["PublishSingleFile"] = "true"; }),
+                Options.Option(Options.CSharp.PublishSingleFile.Disabled, () => { options["PublishSingleFile"] = RemoveLineTag; })
+                );
+                SelectOption
+                (
+                Options.Option(Options.CSharp.PublishTrimmed.Enabled, () => { options["PublishTrimmed"] = "true"; }),
+                Options.Option(Options.CSharp.PublishTrimmed.Disabled, () => { options["PublishTrimmed"] = RemoveLineTag; })
+                );
+            }
+            else
+            {
+                options["PublishSingleFile"] = RemoveLineTag;
+                options["PublishTrimmed"] = RemoveLineTag;
+            }
+
             options["AssemblyOriginatorKeyFile"] = Options.PathOption.Get<Options.CSharp.AssemblyOriginatorKeyFile>(conf, RemoveLineTag, _projectPath);
             options["MinimumVisualStudioVersion"] = Options.StringOption.Get<Options.CSharp.MinimumVisualStudioVersion>(conf);
             options["OldToolsVersion"] = Options.StringOption.Get<Options.CSharp.OldToolsVersion>(conf);

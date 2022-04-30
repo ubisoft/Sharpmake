@@ -202,6 +202,20 @@ namespace Sharpmake
                 Enabled
             }
 
+            public enum PublishSingleFile
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+            
+            public enum PublishTrimmed
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)
