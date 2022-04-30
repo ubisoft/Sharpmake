@@ -2314,6 +2314,7 @@ namespace Sharpmake
         /// Enable or disable the property [EnableDefaultItems] in NetCore Project Schema
         /// </summary>
         public bool EnableDefaultItems { get; set; } = false;
+        public Strings DefaultItemExcludes = new Strings();
 
         public bool IncludeResxAsResources = true;
         public string RootNamespace;

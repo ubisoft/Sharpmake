@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using static Sharpmake.Options;
 
 namespace Sharpmake
@@ -81,11 +82,35 @@ namespace Sharpmake
 
             public static class Compiler
             {
+                [Obsolete("Use " + nameof(DebugInformationFormat) + " instead.")]
                 public enum GenerateDebugInformation
                 {
-                    [Default]
                     Enable,
                     Disable
+                }
+
+                /// <summary>
+                /// Controls debug information. Matches the <c>-g</c> family of compiler options.
+                /// </summary>
+                /// <remarks>
+                /// Prefer using this switch over <seealso cref="GenerateDebugInformation"/>.
+                /// </remarks>
+                public enum DebugInformationFormat
+                {
+                    /// <summary>
+                    /// No debug information at all. Corresponds to the <c>-g0</c> switch.
+                    /// </summary>
+                    None,
+
+                    /// <summary>
+                    /// Outputs some debug information. Corresponds to the <c>-g</c> switch.
+                    /// </summary>
+                    [Default] MinimalDebugInformation,
+
+                    /// <summary>
+                    /// Outputs full debug information. Corresponds to the <c>-g2 -gdwarf-2</c> switches.
+                    /// </summary>
+                    FullDebugInformation
                 }
 
                 public enum Warnings
@@ -205,6 +230,20 @@ namespace Sharpmake
 
             public static class Linker
             {
+                /// <summary>
+                /// Strip debug symbols
+                /// </summary>
+                /// <remarks>
+                /// Whether to strip debug symbols into a separate file after a build.
+                /// This may speed up debugger launch times.
+                /// </remarks>
+                public enum ShouldStripDebugSymbols
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Addressing
                 {
                     [Default]

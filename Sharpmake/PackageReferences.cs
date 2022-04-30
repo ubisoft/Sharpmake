@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2019 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2019, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -99,16 +99,44 @@ namespace Sharpmake
                     yield break;
                 }
 
-                foreach (var value in (AssetsDependency[])Enum.GetValues(typeof(AssetsDependency)))
+                if (dependency.HasFlag(AssetsDependency.Compile))
                 {
-                    if (!dependency.HasFlag(value) || value == AssetsDependency.All || value == AssetsDependency.None)
-                    {
-                        continue;
-                    }
+                    yield return "compile";
+                }
 
-                    var name = Enum.GetName(typeof(AssetsDependency), value);
-                    // The first letter of assets values are in lower case (example: 'contentFiles')
-                    yield return $"{char.ToLower(name[0])}{name.Substring(1)}";
+                if (dependency.HasFlag(AssetsDependency.Runtime))
+                {
+                    yield return "runtime";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.ContentFiles))
+                {
+                    yield return "contentFiles";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Build))
+                {
+                    yield return "build";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Analyzers))
+                {
+                    yield return "analyzers";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.Native))
+                {
+                    yield return "native";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.BuildMultitargeting))
+                {
+                    yield return "buildMultitargeting";
+                }
+
+                if (dependency.HasFlag(AssetsDependency.BuildTransitive))
+                {
+                    yield return "buildTransitive";
                 }
             }
         }
@@ -158,14 +186,20 @@ namespace Sharpmake
             None = 0,
             Compile = 1 << 0,
             Runtime = 1 << 1,
+            [Obsolete("Use " + nameof(ContentFiles) + " instead")]
             ContentFile = 1 << 2,
+            ContentFiles = 1 << 2,
             Build = 1 << 3,
+            [Obsolete("Use " + nameof(Analyzers) + " instead")]
             Analysers = 1 << 4,
+            Analyzers = 1 << 4,
             Native = 1 << 5,
-            All = Compile | Runtime | ContentFile | Build | Analysers | Native
+            BuildMultitargeting = 1 << 6,
+            BuildTransitive = 1 << 7,
+            All = Compile | Runtime | ContentFiles | Build | Analyzers | Native | BuildMultitargeting | BuildTransitive
         }
 
         internal const AssetsDependency DefaultPrivateAssets =
-            AssetsDependency.ContentFile | AssetsDependency.Analysers | AssetsDependency.Build;
+            AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build;
     }
 }

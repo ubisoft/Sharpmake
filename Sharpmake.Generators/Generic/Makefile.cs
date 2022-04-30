@@ -629,8 +629,9 @@ namespace Sharpmake.Generators.Generic
             options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
 
             // this is supported in both gcc and clang
+            string linkerOptionPrefix = conf.Platform.GetLinkerOptionPrefix();
             SelectOption(conf,
-                Options.Option(Options.Makefile.Linker.LibGroup.Enable, () => { options["LibsStartGroup"] = " -Wl,--start-group "; options["LibsEndGroup"] = " -Wl,--end-group "; }),
+                Options.Option(Options.Makefile.Linker.LibGroup.Enable, () => { options["LibsStartGroup"] = $" {linkerOptionPrefix}--start-group "; options["LibsEndGroup"] = $" {linkerOptionPrefix}--end-group "; }),
                 Options.Option(Options.Makefile.Linker.LibGroup.Disable, () => { options["LibsStartGroup"] = string.Empty; options["LibsEndGroup"] = string.Empty; })
                 );
 

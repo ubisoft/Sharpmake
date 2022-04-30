@@ -585,7 +585,11 @@ namespace Sharpmake.Generators.FastBuild
                                     postBuildEvents.Add(eventPair.Key, eventPair.Value);
                                 }
 
-                                var extraPlatformEvents = platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; });
+                                var extraPlatformEvents = new List<Project.Configuration.BuildStepBase>();
+                                if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+                                    extraPlatformEvents.AddRange(platformBff.GetExtraStampEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
+
+                                extraPlatformEvents.AddRange(platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
                                 foreach (var buildEvent in extraPlatformEvents.Concat(conf.ResolvedEventPostBuildExe))
                                 {
                                     string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild, project.RootPath, projectPath);
@@ -830,22 +834,29 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildCompilerForceUsing = builderForceUsingFiles.ToString();
                         }
 
-                        if (isOutputTypeExeOrDll && (conf.PostBuildStampExe != null || conf.PostBuildStampExes.Any()))
+                        if (isOutputTypeExeOrDll)
                         {
-                            List<string> fastbuildStampExecutableList = new List<string>();
-                            List<string> fastBuildStampArgumentsList = new List<string>();
+                            var extraPlatformEvents = new List<Project.Configuration.BuildStepExecutable>();
+                            if (FastBuildSettings.FastBuildSupportLinkerStampList)
+                                extraPlatformEvents.AddRange(platformBff.GetExtraStampEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
 
-                            foreach (var stampExe in conf.PostBuildStampExes.Prepend(conf.PostBuildStampExe).Where(x => x != null))
+                            if (conf.PostBuildStampExe != null || conf.PostBuildStampExes.Any() || extraPlatformEvents.Any())
                             {
-                                fastbuildStampExecutableList.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, stampExe.ExecutableFile, true)));
-                                fastBuildStampArgumentsList.Add(string.Format("{0} {1} {2}",
-                                    stampExe.ExecutableInputFileArgumentOption,
-                                    stampExe.ExecutableOutputFileArgumentOption,
-                                    stampExe.ExecutableOtherArguments));
-                            }
+                                var fastbuildStampExecutableList = new List<string>();
+                                var fastBuildStampArgumentsList = new List<string>();
 
-                            fastBuildStampExecutable = UtilityMethods.FBuildFormatList(fastbuildStampExecutableList, 30);
-                            fastBuildStampArguments = UtilityMethods.FBuildFormatList(fastBuildStampArgumentsList, 30);
+                                foreach (var stampExe in extraPlatformEvents.Concat(conf.PostBuildStampExes.Prepend(conf.PostBuildStampExe)).Where(x => x != null))
+                                {
+                                    fastbuildStampExecutableList.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, stampExe.ExecutableFile, true)));
+                                    fastBuildStampArgumentsList.Add(string.Format("{0} {1} {2}",
+                                        stampExe.ExecutableInputFileArgumentOption,
+                                        stampExe.ExecutableOutputFileArgumentOption,
+                                        stampExe.ExecutableOtherArguments));
+                                }
+
+                                fastBuildStampExecutable = UtilityMethods.FBuildFormatList(fastbuildStampExecutableList, 30);
+                                fastBuildStampArguments = UtilityMethods.FBuildFormatList(fastBuildStampArgumentsList, 30);
+                            }
                         }
 
                         bool linkObjects = false;

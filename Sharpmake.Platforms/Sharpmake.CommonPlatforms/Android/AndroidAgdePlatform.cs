@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ namespace Sharpmake
             public override bool IsMicrosoftPlatform => false;
             public override bool IsPcPlatform => false;
             public override bool IsUsingClang => true;
+            public override bool IsLinkerInvokedViaCompiler { get; set; } = true;
             public override bool HasDotNetSupport => false;
             public override bool HasSharedLibrarySupport => true;
             public override bool HasPrecompiledHeaderSupport => true;
@@ -131,10 +132,10 @@ namespace Sharpmake
                             {
                                 // _PlatformFolder override is not enough for android, we need to know the AdditionalVCTargetsPath
                                 // Note that AdditionalVCTargetsPath is not officially supported by vs2017, but we use the variable anyway for convenience and consistency
-                                if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, SharpmakePlatform)))
+                                if (!string.IsNullOrEmpty(MSBuildGlobalSettings.GetCppPlatformFolder(devEnv, Platform.agde)))
                                     throw new Error($"SetCppPlatformFolder is not supported by {devEnv}: use of MSBuildGlobalSettings.SetCppPlatformFolder should be replaced by use of MSBuildGlobalSettings.SetAdditionalVCTargetsPath.");
 
-                                string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
+                                string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, Platform.agde);
                                 if (!string.IsNullOrEmpty(additionalVCTargetsPath))
                                 {
                                     using (generator.Declare("additionalVCTargetsPath", Sharpmake.Util.EnsureTrailingSeparator(additionalVCTargetsPath)))
@@ -145,14 +146,16 @@ namespace Sharpmake
                     }
                 }
 
-                using (generator.Declare("androidApplicationModule", Options.GetOptionValue("androidApplicationModule", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidNdkVersion", Options.GetOptionValue("androidNdkVersion", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidMinSdkVersion", Options.GetOptionValue("androidMinSdkVersion", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidEnablePackaging", Options.GetOptionValue("androidEnablePackaging", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("androidGradleBuildDir", Options.GetOptionValue("androidGradleBuildDir", context.ProjectConfigurationOptions.Values)))
+                var agdeConfOptions = context.ProjectConfigurationOptions.Where(d => d.Key.Platform == Platform.agde).Select(d => d.Value);
+
+                using (generator.Declare("androidApplicationModule", Options.GetOptionValue("androidApplicationModule", agdeConfOptions)))
+                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", agdeConfOptions)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", agdeConfOptions)))
+                using (generator.Declare("androidNdkVersion", Options.GetOptionValue("androidNdkVersion", agdeConfOptions)))
+                using (generator.Declare("androidMinSdkVersion", Options.GetOptionValue("androidMinSdkVersion", agdeConfOptions)))
+                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", agdeConfOptions)))
+                using (generator.Declare("androidEnablePackaging", Options.GetOptionValue("androidEnablePackaging", agdeConfOptions)))
+                using (generator.Declare("androidGradleBuildDir", Options.GetOptionValue("androidGradleBuildDir", agdeConfOptions)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
@@ -175,7 +178,7 @@ namespace Sharpmake
                 var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
                 if (devEnv.IsVisualStudio() && devEnv >= DevEnv.vs2019)
                 {
-                    string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, SharpmakePlatform);
+                    string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, Platform.agde);
                     if (!string.IsNullOrEmpty(additionalVCTargetsPath))
                         generator.WriteVerbatim(_projectPropertySheets);
                 }
@@ -292,8 +295,9 @@ namespace Sharpmake
                 Options.Option(Options.Android.General.AndroidAPILevel.Android30, () => { options["androidMinSdkVersion"] = "30"; })
                 );
 
-                context.SelectOption
+                context.SelectOptionWithFallback
                 (
+                () => throw new Error("Android AGDE doesn't support the current Options.Android.General.PlatformToolset"),
                 Options.Option(Options.Android.General.PlatformToolset.Default, () => { options["PlatformToolset"] = RemoveLineTag; })
                 );
 
@@ -338,11 +342,11 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.CLanguageStandard.Default, () => { options["CppLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C89, () => { options["CppLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C99, () => { options["CppLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C11, () => { options["CppLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C17, () => { options["CppLanguageStandard"] = "c17"; cmdLineOptions["CppLanguageStandard"] = "-std=c17"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Android.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStandard"] = "-std=c17"; }),
                 Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
                 Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
                 Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
@@ -506,7 +510,7 @@ namespace Sharpmake
                 defines.AddRange(context.Options.ExplicitDefines);
                 defines.AddRange(context.Configuration.Defines);
 
-                context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";").Replace(@"""", "");
+                context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
             }
 
             public override bool HasPrecomp(IGenerationContext context)

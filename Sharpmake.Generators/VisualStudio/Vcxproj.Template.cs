@@ -42,7 +42,8 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectDescription =
 @"  <PropertyGroup Label=""Globals"">
     <ProjectGuid>{[guid]}</ProjectGuid>
-    <TargetFrameworkVersion>[targetFramework]</TargetFrameworkVersion>
+    <TargetFrameworkVersion>[targetFrameworkVersion]</TargetFrameworkVersion>
+    <TargetFramework>[targetFramework]</TargetFramework>
     <Keyword>[projectKeyword]</Keyword>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>[projectName]</RootNamespace>

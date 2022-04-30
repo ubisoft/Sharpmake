@@ -18,12 +18,15 @@ namespace Sharpmake
     {
         public sealed partial class LinuxPlatform
         {
+            private const string _projectStartPlatformConditional =
+@"  <PropertyGroup Label=""Globals"" Condition=""'$(Platform)'=='[platformName]' and ([configurationsConditional])"">
+";
             private const string _projectConfigurationsCompileTemplate =
                 @"    <ClCompile>
                   <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
                   <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);</PreprocessorDefinitions>
                   <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
-                  <GenerateDebugInformation>[options.GenerateDebugInformation]</GenerateDebugInformation>
+                  <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
                   <Warnings>[options.Warnings]</Warnings>
                   <ExtraWarnings>[options.ExtraWarnings]</ExtraWarnings>
                   <WarningsAsErrors>[options.WarningsAsErrors]</WarningsAsErrors>

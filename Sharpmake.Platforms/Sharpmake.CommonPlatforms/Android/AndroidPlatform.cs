@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ namespace Sharpmake
             public override bool IsMicrosoftPlatform => false;
             public override bool IsPcPlatform => false;
             public override bool IsUsingClang => true;
+            public override bool IsLinkerInvokedViaCompiler { get; set; } = true;
             public override bool HasDotNetSupport => false;
             public override bool HasSharedLibrarySupport => true;
             public override bool HasPrecompiledHeaderSupport => true;
@@ -114,7 +115,8 @@ namespace Sharpmake
                 generator.Write(_projectStartPlatformConditional);
 
                 string applicationType = "Android";
-                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", context.ProjectConfigurationOptions.Values);
+                var androidConfOptions = context.ProjectConfigurationOptions.Where(d => d.Key.Platform == SharpmakePlatform).Select(d => d.Value);
+                string applicationTypeRevision = Options.GetOptionValue("applicationTypeRevision", androidConfOptions);
 
                 string msBuildPathOverrides = string.Empty;
 
@@ -160,10 +162,10 @@ namespace Sharpmake
 
                 using (generator.Declare("applicationType", applicationType))
                 using (generator.Declare("applicationTypeRevision", applicationTypeRevision))
-                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("antHome", Options.GetOptionValue("antHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", context.ProjectConfigurationOptions.Values)))
-                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", context.ProjectConfigurationOptions.Values)))
+                using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", androidConfOptions)))
+                using (generator.Declare("antHome", Options.GetOptionValue("antHome", androidConfOptions)))
+                using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", androidConfOptions)))
+                using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", androidConfOptions)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
@@ -252,6 +254,8 @@ namespace Sharpmake
 
             public override void SelectCompilerOptions(IGenerationContext context)
             {
+                base.SelectCompilerOptions(context);
+
                 var options = context.Options;
                 var cmdLineOptions = context.CommandLineOptions;
                 var conf = context.Configuration;
@@ -500,7 +504,7 @@ namespace Sharpmake
                 defines.AddRange(context.Options.ExplicitDefines);
                 defines.AddRange(context.Configuration.Defines);
 
-                context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";").Replace(@"""", "");
+                context.Options["PreprocessorDefinitions"] = (context.DevelopmentEnvironment >= DevEnv.vs2019) ? defines.JoinStrings(";") : defines.JoinStrings(";").Replace(@"""", "");
             }
 
             public override bool HasPrecomp(IGenerationContext context)

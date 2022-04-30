@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
@@ -37,7 +38,7 @@ namespace Sharpmake
             public override bool IsMicrosoftPlatform => false; // No way!
             public override bool IsPcPlatform => true;
             public override bool IsUsingClang => true; // Maybe now? Traditionally GCC but only the GNU project is backing it now.
-            //Used for bff generation in Bff.cs. We might need to use False and implement linux bff generation.
+            public override bool IsLinkerInvokedViaCompiler { get; set; } = false;
             public override bool HasDotNetSupport => false; // Technically false with .NET Core and Mono.
             public override bool HasSharedLibrarySupport => true;
 
@@ -190,10 +191,10 @@ namespace Sharpmake
                 var cmdLineOptions = context.CommandLineOptions;
                 var conf = context.Configuration;
 
-                context.SelectOption
-                (
-                Sharpmake.Options.Option(Options.Compiler.GenerateDebugInformation.Enable, () => { options["GenerateDebugInformation"] = "true"; cmdLineOptions["CLangGenerateDebugInformation"] = "-g"; }),
-                Sharpmake.Options.Option(Options.Compiler.GenerateDebugInformation.Disable, () => { options["GenerateDebugInformation"] = "false"; cmdLineOptions["CLangGenerateDebugInformation"] = ""; })
+                context.SelectOption(
+                Sharpmake.Options.Option(Options.Compiler.DebugInformationFormat.None, () => { options["DebugInformationFormat"] = "None"; cmdLineOptions["DebugInformationFormat"] = "-g0"; }),
+                Sharpmake.Options.Option(Options.Compiler.DebugInformationFormat.MinimalDebugInformation, () => { options["DebugInformationFormat"] = "Minimal"; cmdLineOptions["DebugInformationFormat"] = "-g"; }),
+                Sharpmake.Options.Option(Options.Compiler.DebugInformationFormat.FullDebugInformation, () => { options["DebugInformationFormat"] = "FullDebug"; cmdLineOptions["DebugInformationFormat"] = "-g2 -gdwarf-2"; })
                 );
 
                 context.SelectOption
@@ -226,6 +227,8 @@ namespace Sharpmake
                     options["ProcessorNumber"] = FileGeneratorUtilities.RemoveLineTag;
                 else
                     options["ProcessorNumber"] = processorNumber.Value.ToString();
+
+                string linkerOptionPrefix = conf.Platform.GetLinkerOptionPrefix();
 
                 context.SelectOption
                 (
@@ -298,15 +301,15 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = "-Wl,--enc"; }),
+                Sharpmake.Options.Option(Options.Linker.EditAndContinue.Enable, () => { options["EditAndContinue"] = "true"; cmdLineOptions["EditAndContinue"] = $"{linkerOptionPrefix}--enc"; }),
                 Sharpmake.Options.Option(Options.Linker.EditAndContinue.Disable, () => { options["EditAndContinue"] = "false"; cmdLineOptions["EditAndContinue"] = FileGeneratorUtilities.RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
                 Sharpmake.Options.Option(Options.Linker.InfoStripping.None, () => { options["InfoStripping"] = "None"; cmdLineOptions["InfoStripping"] = FileGeneratorUtilities.RemoveLineTag; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-S"; }),
-                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = "-Wl,-s"; })
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripDebug, () => { options["InfoStripping"] = "StripDebug"; cmdLineOptions["InfoStripping"] = $"{linkerOptionPrefix}-S"; }),
+                Sharpmake.Options.Option(Options.Linker.InfoStripping.StripSymsAndDebug, () => { options["InfoStripping"] = "StripSymsAndDebug"; cmdLineOptions["InfoStripping"] = $"{linkerOptionPrefix}-s"; })
                 );
 
                 context.SelectOption
@@ -355,12 +358,17 @@ namespace Sharpmake
 
             public override void GeneratePlatformSpecificProjectDescription(IVcxprojGenerationContext context, IFileGenerator generator)
             {
+                var linuxConfigurations = context.ProjectConfigurations.Where(c => c.Platform == Platform.linux);
+                string configurationsConditional = string.Join(" or ",
+                    linuxConfigurations.Select(c => $"'$(Configuration)'=='{c.Name}'")
+                );
                 using (generator.Declare("platformName", SimplePlatformString))
+                using (generator.Declare("configurationsConditional", configurationsConditional))
                 using (generator.Declare("applicationType", "Linux"))
                 using (generator.Declare("applicationTypeRevision", "1.0"))
                 using (generator.Declare("targetLinuxPlatform", "Generic"))
                 {
-                    generator.Write(Vcxproj.Template.Project.ProjectDescriptionStartPlatformConditional);
+                    generator.Write(_projectStartPlatformConditional);
                     generator.Write(_projectDescriptionPlatformSpecific);
                     generator.Write(Vcxproj.Template.Project.PropertyGroupEnd);
                 }
@@ -415,6 +423,7 @@ namespace Sharpmake
             public IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; } = new Dictionary<IFastBuildCompilerKey, CompilerFamily>();
             public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, bool> LinkerInvokedViaCompiler { get; set; } = new Dictionary<DevEnv, bool>();
             public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
             public IDictionary<DevEnv, Strings> ExtraFiles { get; set; } = new Dictionary<DevEnv, Strings>();
             #endregion
@@ -450,10 +459,94 @@ namespace Sharpmake
                 }
             }
 
+            public override IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
+            {
+                if (FastBuildSettings.FastBuildSupportLinkerStampList)
+                {
+                    foreach (var step in GetStripDebugSymbolsSteps(configuration, asStampSteps: true))
+                        yield return step;
+                }
+            }
+
+            public override IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
+            {
+                if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+                {
+                    foreach (var step in GetStripDebugSymbolsSteps(configuration, asStampSteps: false))
+                        yield return step;
+                }
+            }
+
+            /// <summary>
+            /// Get the list of steps (if any), to strip the exe/dll from debug symbols for FastBuild
+            /// </summary>
+            /// <param name="configuration">The configuration</param>
+            /// <param name="asStampSteps">Indicates if those steps are post build or stamp, the latter being more efficient</param>
+            /// <returns>The list of steps</returns>
+            private IEnumerable<Project.Configuration.BuildStepExecutable> GetStripDebugSymbolsSteps(Project.Configuration configuration, bool asStampSteps)
+            {
+                if (configuration.Output == Project.Configuration.OutputType.Exe || configuration.Output == Project.Configuration.OutputType.Dll)
+                {
+                    var stripDebugSymbols = Sharpmake.Options.GetObject<Options.Linker.ShouldStripDebugSymbols>(configuration);
+                    if (stripDebugSymbols == Options.Linker.ShouldStripDebugSymbols.Enable)
+                    {
+                        if (!configuration.IsFastBuild)
+                            throw new NotImplementedException("ShouldStripDebugSymbols.Enable is only supported when using FastBuild");
+                        var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
+
+                        var devEnv = configuration.Target.GetFragment<DevEnv>();
+                        string binPath;
+                        if (!fastBuildSettings.BinPath.TryGetValue(devEnv, out binPath))
+                            binPath = ClangForWindows.GetWindowsClangExecutablePath();
+
+                        string fileFullname = configuration.TargetFileFullNameWithExtension;
+                        string targetFileFullPath = @"[conf.TargetPath]\" + fileFullname;
+                        string targetDebugFileFullPath = targetFileFullPath + ".debug";
+
+                        string objCopySentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".extracted";
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "objcopy.exe"),
+                            asStampSteps ? string.Empty : targetFileFullPath,
+                            asStampSteps ? string.Empty : objCopySentinelFile,
+                            string.Join(" ",
+                                "--only-keep-debug",
+                                targetFileFullPath,
+                                targetDebugFileFullPath
+                            ),
+                            useStdOutAsOutput: true
+                        );
+
+                        string strippedSentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".stripped";
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "strip.exe"),
+                            asStampSteps ? string.Empty : objCopySentinelFile,
+                            asStampSteps ? string.Empty : strippedSentinelFile,
+                            string.Join(" ",
+                                "--strip-debug",
+                                "--strip-unneeded",
+                                targetFileFullPath
+                            ),
+                            useStdOutAsOutput: true
+                        );
+
+                        string linkedSentinelFile = @"[conf.IntermediatePath]\" + fileFullname + ".linked";
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            Path.Combine(binPath, GlobalSettings.UseLlvmObjCopy ? "llvm-objcopy.exe" : "objcopy.exe"),
+                            asStampSteps ? string.Empty : strippedSentinelFile,
+                            asStampSteps ? string.Empty : linkedSentinelFile,
+                            string.Join(" ",
+                                $@"--add-gnu-debuglink=""{targetDebugFileFullPath}""",
+                                targetFileFullPath
+                            ),
+                            useStdOutAsOutput: true
+                        );
+                    }
+                }
+            }
+
             public override void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
             {
                 var devEnv = conf.Target.GetFragment<DevEnv>();
-                var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.linux);
 
                 var platform = conf.Target.GetFragment<Platform>();
                 string compilerName = $"Compiler-{Util.GetSimplePlatformString(platform)}-{devEnv}";
@@ -495,8 +588,8 @@ namespace Sharpmake
                             extraFiles.AddRange(userExtraFiles);
                     }
 
-                    var compilerFamily = Sharpmake.CompilerFamily.Clang;
                     var compilerFamilyKey = new FastBuildCompilerKey(devEnv);
+                    CompilerFamily compilerFamily;
                     if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
                         compilerFamily = Sharpmake.CompilerFamily.Clang;
 
@@ -525,6 +618,10 @@ namespace Sharpmake
                     string linkerExe;
                     if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                         linkerExe = "ld.lld.exe";
+
+                    bool isLinkerInvokedViaCompiler;
+                    if (fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(devEnv, out isLinkerInvokedViaCompiler))
+                        IsLinkerInvokedViaCompiler = isLinkerInvokedViaCompiler;
 
                     string librarianExe;
                     if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))

@@ -2168,7 +2168,18 @@ namespace Sharpmake
             /// By default, sharpmake will only add it if the Output is executable, or if <see cref="VcxprojUserFile"/>
             /// is not null.
             /// </summary>
-            public Func<bool> AddFastBuildProjectToSolutionCallback => DefaultAddFastBuildProjectToSolution;
+            public Func<bool> AddFastBuildProjectToSolutionCallback
+            {
+                get
+                {
+                    return _addFastBuildProjectToSolutionCallback ?? DefaultAddFastBuildProjectToSolution;
+                }
+                set
+                {
+                    _addFastBuildProjectToSolutionCallback = value;
+                }
+            }
+            private Func<bool> _addFastBuildProjectToSolutionCallback = null;
 
             /// <summary>
             /// Default method returning whether sharpmake will add the project containing this FastBuild conf to the solution
@@ -2834,6 +2845,9 @@ namespace Sharpmake
 
             // NuGet packages (only C# for now)
             public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
+
+            // Framework references in C#, see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore?view=aspnetcore-5.0&tabs=visual-studio
+            public Strings FrameworkReferences = new Strings();
 
             public bool? ReferenceOutputAssembly = null;
 

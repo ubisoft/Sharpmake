@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,7 +93,10 @@ namespace Sharpmake
         android = 1 << 8,
         linux = 1 << 9,
         mac = 1 << 10,
-        agde = 1 << 11,      // Android Game Development Extension
+        /// <summary>
+        /// Android Game Development Extension
+        /// </summary>
+        agde = 1 << 11,
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,

@@ -47,7 +47,7 @@ namespace Sharpmake
     .CompilerExtraOptions   = ''
             // General options
             // -------------------------
-            + ' [cmdLineOptions.CLangGenerateDebugInformation]'
+            + ' [cmdLineOptions.DebugInformationFormat]'
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
             + ' [cmdLineOptions.PreprocessorDefinitions]'
@@ -65,7 +65,8 @@ namespace Sharpmake
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.CharUnsigned]'
             + ' [cmdLineOptions.MsExtensions]'
-            + ' [options.ClangCppLanguageStandard]'
+            + ' [cmdLineOptions.CppLanguageStd]'
+            + ' [cmdLineOptions.CLanguageStd]'
             // Additional compiler options
             //--------------------------
             + ' [options.AdditionalCompilerOptions]'

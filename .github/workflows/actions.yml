@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.2
 
       - name: Bootstrap.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
@@ -63,14 +63,14 @@ jobs:
 
       - name: Upload sharpmake .net framework release binaries
         if: matrix.configuration == 'release' && matrix.framework == 'net472'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Upload sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.configuration == 'release' && matrix.framework != 'net472'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
@@ -86,18 +86,18 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.2
 
       - name: Download sharpmake .net framework release binaries
         if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.framework != 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
@@ -123,18 +123,18 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.2
 
       - name: Download sharpmake .net framework release binaries
         if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.framework != 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
