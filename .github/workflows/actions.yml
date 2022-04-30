@@ -90,14 +90,14 @@ jobs:
 
       - name: Download sharpmake .net framework release binaries
         if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.framework != 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
@@ -127,14 +127,14 @@ jobs:
 
       - name: Download sharpmake .net framework release binaries
         if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.framework != 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
