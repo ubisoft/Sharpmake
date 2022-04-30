@@ -3535,6 +3535,12 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.CSharp.UseWindowsForms.Disabled, () => { options["UseWindowsForms"] = RemoveLineTag; })
             );
 
+            SelectOption
+            (
+                Options.Option(Options.CSharp.Nullable.Enabled, () => { options["Nullable"] = "enable"; }),
+                Options.Option(Options.CSharp.Nullable.Disabled, () => { options["Nullable"] = RemoveLineTag; })
+            );
+
             // concat defines, don't add options.Defines since they are automatically added by VS
             Strings defines = new Strings();
             defines.AddRange(options.ExplicitDefines);

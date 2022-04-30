@@ -195,6 +195,13 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum Nullable
+            {
+                [Default] 
+                Disabled,
+                Enabled
+            }
+
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)
