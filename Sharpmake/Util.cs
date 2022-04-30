@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -212,10 +212,15 @@ namespace Sharpmake
             return Builder.Instance.Context.WriteGeneratedFile(null, file, stream);
         }
 
+        internal static bool RecordInAutoCleanupDatabase(string fullPath)
+        {
+            return s_writtenFiles.TryAdd(fullPath, DateTime.Now);
+        }
+
         internal static bool FileWriteIfDifferentInternal(FileInfo file, MemoryStream stream, bool bypassAutoCleanupDatabase = false)
         {
             if (!bypassAutoCleanupDatabase)
-                s_writtenFiles.TryAdd(file.FullName, DateTime.Now);
+                RecordInAutoCleanupDatabase(file.FullName);
 
             if (file.Exists)
             {
@@ -508,12 +513,18 @@ namespace Sharpmake
             }
         }
 
+        [Obsolete("Use DeserializeAllCsprojSubTypesJson<T> with the known type: the original C# class that was serialized isn't known in the json serialization.")]
         public static object DeserializeAllCsprojSubTypes()
+        {
+            return DeserializeAllCsprojSubTypesJson<object>();
+        }
+
+        public static T DeserializeAllCsprojSubTypesJson<T>()
         {
             string winFormSubTypesDbFullPath = GetWinFormSubTypeDbPath();
 
             if (!File.Exists(winFormSubTypesDbFullPath))
-                return null;
+                return default(T);
 
             try
             {
@@ -521,14 +532,14 @@ namespace Sharpmake
                 using (BinaryReader binReader = new BinaryReader(readStream))
                 {
                     string csprojSubTypesAsJson = binReader.ReadString();
-                    return System.Text.Json.JsonSerializer.Deserialize<object>(csprojSubTypesAsJson, GetCsprojSubTypesJsonSerializerOptions());
+                    return System.Text.Json.JsonSerializer.Deserialize<T>(csprojSubTypesAsJson, GetCsprojSubTypesJsonSerializerOptions());
                 }
             }
             catch
             {
                 TryDeleteFile(winFormSubTypesDbFullPath);
             }
-            return null;
+            return default(T);
         }
 
         public static bool TryDeleteFile(string filename, bool removeIfReadOnly = false)

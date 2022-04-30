@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ namespace Sharpmake
         public abstract string SimplePlatformString { get; }
         public bool IsMicrosoftPlatform => false;
         public bool IsUsingClang => true;
+        public bool IsLinkerInvokedViaCompiler { get; set; } = false;
         public bool HasDotNetSupport => false; // maybe? (.NET Core)
         public bool HasSharedLibrarySupport => true;
         public bool HasPrecompiledHeaderSupport => true;
@@ -57,6 +58,7 @@ namespace Sharpmake
         public IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; } = new Dictionary<IFastBuildCompilerKey, CompilerFamily>();
         public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
         public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
+        public IDictionary<DevEnv, bool> LinkerInvokedViaCompiler { get; set; } = new Dictionary<DevEnv, bool>();
         public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
         public IDictionary<DevEnv, Strings> ExtraFiles { get; set; } = new Dictionary<DevEnv, Strings>();
         #endregion
@@ -155,6 +157,11 @@ namespace Sharpmake
             return Enumerable.Empty<Project.Configuration.BuildStepBase>();
         }
 
+        public IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
+        {
+            return Enumerable.Empty<Project.Configuration.BuildStepExecutable>();
+        }
+
         public string GetOutputFilename(Project.Configuration.OutputType outputType, string fastBuildOutputFile) => fastBuildOutputFile;
 
         public void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
@@ -232,6 +239,10 @@ namespace Sharpmake
                 string linkerExe;
                 if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                     linkerExe = "ld";
+
+                bool isLinkerInvokedViaCompiler;
+                if (fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(devEnv, out isLinkerInvokedViaCompiler))
+                    IsLinkerInvokedViaCompiler = isLinkerInvokedViaCompiler;
 
                 string librarianExe;
                 if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
@@ -906,14 +917,16 @@ namespace Sharpmake
             var options = context.Options;
             var cmdLineOptions = context.CommandLineOptions;
             var conf = context.Configuration;
+            var platform = context.Configuration.Platform;
 
             if (context.Options["GenerateMapFile"] == "true")
             {
                 string mapFileArg = context.CommandLineOptions["GenerateMapFile"];
-                if (!mapFileArg.StartsWith("-Wl,-Map=", StringComparison.Ordinal))
+                string mapOption = $"{platform.GetLinkerOptionPrefix()}-Map=";
+                if (!mapFileArg.StartsWith(mapOption, StringComparison.Ordinal))
                     throw new Error("Map file argument was supposed to start with -Wl,-Map= but it changed! Please update this module!");
                 // since we directly invoke ld and not clang as a linker, we need to remove -Wl,-Map= and pass -map
-                context.CommandLineOptions["GenerateMapFile"] = "-map " + context.CommandLineOptions["GenerateMapFile"].Substring(9);
+                context.CommandLineOptions["GenerateMapFile"] = "-map " + context.CommandLineOptions["GenerateMapFile"].Substring(mapOption.Length);
             }
 
             // TODO: implement me
@@ -923,6 +936,20 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Linker.StripLinkedProduct.Disable, () => options["StripLinkedProduct"] = "NO"),
                 Options.Option(Options.XCode.Linker.StripLinkedProduct.Enable, () => options["StripLinkedProduct"] = "YES")
             );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Linker.PerformSingleObjectPrelink.Disable, () => options["GenerateMasterObjectFile"] = "NO"),
+                Options.Option(Options.XCode.Linker.PerformSingleObjectPrelink.Enable, () => options["GenerateMasterObjectFile"] = "YES")
+            );
+
+            options["PreLinkedLibraries"] = FileGeneratorUtilities.RemoveLineTag;
+
+            var prelinkedLibrary = Options.XCode.Linker.PrelinkLibraries.Get<Options.XCode.Linker.PrelinkLibraries>(conf);
+            if (!string.IsNullOrEmpty(prelinkedLibrary))
+            {
+                // xcode for some reason does not use arrays for this setting but space separated values
+                options["PreLinkedLibraries"] = prelinkedLibrary;
+            }
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

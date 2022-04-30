@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             // Need to sort by name and platform
             var configurations = new List<Project.Configuration>();
-            configurations.AddRange(unsortedConfigurations.OrderBy(conf => conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)));
+            configurations.AddRange(unsortedConfigurations.OrderBy(conf => conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target), StringComparer.OrdinalIgnoreCase));
 
             // Make sure that all configurations use the same project name,
             // and validate that 2 conf in the same project have a distinct tuple name + platform

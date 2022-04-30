@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2020 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,17 @@ namespace Sharpmake.UnitTests
         public PackageReferencesCSharpTests()
             : base(typeof(PackageReferencesTestProjects.PublicAndPrivatePackageReferencesProject).Namespace)
         {
+        }
+
+        [Test]
+        public void PackageReferencesAssetsDependency()
+        {
+            foreach (PackageReferences.AssetsDependency dep in System.Enum.GetValues(typeof(PackageReferences.AssetsDependency)))
+            {
+                var formatted = PackageReferences.PackageReference.GetFormatedAssetsDependency(dep);
+                Assert.AreEqual(1, formatted.Count());
+                Assert.AreEqual(formatted.First().ToLower(), dep.ToString().ToLower());
+            }
         }
 
         [Test]

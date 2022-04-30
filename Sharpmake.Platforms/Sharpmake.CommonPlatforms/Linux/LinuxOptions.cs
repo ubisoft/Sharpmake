@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using static Sharpmake.Options;
 
 namespace Sharpmake
@@ -28,10 +29,52 @@ namespace Sharpmake
                     [Default]
                     Disable
                 }
+
+                /// <summary>
+                /// VC Platform Toolset
+                /// </summary>
+                /// <remarks>
+                /// Specifies which build tools will be used for the project in Visual Studio
+                /// </remarks>
+                public enum VcPlatformToolset
+                {
+                    [Default]
+                    Default,
+
+                    /// <summary>
+                    /// GCC for Remote Linux
+                    /// </summary>
+                    Remote_GCC_1_0,
+
+                    /// <summary>
+                    /// Clang for Remote Linux
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Remote_Clang_1_0,
+
+                    /// <summary>
+                    /// GCC for Windows Subsystem for Linux
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    WSL_1_0,
+
+                    /// <summary>
+                    /// Clang for Windows Subsystem for Linux
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    WSL_Clang_1_0,
+
+                    /// <summary>
+                    /// WSL2 Toolset
+                    /// </summary>
+                    [DevEnvVersion(minimum = DevEnv.vs2022)]
+                    WSL2_1_0,
+                }
+
                 public enum PlatformRemoteTool
                 {
                     Gpp, //g++
-                    Clang, // Alpine 
+                    Clang, // Alpine
                     [Default]
                     Clang38
                 }
@@ -39,11 +82,35 @@ namespace Sharpmake
 
             public static class Compiler
             {
+                [Obsolete("Use " + nameof(DebugInformationFormat) + " instead.")]
                 public enum GenerateDebugInformation
                 {
-                    [Default]
                     Enable,
                     Disable
+                }
+
+                /// <summary>
+                /// Controls debug information. Matches the <c>-g</c> family of compiler options.
+                /// </summary>
+                /// <remarks>
+                /// Prefer using this switch over <seealso cref="GenerateDebugInformation"/>.
+                /// </remarks>
+                public enum DebugInformationFormat
+                {
+                    /// <summary>
+                    /// No debug information at all. Corresponds to the <c>-g0</c> switch.
+                    /// </summary>
+                    None,
+
+                    /// <summary>
+                    /// Outputs some debug information. Corresponds to the <c>-g</c> switch.
+                    /// </summary>
+                    [Default] MinimalDebugInformation,
+
+                    /// <summary>
+                    /// Outputs full debug information. Corresponds to the <c>-g2 -gdwarf-2</c> switches.
+                    /// </summary>
+                    FullDebugInformation
                 }
 
                 public enum Warnings
@@ -163,6 +230,20 @@ namespace Sharpmake
 
             public static class Linker
             {
+                /// <summary>
+                /// Strip debug symbols
+                /// </summary>
+                /// <remarks>
+                /// Whether to strip debug symbols into a separate file after a build.
+                /// This may speed up debugger launch times.
+                /// </remarks>
+                public enum ShouldStripDebugSymbols
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }
+
                 public enum Addressing
                 {
                     [Default]

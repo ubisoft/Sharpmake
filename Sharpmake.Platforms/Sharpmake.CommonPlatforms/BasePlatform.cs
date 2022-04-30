@@ -28,6 +28,7 @@ namespace Sharpmake
         public abstract bool IsMicrosoftPlatform { get; }
         public abstract bool IsPcPlatform { get; }
         public abstract bool IsUsingClang { get; }
+        public abstract bool IsLinkerInvokedViaCompiler { get; set; }
         public abstract bool HasDotNetSupport { get; }
         public abstract bool HasSharedLibrarySupport { get; }
         public virtual bool HasPrecompiledHeaderSupport => true;
@@ -120,6 +121,11 @@ namespace Sharpmake
         public virtual IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
         {
             return Enumerable.Empty<Project.Configuration.BuildStepBase>();
+        }
+
+        public virtual IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
+        {
+            return Enumerable.Empty<Project.Configuration.BuildStepExecutable>();
         }
 
         public virtual string GetOutputFilename(Project.Configuration.OutputType outputType, string fastBuildOutputFile) => fastBuildOutputFile;

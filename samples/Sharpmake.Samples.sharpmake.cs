@@ -280,6 +280,15 @@ namespace SharpmakeGen.Samples
     }
 
     [Generate]
+    public class HelloRustProject : SampleProject
+    {
+        public HelloRustProject()
+        {
+            Name = "HelloRust";
+        }
+    }
+
+    [Generate]
     public class HelloWorldProject : SampleProject
     {
         public HelloWorldProject()

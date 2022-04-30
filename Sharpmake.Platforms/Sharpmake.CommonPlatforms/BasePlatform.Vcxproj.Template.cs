@@ -28,7 +28,7 @@ namespace Sharpmake
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>[options.AdditionalUsingDirectories]</AdditionalUsingDirectories>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
-      <CompileAsManaged>[clrSupport]</CompileAsManaged>
+      <CompileAsManaged>[compileAsManaged]</CompileAsManaged>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
       <DiagnosticsFormat>[options.DiagnosticsFormat]</DiagnosticsFormat>
@@ -266,16 +266,16 @@ namespace Sharpmake
     <NMakeReBuildCommandLine>cd [relativeMasterBffPath]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandRebuild] </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" >NUL 2>NUL
-del ""[options.IntermediateDirectory]\*.obj"" >NUL 2>NUL
-del ""[options.IntermediateDirectory]\*.a"" >NUL 2>NUL
-del ""[options.IntermediateDirectory]\*.lib"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].exe"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].elf"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].exp"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].lib"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.obj"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.a"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.lib"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].exe"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].elf"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].exp"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].lib"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>[options.OutputFile]</NMakeOutput>
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>

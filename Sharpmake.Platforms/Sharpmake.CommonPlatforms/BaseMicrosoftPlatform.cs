@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ namespace Sharpmake
         #region IPlatformDescriptor implementation
         public override bool IsMicrosoftPlatform => true;
         public override bool IsUsingClang => false;
+        public override bool IsLinkerInvokedViaCompiler { get; set; } = false;
         public override bool HasDotNetSupport => true;
         public override bool HasSharedLibrarySupport => true;
         #endregion
@@ -91,7 +92,8 @@ namespace Sharpmake
         public virtual IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)
         {
             var dirs = new List<string>();
-            var dotnet = Util.IsDotNet(configuration) ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
+            var hasDotNetDependency = Util.IsDotNet(configuration) || configuration.ResolvedSourceFilesWithCompileAsCLROption.Count > 0;
+            var dotnet = hasDotNetDependency ? configuration.Target.GetFragment<DotNetFramework>() : default(DotNetFramework?);
 
             var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(configuration);
             if (platformToolset.IsLLVMToolchain())

@@ -92,16 +92,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\useprecompexe.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\useprecompexe.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\useprecompexe.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\useprecompexe.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\useprecompexe.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\useprecompexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\useprecompexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -112,16 +112,16 @@ del "output\debug_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCl
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" UsePrecompExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean UsePrecompExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\useprecompexe\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\useprecompexe\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\useprecompexe\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\useprecompexe.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\useprecompexe.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\useprecompexe.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\useprecompexe.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\useprecompexe.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\useprecompexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\useprecompexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\useprecompexe\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\useprecompexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\useprecompexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -143,16 +143,16 @@ del "output\debug_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanComm
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\useprecompexe.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\useprecompexe.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\useprecompexe.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\useprecompexe.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\useprecompexe.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\useprecompexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\useprecompexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\useprecompexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -163,16 +163,16 @@ del "output\release_fastbuild_noblob_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMake
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" UsePrecompExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean UsePrecompExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\useprecompexe\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\useprecompexe\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\useprecompexe\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\useprecompexe\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\useprecompexe.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\useprecompexe.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\useprecompexe.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\useprecompexe.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\useprecompexe.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\useprecompexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\useprecompexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\useprecompexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\useprecompexe\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\useprecompexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\useprecompexe.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\useprecompexe.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\useprecompexe.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\useprecompexe.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\useprecompexe.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\useprecompexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\useprecompexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;SOME_UTILITY_STRING="UTIL FUNC";WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>

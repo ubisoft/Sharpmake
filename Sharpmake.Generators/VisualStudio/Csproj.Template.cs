@@ -102,6 +102,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
     <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <DefaultItemExcludes>[defaultItemExcludes]</DefaultItemExcludes>
     <GenerateAssemblyInfo>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInfo]</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyConfigurationAttribute]</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyDescriptionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyDescriptionAttribute]</GenerateAssemblyDescriptionAttribute>
@@ -113,8 +114,13 @@ namespace Sharpmake.Generators.VisualStudio
     <GenerateAssemblyInformationalVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInformationalVersionAttribute]</GenerateAssemblyInformationalVersionAttribute>
     <RestoreProjectStyle>[NugetRestoreProjectStyleString]</RestoreProjectStyle>
     <ProductVersion>[options.ProductVersion]</ProductVersion>
+    <FileVersion>[options.FileVersion]</FileVersion>
+    <Version>[options.Version]</Version>
+    <Product>[options.Product]</Product>
+    <Copyright>[options.Copyright]</Copyright>
     <UseWpf>[options.UseWpf]</UseWpf>
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
+    <Nullable>[options.Nullable]</Nullable>
   </PropertyGroup>
 ";
 
@@ -586,6 +592,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string EntityDeployEnd =
 @"    </EntityDeploy>
+";
+
+                public static string FrameworkReference =
+@"    <FrameworkReference Include=""[include]"" />
+";
+
+                public static string Protobuf =
+@"    <Protobuf Include=""[include]"" GrpcServices=""Both"" />
 ";
             }
 

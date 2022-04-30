@@ -175,13 +175,6 @@ namespace Sharpmake.Generators.VisualStudio
                 () => { context.Options["WindowsTargetPlatformVersion"] = FileGeneratorUtilities.RemoveLineTag; },
                 winTargetPlatformVersionOptionActions.ToArray()
             );
-
-            if (context.Configuration.Target.GetPlatform() == Platform.linux)
-            {
-                context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.ProjectDirectoryCapitalized);
-                context.Options["OutputDirectoryRemote"] = (@"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["OutputDirectory"])));
-                context.Options["IntermediateDirectoryRemote"] = (@"$(RemoteProjectDir)" + Util.ConvertToUnixSeparators(Util.EnsureTrailingSeparator(context.Options["IntermediateDirectory"])));
-            }
         }
 
         private static void SelectConfigurationTypeOption(IGenerationContext context)
@@ -2293,7 +2286,8 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectGenerateMapFileOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(context.Configuration.Platform);
+            var platform = context.Configuration.Platform;
+            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(platform);
 
             Action enableMapOption = () =>
             {
@@ -2302,9 +2296,9 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["MapFileName"] = mapFile;
 
                 string mapFileBffRelative = FormatCommandLineOptionPath(context, mapFile);
-                if (PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).IsUsingClang)
+                if (platform.IsUsingClang())
                 {
-                    context.CommandLineOptions["GenerateMapFile"] = @"-Wl,-Map=""" + mapFileBffRelative + @"""";
+                    context.CommandLineOptions["GenerateMapFile"] = $@"{platform.GetLinkerOptionPrefix()}-Map=""" + mapFileBffRelative + @"""";
                 }
                 else
                 {

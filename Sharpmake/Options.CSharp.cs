@@ -195,6 +195,13 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum Nullable
+            {
+                [Default] 
+                Disabled,
+                Enabled
+            }
+
             public enum PublishSingleFile
             {
                 Enabled,
@@ -360,6 +367,26 @@ namespace Sharpmake
             public class ProductVersion : StringOption
             {
                 public ProductVersion(string versionString) : base(versionString) { }
+            }
+
+            public class FileVersion : StringOption
+            {
+                public FileVersion(string versionString) : base(versionString) { }
+            }
+
+            public class Version : StringOption
+            {
+                public Version(string versionString) : base(versionString) { }
+            }
+
+            public class Product : StringOption
+            {
+                public Product(string product) : base(product) { }
+            }
+
+            public class Copyright : StringOption
+            {
+                public Copyright(string copyright) : base(copyright) { }
             }
 
             public enum MapFileExtensions

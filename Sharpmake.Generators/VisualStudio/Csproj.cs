@@ -41,6 +41,7 @@ namespace Sharpmake.Generators.VisualStudio
         internal class ItemGroups
         {
             internal ItemGroupConditional<TargetFrameworksCondition<Reference>> References = new ItemGroupConditional<TargetFrameworksCondition<Reference>>();
+            internal ItemGroupConditional<TargetFrameworksCondition<FrameworkReference>> FrameworkReferences = new ItemGroupConditional<TargetFrameworksCondition<FrameworkReference>>();
             internal ItemGroup<Service> Services = new ItemGroup<Service>();
             internal ItemGroup<Compile> Compiles = new ItemGroup<Compile>();
             internal ItemGroup<ProjectReference> ProjectReferences = new ItemGroup<ProjectReference>();
@@ -64,11 +65,13 @@ namespace Sharpmake.Generators.VisualStudio
             internal ItemGroup<Analyzer> Analyzers = new ItemGroup<Analyzer>();
             internal ItemGroup<VSIXSourceItem> VSIXSourceItems = new ItemGroup<VSIXSourceItem>();
             internal ItemGroup<FolderInclude> FolderIncludes = new ItemGroup<FolderInclude>();
+            internal ItemGroup<Protobuf> Protobufs = new ItemGroup<Protobuf>();
 
             internal string Resolve(Resolver resolver)
             {
                 var writer = new StringWriter();
                 writer.Write(References.Resolve(resolver));
+                writer.Write(FrameworkReferences.Resolve(resolver));
                 writer.Write(Services.Resolve(resolver));
                 writer.Write(Compiles.Resolve(resolver));
                 writer.Write(Vscts.Resolve(resolver));
@@ -92,6 +95,7 @@ namespace Sharpmake.Generators.VisualStudio
                 writer.Write(VSIXSourceItems.Resolve(resolver));
                 writer.Write(FolderIncludes.Resolve(resolver));
                 writer.Write(WCFMetadataStorages.Resolve(resolver));
+                writer.Write(Protobufs.Resolve(resolver));
 
                 return writer.ToString();
             }
@@ -640,6 +644,18 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            internal class FrameworkReference : ItemGroupItem, IResolvable
+            {
+                /// <inheritdoc />
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.FrameworkReference);
+                    }
+                }
+            }
+
             internal class ItemTemplate : IResolvable, IComparable<ItemTemplate>, IEquatable<ItemTemplate>
             {
                 private readonly string _template;
@@ -912,6 +928,18 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
+            internal class Protobuf : ItemGroupItem, IResolvable
+            {
+                /// <inheritdoc />
+                public string Resolve(Resolver resolver)
+                {
+                    using (resolver.NewScopedParameter("include", Include))
+                    {
+                        return resolver.Resolve(Template.ItemGroups.Protobuf);
+                    }
+                }
+            }
+
             private static void AddTargetFrameworksCondition<T>(ItemGroupConditional<TargetFrameworksCondition<T>> itemGroupConditional, DotNetFramework dotNetFramework, T elem) where T : IResolvable
             {
                 if (itemGroupConditional.Any(it => it.Contains(elem)))
@@ -940,6 +968,10 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     TargetFrameworks = projectFrameworks
                 };
+                FrameworkReferences.AlwaysTrueElement = new TargetFrameworksCondition<FrameworkReference>()
+                {
+                    TargetFrameworks = projectFrameworks
+                };
                 PackageReferences.AlwaysTrueElement = new TargetFrameworksCondition<ItemTemplate>
                 {
                     TargetFrameworks = projectFrameworks
@@ -954,6 +986,11 @@ namespace Sharpmake.Generators.VisualStudio
             public void AddPackageReference(DotNetFramework dotNetFramework, ItemTemplate itemTemplate)
             {
                 AddTargetFrameworksCondition(PackageReferences, dotNetFramework, itemTemplate);
+            }
+
+            public void AddFrameworkReference(FrameworkReference frameworkReference, DotNetFramework dotNetFramework, DotNetOS dotNetOs, string dotnetOSSuffix)
+            {
+                AddTargetFrameworksCondition(FrameworkReferences, dotNetFramework, frameworkReference);
             }
         }
 
@@ -1040,6 +1077,15 @@ namespace Sharpmake.Generators.VisualStudio
             return (string.IsNullOrEmpty(guidFromProjectFile)) ? RemoveLineTag : guidFromProjectFile;
         }
 
+        private static Tuple<DotNetFramework, DotNetOS, string> GetDotNetFrameworkAndOS( Project.Configuration conf )
+        {
+            var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+            DotNetOS dotNetOS;
+            if (!conf.Target.TryGetFragment(out dotNetOS))
+                dotNetOS = conf.DotNetOSVersion;
+            return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
+        }
+
         private void Generate(
             CSharpProject project,
             List<Project.Configuration> unsortedConfigurations,
@@ -1054,17 +1100,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
-            var projectFrameworksPerConf = configurations.ToDictionary(
-                conf => conf,
-                conf =>
-                {
-                    var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
-                    DotNetOS dotNetOS;
-                    if (!conf.Target.TryGetFragment(out dotNetOS))
-                        dotNetOS = conf.DotNetOSVersion;
-                    return Tuple.Create(dotNetFramework, dotNetOS, conf.DotNetOSVersionSuffix);
-                }
-            );
+            var projectFrameworksPerConf = configurations.ToDictionary( conf => conf, GetDotNetFrameworkAndOS );
             var projectFrameworks = projectFrameworksPerConf.Values.Distinct().ToList();
             itemGroups.SetTargetFrameworks(projectFrameworks);
 
@@ -1196,12 +1232,19 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             string netCoreEnableDefaultItems = RemoveLineTag;
+            string defaultItemExcludes = RemoveLineTag;
             string targetFrameworkVersionString = "TargetFrameworkVersion";
             string projectPropertyGuid = configurations[0].ProjectGuid;
             string projectConfigurationCondition = Template.Project.DefaultProjectConfigurationCondition;
             if (isNetCoreProjectSchema)
             {
                 netCoreEnableDefaultItems = project.EnableDefaultItems.ToString().ToLowerInvariant();
+
+                if (project.DefaultItemExcludes.Count > 0)
+                {
+                    defaultItemExcludes = string.Join(";", project.DefaultItemExcludes);
+                }
+
                 targetFrameworkVersionString = "TargetFramework";
                 projectPropertyGuid = RemoveLineTag;
                 if (projectFrameworks.Count() > 1)
@@ -1239,6 +1282,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
             using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
+            using (resolver.NewScopedParameter("defaultItemExcludes", defaultItemExcludes))
             using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
             using (resolver.NewScopedParameter("GenerateDocumentationFile", project.GenerateDocumentationFile ? "true" : RemoveLineTag))
@@ -1248,7 +1292,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!string.IsNullOrEmpty(project.ApplicationIcon))
             {
-                using (resolver.NewScopedParameter("iconpath", project.ApplicationIcon))
+                using (resolver.NewScopedParameter("iconpath", Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(project.ApplicationIcon))))
                     Write(Template.ApplicationIcon, writer, resolver);
             }
 
@@ -1737,6 +1781,14 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var vsixSourceItem in project.VSIXSourceItems)
             {
                 itemGroups.VSIXSourceItems.Add(new ItemGroups.VSIXSourceItem { Include = vsixSourceItem });
+            }
+
+            foreach (var protoFile in project.ProtoFiles)
+            {
+                itemGroups.Protobufs.Add(new ItemGroups.Protobuf
+                {
+                    Include = Util.PathGetRelative(_projectPathCapitalized, Project.GetCapitalizedFile(protoFile))
+                });
             }
 
             HashSet<string> allContents = new HashSet<string>(itemGroups.Contents.Select(c => c.Include));
@@ -2392,6 +2444,17 @@ namespace Sharpmake.Generators.VisualStudio
 
             GeneratePackageReferences(project, configurations, itemGroups, generatedFiles, skipFiles);
 
+            foreach (var configuration in configurations)
+            {
+                var dotnetTuple = GetDotNetFrameworkAndOS(configuration);
+
+                foreach (var frameworkReference in configuration.FrameworkReferences)
+                {
+                    itemGroups.AddFrameworkReference(new ItemGroups.FrameworkReference { Include = frameworkReference },
+                        dotnetTuple.Item1, dotnetTuple.Item2, dotnetTuple.Item3);
+                }
+            }
+
             itemGroups.Services.AddRange(project.Services.Select(s => new ItemGroups.Service { Include = s }));
 
             itemGroups.BootstrapperPackages.AddRange(project.BootstrapperPackages.Select(
@@ -2802,8 +2865,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 if (s_allCachedCsProjSubTypesInfos == null)
                 {
-                    var concurentBagTypes = (ConcurrentBag<CsProjSubTypesInfos>)Util.DeserializeAllCsprojSubTypes();
-                    var listTypes = concurentBagTypes?.ToList();
+                    var listTypes = Util.DeserializeAllCsprojSubTypesJson<List<CsProjSubTypesInfos>>();
                     s_allCachedCsProjSubTypesInfos = listTypes?.Where(p => p != null).ToList() ?? new List<CsProjSubTypesInfos>();
                 }
             }
@@ -3479,6 +3541,10 @@ namespace Sharpmake.Generators.VisualStudio
             options["ManifestCertificateThumbprint"] = Options.StringOption.Get<Options.CSharp.ManifestCertificateThumbprint>(conf);
             options["CopyVsixExtensionLocation"] = Options.StringOption.Get<Options.CSharp.CopyVsixExtensionLocation>(conf);
             options["ProductVersion"] = Options.StringOption.Get<Options.CSharp.ProductVersion>(conf);
+            options["FileVersion"] = Options.StringOption.Get<Options.CSharp.FileVersion>(conf);
+            options["Version"] = Options.StringOption.Get<Options.CSharp.Version>(conf);
+            options["Product"] = Options.StringOption.Get<Options.CSharp.Product>(conf);
+            options["Copyright"] = Options.StringOption.Get<Options.CSharp.Copyright>(conf);
 
             SelectOption
             (
@@ -3490,6 +3556,12 @@ namespace Sharpmake.Generators.VisualStudio
             (
                 Options.Option(Options.CSharp.UseWindowsForms.Enabled, () => { options["UseWindowsForms"] = "true"; }),
                 Options.Option(Options.CSharp.UseWindowsForms.Disabled, () => { options["UseWindowsForms"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
+                Options.Option(Options.CSharp.Nullable.Enabled, () => { options["Nullable"] = "enable"; }),
+                Options.Option(Options.CSharp.Nullable.Disabled, () => { options["Nullable"] = RemoveLineTag; })
             );
 
             // concat defines, don't add options.Defines since they are automatically added by VS

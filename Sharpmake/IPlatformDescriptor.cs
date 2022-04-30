@@ -41,6 +41,11 @@ namespace Sharpmake
         bool IsUsingClang { get; }
 
         /// <summary>
+        /// Get whether this platform launch the linker via the compiler
+        /// </summary>
+        bool IsLinkerInvokedViaCompiler { get; }
+
+        /// <summary>
         /// Gets whether this is a .NET platform.
         /// </summary>
         bool HasDotNetSupport { get; }

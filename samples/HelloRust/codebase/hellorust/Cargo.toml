@@ -1,0 +1,10 @@
+[package]
+name = "hellorust"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate_type = ["staticlib"]
+
+[build-dependencies]
+cbindgen = "0.20.0"
