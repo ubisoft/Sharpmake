@@ -52,22 +52,22 @@ namespace Sharpmake.Generators.FastBuild
                 unchecked // Overflow is fine, just wrap
                 {
                     int hash = 17;
-                    hash = hash * 23 + UnityName.GetHashCode();
-                    hash = hash * 23 + UnityOutputPath.GetHashCode();
-                    hash = hash * 23 + UnityInputPath.GetHashCode();
-                    hash = hash * 23 + UnityInputExcludePath.GetHashCode();
-                    hash = hash * 23 + UnityInputExcludePattern.GetHashCode();
-                    hash = hash * 23 + UnityInputPattern.GetHashCode();
-                    hash = hash * 23 + UnityInputPathRecurse.GetHashCode();
-                    hash = hash * 23 + UnityInputFiles.GetHashCode();
-                    hash = hash * 23 + UnityInputExcludedFiles.GetHashCode();
-                    hash = hash * 23 + UnityInputObjectLists.GetHashCode();
-                    hash = hash * 23 + UnityInputIsolateWritableFiles.GetHashCode();
-                    hash = hash * 23 + UnityInputIsolateWritableFilesLimit.GetHashCode();
-                    hash = hash * 23 + UnityOutputPattern.GetHashCode();
-                    hash = hash * 23 + UnityNumFiles.GetHashCode();
-                    hash = hash * 23 + UnityPCH.GetHashCode();
-                    hash = hash * 23 + UseRelativePaths.GetHashCode();
+                    hash = hash * 23 + UnityName.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityOutputPath.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputPath.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputExcludePath.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputExcludePattern.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputPattern.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputPathRecurse.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputFiles.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputExcludedFiles.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputObjectLists.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputIsolateWritableFiles.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputIsolateWritableFilesLimit.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityOutputPattern.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityNumFiles.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityPCH.GetDeterministicHashCode();
+                    hash = hash * 23 + UseRelativePaths.GetDeterministicHashCode();
 
                     return hash;
                 }
@@ -297,21 +297,26 @@ namespace Sharpmake.Generators.FastBuild
             void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities);
         }
 
+        // Unity file resolver based on the hash of the property values of the Unity object.
+        // Pros: simple and fast.
+        // Cons: - Output names are not readable.
+        //       - Also resulting unity names are sensitive to small changes, which can affect build determinism between computers.
+        //         Example: Build Machines may deactivate UnityInputIsolateWritableFiles, resulting in a different name than for dev machines.
         public class HashUnityResolver : IUnityResolver
         {
             public void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities)
             {
+                string projectRelativePath = Util.PathGetRelative(project.RootPath, projectPath, true);
+                int projectRelativePathHash = projectRelativePath.GetDeterministicHashCode();
+
                 foreach (var unitySection in unities)
                 {
                     var unity = unitySection.Key;
                     var unityConfigurations = unitySection.Value;
-                    var projectRelativePath = Util.PathGetRelative(project.RootPath, projectPath, true);
 
                     // Don't use Object.GetHashCode() on a int[] object from GetMergedFragmentValuesAcrossConfigurations() as it is
-                    // non-deterministic and depends on order of execution. String.GetHashCode() is stable as long as we don't use
-                    // <UseRandomizedStringHashAlgorithm enabled="1" /> in the application config file, or as long as we don't use
-                    // .NET Core. It can change between .NET versions, however; naming should be stable between different runs on the same machine.
-                    int hashcode = unity.GetHashCode() ^ projectRelativePath.GetHashCode() ^ string.Join("_", unityConfigurations).GetHashCode();
+                    // non-deterministic and depends on order of execution.
+                    int hashcode = unity.GetHashCode() ^ projectRelativePathHash ^ string.Join("_", unityConfigurations).GetDeterministicHashCode();
 
                     unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
@@ -319,6 +324,12 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
+        // Unity file resolver based on the fragments of the configurations that share it.
+        // The fragment names that are not relevant are discarded from the output name.
+        // Pros: - User friendly names.
+        //       - Independent from the content of the Unity object.
+        // Cons: - Output name length can be come long if many fragment values are involved.
+        //       - A bit complex, involving smartness to discard fragments.
         public class FragmentUnityResolver : IUnityResolver
         {
             public void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities)
@@ -362,32 +373,78 @@ namespace Sharpmake.Generators.FastBuild
                         if (!differentFragmentIndices.Contains(i))
                             continue;
 
-                        // Convert from int to the fragment enum type, so we can ToString() them.
-                        // Fragments are enums by contract, so Enum.ToObject works
-                        var typedFragment = Enum.ToObject(fragmentsInfos[i].FieldType, unityFragments[i]);
-
-                        if (typedFragment is Platform)
-                        {
-                            Platform platformFragment = (Platform)typedFragment;
-                            foreach (Platform platformEnum in Enum.GetValues(typeof(Platform)))
-                            {
-                                if (!platformFragment.HasFlag(platformEnum))
-                                    continue;
-
-                                string platformString = platformEnum.ToString();
-                                if (platformEnum >= Platform._reserved9)
-                                    platformString = Util.GetSimplePlatformString(platformEnum);
-                                fragmentString += "_" + SanitizeForUnityName(platformString).ToLower();
-                            }
-                        }
-                        else
-                        {
-                            fragmentString += "_" + SanitizeForUnityName(typedFragment.ToString());
-                        }
+                        AppendFragmentUnityName(fragmentsInfos[i], unityFragments[i], ref fragmentString);
                     }
                     unity.UnityName = project.Name + fragmentString + "_unity";
                     unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
                 }
+            }
+        }
+
+        // Unity file resolver based on the hash of the fragments of the configurations that share it.
+        // It is simpler/faster than FragmentUnityResolver, because it doesn't need to discard useless fragments.
+        // Pros: - Relatively simple and fast.
+        //       - Independent from the content of the Unity object.
+        //       - More deterministic than FragmentUnityResolver.
+        //         Discarding of useless fragments, which could affect determinism when adding/removing unrelated targets.
+        // Cons: - Names are not user friendly.
+        public class FragmentHashUnityResolver : IUnityResolver
+        {
+            public void ResolveUnities(Project project, string projectPath, ref Dictionary<Unity, List<Project.Configuration>> unities)
+            {
+                // we need to compute the missing member values in the Unity objects:
+                // UnityName and UnityOutputPattern
+
+                List<FieldInfo> fragmentsInfos = null;
+
+                // merge the fragment values of all configurations sharing a unity
+                foreach (var unitySection in unities)
+                {
+                    var unity = unitySection.Key;
+                    var configurations = unitySection.Value;
+
+                    var fragmentValuesPerConfig = configurations.Select(x => x.Target.GetFragmentsValue()).ToList();
+                    var unityFragments = GetMergedFragments(fragmentValuesPerConfig);
+
+                    // get the fragment info from the first configuration target,
+                    // which works as they all share the same Target type
+                    if (fragmentsInfos == null)
+                        fragmentsInfos = new List<FieldInfo>(configurations.First().Target.GetFragmentFieldInfo());
+
+                    string fragmentString = string.Empty;
+                    for (int i = 0; i < unityFragments.Length; ++i)
+                        AppendFragmentUnityName(fragmentsInfos[i], unityFragments[i], ref fragmentString);
+
+                    int hashcode = fragmentString.ToLowerInvariant().GetDeterministicHashCode();
+                    unity.UnityName = $"{project.Name}_unity_{hashcode:X8}";
+                    unity.UnityOutputPattern = unity.UnityName.ToLower() + "*.cpp";
+                }
+            }
+        }
+
+        private static void AppendFragmentUnityName(FieldInfo fragmentFieldInfo, int unityFragment, ref string fragmentString)
+        {
+            // Convert from int to the fragment enum type, so we can ToString() them.
+            // Fragments are enums by contract, so Enum.ToObject works
+            var typedFragment = Enum.ToObject(fragmentFieldInfo.FieldType, unityFragment);
+
+            if (typedFragment is Platform)
+            {
+                Platform platformFragment = (Platform)typedFragment;
+                foreach (Platform platformEnum in Enum.GetValues(typeof(Platform)))
+                {
+                    if (!platformFragment.HasFlag(platformEnum))
+                        continue;
+
+                    string platformString = platformEnum.ToString();
+                    if (platformEnum >= Platform._reserved9)
+                        platformString = Util.GetSimplePlatformString(platformEnum);
+                    fragmentString += "_" + SanitizeForUnityName(platformString).ToLower();
+                }
+            }
+            else
+            {
+                fragmentString += "_" + SanitizeForUnityName(typedFragment.ToString());
             }
         }
 
