@@ -2851,6 +2851,8 @@ namespace Sharpmake
 
             public bool? ReferenceOutputAssembly = null;
 
+            public string OutputItemType = null;
+
             private List<Configuration> _resolvedDependencies;
             public IEnumerable<Configuration> ResolvedDependencies => _resolvedDependencies;
 
@@ -3258,16 +3260,15 @@ namespace Sharpmake
                                     dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     AdditionalUsingDirectories.Add(dependency.TargetPath);
 
-                                bool? referenceOutputAssembly = ReferenceOutputAssembly;
+                                bool? referenceOutputAssembly = dependency.ReferenceOutputAssembly;
                                 if (isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder)
                                     referenceOutputAssembly = false;
                                 if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                     ForceUsingDependencies.Add(dependency);
 
-                                var dotNetDependency = new DotNetDependency(dependency)
-                                {
-                                    ReferenceOutputAssembly = referenceOutputAssembly
-                                };
+                                var dotNetDependency = new DotNetDependency(dependency);
+                                dotNetDependency.ReferenceOutputAssembly = referenceOutputAssembly;
+                                dotNetDependency.OutputItemType = dependency.OutputItemType;
 
                                 if (!resolvedDotNetPublicDependencies.Contains(dotNetDependency))
                                 {

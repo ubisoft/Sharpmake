@@ -18,6 +18,8 @@ namespace Sharpmake
         public Project.Configuration Configuration { get; }
         public bool? ReferenceOutputAssembly { get; set; }
 
+        public string OutputItemType { get; set; }
+
         public DotNetDependency(Project.Configuration configuration)
         {
             Configuration = configuration;
