@@ -85,6 +85,9 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -107,9 +110,6 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_NoBlob_vs2019_win64_
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -260,6 +260,9 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win6
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -282,9 +285,6 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_NoBlob_vs2019_win6
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -434,6 +434,9 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_Executa
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -456,9 +459,6 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Debug_FastBuild_vs2019_win64_Executa
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -609,6 +609,9 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_Execu
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -631,9 +634,6 @@ Executable( 'ExplicitlyOrderedPostBuildTest_Release_FastBuild_vs2019_win64_Execu
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'

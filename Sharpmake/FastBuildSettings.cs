@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,12 @@ namespace Sharpmake
         /// If left null, dlls will be searched in the Redist\ucrt\DLLs\x64 subfolder of the WinSDK10 indicated in the KitsRootPaths.
         /// </summary>
         public static string SystemDllRoot = null;
+
+        /// <summary>
+        /// Full path under which files and folders are considered part of the workspace and can be expressed as relative to one another.
+        /// If left null, project.RootPath will be used instead.
+        /// </summary>
+        public static string WorkspaceRoot = null;
 
         /// <summary>
         /// Cache path can be

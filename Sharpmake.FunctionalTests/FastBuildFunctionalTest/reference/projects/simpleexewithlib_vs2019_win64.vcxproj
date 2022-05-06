@@ -92,16 +92,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleExeWithLib_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleExeWithLib_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simpleexewithlib\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\simpleexewithlib.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -112,16 +112,16 @@ del "output\debug_fastbuild_noblob_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NMak
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleExeWithLib_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleExeWithLib_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\simpleexewithlib\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\simpleexewithlib\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\simpleexewithlib\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\simpleexewithlib\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\simpleexewithlib.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\simpleexewithlib.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\simpleexewithlib.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\simpleexewithlib.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\simpleexewithlib.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\simpleexewithlib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simpleexewithlib\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simpleexewithlib\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simpleexewithlib\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\simpleexewithlib.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\simpleexewithlib.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\simpleexewithlib.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\simpleexewithlib.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\simpleexewithlib.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\simpleexewithlib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\simpleexewithlib.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -143,16 +143,16 @@ del "output\debug_fastbuild_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NMakeCleanC
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleExeWithLib_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleExeWithLib_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simpleexewithlib\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\simpleexewithlib.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -163,16 +163,16 @@ del "output\release_fastbuild_noblob_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NM
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleExeWithLib_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleExeWithLib_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\simpleexewithlib\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\simpleexewithlib\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\simpleexewithlib\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\simpleexewithlib\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\simpleexewithlib.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\simpleexewithlib.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\simpleexewithlib.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\simpleexewithlib.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\simpleexewithlib.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\simpleexewithlib.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\simpleexewithlib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simpleexewithlib\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simpleexewithlib\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simpleexewithlib\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\simpleexewithlib.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\simpleexewithlib.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\simpleexewithlib.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\simpleexewithlib.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\simpleexewithlib.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\simpleexewithlib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\simpleexewithlib.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
