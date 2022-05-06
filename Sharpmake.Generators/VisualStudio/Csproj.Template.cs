@@ -113,7 +113,6 @@ namespace Sharpmake.Generators.VisualStudio
     <ProductVersion>[options.ProductVersion]</ProductVersion>
     <UseWpf>[options.UseWpf]</UseWpf>
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
-    <WarningsAsErrors>[options.WarningsAsErrors]</WarningsAsErrors>
   </PropertyGroup>
 ";
 
@@ -137,6 +136,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AllowUnsafeBlocks>[options.AllowUnsafeBlocks]</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>[options.TreatWarningsAsErrors]</TreatWarningsAsErrors>
     <WarningsNotAsErrors>[options.WarningsNotAsErrors]</WarningsNotAsErrors>
+    <WarningsAsErrors>[options.WarningsAsErrors]</WarningsAsErrors>
     <CreateVsixContainer>[options.CreateVsixContainer]</CreateVsixContainer>
     <DeployExtension>[options.DeployExtension]</DeployExtension>
     <Prefer32Bit>[options.Prefer32Bit]</Prefer32Bit>
