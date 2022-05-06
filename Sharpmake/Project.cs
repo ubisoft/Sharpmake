@@ -2069,6 +2069,7 @@ namespace Sharpmake
         public string Exclude;
     }
 
+    [Resolver.Resolvable]
     public class AssemblyAttribute
     {
         public string Include;
