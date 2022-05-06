@@ -359,6 +359,27 @@ namespace Sharpmake
                 public WarningsNotAsErrors(params string[] warnings) : base(string.Join(",", warnings)) { }
             }
 
+            /// <summary>
+            /// Treat specific warnings as errors.
+            /// </summary>
+            /// <remarks>
+            /// This option generates a `WarningsAsErrors` element in the C# project XML.
+            /// </remarks>
+            public class WarningsAsErrors : StringOption
+            {
+                public WarningsAsErrors(params int[] warnings) : base(string.Join(",",
+                    warnings.Select(w => w.ToString(System.Globalization.CultureInfo.InvariantCulture))))
+                {
+                }
+
+                /// <summary>
+                /// Creates a new <see cref="WarningsAsErrors"/> instance from a list of warning
+                /// code labels.
+                /// </summary>
+                /// <param name="warnings">The list of warning code labels to treat as errors.</param>
+                public WarningsAsErrors(params string[] warnings) : base(string.Join(",", warnings)) { }
+            }
+
             public class CopyVsixExtensionLocation : StringOption
             {
                 public CopyVsixExtensionLocation(string location) : base(location) { }

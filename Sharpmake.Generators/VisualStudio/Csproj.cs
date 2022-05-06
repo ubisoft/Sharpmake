@@ -3534,6 +3534,7 @@ namespace Sharpmake.Generators.VisualStudio
             options["MinimumRequiredVersion"] = Options.StringOption.Get<Options.CSharp.MinimumRequiredVersion>(conf);
             options["NoWarn"] = Options.StringOption.Get<Options.CSharp.SuppressWarning>(conf);
             options["WarningsNotAsErrors"] = Options.StringOption.Get<Options.CSharp.WarningsNotAsErrors>(conf);
+            options["WarningsAsErrors"] = Options.StringOption.Get<Options.CSharp.WarningsAsErrors>(conf);
             options["ConcordSDKDir"] = Options.StringOption.Get<Options.CSharp.ConcordSDKDir>(conf);
             options["UpdateInterval"] = Options.IntOption.Get<Options.CSharp.UpdateInterval>(conf);
             options["PublishUrl"] = Options.StringOption.Get<Options.CSharp.PublishURL>(conf);
