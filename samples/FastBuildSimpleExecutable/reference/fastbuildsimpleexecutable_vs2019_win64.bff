@@ -76,6 +76,9 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -98,9 +101,6 @@ Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -215,6 +215,9 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -237,9 +240,6 @@ Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
