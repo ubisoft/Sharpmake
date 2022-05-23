@@ -19,7 +19,8 @@ namespace Sharpmake
         public sealed partial class LinuxPlatform
         {
             public const string _linkerOptionsTemplate = @"
-    .LinkerOptions          = '-o ""%2""'
+    .LinkerOptions          = '[cmdLineOptions.SysRoot]'
+                            + '-o ""%2""'
                             + ' [cmdLineOptions.WholeArchiveBegin]'
                             + ' ""%1""'
                             + ' [cmdLineOptions.WholeArchiveEnd]'
@@ -67,6 +68,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.MsExtensions]'
             + ' [cmdLineOptions.CppLanguageStd]'
             + ' [cmdLineOptions.CLanguageStd]'
+            + ' [cmdLineOptions.SysRoot]'
             // Additional compiler options
             //--------------------------
             + ' [options.AdditionalCompilerOptions]'

@@ -78,6 +78,16 @@ namespace Sharpmake
                     [Default]
                     Clang38
                 }
+
+                /// <summary>
+                /// SysRoot: logical root for headers and libraries
+                /// root directory where to look for the directories bin, lib, include
+                /// </summary>
+                public class SysRoot : PathOption
+                {
+                    public SysRoot(string path)
+                        : base(path) { }
+                }
             }
 
             public static class Compiler

@@ -183,6 +183,10 @@ namespace Sharpmake
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteLdToolExe"] = "clang"; }),
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteLdToolExe"] = "clang-3.8"; })
                 );
+
+                string sysRoot = Sharpmake.Options.PathOption.Get<Options.General.SysRoot>(context.Configuration, rootpath: context.ProjectDirectoryCapitalized);
+                context.CommandLineOptions["SysRoot"] = $" --sysroot=\"{sysRoot}\"";
+
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
