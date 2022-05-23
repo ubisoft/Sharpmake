@@ -2006,7 +2006,7 @@ namespace Sharpmake.Generators.FastBuild
                 var projectFile = new Vcxproj.ProjectFile(context, file);
                 allFiles.Add(projectFile);
             }
-            allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCulture));
+            allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.OrdinalIgnoreCase));
 
             var sourceFiles = new List<Vcxproj.ProjectFile>();
             foreach (var projectFile in allFiles)
