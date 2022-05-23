@@ -23,105 +23,105 @@ namespace Sharpmake
 ";
             private const string _projectConfigurationsCompileTemplate =
                 @"    <ClCompile>
-                  <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
-                  <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);</PreprocessorDefinitions>
-                  <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
-                  <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
-                  <Warnings>[options.Warnings]</Warnings>
-                  <ExtraWarnings>[options.ExtraWarnings]</ExtraWarnings>
-                  <WarningsAsErrors>[options.WarningsAsErrors]</WarningsAsErrors>
-                  <MultiProcessorCompilation>[options.MultiProcessorCompilation]</MultiProcessorCompilation>
-                  <ProcessorNumber>[options.ProcessorNumber]</ProcessorNumber>
-                  <Distributable>[options.Distributable]</Distributable>
-                  <OptimizationLevel>[options.OptimizationLevel]</OptimizationLevel>
-                  <PositionIndependentCode>[options.PositionIndependentCode]</PositionIndependentCode>
-                  <FastMath>[options.FastMath]</FastMath>
-                  <NoStrictAliasing>[options.NoStrictAliasing]</NoStrictAliasing>
-                  <UnrollLoops>[options.UnrollLoops]</UnrollLoops>
-                  <AnsiCompliance>[options.AnsiCompliance]</AnsiCompliance>
-                  <CharUnsigned>[options.CharUnsigned]</CharUnsigned>
-                  <MsExtensions>[options.MsExtensions]</MsExtensions>
-                  <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
-                  <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
-                  <AdditionalOptions>[options.AdditionalCompilerOptions] %(AdditionalOptions)</AdditionalOptions>
-                  <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
-                  <PrecompiledHeaderOutputFile>[options.PrecompiledHeaderFile]</PrecompiledHeaderOutputFile>
-                  <CompileAs>Default</CompileAs>
-                  <LinkTimeOptimization>[options.LinkTimeOptimization]</LinkTimeOptimization>
-                  <InlinedScopes>[options.InlineFunctionDebugInformation]</InlinedScopes>
-                </ClCompile>
+      <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
+      <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
+      <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
+      <Warnings>[options.Warnings]</Warnings>
+      <ExtraWarnings>[options.ExtraWarnings]</ExtraWarnings>
+      <WarningsAsErrors>[options.WarningsAsErrors]</WarningsAsErrors>
+      <MultiProcessorCompilation>[options.MultiProcessorCompilation]</MultiProcessorCompilation>
+      <ProcessorNumber>[options.ProcessorNumber]</ProcessorNumber>
+      <Distributable>[options.Distributable]</Distributable>
+      <OptimizationLevel>[options.OptimizationLevel]</OptimizationLevel>
+      <PositionIndependentCode>[options.PositionIndependentCode]</PositionIndependentCode>
+      <FastMath>[options.FastMath]</FastMath>
+      <NoStrictAliasing>[options.NoStrictAliasing]</NoStrictAliasing>
+      <UnrollLoops>[options.UnrollLoops]</UnrollLoops>
+      <AnsiCompliance>[options.AnsiCompliance]</AnsiCompliance>
+      <CharUnsigned>[options.CharUnsigned]</CharUnsigned>
+      <MsExtensions>[options.MsExtensions]</MsExtensions>
+      <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
+      <AdditionalOptions>[options.AdditionalCompilerOptions] %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>[options.PrecompiledHeaderFile]</PrecompiledHeaderOutputFile>
+      <CompileAs>Default</CompileAs>
+      <LinkTimeOptimization>[options.LinkTimeOptimization]</LinkTimeOptimization>
+      <InlinedScopes>[options.InlineFunctionDebugInformation]</InlinedScopes>
+    </ClCompile>
 ";
 
             private const string _projectConfigurationsStaticLinkTemplate =
                             @"    <Link>
-                  <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
-                  <EnableCOMDATFolding>[options.EnableCOMDATFolding]</EnableCOMDATFolding>
-                  <OptimizeReferences>[options.OptimizeReferences]</OptimizeReferences>
-                </Link>
-                <Lib>
-                  <TargetMachine>[options.TargetMachine]</TargetMachine>
-                  <SubSystem/>
-                  <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
-                  <OutputFile>[options.OutputFile]</OutputFile>
-                  <ThinArchive>[options.UseThinArchives]</ThinArchive>
-                </Lib>
+      <GenerateDebugInformation>[options.LinkerGenerateDebugInformation]</GenerateDebugInformation>
+      <EnableCOMDATFolding>[options.EnableCOMDATFolding]</EnableCOMDATFolding>
+      <OptimizeReferences>[options.OptimizeReferences]</OptimizeReferences>
+    </Link>
+    <Lib>
+      <TargetMachine>[options.TargetMachine]</TargetMachine>
+      <SubSystem/>
+      <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
+      <OutputFile>[options.OutputFile]</OutputFile>
+      <ThinArchive>[options.UseThinArchives]</ThinArchive>
+    </Lib>
 ";
 
             private const string _projectConfigurationsLinkTemplate =
                     @"    <Link>
-          <OutputFile>[options.OutputFile]</OutputFile>
-          <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
-          <AdditionalOptions>[options.AdditionalLinkerOptions] %(AdditionalOptions)</AdditionalOptions>
-          <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
-          <ImportLibrary></ImportLibrary>
-          <GenerateMapFile>[options.GenerateMapFile]</GenerateMapFile>
-          <MapFileName>[options.MapFileName]</MapFileName>
-          <EditAndContinue>[options.EditAndContinue]</EditAndContinue>
-          <InfoStripping>[options.InfoStripping]</InfoStripping>
-          <DataStripping>[options.DataStripping]</DataStripping>
-          <WholeArchiveBegin>[options.WholeArchive]</WholeArchiveBegin>
-          <DuplicateStripping>[options.DuplicateStripping]</DuplicateStripping>
-          <Addressing>[options.Addressing]</Addressing>
-        </Link>
+      <OutputFile>[options.OutputFile]</OutputFile>
+      <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories]</AdditionalLibraryDirectories>
+      <AdditionalOptions>[options.AdditionalLinkerOptions] %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary></ImportLibrary>
+      <GenerateMapFile>[options.GenerateMapFile]</GenerateMapFile>
+      <MapFileName>[options.MapFileName]</MapFileName>
+      <EditAndContinue>[options.EditAndContinue]</EditAndContinue>
+      <InfoStripping>[options.InfoStripping]</InfoStripping>
+      <DataStripping>[options.DataStripping]</DataStripping>
+      <WholeArchiveBegin>[options.WholeArchive]</WholeArchiveBegin>
+      <DuplicateStripping>[options.DuplicateStripping]</DuplicateStripping>
+      <Addressing>[options.Addressing]</Addressing>
+    </Link>
 ";
 
             private const string _userFileConfigurationGeneralTemplate =
                 @"    <LocalDebuggerCommand>[conf.VcxprojUserFile.LocalDebuggerCommand]</LocalDebuggerCommand>
-        <LocalDebuggerCommandArguments>[conf.VcxprojUserFile.LocalDebuggerCommandArguments]</LocalDebuggerCommandArguments>
-        <LocalDebuggerWorkingDirectory>[conf.VcxprojUserFile.LocalDebuggerWorkingDirectory]</LocalDebuggerWorkingDirectory>
-        <LocalDebuggerAttach>[conf.VcxprojUserFile.LocalDebuggerAttachString]</LocalDebuggerAttach>
-        <RemoteDebuggerCommand>[conf.VcxprojUserFile.RemoteDebuggerCommand]</RemoteDebuggerCommand>
-        <RemoteDebuggerCommandArguments>[conf.VcxprojUserFile.RemoteDebuggerCommandArguments]</RemoteDebuggerCommandArguments>
-        <RemoteDebuggingMode>[conf.VcxprojUserFile.RemoteDebuggingMode]</RemoteDebuggingMode>
-        <RemoteDebuggerWorkingDirectory>[conf.VcxprojUserFile.RemoteDebuggerWorkingDirectory]</RemoteDebuggerWorkingDirectory>
-        <AdditionalDebuggerCommands>[conf.AdditionalDebuggerCommands]</AdditionalDebuggerCommands>
-        <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>[conf.VcxprojUserFile.LocalDebuggerCommandArguments]</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>[conf.VcxprojUserFile.LocalDebuggerWorkingDirectory]</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAttach>[conf.VcxprojUserFile.LocalDebuggerAttachString]</LocalDebuggerAttach>
+    <RemoteDebuggerCommand>[conf.VcxprojUserFile.RemoteDebuggerCommand]</RemoteDebuggerCommand>
+    <RemoteDebuggerCommandArguments>[conf.VcxprojUserFile.RemoteDebuggerCommandArguments]</RemoteDebuggerCommandArguments>
+    <RemoteDebuggingMode>[conf.VcxprojUserFile.RemoteDebuggingMode]</RemoteDebuggingMode>
+    <RemoteDebuggerWorkingDirectory>[conf.VcxprojUserFile.RemoteDebuggerWorkingDirectory]</RemoteDebuggerWorkingDirectory>
+    <AdditionalDebuggerCommands>[conf.AdditionalDebuggerCommands]</AdditionalDebuggerCommands>
+    <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
 ";
 
             private const string _projectConfigurationsGeneral2 =
                 @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
-        <TargetName>[options.OutputFileName]</TargetName>
-        <OutDir>[options.OutputDirectoryRemote]</OutDir>
-        <IntDir>[options.IntermediateDirectoryRemote]</IntDir>
-        <TargetExt>[options.OutputFileExtension]</TargetExt>
-        <GenerateManifest>[options.GenerateManifest]</GenerateManifest>
-        <PostBuildEventUseInBuild>[options.PostBuildEventEnable]</PostBuildEventUseInBuild>
-        <PreBuildEventUseInBuild>[options.PreBuildEventEnable]</PreBuildEventUseInBuild>
-        <PreLinkEventUseInBuild>[options.PreLinkEventEnable]</PreLinkEventUseInBuild>
-        <LinkIncremental>[options.LinkIncremental]</LinkIncremental>
-        <OutputFile>[options.OutputFile]</OutputFile>
-        <CustomBuildBeforeTargets>[options.CustomBuildStepBeforeTargets]</CustomBuildBeforeTargets>
-        <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
-        <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
-        <RemoteCppCompileToolExe>[options.RemoteCppCompileToolExe]</RemoteCppCompileToolExe>
-        <RemoteCCompileToolExe>[options.RemoteCCompileToolExe]</RemoteCCompileToolExe>
-        <RemoteLdToolExe>[options.RemoteLdToolExe]</RemoteLdToolExe>
-        <LocalRemoteCopySources>[options.CopySources]</LocalRemoteCopySources>
-        <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
-        <RemoteRootDir></RemoteRootDir>
-        <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
-        <RemoteBuildOutputs>[options.RemoteBuildOutputs]</RemoteBuildOutputs>
-      </PropertyGroup>
+    <TargetName>[options.OutputFileName]</TargetName>
+    <OutDir>[options.OutputDirectoryRemote]</OutDir>
+    <IntDir>[options.IntermediateDirectoryRemote]</IntDir>
+    <TargetExt>[options.OutputFileExtension]</TargetExt>
+    <GenerateManifest>[options.GenerateManifest]</GenerateManifest>
+    <PostBuildEventUseInBuild>[options.PostBuildEventEnable]</PostBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>[options.PreBuildEventEnable]</PreBuildEventUseInBuild>
+    <PreLinkEventUseInBuild>[options.PreLinkEventEnable]</PreLinkEventUseInBuild>
+    <LinkIncremental>[options.LinkIncremental]</LinkIncremental>
+    <OutputFile>[options.OutputFile]</OutputFile>
+    <CustomBuildBeforeTargets>[options.CustomBuildStepBeforeTargets]</CustomBuildBeforeTargets>
+    <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
+    <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
+    <RemoteCppCompileToolExe>[options.RemoteCppCompileToolExe]</RemoteCppCompileToolExe>
+    <RemoteCCompileToolExe>[options.RemoteCCompileToolExe]</RemoteCCompileToolExe>
+    <RemoteLdToolExe>[options.RemoteLdToolExe]</RemoteLdToolExe>
+    <LocalRemoteCopySources>[options.CopySources]</LocalRemoteCopySources>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
+    <RemoteRootDir></RemoteRootDir>
+    <RemoteProjectDir>[options.ProjectDirectory]</RemoteProjectDir>
+    <RemoteBuildOutputs>[options.RemoteBuildOutputs]</RemoteBuildOutputs>
+  </PropertyGroup>
 ";
 
             private const string _projectConfigurationsFastBuildMakefile =
