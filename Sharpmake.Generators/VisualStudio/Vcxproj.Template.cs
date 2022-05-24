@@ -160,8 +160,26 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <Import Project=""[importedTargetsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
 
+                // Support both regular and native package types, whichever happens to exist
+                public static string ProjectTargetsNugetReferenceImport =
+@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets')"" />
+    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" />
+";
+
+                public static string ProjectTargetsNugetReferenceError =
+@"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets'))"" />
+";
+
                 public static string ProjectTargetsEnd =
 @"  </ImportGroup>
+";
+
+                public static string ProjectCustomTargetsBegin =
+@"  <Target Name=""name"" BeforeTargets=""PrepareForBuild"">
+";
+
+                public static string ProjectCustomTargetsEnd =
+@"  </Target>
 ";
 
                 public static string ProjectConfigurationsResourceCompile =

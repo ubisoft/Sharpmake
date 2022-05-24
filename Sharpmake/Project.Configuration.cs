@@ -2843,7 +2843,7 @@ namespace Sharpmake
             public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
             public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
 
-            // NuGet packages (only C# for now)
+            // NuGet packages (C# and visual studio c++ for now)
             public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
 
             // Framework references in C#, see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore?view=aspnetcore-5.0&tabs=visual-studio
