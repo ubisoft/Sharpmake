@@ -325,7 +325,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (project.SourceFilesFilters != null && (project.SourceFilesFiltersCount == 0 || project.SkipProjectWhenFiltersActive))
                         continue;
 
-                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
+                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(project.GetType());
                     bool perfectMatch = includedProject != null && solutionProject.Configurations.Contains(includedProject.Configuration);
                     if (!perfectMatch)
                         continue;
@@ -336,9 +336,12 @@ namespace Sharpmake.Generators.FastBuild
 
                     mustGenerateFastbuild = true;
 
-                    IPlatformBff platformBff = platformBffCache.GetValueOrAdd(conf.Platform, PlatformRegistry.Query<IPlatformBff>(conf.Platform));
-
-                    platformBff.AddCompilerSettings(masterBffInfo.CompilerSettings, conf);
+                    var otherConfigurationsInSameBff = project.Configurations.Where(c => conf.BffFullFileName == c.BffFullFileName);
+                    foreach (var c in otherConfigurationsInSameBff)
+                    {
+                        IPlatformBff platformBff = platformBffCache.GetValueOrAdd(c.Platform, PlatformRegistry.Query<IPlatformBff>(c.Platform));
+                        platformBff.AddCompilerSettings(masterBffInfo.CompilerSettings, c);
+                    }
 
                     string fastBuildTargetIdentifier = Bff.GetShortProjectName(project, conf);
 
