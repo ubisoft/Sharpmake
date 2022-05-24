@@ -184,8 +184,10 @@ namespace Sharpmake
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteLdToolExe"] = "clang-3.8"; })
                 );
 
+                // FastBuild only atm
                 string sysRoot = Sharpmake.Options.PathOption.Get<Options.General.SysRoot>(context.Configuration, rootpath: context.ProjectDirectoryCapitalized);
-                context.CommandLineOptions["SysRoot"] = $" --sysroot=\"{sysRoot}\"";
+                string bffSysRoot = Bff.CurrentBffPathKeyCombine(sysRoot);
+                context.CommandLineOptions["BffSysRoot"] = $" --sysroot=\"{bffSysRoot}\"";
 
             }
 
