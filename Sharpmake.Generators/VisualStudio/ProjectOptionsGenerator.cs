@@ -2287,8 +2287,6 @@ namespace Sharpmake.Generators.VisualStudio
         private static void SelectGenerateMapFileOption(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
             var platform = context.Configuration.Platform;
-            var configurationTasks = PlatformRegistry.Get<Project.Configuration.IConfigurationTasks>(platform);
-
             Action enableMapOption = () =>
             {
                 context.Options["GenerateMapFile"] = "true";
