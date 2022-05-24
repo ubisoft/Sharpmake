@@ -20,7 +20,7 @@ namespace Sharpmake
         {
             public const string _linkerOptionsTemplate = @"
     .LinkerOptions          = '[cmdLineOptions.BffSysRoot]'
-                            + '-o ""%2""'
+                            + ' -o ""%2""'
                             + ' [cmdLineOptions.WholeArchiveBegin]'
                             + ' ""%1""'
                             + ' [cmdLineOptions.WholeArchiveEnd]'
