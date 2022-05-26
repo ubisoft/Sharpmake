@@ -400,9 +400,11 @@ namespace Sharpmake.Generators.FastBuild
                             preBuildEvents.Add(eventPair.Key, eventPair.Value);
                         }
 
+                        string projectPath = new FileInfo(solutionProject.ProjectFile).Directory.FullName;
+
                         foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
                         {
-                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild, project.RootPath, masterBffDirectory);
+                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild, project.RootPath, projectPath);
                             preBuildEvents.Add(eventKey, buildEvent);
                         }
 
@@ -414,7 +416,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         foreach (var buildEvent in conf.ResolvedEventCustomPreBuildExe)
                         {
-                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuildCustomAction, project.RootPath, masterBffDirectory);
+                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuildCustomAction, project.RootPath, projectPath);
                             customPreBuildEvents.Add(eventKey, buildEvent);
                         }
 
