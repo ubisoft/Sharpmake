@@ -126,9 +126,7 @@ namespace Sharpmake.Generators.VisualStudio
                 // xml begin header
                 Write(Template.Project.ProjectBegin, writer, resolver);
 
-                string defaultInterpreterRegisterKeyName = $@"Software\Microsoft\VisualStudio\{
-                        devEnvRange.MinDevEnv.GetVisualVersionString()
-                    }\PythonTools\Options\Interpreters";
+                string defaultInterpreterRegisterKeyName = $@"Software\Microsoft\VisualStudio\{devEnvRange.MinDevEnv.GetVisualVersionString()}\PythonTools\Options\Interpreters";
 
                 var defaultInterpreter = GetRegistryCurrentUserSubKeyValue(defaultInterpreterRegisterKeyName, "DefaultInterpreter", "{00000000-0000-0000-0000-000000000000}");
                 var defaultInterpreterVersion = GetRegistryCurrentUserSubKeyValue(defaultInterpreterRegisterKeyName, "DefaultInterpreterVersion", "2.7");
@@ -143,9 +141,7 @@ namespace Sharpmake.Generators.VisualStudio
                     if (pyEnvironment.IsActivated)
                     {
                         string interpreterRegisterKeyName =
-                            $@"Software\Microsoft\VisualStudio\{
-                                devEnvRange.MinDevEnv.GetVisualVersionString()
-                            }\PythonTools\Interpreters\{{{pyEnvironment.Guid}}}";
+                            $@"Software\Microsoft\VisualStudio\{devEnvRange.MinDevEnv.GetVisualVersionString()}\PythonTools\Interpreters\{{{pyEnvironment.Guid}}}";
                         string interpreterDescription = GetRegistryCurrentUserSubKeyValue(interpreterRegisterKeyName, "Description", "");
                         if (interpreterDescription != string.Empty)
                         {
@@ -161,9 +157,7 @@ namespace Sharpmake.Generators.VisualStudio
                     if (virtualEnvironment.IsDefault)
                     {
                         string baseInterpreterRegisterKeyName =
-                            $@"Software\Microsoft\VisualStudio\{
-                                devEnvRange.MinDevEnv.GetVisualVersionString()
-                            }\PythonTools\Interpreters\{{{virtualEnvironment.BaseInterpreterGuid}}}";
+                            $@"Software\Microsoft\VisualStudio\{devEnvRange.MinDevEnv.GetVisualVersionString()}\PythonTools\Interpreters\{{{virtualEnvironment.BaseInterpreterGuid}}}";
                         string baseInterpreterDescription = GetRegistryCurrentUserSubKeyValue(baseInterpreterRegisterKeyName, "Description", "");
                         if (baseInterpreterDescription != string.Empty)
                         {
@@ -216,9 +210,7 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         // Verify if the interpreter exists in the register.
                         string interpreterRegisterKeyName =
-                            $@"Software\Microsoft\VisualStudio\{
-                                devEnvRange.MinDevEnv.GetVisualVersionString()
-                            }\PythonTools\Interpreters\{{{pyEnvironment.Guid}}}";
+                            $@"Software\Microsoft\VisualStudio\{devEnvRange.MinDevEnv.GetVisualVersionString()}\PythonTools\Interpreters\{{{pyEnvironment.Guid}}}";
                         string interpreterDescription = GetRegistryCurrentUserSubKeyValue(interpreterRegisterKeyName, "Description", "");
                         if (interpreterDescription != string.Empty)
                         {

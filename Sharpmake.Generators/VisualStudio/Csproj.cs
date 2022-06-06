@@ -1077,7 +1077,7 @@ namespace Sharpmake.Generators.VisualStudio
             return (string.IsNullOrEmpty(guidFromProjectFile)) ? RemoveLineTag : guidFromProjectFile;
         }
 
-        private static Tuple<DotNetFramework, DotNetOS, string> GetDotNetFrameworkAndOS( Project.Configuration conf )
+        private static Tuple<DotNetFramework, DotNetOS, string> GetDotNetFrameworkAndOS(Project.Configuration conf)
         {
             var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
             DotNetOS dotNetOS;
@@ -1100,7 +1100,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Need to sort by name and platform
             List<Project.Configuration> configurations = unsortedConfigurations.OrderBy(conf => conf.Name + conf.Platform).ToList();
 
-            var projectFrameworksPerConf = configurations.ToDictionary( conf => conf, GetDotNetFrameworkAndOS );
+            var projectFrameworksPerConf = configurations.ToDictionary(conf => conf, GetDotNetFrameworkAndOS);
             var projectFrameworks = projectFrameworksPerConf.Values.Distinct().ToList();
             itemGroups.SetTargetFrameworks(projectFrameworks);
 

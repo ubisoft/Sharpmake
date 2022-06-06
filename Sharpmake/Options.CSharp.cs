@@ -197,7 +197,7 @@ namespace Sharpmake
 
             public enum Nullable
             {
-                [Default] 
+                [Default]
                 Disabled,
                 Enabled
             }
@@ -208,7 +208,7 @@ namespace Sharpmake
                 [Default]
                 Disabled
             }
-            
+
             public enum PublishTrimmed
             {
                 Enabled,

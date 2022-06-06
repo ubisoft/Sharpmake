@@ -601,11 +601,11 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         var compileAsManagedString = FileGeneratorUtilities.RemoveLineTag;
 
-                        if ( clrSupport )
+                        if (clrSupport)
                         {
                             var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
-                        
-                            if( !dotNetFramework.IsDotNetCore())
+
+                            if (!dotNetFramework.IsDotNetCore())
                             {
                                 // This needs to be omitted when targeting .Net Core otherwise compilation fails due to internal compiler errors. Only info found is from here: https://stackoverflow.com/a/62773057
                                 compileAsManagedString = "true";
@@ -728,7 +728,7 @@ namespace Sharpmake.Generators.VisualStudio
                     }
                 }
             }
-            
+
             // add imports to nuget packages
             foreach (var package in firstConf.ReferencesByNuGetPackage)
             {
