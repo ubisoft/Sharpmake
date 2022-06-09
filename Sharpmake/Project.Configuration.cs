@@ -1251,6 +1251,15 @@ namespace Sharpmake
             public string ModuleDefinitionFile = null;
 
             /// <summary>
+            /// Allow/prevent writing VC overrides to the vcxproj files for this conf
+            /// Note that the setting must have the same value for all conf in the same vcxproj file
+            /// </summary>
+            /// <remarks>
+            /// This is only used by the Visual Studio Vcxproj generator
+            /// </remarks>
+            public bool WriteVcOverrides = true;
+
+            /// <summary>
             /// Gets or sets the path where the blob files will be generated.
             /// </summary>
             /// <remarks>

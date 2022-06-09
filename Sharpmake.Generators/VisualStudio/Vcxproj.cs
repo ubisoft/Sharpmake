@@ -239,6 +239,13 @@ namespace Sharpmake.Generators.VisualStudio
 
         private bool WriteVcOverrides(GenerationContext context, FileGenerator fileGenerator)
         {
+            var values = context.ProjectConfigurations.Select(conf => conf.WriteVcOverrides).Distinct().ToList();
+            if (values.Count != 1)
+                throw new Error(nameof(Project.Configuration.WriteVcOverrides) + " has conflicting values in the configurations, they must all have the same");
+
+            if (values.First() == false)
+                return false;
+
             bool overridesActive = false;
 
             bool registrySettingWritten = false;
