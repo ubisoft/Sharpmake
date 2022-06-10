@@ -38,6 +38,8 @@ namespace HelloAndroid
             IsTargetFileNameToLower = false;
 
             SourceRootPath = @"[project.RootPath]\[project.Name]";
+
+            CustomProperties.Add("HostTag", "windows-x86_64");
         }
 
         [ConfigurePriority(ConfigurePriorities.All)]
