@@ -1,8 +1,5 @@
 #include "stdafx.h"
 
-#include <native_app_glue/android_native_app_glue.h>
-#include <native_app_glue/android_native_app_glue.c>
-
 #include "src/util_static_lib1.h"
 #include "util_static_lib2.h"
 #include "sub folder/useless_static_lib2.h"
