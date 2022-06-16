@@ -62,6 +62,7 @@ namespace Sharpmake.UnitTests
             bool writeFiles = false;
             bool dumpDependency = true;
 
+            DependencyTracker.ResetSingleton();
             DependencyTracker.GraphWriteLegend = false;
 
             Builder = new Builder(
