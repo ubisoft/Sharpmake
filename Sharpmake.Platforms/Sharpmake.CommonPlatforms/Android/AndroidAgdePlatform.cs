@@ -148,14 +148,11 @@ namespace Sharpmake
 
                 var agdeConfOptions = context.ProjectConfigurationOptions.Where(d => d.Key.Platform == Platform.agde).Select(d => d.Value);
 
-                using (generator.Declare("androidApplicationModule", Options.GetOptionValue("androidApplicationModule", agdeConfOptions)))
                 using (generator.Declare("androidHome", Options.GetOptionValue("androidHome", agdeConfOptions)))
                 using (generator.Declare("javaHome", Options.GetOptionValue("javaHome", agdeConfOptions)))
                 using (generator.Declare("androidNdkVersion", Options.GetOptionValue("androidNdkVersion", agdeConfOptions)))
                 using (generator.Declare("androidMinSdkVersion", Options.GetOptionValue("androidMinSdkVersion", agdeConfOptions)))
                 using (generator.Declare("ndkRoot", Options.GetOptionValue("ndkRoot", agdeConfOptions)))
-                using (generator.Declare("androidEnablePackaging", Options.GetOptionValue("androidEnablePackaging", agdeConfOptions)))
-                using (generator.Declare("androidGradleBuildDir", Options.GetOptionValue("androidGradleBuildDir", agdeConfOptions)))
                 {
                     generator.Write(_projectDescriptionPlatformSpecific);
                 }
@@ -222,7 +219,9 @@ namespace Sharpmake
                 string ndkRoot = options["ndkRoot"].Equals(RemoveLineTag) ? null : options["ndkRoot"];
                 string ndkVer = Util.GetNdkVersion(ndkRoot);
                 options["androidNdkVersion"] = ndkVer.Equals(string.Empty) ? RemoveLineTag : ndkVer;
-                options["androidGradleBuildDir"] = Options.PathOption.Get<Options.Android.General.AndroidGradleBuildDir>(conf, @"$(SolutionDir)");
+
+                var sdkIncludePaths = GetSdkIncludePaths(context);
+                options["IncludePath"] = sdkIncludePaths.JoinStrings(";");
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -233,17 +232,27 @@ namespace Sharpmake
                 var cmdLineOptions = context.CommandLineOptions;
                 var conf = context.Configuration;
 
-                // Although we add options to cmdLineOptions, FastBuild isn't supported yet for Android projects.
-
-                options["androidApplicationModule"] = null != conf && conf.Output.Equals(Project.Configuration.OutputType.Exe) ? context.Project.Name.ToLowerInvariant() : RemoveLineTag;
-
-                options["androidEnablePackaging"] = null != conf && conf.Output.Equals(Project.Configuration.OutputType.Exe) ? "true" : RemoveLineTag;
-
-                options["AndroidApkName"] = RemoveLineTag;
                 if (conf.Output.Equals(Project.Configuration.OutputType.Exe))
                 {
-                    var androidApkName = Options.GetObject<Options.Android.General.AndroidApkName>(conf)?.Value ?? RemoveLineTag;
-                    options["AndroidApkName"] = androidApkName;
+                    options["AndroidEnablePackaging"] = "true";
+                    string option = Options.StringOption.Get<Options.Agde.General.AndroidApplicationModule>(conf);
+                    options["AndroidApplicationModule"] = option != RemoveLineTag ? option : context.Project.Name.ToLowerInvariant();
+
+                    options["AndroidGradleBuildDir"] = Options.PathOption.Get<Options.Android.General.AndroidGradleBuildDir>(conf, @"$(SolutionDir)");
+                    options["AndroidGradleBuildIntermediateDir"] = Options.PathOption.Get<Options.Agde.General.AndroidGradleBuildIntermediateDir>(conf);
+                    options["AndroidExtraGradleArgs"] = Options.StringOption.Get<Options.Agde.General.AndroidExtraGradleArgs>(conf);
+
+                    option = Options.StringOption.Get<Options.Android.General.AndroidApkName>(conf);
+                    options["AndroidApkName"] = option != RemoveLineTag ? option : @"$(RootNamespace)-$(PlatformTarget).apk";
+                }
+                else
+                {
+                    options["AndroidEnablePackaging"] = RemoveLineTag;
+                    options["AndroidApplicationModule"] = RemoveLineTag;
+                    options["AndroidGradleBuildDir"] = RemoveLineTag;
+                    options["AndroidGradleBuildIntermediateDir"] = RemoveLineTag;
+                    options["AndroidExtraGradleArgs"] = RemoveLineTag;
+                    options["AndroidApkName"] = RemoveLineTag;
                 }
 
                 context.SelectOption
@@ -477,9 +486,16 @@ namespace Sharpmake
 
             public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
             {
-                // the libs must be prefixed with -l: in the additional dependencies field in VS
+                // the static libs must be prefixed with -l: in the additional dependencies field in VS
+                // the dynamic libs must not use the -l: prefix, otherwise AGDE fails to look up and copy it (to the package sources)
                 var additionalDependencies = context.Options["AdditionalDependencies"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies.Select(d => "-l:" + d));
+                context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies.Select(name =>
+                {
+                    if (name.EndsWith(".so", StringComparison.OrdinalIgnoreCase))
+                        return name;
+                    return "-l:" + name;
+                }
+                ));
             }
 
             public override void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
@@ -520,39 +536,7 @@ namespace Sharpmake
 
             private Strings GetSdkIncludePaths(IGenerationContext context)
             {
-                var conf = context.Configuration;
-                var buildTarget = conf.Target.HaveFragment<AndroidBuildTargets>() ? conf.Target.GetFragment<AndroidBuildTargets>() : AndroidBuildTargets.arm64_v8a;
-                string archIncludePath = "";
-
-                switch (buildTarget)
-                {
-                    case AndroidBuildTargets.arm64_v8a:
-                        archIncludePath = "aarch64-linux-android";
-                        break;
-                    case AndroidBuildTargets.armeabi_v7a:
-                        archIncludePath = "arm-linux-androideabi";
-                        break;
-                    case AndroidBuildTargets.x86:
-                        archIncludePath = "i686-linux-android";
-                        break;
-                    case AndroidBuildTargets.x86_64:
-                        archIncludePath = "x86_64-linux-android";
-                        break;
-                    default:
-                        throw new System.Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
-                }
-
-                var androidIncludePaths = new Strings();
-
-                androidIncludePaths.Add(@"$(VS_NdkRoot)\sources\android");
-                androidIncludePaths.Add(@"$(StlIncludeDirectories)");
-
-                // These include paths are necessary for compatiblitity between some Android API versions, VS versions and NDK versions; Google sometimes changes the folder 
-                // hierarchy inside the NDK between API versions and MS is slow to adapt. Without these include paths, sometimes the compiler can't find jni.h or asm/errno.h.
-                androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include");
-                androidIncludePaths.Add(@"$(VS_NdkRoot)\sysroot\usr\include\" + archIncludePath);
-
-                return androidIncludePaths;
+                return new Strings(@"$(AndroidNdkDirectory)\sources\android");
             }
 
             #endregion // IPlatformVcxproj implementation

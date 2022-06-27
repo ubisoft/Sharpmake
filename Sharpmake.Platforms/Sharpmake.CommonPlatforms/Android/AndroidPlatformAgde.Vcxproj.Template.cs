@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@ namespace Sharpmake
     <AndroidNdkVersion>[androidNdkVersion]</AndroidNdkVersion>
     <AndroidSdk>[androidHome]</AndroidSdk>
     <AndroidMinSdkVersion>[androidMinSdkVersion]</AndroidMinSdkVersion>
-    <AndroidEnablePackaging>[androidEnablePackaging]</AndroidEnablePackaging>
-    <AndroidGradleBuildDir>[androidGradleBuildDir]</AndroidGradleBuildDir>
-    <AndroidApplicationModule>[androidApplicationModule]</AndroidApplicationModule>
     <VS_JavaHome>[javaHome]</VS_JavaHome>
     <PlatformToolset>Clang</PlatformToolset>
 ";
@@ -87,6 +84,11 @@ namespace Sharpmake
     <LibraryPath>[options.LibraryPath]</LibraryPath>
     <ExcludePath>[options.ExcludePath]</ExcludePath>
     <UseMultiToolTask>[options.UseMultiToolTask]</UseMultiToolTask>
+    <AndroidEnablePackaging>[options.AndroidEnablePackaging]</AndroidEnablePackaging>
+    <AndroidApplicationModule>[options.AndroidApplicationModule]</AndroidApplicationModule>
+    <AndroidGradleBuildDir>[options.AndroidGradleBuildDir]</AndroidGradleBuildDir>
+    <AndroidGradleBuildOutputDir>[options.AndroidGradleBuildIntermediateDir]</AndroidGradleBuildOutputDir>
+    <AndroidExtraGradleArgs>[options.AndroidExtraGradleArgs]</AndroidExtraGradleArgs>
     <AndroidApkName>[options.AndroidApkName]</AndroidApkName>
   </PropertyGroup>
 ";

@@ -133,6 +133,7 @@
     <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
     <Compile Include="KitsRootPaths.cs" />
     <Compile Include="MSBuildGlobalSettings.cs" />
+    <Compile Include="Options.Agde.cs" />
     <Compile Include="Options.Android.cs" />
     <Compile Include="Options.AndroidMakefile.cs" />
     <Compile Include="Options.CSharp.cs" />
