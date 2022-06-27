@@ -55,16 +55,18 @@ namespace Sharpmake.Generators.Generic
 
                     var generationOutput = generationReport[solution.GetType()];
                     var fileWithExtension = Path.Combine(solutionFileEntry.Key + ".rdjson");
+
+                    var configurations = solutionFileEntry.Value
+                        .Where(it => PlatformRegistry.Has<IPlatformVcxproj>(it.Platform)).ToList();
                     
-                    generator.Generate(builder, solution, solutionFileEntry.Value,
-                        fileWithExtension, generationOutput.Generated, generationOutput.Skipped);
+                    generator.Generate(builder, solution, configurations, fileWithExtension, generationOutput.Generated,
+                        generationOutput.Skipped);
                     
                     builder.LogWriteLine("          {0,5}", fileWithExtension);
 
                     var solutionFileName = Path.GetFileName(solutionFileEntry.Key);
                     
-                    foreach (var projectInfo in solutionFileEntry.Value.SelectMany(solutionConfig =>
-                        solutionConfig.IncludedProjectInfos))
+                    foreach (var projectInfo in configurations.SelectMany(solutionConfig => solutionConfig.IncludedProjectInfos))
                     {
                         if (projectInfo.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Generate)
                         {
