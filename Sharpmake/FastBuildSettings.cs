@@ -15,6 +15,67 @@ namespace Sharpmake
         };
 
         public abstract string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments);
+
+        public static List<string> GetArguments(Sharpmake.Project.Configuration conf)
+        {
+            var arguments = new List<string>();
+            if (FastBuildSettings.FastBuildUseIDE)
+                arguments.Add("-ide");
+
+            if (FastBuildSettings.FastBuildReport)
+                arguments.Add("-report");
+
+            if (FastBuildSettings.FastBuildNoSummaryOnError)
+                arguments.Add("-nosummaryonerror");
+
+            if (FastBuildSettings.FastBuildSummary)
+                arguments.Add("-summary");
+
+            if (FastBuildSettings.FastBuildVerbose)
+                arguments.Add("-verbose");
+
+            if (FastBuildSettings.FastBuildMonitor)
+                arguments.Add("-monitor");
+
+            // Configuring cache mode if that configuration is allowed to use caching
+            if (conf.FastBuildCacheAllowed)
+            {
+                // Setting the appropriate cache type commandline for that target.
+                switch (FastBuildSettings.CacheType)
+                {
+                    case FastBuildSettings.CacheTypes.CacheRead:
+                        arguments.Add("-cacheread");
+                        break;
+                    case FastBuildSettings.CacheTypes.CacheWrite:
+                        arguments.Add("-cachewrite");
+                        break;
+                    case FastBuildSettings.CacheTypes.CacheReadWrite:
+                        arguments.Add("-cache");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
+                arguments.Add("-dist");
+
+            if (FastBuildSettings.FastBuildWait)
+                arguments.Add("-wait");
+
+            if (FastBuildSettings.FastBuildNoStopOnError)
+                arguments.Add("-nostoponerror");
+
+            if (FastBuildSettings.FastBuildFastCancel)
+                arguments.Add("-fastcancel");
+
+            if (FastBuildSettings.FastBuildNoUnity)
+                arguments.Add("-nounity");
+
+            if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
+                arguments.Add(conf.FastBuildCustomArgs);
+            return arguments;
+        }
     }
 
 

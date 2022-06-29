@@ -197,7 +197,11 @@ namespace Sharpmake.Generators.Generic
                 if (configuration.IsFastBuild)
                 {
                     FastBuildMakeCommandGenerator = new Bff.FastBuildDefaultNMakeCommandGenerator();
-                    FastBuildArguments = string.Join(" ", GetFastBuildOptions());
+                    
+                    var fastBuildCommandLineOptions = FastBuildMakeCommandGenerator.GetArguments(Configuration);
+                    fastBuildCommandLineOptions.Add(" -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension);
+                    
+                    FastBuildArguments = string.Join(" ", fastBuildCommandLineOptions);
                 }
             }
             
@@ -209,71 +213,6 @@ namespace Sharpmake.Generators.Generic
             public void SelectOptionWithFallback(Action fallbackAction, params Options.OptionAction[] options)
             {
                 Sharpmake.Options.SelectOptionWithFallback(Configuration, fallbackAction, options);
-            }
-            
-            private List<string> GetFastBuildOptions()
-            {
-                var fastBuildCommandLineOptions = new List<string>();
-
-                if (FastBuildSettings.FastBuildUseIDE)
-                    fastBuildCommandLineOptions.Add("-ide");
-
-                if (FastBuildSettings.FastBuildReport)
-                    fastBuildCommandLineOptions.Add("-report");
-
-                if (FastBuildSettings.FastBuildNoSummaryOnError)
-                    fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                if (FastBuildSettings.FastBuildSummary)
-                    fastBuildCommandLineOptions.Add("-summary");
-
-                if (FastBuildSettings.FastBuildVerbose)
-                    fastBuildCommandLineOptions.Add("-verbose");
-
-                if (FastBuildSettings.FastBuildMonitor)
-                    fastBuildCommandLineOptions.Add("-monitor");
-
-                // Configuring cache mode if that configuration is allowed to use caching
-                if (Configuration.FastBuildCacheAllowed)
-                {
-                    // Setting the appropriate cache type commandline for that target.
-                    switch (FastBuildSettings.CacheType)
-                    {
-                        case FastBuildSettings.CacheTypes.CacheRead:
-                            fastBuildCommandLineOptions.Add("-cacheread");
-                            break;
-                        case FastBuildSettings.CacheTypes.CacheWrite:
-                            fastBuildCommandLineOptions.Add("-cachewrite");
-                            break;
-                        case FastBuildSettings.CacheTypes.CacheReadWrite:
-                            fastBuildCommandLineOptions.Add("-cache");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                if (FastBuildSettings.FastBuildDistribution && Configuration.FastBuildDistribution)
-                    fastBuildCommandLineOptions.Add("-dist");
-
-                if (FastBuildSettings.FastBuildWait)
-                    fastBuildCommandLineOptions.Add("-wait");
-
-                if (FastBuildSettings.FastBuildNoStopOnError)
-                    fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                if (FastBuildSettings.FastBuildFastCancel)
-                    fastBuildCommandLineOptions.Add("-fastcancel");
-
-                if (FastBuildSettings.FastBuildNoUnity)
-                    fastBuildCommandLineOptions.Add("-nounity");
-
-                if (!string.IsNullOrEmpty(Configuration.FastBuildCustomArgs))
-                    fastBuildCommandLineOptions.Add(Configuration.FastBuildCustomArgs);
-
-                fastBuildCommandLineOptions.Add(" -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension);
-                
-                return fastBuildCommandLineOptions;
             }
         }
         
