@@ -129,45 +129,44 @@ namespace Sharpmake.Generators
                              List<string> generatedFiles,
                              List<string> skipFiles)
         {
-            if (configurations[0].Platform == Platform.ios || configurations[0].Platform == Platform.mac)
+            DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
+            switch (devEnv)
             {
-                XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                if (UtilityMethods.HasFastBuildConfig(configurations))
-                {
-                    MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                }
-            }
-            else
-            {
-                DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
-                switch (devEnv)
-                {
-                    case DevEnv.make:
+                case DevEnv.make:
+                    {
+                        if (configurations[0].Platform == Platform.android)
+                            MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                        else
+                            MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                        break;
+                    }
+                case DevEnv.vs2015:
+                case DevEnv.vs2017:
+                case DevEnv.vs2019:
+                case DevEnv.vs2022:
+                    {
+                        if (UtilityMethods.HasFastBuildConfig(configurations))
                         {
-                            if (configurations[0].Platform == Platform.android)
-                                MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            else
-                                MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            break;
+                            MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                         }
-                    case DevEnv.vs2015:
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                    case DevEnv.vs2022:
-                        {
-                            if (UtilityMethods.HasFastBuildConfig(configurations))
-                            {
-                                MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            }
 
-                            SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            break;
-                        }
-                    default:
+                        SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                        break;
+                    }
+                case DevEnv.xcode4ios:
+                    {
+                        if (UtilityMethods.HasFastBuildConfig(configurations))
                         {
-                            throw new Error("Generate called with unknown DevEnv: " + devEnv);
+                            MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                         }
-                }
+
+                        XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                        break;
+                    }
+                default:
+                    {
+                        throw new Error("Generate called with unknown DevEnv: " + devEnv);
+                    }
             }
         }
     }

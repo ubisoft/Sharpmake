@@ -630,6 +630,7 @@ namespace Sharpmake
             );
 
             context.SelectOption(
+                Options.Option(Options.XCode.Compiler.LibraryStandard.CompilerDefault, () => { options["LibraryStandard"] = FileGeneratorUtilities.RemoveLineTag; cmdLineOptions["LibraryStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => { options["LibraryStandard"] = "libstdc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libstdc++"; }),
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["LibraryStandard"] = "libc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libc++"; })
             );
@@ -656,6 +657,7 @@ namespace Sharpmake
             );
 
             context.SelectOption(
+                Options.Option(Options.XCode.Compiler.LibraryStandard.CompilerDefault, () => { options["LibraryStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => options["LibraryStandard"] = "libstdc++"),
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => options["LibraryStandard"] = "libc++")
             );
