@@ -207,14 +207,6 @@ namespace SharpmakeGen.FunctionalTests
             base.ConfigureAll(conf, target);
             conf.Output = Configuration.OutputType.Exe;
         }
-
-        public override void ConfigureWin64(Configuration conf, Target target)
-        {
-            base.ConfigureWin64(conf, target);
-
-            // workaround necessity of rc.exe
-            conf.Options.Add(Options.Vc.Linker.EmbedManifest.No);
-        }
     }
 
     [Generate]
@@ -589,7 +581,7 @@ namespace SharpmakeGen.FunctionalTests
             // This option will make linker invoke rc.exe to embed manifest.
             // Unless FastBuildSettings.SetPathToResourceCompilerInEnvironment is enabled,
             // following error will occur: LINK : fatal error LNK1158: cannot run 'rc.exe'
-            conf.AdditionalLinkerOptions.Add("/MANIFEST:EMBED");
+            conf.Options.Add(Options.Vc.Linker.EmbedManifest.Yes);
         }
     }
 
