@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ namespace HelloAndroidAgde
         public static string RootDirectory;
         public static string TmpDirectory { get { return Path.Combine(RootDirectory, "temp"); } }
         public static string OutputDirectory { get { return Path.Combine(TmpDirectory, "bin"); } }
-
-        public static Dictionary<DevEnv, string> AndroidTargetsPathForDevEnv = new Dictionary<DevEnv, string>();
     }
 
     public static class AndroidUtil
@@ -81,18 +79,9 @@ namespace HelloAndroidAgde
 
         public static void DirectoryCopy(string sourceDirName, string destDirName)
         {
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-            if (!dir.Exists)
+            if (!Directory.Exists(sourceDirName))
             {
                 throw new Error($"Source path does not exist {sourceDirName}");
-                //LogErrorLine("Source path does not exist! {0}", sourceDirName);
-            }
-            DirectoryInfo[] dirs = dir.GetDirectories();
-            // If the destination directory doesn't exist, create it.
-            if (!Directory.Exists(destDirName))
-            {
-                Directory.CreateDirectory(destDirName);
             }
             // Get the files in the directory and copy them to the new location.
             string[] files = Util.DirectoryGetFiles(sourceDirName);

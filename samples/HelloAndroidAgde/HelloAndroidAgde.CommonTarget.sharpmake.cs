@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -102,6 +102,9 @@ namespace HelloAndroidAgde
                 if (BuildSystem == BuildSystem.FastBuild)
                     dirNameParts.Add(BuildSystem.ToString());
 
+                if (Platform == Platform.agde)
+                    dirNameParts.Add(AndroidBuildTargets.ToString());
+
                 return string.Join("_", dirNameParts);
             }
         }
@@ -147,7 +150,7 @@ namespace HelloAndroidAgde
                 BuildSystem.FastBuild
             );
 
-            return new[] { defaultTarget };
+            return new[] { defaultTarget, fastBuildTarget };
         }
     }
 }

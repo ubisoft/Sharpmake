@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ namespace Sharpmake
 {
     public static partial class Android
     {
-        internal static class Util
+        public static class Util
         {
             // will find folders named after the platform api level,
             // following this pattern: android-XX, with XX being 2 digits
@@ -92,6 +92,135 @@ namespace Sharpmake
                     }
                 }
                 return s_ndkVersion;
+            }
+
+            public static string GetPrebuildToolchainString()
+            {
+                return "llvm";
+            }
+
+            /// <summary>
+            /// https://developer.android.com/ndk/guides/other_build_systems#overview
+            /// </summary>
+            /// <returns>
+            /// "darwin-x86_64" on MacOS
+            /// "linux-x86_64" on Linux
+            /// "windows" on Windows 32-bit
+            /// "windows-x86_64" on Windows 64-bit
+            /// </returns>
+            public static string GetHostTag()
+            {
+                Platform platform = Sharpmake.Util.GetExecutingPlatform();
+                switch (platform)
+                {
+                    case Platform.mac:
+                        return "darwin-x86_64";
+                    case Platform.linux:
+                        return "linux-x86_64";
+                    case Platform.win32:
+                        return "windows";
+                    case Platform.win64:
+                        return "windows-x86_64";
+                    default:
+                        throw new Error($"Sharpmake running on unknown platform : {platform}");
+                }
+            }
+
+            /// <summary>
+            /// https://developer.android.com/ndk/guides/other_build_systems#overview
+            /// </summary>
+            /// <param name="buildTarget"></param>
+            /// <param name="forCompiler"></param>
+            /// <param name="vendor"></param>
+            /// <returns></returns>
+            public static string GetTargetTriple(AndroidBuildTargets buildTarget, bool forCompiler = false, string vendor = "")
+            {
+                switch (buildTarget)
+                {
+                    case AndroidBuildTargets.arm64_v8a:
+                        return Options.Clang.GetTargetTriple("aarch64", "", vendor, "linux", "android");
+                    case AndroidBuildTargets.armeabi_v7a:
+                        return Options.Clang.GetTargetTriple("arm", (forCompiler) ? "v7a" : "", vendor, "linux", "androidabi");
+                    case AndroidBuildTargets.x86:
+                        return Options.Clang.GetTargetTriple("i686", "", vendor, "linux", "android");
+                    case AndroidBuildTargets.x86_64:
+                        return Options.Clang.GetTargetTriple("x86_64", "", vendor, "linux", "android");
+                    default:
+                        throw new Error($"Unsupported Android target: {buildTarget}");
+                }
+            }
+
+            public static string GetAndroidApiLevelString(Options.Android.General.AndroidAPILevel androidApiLevel)
+            {
+                switch (androidApiLevel)
+                {
+                    case Options.Android.General.AndroidAPILevel.Android16:
+                        return "16";
+                    case Options.Android.General.AndroidAPILevel.Android17:
+                        return "17";
+                    case Options.Android.General.AndroidAPILevel.Android18:
+                        return "18";
+                    case Options.Android.General.AndroidAPILevel.Android19:
+                        return "19";
+                    case Options.Android.General.AndroidAPILevel.Android20:
+                        return "20";
+                    case Options.Android.General.AndroidAPILevel.Android21:
+                        return "21";
+                    case Options.Android.General.AndroidAPILevel.Android22:
+                        return "22";
+                    case Options.Android.General.AndroidAPILevel.Android23:
+                        return "23";
+                    case Options.Android.General.AndroidAPILevel.Android24:
+                        return "24";
+                    case Options.Android.General.AndroidAPILevel.Android25:
+                        return "25";
+                    case Options.Android.General.AndroidAPILevel.Android26:
+                        return "26";
+                    case Options.Android.General.AndroidAPILevel.Android27:
+                        return "27";
+                    case Options.Android.General.AndroidAPILevel.Android28:
+                        return "28";
+                    case Options.Android.General.AndroidAPILevel.Android29:
+                        return "29";
+                    case Options.Android.General.AndroidAPILevel.Android30:
+                        return "30";
+                    case Options.Android.General.AndroidAPILevel.Latest:
+                    case Options.Android.General.AndroidAPILevel.Default:
+                        return FindLatestApiLevelStringBySdk(GlobalSettings.AndroidHome) ?? "";
+                    default:
+                        throw new Error($"Unsupported Android Api level: {androidApiLevel}");
+                }
+            }
+
+            public static string FindLatestApiLevelStringBySdk(string lookupDirectory)
+            {
+                string latestApiLevel = Util.FindLatestApiLevelInDirectory(Path.Combine(lookupDirectory, "platforms"));
+                string androidApiLevel = null;
+                if (!string.IsNullOrEmpty(latestApiLevel))
+                {
+                    int pos = latestApiLevel.IndexOf("-");
+                    if (pos != -1)
+                    {
+                        androidApiLevel = latestApiLevel.Substring(pos + 1);
+                    }
+                }
+                return androidApiLevel;
+            }
+
+            public static AndroidBuildTargets GetAndroidBuildTarget(Project.Configuration conf, AndroidBuildTargets defaultValue = AndroidBuildTargets.arm64_v8a)
+            {
+                AndroidBuildTargets androidTarget;
+                return (conf.Target.TryGetFragment(out androidTarget)) ? androidTarget : defaultValue;
+            }
+
+            public static string GetTargetTripleWithVersionSuffix(AndroidBuildTargets buildTarget, Options.Android.General.AndroidAPILevel androidApiLevel)
+            {
+                return GetTargetTripleWithVersionSuffix(buildTarget, GetAndroidApiLevelString(androidApiLevel));
+            }
+
+            public static string GetTargetTripleWithVersionSuffix(AndroidBuildTargets buildTarget, string androidMinApi)
+            {
+                return $"{GetTargetTriple(buildTarget)}{androidMinApi}";
             }
         }
     }

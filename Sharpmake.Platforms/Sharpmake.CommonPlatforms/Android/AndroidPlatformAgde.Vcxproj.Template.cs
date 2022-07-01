@@ -56,11 +56,11 @@ namespace Sharpmake
     <PlatformToolset>[options.PlatformToolset]</PlatformToolset>
     <UseOfStl>[options.UseOfStl]</UseOfStl>
     <ThumbMode>[options.ThumbMode]</ThumbMode>
-    <ShowAndroidPathsVerbosity>[options.ShowAndroidPathsVerbosity]</ShowAndroidPathsVerbosity>
     <LinkTimeOptimization>[options.LinkTimeOptimization]</LinkTimeOptimization>
     <ClangLinkType>[options.ClangLinkType]</ClangLinkType>
     <CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
     <CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
+    <AndroidApkLocation>[options.AndroidApkLocation]</AndroidApkLocation>
   </PropertyGroup>
 ";
 
@@ -100,12 +100,12 @@ namespace Sharpmake
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
+      <ClangDebugInformationFormat>[options.DebugInformationFormat]</ClangDebugInformationFormat>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
       <OmitFramePointers>[options.OmitFramePointers]</OmitFramePointers>
       <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
       <ExceptionHandling>[options.ExceptionHandling]</ExceptionHandling>
-      <BufferSecurityCheck>[options.BufferSecurityCheck]</BufferSecurityCheck>
+      <StackProtectionLevel>[options.StackProtectionLevel]</StackProtectionLevel>
       <FunctionLevelLinking>[options.EnableFunctionLevelLinking]</FunctionLevelLinking>
       <DataLevelLinking>[options.EnableDataLevelLinking]</DataLevelLinking>
       <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
@@ -116,6 +116,10 @@ namespace Sharpmake
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
+      <UnwindTables>[options.UnwindTables]</UnwindTables>
+      <AddressSignificanceTable>[options.AddressSignificanceTable]</AddressSignificanceTable>
+      <ClangDiagnosticsFormat>[options.ClangDiagnosticsFormat]</ClangDiagnosticsFormat>
+      <PositionIndependentCode>[options.PositionIndependentCode]</PositionIndependentCode>
     </ClCompile>
 ";
 
@@ -125,10 +129,14 @@ namespace Sharpmake
       <OutputFile>[options.OutputFile]</OutputFile>
       <AdditionalLibraryDirectories>[options.AdditionalLibraryDirectories];%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>[options.AdditionalLinkerOptions]</AdditionalOptions>
-      <AdditionalDependencies>[options.LibsStartGroup];[options.AdditionalDependencies];%(AdditionalDependencies);[options.LibsEndGroup]</AdditionalDependencies>
+      <AdditionalDependencies>[options.AdditionalDependencies];%(AdditionalDependencies);</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>[options.IgnoreDefaultLibraryNames]</IgnoreSpecificDefaultLibraries>
       <GenerateMapFile>[options.MapFileName]</GenerateMapFile>
       <IncrementalLink>[options.IncrementalLink]</IncrementalLink>
+      <FunctionBinding>[options.FunctionBinding]</FunctionBinding>
+      <NoExecStackRequired>[options.NoExecStackRequired]</NoExecStackRequired>
+      <UnresolvedSymbolReferences>[options.UnresolvedSymbolReferences]</UnresolvedSymbolReferences>
+      <Relocation>[options.Relocation]</Relocation>
     </Link>
 ";
 

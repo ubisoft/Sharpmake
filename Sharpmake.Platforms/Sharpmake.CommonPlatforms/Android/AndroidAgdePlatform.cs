@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
+using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake
@@ -25,12 +26,15 @@ namespace Sharpmake
     {
         [PlatformImplementation(Platform.agde,
             typeof(IPlatformDescriptor),
+            typeof(IFastBuildCompilerSettings),
+            typeof(IPlatformBff),
+            typeof(IClangPlatformBff),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
-        public sealed partial class AndroidAgdePlatform : BasePlatform, Project.Configuration.IConfigurationTasks
+        public sealed partial class AndroidAgdePlatform : BasePlatform, Project.Configuration.IConfigurationTasks, IFastBuildCompilerSettings, IClangPlatformBff
         {
             #region IPlatformDescriptor implementation.
-            public override string SimplePlatformString => "Android";
+            public override string SimplePlatformString => "Agde";
             public override string GetPlatformString(ITarget target)
             {
                 if (target == null)
@@ -59,6 +63,16 @@ namespace Sharpmake
             public override bool HasDotNetSupport => false;
             public override bool HasSharedLibrarySupport => true;
             public override bool HasPrecompiledHeaderSupport => true;
+            #endregion
+
+            #region IFastBuildCompilerSettings implementation
+            public IDictionary<DevEnv, string> BinPath { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, string> LinkerPath { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, string> LinkerExe { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, string> LibrarianExe { get; set; } = new Dictionary<DevEnv, string>();
+            public IDictionary<DevEnv, Strings> ExtraFiles { get; set; } = new Dictionary<DevEnv, Strings>();
+            public IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; } = new Dictionary<IFastBuildCompilerKey, CompilerFamily>();
+            IDictionary<DevEnv, bool> IFastBuildCompilerSettings.LinkerInvokedViaCompiler { get; set; } = new Dictionary<DevEnv, bool>();
             #endregion
 
             #region Project.Configuration.IConfigurationTasks implementation
@@ -238,11 +252,11 @@ namespace Sharpmake
                     string option = Options.StringOption.Get<Options.Agde.General.AndroidApplicationModule>(conf);
                     options["AndroidApplicationModule"] = option != RemoveLineTag ? option : context.Project.Name.ToLowerInvariant();
 
-                    options["AndroidGradleBuildDir"] = Options.PathOption.Get<Options.Android.General.AndroidGradleBuildDir>(conf, @"$(SolutionDir)");
+                    options["AndroidGradleBuildDir"] = Options.PathOption.Get<Options.Agde.General.AndroidGradleBuildDir>(conf, @"$(SolutionDir)");
                     options["AndroidGradleBuildIntermediateDir"] = Options.PathOption.Get<Options.Agde.General.AndroidGradleBuildIntermediateDir>(conf);
                     options["AndroidExtraGradleArgs"] = Options.StringOption.Get<Options.Agde.General.AndroidExtraGradleArgs>(conf);
 
-                    option = Options.StringOption.Get<Options.Android.General.AndroidApkName>(conf);
+                    option = Options.StringOption.Get<Options.Agde.General.AndroidApkName>(conf);
                     options["AndroidApkName"] = option != RemoveLineTag ? option : @"$(RootNamespace)-$(PlatformTarget).apk";
                 }
                 else
@@ -255,13 +269,8 @@ namespace Sharpmake
                     options["AndroidApkName"] = RemoveLineTag;
                 }
 
-                context.SelectOption
-                (
-                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.Default, () => { options["ShowAndroidPathsVerbosity"] = RemoveLineTag; }),
-                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.High, () => { options["ShowAndroidPathsVerbosity"] = "High"; }),
-                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.Normal, () => { options["ShowAndroidPathsVerbosity"] = "Normal"; }),
-                Options.Option(Options.Android.General.ShowAndroidPathsVerbosity.Low, () => { options["ShowAndroidPathsVerbosity"] = "Low"; })
-                );
+                var androidApkLocation = Options.GetObject<Options.Agde.General.AndroidApkLocation>(conf)?.Path ?? RemoveLineTag;
+                options["AndroidApkLocation"] = androidApkLocation;
 
                 context.SelectOption
                 (
@@ -273,18 +282,9 @@ namespace Sharpmake
                     string androidApiLevel = RemoveLineTag;
                     if (lookupDirectory != RemoveLineTag)
                     {
-                        string latestApiLevel = Util.FindLatestApiLevelInDirectory(Path.Combine(lookupDirectory, "platforms"));
-                        if (!string.IsNullOrEmpty(latestApiLevel))
-                        {
-                            int pos = latestApiLevel.IndexOf("-");
-                            if (pos != -1)
-                            {
-                                androidApiLevel = latestApiLevel.Substring(pos + 1);
-                            }
-                        }
+                        androidApiLevel = Util.FindLatestApiLevelStringBySdk(lookupDirectory) ?? RemoveLineTag;
                     }
                     options["androidMinSdkVersion"] = androidApiLevel;
-                    options["AndroidAPILevel"] = RemoveLineTag;
                 }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Default, () => { options["androidMinSdkVersion"] = RemoveLineTag; }),
                 Options.Option(Options.Android.General.AndroidAPILevel.Android16, () => { options["androidMinSdkVersion"] = "16"; }),
@@ -304,6 +304,22 @@ namespace Sharpmake
                 Options.Option(Options.Android.General.AndroidAPILevel.Android30, () => { options["androidMinSdkVersion"] = "30"; })
                 );
 
+                string androidApiNum = options["androidMinSdkVersion"];
+                if (!androidApiNum.Equals(RemoveLineTag))
+                {
+                    if (int.TryParse(androidApiNum, out int apiValue))
+                    {
+                        androidApiNum = apiValue.ToString();
+                    }
+                    else
+                    {
+                        throw new Error("androidMinSdkVersion might be in wrong format!");
+                    }
+
+                    AndroidBuildTargets androidBuildtarget = Android.Util.GetAndroidBuildTarget(conf);
+                    cmdLineOptions["ClangCompilerTarget"] = $"-target {Android.Util.GetTargetTripleWithVersionSuffix(androidBuildtarget, androidApiNum)}";
+                }
+
                 context.SelectOptionWithFallback
                 (
                 () => throw new Error("Android AGDE doesn't support the current Options.Android.General.PlatformToolset"),
@@ -312,132 +328,169 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.General.UseOfStl.Default, () => { options["UseOfStl"] = RemoveLineTag; }),
-                Options.Option(Options.Android.General.UseOfStl.GnuStl_Static, () => { options["UseOfStl"] = "gnustl_static"; }),
-                Options.Option(Options.Android.General.UseOfStl.GnuStl_Shared, () => { options["UseOfStl"] = "gnustl_shared"; }),
-                Options.Option(Options.Android.General.UseOfStl.LibCpp_Static, () => { options["UseOfStl"] = "cpp_static"; }),
-                Options.Option(Options.Android.General.UseOfStl.LibCpp_Shared, () => { options["UseOfStl"] = "cpp_shared"; })
+                Options.Option(Options.Agde.General.UseOfStl.GnuStl_Static, () => { options["UseOfStl"] = "gnustl_static"; cmdLineOptions["UseOfStl"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.UseOfStl.GnuStl_Shared, () => { options["UseOfStl"] = "gnustl_shared"; cmdLineOptions["UseOfStl"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.UseOfStl.LibCpp_Static, () => { options["UseOfStl"] = "cpp_static"; cmdLineOptions["UseOfStl"] = "-static-libstdc++"; }),
+                Options.Option(Options.Agde.General.UseOfStl.LibCpp_Shared, () => { options["UseOfStl"] = "cpp_shared"; cmdLineOptions["UseOfStl"] = RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.General.LinkTimeOptimization.None, () => { options["LinkTimeOptimization"] = "None"; }),
-                Options.Option(Options.Android.General.LinkTimeOptimization.LinkTimeOptimization, () => { options["LinkTimeOptimization"] = "LinkTimeOptimization"; }),
-                Options.Option(Options.Android.General.LinkTimeOptimization.ThinLinkTimeOptimization, () => { options["LinkTimeOptimization"] = "ThinLinkTimeOptimization"; })
+                Options.Option(Options.Agde.General.LinkTimeOptimization.None, () => { options["LinkTimeOptimization"] = "None"; cmdLineOptions["LinkTimeOptimization"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.LinkTimeOptimization.LinkTimeOptimization, () => { options["LinkTimeOptimization"] = "LinkTimeOptimization"; cmdLineOptions["LinkTimeOptimization"] = "-flto"; }),
+                Options.Option(Options.Agde.General.LinkTimeOptimization.ThinLinkTimeOptimization, () => { options["LinkTimeOptimization"] = "ThinLinkTimeOptimization"; cmdLineOptions["LinkTimeOptimization"] = "-flto=thin"; })
+                );
+
+                //Bff.Template.cs required this
+                context.SelectOption
+                (
+                Sharpmake.Options.Option(Options.Agde.Linker.UseThinArchives.Enable, () => { cmdLineOptions["UseThinArchives"] = "T"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.UseThinArchives.Disable, () => { cmdLineOptions["UseThinArchives"] = ""; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.General.ClangLinkType.None, () => { options["ClangLinkType"] = RemoveLineTag; }),
-                Options.Option(Options.Android.General.ClangLinkType.DeferToNdk, () => { options["ClangLinkType"] = "DeferToNdk"; }),
-                Options.Option(Options.Android.General.ClangLinkType.gold, () => { options["ClangLinkType"] = "gold"; }),
-                Options.Option(Options.Android.General.ClangLinkType.lld, () => { options["ClangLinkType"] = "lld"; }),
-                Options.Option(Options.Android.General.ClangLinkType.bfd, () => { options["ClangLinkType"] = "bfd"; })
+                Options.Option(Options.Agde.General.ClangLinkType.DeferToNdk, () => { options["ClangLinkType"] = "DeferToNdk"; cmdLineOptions["ClangLinkType"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.ClangLinkType.gold, () => { options["ClangLinkType"] = "gold"; cmdLineOptions["ClangLinkType"] = "-fuse-ld=gold"; }),
+                Options.Option(Options.Agde.General.ClangLinkType.lld, () => { options["ClangLinkType"] = "lld"; cmdLineOptions["ClangLinkType"] = "-fuse-ld=lld"; }),
+                Options.Option(Options.Agde.General.ClangLinkType.bfd, () => { options["ClangLinkType"] = "bfd"; cmdLineOptions["ClangLinkType"] = "-fuse-ld=bfd"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.General.ThumbMode.Default, () => { options["ThumbMode"] = RemoveLineTag; }),
-                Options.Option(Options.Android.General.ThumbMode.Thumb, () => { options["ThumbMode"] = "Thumb"; }),
-                Options.Option(Options.Android.General.ThumbMode.ARM, () => { options["ThumbMode"] = "ARM"; }),
-                Options.Option(Options.Android.General.ThumbMode.Disabled, () => { options["ThumbMode"] = "Disabled"; })
+                Options.Option(Options.Agde.General.ThumbMode.Thumb, () => { options["ThumbMode"] = "Thumb"; cmdLineOptions["ThumbMode"] = "-mthumb"; }),
+                Options.Option(Options.Agde.General.ThumbMode.ARM, () => { options["ThumbMode"] = "ARM"; cmdLineOptions["ThumbMode"] = "-marm"; }),
+                Options.Option(Options.Agde.General.ThumbMode.Disabled, () => { options["ThumbMode"] = "Disabled"; cmdLineOptions["ThumbMode"] = RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.General.WarningLevel.TurnOffAllWarnings, () => { options["WarningLevel"] = "TurnOffAllWarnings"; cmdLineOptions["WarningLevel"] = "-w"; }),
-                Options.Option(Options.Android.General.WarningLevel.EnableAllWarnings, () => { options["WarningLevel"] = "EnableWarnings"; cmdLineOptions["WarningLevel"] = "-Wall"; })
+                Options.Option(Options.Agde.General.WarningLevel.Default, () => { options["WarningLevel"] = RemoveLineTag; cmdLineOptions["WarningLevel"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.WarningLevel.TurnOffAllWarnings, () => { options["WarningLevel"] = "TurnOffAllWarnings"; cmdLineOptions["WarningLevel"] = "-w"; }),
+                Options.Option(Options.Agde.General.WarningLevel.FormatWarnings, () => { options["WarningLevel"] = "EnableFormatWarnings"; cmdLineOptions["WarningLevel"] = "-Wformat"; }),
+                Options.Option(Options.Agde.General.WarningLevel.FormatAndSecurityWarnings, () => { options["WarningLevel"] = "EnableFormatAndSecurityWarnings"; cmdLineOptions["WarningLevel"] = "-Wformat -Wsecurity"; }),
+                Options.Option(Options.Agde.General.WarningLevel.EnableAllWarnings, () => { options["WarningLevel"] = "EnableWarnings"; cmdLineOptions["WarningLevel"] = "-Wall"; }),
+                Options.Option(Options.Agde.General.WarningLevel.ExtraWarnings, () => { options["WarningLevel"] = "EnableExtraWarnings"; cmdLineOptions["WarningLevel"] = "-Wextra"; }),
+                Options.Option(Options.Agde.General.WarningLevel.ExhaustiveWarnings, () => { options["WarningLevel"] = "EnableAllWarnings"; cmdLineOptions["WarningLevel"] = "-Weverything"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStandard"] = "-std=c17"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
-                Options.Option(Options.Android.Compiler.CLanguageStandard.GNU_C17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStandard"] = "-std=c17"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.GNU_C99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.GNU_C11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.GNU_C17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Default, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "cpp98"; cmdLineOptions["CppLanguageStandard"] = "-std=c++98"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "cpp14"; cmdLineOptions["CppLanguageStandard"] = "-std=c++14"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "cpp17"; cmdLineOptions["CppLanguageStandard"] = "-std=c++17"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.Cpp1z, () => { options["CppLanguageStandard"] = "cpp1z"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1z"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp98, () => { options["CppLanguageStandard"] = "gnupp98"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++98"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp11, () => { options["CppLanguageStandard"] = "gnupp11"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++11"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp14, () => { options["CppLanguageStandard"] = "gnupp14"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++14"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp17, () => { options["CppLanguageStandard"] = "gnupp17"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++17"; }),
-                Options.Option(Options.Android.Compiler.CppLanguageStandard.GNU_Cpp1z, () => { options["CppLanguageStandard"] = "gnupp1z"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1z"; })
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Default, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStd"] = "-std=c++11"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "cpp98"; cmdLineOptions["CppLanguageStd"] = "-std=c++98"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp03, () => { options["CppLanguageStandard"] = "cpp03"; cmdLineOptions["CppLanguageStd"] = "-std=c++03"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStd"] = "-std=c++11"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "cpp14"; cmdLineOptions["CppLanguageStd"] = "-std=c++14"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "cpp17"; cmdLineOptions["CppLanguageStd"] = "-std=c++17"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp1z, () => { options["CppLanguageStandard"] = "cpp1z"; cmdLineOptions["CppLanguageStd"] = "-std=c++1z"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp98, () => { options["CppLanguageStandard"] = "gnupp98"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++98"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp03, () => { options["CppLanguageStandard"] = "gnupp03"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++03"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp11, () => { options["CppLanguageStandard"] = "gnupp11"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++11"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp14, () => { options["CppLanguageStandard"] = "gnupp14"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++14"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp17, () => { options["CppLanguageStandard"] = "gnupp17"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++17"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp1z, () => { options["CppLanguageStandard"] = "gnupp1z"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++1z"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.DataLevelLinking.Disable, () => { options["EnableDataLevelLinking"] = "false"; cmdLineOptions["EnableDataLevelLinking"] = RemoveLineTag; }),
-                Options.Option(Options.Android.Compiler.DataLevelLinking.Enable, () => { options["EnableDataLevelLinking"] = "true"; cmdLineOptions["EnableDataLevelLinking"] = "-fdata-sections"; })
+                Options.Option(Options.Agde.Compiler.DataLevelLinking.Disable, () => { options["EnableDataLevelLinking"] = "false"; cmdLineOptions["EnableDataLevelLinking"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.DataLevelLinking.Enable, () => { options["EnableDataLevelLinking"] = "true"; cmdLineOptions["EnableDataLevelLinking"] = "-fdata-sections"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.DebugInformationFormat.None, () => { options["DebugInformationFormat"] = "None"; cmdLineOptions["DebugInformationFormat"] = "-g0"; }),
-                Options.Option(Options.Android.Compiler.DebugInformationFormat.FullDebug, () => { options["DebugInformationFormat"] = "FullDebug"; cmdLineOptions["DebugInformationFormat"] = "-g2 -gdwarf-2"; }),
-                Options.Option(Options.Android.Compiler.DebugInformationFormat.LineNumber, () => { options["DebugInformationFormat"] = "LineNumber"; cmdLineOptions["DebugInformationFormat"] = "-gline-tables-only"; })
+                Options.Option(Options.Agde.Compiler.DebugInformationFormat.None, () => { options["DebugInformationFormat"] = "None"; cmdLineOptions["DebugInformationFormat"] = "-g0"; }),
+                Options.Option(Options.Agde.Compiler.DebugInformationFormat.FullDebug, () => { options["DebugInformationFormat"] = "FullDebug"; cmdLineOptions["DebugInformationFormat"] = "-g"; }),
+                Options.Option(Options.Agde.Compiler.DebugInformationFormat.LineNumber, () => { options["DebugInformationFormat"] = "LineNumber"; cmdLineOptions["DebugInformationFormat"] = "-gline-tables-only"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Compiler.Exceptions.Disable, () => { options["ExceptionHandling"] = "Disabled"; cmdLineOptions["ExceptionHandling"] = "-fno-exceptions"; }),
-                Options.Option(Options.Android.Compiler.Exceptions.Enable, () => { options["ExceptionHandling"] = "Enabled"; cmdLineOptions["ExceptionHandling"] = "-fexceptions"; }),
-                Options.Option(Options.Android.Compiler.Exceptions.UnwindTables, () => { options["ExceptionHandling"] = "UnwindTables"; cmdLineOptions["ExceptionHandling"] = "-funwind-tables"; })
+                Options.Option(Options.Agde.Compiler.Exceptions.Disable, () => { options["ExceptionHandling"] = "Disabled"; cmdLineOptions["ExceptionHandling"] = "-fno-exceptions"; }),
+                Options.Option(Options.Agde.Compiler.Exceptions.Enable, () => { options["ExceptionHandling"] = "Enabled"; cmdLineOptions["ExceptionHandling"] = "-fexceptions"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.General.TreatWarningsAsErrors.Disable, () => { options["TreatWarningAsError"] = "false"; cmdLineOptions["TreatWarningAsError"] = RemoveLineTag; }),
-                Options.Option(Options.Vc.General.TreatWarningsAsErrors.Enable, () => { options["TreatWarningAsError"] = "true"; cmdLineOptions["TreatWarningAsError"] = "-Werror"; })
+                Options.Option(Options.Agde.Compiler.UnwindTables.No, () => { options["UnwindTables"] = "false"; cmdLineOptions["UnwindTables"] = "-fno-unwind-tables"; }),
+                Options.Option(Options.Agde.Compiler.UnwindTables.Yes, () => { options["UnwindTables"] = "true"; cmdLineOptions["UnwindTables"] = "-funwind-tables"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.BufferSecurityCheck.Enable, () => { options["BufferSecurityCheck"] = "true"; cmdLineOptions["BufferSecurityCheck"] = RemoveLineTag; }),
-                Options.Option(Options.Vc.Compiler.BufferSecurityCheck.Disable, () => { options["BufferSecurityCheck"] = "false"; cmdLineOptions["BufferSecurityCheck"] = "-fstack-protector"; })
+                Options.Option(Options.Agde.General.TreatWarningsAsErrors.Disable, () => { options["TreatWarningAsError"] = "false"; cmdLineOptions["TreatWarningAsError"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.TreatWarningsAsErrors.Enable, () => { options["TreatWarningAsError"] = "true"; cmdLineOptions["TreatWarningAsError"] = "-Werror"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.FunctionLevelLinking.Disable, () => { options["EnableFunctionLevelLinking"] = "false"; cmdLineOptions["EnableFunctionLevelLinking"] = RemoveLineTag; }),
-                Options.Option(Options.Vc.Compiler.FunctionLevelLinking.Enable, () => { options["EnableFunctionLevelLinking"] = "true"; cmdLineOptions["EnableFunctionLevelLinking"] = "-ffunction-sections"; })
+                Options.Option(Options.Agde.Compiler.StackProtectionLevel.None, () => { options["StackProtectionLevel"] = "None"; cmdLineOptions["StackProtectionLevel"] = "-fno-stack-protector"; }),
+                Options.Option(Options.Agde.Compiler.StackProtectionLevel.Basic, () => { options["StackProtectionLevel"] = "Basic"; cmdLineOptions["StackProtectionLevel"] = "-fstack-protector"; }),
+                Options.Option(Options.Agde.Compiler.StackProtectionLevel.Strong, () => { options["StackProtectionLevel"] = "Strong"; cmdLineOptions["StackProtectionLevel"] = "-fstack-protector-strong"; }),
+                Options.Option(Options.Agde.Compiler.StackProtectionLevel.All, () => { options["StackProtectionLevel"] = "All"; cmdLineOptions["StackProtectionLevel"] = "-fstack-protector-all"; }),
+                Options.Option(Options.Agde.Compiler.StackProtectionLevel.Default, () => { options["StackProtectionLevel"] = "Default"; cmdLineOptions["StackProtectionLevel"] = RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.OmitFramePointers.Disable, () => { options["OmitFramePointers"] = "false"; cmdLineOptions["OmitFramePointers"] = "-fno-omit-frame-pointer"; }),
-                Options.Option(Options.Vc.Compiler.OmitFramePointers.Enable, () => { options["OmitFramePointers"] = "true"; cmdLineOptions["OmitFramePointers"] = "-fomit-frame-pointer"; })
+                Options.Option(Options.Agde.Compiler.FunctionLevelLinking.Disable, () => { options["EnableFunctionLevelLinking"] = "false"; cmdLineOptions["EnableFunctionLevelLinking"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.FunctionLevelLinking.Enable, () => { options["EnableFunctionLevelLinking"] = "true"; cmdLineOptions["EnableFunctionLevelLinking"] = "-ffunction-sections"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.Optimization.Disable, () => { options["Optimization"] = "Disabled"; cmdLineOptions["Optimization"] = "-O0"; }),
-                Options.Option(Options.Vc.Compiler.Optimization.MinimizeSize, () => { options["Optimization"] = "MinSize"; cmdLineOptions["Optimization"] = "-Os"; }),
-                Options.Option(Options.Vc.Compiler.Optimization.MaximizeSpeed, () => { options["Optimization"] = "MaxSpeed"; cmdLineOptions["Optimization"] = "-O2"; }),
-                Options.Option(Options.Vc.Compiler.Optimization.FullOptimization, () => { options["Optimization"] = "Full"; cmdLineOptions["Optimization"] = "-O3"; })
+                Options.Option(Options.Agde.Compiler.OmitFramePointers.Disable, () => { options["OmitFramePointers"] = "false"; cmdLineOptions["OmitFramePointers"] = "-fno-omit-frame-pointer"; }),
+                Options.Option(Options.Agde.Compiler.OmitFramePointers.Enable, () => { options["OmitFramePointers"] = "true"; cmdLineOptions["OmitFramePointers"] = "-fomit-frame-pointer"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.MultiProcessorCompilation.Enable, () => { options["UseMultiToolTask"] = "true"; }),
-                Options.Option(Options.Vc.Compiler.MultiProcessorCompilation.Disable, () => { options["UseMultiToolTask"] = "false"; })
+                Options.Option(Options.Agde.Compiler.Optimization.Disable, () => { options["Optimization"] = "Disabled"; cmdLineOptions["Optimization"] = "-O0"; }),
+                Options.Option(Options.Agde.Compiler.Optimization.MinimizeSize, () => { options["Optimization"] = "MinSize"; cmdLineOptions["Optimization"] = "-Os"; }),
+                Options.Option(Options.Agde.Compiler.Optimization.MaximizeSpeed, () => { options["Optimization"] = "MaxSpeed"; cmdLineOptions["Optimization"] = "-O2"; }),
+                Options.Option(Options.Agde.Compiler.Optimization.FullOptimization, () => { options["Optimization"] = "Full"; cmdLineOptions["Optimization"] = "-O3"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Compiler.RTTI.Disable, () => { options["RuntimeTypeInfo"] = "false"; cmdLineOptions["RuntimeTypeInfo"] = "-fno-rtti"; }),
-                Options.Option(Options.Vc.Compiler.RTTI.Enable, () => { options["RuntimeTypeInfo"] = "true"; cmdLineOptions["RuntimeTypeInfo"] = "-frtti"; })
+                Options.Option(Options.Agde.Compiler.MultiProcessorCompilation.Enable, () => { options["UseMultiToolTask"] = "true"; }),
+                Options.Option(Options.Agde.Compiler.MultiProcessorCompilation.Disable, () => { options["UseMultiToolTask"] = "false"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Compiler.RTTI.Disable, () => { options["RuntimeTypeInfo"] = "false"; cmdLineOptions["RuntimeTypeInfo"] = "-fno-rtti"; }),
+                Options.Option(Options.Agde.Compiler.RTTI.Enable, () => { options["RuntimeTypeInfo"] = "true"; cmdLineOptions["RuntimeTypeInfo"] = "-frtti"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Compiler.AddressSignificanceTable.Enable, () => { options["AddressSignificanceTable"] = "true"; cmdLineOptions["AddressSignificanceTable"] = "-faddrsig"; }),
+                Options.Option(Options.Agde.Compiler.AddressSignificanceTable.Disable, () => { options["AddressSignificanceTable"] = "false"; cmdLineOptions["AddressSignificanceTable"] = "-fno-addrsig"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Compiler.ClangDiagnosticsFormat.Default, () => { options["ClangDiagnosticsFormat"] = "Default"; cmdLineOptions["ClangDiagnosticsFormat"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.ClangDiagnosticsFormat.MSVC, () => { options["ClangDiagnosticsFormat"] = "MSVC"; cmdLineOptions["ClangDiagnosticsFormat"] = "-fdiagnostics-format=msvc"; })
+                );
+
+                context.SelectOption
+                (
+                    Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false";cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
+                    Options.Option(Options.Agde.Compiler.PositionIndependentCode.Enable, () => { options["PositionIndependentCode"] = "true"; cmdLineOptions["PositionIndependentCode"] = "-fpic"; })
                 );
             }
 
@@ -462,25 +515,44 @@ namespace Sharpmake
                 var cmdLineOptions = context.CommandLineOptions;
                 var conf = context.Configuration;
 
+                cmdLineOptions["GenerateSharedObject"] = (conf.Output == Project.Configuration.OutputType.Exe) ? "-shared" : RemoveLineTag;
+
                 context.SelectOption
                 (
-                Options.Option(Options.Android.Linker.DebuggerSymbolInformation.IncludeAll, () => { options["DebuggerSymbolInformation"] = "true"; }),
-                Options.Option(Options.Android.Linker.DebuggerSymbolInformation.OmitUnneededSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitUnneededSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-unneeded"; }),
-                Options.Option(Options.Android.Linker.DebuggerSymbolInformation.OmitDebuggerSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitDebuggerSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-debug"; }),
-                Options.Option(Options.Android.Linker.DebuggerSymbolInformation.OmitAllSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitAllSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-all"; })
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.IncludeAll, () => { options["DebuggerSymbolInformation"] = "true"; cmdLineOptions["DebuggerSymbolInformation"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitUnneededSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitUnneededSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-unneeded"; }),
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitDebuggerSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitDebuggerSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-debug"; }),
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitAllSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitAllSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-all"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Vc.Linker.Incremental.Default, () => { options["IncrementalLink"] = RemoveLineTag; cmdLineOptions["LinkIncremental"] = RemoveLineTag; }),
-                Options.Option(Options.Vc.Linker.Incremental.Disable, () => { options["IncrementalLink"] = "false"; cmdLineOptions["LinkIncremental"] = RemoveLineTag; }),
-                Options.Option(Options.Vc.Linker.Incremental.Enable, () => { options["IncrementalLink"] = "true"; cmdLineOptions["LinkIncremental"] = "-Wl,--incremental"; })
+                Options.Option(Options.Agde.Linker.EnableImmediateFunctionBinding.No, () => { options["FunctionBinding"] = "false"; cmdLineOptions["FunctionBinding"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Linker.EnableImmediateFunctionBinding.Yes, () => { options["FunctionBinding"] = "true"; cmdLineOptions["FunctionBinding"] = "-Wl,-z,now"; })
                 );
 
                 context.SelectOption
                 (
-                    Options.Option(Options.Android.Linker.LibGroup.Enable, () => { options["LibsStartGroup"] = " -Wl,--start-group "; options["LibsEndGroup"] = " -Wl,--end-group "; }),
-                    Options.Option(Options.Android.Linker.LibGroup.Disable, () => { options["LibsStartGroup"] = string.Empty; options["LibsEndGroup"] = string.Empty; })
+                Options.Option(Options.Agde.Linker.ExecutableStackRequired.No, () => { options["NoExecStackRequired"] = "true"; cmdLineOptions["NoExecStackRequired"] = "-Wl,-z,noexecstack"; }),
+                Options.Option(Options.Agde.Linker.ExecutableStackRequired.Yes, () => { options["NoExecStackRequired"] = "false"; cmdLineOptions["NoExecStackRequired"] = RemoveLineTag; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Linker.ReportUnresolvedSymbolReference.No, () => { options["UnresolvedSymbolReferences"] = "false"; cmdLineOptions["UnresolvedSymbolReferences"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Linker.ReportUnresolvedSymbolReference.Yes, () => { options["UnresolvedSymbolReferences"] = "true"; cmdLineOptions["UnresolvedSymbolReferences"] = "-Wl,--no-undefined"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Linker.VariableReadOnlyAfterRelocation.No, () => { options["Relocation"] = "false"; cmdLineOptions["Relocation"] = "-Wl,-z,norelro"; }),
+                Options.Option(Options.Agde.Linker.VariableReadOnlyAfterRelocation.Yes, () => { options["Relocation"] = "true"; cmdLineOptions["Relocation"] = "-Wl,-z,relro"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Linker.Incremental.Disable, () => { options["IncrementalLink"] = "false"; cmdLineOptions["LinkIncremental"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Linker.Incremental.Enable, () => { options["IncrementalLink"] = "true"; cmdLineOptions["LinkIncremental"] = "-Wl,--incremental"; })
                 );
             }
 
@@ -501,8 +573,8 @@ namespace Sharpmake
             public override void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
             {
                 platformLibExtension = ".a";
-                platformOutputLibExtension = ".a";
-                platformPrefixExtension = string.Empty;
+                platformOutputLibExtension = string.Empty;
+                platformPrefixExtension = "-l:";
             }
 
             protected override IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)
@@ -513,7 +585,10 @@ namespace Sharpmake
             public override IEnumerable<string> GetLibraryPaths(IGenerationContext context)
             {
                 var dirs = new List<string>();
-                dirs.Add(@"$(StlLibraryPath)");
+                if (!context.Configuration.IsFastBuild)
+                {
+                    dirs.Add(@"$(StlLibraryPath)");
+                }
                 dirs.AddRange(base.GetLibraryPaths(context));
 
                 return dirs;
@@ -540,6 +615,140 @@ namespace Sharpmake
             }
 
             #endregion // IPlatformVcxproj implementation
+
+            #region IClangPlatformBff implementation
+
+            public override string CConfigName(Configuration conf)
+            {
+                var buildTarget = conf.Target.GetFragment<AndroidBuildTargets>();
+                switch (buildTarget)
+                {
+                    case AndroidBuildTargets.armeabi_v7a:
+                        return ".androidArmCConfig";
+                    case AndroidBuildTargets.arm64_v8a:
+                        return ".androidArm64CConfig";
+                    case AndroidBuildTargets.x86:
+                        return ".androidX86CConfig";
+                    case AndroidBuildTargets.x86_64:
+                        return ".androidX64CConfig";
+                    default:
+                        throw new Error(string.Format("Unsupported Android architecture: {0}", buildTarget));
+                }
+            }
+
+            public override string CppConfigName(Configuration conf)
+            {
+                var buildTarget = conf.Target.GetFragment<AndroidBuildTargets>();
+                switch (buildTarget)
+                {
+                    case AndroidBuildTargets.armeabi_v7a:
+                        return ".androidArmCppConfig";
+                    case AndroidBuildTargets.arm64_v8a:
+                        return ".androidArm64CppConfig";
+                    case AndroidBuildTargets.x86:
+                        return ".androidX86CppConfig";
+                    case AndroidBuildTargets.x86_64:
+                        return ".androidX64CppConfig";
+                    default:
+                        throw new Error(string.Format("Unsupported Android architecture: {0}", buildTarget));
+                }
+            }
+
+            public override EnvironmentVariableResolver GetPlatformEnvironmentResolver(params VariableAssignment[] parameters)
+            {
+                return new EnvironmentVariableResolver(parameters);
+            }
+
+            public void SetupClangOptions(IFileGenerator generator)
+            {
+                generator.Write(_compilerExtraOptionsTemplate);
+                generator.Write(_compilerOptimizationOptionsTemplate);
+            }
+
+            public override void AddCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf)
+            {
+                var projectRootPath = conf.Project.RootPath;
+                var target = conf.Target;
+                var devEnv = target.GetFragment<DevEnv>();
+
+                string compilerName = string.Join("-", "Compiler", GetPlatformString(target), devEnv, SimplePlatformString);
+                string CompilerSettingsName = compilerName;
+                string CCompilerSettingsName = $"C-{compilerName}";
+
+                // For CPP
+                CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, conf, CompilerSettingsName, devEnv, false);
+                SetConfiguration(compilerSettings.Configurations, conf, false);
+                // For C
+                CompilerSettings CcompilerSettings = GetMasterCompilerSettings(masterCompilerSettings, conf, CCompilerSettingsName, devEnv, true);
+                SetConfiguration(CcompilerSettings.Configurations, conf, true);
+            }
+
+            public override string BffPlatformDefine => "_ANDROID";
+
+            public override void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration outputType, string fastBuildOutputFile)
+            {
+                fileGenerator.Write(_linkerOptionsTemplate);
+            }
+
+            private CompilerSettings GetMasterCompilerSettings(IDictionary<string, CompilerSettings> masterCompilerSettings, Project.Configuration conf, string compilerName, DevEnv devEnv, bool useCCompiler)
+            {
+                CompilerSettings compilerSettings;
+
+                if (masterCompilerSettings.ContainsKey(compilerName))
+                {
+                    compilerSettings = masterCompilerSettings[compilerName];
+                }
+                else
+                {
+                    var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.agde);
+
+                    Strings extraFiles = new Strings();
+                    string executable = useCCompiler ? Path.Combine("$ExecutableRootPath$", "clang.exe") : Path.Combine("$ExecutableRootPath$", "clang++.exe");
+                    string ndkRoot = Options.PathOption.Get<Options.Android.General.NdkRoot>(conf, GlobalSettings.NdkRoot);
+                    string rootPath = Path.Combine(ndkRoot, "toolchains", Android.Util.GetPrebuildToolchainString(), "prebuilt", Android.Util.GetHostTag(), "bin");
+
+                    var compilerFamily = Sharpmake.CompilerFamily.Clang;
+                    var compilerFamilyKey = new FastBuildCompilerKey(devEnv);
+                    if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
+                        compilerFamily = Sharpmake.CompilerFamily.Clang;
+
+                    extraFiles.Add(
+                            @"$ExecutableRootPath$\libwinpthread-1.dll"
+                        );
+
+                    compilerSettings = new CompilerSettings(compilerName, compilerFamily, Platform.android, extraFiles, executable, rootPath, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
+                    masterCompilerSettings.Add(compilerName, compilerSettings);
+                }
+
+                return compilerSettings;
+            }
+
+            private void SetConfiguration(IDictionary<string, CompilerSettings.Configuration> configurations, Project.Configuration conf, bool useCCompiler = false)
+            {
+                string configName = useCCompiler ? CConfigName(conf) : CppConfigName(conf);
+
+                if (!configurations.ContainsKey(configName))
+                {
+                    AndroidBuildTargets androidBuildtarget = Android.Util.GetAndroidBuildTarget(conf);
+
+                    string linkerExecutable = useCCompiler ? "clang.exe" : "clang++.exe";
+
+                    string ndkPath = Options.PathOption.Get<Options.Android.General.NdkRoot>(conf, GlobalSettings.NdkRoot);
+                    configurations.Add(configName,
+                        new CompilerSettings.Configuration(
+                            Platform.android,
+                            binPath: Path.Combine(ndkPath, "toolchains", Android.Util.GetPrebuildToolchainString(), "prebuilt", Android.Util.GetHostTag()),
+                            librarian: Path.Combine("$BinPath$", Android.Util.GetTargetTriple(androidBuildtarget), "bin", "ar.exe"),
+                            linker: Path.Combine("$BinPath$", "bin", linkerExecutable),
+                            // Using clang-orbis to get a correctly escaped response file when the command-line is too long.
+                            fastBuildLinkerType: CompilerSettings.LinkerType.ClangOrbis
+                        )
+                        {
+                        }
+                    );
+                }
+            }
+            #endregion
         }
     }
 }
