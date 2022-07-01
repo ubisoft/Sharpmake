@@ -180,9 +180,8 @@ namespace Sharpmake
                 // Link time optimization, may also be required for some sanitizers.
                 public enum LinkTimeOptimization
                 {
-                    [Default(DefaultTarget.Debug)]
+                    [Default]
                     None,
-                    [Default(DefaultTarget.Release)]
                     LinkTimeOptimization,
                     ThinLinkTimeOptimization
                 }
