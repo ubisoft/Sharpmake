@@ -749,11 +749,19 @@ namespace Sharpmake
                     string linkerExecutable = useCCompiler ? "clang.exe" : "clang++.exe";
 
                     string ndkPath = Options.PathOption.Get<Options.Android.General.NdkRoot>(conf, GlobalSettings.NdkRoot);
+                    string ndkVersionString = Util.GetNdkVersion(ndkPath);
+                    // GNU Binutils remains available up to and including r22. All binutils tools with the exception of the assembler (GAS) were removed in r23. GAS was removed in r24.
+                    // Above, we need to use LLVM utils, located <NDK>/toolchains/llvm/prebuilt/<host-tag>/bin/llvm-<tool>
+                    // cf. https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md#binutils
+                    string librarian = Path.Combine("bin", "llvm-ar.exe");
+                    if (int.TryParse(ndkVersionString, out int ndkVersion) && ndkVersion <= 22)
+                        librarian = Path.Combine(Util.GetTargetTriple(androidBuildtarget), "bin", "ar.exe");
+
                     configurations.Add(configName,
                         new CompilerSettings.Configuration(
                             Platform.android,
                             binPath: Path.Combine(ndkPath, "toolchains", Android.Util.GetPrebuildToolchainString(), "prebuilt", Android.Util.GetHostTag()),
-                            librarian: Path.Combine("$BinPath$", Android.Util.GetTargetTriple(androidBuildtarget), "bin", "ar.exe"),
+                            librarian: Path.Combine("$BinPath$", librarian),
                             linker: Path.Combine("$BinPath$", "bin", linkerExecutable),
                             // Using clang-orbis to get a correctly escaped response file when the command-line is too long.
                             fastBuildLinkerType: CompilerSettings.LinkerType.ClangOrbis
