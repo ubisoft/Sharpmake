@@ -100,7 +100,9 @@ namespace Sharpmake
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ClangDebugInformationFormat>[options.DebugInformationFormat]</ClangDebugInformationFormat>
+      <ClangDebugInformationFormat>[options.ClangDebugInformationFormat]</ClangDebugInformationFormat>
+      <LimitDebugInfo>[options.LimitDebugInfo]</LimitDebugInfo>
+      <FloatABI>[options.FloatABI]</FloatABI>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
       <OmitFramePointers>[options.OmitFramePointers]</OmitFramePointers>
       <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>

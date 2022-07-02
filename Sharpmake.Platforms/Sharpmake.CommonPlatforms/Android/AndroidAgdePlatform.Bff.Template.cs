@@ -40,7 +40,9 @@ namespace Sharpmake
             // -------------------------
             + ' [cmdLineOptions.ClangDiagnosticsFormat]'
             + ' [cmdLineOptions.ClangCompilerTarget]'
-            + ' [cmdLineOptions.DebugInformationFormat]'
+            + ' [cmdLineOptions.LimitDebugInfo]'
+            + ' [cmdLineOptions.ClangDebugInformationFormat]'
+            + ' [cmdLineOptions.FloatABI]'
             + ' [cmdLineOptions.AddressSignificanceTable]'
             // General options
             // -------------------------

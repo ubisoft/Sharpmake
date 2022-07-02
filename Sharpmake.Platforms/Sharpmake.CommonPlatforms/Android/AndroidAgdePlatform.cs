@@ -365,42 +365,42 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.General.WarningLevel.Default, () => { options["WarningLevel"] = RemoveLineTag; cmdLineOptions["WarningLevel"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.General.WarningLevel.Default, () => { options["WarningLevel"] = "Default"; cmdLineOptions["WarningLevel"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.General.WarningLevel.TurnOffAllWarnings, () => { options["WarningLevel"] = "TurnOffAllWarnings"; cmdLineOptions["WarningLevel"] = "-w"; }),
-                Options.Option(Options.Agde.General.WarningLevel.FormatWarnings, () => { options["WarningLevel"] = "EnableFormatWarnings"; cmdLineOptions["WarningLevel"] = "-Wformat"; }),
-                Options.Option(Options.Agde.General.WarningLevel.FormatAndSecurityWarnings, () => { options["WarningLevel"] = "EnableFormatAndSecurityWarnings"; cmdLineOptions["WarningLevel"] = "-Wformat -Wsecurity"; }),
-                Options.Option(Options.Agde.General.WarningLevel.EnableAllWarnings, () => { options["WarningLevel"] = "EnableWarnings"; cmdLineOptions["WarningLevel"] = "-Wall"; }),
-                Options.Option(Options.Agde.General.WarningLevel.ExtraWarnings, () => { options["WarningLevel"] = "EnableExtraWarnings"; cmdLineOptions["WarningLevel"] = "-Wextra"; }),
-                Options.Option(Options.Agde.General.WarningLevel.ExhaustiveWarnings, () => { options["WarningLevel"] = "EnableAllWarnings"; cmdLineOptions["WarningLevel"] = "-Weverything"; })
+                Options.Option(Options.Agde.General.WarningLevel.EnableFormatWarnings, () => { options["WarningLevel"] = "EnableFormatWarnings"; cmdLineOptions["WarningLevel"] = "-Wformat"; }),
+                Options.Option(Options.Agde.General.WarningLevel.EnableFormatAndSecurityWarnings, () => { options["WarningLevel"] = "EnableFormatAndSecurityWarnings"; cmdLineOptions["WarningLevel"] = "-Wformat -Wsecurity"; }),
+                Options.Option(Options.Agde.General.WarningLevel.EnableWarnings, () => { options["WarningLevel"] = "EnableWarnings"; cmdLineOptions["WarningLevel"] = "-Wall"; }),
+                Options.Option(Options.Agde.General.WarningLevel.EnableExtraWarnings, () => { options["WarningLevel"] = "EnableExtraWarnings"; cmdLineOptions["WarningLevel"] = "-Wextra"; }),
+                Options.Option(Options.Agde.General.WarningLevel.EnableAllWarnings, () => { options["WarningLevel"] = "EnableAllWarnings"; cmdLineOptions["WarningLevel"] = "-Weverything"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "Default"; cmdLineOptions["CLanguageStandard"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
                 Options.Option(Options.Agde.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
                 Options.Option(Options.Agde.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
                 Options.Option(Options.Agde.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStandard"] = "-std=c17"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.GNU_C99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.GNU_C11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.GNU_C17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Default, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStd"] = "-std=c++11"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "cpp98"; cmdLineOptions["CppLanguageStd"] = "-std=c++98"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp03, () => { options["CppLanguageStandard"] = "cpp03"; cmdLineOptions["CppLanguageStd"] = "-std=c++03"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStd"] = "-std=c++11"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "cpp14"; cmdLineOptions["CppLanguageStd"] = "-std=c++14"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "cpp17"; cmdLineOptions["CppLanguageStd"] = "-std=c++17"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp1z, () => { options["CppLanguageStandard"] = "cpp1z"; cmdLineOptions["CppLanguageStd"] = "-std=c++1z"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp98, () => { options["CppLanguageStandard"] = "gnupp98"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++98"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp03, () => { options["CppLanguageStandard"] = "gnupp03"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++03"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp11, () => { options["CppLanguageStandard"] = "gnupp11"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++11"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp14, () => { options["CppLanguageStandard"] = "gnupp14"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++14"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp17, () => { options["CppLanguageStandard"] = "gnupp17"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++17"; }),
-                Options.Option(Options.Agde.Compiler.CppLanguageStandard.GNU_Cpp1z, () => { options["CppLanguageStandard"] = "gnupp1z"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++1z"; })
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Default, () => { options["CppLanguageStandard"] = "Default"; cmdLineOptions["CppLanguageStandard"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp98, () => { options["CppLanguageStandard"] = "cpp98"; cmdLineOptions["CppLanguageStandard"] = "-std=c++98"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp03, () => { options["CppLanguageStandard"] = "cpp03"; cmdLineOptions["CppLanguageStandard"] = "-std=c++03"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp11, () => { options["CppLanguageStandard"] = "cpp11"; cmdLineOptions["CppLanguageStandard"] = "-std=c++11"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp14, () => { options["CppLanguageStandard"] = "cpp14"; cmdLineOptions["CppLanguageStandard"] = "-std=c++14"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp1z, () => { options["CppLanguageStandard"] = "cpp1z"; cmdLineOptions["CppLanguageStandard"] = "-std=c++1z"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Cpp17, () => { options["CppLanguageStandard"] = "cpp17"; cmdLineOptions["CppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Gnupp98, () => { options["CppLanguageStandard"] = "gnupp98"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++98"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Gnupp03, () => { options["CppLanguageStandard"] = "gnupp03"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++03"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Gnupp11, () => { options["CppLanguageStandard"] = "gnupp11"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++11"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Gnupp14, () => { options["CppLanguageStandard"] = "gnupp14"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++14"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Gnupp1z, () => { options["CppLanguageStandard"] = "gnupp1z"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++1z"; }),
+                Options.Option(Options.Agde.Compiler.CppLanguageStandard.Gnupp17, () => { options["CppLanguageStandard"] = "gnupp17"; cmdLineOptions["CppLanguageStandard"] = "-std=gnu++17"; })
                 );
 
                 context.SelectOption
@@ -411,26 +411,40 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.DebugInformationFormat.None, () => { options["DebugInformationFormat"] = "None"; cmdLineOptions["DebugInformationFormat"] = "-g0"; }),
-                Options.Option(Options.Agde.Compiler.DebugInformationFormat.FullDebug, () => { options["DebugInformationFormat"] = "FullDebug"; cmdLineOptions["DebugInformationFormat"] = "-g"; }),
-                Options.Option(Options.Agde.Compiler.DebugInformationFormat.LineNumber, () => { options["DebugInformationFormat"] = "LineNumber"; cmdLineOptions["DebugInformationFormat"] = "-gline-tables-only"; })
+                Options.Option(Options.Agde.General.ClangDebugInformationFormat.None, () => { options["ClangDebugInformationFormat"] = "None"; cmdLineOptions["ClangDebugInformationFormat"] = "-g0"; }),
+                Options.Option(Options.Agde.General.ClangDebugInformationFormat.FullDebug, () => { options["ClangDebugInformationFormat"] = "FullDebug"; cmdLineOptions["ClangDebugInformationFormat"] = "-g"; }),
+                Options.Option(Options.Agde.General.ClangDebugInformationFormat.LineNumber, () => { options["ClangDebugInformationFormat"] = "LineNumber"; cmdLineOptions["ClangDebugInformationFormat"] = "-gline-tables-only"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.Exceptions.Disable, () => { options["ExceptionHandling"] = "Disabled"; cmdLineOptions["ExceptionHandling"] = "-fno-exceptions"; }),
-                Options.Option(Options.Agde.Compiler.Exceptions.Enable, () => { options["ExceptionHandling"] = "Enabled"; cmdLineOptions["ExceptionHandling"] = "-fexceptions"; })
+                Options.Option(Options.Agde.General.LimitDebugInfo.Enable, () => { options["LimitDebugInfo"] = "true"; cmdLineOptions["LimitDebugInfo"] = "-flimit-debug-info"; }),
+                Options.Option(Options.Agde.General.LimitDebugInfo.Disable, () => { options["LimitDebugInfo"] = RemoveLineTag; cmdLineOptions["LimitDebugInfo"] = RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.UnwindTables.No, () => { options["UnwindTables"] = "false"; cmdLineOptions["UnwindTables"] = "-fno-unwind-tables"; }),
-                Options.Option(Options.Agde.Compiler.UnwindTables.Yes, () => { options["UnwindTables"] = "true"; cmdLineOptions["UnwindTables"] = "-funwind-tables"; })
+                Options.Option(Options.Agde.Compiler.ExceptionHandling.Disable, () => { options["ExceptionHandling"] = "Disabled"; cmdLineOptions["ExceptionHandling"] = "-fno-exceptions"; }),
+                Options.Option(Options.Agde.Compiler.ExceptionHandling.Enable, () => { options["ExceptionHandling"] = "Enabled"; cmdLineOptions["ExceptionHandling"] = "-fexceptions"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.General.TreatWarningsAsErrors.Disable, () => { options["TreatWarningAsError"] = "false"; cmdLineOptions["TreatWarningAsError"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.FloatABI.Default, () => { options["FloatABI"] = "Default"; cmdLineOptions["FloatABI"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.FloatABI.Soft, () => { options["FloatABI"] = "soft"; cmdLineOptions["FloatABI"] = "-mfloat-abi=soft"; }),
+                Options.Option(Options.Agde.Compiler.FloatABI.Softfp, () => { options["FloatABI"] = "softfp"; cmdLineOptions["FloatABI"] = "-mfloat-abi=softfp"; }),
+                Options.Option(Options.Agde.Compiler.FloatABI.Hard, () => { options["FloatABI"] = "hard"; cmdLineOptions["FloatABI"] = "-mfloat-abi=hard"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.Compiler.UnwindTables.Enable, () => { context.Options["UnwindTables"] = "true"; context.CommandLineOptions["UnwindTables"] = "-funwind-tables"; }),
+                Options.Option(Options.Agde.Compiler.UnwindTables.Disable, () => { context.Options["UnwindTables"] = "false"; context.CommandLineOptions["UnwindTables"] = "-fno-unwind-tables"; })
+                );
+
+                context.SelectOption
+                (
+                Options.Option(Options.Agde.General.TreatWarningsAsErrors.Disable, () => { options["TreatWarningAsError"] = RemoveLineTag; cmdLineOptions["TreatWarningAsError"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.General.TreatWarningsAsErrors.Enable, () => { options["TreatWarningAsError"] = "true"; cmdLineOptions["TreatWarningAsError"] = "-Werror"; })
                 );
 
@@ -457,10 +471,11 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.Optimization.Disable, () => { options["Optimization"] = "Disabled"; cmdLineOptions["Optimization"] = "-O0"; }),
-                Options.Option(Options.Agde.Compiler.Optimization.MinimizeSize, () => { options["Optimization"] = "MinSize"; cmdLineOptions["Optimization"] = "-Os"; }),
-                Options.Option(Options.Agde.Compiler.Optimization.MaximizeSpeed, () => { options["Optimization"] = "MaxSpeed"; cmdLineOptions["Optimization"] = "-O2"; }),
-                Options.Option(Options.Agde.Compiler.Optimization.FullOptimization, () => { options["Optimization"] = "Full"; cmdLineOptions["Optimization"] = "-O3"; })
+                Options.Option(Options.Agde.Compiler.Optimization.Custom, () => { options["Optimization"] = "Custom"; cmdLineOptions["Optimization"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.Optimization.Disabled, () => { options["Optimization"] = "Disabled"; cmdLineOptions["Optimization"] = "-O0"; }),
+                Options.Option(Options.Agde.Compiler.Optimization.MinSize, () => { options["Optimization"] = "MinSize"; cmdLineOptions["Optimization"] = "-Os"; }),
+                Options.Option(Options.Agde.Compiler.Optimization.MaxSpeed, () => { options["Optimization"] = "MaxSpeed"; cmdLineOptions["Optimization"] = "-O2"; }),
+                Options.Option(Options.Agde.Compiler.Optimization.Full, () => { options["Optimization"] = "Full"; cmdLineOptions["Optimization"] = "-O3"; })
                 );
 
                 context.SelectOption
@@ -489,8 +504,8 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                    Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false";cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
-                    Options.Option(Options.Agde.Compiler.PositionIndependentCode.Enable, () => { options["PositionIndependentCode"] = "true"; cmdLineOptions["PositionIndependentCode"] = "-fpic"; })
+                Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false";cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.PositionIndependentCode.Enable, () => { options["PositionIndependentCode"] = "true"; cmdLineOptions["PositionIndependentCode"] = "-fpic"; })
                 );
             }
 
@@ -505,7 +520,7 @@ namespace Sharpmake
                 }
                 else
                 {
-                    context.Options["PrecompiledHeaderThrough"] = Path.GetFileName(context.Options["PrecompiledHeaderThrough"]);
+                    options["PrecompiledHeaderThrough"] = Path.GetFileName(options["PrecompiledHeaderThrough"]);
                 }
             }
 
