@@ -376,14 +376,14 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "Default"; cmdLineOptions["CLanguageStandard"] = RemoveLineTag; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStandard"] = "-std=c89"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStandard"] = "-std=c99"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStandard"] = "-std=c11"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStandard"] = "-std=c17"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStandard"] = "-std=gnu99"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStandard"] = "-std=gnu11"; }),
-                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStandard"] = "-std=gnu17"; })
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Default, () => { options["CLanguageStandard"] = "Default"; cmdLineOptions["CLanguageStd"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C89, () => { options["CLanguageStandard"] = "c89"; cmdLineOptions["CLanguageStd"] = "-std=c89"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C99, () => { options["CLanguageStandard"] = "c99"; cmdLineOptions["CLanguageStd"] = "-std=c99"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C11, () => { options["CLanguageStandard"] = "c11"; cmdLineOptions["CLanguageStd"] = "-std=c11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.C17, () => { options["CLanguageStandard"] = "c17"; cmdLineOptions["CLanguageStd"] = "-std=c17"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu99, () => { options["CLanguageStandard"] = "gnu99"; cmdLineOptions["CLanguageStd"] = "-std=gnu99"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu11, () => { options["CLanguageStandard"] = "gnu11"; cmdLineOptions["CLanguageStd"] = "-std=gnu11"; }),
+                Options.Option(Options.Agde.Compiler.CLanguageStandard.Gnu17, () => { options["CLanguageStandard"] = "gnu17"; cmdLineOptions["CLanguageStd"] = "-std=gnu17"; })
                 );
 
                 context.SelectOption

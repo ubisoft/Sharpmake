@@ -62,6 +62,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.ExceptionHandling]'
             + ' [cmdLineOptions.UnwindTables]'
             + ' [cmdLineOptions.CppLanguageStd]'
+            + ' [cmdLineOptions.CLanguageStd]'
             + ' [cmdLineOptions.ThumbMode]'
             + ' [cmdLineOptions.PositionIndependentCode]'
             // Additional compiler options
