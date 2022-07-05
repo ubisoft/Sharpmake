@@ -533,42 +533,44 @@ namespace Sharpmake
 
                 cmdLineOptions["GenerateSharedObject"] = (conf.Output == Project.Configuration.OutputType.Exe) ? "-shared" : RemoveLineTag;
 
+                string linkerOptionPrefix = conf.Platform.GetLinkerOptionPrefix();
+
                 context.SelectOption
                 (
                 Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.IncludeAll, () => { options["DebuggerSymbolInformation"] = "true"; cmdLineOptions["DebuggerSymbolInformation"] = RemoveLineTag; }),
-                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitUnneededSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitUnneededSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-unneeded"; }),
-                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitDebuggerSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitDebuggerSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-debug"; }),
-                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitAllSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitAllSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = "-Wl,--strip-all"; })
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitUnneededSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitUnneededSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = $"{linkerOptionPrefix}--strip-unneeded"; }),
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitDebuggerSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitDebuggerSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = $"{linkerOptionPrefix}--strip-debug"; }),
+                Options.Option(Options.Agde.Linker.DebuggerSymbolInformation.OmitAllSymbolInformation, () => { options["DebuggerSymbolInformation"] = "OmitAllSymbolInformation"; cmdLineOptions["DebuggerSymbolInformation"] = $"{linkerOptionPrefix}--strip-all"; })
                 );
 
                 context.SelectOption
                 (
                 Options.Option(Options.Agde.Linker.EnableImmediateFunctionBinding.No, () => { options["FunctionBinding"] = "false"; cmdLineOptions["FunctionBinding"] = RemoveLineTag; }),
-                Options.Option(Options.Agde.Linker.EnableImmediateFunctionBinding.Yes, () => { options["FunctionBinding"] = "true"; cmdLineOptions["FunctionBinding"] = "-Wl,-z,now"; })
+                Options.Option(Options.Agde.Linker.EnableImmediateFunctionBinding.Yes, () => { options["FunctionBinding"] = "true"; cmdLineOptions["FunctionBinding"] = $"{linkerOptionPrefix}-z,now"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Linker.ExecutableStackRequired.No, () => { options["NoExecStackRequired"] = "true"; cmdLineOptions["NoExecStackRequired"] = "-Wl,-z,noexecstack"; }),
+                Options.Option(Options.Agde.Linker.ExecutableStackRequired.No, () => { options["NoExecStackRequired"] = "true"; cmdLineOptions["NoExecStackRequired"] = $"{linkerOptionPrefix}-z,noexecstack"; }),
                 Options.Option(Options.Agde.Linker.ExecutableStackRequired.Yes, () => { options["NoExecStackRequired"] = "false"; cmdLineOptions["NoExecStackRequired"] = RemoveLineTag; })
                 );
 
                 context.SelectOption
                 (
                 Options.Option(Options.Agde.Linker.ReportUnresolvedSymbolReference.No, () => { options["UnresolvedSymbolReferences"] = "false"; cmdLineOptions["UnresolvedSymbolReferences"] = RemoveLineTag; }),
-                Options.Option(Options.Agde.Linker.ReportUnresolvedSymbolReference.Yes, () => { options["UnresolvedSymbolReferences"] = "true"; cmdLineOptions["UnresolvedSymbolReferences"] = "-Wl,--no-undefined"; })
+                Options.Option(Options.Agde.Linker.ReportUnresolvedSymbolReference.Yes, () => { options["UnresolvedSymbolReferences"] = "true"; cmdLineOptions["UnresolvedSymbolReferences"] = $"{linkerOptionPrefix}--no-undefined"; })
                 );
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Linker.VariableReadOnlyAfterRelocation.No, () => { options["Relocation"] = "false"; cmdLineOptions["Relocation"] = "-Wl,-z,norelro"; }),
-                Options.Option(Options.Agde.Linker.VariableReadOnlyAfterRelocation.Yes, () => { options["Relocation"] = "true"; cmdLineOptions["Relocation"] = "-Wl,-z,relro"; })
+                Options.Option(Options.Agde.Linker.VariableReadOnlyAfterRelocation.No, () => { options["Relocation"] = "false"; cmdLineOptions["Relocation"] = $"{linkerOptionPrefix}-z,norelro"; }),
+                Options.Option(Options.Agde.Linker.VariableReadOnlyAfterRelocation.Yes, () => { options["Relocation"] = "true"; cmdLineOptions["Relocation"] = $"{linkerOptionPrefix}-z,relro"; })
                 );
 
                 context.SelectOption
                 (
                 Options.Option(Options.Agde.Linker.Incremental.Disable, () => { options["IncrementalLink"] = "false"; cmdLineOptions["LinkIncremental"] = RemoveLineTag; }),
-                Options.Option(Options.Agde.Linker.Incremental.Enable, () => { options["IncrementalLink"] = "true"; cmdLineOptions["LinkIncremental"] = "-Wl,--incremental"; })
+                Options.Option(Options.Agde.Linker.Incremental.Enable, () => { options["IncrementalLink"] = "true"; cmdLineOptions["LinkIncremental"] = $"{linkerOptionPrefix}--incremental"; })
                 );
             }
 
