@@ -116,6 +116,7 @@ namespace Sharpmake
       <UndefinePreprocessorDefinitions>[options.UndefinePreprocessorDefinitions]</UndefinePreprocessorDefinitions>
       <AdditionalOptions>[options.AdditionalCompilerOptions]</AdditionalOptions>
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFileDirectory>[options.PrecompiledHeaderOutputFileDirectory]</PrecompiledHeaderOutputFileDirectory>
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
       <UnwindTables>[options.UnwindTables]</UnwindTables>
