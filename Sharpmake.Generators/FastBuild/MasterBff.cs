@@ -735,7 +735,7 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastbuildCompilerName", compiler.Key))
                 using (masterBffGenerator.Declare("fastBuildCompilerRootPath", compilerSettings.RootPath))
                 using (masterBffGenerator.Declare("fastBuildCompilerExecutable", string.IsNullOrEmpty(compilerSettings.Executable) ? FileGeneratorUtilities.RemoveLineTag : compilerSettings.Executable))
-                using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28) : FileGeneratorUtilities.RemoveLineTag))
+                using (masterBffGenerator.Declare("fastBuildExtraFiles", compilerSettings.ExtraFiles.Count > 0 ? UtilityMethods.FBuildCollectionFormat(compilerSettings.ExtraFiles, 28, sort: false) : FileGeneratorUtilities.RemoveLineTag))
                 using (masterBffGenerator.Declare("fastBuildCompilerFamily", string.IsNullOrEmpty(fastBuildCompilerFamily) ? FileGeneratorUtilities.RemoveLineTag : fastBuildCompilerFamily))
                 using (masterBffGenerator.Declare("fastBuildCompilerUseRelativePaths", fastBuildCompilerUseRelativePaths))
                 using (masterBffGenerator.Declare("fastBuildCompilerAdditionalSettings", fastBuildCompilerAdditionalSettings))

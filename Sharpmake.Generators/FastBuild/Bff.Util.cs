@@ -671,12 +671,13 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        internal static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null)
+        internal static string FBuildCollectionFormat(Strings collection, int spaceLength, Strings includedExtensions = null, bool sort = true)
         {
             // Select items.
+            List<string> collectionItems = sort ? collection.SortedValues : collection.Values;
             List<string> items = new List<string>(collection.Count);
 
-            foreach (string collectionItem in collection.SortedValues)
+            foreach (string collectionItem in collectionItems)
             {
                 if (includedExtensions == null)
                 {
