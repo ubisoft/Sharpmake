@@ -521,6 +521,7 @@ namespace Sharpmake
                 else
                 {
                     options["PrecompiledHeaderThrough"] = Path.GetFileName(options["PrecompiledHeaderThrough"]);
+                    options["PrecompiledHeaderOutputFileDirectory"] = Sharpmake.Util.EnsureTrailingSeparator(context.Configuration.IntermediatePath);
                 }
             }
 
