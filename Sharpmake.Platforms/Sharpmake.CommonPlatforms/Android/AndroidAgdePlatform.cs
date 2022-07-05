@@ -578,8 +578,13 @@ namespace Sharpmake
                 var additionalDependencies = context.Options["AdditionalDependencies"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 context.Options["AdditionalDependencies"] = string.Join(";", additionalDependencies.Select(name =>
                 {
-                    if (name.EndsWith(".so", StringComparison.OrdinalIgnoreCase))
-                        return name;
+                    if (name.EndsWith(SharedLibraryFileFullExtension, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        string nameWithoutExtension = Path.GetFileNameWithoutExtension(name);
+                        if (nameWithoutExtension.StartsWith("lib"))
+                            nameWithoutExtension = nameWithoutExtension.Remove(0, 3);
+                        return "-l" + nameWithoutExtension;
+                    }
                     return "-l:" + name;
                 }
                 ));
