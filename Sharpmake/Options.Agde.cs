@@ -254,20 +254,6 @@ namespace Sharpmake
                     /// </remarks>
                     EnableAllWarnings
                 }
-
-
-                /// <summary>
-                /// Treat Warnings As Errors
-                /// </summary>
-                /// <remarks>
-                /// Treats all compiler warnings as errors. For a new project, it may be  best to use this flag in all compilations; resolving all warnings will  ensure the fewest possible hard-to-find code defects.
-                /// </remarks>
-                public enum TreatWarningsAsErrors
-                {
-                    Enable,
-                    [Default]
-                    Disable
-                }
             }
 
             public static class Compiler
@@ -674,19 +660,6 @@ namespace Sharpmake
                     /// Expensive Optimizations.
                     /// </remarks>
                     Full
-                }
-
-                /// <summary>
-                /// Enable Run-Time Type Information
-                /// </summary>
-                /// <remarks>
-                /// Adds code for checking C++ object types at run time (runtime type information).
-                /// </remarks>
-                public enum RTTI
-                {
-                    [Default]
-                    Disable,
-                    Enable
                 }
 
                 /// <summary>
