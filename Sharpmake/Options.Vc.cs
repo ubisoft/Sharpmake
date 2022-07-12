@@ -1099,6 +1099,7 @@ namespace Sharpmake
 
                 public enum OpenMP
                 {
+                    Default,
                     [Default]
                     Disable,
                     Enable

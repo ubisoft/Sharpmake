@@ -944,10 +944,9 @@ namespace Sharpmake.Generators.VisualStudio
             );
 
             //Options.Vc.Compiler.OpenMP.
-            //    Disable                                 OpenMP="false"                                  /openmp-
-            //    Enable                                  OpenMP="true"                                   /openmp
             context.SelectOption
             (
+            Options.Option(Options.Vc.Compiler.OpenMP.Default, () => { context.Options["OpenMP"] = FileGeneratorUtilities.RemoveLineTag; context.CommandLineOptions["OpenMP"] = FileGeneratorUtilities.RemoveLineTag; }),
             Options.Option(Options.Vc.Compiler.OpenMP.Disable, () => { context.Options["OpenMP"] = "false"; context.CommandLineOptions["OpenMP"] = "/openmp-"; }),
             Options.Option(Options.Vc.Compiler.OpenMP.Enable, () => { context.Options["OpenMP"] = "true"; context.CommandLineOptions["OpenMP"] = "/openmp"; })
             );
