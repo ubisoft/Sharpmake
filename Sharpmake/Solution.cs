@@ -40,6 +40,14 @@ namespace Sharpmake
         public string SharpmakeCsFileName { get; private set; }             // File name of the c# project configuration, ex: "MyProject.cs"
         public string SharpmakeCsPath { get; private set; }                 // Path of the CsFileName, ex: "c:\dev\MyProject"
 
+        /// <summary>
+        /// Override development environment version of generated solution file.
+        /// Intended to be used with development environments that have multiple different versions available and support having them in single solution, such as Visual Studio.
+        /// Allows generating solution for higher version that will contain projects targeting older versions.
+        /// If unspecified, the maximum version specified across configurations will be used.
+        /// </summary>
+        public DevEnv? SolutionFileDevEnv = null;
+
         // FastBuild specific
 
         /// <summary>

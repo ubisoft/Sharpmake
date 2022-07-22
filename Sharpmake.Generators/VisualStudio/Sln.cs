@@ -273,7 +273,13 @@ namespace Sharpmake.Generators.VisualStudio
 
             string solutionGuid = Util.BuildGuid(solutionFileInfo.FullName, solution.SharpmakeCsPath);
 
-            DevEnv devEnv = solutionConfigurations[0].Target.GetFragment<DevEnv>();
+            DevEnvRange devEnvRange = new DevEnvRange(solutionConfigurations);
+            DevEnv solutionFileDevEnv = solution.SolutionFileDevEnv ?? devEnvRange.MaxDevEnv;
+            if (solutionFileDevEnv < devEnvRange.MaxDevEnv)
+            {
+                throw new Error($"DevEnv {solutionFileDevEnv} override for solution file {solution.Name} cannot be lower than max DevEnv {devEnvRange.MaxDevEnv} of its project configurations");
+            }
+
             List<Solution.ResolvedProject> solutionProjects = ResolveSolutionProjects(solution, solutionConfigurations);
 
             if (solutionProjects.Count == 0)
@@ -292,7 +298,7 @@ namespace Sharpmake.Generators.VisualStudio
             var fileGenerator = new FileGenerator();
 
             // write solution header
-            switch (devEnv)
+            switch (solutionFileDevEnv)
             {
                 case DevEnv.vs2015:
                     fileGenerator.Write(Template.Solution.HeaderBeginVs2015);
@@ -307,7 +313,7 @@ namespace Sharpmake.Generators.VisualStudio
                     fileGenerator.Write(Template.Solution.HeaderBeginVs2022);
                     break;
                 default:
-                    throw new Error($"Unsupported DevEnv {devEnv} for solution {solution.Name}");
+                    throw new Error($"Unsupported DevEnv {solutionFileDevEnv} for solution {solution.Name}");
             }
 
             SolutionFolder masterBffFolder = null;
@@ -443,7 +449,7 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Solution.GlobalBegin);
 
             // write solution configurations
-            string visualStudioExe = GetVisualStudioIdePath(devEnv) + Util.WindowsSeparator + "devenv.com";
+            string visualStudioExe = GetVisualStudioIdePath(solutionFileDevEnv) + Util.WindowsSeparator + "devenv.com";
 
             var configurationSectionNames = new List<string>();
 
