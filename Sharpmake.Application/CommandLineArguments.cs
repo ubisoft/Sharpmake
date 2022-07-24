@@ -71,6 +71,7 @@ namespace Sharpmake.Application
             public bool GenerateDebugSolutionOnly = false;
             public string DebugSolutionStartArguments = string.Empty;
             public string DebugSolutionPath = string.Empty;
+            public bool PrintHelp = false;
 
             [CommandLine.Option("sources", @"sharpmake sources files: ex: /sources( ""project1.sharpmake"", ""..\..\project2.sharpmake"" )")]
             public void SetSources(params string[] files)
