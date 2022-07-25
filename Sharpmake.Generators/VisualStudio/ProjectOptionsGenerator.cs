@@ -373,6 +373,26 @@ namespace Sharpmake.Generators.VisualStudio
                 );
             }
 
+            // MSVC NMake IntelliSence options
+
+            context.Options["AdditionalOptions"] = (context.Configuration.CustomBuildSettings is null) ? "" : context.Configuration.CustomBuildSettings.AdditionalOptions;
+
+            if (context.Configuration.CustomBuildSettings is null || context.Configuration.CustomBuildSettings.AutoConfigure)
+            {
+                context.SelectOption
+                (
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP98, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP11, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { context.Options["AdditionalOptions"] += " /std:c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { context.Options["AdditionalOptions"] += " /std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { context.Options["AdditionalOptions"] += " /std:c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { context.Options["AdditionalOptions"] += " /std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { context.Options["AdditionalOptions"] += " /std:c++latest"; })
+                );
+            }
+
             // Compiler section
 
             context.SelectOption
