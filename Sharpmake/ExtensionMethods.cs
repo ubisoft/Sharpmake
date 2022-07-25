@@ -811,7 +811,7 @@ namespace Sharpmake
                     break;
                 case DevEnv.vs2022:
                     vcTargetsPathKey = "VCTargetsPath17";
-                    vcRootPathKey = "VCInstallDir_160"; // LCTODO: Preview3 still uses 160!!!
+                    vcRootPathKey = "VCInstallDir_170";
                     break;
                 default:
                     throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);
