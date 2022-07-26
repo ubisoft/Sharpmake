@@ -1620,6 +1620,12 @@ namespace Sharpmake
                 public string RebuildCommand = RemoveLineTag;
                 public string CleanCommand = RemoveLineTag;
                 public string OutputFile = RemoveLineTag;
+                public string AdditionalOptions = "";
+
+                /// <summary>
+                /// Automatically add hidden arguments to AdditionalOptions so that the IntelliSense match with the project parameters
+                /// </summary>
+                public bool AutoConfigure = true;
 
                 public bool IsResolved { get; private set; } = false;
 
@@ -1632,6 +1638,7 @@ namespace Sharpmake
                     RebuildCommand = resolver.Resolve(RebuildCommand);
                     CleanCommand = resolver.Resolve(CleanCommand);
                     OutputFile = resolver.Resolve(OutputFile);
+                    AdditionalOptions = resolver.Resolve(AdditionalOptions);
 
                     IsResolved = true;
                 }
