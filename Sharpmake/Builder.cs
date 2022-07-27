@@ -34,6 +34,8 @@ namespace Sharpmake
 
         public FileInfo MainFileInfo = null;
 
+        public bool PrintHelp { get; }
+
         public void AddFragmentMask(params object[] fragmentMasks)
         {
             foreach (object fragmentMask in fragmentMasks)
@@ -73,9 +75,10 @@ namespace Sharpmake
             TypesToGenerate.Add(type);
         }
 
-        public Arguments(Builder builder)
+        public Arguments(Builder builder, bool printHelp)
         {
             Builder = builder;
+            PrintHelp = printHelp;
         }
     }
 
@@ -264,11 +267,12 @@ namespace Sharpmake
             bool skipInvalidPath,
             bool diagnostics,
             bool debugScripts,
+            bool printHelp,
             Func<IGeneratorManager> getGeneratorsManagerCallBack,
             HashSet<string> defines)
         {
             Context = context;
-            Arguments = new Arguments(this);
+            Arguments = new Arguments(this, printHelp);
             _multithreaded = multithreaded;
             DumpDependencyGraph = dumpDependencyGraph;
             _cleanBlobsOnly = cleanBlobsOnly;
@@ -297,8 +301,8 @@ namespace Sharpmake
         }
 
         [Obsolete("Use the builder with the new debugScripts argument", error: false)]
-        public Builder(BuildContext.BaseBuildContext context, bool multithreaded, bool dumpDependencyGraph, bool cleanBlobsOnly, bool blobOnly, bool skipInvalidPath, bool diagnostics, Func<IGeneratorManager> getGeneratorsManagerCallBack, HashSet<string> defines)
-            : this(context, multithreaded, dumpDependencyGraph, cleanBlobsOnly, blobOnly, skipInvalidPath, diagnostics, true, getGeneratorsManagerCallBack, defines) { }
+        public Builder(BuildContext.BaseBuildContext context, bool multithreaded, bool dumpDependencyGraph, bool cleanBlobsOnly, bool blobOnly, bool skipInvalidPath, bool diagnostics, bool printHelp, Func<IGeneratorManager> getGeneratorsManagerCallBack, HashSet<string> defines)
+            : this(context, multithreaded, dumpDependencyGraph, cleanBlobsOnly, blobOnly, skipInvalidPath, diagnostics, true, printHelp, getGeneratorsManagerCallBack, defines) { }
 
         public void Dispose()
         {

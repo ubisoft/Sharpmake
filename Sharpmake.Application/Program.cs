@@ -207,13 +207,6 @@ namespace Sharpmake.Application
                 LogWriteLine("  running on framework: {0}", RuntimeInformation.FrameworkDescription);
                 LogWriteLine(string.Empty);
 
-                // display help if wanted and quit
-                if ((CommandLine.GetProgramCommandLine().Length == 0) || CommandLine.ContainParameter("help"))
-                {
-                    LogWriteLine(CommandLine.GetCommandLineHelp(typeof(Argument), false));
-                    return CommandLine.ContainParameter("help") ? (int)ExitCode.Success : (int)ExitCode.Error;
-                }
-
                 AppDomain.CurrentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
 
                 // Log warnings and errors from builder
@@ -224,6 +217,24 @@ namespace Sharpmake.Application
 
                 if (parameters.Exit)
                     return (int)ExitCode.Success;
+
+                // display help
+                parameters.PrintHelp = CommandLine.ContainParameter("help");
+                if ((CommandLine.GetProgramCommandLine().Length == 0) || parameters.PrintHelp)
+                {
+                    LogWriteLine(CommandLine.GetCommandLineHelp(typeof(Argument), staticMethod: false, printPreamble: true));
+
+                    if (!parameters.PrintHelp)
+                    {
+                        // Command line is empty.
+                        return (int)ExitCode.Error;
+                    }
+                    else if(parameters.Sources.Length == 0 && parameters.Assemblies.Length == 0)
+                    {
+                        // No need to continue if no sources/assemblies were provided from which we could print additional help.
+                        return (int)ExitCode.Success;
+                    }
+                }
 
                 const string sharpmakeSymbolPrefix = "_SHARPMAKE";
                 List<string> invalidSymbols = parameters.Defines.Where(define => define.StartsWith(sharpmakeSymbolPrefix)).ToList();
@@ -396,7 +407,11 @@ namespace Sharpmake.Application
                 }
             }
 
-            LogWriteLine(@"{0} errors, {1} warnings", s_errorCount, s_warningCount);
+            if(!parameters.PrintHelp || s_errorCount != 0 || s_warningCount != 0)
+            {
+                LogWriteLine(@"{0} errors, {1} warnings", s_errorCount, s_warningCount);
+            }
+
             if (s_errorCount != 0)
             {
                 if (Debugger.IsAttached)
@@ -459,6 +474,10 @@ namespace Sharpmake.Application
                 {
                     LogWriteLine("success:");
                     LogWriteLine("    blobs               {0,4} generated, {1,3} up-to-date", Project.BlobGenerated, Project.BlobUpdateToDate);
+                }
+                else if (parameters.PrintHelp)
+                {
+                    return;
                 }
                 else
                 {
@@ -610,6 +629,7 @@ namespace Sharpmake.Application
                 parameters.SkipInvalidPath,
                 parameters.Diagnostics,
                 debugScripts: true, // warning: some code that rely on callstacks misbehaves in release, because methods can completely disappear due to optimizations, so force disable for now
+                printHelp: parameters.PrintHelp,
                 getGeneratorsManagerCallBack: GetGeneratorsManager,
                 defines: parameters.Defines
             );
@@ -655,8 +675,28 @@ namespace Sharpmake.Application
                 }
 
                 if (builder.Arguments.TypesToGenerate.Count == 0)
-                    throw new Error("Sharpmake has nothing to generate!" + Environment.NewLine
-                        + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
+                {
+                    if(!parameters.PrintHelp)
+                    {
+                        throw new Error("Sharpmake has nothing to generate!" + Environment.NewLine
+                            + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
+                    }
+                }
+                else
+                {
+                    if(parameters.PrintHelp)
+                    {
+                        throw new Error("Sharpmake received types to generate despite /help option being passed!" + Environment.NewLine
+                            + $"  Make sure that a static entry point method flagged with [{typeof(Main).FullName}] returns after handling 'arguments.PrintHelp' parameter, and before calling 'arguments.Generate<[your_class]>();' in it.");
+                    }
+                }
+
+                if(parameters.PrintHelp)
+                {
+                    // There is nothing to build if we only wanted to print help.
+                    return builder;
+                }
+
                 builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
 
                 // Call all configuration's methods and resolve project/solution member's values

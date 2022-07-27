@@ -123,7 +123,7 @@ namespace Sharpmake
             return false;
         }
 
-        public static string GetCommandLineHelp(Type type, bool staticMethod)
+        public static string GetCommandLineHelp(Type type, bool staticMethod, bool printPreamble = false)
         {
             StringWriter help = new StringWriter();
 
@@ -132,11 +132,20 @@ namespace Sharpmake
             List<string> sortedMethodNames = new List<string>(methodMappings.Keys);
             sortedMethodNames.Sort();
 
-            help.WriteLine("Usage: sharpmake [options]");
-            help.WriteLine("Options:");
+            if (printPreamble)
+            {
+                help.WriteLine("Usage: sharpmake [options]");
+                help.WriteLine("Options:");
+            }
 
+            bool firstCommandLine = true;
             foreach (string commandLine in sortedMethodNames)
             {
+                if (!firstCommandLine)
+                {
+                    help.WriteLine("");
+                }
+
                 help.Write("  /" + commandLine);
 
                 foreach (MethodInfo methodInfo in methodMappings[commandLine])
@@ -161,7 +170,7 @@ namespace Sharpmake
                     }
                 }
 
-                help.WriteLine("");
+                firstCommandLine = false;
             }
 
             return help.ToString();
