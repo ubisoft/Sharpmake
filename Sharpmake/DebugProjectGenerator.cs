@@ -29,6 +29,8 @@ namespace Sharpmake
     {
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
+        internal static DevEnv DevEnv { get; private set; }
+        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2019;
 
         public interface IDebugProjectExtension
         {
@@ -97,7 +99,7 @@ namespace Sharpmake
         /// <param name="startArguments"></param>
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments)
         {
-            GenerateDebugSolution(sources, null, arguments, startArguments);
+            GenerateDebugSolution(sources, null, arguments, startArguments, DefaultDevEnv);
         }
 
         /// <summary>
@@ -110,7 +112,7 @@ namespace Sharpmake
         [Obsolete("Defines should be inserted in the Sharpmake.Arguments parameter thus rendering this function useless ", error: true)]
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
         {
-            GenerateDebugSolution(sources, null, arguments, startArguments);
+            GenerateDebugSolution(sources, null, arguments, startArguments, DefaultDevEnv);
         }
 
         /// <summary>
@@ -122,6 +124,20 @@ namespace Sharpmake
         /// <param name="startArguments"></param>
         internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments)
         {
+            GenerateDebugSolution(sources, solutionPath, arguments, startArguments, DefaultDevEnv);
+        }
+
+        /// <summary>
+        /// Generates debug projects and solutions
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="solutionPath"></param>
+        /// <param name="arguments"></param>
+        /// <param name="startArguments"></param>
+        /// <param name="devEnv"></param>
+        internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments, DevEnv devEnv)
+        {
+            DevEnv = devEnv;
             FindAllSources(sources, solutionPath, arguments, startArguments);
             arguments.Generate<DebugSolution>();
         }
@@ -254,7 +270,7 @@ namespace Sharpmake
         {
             return new Target(
                 Platform.anycpu,
-                DevEnv.vs2019,
+                DevEnv,
                 Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
