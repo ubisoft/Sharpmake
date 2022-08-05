@@ -93,6 +93,12 @@ namespace Sharpmake
   </PropertyGroup>
 ";
 
+            private const string _projectConfigurationsFastBuildMakefile =
+                @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <AndroidApkName>[options.AndroidApkName]</AndroidApkName>
+  </PropertyGroup>
+";
+
             private const string _projectConfigurationsCompileTemplate =
 @"    <ClCompile>
       <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>

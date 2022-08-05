@@ -210,6 +210,12 @@ namespace Sharpmake
                 generator.Write(_projectConfigurationsGeneral2Template);
             }
 
+            public override void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
+            {
+                base.GenerateProjectConfigurationFastBuildMakeFile(context, generator);
+                generator.Write(_projectConfigurationsFastBuildMakefile);
+            }
+
             protected override string GetProjectLinkSharedVcxprojTemplate()
             {
                 return _projectConfigurationsSharedLinkTemplate;
