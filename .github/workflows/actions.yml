@@ -217,14 +217,15 @@ jobs:
           & $env:COMPILE_BATCH projects\fastbuildsample_vs2019_win64.sln "${{ matrix.configuration }}" "x64"
           projects\output\win64\${{ matrix.configuration }}\fastbuildsimpleexecutable.exe
 
-      - name: HelloAndroid ${{ matrix.configuration }}
-        if: runner.os == 'Windows'
-        working-directory: 'samples/HelloAndroid'
-        run: |
-          $env:JAVA_HOME = $env:JAVA_HOME_11_X64
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
+      # Temp disable after Github VM update which updated the NDK and broke it
+      # - name: HelloAndroid ${{ matrix.configuration }}
+      #   if: runner.os == 'Windows'
+      #   working-directory: 'samples/HelloAndroid'
+      #   run: |
+      #     $env:JAVA_HOME = $env:JAVA_HOME_11_X64
+      #     & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
+      #     & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
+      #     & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
 
       - name: HelloClangCl debug
         if: runner.os == 'Windows' && matrix.configuration == 'debug'
