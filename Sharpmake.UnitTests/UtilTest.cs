@@ -209,6 +209,124 @@ namespace Sharpmake.UnitTests
         }
     }
 
+    public class FindCommonRootPath
+    {
+        [Test]
+        public void NullIfEmpty()
+        {
+            Assert.IsNull(Util.FindCommonRootPath(Enumerable.Empty<string>()));
+        }
+
+        [Test]
+        public void EmptyString()
+        {
+            Assert.IsNull(Util.FindCommonRootPath(new[] { "" }));
+            Assert.IsNull(Util.FindCommonRootPath(new[] { "", "" }));
+        }
+
+        [Test]
+        public void DifferentDrives()
+        {
+            Assert.IsNull(Util.FindCommonRootPath(new[] {
+                @"C:\bla",
+                @"D:\bla"
+            }));
+        }
+
+        [Test]
+        public void OnlyRoot()
+        {
+            Assert.AreEqual(
+                Util.PathMakeStandard(@"C:"),
+                Util.FindCommonRootPath(new[] {
+                    @"C:\bla",
+                    @"C:\bli"
+                })
+            );
+        }
+
+        [Test]
+        public void SameDir()
+        {
+            Assert.AreEqual(
+                Util.PathMakeStandard(@"C:\bla"),
+                Util.FindCommonRootPath(new[] {
+                    @"C:\bla",
+                    @"C:\bla"
+                })
+            );
+
+            Assert.AreEqual(
+                Util.PathMakeStandard(@"C:\bla"),
+                Util.FindCommonRootPath(new[] {
+                    @"C:\bla\",
+                    @"C:\bla"
+                })
+            );
+
+            Assert.AreEqual(
+                Util.PathMakeStandard(@"C:\bla"),
+                Util.FindCommonRootPath(new[] {
+                    @"C:\\bla\",
+                    @"C:\bla"
+                })
+            );
+
+            Assert.AreEqual(
+                Util.PathMakeStandard(@"C:\bla"),
+                Util.FindCommonRootPath(new[] {
+                    @"C:\bla",
+                    @"C:\bla",
+                    @"C:\bla",
+                    @"C:\bla"
+                })
+            );
+        }
+
+        [Test]
+        public void LongPaths()
+        {
+            Assert.AreEqual(
+                Util.PathMakeStandard(@"C:\a\b\c\d"),
+                Util.FindCommonRootPath(new[] {
+                    @"C:\a\b\c\d\e\f",
+                    @"C:\a\b\c\d\file1.ext",
+                    @"C:\a\b\c\d\file2.ext",
+                    @"C:\a\b\c\d\e\file3.ext",
+                    @"C:\a\b\c\d\e\f\g\h\file4.ext",
+                })
+            );
+
+            // check that it's case sensitive on unix and not on windows
+            if (Util.IsRunningOnUnix())
+            {
+                Assert.AreEqual(
+                    Util.PathMakeStandard(@"/a/b"),
+                    Util.FindCommonRootPath(new[] {
+                        @"/a/b/c/d/e/f",
+                        @"/a/b/C/d/file1.ext",
+                        @"/a/b/c/d/file2.ext",
+                        @"/a/b/c/D/E/file3.ext",
+                        @"/a/b/c/d/e/f/g/h/file4.ext",
+                    })
+                );
+            }
+            else
+            {
+                Assert.AreEqual(
+                    Util.PathMakeStandard(@"C:\a\b\c\d"),
+                    Util.FindCommonRootPath(new[] {
+                        @"C:\a\B\c\d\e\f",
+                        @"C:\a\b\c\d\file1.ext",
+                        @"C:\a\b\C\d\file2.ext",
+                        @"C:\a\b\c\D\E\file3.ext",
+                        @"C:\a\b\c\d\e\f\g\h\file4.ext",
+                    })
+                );
+            }
+        }
+    }
+
     /// <summary>
     ///     Mock <c>GetEnvironmentVariable</c> by reproducing the logic to make it works on Windows and Linux
     ///     The test cases are: 

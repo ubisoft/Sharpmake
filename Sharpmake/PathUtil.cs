@@ -813,5 +813,37 @@ namespace Sharpmake
 
             return modifiedPath;
         }
+
+        public static string FindCommonRootPath(IEnumerable<string> paths)
+        {
+            var pathsChunks = paths.Select(p => PathMakeStandard(p).Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
+            if (pathsChunks.Any())
+            {
+                var firstPathChunks = pathsChunks.First();
+                bool foundSomeCommonChunks = false;
+                int commonPathIndex = 0;
+                do
+                {
+                    if (firstPathChunks.Length > commonPathIndex)
+                    {
+                        string reference = firstPathChunks[commonPathIndex];
+                        if (!pathsChunks.Any(p => !string.Equals(p.Length > commonPathIndex ? p[commonPathIndex] : string.Empty, reference, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            ++commonPathIndex;
+                            foundSomeCommonChunks = true;
+                        }
+                        else
+                            break;
+                    }
+                    else
+                        break;
+                }
+                while (true);
+
+                if (foundSomeCommonChunks)
+                    return string.Join(Path.DirectorySeparatorChar.ToString(), firstPathChunks.Take(commonPathIndex));
+            }
+            return null;
+        }
     }
 }
