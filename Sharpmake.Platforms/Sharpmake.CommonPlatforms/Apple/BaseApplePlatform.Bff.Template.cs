@@ -40,7 +40,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
             + ' [cmdLineOptions.PreprocessorDefinitions]'
-            + ' [cmdLineOptions.LibraryStandard]'
+            + ' [cmdLineOptions.StdLib]'
             + ' [cmdLineOptions.SDKRoot]'
             + ' [options.ClangCppLanguageStandard]'
 ";

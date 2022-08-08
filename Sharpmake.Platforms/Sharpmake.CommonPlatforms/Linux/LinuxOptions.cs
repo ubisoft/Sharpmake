@@ -80,6 +80,18 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// C++ standard library to use. <arg> must be ‘libc++’, ‘libstdc++’ or ‘platform’.
+                /// </summary>
+                public enum StdLib
+                {
+                    [Default]
+                    Default,
+                    LibCpp,
+                    LibStdCpp,
+                    Platform
+                }
+
+                /// <summary>
                 /// SysRoot: logical root for headers and libraries
                 /// root directory where to look for the directories bin, lib, include
                 /// </summary>

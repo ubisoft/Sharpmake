@@ -387,7 +387,7 @@ namespace Sharpmake
         public IEnumerable<string> GetPlatformLibraryFiles(IGenerationContext context)
         {
             var cmdLineOptions = context.CommandLineOptions;
-            string libStd = cmdLineOptions["LibraryStandard"];
+            string libStd = cmdLineOptions["StdLib"];
             if (!libStd.StartsWith("-stdlib=lib"))
                 throw new Error("Stdlib argument doesn't match the expected format");
 
@@ -632,8 +632,8 @@ namespace Sharpmake
             );
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => { options["LibraryStandard"] = "libstdc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libstdc++"; }),
-                Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["LibraryStandard"] = "libc++"; cmdLineOptions["LibraryStandard"] = "-stdlib=libc++"; })
+                Options.Option(Options.XCode.Compiler.LibraryStandard.CppStandard, () => { options["StdLib"] = "libstdc++"; cmdLineOptions["StdLib"] = "-stdlib=libstdc++"; }),
+                Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["StdLib"] = "libc++"; cmdLineOptions["StdLib"] = "-stdlib=libc++"; })
             );
 
             Strings frameworkPaths = Options.GetStrings<Options.XCode.Compiler.FrameworkPaths>(conf);

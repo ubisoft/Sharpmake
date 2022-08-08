@@ -33,6 +33,7 @@ namespace Sharpmake
                             + ' [cmdLineOptions.AdditionalDependencies]'
                             // Options
                             //--------
+                            + ' [cmdLineOptions.StdLib]'
                             + ' [cmdLineOptions.EditAndContinue]'
                             + ' [cmdLineOptions.InfoStripping]'
                             + ' [cmdLineOptions.DataStripping]'
@@ -48,6 +49,7 @@ namespace Sharpmake
     .CompilerExtraOptions   = ''
             // General options
             // -------------------------
+            + ' [cmdLineOptions.StdLib]'
             + ' [cmdLineOptions.DebugInformationFormat]'
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'

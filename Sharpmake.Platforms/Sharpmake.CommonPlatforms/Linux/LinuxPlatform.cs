@@ -140,6 +140,9 @@ namespace Sharpmake
 
             public override void SetupSdkOptions(IGenerationContext context)
             {
+                var options = context.Options;
+                var cmdLineOptions = context.CommandLineOptions;
+
                 if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
                 {
                     context.Options["ProjectDirectory"] = Util.ConvertToMountedUnixPath(context.Configuration.TargetLibraryPath);
@@ -182,6 +185,13 @@ namespace Sharpmake
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Gpp, () => { context.Options["RemoteLdToolExe"] = "g++"; }),
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang, () => { context.Options["RemoteLdToolExe"] = "clang"; }),
                     Sharpmake.Options.Option(Options.General.PlatformRemoteTool.Clang38, () => { context.Options["RemoteLdToolExe"] = "clang-3.8"; })
+                );
+
+                context.SelectOption(
+                Sharpmake.Options.Option(Options.General.StdLib.Default, () => { cmdLineOptions["StdLib"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Sharpmake.Options.Option(Options.General.StdLib.LibCpp, () => { cmdLineOptions["StdLib"] = "--stdlib=libc++"; }),
+                Sharpmake.Options.Option(Options.General.StdLib.LibStdCpp, () => { cmdLineOptions["StdLib"] = "--stdlib=libstdc++"; }),
+                Sharpmake.Options.Option(Options.General.StdLib.Platform, () => { cmdLineOptions["StdLib"] = "--stdlib=platform"; })
                 );
 
                 // FastBuild only atm

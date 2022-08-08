@@ -652,6 +652,8 @@ namespace Sharpmake.Generators.FastBuild
                             // Do not take Cpp Language conformance into account while compiling in C
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // and remove the stdlib specification as well
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "StdLib", FileGeneratorUtilities.RemoveLineTag));
                             // MSVC
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
 

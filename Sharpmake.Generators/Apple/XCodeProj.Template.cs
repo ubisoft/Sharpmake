@@ -335,7 +335,7 @@ namespace Sharpmake.Generators.Apple
 				ASSETCATALOG_COMPILER_APPICON_NAME = [item.Options.AssetCatalogCompilerAppIconName];
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = [item.Options.ClangAnalyzerLocalizabilityNonlocalized];
 				CLANG_CXX_LANGUAGE_STANDARD = ""[item.Options.CppStandard]"";
-				CLANG_CXX_LIBRARY = ""[item.Options.LibraryStandard]"";
+				CLANG_CXX_LIBRARY = ""[item.Options.StdLib]"";
 				CLANG_ENABLE_MODULES = [item.Options.ClangEnableModules];
 				CLANG_ENABLE_OBJC_ARC = [item.Options.AutomaticReferenceCounting];
 				CLANG_ENABLE_OBJC_WEAK = [item.Options.ObjCWeakReferences];
