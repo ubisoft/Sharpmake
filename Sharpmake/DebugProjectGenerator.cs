@@ -328,8 +328,11 @@ namespace Sharpmake
         {
             _projectInfo = DebugProjectGenerator.DebugProjects[GetType()];
 
+            PreserveLinkFolderPaths = true;
+
             // set paths
-            RootPath = _projectInfo.ProjectFolder;
+
+            RootPath = Util.FindCommonRootPath(_projectInfo.ProjectFiles.Select(f => Path.GetDirectoryName(f)).Distinct()) ?? _projectInfo.ProjectFolder;
             SourceRootPath = RootPath;
 
             // add selected source files
