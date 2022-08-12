@@ -139,14 +139,20 @@ namespace Sharpmake
                     return null;
             }
 
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
-            if (!fastLoad)
+            try
             {
-                if (!ExtensionChecker.IsSharpmakeExtension(assembly))
-                    return null;
+                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                if (!fastLoad)
+                {
+                    if (!ExtensionChecker.IsSharpmakeExtension(assembly))
+                        return null;
+                }
+                return assembly;
             }
-
-            return assembly;
+            catch (BadImageFormatException)
+            {
+                return null;
+            }
         }
 
         /// <summary>
