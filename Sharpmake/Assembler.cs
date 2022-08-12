@@ -467,6 +467,9 @@ namespace Sharpmake
 
             foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r)))
             {
+                // Skip references that are already provided by the runtime
+                if (BasicReferenceAssemblies.All.Any(a => string.Equals(Path.GetFileName(reference), a.FilePath, StringComparison.OrdinalIgnoreCase)))
+                    continue;
                 metadataReferences.Add(MetadataReference.CreateFromFile(reference));
             }
 
