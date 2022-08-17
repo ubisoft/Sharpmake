@@ -52,7 +52,7 @@ namespace PackageReference
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
 
             conf.ReferencesByNuGetPackage.Add("NUnit", "3.6.0");
-            conf.ReferencesByNuGetPackage.Add("Newtonsoft.Json", "9.0.1");
+            conf.ReferencesByNuGetPackage.Add("Newtonsoft.Json", "13.0.1");
             conf.ReferencesByNuGetPackage.Add("Mono.Cecil", "0.9.6.4", privateAssets: Sharpmake.PackageReferences.AssetsDependency.All);
             conf.ReferencesByNuGetPackage.Add("MySql.Data", "6.10.6", privateAssets: Sharpmake.PackageReferences.AssetsDependency.Build | Sharpmake.PackageReferences.AssetsDependency.Compile);
         }
