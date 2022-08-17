@@ -116,6 +116,8 @@ namespace Sharpmake
 
             public List<Project.Configuration> Configurations = new List<Project.Configuration>();
 
+            public Dictionary<Solution.Configuration, Configuration.IncludedProjectInfo.Build> SolutionConfigurationsBuild = new Dictionary<Solution.Configuration, Configuration.IncludedProjectInfo.Build>();
+
             // Default target use when a project is excluded from build, some generator need to specify a 'dummy' target
             public ITarget TargetDefault;
 
@@ -182,17 +184,6 @@ namespace Sharpmake
                         projectsWereFiltered = true;
                         continue;
                     }
-                    else if (solutionConfiguration.IncludeOnlyNeededFastBuildProjects)
-                    {
-                        if (!includedProjectInfo.Project.IsFastBuildAll &&
-                            (includedProjectInfo.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.No || includedProjectInfo.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.YesThroughDependency) &&
-                            includedProjectInfo.Configuration.IsFastBuild && !includedProjectInfo.Configuration.DoNotGenerateFastBuild &&
-                            !(includedProjectInfo.Configuration.AddFastBuildProjectToSolutionCallback?.Invoke() ?? false))
-                        {
-                            projectsWereFiltered = true;
-                            continue;
-                        }
-                    }
 
                     ResolvedProject resolvedProject = result.GetValueOrAdd(
                         includedProjectInfo.Configuration.ProjectFullFileName,
@@ -208,6 +199,7 @@ namespace Sharpmake
                         });
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
+                    resolvedProject.SolutionConfigurationsBuild.Add(solutionConfiguration, includedProjectInfo.ToBuild);
 
                     if (!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
                         configurationsToProjects[includedProjectInfo.Configuration] = resolvedProject;

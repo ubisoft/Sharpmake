@@ -748,17 +748,26 @@ namespace Sharpmake.Generators.VisualStudio
         private List<Solution.ResolvedProject> ResolveSolutionProjects(Solution solution, IReadOnlyList<Solution.Configuration> solutionConfigurations)
         {
             bool projectsWereFiltered;
-            List<Solution.ResolvedProject> solutionProjects = solution.GetResolvedProjects(solutionConfigurations, out projectsWereFiltered).ToList();
+            var resolvedProjects = solution.GetResolvedProjects(solutionConfigurations, out projectsWereFiltered);
+
+            var filtered = resolvedProjects.Where(sp =>
+            {
+                var onlyNeeded = sp.SolutionConfigurationsBuild.All(
+                    scb => scb.Key.IncludeOnlyNeededFastBuildProjects && (scb.Value == Solution.Configuration.IncludedProjectInfo.Build.No || scb.Value == Solution.Configuration.IncludedProjectInfo.Build.YesThroughDependency)
+                );
+                if (onlyNeeded)
+                {
+                    if (!sp.Project.IsFastBuildAll && (sp.Configurations.All(pc => pc.IsFastBuild && !pc.DoNotGenerateFastBuild && !(pc.AddFastBuildProjectToSolutionCallback?.Invoke() ?? false))))
+                        return false;
+                }
+                return true;
+            });
 
             // Ensure all projects are always in the same order to avoid random shuffles
-            solutionProjects.Sort((a, b) =>
-            {
-                int nameComparison = string.Compare(a.ProjectName, b.ProjectName, StringComparison.InvariantCultureIgnoreCase);
-                if (nameComparison != 0)
-                    return nameComparison;
-
-                return string.Compare(a.ProjectFile, b.ProjectFile, StringComparison.InvariantCultureIgnoreCase);
-            });
+            var solutionProjects = filtered
+                .OrderBy(p => p.ProjectName, StringComparer.InvariantCultureIgnoreCase)
+                .ThenBy(p => p.ProjectFile, StringComparer.InvariantCultureIgnoreCase)
+                .ToList();
 
             // Validate and handle startup project.
             IEnumerable<Solution.Configuration> confWithStartupProjects = solutionConfigurations.Where(conf => conf.StartupProject != null);

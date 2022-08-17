@@ -64,5 +64,14 @@ namespace SharpmakeGen
                 Name = "NoAllFastBuildProjectFunctionalTest";
             }
         }
+
+        [Generate]
+        public class OnlyNeededFastBuildTest : FunctionalTestProject
+        {
+            public OnlyNeededFastBuildTest()
+            {
+                Name = "OnlyNeededFastBuildTest";
+            }
+        }
     }
 }
