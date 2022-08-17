@@ -41,7 +41,7 @@ namespace SharpmakeGen
                 {
                     StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
                     StartProgram = @"[project.RootPath]\tmp\bin\$(Configuration)\$(TargetFramework)\Sharpmake.Application.exe",
-                    StartArguments = "/sources(\"[project.Name].sharpmake.cs\")",
+                    StartArguments = "/sources('[project.Name].sharpmake.cs')",
                     WorkingDirectory = "[project.SourceRootPath]"
                 };
             }
