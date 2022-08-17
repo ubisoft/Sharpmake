@@ -234,6 +234,7 @@ namespace SharpmakeGen.FunctionalTests
 
             FastBuildSettings.FastBuildMakeCommand = Path.Combine(sharpmakeRootDirectory, @"tools\FastBuild\Windows-x64\FBuild.exe");
             FastBuildSettings.FastBuildWait = true;
+            FastBuildSettings.WriteAllConfigsSection = true;
 
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.Latest);
 
