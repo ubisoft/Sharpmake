@@ -375,22 +375,35 @@ namespace Sharpmake.Generators.VisualStudio
 
             // MSVC NMake IntelliSence options
 
-            context.Options["AdditionalOptions"] = (context.Configuration.CustomBuildSettings is null) ? "" : context.Configuration.CustomBuildSettings.AdditionalOptions;
+            context.Options["AdditionalOptions"] = (context.Configuration.CustomBuildSettings is null) ? FileGeneratorUtilities.RemoveLineTag : context.Configuration.CustomBuildSettings.AdditionalOptions;
 
+            string cppLanguageStd = null;
             if (context.Configuration.CustomBuildSettings is null || context.Configuration.CustomBuildSettings.AutoConfigure)
             {
                 context.SelectOption
                 (
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP98, () => { }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP11, () => { }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { context.Options["AdditionalOptions"] += " /std:c++14"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { context.Options["AdditionalOptions"] += " /std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { cppLanguageStd = "/std:c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { cppLanguageStd = "/std:c++17"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { context.Options["AdditionalOptions"] += " /std:c++14"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { context.Options["AdditionalOptions"] += " /std:c++17"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { context.Options["AdditionalOptions"] += " /std:c++latest"; })
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { cppLanguageStd = "/std:c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { cppLanguageStd = "/std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { cppLanguageStd = "/std:c++latest"; })
                 );
+            }
+
+            if (!string.IsNullOrEmpty(cppLanguageStd))
+            {
+                if (string.IsNullOrEmpty(context.Options["AdditionalOptions"]) || context.Options["AdditionalOptions"] == FileGeneratorUtilities.RemoveLineTag)
+                    context.Options["AdditionalOptions"] = cppLanguageStd;
+                else
+                    context.Options["AdditionalOptions"] += $" {cppLanguageStd}";
+            }
+            else if (string.IsNullOrEmpty(context.Options["AdditionalOptions"]))
+            {
+                context.Options["AdditionalOptions"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
             // Compiler section
