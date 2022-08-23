@@ -386,6 +386,7 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP11, () => { }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { cppLanguageStd = "/std:c++14"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { cppLanguageStd = "/std:c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP20, () => { cppLanguageStd = "/std:c++20"; }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { }),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { cppLanguageStd = "/std:c++14"; }),
