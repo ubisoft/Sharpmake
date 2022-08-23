@@ -367,7 +367,7 @@ namespace Sharpmake
         [Configure]
         public void ConfigureAll(Configuration conf, Target target)
         {
-            conf.ProjectPath = RootPath;
+            conf.ProjectPath = _projectInfo.ProjectFolder;
             conf.ProjectFileName = "[project.Name].[target.DevEnv]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
 
@@ -395,8 +395,7 @@ namespace Sharpmake
             DebugProjectGenerator.DebugProjectExtension.AddSharpmakePackage(conf);
 
             // set up custom configuration only to setup project
-            if (_projectInfo.IsSetupProject &&
-                FileSystemStringComparer.Default.Equals(conf.ProjectPath, RootPath))
+            if (_projectInfo.IsSetupProject)
             {
                 conf.SetupProjectOptions(_projectInfo.StartArguments);
             }
