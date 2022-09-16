@@ -332,6 +332,12 @@ namespace Sharpmake.Generators.Generic
             }
 
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+            if (context.DevelopmentEnvironment.IsVisualStudio())
+            {
+                var winIncludePath = context.DevelopmentEnvironment.GetWindowsIncludePath();
+                includePaths.AddRange(winIncludePath.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+            }
+            
             includePaths.AddRange(platformVcxproj.GetPlatformIncludePaths(context));
 
             defines.AddRange(platformVcxproj.GetImplicitlyDefinedSymbols(context));
