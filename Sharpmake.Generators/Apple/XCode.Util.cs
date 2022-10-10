@@ -23,8 +23,10 @@ namespace Sharpmake.Generators.Apple
     {
         public static string XCodeFormatSingleItem(string item, bool forceQuotes = false)
         {
-            if (forceQuotes || item.Contains(' ') || item.Contains(Util.DoubleQuotes))
+            if (forceQuotes || item.Contains(Util.DoubleQuotes) || item.Contains(' '))
                 return $"{Util.DoubleQuotes}{Util.EscapedDoubleQuotes}{item.Replace(Util.DoubleQuotes, @"\\\""")}{Util.EscapedDoubleQuotes}{Util.DoubleQuotes}";
+            else if (item.Contains('+'))
+                return $"{Util.DoubleQuotes}{item}{Util.DoubleQuotes}";
             return $"{item}";
         }
 

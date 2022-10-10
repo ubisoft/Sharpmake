@@ -22,7 +22,7 @@ namespace HelloXCode
         public StaticLib1Project()
         {
             AddTargets(CommonTarget.GetDefaultTargets());
-            Name = "static_lib1";
+            Name = "static_lib+1";
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
