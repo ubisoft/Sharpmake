@@ -190,6 +190,11 @@ namespace Sharpmake
             return GetResourceIncludePathsImpl(context);
         }
 
+        public IEnumerable<string> GetAssemblyIncludePaths(IGenerationContext context)
+        {
+            return GetAssemblyIncludePathsImpl(context);
+        }
+
         public virtual IEnumerable<string> GetCxUsingPath(IGenerationContext context)
         {
             yield break;
@@ -532,6 +537,11 @@ namespace Sharpmake
             resourceIncludePaths.AddRange(context.Configuration.DependenciesResourceIncludePaths);
 
             return resourceIncludePaths;
+        }
+
+        protected virtual IEnumerable<string> GetAssemblyIncludePathsImpl(IGenerationContext context)
+        {
+            yield break;
         }
 
         #endregion

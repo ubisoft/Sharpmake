@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
@@ -164,6 +165,17 @@ namespace Sharpmake
             }
             else
                 throw new NotImplementedException("Unsupported runtime library value " + runtime);
+        }
+
+        protected override IEnumerable<string> GetAssemblyIncludePathsImpl(IGenerationContext context)
+        {
+            var assemblyIncludePaths = new OrderableStrings();
+            assemblyIncludePaths.AddRange(context.Configuration.AssemblyIncludePaths);
+
+            if (assemblyIncludePaths.Count() > 10)
+                throw new Error("{0} project configuration contains more than 10 Assembly include paths, in total: {1}", context.Configuration, assemblyIncludePaths.Count());
+
+            return assemblyIncludePaths;
         }
 
         public override void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)

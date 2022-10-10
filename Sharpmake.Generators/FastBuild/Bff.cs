@@ -1491,9 +1491,11 @@ namespace Sharpmake.Generators.FastBuild
 
             var includePaths = new OrderableStrings(platformVcxproj.GetIncludePaths(context));
             var resourceIncludePaths = new OrderableStrings(platformVcxproj.GetResourceIncludePaths(context));
+            var assemblyIncludePaths = new OrderableStrings(platformVcxproj.GetAssemblyIncludePaths(context));
             context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["AdditionalAssemblyIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
 
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
             if (context.EnvironmentVariableResolver != null)
@@ -1521,6 +1523,13 @@ namespace Sharpmake.Generators.FastBuild
 
                 if (resourceDirs.Any())
                     context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", resourceDirs);
+
+                // Fill Assembly include dirs
+                var assemblyDirs = new List<string>();
+                assemblyDirs.AddRange(assemblyIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
+
+                if (assemblyDirs.Any())
+                    context.CommandLineOptions["AdditionalAssemblyIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", assemblyDirs);
 
                 // Fill using dirs
                 Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);

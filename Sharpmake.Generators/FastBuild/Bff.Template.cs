@@ -332,6 +332,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
 
                 public static string MasmCompilerExtraOptions = @"
     .CompilerExtraOptions   = ''
+            + ' [cmdLineOptions.AdditionalAssemblyIncludeDirectories]'
             + ' /nologo'
             + ' /W3'
             + ' /errorReport:queue'
