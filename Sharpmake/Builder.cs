@@ -133,7 +133,7 @@ namespace Sharpmake
         private ThreadPool _tasks;
         // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
-        private readonly Dictionary<string, string> _references = new Dictionary<string, string>(); // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
+        private readonly Dictionary<string, string> _runtimeReferences = new Dictionary<string, string>(); // Keep track of runtime assemblies explicitly referenced from scripts, and needed during execution
 
         private class ProfilingCompleteEvent
         {
@@ -543,16 +543,16 @@ namespace Sharpmake
             if (newAssemblyInfo.Assembly == null && context.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
                 throw new InternalError();
 
-            // Keep track of assemblies explicitly referenced by compiled files
+            // Keep track of runtime assemblies explicitly referenced by compiled files
             foreach (var fullpath in assembler.References.Distinct())
             {
                 var assemblyName = AssemblyName.GetAssemblyName(fullpath).FullName;
                 string assemblyPath;
-                if (_references.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
+                if (_runtimeReferences.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new Error($"Assembly {assemblyName} present in two different locations: {fullpath} and {assemblyPath}.");
                 }
-                _references[assemblyName] = fullpath;
+                _runtimeReferences[assemblyName] = fullpath;
             }
 
             if (newAssemblyInfo.Assembly != null)
@@ -579,14 +579,14 @@ namespace Sharpmake
             if (builtAssembly != null)
                 return builtAssembly;
 
-            // Check if this is an assembly that if referenced by [module: Sharpmake.Reference("...")], is so, explicitly load it with its fullPath
+            // Check if this is a runtime assembly referenced by a script, if so, explicitly load it with its fullPath
             string explicitReferencesFullPath;
-            if (_references.TryGetValue(args.Name, out explicitReferencesFullPath))
+            if (_runtimeReferences.TryGetValue(args.Name, out explicitReferencesFullPath))
                 return Assembly.LoadFrom(explicitReferencesFullPath);
 
             // Default binding redirect for old versions of an assembly to the implicitly/explicitly referenced one
             var requestedAssemblyName = new AssemblyName(args.Name);
-            var referencedAssemblyHighestVersion = _references.Keys
+            var referencedAssemblyHighestVersion = _runtimeReferences.Keys
                 .Where(assemblyFullName => assemblyFullName.StartsWith(requestedAssemblyName.Name, StringComparison.OrdinalIgnoreCase))
                 .Select(assemblyFullName => new AssemblyName(assemblyFullName))
                 .OrderBy(assemblyName => assemblyName.Version)
@@ -595,7 +595,7 @@ namespace Sharpmake
 
             if (referencedAssemblyHighestVersion != null)
             {
-                return Assembly.LoadFrom(_references[referencedAssemblyHighestVersion]);
+                return Assembly.LoadFrom(_runtimeReferences[referencedAssemblyHighestVersion]);
             }
 
             return null;

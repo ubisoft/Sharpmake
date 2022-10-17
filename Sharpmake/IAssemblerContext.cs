@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -42,8 +43,13 @@ namespace Sharpmake
     public interface IAssemblerContext
     {
         void AddSourceFile(string file);
+        [Obsolete("Use AddRuntimeReference() instead")]
         void AddReference(string file);
+        void AddRuntimeReference(string file);
+        [Obsolete("Use AddRuntimeReference() instead")]
         void AddReference(IAssemblyInfo info);
+        void AddRuntimeReference(IAssemblyInfo info);
+        void AddBuildReference(string file);
         void AddSourceAttributeParser(ISourceAttributeParser parser);
         IAssemblyInfo BuildAndLoadSharpmakeFiles(params string[] files);
         void SetDebugProjectName(string name);
@@ -56,7 +62,10 @@ namespace Sharpmake
         string DebugProjectName { get; }
         Assembly Assembly { get; }
         IReadOnlyCollection<string> SourceFiles { get; }
+        [Obsolete("Use RuntimeReference instead")]
         IReadOnlyCollection<string> References { get; }
+        IReadOnlyCollection<string> RuntimeReferences { get; }
+        IReadOnlyCollection<string> BuildReferences { get; }
         IReadOnlyDictionary<string, IAssemblyInfo> SourceReferences { get; }
         bool UseDefaultReferences { get; }
     }
@@ -70,16 +79,28 @@ namespace Sharpmake
                 context.AddSourceFile(file);
         }
 
-        public static void AddReferences(this IAssemblerContext context, IEnumerable<string> files)
+        [Obsolete("Use AddRuntimeReferences() instead")]
+        public static void AddReferences(this IAssemblerContext context, IEnumerable<string> files) => AddRuntimeReferences(context, files);
+
+        public static void AddRuntimeReferences(this IAssemblerContext context, IEnumerable<string> files)
         {
             foreach (string file in files)
-                context.AddReference(file);
+                context.AddRuntimeReference(file);
         }
 
-        public static void AddReferences(this IAssemblerContext context, IEnumerable<IAssemblyInfo> infos)
+        public static void AddBuildReferences(this IAssemblerContext context, IEnumerable<string> files)
+        {
+            foreach (string file in files)
+                context.AddBuildReference(file);
+        }
+
+        [Obsolete("Use AddRuntimeReferences() instead")]
+        public static void AddReferences(this IAssemblerContext context, IEnumerable<IAssemblyInfo> infos) => AddRuntimeReferences(context, infos);
+
+        public static void AddRuntimeReferences(this IAssemblerContext context, IEnumerable<IAssemblyInfo> infos)
         {
             foreach (var info in infos)
-                context.AddReference(info);
+                context.AddRuntimeReference(info);
         }
 
         public static void AddSourceAttributeParsers(this IAssemblerContext context, IEnumerable<ISourceAttributeParser> parsers)
@@ -91,7 +112,7 @@ namespace Sharpmake
         public static IAssemblyInfo BuildLoadAndAddReferenceToSharpmakeFilesAssembly(this IAssemblerContext context, params string[] files)
         {
             var assemblyInfo = context.BuildAndLoadSharpmakeFiles(files);
-            context.AddReference(assemblyInfo);
+            context.AddRuntimeReference(assemblyInfo);
             return assemblyInfo;
         }
 
@@ -113,7 +134,10 @@ namespace Sharpmake
 
             public Assembly Assembly => _info.Assembly;
             public string Id => _info.Id;
-            public IReadOnlyCollection<string> References => _info.References;
+            [Obsolete("Use RuntimeReference instead")]
+            public IReadOnlyCollection<string> References => RuntimeReferences;
+            public IReadOnlyCollection<string> RuntimeReferences => _info.RuntimeReferences;
+            public IReadOnlyCollection<string> BuildReferences => _info.BuildReferences;
             public IReadOnlyCollection<string> SourceFiles => _info.SourceFiles;
             public IReadOnlyDictionary<string, IAssemblyInfo> SourceReferences => _info.SourceReferences;
             public bool UseDefaultReferences => _info.UseDefaultReferences;

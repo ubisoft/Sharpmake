@@ -220,7 +220,7 @@ namespace Sharpmake
 
             // Add references
             var references = new HashSet<string>();
-            foreach (var assemblerRef in assemblyInfo.References)
+            foreach (var assemblerRef in assemblyInfo.RuntimeReferences)
             {
                 if (!assemblyInfo.SourceReferences.ContainsKey(assemblerRef))
                 {
