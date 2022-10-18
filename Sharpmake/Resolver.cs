@@ -809,12 +809,14 @@ namespace Sharpmake
                             SetResolving(memberPath);
                             IList<string> values = fieldValue as IList<string>;
 
-                            for (int i = 0; i < values.Count; ++i)
+                            string[] copyOfList = values.ToArray();
+                            values.Clear();
+
+                            for (int i = 0; i < copyOfList.Length; ++i)
                             {
                                 bool wasChanged;
-                                string value = Resolve(values[i], fallbackValue, out wasChanged);
-                                if (wasChanged)
-                                    values[i] = value;
+                                string value = Resolve(copyOfList[i], fallbackValue, out wasChanged);
+                                values.Add(value);
                             }
 
                             SetResolved(memberPath);
