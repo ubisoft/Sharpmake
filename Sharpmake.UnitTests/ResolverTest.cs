@@ -300,7 +300,6 @@ namespace Sharpmake.UnitTests
 
             Assert.That(obj.Value1, Is.EqualTo("PropertyClass"));
             Assert.That(obj.Value2, Is.EqualTo("propertyclass"));
-            Assert.That(obj.Value3, Is.EqualTo("propertyclass"));
         }
 
         [Test]
@@ -318,6 +317,11 @@ namespace Sharpmake.UnitTests
 
             resolver.Resolve(strings);
             Assert.That(strings.OrderableStrings.ToString(), Is.EqualTo("a,b"));
+
+            strings.OrderableStrings.Clear();
+            strings.OrderableStrings.Add("[path1]", 1);
+            strings.OrderableStrings.Add("[path2]", 2);
+            Assert.Throws<Error>(() => resolver.Resolve(strings));
         }
 
     }
