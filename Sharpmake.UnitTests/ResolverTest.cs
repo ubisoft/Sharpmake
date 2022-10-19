@@ -81,6 +81,12 @@ namespace Sharpmake.UnitTests
             public Dictionary<string, string> Dictionary = new Dictionary<string, string>();
         }
 
+        [Resolver.Resolvable]
+        private class OrderableStringsClass
+        {
+            public OrderableStrings OrderableStrings = new OrderableStrings();
+        }
+
         [Test]
         public void CanResolveAFieldClass()
         {
@@ -296,6 +302,24 @@ namespace Sharpmake.UnitTests
             Assert.That(obj.Value2, Is.EqualTo("propertyclass"));
             Assert.That(obj.Value3, Is.EqualTo("propertyclass"));
         }
+
+        [Test]
+        public void CanResolveDuplicateOrderableStrings()
+        {
+            var strings = new OrderableStringsClass();
+            strings.OrderableStrings.Add("[path1]");
+            strings.OrderableStrings.Add("[path2]");
+            strings.OrderableStrings.Add("[path3]");
+
+            var resolver = new Resolver();
+            resolver.SetParameter("path1", "a");
+            resolver.SetParameter("path2", "a");
+            resolver.SetParameter("path3", "b");
+
+            resolver.Resolve(strings);
+            Assert.That(strings.OrderableStrings.ToString(), Is.EqualTo("a,b"));
+        }
+
     }
 }
 

@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Sharpmake
 {
@@ -69,7 +70,9 @@ namespace Sharpmake
 
             foreach (string destFullPath in destFullPaths.Values)
             {
-                result.Add(PathGetRelative(sourceFullPath, destFullPath, ignoreCase));
+                var path = PathGetRelative(sourceFullPath, destFullPath, ignoreCase);
+                if (!result.Contains(path))
+                    result.Add(path);
             }
             return result;
         }
@@ -80,7 +83,8 @@ namespace Sharpmake
 
             for (int i = 0; i < result.Count; ++i)
             {
-                result[i] = PathGetRelative(sourceFullPath, result[i], ignoreCase);
+                var path = PathGetRelative(sourceFullPath, result[i], ignoreCase);
+                i = result.SetOrRemoveAtIndex(i, path);
             }
             return result;
         }
@@ -91,7 +95,8 @@ namespace Sharpmake
 
             for (int i = 0; i < result.Count; ++i)
             {
-                result[i] = PathGetRelative(sourceFullPath, result[i], ignoreCase);
+                var path = PathGetRelative(sourceFullPath, result[i], ignoreCase);
+                i = result.SetOrRemoveAtIndex(i, path);
             }
             return result;
         }
