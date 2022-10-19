@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_FastBuild_vs2019|x64">
+      <Configuration>Debug_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_vs2019|x64">
+      <Configuration>Release_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>SpanMultipleSrcDirsFBUnityIsolate</RootNamespace>
+    <ProjectName>SpanMultipleSrcDirsFBUnityIsolate</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
+    <OutDir>output\debug_fastbuild_vs2019\</OutDir>
+    <IntDir>build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>..\codebase\spanmultiplesrcdirs\additional_dir;..\codebase\spanmultiplesrcdirs\dir_individual_files</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
+    <OutDir>output\release_fastbuild_vs2019\</OutDir>
+    <IntDir>build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>..\codebase\spanmultiplesrcdirs\additional_dir;..\codebase\spanmultiplesrcdirs\dir_individual_files</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="spanmultiplesrcdirsfbunityisolate_vs2019_win64.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

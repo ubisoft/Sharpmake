@@ -571,6 +571,7 @@ Unity( '[unityFile.UnityName]' )
     .UnityInputObjectLists              = [unityFile.UnityInputObjectLists]
     .UnityInputIsolateWritableFiles     =  [unityFile.UnityInputIsolateWritableFiles]
     .UnityInputIsolateWritableFilesLimit = [unityFile.UnityInputIsolateWritableFilesLimit]
+    .UnityInputIsolateListFile          = '[unityFile.UnityInputIsolateListFile]'
     .UnityOutputPath                    = '[unityFile.UnityOutputPath]'
     .UnityOutputPattern                 = '[unityFile.UnityOutputPattern]'
     .UnityNumFiles                      =  [unityFile.UnityNumFiles]

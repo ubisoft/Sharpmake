@@ -1,0 +1,309 @@
+
+//=================================================================================================================
+// SpanMultipleSrcDirsFBUnityIsolate FASTBuild config file
+//=================================================================================================================
+#once
+
+
+Unity( 'SpanMultipleSrcDirsFBUnityIsolate_unity' )
+{
+    .UnityInputPath                     = {
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\additional_dir',
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\main_dir'
+                                          }
+    .UnityInputFiles                    = {
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_class.cpp',
+                                              '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\dir_individual_files\floating_file.cpp'
+                                          }
+    .UnityInputIsolateWritableFiles     =  false
+    .UnityInputIsolateListFile          = '.\$_CURRENT_BFF_DIR_$\..\codebase\SpanMultipleSrcDirs\temp\isolate_list.txt'
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\SpanMultipleSrcDirsFBUnityIsolate'
+    .UnityOutputPattern                 = 'spanmultiplesrcdirsfbunityisolate_unity*.cpp'
+    .UnityNumFiles                      =  1
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+ObjectList( 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            + ' /GF'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\spanmultiplesrcdirsfbunityisolate_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'SpanMultipleSrcDirsFBUnityIsolate_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+Executable( 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\'
+    .Libraries              = 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\spanmultiplesrcdirsfbunityisolate.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\additional_dir"'
+            + ' /I".\$_CURRENT_BFF_DIR_$\..\codebase\spanmultiplesrcdirs\dir_individual_files"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /GF'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\spanmultiplesrcdirsfbunityisolate_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'SpanMultipleSrcDirsFBUnityIsolate_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+Executable( 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\'
+    .Libraries              = 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate\spanmultiplesrcdirsfbunityisolate.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\spanmultiplesrcdirsfbunityisolate.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////
