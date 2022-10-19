@@ -29,12 +29,12 @@ namespace SharpmakeGen
 
             if (target.Framework.IsDotNetFramework())
             {
-                conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net472", "1.3.0");
+                conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net472", "1.2.4");
                 conf.ReferencesByNuGetPackage.Add("System.Text.Json", "5.0.2");
             }
             else if (target.Framework.IsDotNetCore())
             {
-                conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net50", "1.2.4");
+                conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net50", "1.3.0");
                 conf.ReferencesByNuGetPackage.Add("Microsoft.Win32.Registry", "5.0.0");
             }
         }
