@@ -941,6 +941,16 @@ namespace Sharpmake
             public string PrecompHeaderOutputFolder = null;
 
             /// <summary>
+            /// Gets or sets the name for the precompiled header's binary file in C and C++ projects,
+            /// e.g. <c>pch.pch</c>.
+            /// </summary>
+            /// <remarks>
+            /// If this property is set to <c>null</c>, Sharpmake will simply use the project's name.
+            /// To modify the output directory of this file, use <see cref="PrecompHeaderOutputFolder"/>.
+            /// </remarks>
+            public string PrecompHeaderOutputFile = null;
+
+            /// <summary>
             /// Gets a list of files that don't use the precompiled headers.
             /// </summary>
             public Strings PrecompSourceExclude = new Strings();
