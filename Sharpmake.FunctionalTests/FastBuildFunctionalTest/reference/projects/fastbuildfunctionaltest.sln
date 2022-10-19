@@ -40,6 +40,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityInclude", "spanmultiplesrcdirsfbunityinclude_vs2019_win64.vcxproj", "{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityIsolate", "spanmultiplesrcdirsfbunityisolate_vs2019_win64.vcxproj", "{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UsePrecompExe", "useprecompexe_vs2019_win64.vcxproj", "{3B88798D-8E0B-330F-7C31-7F761D686B03}"
 EndProject
 Global
@@ -174,6 +176,12 @@ Global
 		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
 		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2019|x64
 		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2019|x64
 		{3B88798D-8E0B-330F-7C31-7F761D686B03}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
 		{3B88798D-8E0B-330F-7C31-7F761D686B03}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
 		{3B88798D-8E0B-330F-7C31-7F761D686B03}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64

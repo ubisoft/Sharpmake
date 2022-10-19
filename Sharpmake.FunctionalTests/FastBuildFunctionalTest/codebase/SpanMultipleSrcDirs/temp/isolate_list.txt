@@ -1,0 +1,2 @@
+../codebase/SpanMultipleSrcDirs/additional_dir/extra_class1.cpp
+../codebase/SpanMultipleSrcDirs/main_dir/main.cpp
