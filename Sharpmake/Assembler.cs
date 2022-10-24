@@ -47,9 +47,14 @@ namespace Sharpmake
         public List<Assembly> Assemblies { get { return _assemblies; } }
 
         /// <summary>
-        /// Extra user assembly file name to use while compiling
+        /// Extra user assembly file name to use while compiling/running
         /// </summary>
         public IReadOnlyList<string> References { get { return _references; } }
+
+        /// <summary>
+        /// Extra user assembly file name to use while compiling
+        /// </summary>
+        public IReadOnlyList<string> BuildReferences { get { return _buildReferences; } }
 
         private readonly HashSet<string> _defines;
 
@@ -76,12 +81,16 @@ namespace Sharpmake
             public string DebugProjectName { get; set; }
             public Assembly Assembly { get; set; }
             public IReadOnlyCollection<string> SourceFiles => _sourceFiles;
-            public IReadOnlyCollection<string> References => _references;
+            [Obsolete("Use RuntimeReference instead")]
+            public IReadOnlyCollection<string> References => RuntimeReferences;
+            public IReadOnlyCollection<string> RuntimeReferences => _runtimeReferences;
+            public IReadOnlyCollection<string> BuildReferences => _buildReferences;
             public IReadOnlyDictionary<string, IAssemblyInfo> SourceReferences => _sourceReferences;
             public bool UseDefaultReferences { get; set; }
 
             public List<string> _sourceFiles = new List<string>();
-            public List<string> _references = new List<string>();
+            public List<string> _runtimeReferences = new List<string>();
+            public List<string> _buildReferences = new List<string>();
             public Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
         }
 
@@ -298,9 +307,9 @@ namespace Sharpmake
 
         #region Private
 
-        private List<string> _assemblyDirectory = new List<string>();
         private List<Assembly> _assemblies = new List<Assembly>();
         private List<string> _references = new List<string>();
+        private List<string> _buildReferences = new List<string>();
         private List<ISourceAttributeParser> _attributeParsers = new List<ISourceAttributeParser>();
         private List<IParsingFlowParser> _parsingFlowParsers = new List<IParsingFlowParser>();
 
@@ -364,25 +373,39 @@ namespace Sharpmake
                 }
             }
 
-            public void AddReference(string file)
+            [Obsolete("Use AddRuntimeReference() instead")]
+            public void AddReference(string file) => AddRuntimeReference(file);
+
+            public void AddRuntimeReference(string file)
             {
-                if (!_assemblyInfo._references.Contains(file))
+                if (!_assemblyInfo._runtimeReferences.Contains(file))
                 {
-                    _assemblyInfo._references.Add(file);
+                    _assemblyInfo._runtimeReferences.Add(file);
                     var loadInfo = _builderContext.LoadExtension(file);
                     this.AddSourceAttributeParsers(loadInfo.Parsers);
                 }
             }
 
-            public void AddReference(IAssemblyInfo info)
+            public void AddBuildReference(string file)
+            {
+                if (!_assemblyInfo._buildReferences.Contains(file))
+                {
+                    _assemblyInfo._buildReferences.Add(file);
+                }
+            }
+
+            [Obsolete("Use AddRuntimeReference() instead")]
+            public void AddReference(IAssemblyInfo info) => AddRuntimeReference(info);
+
+            public void AddRuntimeReference(IAssemblyInfo info)
             {
                 if (info.Assembly == null)
                 {
                     _assemblyInfo._sourceReferences.Add(info.Id, info);
                 }
-                else if (!_assemblyInfo._references.Contains(info.Id))
+                else if (!_assemblyInfo._runtimeReferences.Contains(info.Id))
                 {
-                    _assemblyInfo._references.Add(info.Assembly.Location);
+                    _assemblyInfo._runtimeReferences.Add(info.Assembly.Location);
                     _assemblyInfo._sourceReferences.Add(info.Id, info);
                 }
             }
@@ -417,19 +440,24 @@ namespace Sharpmake
         private IAssemblyInfo Build(IBuilderContext builderContext, string libraryFile, params string[] sources)
         {
             var assemblyInfo = LoadAssemblyInfo(builderContext, sources);
-            HashSet<string> references = GetReferences();
+            HashSet<string> references = GetReferencesForBuild();
 
             assemblyInfo.Assembly = Compile(builderContext, assemblyInfo.SourceFiles.ToArray(), libraryFile, references);
             assemblyInfo.Id = assemblyInfo.Assembly.Location;
             return assemblyInfo;
         }
 
-        private HashSet<string> GetReferences()
+        private HashSet<string> GetReferencesForBuild()
         {
             HashSet<string> references = new HashSet<string>();
 
+            // Search if we have a more suitable build reference for each runtime reference
             foreach (string assemblyFile in _references)
-                references.Add(assemblyFile);
+            {
+                var assemblyFullName = AssemblyName.GetAssemblyName(assemblyFile).FullName;
+                var buildAssemblyFile = _buildReferences.SingleOrDefault(buildAssemblyfile => string.Equals(assemblyFullName, AssemblyName.GetAssemblyName(buildAssemblyfile).FullName, StringComparison.OrdinalIgnoreCase));
+                references.Add(buildAssemblyFile ?? assemblyFile);
+            }
 
             foreach (Assembly assembly in _assemblies)
             {
@@ -577,7 +605,8 @@ namespace Sharpmake
             var context = new AssemblerContext(this, assemblyInfo, builderContext, sources);
             AnalyseSourceFiles(context);
 
-            _references.AddRange(assemblyInfo.References);
+            _references.AddRange(assemblyInfo.RuntimeReferences);
+            _buildReferences.AddRange(assemblyInfo.BuildReferences);
 
             return assemblyInfo;
         }
