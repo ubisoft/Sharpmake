@@ -656,11 +656,11 @@ namespace Sharpmake.Generators.Generic
 
             foreach (string file in projectSourceFiles)
             {
-                string fileName = Path.GetFileName(file);
+                string fileName = Path.GetFileNameWithoutExtension(file);
                 int fileNameOccurences = 0;
                 if (fileNamesOccurences.TryGetValue(fileName, out fileNameOccurences))
                 {
-                    fileNamesOccurences[fileName] = fileNameOccurences++;
+                    fileNamesOccurences[fileName] = ++fileNameOccurences;
                 }
                 else
                 {
