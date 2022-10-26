@@ -286,6 +286,9 @@ namespace Sharpmake
 
         public string GetTargetString()
         {
+            if (_valueCache != null)
+                return _valueCache;
+
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
 
             var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
@@ -303,6 +306,7 @@ namespace Sharpmake
                     return value.ToString();
                 }))
             );
+            _valueCache = result;
             return result;
         }
 
@@ -382,7 +386,9 @@ namespace Sharpmake
             if (other._valueCache == null)
                 other._valueCache = other.GetTargetString();
 
-            return _valueCache == other._valueCache;
+            if (_valueCache == other._valueCache)
+                return true;
+            return string.Compare(_valueCache, other._valueCache, StringComparison.Ordinal) == 0;
         }
 
         //possible to override this to make the associations with custom platforms and Sharpmake's
