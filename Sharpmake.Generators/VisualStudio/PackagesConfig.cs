@@ -110,7 +110,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                     fileGenerator.Write(Template.End);
 
-                    bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(packagesConfigPath), fileGenerator.ToMemoryStream());
+                    bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(packagesConfigPath), fileGenerator);
                     if (written)
                         generatedFiles.Add(packagesConfigPath);
                     else

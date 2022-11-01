@@ -198,7 +198,7 @@ namespace Sharpmake.Generators.Generic
             fileGenerator.WriteVerbatim(Template.Solution.HelpRuleEnd);
 
             // Write the solution file
-            updated = builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator.ToMemoryStream());
+            updated = builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator);
 
             solution.PostGenerationCallback?.Invoke(solutionPath, solutionFile, MakeExtension);
 
@@ -372,7 +372,7 @@ namespace Sharpmake.Generators.Generic
                 fileGenerator.Write(Template.Project.Footer);
 
                 // Write the project file
-                updated = builder.Context.WriteGeneratedFile(project.GetType(), projectFileInfo, fileGenerator.ToMemoryStream());
+                updated = builder.Context.WriteGeneratedFile(project.GetType(), projectFileInfo, fileGenerator);
             }
 
             return projectFileInfo.FullName;

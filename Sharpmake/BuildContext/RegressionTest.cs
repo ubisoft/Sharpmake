@@ -125,5 +125,20 @@ namespace Sharpmake.BuildContext
 
             return isDifferent;
         }
+
+        public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+        {
+            var rootPath = RemapRoot?.FullName ?? Path.GetPathRoot(path.FullName);
+            var outFileInfo = new FileInfo(path.FullName.ReplaceHeadPath(rootPath, Output.FullName));
+            var refFileInfo = new FileInfo(path.FullName.ReplaceHeadPath(rootPath, Reference.FullName));
+
+            bool isDifferent = generator.IsFileDifferent(refFileInfo);
+            var outputInfo = new OutputInfo(refFileInfo.FullName, outFileInfo.FullName, isDifferent ? FileStatus.Different : FileStatus.Similar);
+            _referenceDifferenceMap[refFileInfo.FullName] = outputInfo;
+
+            generator.FileWriteIfDifferent(outFileInfo);
+
+            return isDifferent;
+        }
     }
 }

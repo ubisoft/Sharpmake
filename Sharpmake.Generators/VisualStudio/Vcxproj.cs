@@ -359,7 +359,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             GenerateConfOptions(context);
 
-            var fileGenerator = new XmlFileGenerator();
+            var fileGenerator = new FileGenerator();
 
             // xml begin header
             using (fileGenerator.Declare("toolsVersion", context.DevelopmentEnvironmentsRange.MinDevEnv.GetVisualProjectToolsVersionString()))
@@ -788,12 +788,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
-            MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream();
 
             vcTargetsPathScopeVar.Dispose();
 
             FileInfo projectFileInfo = new FileInfo(context.ProjectPath + ProjectExtension);
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, cleanMemoryStream))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator))
                 generatedFiles.Add(projectFileInfo.FullName);
             else
                 skipFiles.Add(projectFileInfo.FullName);
@@ -1149,11 +1148,10 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            var projectFilesText = projectFilesWriter.ToString();
-            if (!string.IsNullOrWhiteSpace(projectFilesText))
+            if (!projectFilesWriter.IsEmpty())
             {
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                fileGenerator.Write(projectFilesText);
+                projectFilesWriter.WriteTo(fileGenerator);
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
 
@@ -1356,7 +1354,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Write the project file
             FileInfo projectFiltersFileInfo = new FileInfo(filtersFileName);
 
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFiltersFileInfo, fileGenerator.ToMemoryStream()))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFiltersFileInfo, fileGenerator))
                 generatedFiles.Add(projectFiltersFileInfo.FullName);
             else
                 skipFiles.Add(projectFiltersFileInfo.FullName);
@@ -2050,7 +2048,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 FileInfo copyDependenciesFileInfo = new FileInfo(copyDependenciesFileName);
 
-                if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), copyDependenciesFileInfo, dependenciesFileGenerator.ToMemoryStream()))
+                if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), copyDependenciesFileInfo, dependenciesFileGenerator))
                     generatedFiles.Add(copyDependenciesFileInfo.FullName);
                 else
                     skipFiles.Add(copyDependenciesFileInfo.FullName);

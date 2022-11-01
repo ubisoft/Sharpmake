@@ -47,3 +47,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.22.1.0")]
 
 [assembly: InternalsVisibleTo("Sharpmake")]
+[assembly: InternalsVisibleTo("Sharpmake.UnitTests")]
