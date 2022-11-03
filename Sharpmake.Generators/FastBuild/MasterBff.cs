@@ -177,7 +177,7 @@ namespace Sharpmake.Generators.FastBuild
             // Studio, even if all it does is include the real BFF.
             //
 
-            IEnumerable<ConfigurationsPerBff> confsPerBffs = ConfigurationsPerBff.Create(solution, solutionConfigurations).ToArray();
+            IEnumerable<ConfigurationsPerBff> confsPerBffs = ConfigurationsPerBff.Create(solution, solutionConfigurations);
             foreach (ConfigurationsPerBff confsPerBff in confsPerBffs)
             {
                 if (confsPerBff.Configurations.Any(conf => conf.SolutionFilePath != conf.MasterBffFilePath))
