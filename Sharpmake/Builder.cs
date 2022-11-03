@@ -503,7 +503,7 @@ namespace Sharpmake
                     {
                         var candidatePath = Path.Combine(assemblyFolder, dllName);
                         if (File.Exists(candidatePath))
-                            extensionLoader.LoadExtension(candidatePath, false);
+                            extensionLoader.LoadExtension(candidatePath);
                     }
                 }
             }
@@ -1405,7 +1405,7 @@ namespace Sharpmake
                 using (var extensionLoader = new ExtensionLoader())
                 {
                     var parserCount = _builder._attributeParsers.Count;
-                    var assembly = extensionLoader.LoadExtension(file, false);
+                    var assembly = extensionLoader.LoadExtension(file);
                     return new LoadInfo(assembly, _builder._attributeParsers.Skip(parserCount));
                 }
             }

@@ -27,7 +27,7 @@ if [ $DOTNET_FOUND -ne 0 ]; then
 fi
 
 SHARPMAKE_OPTIM=${2:-"debug"}
-SHARPMAKE_FRAMEWORK=${3:-"net5.0"}
+SHARPMAKE_FRAMEWORK=${3:-"net6.0"}
 
 echo "Build and run sharpmake $SHARPMAKE_FRAMEWORK in $SHARPMAKE_OPTIM..."
 

@@ -80,6 +80,10 @@ def find_target_path(root_directory, target_directory, subdirectory, target):
         dir_path = os.path.abspath(os.path.join(root_directory, "tmp", target_directory, optim_token, subdirectory))
         for root, dirs, files in os.walk(dir_path):
             for framework_dir in dirs:
+                # Skip any old executable lying around.
+                if (framework_dir == "net472" or framework_dir == "net5.0"):
+                    continue # We don't support anymore those framework versions
+
                 path = os.path.join(dir_path, framework_dir, target)
                 if os.path.isfile(path):
                     return path

@@ -7,7 +7,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake</RootNamespace>
     <AssemblyName>Sharpmake.CommonPlatforms</AssemblyName>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultItems>false</EnableDefaultItems>

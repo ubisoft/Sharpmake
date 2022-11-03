@@ -26,6 +26,8 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 #if NET5_0
 using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net50;
+#elif NET6_0
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net60;
 #else
 #error unhandled framework version
 #endif
@@ -37,6 +39,8 @@ namespace Sharpmake
         public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
 #if NET5_0
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net5_0;
+#elif NET6_0
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net6_0;
 #else
 #error unhandled framework version
 #endif

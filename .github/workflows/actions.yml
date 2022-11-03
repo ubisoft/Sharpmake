@@ -18,8 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2019, windows-2022]
-        framework: [net5.0]
+        os: [ubuntu-latest, macos-latest, windows-2022]
+        framework: [net6.0]
         configuration: [debug, release]
 
     steps:
@@ -72,7 +72,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2019] # only windows for now, but ideally should be all. TODO: add windows-2022
-        framework: [net5.0]
+        framework: [net6.0]
 
     steps:
       - name: Checkout the repo
@@ -95,7 +95,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2019] # TODO: add windows-2022
-        framework: [net5.0]
+        framework: [net6.0]
         configuration: [debug, release]
 
     env:
