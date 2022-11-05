@@ -158,6 +158,10 @@ namespace Sharpmake
             const string ClangLinkerName = "clang.exe";
             const string GccLinkerName = "g++.exe";
 
+            const string MsvcArchiverName = "lib.exe";
+            const string ClangArchiverName = "llvm-ar.exe";
+            const string ClangRanLibName = "llvm-ranlib.exe";
+
             const string NinjaName = "ninja.exe";
 
             string MsvcCompilerPath = "";
@@ -166,6 +170,11 @@ namespace Sharpmake
             string MsvcLinkerPath = "";
             string ClangLinkerPath = "";
             string GccLinkerPath = "";
+
+            string MsvcArchiver = "";
+            string ClangArchiver = "";
+            string ClangRanLib = "";
+
             string NinjaPath = "";
 
             var envPath = Environment.GetEnvironmentVariable("PATH");
@@ -208,6 +217,18 @@ namespace Sharpmake
                     {
                         GccLinkerPath = file;
                     }
+                    if (filename == MsvcArchiverName)
+                    {
+                        MsvcArchiver = file;
+                    }
+                    if (filename == ClangArchiverName)
+                    {
+                        ClangArchiver = file;
+                    }
+                    if (filename == ClangRanLibName)
+                    {
+                        ClangRanLib = file;
+                    }
                     if (filename == NinjaName)
                     {
                         NinjaPath = file;
@@ -215,15 +236,15 @@ namespace Sharpmake
                 }
             }
 
-            SetCompilerPaths(Compiler.MSVC, MsvcCompilerPath, MsvcLinkerPath);
-            SetCompilerPaths(Compiler.Clang, ClangCompilerPath, ClangLinkerPath);
-            SetCompilerPaths(Compiler.GCC, GccCompilerPath, GccLinkerPath);
+            SetCompilerPaths(Compiler.MSVC, MsvcCompilerPath, MsvcLinkerPath, MsvcArchiver, "");
+            SetCompilerPaths(Compiler.Clang, ClangCompilerPath, ClangLinkerPath, ClangArchiver, ClangRanLib);
+            SetCompilerPaths(Compiler.GCC, GccCompilerPath, GccLinkerPath, GccLinkerPath, "");
             SetNinjaPath(NinjaPath);
         }
 
-        private static void SetCompilerPaths(Compiler compiler, string compilerPath, string linkerPath)
+        private static void SetCompilerPaths(Compiler compiler, string compilerPath, string linkerPath, string archiverPath, string ranLibPath)
         {
-            s_compilerInfo.GetValueOrAdd(compiler, new CompilerInfo(compiler, compilerPath, linkerPath));
+            s_compilerInfo.GetValueOrAdd(compiler, new CompilerInfo(compiler, compilerPath, linkerPath, archiverPath, ranLibPath));
         }
 
         public static CompilerInfo GetCompilerSettings(Compiler compiler)

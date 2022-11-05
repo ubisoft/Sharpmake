@@ -17,15 +17,19 @@ namespace Sharpmake
 
     public class CompilerInfo
     {
-        public CompilerInfo(Compiler compiler, string binPath, string linkerPath)
+        public CompilerInfo(Compiler compiler, string binPath, string linkerPath, string archivePath, string ranLibPath)
         {
             Compiler = compiler;
             BinPath = binPath;
             LinkerPath = linkerPath;
+            ArchiverPath = archivePath;
+            RanLibPath = ranLibPath;
         }
 
         public Compiler Compiler { get; set; }
         public string BinPath { get; set; }
         public string LinkerPath { get; set; }
+        public string ArchiverPath { get; set; }
+        public string RanLibPath { get; set; }
     }
 }

@@ -224,7 +224,7 @@ namespace Sharpmake.Generators.Generic
                 WriteIfNotEmptyOr(fileGenerator, $"  {Template.Project.PreBuild}", PreBuild, "cd .");
                 WriteIfNotEmptyOr(fileGenerator, $"  {Template.Project.PostBuild}", PostBuild, "cd .");
                 ;
-                
+
                 return fileGenerator.ToString();
             }
         }
@@ -397,7 +397,7 @@ namespace Sharpmake.Generators.Generic
             {
                 fileGenerator.WriteLine(compileStatement.ToString());
             }
-               
+
             foreach (var linkStatement in linkStatements)
             {
                 fileGenerator.WriteLine(linkStatement.ToString());
@@ -527,7 +527,9 @@ namespace Sharpmake.Generators.Generic
 
         private string GetLinkerPath(GenerationContext context)
         {
-            return KitsRootPaths.GetCompilerSettings(context.Compiler).LinkerPath;
+            return context.Configuration.Output == Project.Configuration.OutputType.Lib
+                ? KitsRootPaths.GetCompilerSettings(context.Compiler).ArchiverPath
+                : KitsRootPaths.GetCompilerSettings(context.Compiler).LinkerPath;
         }
 
         private void GenerateHeader(FileGenerator fileGenerator)
@@ -554,10 +556,15 @@ namespace Sharpmake.Generators.Generic
             fileGenerator.WriteLine($"");
 
             // Linking
+
+            string outputType = context.Configuration.Output == Project.Configuration.OutputType.Exe
+                ? "executable"
+                : "archive";
+
             fileGenerator.WriteLine($"# Rule for linking C++ objects");
             fileGenerator.WriteLine($"{Template.Project.RuleBegin}{Template.Project.BuildLinkExeName}");
             fileGenerator.WriteLine($"{Template.Project.CommandBegin}cmd.exe /C \"${Template.Project.PreBuild} && {GetLinkerPath(context)} ${Template.Project.LinkerImplicitFlags} ${Template.Project.LinkerFlags} ${Template.Project.ImplicitLinkPaths} ${Template.Project.ImplicitLinkLibraries} ${Template.Project.LinkLibraries} $in && ${Template.Project.PostBuild}\"");
-            fileGenerator.WriteLine($"{Template.Project.DescriptionBegin}Linking C++ executable $TARGET_FILE");
+            fileGenerator.WriteLine($"{Template.Project.DescriptionBegin}Linking C++ {outputType} ${Template.Project.TargetFile}");
             fileGenerator.WriteLine($"  restat = $RESTAT");
             fileGenerator.WriteLine($"");
 
@@ -664,6 +671,14 @@ namespace Sharpmake.Generators.Generic
                     throw new Error("Unknown Compiler used for implicit compiler flags");
             }
 
+            if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
+            {
+                if (PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform).HasSharedLibrarySupport)
+                {
+                    flags.Add($" {CompilerFlagLookupTable.Get(context.Compiler, CompilerFlag.Define)}_WINDLL");
+                }
+            }
+
             return flags;
         }
         private Strings GetImplicitLinkerFlags(GenerationContext context, string outputPath)
@@ -673,12 +688,28 @@ namespace Sharpmake.Generators.Generic
             {
                 case Compiler.MSVC:
                     flags.Add($" /OUT:{outputPath}"); // Output file
+                    if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
+                    {
+                        flags.Add(" /dll");
+                    }
                     break;
                 case Compiler.Clang:
-                    flags.Add(" -fuse-ld=lld-link"); // use the llvm lld linker
-                    flags.Add(" -nostartfiles"); // Do not use the standard system startup files when linking
-                    flags.Add(" -nostdlib"); // Do not use the standard system startup files or libraries when linking
-                    flags.Add($" -o {outputPath}"); // Output file
+                    if (context.Configuration.Output != Project.Configuration.OutputType.Lib)
+                    {
+                        flags.Add(" -fuse-ld=lld-link"); // use the llvm lld linker
+                        flags.Add(" -nostartfiles"); // Do not use the standard system startup files when linking
+                        flags.Add(" -nostdlib"); // Do not use the standard system startup files or libraries when linking
+                        flags.Add($" -o {outputPath}"); // Output file
+                        if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
+                        {
+                            flags.Add(" -shared");
+                        }
+                    }
+                    else
+                    {
+                        flags.Add(" qc");
+                        flags.Add($" {outputPath}"); // Output file
+                    }
                     break;
                 case Compiler.GCC:
                     //flags += " -fuse-ld=lld"; // use the llvm lld linker
@@ -697,26 +728,30 @@ namespace Sharpmake.Generators.Generic
         {
             Strings linkPath = new Strings();
 
-            switch (context.Configuration.Target.GetFragment<Compiler>())
+            if (context.Configuration.Output != Project.Configuration.OutputType.Lib)
             {
-                case Compiler.MSVC:
-                    linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
-                    linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
-                    linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
-                    linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
-                    break;
-                case Compiler.Clang:
-                    linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
-                    linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
-                    linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
-                    linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
-                    break;
-                case Compiler.GCC:
-                    linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
-                    linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
-                    linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
-                    linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
-                    break;
+
+                switch (context.Configuration.Target.GetFragment<Compiler>())
+                {
+                    case Compiler.MSVC:
+                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
+                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
+                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
+                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
+                        break;
+                    case Compiler.Clang:
+                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
+                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
+                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
+                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
+                        break;
+                    case Compiler.GCC:
+                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
+                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
+                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
+                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
+                        break;
+                }
             }
 
             return linkPath;
@@ -725,6 +760,9 @@ namespace Sharpmake.Generators.Generic
         private Strings GetImplicitLinkLibraries(GenerationContext context)
         {
             Strings linkLibraries = new Strings();
+
+            if (context.Configuration.Output == Project.Configuration.OutputType.Lib)
+                return linkLibraries;
 
             switch (context.Configuration.Target.GetFragment<Compiler>())
             {
@@ -788,7 +826,65 @@ namespace Sharpmake.Generators.Generic
         }
         private Strings GetLinkerFlags(GenerationContext context)
         {
-            return new Strings(context.LinkerCommandLineOptions.Values);
+            Strings flags = new Strings(context.LinkerCommandLineOptions.Values);
+
+            // If we're making an archive, not all linker flags are supported
+            switch (context.Compiler)
+            {
+                case Compiler.MSVC:
+                    return FilterMsvcLinkerFlags(flags, context);
+                case Compiler.Clang:
+                    return FilterClangLinkerFlags(flags, context);
+                default:
+                    throw new Error($"Not linker flag filtering implemented for compiler {context.Compiler}");
+            }
+        }
+
+        private Strings FilterMsvcLinkerFlags(Strings flags, GenerationContext context)
+        {
+            switch (context.Configuration.Output)
+            {
+                case Project.Configuration.OutputType.Exe:
+                    break;
+                case Project.Configuration.OutputType.Lib:
+                    RemoveIfContains(flags, "/INCREMENTAL");
+                    RemoveIfContains(flags, "/DYNAMICBASE");
+                    RemoveIfContains(flags, "/DEBUG");
+                    RemoveIfContains(flags, "/PDB");
+                    RemoveIfContains(flags, "/LARGEADDRESSAWARE");
+                    RemoveIfContains(flags, "/OPT:REF");
+                    RemoveIfContains(flags, "/OPT:ICF");
+                    RemoveIfContains(flags, "/OPT:NOREF");
+                    RemoveIfContains(flags, "/OPT:NOICF");
+                    RemoveIfContains(flags, "/FUNCTIONPADMIN");
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                default:
+                    break;
+            }
+
+            return flags;
+        }
+        private Strings FilterClangLinkerFlags(Strings flags, GenerationContext context)
+        {
+            switch (context.Configuration.Output)
+            {
+                case Project.Configuration.OutputType.Exe:
+                    break;
+                case Project.Configuration.OutputType.Lib:
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    break;
+                default:
+                    break;
+            }
+
+            return flags;
+        }
+
+        private void RemoveIfContains(Strings flags, string value)
+        {
+            flags.RemoveAll(x => x.StartsWith(value));
         }
 
         private void GenerateConfOptions(GenerationContext context)
