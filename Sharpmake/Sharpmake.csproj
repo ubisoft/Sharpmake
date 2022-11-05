@@ -106,6 +106,7 @@
     <Compile Include="Builder.cs" />
     <Compile Include="BuilderExtension.cs" />
     <Compile Include="CommandLine.cs" />
+    <Compile Include="CompilerFlagLookupTable.cs" />
     <Compile Include="Configurable.cs" />
     <Compile Include="ConfigureCollection.cs" />
     <Compile Include="DebugBreaks.cs" />
@@ -132,7 +133,9 @@
     <Compile Include="IResolverHelper.cs" />
     <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
     <Compile Include="KitsRootPaths.cs" />
+    <Compile Include="LinkerFlagLookupTable.cs" />
     <Compile Include="MSBuildGlobalSettings.cs" />
+    <Compile Include="CompilerInfo.cs" />
     <Compile Include="Options.Agde.cs" />
     <Compile Include="Options.Android.cs" />
     <Compile Include="Options.AndroidMakefile.cs" />

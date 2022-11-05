@@ -93,6 +93,7 @@ namespace Sharpmake.Generators.VisualStudio
                     _cmdLineOptions = value;
                 }
             }
+            public IDictionary<string, string> LinkerCommandLineOptions { get; set; } = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
             public Resolver EnvironmentVariableResolver
             {
                 get

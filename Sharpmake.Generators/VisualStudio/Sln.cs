@@ -81,7 +81,7 @@ namespace Sharpmake.Generators.VisualStudio
 
     public partial class Sln : ISolutionGenerator
     {
-        public const string SolutionExtension = ".sln";
+        public readonly string SolutionExtension = Util.GetSolutionExtension(DevEnv.VisualStudio);
 
         private readonly List<SolutionFolder> _rootSolutionFolders = new List<SolutionFolder>();
         private readonly List<SolutionFolder> _solutionFolders = new List<SolutionFolder>();

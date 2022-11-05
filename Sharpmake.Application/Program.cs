@@ -252,6 +252,9 @@ namespace Sharpmake.Application
                     CommandLine.ExecuteOnObject(platformCmdLine);
                     platformCmdLine.Validate();
                 }
+                
+                CompilerFlagLookupTable.Init();
+                LinkerFlagLookupTable.Init();
 
                 bool oneInstanceMutexCreated;
                 string mutexName = string.Format("SharpmakeSingleInstanceMutex{0}", parameters.MutexSuffix); // Allow custom mutex name suffix. Useful to debug concurrently multiple sharpmake running from different branches
@@ -402,7 +405,7 @@ namespace Sharpmake.Application
                 if (Debugger.IsAttached)
                 {
                     LogWriteLine("Please look at the errors.");
-                    Debugger.Break();
+                    Debugger.Break();   
                 }
             }
 

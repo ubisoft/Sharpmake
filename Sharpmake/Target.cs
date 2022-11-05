@@ -65,6 +65,11 @@ namespace Sharpmake
         make = 1 << 9,
 
         /// <summary>
+        /// Using Ninja with the MSVC compiler
+        /// </summary>
+        ninja = 1 << 10,
+
+        /// <summary>
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
@@ -127,6 +132,7 @@ namespace Sharpmake
     {
         MSBuild = 0x01,
         FastBuild = 0x02,
+        None = 0x04
     }
 
     [Fragment, Flags]

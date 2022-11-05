@@ -1448,6 +1448,9 @@ namespace Sharpmake
                     case DevEnv.make:
                         return ".make";
 
+                    case DevEnv.ninja:
+                        return ".ninja";
+
                     default:
                         throw new NotImplementedException("GetProjectFileExtension called with unknown DevEnv: " + devEnv);
                 }
@@ -1779,6 +1782,27 @@ namespace Sharpmake
                 int result;
                 int.TryParse(version, out result);
                 return result;
+            }
+        }
+
+        public static string GetSolutionExtension(DevEnv env)
+        {
+            switch (env)
+            {
+                case DevEnv.vs2015:
+                case DevEnv.vs2017:
+                case DevEnv.vs2019:
+                case DevEnv.vs2022:
+                case DevEnv.VisualStudio:
+                    return ".sln";
+                case DevEnv.xcode4ios:
+                case DevEnv.eclipse:
+                case DevEnv.make:
+                    return "";
+                case DevEnv.ninja:
+                    return ".ninja";
+                default:
+                    throw new Error("Unknown DevEnv for solution extension");
             }
         }
 

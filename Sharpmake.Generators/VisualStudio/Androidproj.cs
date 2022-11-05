@@ -39,6 +39,7 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
             public IDictionary<string, string> CommandLineOptions { get; set; }
+            public IDictionary<string, string> LinkerCommandLineOptions { get; set; } = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
             public string ProjectDirectoryCapitalized { get; }
             public string ProjectSourceCapitalized { get; }
             public bool PlainOutput { get; }

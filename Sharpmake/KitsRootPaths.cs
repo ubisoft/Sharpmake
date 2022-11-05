@@ -27,6 +27,10 @@ namespace Sharpmake
         private static Dictionary<DevEnv, Tuple<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>> s_useKitsRootForDevEnv = new Dictionary<DevEnv, Tuple<KitsRootEnum, Options.Vc.General.WindowsTargetPlatformVersion?>>();
         private static Dictionary<KitsRootEnum, string> s_kitsRoots = new Dictionary<KitsRootEnum, string>();
 
+        private static Dictionary<Compiler, CompilerInfo> s_compilerInfo = new Dictionary<Compiler, CompilerInfo>();
+
+        private static string s_ninjaPath = "";
+
         private static readonly ConcurrentDictionary<DotNetFramework, string> s_netFxKitsDir = new ConcurrentDictionary<DotNetFramework, string>();
 
         private static readonly ConcurrentDictionary<DotNetFramework, string> s_netFxToolsDir = new ConcurrentDictionary<DotNetFramework, string>();
@@ -143,6 +147,98 @@ namespace Sharpmake
                 return version.Value;
 
             throw new NotImplementedException("No WindowsTargetPlatformVersion associated with " + devEnv);
+        }
+
+        public static void InitializeForNinja()
+        {
+            const string MsvcCompilerName = "cl.exe";
+            const string ClangCompilerName = "clang.exe";
+            const string GccCompilerName = "g++.exe";
+            const string MsvcLinkerName = "link.exe";
+            const string ClangLinkerName = "clang.exe";
+            const string GccLinkerName = "g++.exe";
+
+            const string NinjaName = "ninja.exe";
+
+            string MsvcCompilerPath = "";
+            string ClangCompilerPath = "";
+            string GccCompilerPath = "";
+            string MsvcLinkerPath = "";
+            string ClangLinkerPath = "";
+            string GccLinkerPath = "";
+            string NinjaPath = "";
+
+            var envPath = Environment.GetEnvironmentVariable("PATH");
+            string[] paths = envPath.Split(';');
+
+            foreach (var path in paths)
+            {
+                if (!Directory.Exists(path))
+                {
+                    continue;
+                }
+
+                List<string> files = Directory.EnumerateFiles(path).ToList();
+
+                foreach (string file in files)
+                {
+                    string filename = Path.GetFileName(file);
+
+                    if (filename == MsvcCompilerName)
+                    {
+                        MsvcCompilerPath = file;
+                    }
+                    if (filename == ClangCompilerName)
+                    {
+                        ClangCompilerPath = file;
+                    }
+                    if (filename == GccCompilerName)
+                    {
+                        GccCompilerPath = file;
+                    }
+                    if (filename == MsvcLinkerName)
+                    {
+                        MsvcLinkerPath = file;
+                    }
+                    if (filename == ClangLinkerName)
+                    {
+                        ClangLinkerPath = file;
+                    }
+                    if (filename == GccLinkerName)
+                    {
+                        GccLinkerPath = file;
+                    }
+                    if (filename == NinjaName)
+                    {
+                        NinjaPath = file;
+                    }
+                }
+            }
+
+            SetCompilerPaths(Compiler.MSVC, MsvcCompilerPath, MsvcLinkerPath);
+            SetCompilerPaths(Compiler.Clang, ClangCompilerPath, ClangLinkerPath);
+            SetCompilerPaths(Compiler.GCC, GccCompilerPath, GccLinkerPath);
+            SetNinjaPath(NinjaPath);
+        }
+
+        private static void SetCompilerPaths(Compiler compiler, string compilerPath, string linkerPath)
+        {
+            s_compilerInfo.GetValueOrAdd(compiler, new CompilerInfo(compiler, compilerPath, linkerPath));
+        }
+
+        public static CompilerInfo GetCompilerSettings(Compiler compiler)
+        {
+            return s_compilerInfo[compiler];
+        }
+
+        private static void SetNinjaPath(string path)
+        {
+            s_ninjaPath = path;
+        }
+
+        public static string GetNinjaPath()
+        {
+            return s_ninjaPath;
         }
 
         public static string GetNETFXKitsDir(DotNetFramework dotNetFramework)
