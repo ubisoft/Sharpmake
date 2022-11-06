@@ -355,6 +355,7 @@ namespace SharpmakeGen.Samples
         }
     }
 
+    [Generate]
     public class VcpkgProject : SampleProject
     {
         public VcpkgProject()
