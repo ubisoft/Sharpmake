@@ -85,6 +85,9 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -107,9 +110,6 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -143,7 +143,7 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable
 
 
 //=================================================================================================================
-CopyDir( 'Copy_0856A229' )
+CopyDir( 'Copy_FC14A229' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -157,7 +157,7 @@ Alias( 'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable',
-                   'Copy_0856A229'
+                   'Copy_FC14A229'
                }
 }
 
@@ -236,6 +236,9 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2019_win64_Executab
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -258,9 +261,6 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2019_win64_Executab
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -294,7 +294,7 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2019_win64_Executab
 
 
 //=================================================================================================================
-CopyDir( 'Copy_D0BF3DD9' )
+CopyDir( 'Copy_3C3D3DD9' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -308,7 +308,7 @@ Alias( 'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2019_win64_Executable',
-                   'Copy_D0BF3DD9'
+                   'Copy_3C3D3DD9'
                }
 }
 
@@ -386,6 +386,9 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -408,9 +411,6 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -444,7 +444,7 @@ Executable( 'PostBuildCopyDirTest_Debug_FastBuild_vs2019_win64_Executable' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_FA589A94' )
+CopyDir( 'Copy_13B69A94' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -458,7 +458,7 @@ Alias( 'PostBuildCopyDirTest_Debug_FastBuild_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Debug_FastBuild_vs2019_win64_Executable',
-                   'Copy_FA589A94'
+                   'Copy_13B69A94'
                }
 }
 
@@ -537,6 +537,9 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -559,9 +562,6 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -595,7 +595,7 @@ Executable( 'PostBuildCopyDirTest_Release_FastBuild_vs2019_win64_Executable' )
 
 
 //=================================================================================================================
-CopyDir( 'Copy_A1643CC6' )
+CopyDir( 'Copy_E6823CC6' )
 {
     .SourcePaths                        = '.\$_CURRENT_BFF_DIR_$\..\codebase\postbuildcopydirtest\'
     .SourcePathsPattern                 = { '*.cpp', '*.txt' }
@@ -609,7 +609,7 @@ Alias( 'PostBuildCopyDirTest_Release_FastBuild_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildCopyDirTest_Release_FastBuild_vs2019_win64_Executable',
-                   'Copy_A1643CC6'
+                   'Copy_E6823CC6'
                }
 }
 

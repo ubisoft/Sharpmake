@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Ubisoft Entertainment
+// Copyright (c) 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -773,12 +773,12 @@ namespace Sharpmake
             return path.Substring(0, 1).ToLower() + path.Substring(1);
         }
 
-        internal static string ConvertToUnixSeparators(string path)
+        public static string ConvertToUnixSeparators(string path)
         {
             return path.Replace(WindowsSeparator, UnixSeparator);
         }
 
-        internal static string ConvertToMountedUnixPath(string path)
+        public static string ConvertToMountedUnixPath(string path)
         {
             return s_unixMountPointForWindowsDrives + ConvertToUnixSeparators(DecapitalizeDriveLetter(EnsureTrailingSeparator(path)).Replace(@":", string.Empty));
         }
@@ -812,6 +812,42 @@ namespace Sharpmake
             var modifiedPath = Path.Combine(replacementHeadPath, pathRelativeToOutput);
 
             return modifiedPath;
+        }
+
+        public static string FindCommonRootPath(IEnumerable<string> paths)
+        {
+            var pathsChunks = paths.Select(p => PathMakeStandard(p).Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
+            if (pathsChunks.Any())
+            {
+                bool firstCharIsPathSeparator = UsesUnixSeparator ? paths.Any(p => p[0] == UnixSeparator) : false;
+                var firstPathChunks = pathsChunks.First();
+                bool foundSomeCommonChunks = false;
+                int commonPathIndex = 0;
+                do
+                {
+                    if (firstPathChunks.Length > commonPathIndex)
+                    {
+                        string reference = firstPathChunks[commonPathIndex];
+                        if (!pathsChunks.Any(p => !string.Equals(p.Length > commonPathIndex ? p[commonPathIndex] : string.Empty, reference, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            ++commonPathIndex;
+                            foundSomeCommonChunks = true;
+                        }
+                        else
+                            break;
+                    }
+                    else
+                        break;
+                }
+                while (true);
+
+                if (foundSomeCommonChunks)
+                {
+                    var commonRootPath = string.Join(Path.DirectorySeparatorChar.ToString(), firstPathChunks.Take(commonPathIndex));
+                    return firstCharIsPathSeparator ? UnixSeparator.ToString() + commonRootPath : commonRootPath;
+                }
+            }
+            return null;
         }
     }
 }

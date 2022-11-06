@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,6 +100,13 @@ namespace Sharpmake
                     _platformName = value;
                 }
             }
+
+            /// <summary>
+            /// Experimental: only add to the solution the FastBuild projects that are really needed, or where
+            /// <see cref="Project.Configuration.AddFastBuildProjectToSolutionCallback"/> returned true.
+            /// Set to false to add all of them.
+            /// </summary>
+            public bool IncludeOnlyNeededFastBuildProjects = false;
 
             public bool IncludeOnlyFilterProject = false;
 

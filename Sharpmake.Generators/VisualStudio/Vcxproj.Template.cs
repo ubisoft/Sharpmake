@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,13 +42,11 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectDescription =
 @"  <PropertyGroup Label=""Globals"">
     <ProjectGuid>{[guid]}</ProjectGuid>
-    <TargetFrameworkVersion>[targetFramework]</TargetFrameworkVersion>
+    <TargetFrameworkVersion>[targetFrameworkVersion]</TargetFrameworkVersion>
+    <TargetFramework>[targetFramework]</TargetFramework>
     <Keyword>[projectKeyword]</Keyword>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>[projectName]</RootNamespace>
-    <SccProjectName>[sccProjectName]</SccProjectName>
-    <SccLocalPath>[sccLocalPath]</SccLocalPath>
-    <SccProvider>[sccProvider]</SccProvider>
     <ProjectName>[projectName]</ProjectName>
 ";
 
@@ -162,8 +160,26 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <Import Project=""[importedTargetsFile]"" Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" />
 ";
 
+                // Support both regular and native package types, whichever happens to exist
+                public static string ProjectTargetsNugetReferenceImport =
+@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets')"" />
+    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" />
+";
+
+                public static string ProjectTargetsNugetReferenceError =
+@"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets'))"" />
+";
+
                 public static string ProjectTargetsEnd =
 @"  </ImportGroup>
+";
+
+                public static string ProjectCustomTargetsBegin =
+@"  <Target Name=""name"" BeforeTargets=""PrepareForBuild"">
+";
+
+                public static string ProjectCustomTargetsEnd =
+@"  </Target>
 ";
 
                 public static string ProjectConfigurationsResourceCompile =

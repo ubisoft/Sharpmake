@@ -10,7 +10,7 @@ function BuildSharpmake {
     configuration=$2
     platform=$3
     echo Compiling $solutionPath in "${configuration}|${platform}"...
-    MSBUILD_CMD="msbuild -t:build -restore \"${solutionPath}\" /nologo /v:m /p:Configuration=${configuration} /p:Platform=\"${platform}\""
+    MSBUILD_CMD="msbuild -t:build -restore -p:RestoreUseStaticGraphEvaluation=true \"${solutionPath}\" /nologo /v:m /p:Configuration=${configuration} /p:Platform=\"${platform}\""
     echo $MSBUILD_CMD
     eval $MSBUILD_CMD
     if [ $? -ne 0 ]; then

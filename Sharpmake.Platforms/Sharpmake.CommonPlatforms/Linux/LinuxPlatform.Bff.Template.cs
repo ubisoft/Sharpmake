@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ namespace Sharpmake
                             + ' ""%1""'
                             + ' [cmdLineOptions.WholeArchiveEnd]'
                             + ' [sharedOption]'
+                            + ' [cmdLineOptions.BffSysRoot]'
                             // Library Search Path
                             // ---------------------------
                             + ' [cmdLineOptions.AdditionalLibraryDirectories]'
@@ -32,6 +33,7 @@ namespace Sharpmake
                             + ' [cmdLineOptions.AdditionalDependencies]'
                             // Options
                             //--------
+                            + ' [cmdLineOptions.StdLib]'
                             + ' [cmdLineOptions.EditAndContinue]'
                             + ' [cmdLineOptions.InfoStripping]'
                             + ' [cmdLineOptions.DataStripping]'
@@ -47,7 +49,8 @@ namespace Sharpmake
     .CompilerExtraOptions   = ''
             // General options
             // -------------------------
-            + ' [cmdLineOptions.CLangGenerateDebugInformation]'
+            + ' [cmdLineOptions.StdLib]'
+            + ' [cmdLineOptions.DebugInformationFormat]'
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
             + ' [cmdLineOptions.PreprocessorDefinitions]'
@@ -65,7 +68,9 @@ namespace Sharpmake
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.CharUnsigned]'
             + ' [cmdLineOptions.MsExtensions]'
-            + ' [options.ClangCppLanguageStandard]'
+            + ' [cmdLineOptions.CppLanguageStd]'
+            + ' [cmdLineOptions.CLanguageStd]'
+            + ' [cmdLineOptions.BffSysRoot]'
             // Additional compiler options
             //--------------------------
             + ' [options.AdditionalCompilerOptions]'

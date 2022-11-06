@@ -92,16 +92,16 @@
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.exe" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.elf" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.exp" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.lib" >NUL 2>NUL
-del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\mixcppandcexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_noblob_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -112,16 +112,16 @@ del "output\debug_fastbuild_noblob_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCl
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\debug_fastbuild_vs2019\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\mixcppandcexe.exe" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\mixcppandcexe.elf" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\mixcppandcexe.exp" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\mixcppandcexe.lib" >NUL 2>NUL
-del "output\debug_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\mixcppandcexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\mixcppandcexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\mixcppandcexe\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\mixcppandcexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\mixcppandcexe.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\mixcppandcexe.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\mixcppandcexe.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\mixcppandcexe.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\mixcppandcexe.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\mixcppandcexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\debug_fastbuild_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -143,16 +143,16 @@ del "output\debug_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanComm
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.exe" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.elf" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.exp" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.lib" >NUL 2>NUL
-del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\mixcppandcexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_noblob_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>
@@ -163,16 +163,16 @@ del "output\release_fastbuild_noblob_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMake
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" MixCppAndCExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>cd $(SolutionDir)
 "$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean MixCppAndCExe_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\mixcppandcexe\*unity*.cpp" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\mixcppandcexe\*.obj" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\mixcppandcexe\*.a" >NUL 2>NUL
-del "build\release_fastbuild_vs2019\mixcppandcexe\*.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\mixcppandcexe.exe" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\mixcppandcexe.elf" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\mixcppandcexe.exp" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\mixcppandcexe.ilk" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\mixcppandcexe.lib" >NUL 2>NUL
-del "output\release_fastbuild_vs2019\mixcppandcexe.pdb" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\mixcppandcexe\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\mixcppandcexe\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\mixcppandcexe\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\mixcppandcexe\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\mixcppandcexe.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\mixcppandcexe.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\mixcppandcexe.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\mixcppandcexe.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\mixcppandcexe.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\mixcppandcexe.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>output\release_fastbuild_vs2019\mixcppandcexe.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
   </PropertyGroup>

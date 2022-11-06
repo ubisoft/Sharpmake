@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,15 @@ namespace HelloAndroidAgde
                 //copy top-level build gradle files to root dir
                 AndroidUtil.DirectoryCopy(Path.Combine(conf.Solution.SharpmakeCsPath, @"..\gradle\root"), conf.SolutionPath);
                 _hasCopiedResources = true;
+
+                var gradlePropertiesFile = Path.Combine(conf.SolutionPath, "gradle.properties");
+                if (File.Exists(gradlePropertiesFile))
+                {
+                    using (StreamWriter sw = File.AppendText(gradlePropertiesFile))
+                    {
+                        sw.WriteLine(string.Format("ndkRoot={0}", Android.GlobalSettings.NdkRoot.Replace("\\","/")));
+                    }
+                }
             }
         }
     }

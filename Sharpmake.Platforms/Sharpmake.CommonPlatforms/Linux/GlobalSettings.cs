@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,12 @@ namespace Sharpmake
             /// Allows setting a custom provider for system paths
             /// </summary>
             public static ISystemPathProvider SystemPathProvider { get; set; } = null;
+
+            /// <summary>
+            /// Use llvm-objcopy instead of objcopy from binutils when stripping/extracting debug symbols
+            /// from object files
+            /// </summary>
+            public static bool UseLlvmObjCopy = false;
         }
     }
 }

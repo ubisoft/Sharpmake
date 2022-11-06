@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -195,6 +195,27 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum Nullable
+            {
+                [Default]
+                Disabled,
+                Enabled
+            }
+
+            public enum PublishSingleFile
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
+            public enum PublishTrimmed
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             public class UpdateInterval : IntOption
             {
                 public UpdateInterval(int interval)
@@ -338,6 +359,27 @@ namespace Sharpmake
                 public WarningsNotAsErrors(params string[] warnings) : base(string.Join(",", warnings)) { }
             }
 
+            /// <summary>
+            /// Treat specific warnings as errors.
+            /// </summary>
+            /// <remarks>
+            /// This option generates a `WarningsAsErrors` element in the C# project XML.
+            /// </remarks>
+            public class WarningsAsErrors : StringOption
+            {
+                public WarningsAsErrors(params int[] warnings) : base(string.Join(",",
+                    warnings.Select(w => w.ToString(System.Globalization.CultureInfo.InvariantCulture))))
+                {
+                }
+
+                /// <summary>
+                /// Creates a new <see cref="WarningsAsErrors"/> instance from a list of warning
+                /// code labels.
+                /// </summary>
+                /// <param name="warnings">The list of warning code labels to treat as errors.</param>
+                public WarningsAsErrors(params string[] warnings) : base(string.Join(",", warnings)) { }
+            }
+
             public class CopyVsixExtensionLocation : StringOption
             {
                 public CopyVsixExtensionLocation(string location) : base(location) { }
@@ -346,6 +388,26 @@ namespace Sharpmake
             public class ProductVersion : StringOption
             {
                 public ProductVersion(string versionString) : base(versionString) { }
+            }
+
+            public class FileVersion : StringOption
+            {
+                public FileVersion(string versionString) : base(versionString) { }
+            }
+
+            public class Version : StringOption
+            {
+                public Version(string versionString) : base(versionString) { }
+            }
+
+            public class Product : StringOption
+            {
+                public Product(string product) : base(product) { }
+            }
+
+            public class Copyright : StringOption
+            {
+                public Copyright(string copyright) : base(copyright) { }
             }
 
             public enum MapFileExtensions

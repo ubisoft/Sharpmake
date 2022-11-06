@@ -359,43 +359,43 @@
     </CustomBuild>
     <CustomBuild Include="..\codebase\floatanglespinbox.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug floatanglespinbox.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  -fstdafx.h -f..\codebase\floatanglespinbox.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\debug\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  -fstdafx.h -f..\codebase\floatanglespinbox.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\debug\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\moc_floatanglespinbox.cpp</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release floatanglespinbox.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  -fstdafx.h -f..\codebase\floatanglespinbox.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\release\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  -fstdafx.h -f..\codebase\floatanglespinbox.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\release\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\moc_floatanglespinbox.cpp</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail floatanglespinbox.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  -fstdafx.h -f..\codebase\floatanglespinbox.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\retail\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  -fstdafx.h -f..\codebase\floatanglespinbox.h ..\codebase\floatanglespinbox.h -o obj\win64\qt\retail\moc_floatanglespinbox.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\moc_floatanglespinbox.cpp</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\codebase\floatcosanglespinbox.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug floatcosanglespinbox.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  -fstdafx.h -f..\codebase\floatcosanglespinbox.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\debug\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  -fstdafx.h -f..\codebase\floatcosanglespinbox.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\debug\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\moc_floatcosanglespinbox.cpp</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release floatcosanglespinbox.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  -fstdafx.h -f..\codebase\floatcosanglespinbox.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\release\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  -fstdafx.h -f..\codebase\floatcosanglespinbox.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\release\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\moc_floatcosanglespinbox.cpp</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail floatcosanglespinbox.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  -fstdafx.h -f..\codebase\floatcosanglespinbox.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\retail\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  -fstdafx.h -f..\codebase\floatcosanglespinbox.h ..\codebase\floatcosanglespinbox.h -o obj\win64\qt\retail\moc_floatcosanglespinbox.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\moc_floatcosanglespinbox.cpp</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\codebase\privatewidget.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug privatewidget.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  -fstdafx.h -f..\codebase\privatewidget.h ..\codebase\privatewidget.h -o obj\win64\qt\debug\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  -fstdafx.h -f..\codebase\privatewidget.h ..\codebase\privatewidget.h -o obj\win64\qt\debug\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\moc_privatewidget.cpp</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release privatewidget.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  -fstdafx.h -f..\codebase\privatewidget.h ..\codebase\privatewidget.h -o obj\win64\qt\release\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  -fstdafx.h -f..\codebase\privatewidget.h ..\codebase\privatewidget.h -o obj\win64\qt\release\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\moc_privatewidget.cpp</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail privatewidget.h</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  -fstdafx.h -f..\codebase\privatewidget.h ..\codebase\privatewidget.h -o obj\win64\qt\retail\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  -fstdafx.h -f..\codebase\privatewidget.h ..\codebase\privatewidget.h -o obj\win64\qt\retail\moc_privatewidget.cpp&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\moc_privatewidget.cpp</Outputs>
     </CustomBuild>
@@ -415,19 +415,19 @@
     </CustomBuild>
     <CustomBuild Include="obj\win64\qt\debug\privatewidget.inl">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc Debug privatewidget.cpp</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  ..\codebase\privatewidget.cpp -o obj\win64\qt\debug\privatewidget.moc&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\debug  ..\codebase\privatewidget.cpp -o obj\win64\qt\debug\privatewidget.moc&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\codebase\privatewidget.cpp;..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\win64\qt\debug\privatewidget.moc</Outputs>
     </CustomBuild>
     <CustomBuild Include="obj\win64\qt\release\privatewidget.inl">
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc Release privatewidget.cpp</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  ..\codebase\privatewidget.cpp -o obj\win64\qt\release\privatewidget.moc&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\release  ..\codebase\privatewidget.cpp -o obj\win64\qt\release\privatewidget.moc&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\codebase\privatewidget.cpp;..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\win64\qt\release\privatewidget.moc</Outputs>
     </CustomBuild>
     <CustomBuild Include="obj\win64\qt\retail\privatewidget.inl">
       <Message Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Moc Retail privatewidget.cpp</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  ..\codebase\privatewidget.cpp -o obj\win64\qt\retail\privatewidget.moc&#x0D;&#x0A;</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\qt\5.9.2\msvc2017_64\bin\moc.exe -DQT_NO_DEBUG -DQT_SHARED -DWIN32 -D_HAS_EXCEPTIONS=0 -D_MSC_VER=1910 -I. -I..\qt\5.9.2\msvc2017_64\include -Iobj\win64\qt\retail  ..\codebase\privatewidget.cpp -o obj\win64\qt\retail\privatewidget.moc&#x0D;&#x0A;</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">..\codebase\privatewidget.cpp;..\qt\5.9.2\msvc2017_64\bin\moc.exe</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">obj\win64\qt\retail\privatewidget.moc</Outputs>
     </CustomBuild>

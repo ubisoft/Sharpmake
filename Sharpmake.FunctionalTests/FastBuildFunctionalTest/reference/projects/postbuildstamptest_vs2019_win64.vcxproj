@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Debug_FastBuild_NoBlob_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_FastBuild_vs2019|x64">
+      <Configuration>Debug_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_MSBuild_vs2019|x64">
+      <Configuration>Debug_MSBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Release_FastBuild_NoBlob_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_vs2019|x64">
+      <Configuration>Release_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_MSBuild_vs2019|x64">
+      <Configuration>Release_MSBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>PostBuildStampTest</RootNamespace>
+    <ProjectName>PostBuildStampTest</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">
+    <OutDir>output\debug_fastbuild_noblob_vs2019\</OutDir>
+    <IntDir>build\debug_fastbuild_noblob_vs2019\postbuildstamptest\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_noblob_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
+    <OutDir>output\debug_fastbuild_vs2019\</OutDir>
+    <IntDir>build\debug_fastbuild_vs2019\postbuildstamptest\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\debug_fastbuild_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\debug_fastbuild_vs2019\postbuildstamptest.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
+    <TargetName>postbuildstamptest</TargetName>
+    <OutDir>output\debug_msbuild_vs2019\</OutDir>
+    <IntDir>build\debug_msbuild_vs2019\postbuildstamptest\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\debug_msbuild_vs2019\postbuildstamptest.exe</OutputFile>
+    <EmbedManifest>false</EmbedManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">
+    <OutDir>output\release_fastbuild_noblob_vs2019\</OutDir>
+    <IntDir>build\release_fastbuild_noblob_vs2019\postbuildstamptest\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_noblob_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
+    <OutDir>output\release_fastbuild_vs2019\</OutDir>
+    <IntDir>build\release_fastbuild_vs2019\postbuildstamptest\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" PostBuildStampTest_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean PostBuildStampTest_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\postbuildstamptest\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildstamptest\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildstamptest\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\postbuildstamptest\*.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.exe" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.elf" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.exp" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.ilk" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.lib" &gt;NUL 2&gt;NUL
+del "output\release_fastbuild_vs2019\postbuildstamptest.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>output\release_fastbuild_vs2019\postbuildstamptest.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
+    <TargetName>postbuildstamptest</TargetName>
+    <OutDir>output\release_msbuild_vs2019\</OutDir>
+    <IntDir>build\release_msbuild_vs2019\postbuildstamptest\</IntDir>
+    <TargetExt>.exe</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>output\release_msbuild_vs2019\postbuildstamptest.exe</OutputFile>
+    <EmbedManifest>false</EmbedManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN64;_CONSOLE;_DEBUG;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <ProgramDatabaseFileName>build\debug_msbuild_vs2019\postbuildstamptest\postbuildstamptest_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\debug_msbuild_vs2019\postbuildstamptest.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ManifestFile>build\debug_msbuild_vs2019\postbuildstamptest\postbuildstamptest.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\debug_msbuild_vs2019\postbuildstamptest.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\debug_msbuild_vs2019\postbuildstamptest.map</MapFileName>
+    </Link>
+    <PostBuildEvent>
+      <Command>output\Debug_MSBuild_vs2019\PostBuildStamper.exe  e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PreprocessorDefinitions>NDEBUG;WIN64;_CONSOLE;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <ProgramDatabaseFileName>build\release_msbuild_vs2019\postbuildstamptest\postbuildstamptest_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>output\release_msbuild_vs2019\postbuildstamptest.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+      <ManifestFile>build\release_msbuild_vs2019\postbuildstamptest\postbuildstamptest.intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>output\release_msbuild_vs2019\postbuildstamptest.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SwapRunFromCD>false</SwapRunFromCD>
+      <SwapRunFromNET>false</SwapRunFromNET>
+      <Driver>NotSet</Driver>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ProfileGuidedDatabase>
+      </ProfileGuidedDatabase>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
+      <TypeLibraryResourceID>1</TypeLibraryResourceID>
+      <NoEntryPoint>false</NoEntryPoint>
+      <SetChecksum>false</SetChecksum>
+      <TurnOffAssemblyGeneration>false</TurnOffAssemblyGeneration>
+      <TargetMachine>MachineX64</TargetMachine>
+      <Profile>false</Profile>
+      <CLRImageType>Default</CLRImageType>
+      <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <MapFileName>output\release_msbuild_vs2019\postbuildstamptest.map</MapFileName>
+    </Link>
+    <PostBuildEvent>
+      <Command>output\Release_MSBuild_vs2019\PostBuildStamper.exe  e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_MSBuild_vs2019\PostBuildStampTest.exe _Stamp_Message&#x0D;&#x0A;</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\codebase\PostBuildStampTest\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="postbuildstamptest_vs2019_win64.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

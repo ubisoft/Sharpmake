@@ -85,6 +85,9 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -107,9 +110,6 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -143,7 +143,7 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_A9847703' )
+Exec( 'Exec_postbuildexecutetest_exe_AEC27703' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuild_exec_sentinel.txt'
@@ -157,7 +157,7 @@ Alias( 'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_A9847703'
+                   'Exec_postbuildexecutetest_exe_AEC27703'
                }
 }
 
@@ -236,6 +236,9 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_Executab
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -258,9 +261,6 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_Executab
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -294,7 +294,7 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_Executab
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_3F4E6497' )
+Exec( 'Exec_postbuildexecutetest_exe_EC4C6497' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuild_exec_sentinel.txt'
@@ -308,7 +308,7 @@ Alias( 'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_3F4E6497'
+                   'Exec_postbuildexecutetest_exe_EC4C6497'
                }
 }
 
@@ -386,6 +386,9 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -408,9 +411,6 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -444,7 +444,7 @@ Executable( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_Executable' )
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_92FBF0A6' )
+Exec( 'Exec_postbuildexecutetest_exe_85D9F0A6' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuild_exec_sentinel.txt'
@@ -458,7 +458,7 @@ Alias( 'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_92FBF0A6'
+                   'Exec_postbuildexecutetest_exe_85D9F0A6'
                }
 }
 
@@ -537,6 +537,9 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -559,9 +562,6 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -595,7 +595,7 @@ Executable( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_Executable' )
 
 
 //=================================================================================================================
-Exec( 'Exec_postbuildexecutetest_exe_10F269BC' )
+Exec( 'Exec_postbuildexecutetest_exe_5F9069BC' )
 {
   .ExecExecutable       = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildexecutetest.exe'
   .ExecOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuild_exec_sentinel.txt'
@@ -609,7 +609,7 @@ Alias( 'PostBuildExecuteTest_Release_FastBuild_vs2019_win64' )
 {
     .Targets = {
                    'PostBuildExecuteTest_Release_FastBuild_vs2019_win64_Executable',
-                   'Exec_postbuildexecutetest_exe_10F269BC'
+                   'Exec_postbuildexecutetest_exe_5F9069BC'
                }
 }
 

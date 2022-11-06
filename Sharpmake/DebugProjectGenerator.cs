@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ namespace Sharpmake
     {
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
+        internal static DevEnv DevEnv { get; private set; }
+        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2019;
 
         public interface IDebugProjectExtension
         {
@@ -97,7 +99,7 @@ namespace Sharpmake
         /// <param name="startArguments"></param>
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments)
         {
-            GenerateDebugSolution(sources, arguments, startArguments, null);
+            GenerateDebugSolution(sources, null, arguments, startArguments, DefaultDevEnv);
         }
 
         /// <summary>
@@ -107,9 +109,36 @@ namespace Sharpmake
         /// <param name="arguments"></param>
         /// <param name="startArguments"></param>
         /// <param name="defines"></param>
+        [Obsolete("Defines should be inserted in the Sharpmake.Arguments parameter thus rendering this function useless ", error: true)]
         public static void GenerateDebugSolution(string[] sources, Arguments arguments, string startArguments, string[] defines)
         {
-            FindAllSources(sources, arguments, startArguments, defines);
+            GenerateDebugSolution(sources, null, arguments, startArguments, DefaultDevEnv);
+        }
+
+        /// <summary>
+        /// Generates debug projects and solutions
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="solutionPath"></param>
+        /// <param name="arguments"></param>
+        /// <param name="startArguments"></param>
+        internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments)
+        {
+            GenerateDebugSolution(sources, solutionPath, arguments, startArguments, DefaultDevEnv);
+        }
+
+        /// <summary>
+        /// Generates debug projects and solutions
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <param name="solutionPath"></param>
+        /// <param name="arguments"></param>
+        /// <param name="startArguments"></param>
+        /// <param name="devEnv"></param>
+        internal static void GenerateDebugSolution(string[] sources, string solutionPath, Arguments arguments, string startArguments, DevEnv devEnv)
+        {
+            DevEnv = devEnv;
+            FindAllSources(sources, solutionPath, arguments, startArguments);
             arguments.Generate<DebugSolution>();
         }
 
@@ -131,16 +160,28 @@ namespace Sharpmake
         }
         internal static readonly Dictionary<Type, ProjectContent> DebugProjects = new Dictionary<Type, ProjectContent>();
 
-        private static void FindAllSources(string[] sourcesArguments, Sharpmake.Arguments sharpmakeArguments, string startArguments, string[] defines)
+        private static void FindAllSources(string[] sourcesArguments, string solutionPath, Sharpmake.Arguments sharpmakeArguments, string startArguments)
         {
             MainSources = sourcesArguments;
-            RootPath = Path.GetDirectoryName(sourcesArguments[0]);
+            if (!string.IsNullOrEmpty(solutionPath))
+            {
+                RootPath = solutionPath;
+                if (!Path.IsPathRooted(RootPath))
+                {
+                    RootPath = Path.Combine(Directory.GetCurrentDirectory(), RootPath);
+                }
+                Directory.CreateDirectory(RootPath);
+            }
+            else
+            {
+                RootPath = Path.GetDirectoryName(sourcesArguments[0]);
+            }
 
             Assembler assembler = new Assembler(sharpmakeArguments.Builder.Defines);
             assembler.AttributeParsers.Add(new DebugProjectNameAttributeParser());
             IAssemblyInfo assemblyInfo = assembler.LoadUncompiledAssemblyInfo(Builder.Instance.CreateContext(BuilderCompileErrorBehavior.ReturnNullAssembly), MainSources);
 
-            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>(), defines);
+            GenerateDebugProject(assemblyInfo, true, startArguments, new Dictionary<string, Type>(), sharpmakeArguments.Builder.Defines.ToArray());
         }
 
         private static Type GenerateDebugProject(IAssemblyInfo assemblyInfo, bool isSetupProject, string startArguments, IDictionary<string, Type> visited, string[] defines)
@@ -179,7 +220,7 @@ namespace Sharpmake
 
             // Add references
             var references = new HashSet<string>();
-            foreach (var assemblerRef in assemblyInfo.References)
+            foreach (var assemblerRef in assemblyInfo.RuntimeReferences)
             {
                 if (!assemblyInfo.SourceReferences.ContainsKey(assemblerRef))
                 {
@@ -229,7 +270,7 @@ namespace Sharpmake
         {
             return new Target(
                 Platform.anycpu,
-                DevEnv.vs2019,
+                DevEnv,
                 Optimization.Debug | Optimization.Release,
                 OutputType.Dll,
                 Blob.NoBlob,
@@ -287,8 +328,11 @@ namespace Sharpmake
         {
             _projectInfo = DebugProjectGenerator.DebugProjects[GetType()];
 
+            PreserveLinkFolderPaths = true;
+
             // set paths
-            RootPath = _projectInfo.ProjectFolder;
+
+            RootPath = Util.FindCommonRootPath(_projectInfo.ProjectFiles.Select(f => Path.GetDirectoryName(f)).Distinct()) ?? _projectInfo.ProjectFolder;
             SourceRootPath = RootPath;
 
             // add selected source files
@@ -301,6 +345,9 @@ namespace Sharpmake
             ResourceFiles.Clear();
             NoneExtensions.Clear();
             VsctExtension.Clear();
+
+            // nor removed
+            SourceFilesExcludeRegex.Clear();
 
             Name = _projectInfo.DisplayName;
 
@@ -320,7 +367,7 @@ namespace Sharpmake
         [Configure]
         public void ConfigureAll(Configuration conf, Target target)
         {
-            conf.ProjectPath = RootPath;
+            conf.ProjectPath = _projectInfo.ProjectFolder;
             conf.ProjectFileName = "[project.Name].[target.DevEnv]";
             conf.Output = Configuration.OutputType.DotNetClassLibrary;
 
@@ -348,8 +395,7 @@ namespace Sharpmake
             DebugProjectGenerator.DebugProjectExtension.AddSharpmakePackage(conf);
 
             // set up custom configuration only to setup project
-            if (_projectInfo.IsSetupProject &&
-                FileSystemStringComparer.Default.Equals(conf.ProjectPath, RootPath))
+            if (_projectInfo.IsSetupProject)
             {
                 conf.SetupProjectOptions(_projectInfo.StartArguments);
             }

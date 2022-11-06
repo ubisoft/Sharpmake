@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2019-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ubisoft")]
 [assembly: AssemblyProduct("Sharpmake.Application")]
-[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2017-2021")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Ubisoft 2017-2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -43,4 +43,4 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("0.17.5")]
+[assembly: AssemblyVersion("0.21.1.0")]

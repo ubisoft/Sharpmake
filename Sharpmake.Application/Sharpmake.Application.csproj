@@ -19,6 +19,7 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
     <MSBuildProjectExtensionsPath>..\tmp\projects\Sharpmake.Application</MSBuildProjectExtensionsPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)|$(TargetFramework)'=='Debug|AnyCPU|net472'">

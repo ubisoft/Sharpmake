@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -145,6 +145,9 @@ Compiler( '[fastBuildMasmCompilerName]' )
 
                 public static string LinkerOptions = @"
     .LinkerOptions          = '/OUT:""%2""[dllOption]'
+                            // Input files
+                            // ---------------------------
+                            + ' ""%1""'
                             // General
                             // ---------------------------
                             + ' [cmdLineOptions.ShowProgress]'
@@ -160,9 +163,6 @@ Compiler( '[fastBuildMasmCompilerName]' )
                             + ' [cmdLineOptions.IgnoreDefaultLibraryNames]'
                             + ' [cmdLineOptions.DelayLoadedDLLs]'
                             + ' [cmdLineOptions.EmbedResources]'
-                            // Input files
-                            // ---------------------------
-                            + ' ""%1""'
                             // Manifest
                             // ---------------------------
                             + ' [cmdLineOptions.GenerateManifest]'
@@ -571,6 +571,7 @@ Unity( '[unityFile.UnityName]' )
     .UnityInputObjectLists              = [unityFile.UnityInputObjectLists]
     .UnityInputIsolateWritableFiles     =  [unityFile.UnityInputIsolateWritableFiles]
     .UnityInputIsolateWritableFilesLimit = [unityFile.UnityInputIsolateWritableFilesLimit]
+    .UnityInputIsolateListFile          = '[unityFile.UnityInputIsolateListFile]'
     .UnityOutputPath                    = '[unityFile.UnityOutputPath]'
     .UnityOutputPattern                 = '[unityFile.UnityOutputPattern]'
     .UnityNumFiles                      =  [unityFile.UnityNumFiles]

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,8 +90,8 @@ namespace HelloAndroid
 
             //the plugin and gradle version are good and stable version to be used with Android libraries,
             //we don't want to use the default version on VS(ver. 0.4.0 and 2.8 respectively) since it is quite old
-            GradlePlugin = "gradle:4.2.0";
-            GradleVersion = "6.7.1";
+            GradlePlugin = "gradle:7.0.1";
+            GradleVersion = "7.0.2";
 
             // Path to the Gradle template files
             GradleTemplateFiles.Add(@"app\src\main\AndroidManifest.xml.template");

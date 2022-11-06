@@ -85,6 +85,9 @@ Executable( 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_wi
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -107,9 +110,6 @@ Executable( 'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_wi
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -233,6 +233,9 @@ Executable( 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -255,9 +258,6 @@ Executable( 'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'

@@ -133,6 +133,13 @@ class NoAllFastBuildProjectFunctionalTest(FunctionalTest):
     def build(self, projectDir):
         return build_with_fastbuild(projectDir, self.directory)
 
+class OnlyNeededFastBuildTest(FunctionalTest):
+    def __init__(self):
+        super(OnlyNeededFastBuildTest, self).__init__("OnlyNeededFastBuildTest", "OnlyNeededFastBuildTest.sharpmake.cs")
+
+    def build(self, projectDir):
+        return build_with_fastbuild(projectDir, self.directory)
+
 class SharpmakePackageFunctionalTest(FunctionalTest):
     def __init__(self):
         super(SharpmakePackageFunctionalTest, self).__init__("SharpmakePackageFunctionalTest", "SharpmakePackageFunctionalTest.sharpmake.cs", ["/generateDebugSolution"])
@@ -268,6 +275,7 @@ if __name__ == "__main__":
     funcTests = [
         FastBuildFunctionalTest(args.enable_multi_stamping),
         NoAllFastBuildProjectFunctionalTest(),
+        OnlyNeededFastBuildTest(),
         SharpmakePackageFunctionalTest()
     ]
 

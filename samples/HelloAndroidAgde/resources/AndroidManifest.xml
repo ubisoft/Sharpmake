@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Changes made to Package Name should also be reflected in the Debugging - Package Name property, in the Property Pages -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.$(ApplicationName)"
+        package="placeholder"
         android:versionCode="1"
         android:versionName="1.0">
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -494,6 +494,12 @@ namespace Sharpmake
             public bool AllowOutputDllCopy = true;
 
             /// <summary>
+            /// Controls whether the .pdb files of [Export] projects will be copied to dependents.
+            /// The default value is <c>false</c>.
+            /// </summary>
+            public bool AllowExportProjectsToCopyPdbToDependentTargets = false;
+
+            /// <summary>
             /// Gets or sets whether dependent projects will copy their dll debugging database to the
             /// target path of their dependency projects. The default value is <c>true</c>.
             /// </summary>
@@ -943,6 +949,16 @@ namespace Sharpmake
             public string PrecompHeaderOutputFolder = null;
 
             /// <summary>
+            /// Gets or sets the name for the precompiled header's binary file in C and C++ projects,
+            /// e.g. <c>pch.pch</c>.
+            /// </summary>
+            /// <remarks>
+            /// If this property is set to <c>null</c>, Sharpmake will simply use the project's name.
+            /// To modify the output directory of this file, use <see cref="PrecompHeaderOutputFolder"/>.
+            /// </remarks>
+            public string PrecompHeaderOutputFile = null;
+
+            /// <summary>
             /// Gets a list of files that don't use the precompiled headers.
             /// </summary>
             public Strings PrecompSourceExclude = new Strings();
@@ -1253,6 +1269,15 @@ namespace Sharpmake
             public string ModuleDefinitionFile = null;
 
             /// <summary>
+            /// Allow/prevent writing VC overrides to the vcxproj files for this conf
+            /// Note that the setting must have the same value for all conf in the same vcxproj file
+            /// </summary>
+            /// <remarks>
+            /// This is only used by the Visual Studio Vcxproj generator
+            /// </remarks>
+            public bool WriteVcOverrides = true;
+
+            /// <summary>
             /// Gets or sets the path where the blob files will be generated.
             /// </summary>
             /// <remarks>
@@ -1318,6 +1343,19 @@ namespace Sharpmake
 
             // Disable isolation when many files are writable
             public int FastBuildUnityInputIsolateWritableFilesLimit = 10;
+
+            /// <summary>
+            /// Gets or sets the path of the list with files to isolate,
+            /// e.g.: @"temp\IsolateFileList.txt".
+            /// </summary>
+            /// <remarks>
+            /// <note>
+            /// Files in this list will be excluded from the FASTBuild unity build.
+            /// Their path must be relative to the FASTBuild working directory.
+            /// This is usually the location of the MasterBff file.
+            /// </note>
+            /// </remarks>
+            public string FastBuildUnityInputIsolateListFile = null;
 
             /// <summary>
             /// Custom Actions to do before invoking FastBuildExecutable.
@@ -1613,6 +1651,12 @@ namespace Sharpmake
                 public string RebuildCommand = RemoveLineTag;
                 public string CleanCommand = RemoveLineTag;
                 public string OutputFile = RemoveLineTag;
+                public string AdditionalOptions = "";
+
+                /// <summary>
+                /// Automatically add hidden arguments to AdditionalOptions so that the IntelliSense match with the project parameters
+                /// </summary>
+                public bool AutoConfigure = true;
 
                 public bool IsResolved { get; private set; } = false;
 
@@ -1625,6 +1669,7 @@ namespace Sharpmake
                     RebuildCommand = resolver.Resolve(RebuildCommand);
                     CleanCommand = resolver.Resolve(CleanCommand);
                     OutputFile = resolver.Resolve(OutputFile);
+                    AdditionalOptions = resolver.Resolve(AdditionalOptions);
 
                     IsResolved = true;
                 }
@@ -2163,6 +2208,48 @@ namespace Sharpmake
 
             // If true, remove the source files from a FastBuild project's associated vcxproj file.
             public bool StripFastBuildSourceFiles = true;
+
+            /// <summary>
+            /// Override this delegate with a method returning a bool letting sharpmake know if it needs to add the
+            /// project containing this FastBuild conf to the solution.
+            /// By default, sharpmake will only add it if the Output is executable, or if <see cref="VcxprojUserFile"/>
+            /// is not null.
+            /// </summary>
+            public Func<bool> AddFastBuildProjectToSolutionCallback
+            {
+                get
+                {
+                    return _addFastBuildProjectToSolutionCallback ?? DefaultAddFastBuildProjectToSolution;
+                }
+                set
+                {
+                    _addFastBuildProjectToSolutionCallback = value;
+                }
+            }
+            private Func<bool> _addFastBuildProjectToSolutionCallback = null;
+
+            /// <summary>
+            /// Default method returning whether sharpmake will add the project containing this FastBuild conf to the solution
+            /// </summary>
+            public bool DefaultAddFastBuildProjectToSolution()
+            {
+                if (!IsFastBuild)
+                    return true;
+
+                if (Project.IsFastBuildAll)
+                    return true;
+
+                if (!DoNotGenerateFastBuild)
+                {
+                    if (Output == OutputType.Exe)
+                        return true;
+
+                    if (VcxprojUserFile != null)
+                        return true;
+                }
+
+                return false;
+            }
 
             private Dictionary<KeyValuePair<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<KeyValuePair<Type, ITarget>, DependencySetting>();
 
@@ -2803,8 +2890,11 @@ namespace Sharpmake
             public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
             public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
 
-            // NuGet packages (only C# for now)
+            // NuGet packages (C# and visual studio c++ for now)
             public PackageReferences ReferencesByNuGetPackage = new PackageReferences();
+
+            // Framework references in C#, see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore?view=aspnetcore-5.0&tabs=visual-studio
+            public Strings FrameworkReferences = new Strings();
 
             public bool? ReferenceOutputAssembly = null;
 
@@ -2844,15 +2934,18 @@ namespace Sharpmake
                 public string LocalDebuggerCommandArguments = RemoveLineTag;
                 public string LocalDebuggerEnvironment = RemoveLineTag;
                 public string LocalDebuggerWorkingDirectory = RemoveLineTag;
+                public bool LocalDebuggerAttach = false;
                 public string RemoteDebuggerCommand = RemoveLineTag;
                 public string RemoteDebuggerCommandArguments = RemoveLineTag;
                 public string RemoteDebuggingMode = RemoveLineTag;
                 public string RemoteDebuggerWorkingDirectory = RemoveLineTag;
                 public bool OverwriteExistingFile = true;
+                public string LocalDebuggerAttachString => LocalDebuggerAttach ? "true" : RemoveLineTag;
             }
 
             public VcxprojUserFileSettings VcxprojUserFile = null;
 
+            [Resolver.Resolvable]
             public class CsprojUserFileSettings
             {
                 public enum StartActionSetting
@@ -3140,7 +3233,8 @@ namespace Sharpmake
                                     {
                                         _resolvedTargetCopyFiles.Add(dependencyDllFullPath);
                                         // Add PDBs only if they exist and the dependency is not an [export] project
-                                        if (!isExport && Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
+                                        if ((!isExport || dependency.AllowExportProjectsToCopyPdbToDependentTargets) &&
+                                            Sharpmake.Options.GetObject<Options.Vc.Linker.GenerateDebugInformation>(dependency) != Sharpmake.Options.Vc.Linker.GenerateDebugInformation.Disable)
                                         {
                                             if (dependency.CopyLinkerPdbToDependentTargets)
                                                 _resolvedTargetCopyFiles.Add(dependency.LinkerPdbFilePath);

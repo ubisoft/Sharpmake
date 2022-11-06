@@ -1,0 +1,329 @@
+
+//=================================================================================================================
+// SimpleLib FASTBuild config file
+//=================================================================================================================
+#once
+
+
+Unity( 'SimpleLib_FastBuildUnitys_unity' )
+{
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\SimpleLib'
+    .UnityInputIsolateWritableFiles     =  true
+    .UnityInputIsolateWritableFilesLimit = 10
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\SimpleLib'
+    .UnityOutputPattern                 = 'simplelib_fastbuildunitys_unity*.cpp'
+    .UnityNumFiles                      =  1
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+Library( 'SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64_Library' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\simplelib\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"WIN64"'
+            + ' /D"_DEBUG"'
+            + ' /D"_LIB"'
+            + ' /GF'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\simplelib\simplelib_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\SimpleLib\simplelib.cpp'
+
+
+
+    .LibrarianOutput        = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.lib'
+    .LibrarianOptions       = '"%1" /OUT:"%2"'
+                            + ' /NOLOGO'
+
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = 'SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Library( 'SimpleLib_Release_FastBuild_NoBlob_vs2019_win64_Library' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\simplelib\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_LIB"'
+            + ' /GF'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\simplelib\simplelib_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\SimpleLib\simplelib.cpp'
+
+
+
+    .LibrarianOutput        = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\simplelib\simplelib.lib'
+    .LibrarianOptions       = '"%1" /OUT:"%2"'
+                            + ' /NOLOGO'
+
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Release_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = 'SimpleLib_Release_FastBuild_NoBlob_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SimpleLib_Release_FastBuild_NoBlob_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Library( 'SimpleLib_Debug_FastBuild_vs2019_win64_Library' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\simplelib\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"WIN64"'
+            + ' /D"_DEBUG"'
+            + ' /D"_LIB"'
+            + ' /GF'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\simplelib\simplelib_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'SimpleLib_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+
+
+    .LibrarianOutput        = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\simplelib\simplelib.lib'
+    .LibrarianOptions       = '"%1" /OUT:"%2"'
+                            + ' /NOLOGO'
+
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Debug_FastBuild_vs2019_win64' )
+{
+    .Targets = 'SimpleLib_Debug_FastBuild_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SimpleLib_Debug_FastBuild_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Library( 'SimpleLib_Release_FastBuild_vs2019_win64_Library' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\simplelib\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_LIB"'
+            + ' /GF'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\simplelib\simplelib_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'SimpleLib_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+
+
+    .LibrarianOutput        = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\simplelib\simplelib.lib'
+    .LibrarianOptions       = '"%1" /OUT:"%2"'
+                            + ' /NOLOGO'
+
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = 'SimpleLib_Release_FastBuild_vs2019_win64_Library'
+}
+
+
+//=================================================================================================================
+Alias( 'SimpleLib_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'SimpleLib_Release_FastBuild_vs2019_win64_Library'
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////

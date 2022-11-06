@@ -39,7 +39,7 @@ namespace SharpmakeGen.Samples
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings
             {
                 StartAction = Project.Configuration.CsprojUserFileSettings.StartActionSetting.Program,
-                StartProgram = @"[project.RootPath]\tmp\bin\[conf.Target.Optimization]\Sharpmake.Application.exe",
+                StartProgram = @"[project.RootPath]\tmp\bin\$(Configuration)\$(TargetFramework)\Sharpmake.Application.exe",
                 StartArguments = "/sources(@'[project.SharpmakeMainFile]')",
                 WorkingDirectory = "[project.SourceRootPath]"
             };
@@ -277,6 +277,15 @@ namespace SharpmakeGen.Samples
             base.ConfigureAll(conf, target);
 
             conf.AddPrivateDependency<SharpmakeGeneratorsProject>(target);
+        }
+    }
+
+    [Generate]
+    public class HelloRustProject : SampleProject
+    {
+        public HelloRustProject()
+        {
+            Name = "HelloRust";
         }
     }
 

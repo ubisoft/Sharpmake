@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ namespace Sharpmake
         /// Gets whether this platform supports Clang.
         /// </summary>
         bool IsUsingClang { get; }
+
+        /// <summary>
+        /// Get whether this platform launch the linker via the compiler
+        /// </summary>
+        bool IsLinkerInvokedViaCompiler { get; }
 
         /// <summary>
         /// Gets whether this is a .NET platform.

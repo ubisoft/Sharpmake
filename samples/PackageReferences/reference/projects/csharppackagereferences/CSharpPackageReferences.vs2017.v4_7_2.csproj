@@ -2,45 +2,45 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{EFF94431-45DF-6D89-7216-60D79A2DFD88}</ProjectGuid>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <PlatformTarget Condition=" '$(Platform)' == '' ">x64</PlatformTarget>
+    <ProjectGuid>{B71C3460-96EB-DA8A-3241-14BB9136F543}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PackageReferences</RootNamespace>
+    <RootNamespace>CSharpPackageReferences</RootNamespace>
     <AssemblyName>PackageReference</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>output\vs2017\debug</OutputPath>
-    <IntermediateOutputPath>obj\anycpu\debug</IntermediateOutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IntermediateOutputPath>obj\win64\debug</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE;WIN64</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>output\vs2017\release</OutputPath>
-    <IntermediateOutputPath>obj\anycpu\release</IntermediateOutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <IntermediateOutputPath>obj\win64\release</IntermediateOutputPath>
+    <DefineConstants>TRACE;WIN64</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\codebase\PackageReferences\Program.cs">
+    <Compile Include="..\..\codebase\CSharpPackageReferences\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="..\..\codebase\PackageReferences\Properties\AssemblyInfo.cs">
+    <Compile Include="..\..\codebase\CSharpPackageReferences\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
@@ -51,7 +51,7 @@
     <PackageReference Include="MySql.Data" Version="6.10.6">
         <PrivateAssets>compile;build</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NUnit" Version="3.6.0" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

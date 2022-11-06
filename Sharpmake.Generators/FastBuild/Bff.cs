@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -204,7 +204,6 @@ namespace Sharpmake.Generators.FastBuild
             string projectPath = new FileInfo(projectFile).Directory.FullName;
             var context = new BffGenerationContext(builder, project, projectPath, configurations);
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
-            string fastBuildClrSupport = Util.IsDotNet(firstConf) ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
             Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles;
             using (builder.CreateProfilingScope("BffGenerator.Generate:GetGeneratedFiles"))
@@ -272,6 +271,7 @@ namespace Sharpmake.Generators.FastBuild
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
+                var dotNetConf = Util.IsDotNet(conf);
 
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
@@ -348,9 +348,11 @@ namespace Sharpmake.Generators.FastBuild
                             isUnity = false;
                         }
 
+                        var useClr = dotNetConf && !isCompileAsNonCLRFile || isCompileAsCLRFile;
+                        var fastBuildSubConfigClrSupport = useClr ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
+
                         Trace.Assert(!isCompileAsCPPFile, "Sharpmake-FastBuild : CompiledAsCPP isn't yet supported.");
-                        Trace.Assert(!isCompileAsCLRFile, "Sharpmake-FastBuild : CompiledAsCLR isn't yet supported.");
-                        Trace.Assert(!isCompileAsNonCLRFile, "Sharpmake-FastBuild : !CompiledAsCLR isn't yet supported.");
+                        Trace.Assert(!isCompileAsCLRFile || !isCompileAsNonCLRFile, "Sharpmake-FastBuild : a file cannot be simultaneously compiled with and without the CLR");
 
                         Strings fastBuildCompilerInputPatternList = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
                         Strings fastBuildCompilerInputPatternTransformedList = new Strings(fastBuildCompilerInputPatternList.Select((s) => { return "*" + s; }));
@@ -395,6 +397,7 @@ namespace Sharpmake.Generators.FastBuild
                         var fastBuildProjectDependencies = new Strings();
                         var fastBuildBuildOnlyDependencies = new Strings();
                         var fastBuildProjectExeUtilityDependencyList = new Strings();
+                        var fastBuildTargetSubTargets = new Strings();
 
                         bool mustGenerateLibrary = confSubConfigs.Count > 1 && !useObjectLists && isLastSubConfig && isOutputTypeLib;
 
@@ -422,7 +425,10 @@ namespace Sharpmake.Generators.FastBuild
                                     string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
                                     if (!dependenciesInfo.IgnoredLibraryNames.Contains(depProjConfig.TargetFileFullNameWithExtension))
                                         fastBuildProjectDependencies.Add(shortProjectName + "_LibraryDependency");
-                                    fastBuildBuildOnlyDependencies.Add(shortProjectName);
+                                    if (depProjConfig.EventPostBuildExecute.Count != 0)
+                                    {
+                                        fastBuildTargetSubTargets.Add(shortProjectName);
+                                    }
                                 }
                                 else if (!depProjConfig.IsExcludedFromBuild)
                                 {
@@ -509,7 +515,6 @@ namespace Sharpmake.Generators.FastBuild
 
                         Strings preBuildTargets = new Strings();
 
-                        var fastBuildTargetSubTargets = new Strings();
                         var fastBuildTargetLibraryDependencies = new Strings();
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
@@ -580,7 +585,11 @@ namespace Sharpmake.Generators.FastBuild
                                     postBuildEvents.Add(eventPair.Key, eventPair.Value);
                                 }
 
-                                var extraPlatformEvents = platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; });
+                                var extraPlatformEvents = new List<Project.Configuration.BuildStepBase>();
+                                if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+                                    extraPlatformEvents.AddRange(platformBff.GetExtraStampEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
+
+                                extraPlatformEvents.AddRange(platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
                                 foreach (var buildEvent in extraPlatformEvents.Concat(conf.ResolvedEventPostBuildExe))
                                 {
                                     string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PostBuild, project.RootPath, projectPath);
@@ -643,6 +652,8 @@ namespace Sharpmake.Generators.FastBuild
                             // Do not take Cpp Language conformance into account while compiling in C
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // and remove the stdlib specification as well
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "StdLib", FileGeneratorUtilities.RemoveLineTag));
                             // MSVC
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
 
@@ -715,7 +726,7 @@ namespace Sharpmake.Generators.FastBuild
                             foreach (var refByPath in conf.ReferencesByPath)
                             {
                                 string refByPathCopy = refByPath;
-                                if (refByPath.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                                if (ShouldMakePathRelative(refByPath, context.Project))
                                     refByPathCopy = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, refByPath));
 
                                 fastBuildAdditionalCompilerOptionsFromCode += "/FU\"" + refByPathCopy + "\" ";
@@ -817,7 +828,7 @@ namespace Sharpmake.Generators.FastBuild
                             foreach (var f in conf.ForceUsingFiles.Union(conf.DependenciesForceUsingFiles))
                             {
                                 string file = f;
-                                if (f.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                                if (ShouldMakePathRelative(f, context.Project))
                                     file = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, f));
 
                                 builderForceUsingFiles.AppendFormat(@" /FU""{0}""", file);
@@ -825,22 +836,29 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildCompilerForceUsing = builderForceUsingFiles.ToString();
                         }
 
-                        if (isOutputTypeExeOrDll && (conf.PostBuildStampExe != null || conf.PostBuildStampExes.Any()))
+                        if (isOutputTypeExeOrDll)
                         {
-                            List<string> fastbuildStampExecutableList = new List<string>();
-                            List<string> fastBuildStampArgumentsList = new List<string>();
+                            var extraPlatformEvents = new List<Project.Configuration.BuildStepExecutable>();
+                            if (FastBuildSettings.FastBuildSupportLinkerStampList)
+                                extraPlatformEvents.AddRange(platformBff.GetExtraStampEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
 
-                            foreach (var stampExe in conf.PostBuildStampExes.Prepend(conf.PostBuildStampExe).Where(x => x != null))
+                            if (conf.PostBuildStampExe != null || conf.PostBuildStampExes.Any() || extraPlatformEvents.Any())
                             {
-                                fastbuildStampExecutableList.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, stampExe.ExecutableFile, true)));
-                                fastBuildStampArgumentsList.Add(string.Format("{0} {1} {2}",
-                                    stampExe.ExecutableInputFileArgumentOption,
-                                    stampExe.ExecutableOutputFileArgumentOption,
-                                    stampExe.ExecutableOtherArguments));
-                            }
+                                var fastbuildStampExecutableList = new List<string>();
+                                var fastBuildStampArgumentsList = new List<string>();
 
-                            fastBuildStampExecutable = UtilityMethods.FBuildFormatList(fastbuildStampExecutableList, 30);
-                            fastBuildStampArguments = UtilityMethods.FBuildFormatList(fastBuildStampArgumentsList, 30);
+                                foreach (var stampExe in extraPlatformEvents.Concat(conf.PostBuildStampExes.Prepend(conf.PostBuildStampExe)).Where(x => x != null))
+                                {
+                                    fastbuildStampExecutableList.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(projectPath, stampExe.ExecutableFile, true)));
+                                    fastBuildStampArgumentsList.Add(string.Format("{0} {1} {2}",
+                                        stampExe.ExecutableInputFileArgumentOption,
+                                        stampExe.ExecutableOutputFileArgumentOption,
+                                        stampExe.ExecutableOtherArguments));
+                                }
+
+                                fastBuildStampExecutable = UtilityMethods.FBuildFormatList(fastbuildStampExecutableList, 30);
+                                fastBuildStampArguments = UtilityMethods.FBuildFormatList(fastBuildStampArgumentsList, 30);
+                            }
                         }
 
                         bool linkObjects = false;
@@ -1031,7 +1049,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("cmdLineOptions", confCmdLineOptions))
                                     using (bffGenerator.Declare("fastBuildUsingPlatformConfig", "Using( " + fastBuildUsingPlatformConfig + " )"))
                                     using (bffGenerator.Declare("fastBuildProjectName", projectName))
-                                    using (bffGenerator.Declare("fastBuildClrSupport", fastBuildClrSupport))
+                                    using (bffGenerator.Declare("fastBuildClrSupport", fastBuildSubConfigClrSupport))
                                     using (bffGenerator.Declare("fastBuildOutputFileShortName", fastBuildOutputFileShortName))
                                     using (bffGenerator.Declare("fastBuildOutputFile", fastBuildOutputFile))
                                     using (bffGenerator.Declare("fastBuildLinkerOutputFile", fastBuildLinkerOutputFile))
@@ -1363,10 +1381,35 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             // Write all unity sections together at the beginning of the .bff just after the header.
-            foreach (var unityFile in _unities.Keys.OrderBy(u => u.UnityName))
+            if (_unities.Any())
             {
-                using (bffWholeFileGenerator.Declare("unityFile", unityFile))
-                    bffWholeFileGenerator.Write(Template.ConfigurationFile.UnitySection);
+                foreach (var unityFile in _unities.Keys.OrderBy(u => u.UnityName))
+                {
+                    using (bffWholeFileGenerator.Declare("unityFile", unityFile))
+                        bffWholeFileGenerator.Write(Template.ConfigurationFile.UnitySection);
+
+                    // Record the unities in the autocleanupdb to allow auto removal when they become stale.
+                    // Note that can't record them as 'generated', since they are created by FastBuild and not by us.
+                    int nbUnities = 1;
+                    if (unityFile.UnityNumFiles != FileGeneratorUtilities.RemoveLineTag)
+                    {
+                        if (!int.TryParse(unityFile.UnityNumFiles, out nbUnities))
+                            throw new Error("'{0}' cannot be converted to int!", unityFile.UnityNumFiles);
+                    }
+
+                    string outputPattern = unityFile.UnityOutputPattern == FileGeneratorUtilities.RemoveLineTag ? Sharpmake.Generators.FastBuild.Bff.Unity.DefaultUnityOutputPatternExtension : unityFile.UnityOutputPattern;
+                    int wildcardIndex = outputPattern.IndexOf('*');
+                    if (wildcardIndex == -1)
+                        throw new Error("UnityOutputPattern must include a '*', but none was found in '{0}'!", unityFile.UnityNumFiles);
+
+                    string firstStringChunk = outputPattern.Substring(0, wildcardIndex);
+                    string lastStringChunk = outputPattern.Substring(wildcardIndex + 1);
+                    for (int i = 1; i <= nbUnities; ++i)
+                    {
+                        string fullPath = Path.Combine(unityFile.UnityFullOutputPath, $"{firstStringChunk}{i}{lastStringChunk}");
+                        Util.RecordInAutoCleanupDatabase(fullPath);
+                    }
+                }
             }
 
             // Now combine all the streams.
@@ -1396,7 +1439,7 @@ namespace Sharpmake.Generators.FastBuild
             // if the include is below the global root, we compute the relative path,
             // otherwise it's probably a system include for which we keep the full path
             string resolvedInclude = resolver.Resolve(include);
-            if (resolvedInclude.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+            if (ShouldMakePathRelative(resolvedInclude, context.Project))
                 resolvedInclude = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, resolvedInclude, true));
             return $@"{prefix}{Util.DoubleQuotes}{resolvedInclude}{Util.DoubleQuotes}";
         }
@@ -1659,7 +1702,7 @@ namespace Sharpmake.Generators.FastBuild
                 if (Path.IsPathRooted(libraryFile))
                 {
                     // if the path is below the global root, we compute the relative path, otherwise we keep the full path
-                    if (libraryFile.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                    if (ShouldMakePathRelative(libraryFile, context.Project))
                         additionalDependencies.Add(CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, libraryFile, true)), libraryFiles.GetOrderNumber(i));
                     else
                         additionalDependencies.Add(libraryFile, libraryFiles.GetOrderNumber(i));
@@ -1768,6 +1811,8 @@ namespace Sharpmake.Generators.FastBuild
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude.Select(Util.GetCapitalizedPath));
 
+            string fastBuildUnityInputIsolateListFile = FileGeneratorUtilities.RemoveLineTag;
+
             bool srcDirsAreEmpty = true;
             var items = new List<string>();
 
@@ -1814,7 +1859,7 @@ namespace Sharpmake.Generators.FastBuild
                 var unityInputRelativePaths = new Strings(unityInputPaths.Select(
                     p =>
                     {
-                        if (p.StartsWith(context.Project.RootPath, StringComparison.OrdinalIgnoreCase))
+                        if (ShouldMakePathRelative(p, context.Project))
                             return CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, p, true));
                         return p;
                     }
@@ -1871,12 +1916,17 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildUnityInputPattern = UtilityMethods.FBuildCollectionFormat(inputPatterns, spaceLength);
             }
 
+            if (!string.IsNullOrEmpty(conf.FastBuildUnityInputIsolateListFile))
+                fastBuildUnityInputIsolateListFile = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.FastBuildUnityInputIsolateListFile, true));
+
             Unity unityFile = new Unity
             {
                 // Note that the UnityName and UnityOutputPattern are intentionally left empty: they will be set in the Resolve
                 UnityOutputPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.FastBuildUnityPath, true)),
+                UnityFullOutputPath = Path.Combine(context.ProjectDirectoryCapitalized, conf.FastBuildUnityPath),
                 UnityInputIsolateWritableFiles = conf.FastBuildUnityInputIsolateWritableFiles.ToString().ToLower(),
                 UnityInputIsolateWritableFilesLimit = conf.FastBuildUnityInputIsolateWritableFiles ? conf.FastBuildUnityInputIsolateWritableFilesLimit.ToString() : FileGeneratorUtilities.RemoveLineTag,
+                UnityInputIsolateListFile = fastBuildUnityInputIsolateListFile,
                 UnityPCH = conf.PrecompHeader ?? FileGeneratorUtilities.RemoveLineTag,
                 UnityInputExcludePath = fastBuildUnityInputExcludePath,
                 UnityNumFiles = fastBuildUnityCount,
@@ -1964,7 +2014,7 @@ namespace Sharpmake.Generators.FastBuild
                 var projectFile = new Vcxproj.ProjectFile(context, file);
                 allFiles.Add(projectFile);
             }
-            allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.InvariantCulture));
+            allFiles.Sort((l, r) => string.Compare(l.FileNameProjectRelative, r.FileNameProjectRelative, StringComparison.OrdinalIgnoreCase));
 
             var sourceFiles = new List<Vcxproj.ProjectFile>();
             foreach (var projectFile in allFiles)
@@ -2062,6 +2112,12 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             return confSubConfigs;
+        }
+
+        private static bool ShouldMakePathRelative(string path, Project project)
+        {
+            string rootPath = FastBuildSettings.WorkspaceRoot ?? project.RootPath;
+            return path.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsFileInInputPathList(Strings inputPaths, string path)

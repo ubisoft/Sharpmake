@@ -309,6 +309,26 @@ namespace SharpmakeGen.FunctionalTests
     }
 
     [Generate]
+    public class SpanMultipleSrcDirsFBUnityIsolate : SpanMultipleSrcDirs
+    {
+        public SpanMultipleSrcDirsFBUnityIsolate()
+        {
+            AddFragmentMask(Blob.FastBuildUnitys);
+        }
+
+        public override void FastBuildUnitys(Configuration conf, Target target)
+        {
+            base.FastBuildUnitys(conf, target);
+
+            // Isolating writable files works well only for Perforce
+            conf.FastBuildUnityInputIsolateWritableFiles = false;
+
+            // Provides a list of files that should be manually isolated. It can be used for Git difference of names, for example
+            conf.FastBuildUnityInputIsolateListFile = @"[project.RootPath]\codebase\SpanMultipleSrcDirs\temp\isolate_list.txt";
+        }
+    }
+
+    [Generate]
     public class UsePrecompExe : CommonExeProject
     {
         public UsePrecompExe()
@@ -553,6 +573,27 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class SimpleLib : CommonProject
+    {
+        public SimpleLib()
+        {
+        }
+    }
+
+    [Generate]
+    public class SimpleExeWithLib : CommonExeProject
+    {
+        public SimpleExeWithLib()
+        {
+        }
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.AddPublicDependency<SimpleLib>(target);
+        }
+    }
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -581,11 +622,13 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<PostBuildTestExecution>(target);
             conf.AddProject<PostBuildStampTest>(target);
             conf.AddProject<ExplicitlyOrderedPostBuildTest>(target);
+            conf.AddProject<SimpleExeWithLib>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {
                 conf.AddProject<SpanMultipleSrcDirsFBUnityInclude>(target);
                 conf.AddProject<SpanMultipleSrcDirsFBUnityExclude>(target);
+                conf.AddProject<SpanMultipleSrcDirsFBUnityIsolate>(target);
             }
             else if (target.Blob == Blob.NoBlob)
             {

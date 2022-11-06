@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -629,8 +629,9 @@ namespace Sharpmake.Generators.Generic
             options["AdditionalLinkerOptions"] = linkerAdditionalOptions;
 
             // this is supported in both gcc and clang
+            string linkerOptionPrefix = conf.Platform.GetLinkerOptionPrefix();
             SelectOption(conf,
-                Options.Option(Options.Makefile.Linker.LibGroup.Enable, () => { options["LibsStartGroup"] = " -Wl,--start-group "; options["LibsEndGroup"] = " -Wl,--end-group "; }),
+                Options.Option(Options.Makefile.Linker.LibGroup.Enable, () => { options["LibsStartGroup"] = $" {linkerOptionPrefix}--start-group "; options["LibsEndGroup"] = $" {linkerOptionPrefix}--end-group "; }),
                 Options.Option(Options.Makefile.Linker.LibGroup.Disable, () => { options["LibsStartGroup"] = string.Empty; options["LibsEndGroup"] = string.Empty; })
                 );
 
@@ -655,11 +656,11 @@ namespace Sharpmake.Generators.Generic
 
             foreach (string file in projectSourceFiles)
             {
-                string fileName = Path.GetFileName(file);
+                string fileName = Path.GetFileNameWithoutExtension(file);
                 int fileNameOccurences = 0;
                 if (fileNamesOccurences.TryGetValue(fileName, out fileNameOccurences))
                 {
-                    fileNamesOccurences[fileName] = fileNameOccurences++;
+                    fileNamesOccurences[fileName] = ++fileNameOccurences;
                 }
                 else
                 {

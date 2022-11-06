@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,7 +80,6 @@ namespace Sharpmake
             {
                 string commandLine = Environment.CommandLine.Remove(0, commandLineArgs[0].Length + 1);
                 commandLine = commandLine.Trim(' ', '\"');
-                commandLine = commandLine.Replace(@"'", @"""");
                 return commandLine;
             }
 
@@ -178,7 +177,7 @@ namespace Sharpmake
         {
             bool isStatic = instance == null;
 
-            Parameter[] parameters = GetParameters(commandLine);
+            Parameter[] parameters = GetParameters(commandLine.Replace(@"'", @""""));
             if (parameters.Length == 0)
                 return;
 

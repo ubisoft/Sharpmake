@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.IO;
+using System.Text;
 using System.Xml;
 using Sharpmake;
 
@@ -29,8 +30,12 @@ namespace HelloAndroidAgde
             SourceFilesExtensions.Add(".xml");
             SourceFilesExtensions.Add(".gradle");
 
+            SourceFiles.Add(Path.Combine(Android.GlobalSettings.NdkRoot, @"sources\android\native_app_glue\android_native_app_glue.c"));
+
             // Show resource files in project
-            AdditionalSourceRootPaths.Add(Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]"));
+            var projectPath = Path.Combine(Globals.TmpDirectory, "projects", Name);
+            AdditionalSourceRootPaths.Add(projectPath);
+            CopyAndroidResources(projectPath);
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
@@ -48,54 +53,89 @@ namespace HelloAndroidAgde
             conf.Defines.Add("CREATION_DATE=\"April 2021\"");
         }
 
+        private string GetABI(CommonTarget target)
+        {
+            switch (target.AndroidBuildTargets)
+            {
+                case Android.AndroidBuildTargets.arm64_v8a:
+                    return "arm64-v8a";
+                case Android.AndroidBuildTargets.x86_64:
+                    return "x86_64";
+                case Android.AndroidBuildTargets.armeabi_v7a:
+                    return "armeabi-v7a";
+                case Android.AndroidBuildTargets.x86:
+                    return "x86";
+                default:
+                    throw new System.Exception($"Something wrong? {target.AndroidBuildTargets} is not supported Android target for AGDE.");
+            }
+        }
+
         public override void ConfigureAgde(Configuration conf, CommonTarget target)
         {
             base.ConfigureAgde(conf, target);
 
-            conf.IncludePaths.Add(@"$(AndroidNdkDirectory)\sources\android"); // For android_native_app_glue.h
+            conf.IncludePaths.Add(Path.Combine(Android.GlobalSettings.NdkRoot, @"sources\android")); // For android_native_app_glue.h
 
-            switch (target.AndroidBuildTargets)
-            {
-                case Android.AndroidBuildTargets.arm64_v8a:
-                    conf.TargetPath = Path.Combine(conf.TargetPath, "arm64-v8a"); // The gradle script require the outdir end of "arm64-v8a"
-                    break;
-                case Android.AndroidBuildTargets.x86_64:
-                    conf.TargetPath = Path.Combine(conf.TargetPath, "x86_64");
-                    break;
-                case Android.AndroidBuildTargets.armeabi_v7a:
-                    conf.TargetPath = Path.Combine(conf.TargetPath, "armeabi-v7a");
-                    break;
-                case Android.AndroidBuildTargets.x86:
-                    conf.TargetPath = Path.Combine(conf.TargetPath, "x86");
-                    break;
-
-                default:
-                    throw new System.Exception($"TODO, {target.AndroidBuildTargets} is not supported Android target for AGDE.");
-            }
+            //It is an error if the `OutDir` does not end with one of the following Android ABI name.
+            //  - x86
+            //  - x86_64
+            //  - armeabi-v7a
+            //  - arm64-v8a
+            conf.TargetPath = Path.Combine(conf.TargetPath, GetABI(target));
+            // There's a bug in AGDE which fail to copy dependencies when using conf.LibraryFiles.Add("liblog.so", "libandroid.so")
             conf.AdditionalLinkerOptions.Add("-llog", "-landroid");
 
-            // Make sure the path of project exists as it is set to SourceRootPath.
-            Resolver resolver = new Resolver();
-            resolver.SetParameter("project", this);
-            string projectPath = resolver.Resolve(conf.ProjectPath);
-            if (!Directory.Exists(projectPath))
-            {
-                Directory.CreateDirectory(projectPath);
-            }
-
-            if (!_hasCopiedResources)
-                CopyAndroidResources(projectPath);
-
             // The short name(libxxx.so, xxx is the short name) of App executable .so has to match the name of the project
-            // because the native activity name is set to project.LowerName in AndroidManifest.xml.
+            // because it is set to project.LowerName in AndroidManifest.xml.
             conf.TargetFileName = LowerName;
         }
 
-        private bool _hasCopiedResources = false;
+        public override void PostResolve()
+        {
+            base.PostResolve();
+
+            foreach (var conf in Configurations)
+            {
+                if (conf.IsFastBuild)
+                {
+                    CommonTarget target = conf.Target as CommonTarget;
+                    var apkFilename = Name + "_" + target.DirectoryName + ".apk";
+
+                    //Define where to find the apk for debugging
+                    var apkFileWithAbsolutePath = Util.SimplifyPath(Path.Combine(conf.TargetPath, @"..\..", apkFilename));
+                    conf.Options.Add(new Options.Agde.General.AndroidApkLocation(apkFileWithAbsolutePath));
+
+                    SetupPackageBat(conf, target, apkFilename);
+                }
+            }
+        }
+
+        private void SetupPackageBat(Configuration conf, CommonTarget target, string apkFilename)
+        {
+            bool libCppShared = conf.Options.Contains(Options.Agde.General.UseOfStl.LibCpp_Shared) ? true : false;
+
+            var ndkVersion = Android.Util.GetNdkVersion(Android.GlobalSettings.NdkRoot);
+            var minSdkVersion = Android.Util.GetAndroidApiLevelString(AndroidMinSdkVersion);
+            var targetLibsPath = Util.SimplifyPath(Path.Combine(conf.TargetPath, ".."));
+
+            //It must be a relative path as gradle required,
+            // the following relative path is against "HelloAndroidAgde\codebase\temp\projects\exe\build\outputs\apk\[optimization]" folder
+            var apkTargetFile = "../../../../../../bin/" + apkFilename;
+
+            var gradlewParam = "clean :" + Name + ":assemble" + target.Name;
+            targetLibsPath = targetLibsPath.Replace("\\", "/");
+            gradlewParam += string.Format(@" ""-PNDK_VERSION={0}"" ""-PMIN_SDK_VERSION={1}"" ""-PJNI_LIBS_SRC_DIR={2}"" ""-PANDROID_OUTPUT_APK_NAME={3}"" ""-PFastBuild=True"" ""-PLibCppShared={4}"" ""-PABI={5}""", ndkVersion, minSdkVersion, targetLibsPath, apkTargetFile, libCppShared, GetABI(target));
+            var packageBatFile = Util.SimplifyPath(conf.ProjectPath + @"\..\gradlew.bat ");
+
+            conf.PostBuildStampExes.Add(new Sharpmake.Project.Configuration.BuildStepExecutable(
+                    packageBatFile,
+                    "",
+                    "",
+                    gradlewParam));
+        }
+
         private void CopyAndroidResources(string projectPath)
         {
-            _hasCopiedResources = true;
-
             string dstPath = Path.Combine(projectPath, @"src\main");
             if (!Directory.Exists(dstPath))
             {
@@ -104,50 +144,10 @@ namespace HelloAndroidAgde
             string srcManifestFile = Path.Combine(SharpmakeCsProjectPath, @"..\..\resources\AndroidManifest.xml");
             string dstManifestFile = Path.Combine(dstPath, "AndroidManifest.xml");
             Util.ForceCopy(srcManifestFile, dstManifestFile);
-            UpdateManifestXML(dstManifestFile, "HelloAndroidAgde");
 
             // Copy module build gradle file to project folder
             string srcModulePath = Path.Combine(SharpmakeCsProjectPath, @"..\..\gradle\app");
             AndroidUtil.DirectoryCopy(srcModulePath, projectPath);
-        }
-
-        private void UpdateManifestXML(string destManifest, string packageName)
-        {
-            #region Remove the read only attribute of the manifest file
-            FileAttributes attributes = File.GetAttributes(destManifest);
-            if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-            {
-                attributes &= ~FileAttributes.ReadOnly;
-                File.SetAttributes(destManifest, attributes);
-            }
-            #endregion
-
-            #region Update the contents
-            XmlDocument androidManifestDoc = new XmlDocument();
-            androidManifestDoc.Load(destManifest);
-            XmlElement root = androidManifestDoc.DocumentElement;
-
-            // Change package name
-            root.SetAttribute("package", string.Format("com.android.{0}", packageName.ToLowerInvariant()));
-
-            // Change application label
-            string nsURI = root.GetAttribute("xmlns:android");
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(androidManifestDoc.NameTable);
-            nsmgr.AddNamespace("ns", nsURI);
-            XmlAttribute xmlAndroidLabel = (XmlAttribute)androidManifestDoc.SelectSingleNode("//manifest/application/@ns:label", nsmgr);
-            if (xmlAndroidLabel != null)
-            {
-                xmlAndroidLabel.Value = packageName;
-            }
-            xmlAndroidLabel = (XmlAttribute)androidManifestDoc.SelectSingleNode("manifest/application/activity/@ns:label", nsmgr);
-            if (xmlAndroidLabel != null)
-            {
-                xmlAndroidLabel.Value = packageName;
-            }
-
-            #endregion
-
-            androidManifestDoc.Save(destManifest);
         }
     }
 }

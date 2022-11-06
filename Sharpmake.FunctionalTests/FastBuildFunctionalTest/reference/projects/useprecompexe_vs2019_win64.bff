@@ -166,6 +166,9 @@ Executable( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -188,9 +191,6 @@ Executable( 'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -384,6 +384,9 @@ Executable( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -406,9 +409,6 @@ Executable( 'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -597,6 +597,9 @@ Executable( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -619,9 +622,6 @@ Executable( 'UsePrecompExe_Debug_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
@@ -812,6 +812,9 @@ Executable( 'UsePrecompExe_Release_FastBuild_vs2019_win64_Executable' )
     .LinkerLinkObjects      = false
 
     .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
                             // General
                             // ---------------------------
                             + ' /INCREMENTAL:NO'
@@ -834,9 +837,6 @@ Executable( 'UsePrecompExe_Release_FastBuild_vs2019_win64_Executable' )
                             + ' "uuid.lib"'
                             + ' "odbc32.lib"'
                             + ' "odbccp32.lib"'
-                            // Input files
-                            // ---------------------------
-                            + ' "%1"'
                             // Manifest
                             // ---------------------------
                             + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'

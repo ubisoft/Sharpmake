@@ -18,13 +18,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-2019, windows-2022]
         framework: [net472, net5.0]
         configuration: [debug, release]
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
 
       - name: Bootstrap.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
@@ -63,14 +63,14 @@ jobs:
 
       - name: Upload sharpmake .net framework release binaries
         if: matrix.configuration == 'release' && matrix.framework == 'net472'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Upload sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.configuration == 'release' && matrix.framework != 'net472'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
@@ -81,23 +81,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest] # only windows for now, but ideally should be all
+        os: [windows-2019] # only windows for now, but ideally should be all. TODO: add windows-2022
         framework: [net472, net5.0]
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
 
       - name: Download sharpmake .net framework release binaries
         if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.framework != 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
@@ -112,7 +112,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-2019] # TODO: add windows-2022
         framework: [net472, net5.0]
         configuration: [debug, release]
 
@@ -123,18 +123,18 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
 
       - name: Download sharpmake .net framework release binaries
         if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.framework != 'net472'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
@@ -217,6 +217,16 @@ jobs:
           & $env:COMPILE_BATCH projects\fastbuildsample_vs2019_win64.sln "${{ matrix.configuration }}" "x64"
           projects\output\win64\${{ matrix.configuration }}\fastbuildsimpleexecutable.exe
 
+      # Temp disable after Github VM update which updated the NDK and broke it
+      # - name: HelloAndroid ${{ matrix.configuration }}
+      #   if: runner.os == 'Windows'
+      #   working-directory: 'samples/HelloAndroid'
+      #   run: |
+      #     $env:JAVA_HOME = $env:JAVA_HOME_11_X64
+      #     & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
+      #     & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
+      #     & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
+
       - name: HelloClangCl debug
         if: runner.os == 'Windows' && matrix.configuration == 'debug'
         working-directory: 'samples/HelloClangCl'
@@ -280,22 +290,14 @@ jobs:
         working-directory: 'samples/HelloXCode'
         run: |
           mono --debug $SHARPMAKE_WIN_EXE "/sources('HelloXCode.Main.sharpmake.cs')" || $SHARPMAKE_UNIX_EXE "/sources('HelloXCode.Main.sharpmake.cs')"
-          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme "exe FastBuild"
+          set -o pipefail
+          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme "exe FastBuild" | xcpretty
           codebase/temp/bin/mac_${{ matrix.configuration }}_fastbuild/exe
-          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_mac
+          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_prelinked_mac | xcpretty
+          codebase/temp/bin/mac_${{ matrix.configuration }}/exe_prelinked
+          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_mac | xcpretty
           cd codebase/temp/bin/mac_${{ matrix.configuration }}
           DYLD_LIBRARY_PATH=. ./exe
-
-      - name: HelloAndroid ${{ matrix.configuration }}
-        if: runner.os == 'Windows'
-        working-directory: 'samples/HelloAndroid'
-        env:
-            REMOVE_ANDROID_BUILD_TOOLS_VERSION: 31.0.0
-        run: | #Installed Build Tools revision 31.0.0 is corrupted. Need to remove and install again using the SDK Manager.
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-          & $env:ANDROID_HOME/tools/bin/sdkmanager --uninstall "build-tools;${{ env.REMOVE_ANDROID_BUILD_TOOLS_VERSION }}"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
 
       - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }}
         if: runner.os == 'Windows'
@@ -346,14 +348,18 @@ jobs:
         working-directory: 'samples/PackageReferences'
         run: |
           & $env:SHARPMAKE_WIN_EXE "/sources('PackageReferences.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-          projects\packagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe
-          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-          projects\packagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe
+          nuget restore projects\PackageReferenceSolution.vs2017.v4_7_2.sln
+          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "x64"
+          projects\csharppackagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe
+          projects\cpppackagereferences\output\vs2017\${{ matrix.configuration }}\cpppackagereferences.exe
+          nuget restore projects\PackageReferenceSolution.vs2019.v4_7_2.sln
+          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "x64"
+          projects\csharppackagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe
+          projects\cpppackagereferences\output\vs2019\${{ matrix.configuration }}\cpppackagereferences.exe
 
       - name: Install Qt
         if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v2.14.0
+        uses: jurplel/install-qt-action@v3.0.0
 
       - name: QTFileCustomBuild ${{ matrix.configuration }}
         if: runner.os == 'Windows'

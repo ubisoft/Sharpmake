@@ -18,8 +18,10 @@ Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_NoBlob_vs2019_win64' )
                    'PostBuildCopyDirTest_Debug_FastBuild_NoBlob_vs2019_win64',
                    'PostBuildCopySingleFileTest_Debug_FastBuild_NoBlob_vs2019_win64',
                    'PostBuildExecuteTest_Debug_FastBuild_NoBlob_vs2019_win64',
+                   'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64',
                    'PostBuildTestExecution_Debug_FastBuild_NoBlob_vs2019_win64',
                    'RequirePreBuildStep_Debug_FastBuild_NoBlob_vs2019_win64',
+                   'SimpleExeWithLib_Debug_FastBuild_NoBlob_vs2019_win64',
                    'SpanMultipleSrcDirsFBNoBlobExclude_Debug_FastBuild_NoBlob_vs2019_win64',
                    'SpanMultipleSrcDirsFBNoBlobInclude_Debug_FastBuild_NoBlob_vs2019_win64',
                    'UsePrecompExe_Debug_FastBuild_NoBlob_vs2019_win64'
@@ -36,8 +38,10 @@ Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_NoBlob_vs2019_win64' )
                    'PostBuildCopyDirTest_Release_FastBuild_NoBlob_vs2019_win64',
                    'PostBuildCopySingleFileTest_Release_FastBuild_NoBlob_vs2019_win64',
                    'PostBuildExecuteTest_Release_FastBuild_NoBlob_vs2019_win64',
+                   'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64',
                    'PostBuildTestExecution_Release_FastBuild_NoBlob_vs2019_win64',
                    'RequirePreBuildStep_Release_FastBuild_NoBlob_vs2019_win64',
+                   'SimpleExeWithLib_Release_FastBuild_NoBlob_vs2019_win64',
                    'SpanMultipleSrcDirsFBNoBlobExclude_Release_FastBuild_NoBlob_vs2019_win64',
                    'SpanMultipleSrcDirsFBNoBlobInclude_Release_FastBuild_NoBlob_vs2019_win64',
                    'UsePrecompExe_Release_FastBuild_NoBlob_vs2019_win64'
@@ -54,10 +58,13 @@ Alias( 'FastBuildFunctionalTest_All_Debug_FastBuild_vs2019_win64' )
                    'PostBuildCopyDirTest_Debug_FastBuild_vs2019_win64',
                    'PostBuildCopySingleFileTest_Debug_FastBuild_vs2019_win64',
                    'PostBuildExecuteTest_Debug_FastBuild_vs2019_win64',
+                   'PostBuildStampTest_Debug_FastBuild_vs2019_win64',
                    'PostBuildTestExecution_Debug_FastBuild_vs2019_win64',
                    'RequirePreBuildStep_Debug_FastBuild_vs2019_win64',
+                   'SimpleExeWithLib_Debug_FastBuild_vs2019_win64',
                    'SpanMultipleSrcDirsFBUnityExclude_Debug_FastBuild_vs2019_win64',
                    'SpanMultipleSrcDirsFBUnityInclude_Debug_FastBuild_vs2019_win64',
+                   'SpanMultipleSrcDirsFBUnityIsolate_Debug_FastBuild_vs2019_win64',
                    'UsePrecompExe_Debug_FastBuild_vs2019_win64'
                }
 }
@@ -72,10 +79,13 @@ Alias( 'FastBuildFunctionalTest_All_Release_FastBuild_vs2019_win64' )
                    'PostBuildCopyDirTest_Release_FastBuild_vs2019_win64',
                    'PostBuildCopySingleFileTest_Release_FastBuild_vs2019_win64',
                    'PostBuildExecuteTest_Release_FastBuild_vs2019_win64',
+                   'PostBuildStampTest_Release_FastBuild_vs2019_win64',
                    'PostBuildTestExecution_Release_FastBuild_vs2019_win64',
                    'RequirePreBuildStep_Release_FastBuild_vs2019_win64',
+                   'SimpleExeWithLib_Release_FastBuild_vs2019_win64',
                    'SpanMultipleSrcDirsFBUnityExclude_Release_FastBuild_vs2019_win64',
                    'SpanMultipleSrcDirsFBUnityInclude_Release_FastBuild_vs2019_win64',
+                   'SpanMultipleSrcDirsFBUnityIsolate_Release_FastBuild_vs2019_win64',
                    'UsePrecompExe_Release_FastBuild_vs2019_win64'
                }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2018-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -264,7 +264,7 @@ namespace Sharpmake.Generators.FastBuild
                 }
                 else if (FileSystemStringComparer.StaticCompare(pair.sourceBff, bffFullPath) != 0 || pair.sourceNodeIdentifier != fastBuildTargetIdentifier)
                 {
-                    throw new Error("Found identical output from multiple sources!");
+                    throw new Error($"Found identical output '{outputFile}' from multiple sources!");
                 }
             }
 
@@ -316,7 +316,6 @@ namespace Sharpmake.Generators.FastBuild
                 foreach (var solutionProject in solutionProjects)
                 {
                     var project = solutionProject.Project;
-                    string projectPath = new FileInfo(solutionProject.ProjectFile).Directory.FullName;
 
                     // Export projects do not have any bff
                     if (project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
@@ -326,7 +325,7 @@ namespace Sharpmake.Generators.FastBuild
                     if (project.SourceFilesFilters != null && (project.SourceFilesFiltersCount == 0 || project.SkipProjectWhenFiltersActive))
                         continue;
 
-                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(solutionProject.Project.GetType());
+                    Solution.Configuration.IncludedProjectInfo includedProject = solutionConfiguration.GetProject(project.GetType());
                     bool perfectMatch = includedProject != null && solutionProject.Configurations.Contains(includedProject.Configuration);
                     if (!perfectMatch)
                         continue;
@@ -337,9 +336,12 @@ namespace Sharpmake.Generators.FastBuild
 
                     mustGenerateFastbuild = true;
 
-                    IPlatformBff platformBff = platformBffCache.GetValueOrAdd(conf.Platform, PlatformRegistry.Query<IPlatformBff>(conf.Platform));
-
-                    platformBff.AddCompilerSettings(masterBffInfo.CompilerSettings, conf);
+                    var otherConfigurationsInSameBff = project.Configurations.Where(c => conf.BffFullFileName == c.BffFullFileName);
+                    foreach (var c in otherConfigurationsInSameBff)
+                    {
+                        IPlatformBff platformBff = platformBffCache.GetValueOrAdd(c.Platform, PlatformRegistry.Query<IPlatformBff>(c.Platform));
+                        platformBff.AddCompilerSettings(masterBffInfo.CompilerSettings, c);
+                    }
 
                     string fastBuildTargetIdentifier = Bff.GetShortProjectName(project, conf);
 
@@ -398,9 +400,11 @@ namespace Sharpmake.Generators.FastBuild
                             preBuildEvents.Add(eventPair.Key, eventPair.Value);
                         }
 
+                        string projectPath = new FileInfo(solutionProject.ProjectFile).Directory.FullName;
+
                         foreach (var buildEvent in conf.ResolvedEventPreBuildExe)
                         {
-                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild, project.RootPath, masterBffDirectory);
+                            string eventKey = ProjectOptionsGenerator.MakeBuildStepName(conf, buildEvent, Vcxproj.BuildStep.PreBuild, project.RootPath, projectPath);
                             preBuildEvents.Add(eventKey, buildEvent);
                         }
 

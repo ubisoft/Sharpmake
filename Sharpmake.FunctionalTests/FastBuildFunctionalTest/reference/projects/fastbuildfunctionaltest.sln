@@ -11,20 +11,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExplicitlyOrderedPostBuildTest", "explicitlyorderedpostbuildtest_vs2019_win64.vcxproj", "{E965FD55-C022-64FC-AB1B-9C299D53E107}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastBuildFunctionalTest_All", "fastbuildfunctionaltest_all.vcxproj", "{6AE06EC2-B2C7-52F6-C657-FE1FFFA43666}"
-	ProjectSection(ProjectDependencies) = postProject
-		{09B70182-6E14-896B-E2DF-B4874B8125B1} = {09B70182-6E14-896B-E2DF-B4874B8125B1}
-		{3B88798D-8E0B-330F-7C31-7F761D686B03} = {3B88798D-8E0B-330F-7C31-7F761D686B03}
-		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035} = {4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}
-		{6644576B-DABD-B111-1BB5-47804F5CE2DC} = {6644576B-DABD-B111-1BB5-47804F5CE2DC}
-		{6C284AF9-4231-78AB-754D-A7143C2B81DD} = {6C284AF9-4231-78AB-754D-A7143C2B81DD}
-		{8DF6E677-91F0-4434-28CE-36FEC6B2B858} = {8DF6E677-91F0-4434-28CE-36FEC6B2B858}
-		{907F7CFF-3D45-EE04-7085-E9E2DB067942} = {907F7CFF-3D45-EE04-7085-E9E2DB067942}
-		{9BA0D009-9D4F-6BD1-2245-32F2E42A6FA5} = {9BA0D009-9D4F-6BD1-2245-32F2E42A6FA5}
-		{BC3341AC-FE51-B984-2CC3-805586205CBC} = {BC3341AC-FE51-B984-2CC3-805586205CBC}
-		{C987AAB6-A816-E538-96F5-B2B11C90C207} = {C987AAB6-A816-E538-96F5-B2B11C90C207}
-		{D4A0C206-AA95-4DD7-C15C-ACEF32DF514E} = {D4A0C206-AA95-4DD7-C15C-ACEF32DF514E}
-		{E965FD55-C022-64FC-AB1B-9C299D53E107} = {E965FD55-C022-64FC-AB1B-9C299D53E107}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixCppAndCExe", "mixcppandcexe_vs2019_win64.vcxproj", "{C987AAB6-A816-E538-96F5-B2B11C90C207}"
 EndProject
@@ -34,9 +20,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildCopySingleFileTest
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildExecuteTest", "postbuildexecutetest_vs2019_win64.vcxproj", "{D4A0C206-AA95-4DD7-C15C-ACEF32DF514E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildStamper", "postbuildstamper_vs2019_win64.vcxproj", "{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildStampTest", "postbuildstamptest_vs2019_win64.vcxproj", "{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostBuildTestExecution", "postbuildtestexecution_vs2019_win64.vcxproj", "{6644576B-DABD-B111-1BB5-47804F5CE2DC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RequirePreBuildStep", "requireprebuildstep_vs2019_win64.vcxproj", "{907F7CFF-3D45-EE04-7085-E9E2DB067942}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleExeWithLib", "simpleexewithlib_vs2019_win64.vcxproj", "{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleLib", "simplelib_vs2019_win64.vcxproj", "{42927944-97F0-ACD6-0787-AB607A15027F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBNoBlobExclude", "spanmultiplesrcdirsfbnoblobexclude_vs2019_win64.vcxproj", "{9BA0D009-9D4F-6BD1-2245-32F2E42A6FA5}"
 EndProject
@@ -45,6 +39,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityExclude", "spanmultiplesrcdirsfbunityexclude_vs2019_win64.vcxproj", "{09B70182-6E14-896B-E2DF-B4874B8125B1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityInclude", "spanmultiplesrcdirsfbunityinclude_vs2019_win64.vcxproj", "{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpanMultipleSrcDirsFBUnityIsolate", "spanmultiplesrcdirsfbunityisolate_vs2019_win64.vcxproj", "{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UsePrecompExe", "useprecompexe_vs2019_win64.vcxproj", "{3B88798D-8E0B-330F-7C31-7F761D686B03}"
 EndProject
@@ -108,6 +104,22 @@ Global
 		{D4A0C206-AA95-4DD7-C15C-ACEF32DF514E}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2019|x64
 		{D4A0C206-AA95-4DD7-C15C-ACEF32DF514E}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2019|x64
 		{D4A0C206-AA95-4DD7-C15C-ACEF32DF514E}.Release|MSBuild.Build.0 = Release_MSBuild_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2019|x64
+		{2093F67D-893F-9F48-CE9C-D33ABE1E2BFF}.Release|MSBuild.Build.0 = Release_MSBuild_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2019|x64
+		{D6CD0AF8-4246-8B90-F4CC-FFEED89FA8C7}.Release|MSBuild.Build.0 = Release_MSBuild_vs2019|x64
 		{6644576B-DABD-B111-1BB5-47804F5CE2DC}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
 		{6644576B-DABD-B111-1BB5-47804F5CE2DC}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
 		{6644576B-DABD-B111-1BB5-47804F5CE2DC}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64
@@ -124,6 +136,22 @@ Global
 		{907F7CFF-3D45-EE04-7085-E9E2DB067942}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2019|x64
 		{907F7CFF-3D45-EE04-7085-E9E2DB067942}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2019|x64
 		{907F7CFF-3D45-EE04-7085-E9E2DB067942}.Release|MSBuild.Build.0 = Release_MSBuild_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2019|x64
+		{66831DE7-5D2E-C368-ABD4-4F45E76AAFF3}.Release|MSBuild.Build.0 = Release_MSBuild_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Debug|MSBuild.Build.0 = Debug_MSBuild_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_NoBlob_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Release|MSBuild.ActiveCfg = Release_MSBuild_vs2019|x64
+		{42927944-97F0-ACD6-0787-AB607A15027F}.Release|MSBuild.Build.0 = Release_MSBuild_vs2019|x64
 		{9BA0D009-9D4F-6BD1-2245-32F2E42A6FA5}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
 		{9BA0D009-9D4F-6BD1-2245-32F2E42A6FA5}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
 		{9BA0D009-9D4F-6BD1-2245-32F2E42A6FA5}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
@@ -148,6 +176,12 @@ Global
 		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
 		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2019|x64
 		{4CAA3DED-3DBD-71FD-8F76-B3B8ADFA2035}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Debug|MSBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Release|FastBuild.ActiveCfg = Release_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Release|FastBuild_NoBlob.ActiveCfg = Release_FastBuild_vs2019|x64
+		{CB3DB407-EB24-B12A-AAFB-A3BFFCA31040}.Release|MSBuild.ActiveCfg = Release_FastBuild_vs2019|x64
 		{3B88798D-8E0B-330F-7C31-7F761D686B03}.Debug|FastBuild.ActiveCfg = Debug_FastBuild_vs2019|x64
 		{3B88798D-8E0B-330F-7C31-7F761D686B03}.Debug|FastBuild_NoBlob.ActiveCfg = Debug_FastBuild_NoBlob_vs2019|x64
 		{3B88798D-8E0B-330F-7C31-7F761D686B03}.Debug|MSBuild.ActiveCfg = Debug_MSBuild_vs2019|x64

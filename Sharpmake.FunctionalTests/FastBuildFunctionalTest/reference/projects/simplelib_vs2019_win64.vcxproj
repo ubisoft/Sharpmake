@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Debug_FastBuild_NoBlob_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_FastBuild_vs2019|x64">
+      <Configuration>Debug_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_MSBuild_vs2019|x64">
+      <Configuration>Debug_MSBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_NoBlob_vs2019|x64">
+      <Configuration>Release_FastBuild_NoBlob_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_FastBuild_vs2019|x64">
+      <Configuration>Release_FastBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_MSBuild_vs2019|x64">
+      <Configuration>Release_MSBuild_vs2019</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{42927944-97F0-ACD6-0787-AB607A15027F}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <RootNamespace>SimpleLib</RootNamespace>
+    <ProjectName>SimpleLib</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_NoBlob_vs2019|x64'">
+    <OutDir>build\debug_fastbuild_noblob_vs2019\simplelib\</OutDir>
+    <IntDir>build\debug_fastbuild_noblob_vs2019\simplelib\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleLib_Debug_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_noblob_vs2019\simplelib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\*.lib" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.exe" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.elf" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.exp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.ilk" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.lib" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>build\debug_fastbuild_noblob_vs2019\simplelib\simplelib.lib</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_DEBUG;_LIB</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_FastBuild_vs2019|x64'">
+    <OutDir>build\debug_fastbuild_vs2019\simplelib\</OutDir>
+    <IntDir>build\debug_fastbuild_vs2019\simplelib\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleLib_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleLib_Debug_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\debug_fastbuild_vs2019\simplelib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\*.obj" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\*.a" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\*.lib" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\simplelib.exe" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\simplelib.elf" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\simplelib.exp" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\simplelib.ilk" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\simplelib.lib" &gt;NUL 2&gt;NUL
+del "build\debug_fastbuild_vs2019\simplelib\simplelib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>build\debug_fastbuild_vs2019\simplelib\simplelib.lib</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN64;_DEBUG;_LIB</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
+    <TargetName>simplelib</TargetName>
+    <OutDir>build\debug_msbuild_vs2019\simplelib\</OutDir>
+    <IntDir>build\debug_msbuild_vs2019\simplelib\</IntDir>
+    <TargetExt>.lib</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>build\debug_msbuild_vs2019\simplelib\simplelib.lib</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_NoBlob_vs2019|x64'">
+    <OutDir>build\release_fastbuild_noblob_vs2019\simplelib\</OutDir>
+    <IntDir>build\release_fastbuild_noblob_vs2019\simplelib\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleLib_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleLib_Release_FastBuild_NoBlob_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_noblob_vs2019\simplelib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\*.lib" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\simplelib.exe" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\simplelib.elf" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\simplelib.exp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\simplelib.ilk" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\simplelib.lib" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_noblob_vs2019\simplelib\simplelib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>build\release_fastbuild_noblob_vs2019\simplelib\simplelib.lib</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_LIB</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_FastBuild_vs2019|x64'">
+    <OutDir>build\release_fastbuild_vs2019\simplelib\</OutDir>
+    <IntDir>build\release_fastbuild_vs2019\simplelib\</IntDir>
+    <NMakeBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" SimpleLib_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>cd $(SolutionDir)
+"$(ProjectDir)..\..\..\tools\FastBuild\Windows-x64\FBuild.exe" -clean SimpleLib_Release_FastBuild_vs2019_win64 -ide -summary -wait -config $(SolutionName).bff </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>del "build\release_fastbuild_vs2019\simplelib\*unity*.cpp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\*.obj" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\*.a" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\*.lib" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\simplelib.exe" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\simplelib.elf" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\simplelib.exp" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\simplelib.ilk" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\simplelib.lib" &gt;NUL 2&gt;NUL
+del "build\release_fastbuild_vs2019\simplelib\simplelib.pdb" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
+    <NMakeOutput>build\release_fastbuild_vs2019\simplelib\simplelib.lib</NMakeOutput>
+    <NMakePreprocessorDefinitions>NDEBUG;WIN64;_LIB</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
+    <TargetName>simplelib</TargetName>
+    <OutDir>build\release_msbuild_vs2019\simplelib\</OutDir>
+    <IntDir>build\release_msbuild_vs2019\simplelib\</IntDir>
+    <TargetExt>.lib</TargetExt>
+    <GenerateManifest>true</GenerateManifest>
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>build\release_msbuild_vs2019\simplelib\simplelib.lib</OutputFile>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MSBuild_vs2019|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN64;_DEBUG;_LIB;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <ProgramDatabaseFileName>build\debug_msbuild_vs2019\simplelib\simplelib_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <OptimizeReferences>false</OptimizeReferences>
+    </Link>
+    <Lib>
+      <TargetMachine>MachineX64</TargetMachine>
+      <SubSystem/>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>build\debug_msbuild_vs2019\simplelib\simplelib.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MSBuild_vs2019|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Full</Optimization>
+      <PreprocessorDefinitions>NDEBUG;WIN64;_LIB;%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <BrowseInformation>false</BrowseInformation>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <ProgramDatabaseFileName>build\release_msbuild_vs2019\simplelib\simplelib_compiler.pdb</ProgramDatabaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <TargetMachine>MachineX64</TargetMachine>
+      <SubSystem/>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>build\release_msbuild_vs2019\simplelib\simplelib.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\codebase\SimpleLib\simplelib.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="simplelib_vs2019_win64.bff" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

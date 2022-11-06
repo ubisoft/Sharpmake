@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ namespace Sharpmake.UnitTests
             bool writeFiles = false;
             bool dumpDependency = true;
 
+            DependencyTracker.ResetSingleton();
             DependencyTracker.GraphWriteLegend = false;
 
             Builder = new Builder(

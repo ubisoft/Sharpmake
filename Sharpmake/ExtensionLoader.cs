@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020, 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -139,14 +139,20 @@ namespace Sharpmake
                     return null;
             }
 
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
-            if (!fastLoad)
+            try
             {
-                if (!ExtensionChecker.IsSharpmakeExtension(assembly))
-                    return null;
+                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                if (!fastLoad)
+                {
+                    if (!ExtensionChecker.IsSharpmakeExtension(assembly))
+                        return null;
+                }
+                return assembly;
             }
-
-            return assembly;
+            catch (BadImageFormatException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

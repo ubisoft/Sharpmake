@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018, 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2018, 2020-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+using System;
 
 namespace Sharpmake
 {
@@ -87,6 +89,7 @@ namespace Sharpmake
                 /// This is applicable for AGDE only
                 /// The full path to the directory containing the top-level build.gradle file.
                 /// </summary>
+                [Obsolete("Use the option in Agde instead.")]
                 public class AndroidGradleBuildDir : PathOption
                 {
                     public AndroidGradleBuildDir(string androidGradleBuildDir)
@@ -96,6 +99,7 @@ namespace Sharpmake
                 /// <summary>
                 /// Output Apk name for AGDE project which can be set per configuration.
                 /// </summary>
+                [Obsolete("Use the option in Agde instead.")]
                 public class AndroidApkName : StringOption
                 {
                     public AndroidApkName(string androidApkName)
@@ -178,17 +182,18 @@ namespace Sharpmake
 
                 // This is applicable for AGDE only
                 // Link time optimization, may also be required for some sanitizers.
+                [Obsolete("Use the option in Agde instead.")]
                 public enum LinkTimeOptimization
                 {
-                    [Default(DefaultTarget.Debug)]
+                    [Default]
                     None,
-                    [Default(DefaultTarget.Release)]
                     LinkTimeOptimization,
                     ThinLinkTimeOptimization
                 }
 
                 // This is applicable for AGDE only
                 // Set the flag '-fuse-ld=' which specifies which linker to use.
+                [Obsolete("Use the option in Agde instead.")]
                 public enum ClangLinkType
                 {
                     None,

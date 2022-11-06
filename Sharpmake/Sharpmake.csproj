@@ -133,6 +133,7 @@
     <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
     <Compile Include="KitsRootPaths.cs" />
     <Compile Include="MSBuildGlobalSettings.cs" />
+    <Compile Include="Options.Agde.cs" />
     <Compile Include="Options.Android.cs" />
     <Compile Include="Options.AndroidMakefile.cs" />
     <Compile Include="Options.CSharp.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="ReferenceAlias.cs" />
     <Compile Include="RegexCache.cs" />
     <Compile Include="Resolver.cs" />
+    <Compile Include="RustProject.cs" />
     <Compile Include="SharpmakeExtension.cs" />
     <Compile Include="Solution.Configuration.cs" />
     <Compile Include="Solution.cs" />

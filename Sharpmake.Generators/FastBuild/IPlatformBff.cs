@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,6 +69,14 @@ namespace Sharpmake.Generators.FastBuild
         /// <param name="fastBuildOutputFile">The file name of the build output.</param>
         /// <returns>The list of post build step to execute.</returns>
         IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile);
+
+        /// <summary>
+        /// Get the extra list of stamp steps to execute for this platform.
+        /// </summary>
+        /// <param name="configuration">The project configuration</param>
+        /// <param name="fastBuildOutputFile">The file name of the build output.</param>
+        /// <returns>The list of stamp step to execute.</returns>
+        IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile);
 
         /// <summary>
         /// Get the linker output name for this platform.

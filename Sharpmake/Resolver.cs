@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -737,7 +737,7 @@ namespace Sharpmake
 
             if (parameter == null)
             {
-                throw new NotFoundException(parameterName + name + " is null, please set a proper value for sharpmake to resolve it");
+                throw new NotFoundException(parameterName + name + " is null on target type " + refCountedReference.Value.GetType().Name + ", please set a proper value for sharpmake to resolve it");
             }
 
             return ApplyModifier(modifier, parameter.ToString());

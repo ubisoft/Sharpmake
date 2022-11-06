@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,19 @@ namespace Sharpmake
         public static bool IsUsingClang(this Platform platform)
         {
             return PlatformRegistry.Get<IPlatformDescriptor>(platform).IsUsingClang;
+        }
+
+        public static bool IsLinkerInvokedViaCompiler(this Platform platform)
+        {
+            return PlatformRegistry.Get<IPlatformDescriptor>(platform).IsLinkerInvokedViaCompiler;
+        }
+
+        public static string GetLinkerOptionPrefix(this Platform platform)
+        {
+            if (IsUsingClang(platform) && IsLinkerInvokedViaCompiler(platform))
+                return "-Wl,";
+
+            return "";
         }
 
         public static string ToVersionString(this DotNetFramework framework)
@@ -724,6 +737,8 @@ namespace Sharpmake
                     return "10.0.20348.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_22000_0:
                     return "10.0.22000.0";
+                case Options.Vc.General.WindowsTargetPlatformVersion.v10_0_22621_0:
+                    return "10.0.22621.0";
                 case Options.Vc.General.WindowsTargetPlatformVersion.Latest:
                     return "$(LatestTargetPlatformVersion)";
                 default:
@@ -796,7 +811,7 @@ namespace Sharpmake
                     break;
                 case DevEnv.vs2022:
                     vcTargetsPathKey = "VCTargetsPath17";
-                    vcRootPathKey = "VCInstallDir_160"; // LCTODO: Preview3 still uses 160!!!
+                    vcRootPathKey = "VCInstallDir_170";
                     break;
                 default:
                     throw new NotImplementedException("Please implement redirection of toolchain for " + devEnv);

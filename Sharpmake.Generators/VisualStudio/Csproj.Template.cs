@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,15 +47,14 @@ namespace Sharpmake.Generators.VisualStudio
     <AssemblyName>[assemblyName]</AssemblyName>
     <SignAssembly>[options.SignAssembly]</SignAssembly>
     <AssemblyOriginatorKeyFile>[options.AssemblyOriginatorKeyFile]</AssemblyOriginatorKeyFile>
-    <SccProjectName>[sccProjectName]</SccProjectName>
-    <SccLocalPath>[sccLocalPath]</SccLocalPath>
-    <SccProvider>[sccProvider]</SccProvider>
     <[targetFrameworkVersionString]>[targetFramework]</[targetFrameworkVersionString]>
     <FileAlignment>[options.FileAlignment]</FileAlignment>
     <IsWebBootstrapper>[options.IsWebBootstrapper]</IsWebBootstrapper>
     <ProjectTypeGuids>[projectTypeGuids]</ProjectTypeGuids>
     <IsPublishable>[options.IsPublishable]</IsPublishable>
     <PublishUrl>[options.PublishUrl]</PublishUrl>
+    <PublishSingleFile>[options.PublishSingleFile]</PublishSingleFile>
+    <PublishTrimmed>[options.PublishTrimmed]</PublishTrimmed>
     <InstallUrl>[options.InstallUrl]</InstallUrl>
     <ManifestKeyFile>[options.ManifestKeyFile]</ManifestKeyFile>
     <ManifestCertificateThumbprint>[options.ManifestCertificateThumbprint]</ManifestCertificateThumbprint>
@@ -103,6 +102,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AutoGenerateBindingRedirects>[options.AutoGenerateBindingRedirects]</AutoGenerateBindingRedirects>
     <SonarQubeExclude>[options.SonarQubeExclude]</SonarQubeExclude>
     <EnableDefaultItems>[netCoreEnableDefaultItems]</EnableDefaultItems>
+    <DefaultItemExcludes>[defaultItemExcludes]</DefaultItemExcludes>
     <GenerateAssemblyInfo>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInfo]</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyConfigurationAttribute]</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyDescriptionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyDescriptionAttribute]</GenerateAssemblyDescriptionAttribute>
@@ -114,8 +114,13 @@ namespace Sharpmake.Generators.VisualStudio
     <GenerateAssemblyInformationalVersionAttribute>[GeneratedAssemblyConfigTemplate.GenerateAssemblyInformationalVersionAttribute]</GenerateAssemblyInformationalVersionAttribute>
     <RestoreProjectStyle>[NugetRestoreProjectStyleString]</RestoreProjectStyle>
     <ProductVersion>[options.ProductVersion]</ProductVersion>
+    <FileVersion>[options.FileVersion]</FileVersion>
+    <Version>[options.Version]</Version>
+    <Product>[options.Product]</Product>
+    <Copyright>[options.Copyright]</Copyright>
     <UseWpf>[options.UseWpf]</UseWpf>
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
+    <Nullable>[options.Nullable]</Nullable>
   </PropertyGroup>
 ";
 
@@ -139,6 +144,7 @@ namespace Sharpmake.Generators.VisualStudio
     <AllowUnsafeBlocks>[options.AllowUnsafeBlocks]</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>[options.TreatWarningsAsErrors]</TreatWarningsAsErrors>
     <WarningsNotAsErrors>[options.WarningsNotAsErrors]</WarningsNotAsErrors>
+    <WarningsAsErrors>[options.WarningsAsErrors]</WarningsAsErrors>
     <CreateVsixContainer>[options.CreateVsixContainer]</CreateVsixContainer>
     <DeployExtension>[options.DeployExtension]</DeployExtension>
     <Prefer32Bit>[options.Prefer32Bit]</Prefer32Bit>
@@ -587,6 +593,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 public static string EntityDeployEnd =
 @"    </EntityDeploy>
+";
+
+                public static string FrameworkReference =
+@"    <FrameworkReference Include=""[include]"" />
+";
+
+                public static string Protobuf =
+@"    <Protobuf Include=""[include]"" GrpcServices=""Both"" />
 ";
             }
 

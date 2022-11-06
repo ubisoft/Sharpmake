@@ -1,19 +1,12 @@
 #include "stdafx.h"
 
-#include <native_app_glue/android_native_app_glue.h>
-#include <native_app_glue/android_native_app_glue.c>
-
 #include "src/util_static_lib1.h"
 #include "util_static_lib2.h"
 #include "sub folder/useless_static_lib2.h"
 
-#define EXPAND(x) #x
-#define STRINGIFY(x) EXPAND(x)
-
 int exe()
 {
-
-    Util2::Log("Hello Android World, from " STRINGIFY(CREATION_DATE) "!");
+    Util2::Log("Hello Android World, from " CREATION_DATE "!");
 
 #if _DEBUG
     Util2::Log("- Exe is built in Debug !");
@@ -22,7 +15,6 @@ int exe()
 #if NDEBUG
     Util2::Log("- Exe is built in Release !");
 #endif
-
 
     // from static_lib1
     static_lib1_utils::GetRandomPosition();

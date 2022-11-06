@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace Sharpmake
         public override bool IsMicrosoftPlatform => true;
         public override bool IsPcPlatform => true;
         public override bool IsUsingClang => false;
+        public override bool IsLinkerInvokedViaCompiler { get; set; } = false;
         public override bool HasDotNetSupport => true;
         public override bool HasSharedLibrarySupport => true;
         #endregion

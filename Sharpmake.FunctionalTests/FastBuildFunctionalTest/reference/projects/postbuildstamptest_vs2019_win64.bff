@@ -1,0 +1,593 @@
+
+//=================================================================================================================
+// PostBuildStampTest FASTBuild config file
+//=================================================================================================================
+#once
+
+
+Unity( 'PostBuildStampTest_FastBuildUnitys_unity' )
+{
+    .UnityInputPath                     = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildStampTest'
+    .UnityInputIsolateWritableFiles     =  true
+    .UnityInputIsolateWritableFilesLimit = 10
+    .UnityOutputPath                    = '.\$_CURRENT_BFF_DIR_$\unity\PostBuildStampTest'
+    .UnityOutputPattern                 = 'postbuildstamptest_fastbuildunitys_unity*.cpp'
+    .UnityNumFiles                      =  1
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+ObjectList( 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildstamptest\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            + ' /GF'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildstamptest\postbuildstamptest_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildStampTest\main.cpp'
+
+}
+
+
+//=================================================================================================================
+Executable( 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildstamptest\'
+    .Libraries              = 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildstamptest.exe'
+    .LinkerLinkObjects      = false
+    .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Debug_FastBuild_NoBlob_vs2019\PostBuildStamper.exe'
+    .LinkerStampExeArgs     = ' e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_FastBuild_NoBlob_vs2019\PostBuildStampTest.exe _Stamp_Message'
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_noblob_vs2019\postbuildstamptest\postbuildstamptest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildstamptest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_noblob_vs2019\postbuildstamptest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = {
+                   'PostBuildStamper_Debug_FastBuild_NoBlob_vs2019_win64',
+                   'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildStampTest_Debug_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildstamptest\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /GF'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildstamptest\postbuildstamptest_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\PostBuildStampTest\main.cpp'
+
+}
+
+
+//=================================================================================================================
+Executable( 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildstamptest\'
+    .Libraries              = 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildstamptest.exe'
+    .LinkerLinkObjects      = false
+    .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Release_FastBuild_NoBlob_vs2019\PostBuildStamper.exe'
+    .LinkerStampExeArgs     = ' e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_FastBuild_NoBlob_vs2019\PostBuildStampTest.exe _Stamp_Message'
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_noblob_vs2019\postbuildstamptest\postbuildstamptest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildstamptest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_noblob_vs2019\postbuildstamptest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64' )
+{
+    .Targets = {
+                   'PostBuildStamper_Release_FastBuild_NoBlob_vs2019_win64',
+                   'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildStampTest_Release_FastBuild_NoBlob_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildstamptest\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            + ' /GF'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildstamptest\postbuildstamptest_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'PostBuildStampTest_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+Executable( 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildstamptest\'
+    .Libraries              = 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildstamptest.exe'
+    .LinkerLinkObjects      = false
+    .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Debug_FastBuild_vs2019\PostBuildStamper.exe'
+    .LinkerStampExeArgs     = ' e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Debug_FastBuild_vs2019\PostBuildStampTest.exe _Stamp_Message'
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\debug_fastbuild_vs2019\postbuildstamptest\postbuildstamptest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildstamptest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\debug_fastbuild_vs2019\postbuildstamptest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Debug_FastBuild_vs2019_win64' )
+{
+    .Targets = {
+                   'PostBuildStamper_Debug_FastBuild_vs2019_win64',
+                   'PostBuildStampTest_Debug_FastBuild_vs2019_win64_Executable'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildStampTest_Debug_FastBuild_vs2019_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'PostBuildStampTest_Release_FastBuild_vs2019_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildstamptest\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\include"'
+            + ' /I"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /GF'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildstamptest\postbuildstamptest_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerInputUnity       = 'PostBuildStampTest_FastBuildUnitys_unity'
+    .CompilerOutputPath       = '$Intermediate$'
+
+}
+
+
+//=================================================================================================================
+Executable( 'PostBuildStampTest_Release_FastBuild_vs2019_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildstamptest\'
+    .Libraries              = 'PostBuildStampTest_Release_FastBuild_vs2019_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildstamptest.exe'
+    .LinkerLinkObjects      = false
+    .LinkerStampExe         = '.\$_CURRENT_BFF_DIR_$\output\Release_FastBuild_vs2019\PostBuildStamper.exe'
+    .LinkerStampExeArgs     = ' e:\rd\sharpmakes\sharpmake.packageci\sharpmake\sharpmake.functionaltests\fastbuildfunctionaltest\projects\output\Release_FastBuild_vs2019\PostBuildStampTest.exe _Stamp_Message'
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /ManifestFile:".\$_CURRENT_BFF_DIR_$\build\release_fastbuild_vs2019\postbuildstamptest\postbuildstamptest.intermediate.manifest"'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildstamptest.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\release_fastbuild_vs2019\postbuildstamptest.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Release_FastBuild_vs2019_win64' )
+{
+    .Targets = {
+                   'PostBuildStamper_Release_FastBuild_vs2019_win64',
+                   'PostBuildStampTest_Release_FastBuild_vs2019_win64_Executable'
+               }
+}
+
+
+//=================================================================================================================
+Alias( 'PostBuildStampTest_Release_FastBuild_vs2019_win64_LibraryDependency' )
+{
+    .Targets = 'PostBuildStampTest_Release_FastBuild_vs2019_win64_Executable'
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////

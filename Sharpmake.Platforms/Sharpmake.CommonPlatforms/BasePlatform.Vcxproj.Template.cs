@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,12 +20,15 @@ namespace Sharpmake
       <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
       <CompileAsWinRT>[options.CompileAsWinRT]</CompileAsWinRT>
       <WarningLevel>[options.WarningLevel]</WarningLevel>
+      <TreatAngleIncludeAsExternal>[options.TreatAngleIncludeAsExternal]</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>[options.ExternalWarningLevel]</ExternalWarningLevel>
+      <ExternalTemplatesDiagnostics>[options.ExternalTemplatesDiagnostics]</ExternalTemplatesDiagnostics>
       <Optimization>[options.Optimization]</Optimization>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>[options.AdditionalUsingDirectories]</AdditionalUsingDirectories>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
-      <CompileAsManaged>[clrSupport]</CompileAsManaged>
+      <CompileAsManaged>[compileAsManaged]</CompileAsManaged>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TreatWarningAsError>[options.TreatWarningAsError]</TreatWarningAsError>
       <DiagnosticsFormat>[options.DiagnosticsFormat]</DiagnosticsFormat>
@@ -167,6 +170,7 @@ namespace Sharpmake
     <LocalDebuggerCommandArguments>[conf.VcxprojUserFile.LocalDebuggerCommandArguments]</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>[conf.VcxprojUserFile.LocalDebuggerEnvironment]</LocalDebuggerEnvironment>
     <LocalDebuggerWorkingDirectory>[conf.VcxprojUserFile.LocalDebuggerWorkingDirectory]</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAttach>[conf.VcxprojUserFile.LocalDebuggerAttachString]</LocalDebuggerAttach>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
 ";
 
@@ -186,9 +190,6 @@ namespace Sharpmake
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
-    <TreatAngleIncludeAsExternal>[options.TreatAngleIncludeAsExternal]</TreatAngleIncludeAsExternal>
-    <ExternalWarningLevel>[options.ExternalWarningLevel]</ExternalWarningLevel>
-    <ExternalTemplatesDiagnostics>[options.ExternalTemplatesDiagnostics]</ExternalTemplatesDiagnostics>
   </PropertyGroup>
 ";
 
@@ -207,6 +208,9 @@ namespace Sharpmake
     <EmbedManifest>[options.EmbedManifest]</EmbedManifest>
     <IgnoreImportLibrary>[options.IgnoreImportLibrary]</IgnoreImportLibrary>
     <RunCodeAnalysis>[options.RunCodeAnalysis]</RunCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>[options.MicrosoftCodeAnalysis]</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>[options.ClangTidyCodeAnalysis]</EnableClangTidyCodeAnalysis>
+    <CAExcludepath>[options.CAexcludePaths];%(CAExcludepath)</CAExcludepath>
     <CustomBuildBeforeTargets>[options.CustomBuildStepBeforeTargets]</CustomBuildBeforeTargets>
     <CustomBuildAfterTargets>[options.CustomBuildStepAfterTargets]</CustomBuildAfterTargets>
     <ExecutablePath>[options.ExecutablePath]</ExecutablePath>
@@ -262,20 +266,21 @@ namespace Sharpmake
     <NMakeReBuildCommandLine>cd [relativeMasterBffPath]
 [conf.FastBuildCustomActionsBeforeBuildCommand]
 [fastBuildMakeCommandRebuild] </NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" >NUL 2>NUL
-del ""[options.IntermediateDirectory]\*.obj"" >NUL 2>NUL
-del ""[options.IntermediateDirectory]\*.a"" >NUL 2>NUL
-del ""[options.IntermediateDirectory]\*.lib"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].exe"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].elf"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].exp"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].lib"" >NUL 2>NUL
-del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>del ""[options.IntermediateDirectory]\*unity*.cpp"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.obj"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.a"" &gt;NUL 2&gt;NUL
+del ""[options.IntermediateDirectory]\*.lib"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].exe"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].elf"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].exp"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].lib"" &gt;NUL 2&gt;NUL
+del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>[options.OutputFile]</NMakeOutput>
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
     <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.AdditionalOptions]</AdditionalOptions>
   </PropertyGroup>
 ";
 
@@ -290,6 +295,7 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" >NUL 2>NUL</NMak
     <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
     <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.AdditionalOptions]</AdditionalOptions>
   </PropertyGroup>
 ";
     }

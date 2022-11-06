@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Ubisoft Entertainment
+// Copyright (c) 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,12 +69,8 @@ namespace Common
             // if set to true, dependencies that the project uses will be copied to the output directory
             DependenciesCopyLocal = DependenciesCopyLocalTypes.Default;
 
-            // Set to null if you don't want to use Perforce
-            PerforceRootPath = null;
-
             // Files put in this directory will be added to the project as resources (linked) build Action
             ResourcesPath = RootPath + @"\Resources\";
-
 
             // Files put in this directory will be added to the project as Content build Action
             ContentPath = RootPath + @"\Content\";

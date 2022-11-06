@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -631,7 +631,7 @@ namespace Sharpmake.Application
                     if (generateDebugSolution)
                     {
                         LogWriteLine("Generate debug solution...");
-                        DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, builder.Arguments, parameters.DebugSolutionStartArguments, parameters.Defines.ToArray());
+                        DebugProjectGenerator.GenerateDebugSolution(parameters.Sources, parameters.DebugSolutionPath, builder.Arguments, parameters.DebugSolutionStartArguments, parameters.DebugSolutionDevEnv);
                         builder.BuildProjectAndSolution();
                         return builder;
                     }

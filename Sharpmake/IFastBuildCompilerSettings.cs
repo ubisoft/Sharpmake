@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2018, 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -76,6 +76,7 @@ namespace Sharpmake
         IDictionary<IFastBuildCompilerKey, CompilerFamily> CompilerFamily { get; set; }
         IDictionary<DevEnv, string> LinkerPath { get; set; }
         IDictionary<DevEnv, string> LinkerExe { get; set; }
+        IDictionary<DevEnv, bool> LinkerInvokedViaCompiler { get; set; }
         IDictionary<DevEnv, string> LibrarianExe { get; set; }
         IDictionary<DevEnv, Strings> ExtraFiles { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,6 +85,7 @@ namespace Sharpmake
                     v10_0_19041_0, // 2004, May 2020 Update
                     v10_0_20348_0, // 2104/21H1
                     v10_0_22000_0, // Windows 11
+                    v10_0_22621_0, // Windows 11 22H2
                     Latest,        // latest available in host machine
                 }
 
@@ -1098,6 +1099,7 @@ namespace Sharpmake
 
                 public enum OpenMP
                 {
+                    Default,
                     [Default]
                     Disable,
                     Enable
@@ -1365,6 +1367,27 @@ namespace Sharpmake
                     Enable,
                     [Default]
                     Disable
+                }
+
+                public enum MicrosoftCodeAnalysis
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public enum ClangTidyCodeAnalysis
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
+                public class CodeAnalysisExcludePaths : PathOption
+                {
+                    public CodeAnalysisExcludePaths(string value)
+                        : base(value)
+                    { }
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,6 +58,11 @@ namespace Sharpmake
         public bool FastBuildAllSlnDependencyFromExe = false;
 
         /// <summary>
+        /// Force the generation of a "FastBuildAll" project, even in solutions that don't seem to need one
+        /// </summary>
+        public bool ForceGenerateFastBuildAll = false;
+
+        /// <summary>
         /// In case we've generated a "FastBuildAll" project, this flag will determine if we generate it for all
         /// the configurations, or only the ones that need it
         /// </summary>
@@ -69,12 +74,8 @@ namespace Sharpmake
         /// </summary>
         public Dictionary<string, Strings> ExtraItems = new Dictionary<string, Strings>();
 
-        private string _perforceRootPath = null;
-        public string PerforceRootPath
-        {
-            get { return _perforceRootPath; }
-            set { SetProperty(ref _perforceRootPath, value); }
-        }
+        [Obsolete("This property is deprecated, scc info shouldn't be stored in the solution files anymore", error: true)]
+        public string PerforceRootPath;
 
         private bool _mergePlatformConfiguration = false;
         public bool MergePlatformConfiguration
@@ -114,6 +115,8 @@ namespace Sharpmake
             public string SolutionFolderOverride;
 
             public List<Project.Configuration> Configurations = new List<Project.Configuration>();
+
+            public Dictionary<Solution.Configuration, Configuration.IncludedProjectInfo.Build> SolutionConfigurationsBuild = new Dictionary<Solution.Configuration, Configuration.IncludedProjectInfo.Build>();
 
             // Default target use when a project is excluded from build, some generator need to specify a 'dummy' target
             public ITarget TargetDefault;
@@ -196,6 +199,7 @@ namespace Sharpmake
                         });
 
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
+                    resolvedProject.SolutionConfigurationsBuild.Add(solutionConfiguration, includedProjectInfo.ToBuild);
 
                     if (!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
                         configurationsToProjects[includedProjectInfo.Configuration] = resolvedProject;
@@ -450,9 +454,6 @@ namespace Sharpmake
                 resolver.SetParameter("solution", this);
                 resolver.Resolve(this);
 
-                if (PerforceRootPath != null)
-                    Util.ResolvePath(SharpmakeCsPath, ref _perforceRootPath);
-
                 foreach (Solution.Configuration conf in Configurations)
                     conf.Resolve(resolver);
 
@@ -540,7 +541,7 @@ namespace Sharpmake
                         continue;
 
                     // if there's only one project to build, no need for the FastBuildAll
-                    generateFastBuildAll |= fastBuildProjectConfsToBuild.Count > 1;
+                    generateFastBuildAll |= ForceGenerateFastBuildAll || fastBuildProjectConfsToBuild.Count > 1;
                     projectsToBuildPerSolutionConfig.Add(Tuple.Create(solutionConfiguration, fastBuildProjectConfsToBuild));
                 }
 
@@ -558,7 +559,7 @@ namespace Sharpmake
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
 
-                    if (GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                    if (!ForceGenerateFastBuildAll && GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
                         continue;
 
                     var solutionTarget = solutionConf.Target;
@@ -595,7 +596,7 @@ namespace Sharpmake
                     var solutionConf = projectsToBuildInSolutionConfig.Item1;
                     var projectConfigsToBuild = projectsToBuildInSolutionConfig.Item2;
 
-                    if (GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
+                    if (!ForceGenerateFastBuildAll && GenerateFastBuildAllOnlyForConfThatNeedIt && projectConfigsToBuild.Count == 1)
                         continue;
 
                     var solutionTarget = solutionConf.Target;
@@ -629,8 +630,12 @@ namespace Sharpmake
                     // get some settings that are usually global from the first project
                     // we could expose those, if we need to set them specifically for FastBuildAllProject
                     var firstProject = projectConfigsToBuild.First();
+                    projectConf.FastBuildCacheAllowed = firstProject.Configuration.FastBuildCacheAllowed;
                     projectConf.FastBuildCustomArgs = firstProject.Configuration.FastBuildCustomArgs;
                     projectConf.FastBuildCustomActionsBeforeBuildCommand = firstProject.Configuration.FastBuildCustomActionsBeforeBuildCommand;
+                    projectConf.FastBuildDistribution = firstProject.Configuration.FastBuildDistribution;
+                    projectConf.WriteVcOverrides = firstProject.Configuration.WriteVcOverrides;
+                    projectConf.Options.AddRange(firstProject.Configuration.Options);
 
                     // add all the projects to build as private dependencies, and OnlyBuildOrder
                     foreach (Configuration.IncludedProjectInfo projectConfigToBuild in projectConfigsToBuild)

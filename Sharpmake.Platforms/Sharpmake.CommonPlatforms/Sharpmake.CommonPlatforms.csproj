@@ -89,6 +89,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Android\AndroidAgdePlatform.Bff.Template.cs" />
     <Compile Include="Android\AndroidAgdePlatform.cs" />
     <Compile Include="Android\AndroidFragments.cs" />
     <Compile Include="Android\AndroidPlatform.Vcxproj.Template.cs" />

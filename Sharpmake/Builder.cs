@@ -133,7 +133,7 @@ namespace Sharpmake
         private ThreadPool _tasks;
         // Keep all instances of manually built (and loaded) assemblies, as they may be needed by other assemblies on load (command line).
         private readonly ConcurrentDictionary<string, Assembly> _builtAssemblies = new ConcurrentDictionary<string, Assembly>(); // Assembly Full Path -> Assembly
-        private readonly Dictionary<string, string> _references = new Dictionary<string, string>(); // Keep track of assemblies explicitly referenced with [module: Sharpmake.Reference("...")] in compiled files
+        private readonly Dictionary<string, string> _runtimeReferences = new Dictionary<string, string>(); // Keep track of runtime assemblies explicitly referenced from scripts, and needed during execution
 
         private class ProfilingCompleteEvent
         {
@@ -511,20 +511,6 @@ namespace Sharpmake
             return assemblies;
         }
 
-        private readonly Lazy<Assembly> _sharpmakeAssembly = new Lazy<Assembly>(() => Assembly.GetAssembly(typeof(Builder)));
-        private readonly Lazy<Assembly> _sharpmakeGeneratorAssembly = new Lazy<Assembly>(() =>
-        {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.Generators.dll";
-            return Assembly.LoadFrom(generatorsAssembly);
-        });
-        private readonly Lazy<Assembly> _sharpmakeCommonPlatformsAssembly = new Lazy<Assembly>(() =>
-        {
-            DirectoryInfo entryDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-            string generatorsAssembly = entryDirectoryInfo.FullName + Path.DirectorySeparatorChar + "Sharpmake.CommonPlatforms.dll";
-            return Assembly.LoadFrom(generatorsAssembly);
-        });
-
         private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, BuilderCompileErrorBehavior compileErrorBehavior)
         {
             return BuildAndLoadAssembly(sharpmakeFiles, new BuilderContext(this, compileErrorBehavior));
@@ -533,13 +519,7 @@ namespace Sharpmake
         private IAssemblyInfo BuildAndLoadAssembly(IList<string> sharpmakeFiles, IBuilderContext context, IEnumerable<ISourceAttributeParser> parsers = null, IEnumerable<IParsingFlowParser> flowParsers = null)
         {
             Assembler assembler = new Assembler(Defines);
-
-            // Add sharpmake assembly
-            assembler.Assemblies.Add(_sharpmakeAssembly.Value);
-
-            // Add generators and common platforms assemblies to be able to reference them from .sharpmake.cs files
-            assembler.Assemblies.Add(_sharpmakeGeneratorAssembly.Value);
-            assembler.Assemblies.Add(_sharpmakeCommonPlatformsAssembly.Value);
+            assembler.AddSharpmakeAssemblies();
 
             // Add attribute parsers
             if (parsers != null)
@@ -563,16 +543,16 @@ namespace Sharpmake
             if (newAssemblyInfo.Assembly == null && context.CompileErrorBehavior == BuilderCompileErrorBehavior.ThrowException)
                 throw new InternalError();
 
-            // Keep track of assemblies explicitly referenced by compiled files
+            // Keep track of runtime assemblies explicitly referenced by compiled files
             foreach (var fullpath in assembler.References.Distinct())
             {
                 var assemblyName = AssemblyName.GetAssemblyName(fullpath).FullName;
                 string assemblyPath;
-                if (_references.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
+                if (_runtimeReferences.TryGetValue(assemblyName, out assemblyPath) && !string.Equals(assemblyPath, fullpath, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new Error($"Assembly {assemblyName} present in two different locations: {fullpath} and {assemblyPath}.");
                 }
-                _references[assemblyName] = fullpath;
+                _runtimeReferences[assemblyName] = fullpath;
             }
 
             if (newAssemblyInfo.Assembly != null)
@@ -599,14 +579,14 @@ namespace Sharpmake
             if (builtAssembly != null)
                 return builtAssembly;
 
-            // Check if this is an assembly that if referenced by [module: Sharpmake.Reference("...")], is so, explicitly load it with its fullPath
+            // Check if this is a runtime assembly referenced by a script, if so, explicitly load it with its fullPath
             string explicitReferencesFullPath;
-            if (_references.TryGetValue(args.Name, out explicitReferencesFullPath))
+            if (_runtimeReferences.TryGetValue(args.Name, out explicitReferencesFullPath))
                 return Assembly.LoadFrom(explicitReferencesFullPath);
 
             // Default binding redirect for old versions of an assembly to the implicitly/explicitly referenced one
             var requestedAssemblyName = new AssemblyName(args.Name);
-            var referencedAssemblyHighestVersion = _references.Keys
+            var referencedAssemblyHighestVersion = _runtimeReferences.Keys
                 .Where(assemblyFullName => assemblyFullName.StartsWith(requestedAssemblyName.Name, StringComparison.OrdinalIgnoreCase))
                 .Select(assemblyFullName => new AssemblyName(assemblyFullName))
                 .OrderBy(assemblyName => assemblyName.Version)
@@ -615,7 +595,7 @@ namespace Sharpmake
 
             if (referencedAssemblyHighestVersion != null)
             {
-                return Assembly.LoadFrom(_references[referencedAssemblyHighestVersion]);
+                return Assembly.LoadFrom(_runtimeReferences[referencedAssemblyHighestVersion]);
             }
 
             return null;
@@ -930,7 +910,7 @@ namespace Sharpmake
             }
         }
 
-        private void DetermineUsedProjectConfigurations(List<Solution> solutions)
+        private void DetermineUsedProjectConfigurations(List<Project> projects, List<Solution> solutions)
         {
             Trace.Assert(_usedProjectConfigurations == null);
             Trace.Assert(_linked, "This method can only be called *after* the link has occurred");
@@ -939,6 +919,14 @@ namespace Sharpmake
             var usedProjectConfigs = new HashSet<Project.Configuration>();
             using (new Util.StopwatchProfiler(ms => { LogWriteLine("    figuring out used project configs took {0:0.0} sec", ms / 1000.0f); }, minThresholdMs: 100))
             {
+                // generate the project if it was explicitly queried by the user-code
+                var projectExplicitlyQueried = new HashSet<Type>(Arguments.TypesToGenerate.Where(t => t.IsSubclassOf(typeof(Project))));
+                foreach (Project p in projects.Where(p => projectExplicitlyQueried.Contains(p.GetType())))
+                {
+                    foreach (var projectConfig in p.Configurations)
+                        usedProjectConfigs.Add(projectConfig);
+                }
+
                 foreach (Solution s in solutions)
                 {
                     foreach (var pair in s.SolutionFilesMapping)
@@ -956,6 +944,69 @@ namespace Sharpmake
             _usedProjectConfigurations = usedProjectConfigs;
         }
 
+        private class DiagHelper
+        {
+            public DiagHelper(FieldInfo fieldInfo)
+            {
+                FieldInfo = fieldInfo;
+            }
+
+            private FieldInfo FieldInfo { get; }
+            private Dictionary<int, List<Project.Configuration>> Used { get; } = new Dictionary<int, List<Project.Configuration>>();
+            private Dictionary<int, List<Project.Configuration>> Unused { get; } = new Dictionary<int, List<Project.Configuration>>();
+
+            public void AddUsedConf(int fragmentValue, Project.Configuration conf)
+            {
+                if (!Used.ContainsKey(fragmentValue))
+                    Used[fragmentValue] = new List<Project.Configuration>() { conf };
+                else
+                    Used[fragmentValue].Add(conf);
+            }
+
+            public void AddUnusedConf(int fragmentValue, Project.Configuration conf)
+            {
+                if (!Unused.ContainsKey(fragmentValue))
+                    Unused[fragmentValue] = new List<Project.Configuration>() { conf };
+                else
+                    Unused[fragmentValue].Add(conf);
+            }
+
+            private string GetFragmentInfoString(int fragmentValue)
+            {
+                var typedFragment = Enum.ToObject(FieldInfo.FieldType, fragmentValue);
+                if (typedFragment is Platform)
+                {
+                    Platform platformFragment = (Platform)typedFragment;
+                    return platformFragment >= Platform._reserved9 ? Util.GetSimplePlatformString(platformFragment) : platformFragment.ToString();
+                }
+                return typedFragment.ToString();
+            }
+
+            public void LogAllFragmentValuesThatAreAllUnused()
+            {
+                List<string> fullyUnusedValues = null;
+                foreach (var kvp in Unused)
+                {
+                    var fragmentValue = kvp.Key;
+                    if (!Used.ContainsKey(fragmentValue))
+                    {
+                        if (fullyUnusedValues == null)
+                            fullyUnusedValues = new List<string>();
+
+                        fullyUnusedValues.Add($"'{GetFragmentInfoString(fragmentValue)}' ({kvp.Value.Count})");
+                    }
+                }
+
+                if (fullyUnusedValues != null)
+                {
+                    Instance.LogWarningLine("Unused values for fragment type '{0}': {1}", FieldInfo.Name, string.Join("|", fullyUnusedValues));
+                    var composedString = Used.Select(kvp => $"'{GetFragmentInfoString(kvp.Key)}' ({kvp.Value.Count})").ToList();
+                    Instance.LogWarningLine("Used values for fragment type '{0}': {1}", FieldInfo.Name, string.Join("|", composedString));
+                }
+            }
+        }
+
+        private static bool s_logUsedConfigurations = false;
         private void LogUnusedProjectConfigurations(List<Project> projects, List<Solution> solutions)
         {
             Trace.Assert(_usedProjectConfigurations != null);
@@ -964,10 +1015,139 @@ namespace Sharpmake
                 if (p.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                     continue;
 
+                var dic = new Dictionary<FieldInfo, DiagHelper>();
+
+                List<ITarget> uselessTargets = null;
+
+                var debugList = new List<string>();
+                bool foundUnusedConfInProject = false;
+
                 foreach (var conf in p.Configurations)
                 {
-                    if (!_usedProjectConfigurations.Contains(conf))
-                        LogWarningLine(conf.Project.SharpmakeCsFileName + ": Warning: Config not used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);
+                    bool confWasUsed = _usedProjectConfigurations.Contains(conf);
+
+                    var target = conf.Target;
+                    if (!confWasUsed)
+                    {
+                        foundUnusedConfInProject = true;
+
+                        debugList.ForEach(d => LogWriteLine(d));
+
+                        LogWriteLine(conf.Project.SharpmakeCsFileName + ":          Config not used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);
+                        if (uselessTargets == null)
+                            uselessTargets = new List<ITarget>(p.Configurations.Count);
+                        uselessTargets.Add(target);
+                    }
+                    else if (s_logUsedConfigurations)
+                    {
+                        if (!foundUnusedConfInProject)
+                            debugList.Add(conf.Project.SharpmakeCsFileName + ":          Config WAS used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);
+                        else
+                            LogWriteLine(conf.Project.SharpmakeCsFileName + ":          Config WAS used during generation: " + conf.Owner.GetType().ToNiceTypeName() + ":" + conf.Target);
+                    }
+
+                    FieldInfo[] fragmentFields = target.GetFragmentFieldInfo();
+
+                    int[] fragmentValues = new int[fragmentFields.Length];
+
+                    for (int i = 0; i < fragmentValues.Length; ++i)
+                    {
+                        FieldInfo fieldInfo = fragmentFields[i];
+                        int fragmentValue = (int)fieldInfo.GetValue(target);
+
+                        if (!dic.ContainsKey(fieldInfo))
+                            dic[fieldInfo] = new DiagHelper(fieldInfo);
+
+                        if (confWasUsed)
+                            dic[fieldInfo].AddUsedConf(fragmentValue, conf);
+                        else
+                            dic[fieldInfo].AddUnusedConf(fragmentValue, conf);
+                    }
+                }
+
+                if (uselessTargets != null && uselessTargets.Count > 1)
+                {
+                    foreach (var tuple in dic)
+                    {
+                        var fieldInfo = tuple.Key;
+                        var diagHelper = tuple.Value;
+
+                        diagHelper.LogAllFragmentValuesThatAreAllUnused();
+                    }
+
+                    List<ITarget> mergeCandidateTargets = uselessTargets;
+                    List<ITarget> doneTargets = new List<ITarget>(uselessTargets.Count);
+                    int currentDepth = 0;
+                    while (mergeCandidateTargets.Count > 0)
+                    {
+                        ITarget previousTarget = null;
+                        int[] previousFragmentValues = null;
+                        int previousDiffIndex = -1;
+                        List<ITarget> nextMergeCandidateTargets = new List<ITarget>(mergeCandidateTargets.Count);
+                        foreach (var target in mergeCandidateTargets)
+                        {
+                            int[] fragmentValues = target.GetFragmentsValue();
+                            if (previousTarget == null)
+                            {
+                                previousTarget = target;
+                                previousFragmentValues = fragmentValues;
+                                continue;
+                            }
+                            int firstDiffIndex = -1;
+                            for (int i = 0; i < fragmentValues.Length; ++i)
+                            {
+                                if (fragmentValues[i] != previousFragmentValues[i])
+                                {
+                                    if (firstDiffIndex == -1)
+                                        firstDiffIndex = i;
+                                    else
+                                    {
+                                        firstDiffIndex = -1;
+                                        break;  // can't accept more than one difference
+                                    }
+                                }
+                            }
+                            if (firstDiffIndex != -1)
+                            {
+                                ITarget mergedTarget = target.Clone();
+                                previousFragmentValues[firstDiffIndex] = fragmentValues[firstDiffIndex] | previousFragmentValues[firstDiffIndex];
+                                mergedTarget.GetFragmentFieldInfo()[firstDiffIndex].SetValue(mergedTarget, previousFragmentValues[firstDiffIndex]);
+                                previousTarget = mergedTarget;
+                                previousDiffIndex = firstDiffIndex;
+                                continue;
+                            }
+                            if (previousDiffIndex != -1)
+                            {
+                                nextMergeCandidateTargets.Add(previousTarget);
+                                previousDiffIndex = -1;
+                            }
+                            else
+                            {
+                                doneTargets.Add(previousTarget);
+                            }
+                            previousTarget = target;
+                            previousFragmentValues = fragmentValues;
+                        }
+                        if (previousDiffIndex != -1)
+                        {
+                            nextMergeCandidateTargets.Add(previousTarget);
+                        }
+                        else
+                        {
+                            doneTargets.Add(previousTarget);
+                        }
+                        mergeCandidateTargets = nextMergeCandidateTargets;
+                        ++currentDepth;
+                    }
+
+                    if (doneTargets.Count < uselessTargets.Count)
+                    {
+                        LogWarningLine("Previously mentioned useless Configs in compact format:");
+                        foreach (ITarget target in doneTargets)
+                        {
+                            LogWarningLine("Target: " + target.ToString().Replace(", ", "|"));
+                        }
+                    }
                 }
             }
         }
@@ -1003,7 +1183,7 @@ namespace Sharpmake
                 foreach (Solution solution in solutions)
                     Generate(solution);
 
-                DetermineUsedProjectConfigurations(solutions);
+                DetermineUsedProjectConfigurations(projects, solutions);
 
                 // start with huge projects to balance task with small one at the end.
                 projects.Sort((p0, p1) => p1.ProjectFilesMapping.Count.CompareTo(p0.ProjectFilesMapping.Count));

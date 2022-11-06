@@ -1,8 +1,54 @@
 apply plugin: 'com.android.application'
 
 android {
+    if (!project.hasProperty('MSBUILD_NDK_VERSION'))
+        ext.MSBUILD_NDK_VERSION = NDK_VERSION
+    if (!project.hasProperty('MSBUILD_MIN_SDK_VERSION'))
+        ext.MSBUILD_MIN_SDK_VERSION = MIN_SDK_VERSION
+    if (!project.hasProperty('MSBUILD_JNI_LIBS_SRC_DIR'))
+        ext.MSBUILD_JNI_LIBS_SRC_DIR = JNI_LIBS_SRC_DIR
+    if (!project.hasProperty('MSBUILD_ANDROID_OUTPUT_APK_NAME'))
+        ext.MSBUILD_ANDROID_OUTPUT_APK_NAME = ANDROID_OUTPUT_APK_NAME
+
+    def isFastBuild = 'False';
+    if (project.hasProperty('FastBuild'))
+        isFastBuild = FastBuild
+    def libCppShared = 'False'
+    if (project.hasProperty('LibCppShared'))
+        libCppShared = LibCppShared
+    def ndkPath  = ''
+    if (project.hasProperty('ndkRoot'))
+        ndkPath = ndkRoot
+    def abi = ''
+    if (project.hasProperty('ABI'))
+        abi = ABI
+
+    tasks.named('preBuild') {
+        doFirst {
+            if (isFastBuild == 'True')
+            {
+                delete project.buildDir
+                delete file("${buildDir}/outputs/apk/Debug_FastBuild/" + ANDROID_OUTPUT_APK_NAME)
+
+                if (libCppShared == 'True')
+                {
+                    def libCppSharedFile = "/libc++_shared.so"
+                    def libCppSharedSrc = ndkPath + "/sources/cxx-stl/llvm-libc++/libs/" + abi + libCppSharedFile
+                    def libCppSharedDst = MSBUILD_JNI_LIBS_SRC_DIR + "/" + abi + libCppSharedFile
+
+                    if (!file(libCppSharedDst).exists())
+                    {
+                        copy {
+                            from libCppSharedSrc
+                            into MSBUILD_JNI_LIBS_SRC_DIR + "/" + abi + "/."
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     compileSdkVersion 29
-    buildToolsVersion "29.0.1"
     ndkVersion MSBUILD_NDK_VERSION
     defaultConfig {
         applicationId "com.example.helloandroid.agde"
@@ -36,6 +82,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             debuggable true
+        }
+
+        Debug_FastBuild {
+            initWith debug
+        }
+        Release_FastBuild {
+            initWith release
         }
     }
     sourceSets {

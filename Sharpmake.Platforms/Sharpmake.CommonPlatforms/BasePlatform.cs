@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ namespace Sharpmake
         public abstract bool IsMicrosoftPlatform { get; }
         public abstract bool IsPcPlatform { get; }
         public abstract bool IsUsingClang { get; }
+        public abstract bool IsLinkerInvokedViaCompiler { get; set; }
         public abstract bool HasDotNetSupport { get; }
         public abstract bool HasSharedLibrarySupport { get; }
         public virtual bool HasPrecompiledHeaderSupport => true;
@@ -120,6 +121,11 @@ namespace Sharpmake
         public virtual IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
         {
             return Enumerable.Empty<Project.Configuration.BuildStepBase>();
+        }
+
+        public virtual IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
+        {
+            return Enumerable.Empty<Project.Configuration.BuildStepExecutable>();
         }
 
         public virtual string GetOutputFilename(Project.Configuration.OutputType outputType, string fastBuildOutputFile) => fastBuildOutputFile;
