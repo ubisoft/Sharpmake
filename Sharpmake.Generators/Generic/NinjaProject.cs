@@ -146,25 +146,21 @@ namespace Sharpmake.Generators.Generic
             {
                 var fileGenerator = new FileGenerator();
 
-                fileGenerator.Declare("project_name", Context.Project.Name);
-                fileGenerator.Declare("config_name", Context.Configuration.Name);
-                fileGenerator.Declare("config_compiler", Context.Compiler.ToString());
-
                 string defines = MergeMultipleFlagsToString(Defines, CompilerFlagLookupTable.Get(Context.Compiler, CompilerFlag.Define));
                 string implicitCompilerFlags = MergeMultipleFlagsToString(ImplicitCompilerFlags);
                 string compilerFlags = MergeMultipleFlagsToString(CompilerFlags);
                 string includes = MergeMultipleFlagsToString(Includes, CompilerFlagLookupTable.Get(Context.Compiler, CompilerFlag.Include));
                 string systemIncludes = MergeMultipleFlagsToString(SystemIncludes, CompilerFlagLookupTable.Get(Context.Compiler, CompilerFlag.SystemInclude));
 
-                fileGenerator.WriteLine($"{Template.Project.BuildBegin}{Name}: {Template.Project.BuildCPPFileName} {Input}");
+                fileGenerator.WriteLine($"{Template.BuildBegin}{Name}: {Template.RuleStatement.CompileCppFile(Context)} {Input}");
 
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.Defines}", defines);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.DepFile}", $"{DepPath}.d");
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.CompilerImplicitFlags}", implicitCompilerFlags);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.SystemIncludes}", systemIncludes);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.CompilerFlags}", compilerFlags);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.Includes}", includes);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.TargetPdb}", TargetFilePath);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.Defines(Context)}", defines);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.DepFile(Context)}", $"{DepPath}.d");
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.CompilerImplicitFlags(Context)}", implicitCompilerFlags);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.SystemIncludes(Context)}", systemIncludes);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.CompilerFlags(Context)}", compilerFlags);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.Includes(Context)}", includes);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.TargetPdb(Context)}", TargetFilePath);
 
                 return fileGenerator.ToString();
             }
@@ -199,10 +195,6 @@ namespace Sharpmake.Generators.Generic
             {
                 var fileGenerator = new FileGenerator();
 
-                fileGenerator.Declare("project_name", Context.Project.Name);
-                fileGenerator.Declare("config_name", Context.Configuration.Name);
-                fileGenerator.Declare("config_compiler", Context.Compiler.ToString());
-
                 string objPaths = MergeMultipleFlagsToString(ObjFilePaths);
                 string implicitLinkerFlags = MergeMultipleFlagsToString(ImplicitLinkerFlags);
                 string implicitLinkerPaths = MergeMultipleFlagsToString(ImplicitLinkerPaths, LinkerFlagLookupTable.Get(Context.Compiler, LinkerFlag.IncludePath));
@@ -211,18 +203,18 @@ namespace Sharpmake.Generators.Generic
                 string libraryPaths = MergeMultipleFlagsToString(LinkerPaths, LinkerFlagLookupTable.Get(Context.Compiler, LinkerFlag.IncludePath));
                 string libraryFiles = MergeMultipleFlagsToString(LinkerLibs, LinkerFlagLookupTable.Get(Context.Compiler, LinkerFlag.IncludeFile));
 
-                fileGenerator.WriteLine($"{Template.Project.BuildBegin}{CreateNinjaFilePath(FullOutputPath(Context))}: {Template.Project.BuildLinkExeName} {objPaths}");
+                fileGenerator.WriteLine($"{Template.BuildBegin}{CreateNinjaFilePath(FullOutputPath(Context))}: {Template.RuleStatement.LinkToUse(Context)} {objPaths}");
 
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.LinkerImplicitFlags}", implicitLinkerFlags);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.ImplicitLinkPaths}", implicitLinkerPaths);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.ImplicitLinkLibraries}", implicitLinkerLibs);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.LinkerFlags}", linkerFlags);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.LinkPaths}", libraryPaths);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.LinkLibraries}", libraryFiles);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.TargetFile}", OutputPath);
-                WriteIfNotEmpty(fileGenerator, $"  {Template.Project.TargetPdb}", TargetPdb);
-                WriteIfNotEmptyOr(fileGenerator, $"  {Template.Project.PreBuild}", PreBuild, "cd .");
-                WriteIfNotEmptyOr(fileGenerator, $"  {Template.Project.PostBuild}", PostBuild, "cd .");
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.LinkerImplicitFlags(Context)}", implicitLinkerFlags);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.ImplicitLinkerPaths(Context)}", implicitLinkerPaths);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.ImplicitLinkerLibraries(Context)}", implicitLinkerLibs);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.LinkerFlags(Context)}", linkerFlags);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.LinkerPaths(Context)}", libraryPaths);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.LinkerLibraries(Context)}", libraryFiles);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.TargetFile(Context)}", OutputPath);
+                WriteIfNotEmpty(fileGenerator, $"  {Template.BuildStatement.TargetPdb(Context)}", TargetPdb);
+                WriteIfNotEmptyOr(fileGenerator, $"  {Template.BuildStatement.PreBuild(Context)}", PreBuild, "cd .");
+                WriteIfNotEmptyOr(fileGenerator, $"  {Template.BuildStatement.PostBuild(Context)}", PostBuild, "cd .");
                 ;
 
                 return fileGenerator.ToString();
@@ -275,6 +267,7 @@ namespace Sharpmake.Generators.Generic
                 GenerationContext context = new GenerationContext(builder, projectFilePath, project, config);
 
                 WritePerConfigFile(context, filesToCompile, generatedFiles, skipFiles);
+                WriteCompilerDatabaseFile(context);
             }
 
             // the second pass uses these files to create a project file where the files can be build
@@ -384,10 +377,6 @@ namespace Sharpmake.Generators.Generic
 
             var fileGenerator = new FileGenerator();
 
-            fileGenerator.Declare("project_name", context.Project.Name);
-            fileGenerator.Declare("config_name", context.Configuration.Name);
-            fileGenerator.Declare("config_compiler", context.Compiler.ToString());
-
             GenerateHeader(fileGenerator);
             GenerateRules(fileGenerator, context);
 
@@ -417,9 +406,45 @@ namespace Sharpmake.Generators.Generic
             }
         }
 
+        private void WriteCompilerDatabaseFile(GenerationContext context)
+        {
+            string outputFolder = Directory.GetParent(GetCompilerDBPath(context)).FullName;
+            string outputPath = GetCompilerDBPath(context);
+            if (!Directory.Exists(outputFolder))
+            {
+                Directory.CreateDirectory(outputFolder);
+            }
+            else if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
+            
+
+            string ninjaFilePath = KitsRootPaths.GetNinjaPath();
+            string command = $"-f {GetPerConfigFilePath(context)} {Template.CompDBBuildStatement(context)} --quiet >> {outputPath}";
+
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = $"/C {ninjaFilePath} {command}";
+            process.StartInfo = startInfo;
+            process.Start();
+        }
+
+        private string GetPerConfigFileName(GenerationContext context)
+        {
+            return $"{context.Project.Name}.{context.Configuration.Name}.{context.Compiler}{ProjectExtension}";
+        }
+
+        private string GetCompilerDBPath(GenerationContext context)
+        {
+            return $"{Path.Combine(context.Configuration.ProjectPath, "clang_tools", $"{Template.PerConfigFolderFormat(context)}", "compile_commands.json")}";
+        }
+
         private string GetPerConfigFilePath(GenerationContext context)
         {
-            return Path.Combine(context.Configuration.ProjectPath, "ninja", $"{context.Project.Name}.{context.Configuration.Name}.{context.Compiler}{ProjectExtension}");
+            return Path.Combine(context.Configuration.ProjectPath, "ninja", GetPerConfigFileName(context));
         }
 
         private static void WriteIfNotEmpty(FileGenerator fileGenerator, string key, string value)
@@ -548,11 +573,11 @@ namespace Sharpmake.Generators.Generic
             fileGenerator.WriteLine($"# Rules to specify how to do things");
             fileGenerator.WriteLine($"");
             fileGenerator.WriteLine($"# Rule for compiling C++ files using {context.Compiler}");
-            fileGenerator.WriteLine($"{Template.Project.RuleBegin} {Template.Project.BuildCPPFileName}");
-            fileGenerator.WriteLine($"  depfile = ${Template.Project.DepFile}");
+            fileGenerator.WriteLine($"{Template.RuleBegin} {Template.RuleStatement.CompileCppFile(context)}");
+            fileGenerator.WriteLine($"  depfile = ${Template.BuildStatement.DepFile(context)}");
             fileGenerator.WriteLine($"  deps = gcc");
-            fileGenerator.WriteLine($"{Template.Project.CommandBegin}{GetCompilerPath(context)} ${Template.Project.Defines} ${Template.Project.SystemIncludes} ${Template.Project.Includes} ${Template.Project.CompilerFlags} ${Template.Project.CompilerImplicitFlags} $in");
-            fileGenerator.WriteLine($"{Template.Project.DescriptionBegin} Building C++ object $out");
+            fileGenerator.WriteLine($"{Template.CommandBegin}{GetCompilerPath(context)} ${Template.BuildStatement.Defines(context)} ${Template.BuildStatement.SystemIncludes(context)} ${Template.BuildStatement.Includes(context)} ${Template.BuildStatement.CompilerFlags(context)} ${Template.BuildStatement.CompilerImplicitFlags(context)} {Template.Input}");
+            fileGenerator.WriteLine($"{Template.DescriptionBegin} Building C++ object $out");
             fileGenerator.WriteLine($"");
 
             // Linking
@@ -562,17 +587,23 @@ namespace Sharpmake.Generators.Generic
                 : "archive";
 
             fileGenerator.WriteLine($"# Rule for linking C++ objects");
-            fileGenerator.WriteLine($"{Template.Project.RuleBegin}{Template.Project.BuildLinkExeName}");
-            fileGenerator.WriteLine($"{Template.Project.CommandBegin}cmd.exe /C \"${Template.Project.PreBuild} && {GetLinkerPath(context)} ${Template.Project.LinkerImplicitFlags} ${Template.Project.LinkerFlags} ${Template.Project.ImplicitLinkPaths} ${Template.Project.ImplicitLinkLibraries} ${Template.Project.LinkLibraries} $in && ${Template.Project.PostBuild}\"");
-            fileGenerator.WriteLine($"{Template.Project.DescriptionBegin}Linking C++ {outputType} ${Template.Project.TargetFile}");
+            fileGenerator.WriteLine($"{Template.RuleBegin}{Template.RuleStatement.LinkToUse(context)}");
+            fileGenerator.WriteLine($"{Template.CommandBegin}cmd.exe /C \"${Template.BuildStatement.PreBuild(context)} && {GetLinkerPath(context)} ${Template.BuildStatement.LinkerImplicitFlags(context)} ${Template.BuildStatement.LinkerFlags(context)} ${Template.BuildStatement.ImplicitLinkerPaths(context)} ${Template.BuildStatement.ImplicitLinkerLibraries(context)} ${Template.BuildStatement.LinkerLibraries(context)} $in && ${Template.BuildStatement.PostBuild(context)}\"");
+            fileGenerator.WriteLine($"{Template.DescriptionBegin}Linking C++ {outputType} ${Template.BuildStatement.TargetFile(context)}");
             fileGenerator.WriteLine($"  restat = $RESTAT");
             fileGenerator.WriteLine($"");
 
             // Cleaning
             fileGenerator.WriteLine($"# Rule to clean all built files");
-            fileGenerator.WriteLine($"{Template.Project.RuleBegin}{Template.Project.Clean}");
-            fileGenerator.WriteLine($"{Template.Project.CommandBegin}{KitsRootPaths.GetNinjaPath()} $FILE_ARG -t clean $TARGETS");
-            fileGenerator.WriteLine($"{Template.Project.DescriptionBegin}Cleaning all built files");
+            fileGenerator.WriteLine($"{Template.RuleBegin}{Template.RuleStatement.Clean(context)}");
+            fileGenerator.WriteLine($"{Template.CommandBegin}{KitsRootPaths.GetNinjaPath()} -f {GetPerConfigFilePath(context)} -t clean");
+            fileGenerator.WriteLine($"{Template.DescriptionBegin}Cleaning all build files");
+            fileGenerator.WriteLine($"");
+
+            // Compiler DB
+            fileGenerator.WriteLine($"# Rule to generate compiler db");
+            fileGenerator.WriteLine($"{Template.RuleBegin}{Template.RuleStatement.CompilerDB(context)}");
+            fileGenerator.WriteLine($"{Template.CommandBegin}{KitsRootPaths.GetNinjaPath()} -f {GetPerConfigFilePath(context)} -t compdb {Template.RuleStatement.CompileCppFile(context)}");
             fileGenerator.WriteLine($"");
         }
 
@@ -616,8 +647,8 @@ namespace Sharpmake.Generators.Generic
             linkStatement.LinkerPaths = GetLinkerPaths(context);
             linkStatement.ImplicitLinkerLibs = GetImplicitLinkLibraries(context);
             linkStatement.LinkerLibs = GetLinkLibraries(context);
-            linkStatement.PreBuild = "";
-            linkStatement.PostBuild = "";
+            linkStatement.PreBuild = GetPreBuildCommands(context);
+            linkStatement.PostBuild = GetPostBuildCommands(context);
             linkStatement.TargetPdb = context.Configuration.LinkerPdbFilePath;
 
             statements.Add(linkStatement);
@@ -629,7 +660,10 @@ namespace Sharpmake.Generators.Generic
         {
             //build app.exe: phony d$:\testing\ninjasharpmake\.rex\build\ninja\app\debug\bin\app.exe
             string phony_name = $"{ context.Configuration.Name }_{ context.Compiler}_{ context.Configuration.TargetFileFullName}".ToLower();
-            fileGenerator.WriteLine($"{Template.Project.BuildBegin}{phony_name}: phony {FullOutputPath(context)}");
+            fileGenerator.WriteLine($"{Template.BuildBegin}{phony_name}: phony {FullOutputPath(context)}");
+            fileGenerator.WriteLine($"{Template.BuildBegin}{Template.CleanBuildStatement(context)}: {Template.RuleStatement.Clean(context)}");
+            fileGenerator.WriteLine($"{Template.BuildBegin}{Template.CompDBBuildStatement(context)}: {Template.RuleStatement.CompilerDB(context)}");
+            fileGenerator.WriteLine($"");
 
             fileGenerator.WriteLine($"default {phony_name}");
         }
@@ -824,6 +858,47 @@ namespace Sharpmake.Generators.Generic
         {
             return new Strings(context.Configuration.LibraryFiles);
         }
+
+        private string GetPreBuildCommands(GenerationContext context)
+        {
+            string preBuildCommand = "";
+            string suffix = " && ";
+
+            foreach (var command in context.Configuration.EventPreBuild)
+            {
+                preBuildCommand += command;
+                preBuildCommand += suffix;
+            }
+
+            // remove trailing && if possible
+            if (preBuildCommand.EndsWith(suffix))
+            {
+                preBuildCommand = preBuildCommand.Substring(0, preBuildCommand.Length - suffix.Length);
+            }
+
+            return preBuildCommand;
+        }
+
+        private string GetPostBuildCommands(GenerationContext context)
+        {
+            string postBuildCommand = "";
+            string suffix = " && ";
+
+            foreach (var command in context.Configuration.EventPostBuild)
+            {
+                postBuildCommand += command;
+                postBuildCommand += suffix;
+            }
+
+            // remove trailing && if possible
+            if (postBuildCommand.EndsWith(suffix))
+            {
+                postBuildCommand = postBuildCommand.Substring(0, postBuildCommand.Length - suffix.Length);
+            }
+
+            return postBuildCommand;
+        }
+
         private Strings GetLinkerFlags(GenerationContext context)
         {
             Strings flags = new Strings(context.LinkerCommandLineOptions.Values);

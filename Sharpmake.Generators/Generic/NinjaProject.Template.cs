@@ -1,46 +1,151 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sharpmake.Generators.Generic
+﻿namespace Sharpmake.Generators.Generic
 {
     public partial class NinjaProject
     {
-        public static class Template
+        private static class Template
         {
-            public static class Project
+            // Ninja syntax
+            public static string RuleBegin = "rule ";
+            public static string BuildBegin = "build ";
+            public static string CommandBegin = "  command = ";
+            public static string DescriptionBegin = "  description = ";
+            public static string Input = "$in";
+            public static string Output = "$out";
+
+            public static string PerConfigFormat(GenerationContext context)
             {
-                public static string ConfigurationBegin = "CONFIGURATION";
+                return $"{context.Project.Name}_{context.Configuration.Name}_{context.Compiler}".ToLower();
+            }
+            public static string PerConfigFolderFormat(GenerationContext context)
+            {
+                return System.IO.Path.Combine(context.Compiler.ToString(), context.Configuration.Name);
+            }
 
-                public static string RuleBegin = "rule ";
+            public static string CleanBuildStatement(GenerationContext context)
+            {
+                return $"clean_{PerConfigFormat(context)}";
+            }
+            public static string CompDBBuildStatement(GenerationContext context)
+            {
+                return $"compdb_{PerConfigFormat(context)}";
+            }
 
-                public static string BuildBegin = "build ";
-                public static string BuildCPPFileName = "COMPILE_CPP_FILE_[project_name]_[config_name]_[config_compiler]";
-                public static string BuildLinkExeName = "LINK_CPP_FILE_EXE_[project_name]_[config_name]_[config_compiler]";
-                public static string Clean = "Clean_[config_name]_[config_compiler]";
+            public static class RuleStatement
+            {
+                private static readonly string RulePrefix = "rule_";
 
-                public static string CommandBegin = "  command = ";
-                public static string DescriptionBegin = "  description = ";
+                public static string CompileCppFile(GenerationContext context)
+                {
+                    return $"{RulePrefix}compile_cpp_file_{PerConfigFormat(context)}";
+                }
 
-                public static readonly string Defines = "[project_name]_[config_name]_[config_compiler]_DEFINES";
-                public static readonly string Includes = "[project_name]_[config_name]_[config_compiler]_INCLUDES";
-                public static readonly string SystemIncludes = "[project_name]_[config_name]_[config_compiler]_SYSTEM_INCLUDES";
-                public static readonly string DepFile = "[project_name]_[config_name]_[config_compiler]_DEP_FILE";
-                public static readonly string CompilerImplicitFlags = "[project_name]_[config_name]_[config_compiler]_COMPILER_IMPLICIT_FLAGS";
-                public static readonly string LinkerImplicitFlags = "[project_name]_[config_name]_[config_compiler]_LINKER_IMPLICIT_FLAGS";
-                public static readonly string CompilerFlags = "[project_name]_[config_name]_[config_compiler]_COMPILER_FLAGS";
-                public static readonly string LinkerFlags = "[project_name]_[config_name]_[config_compiler]_LINKER_FLAGS";
-                public static readonly string TargetPdb = "[project_name]_[config_name]_[config_compiler]_TARGET_PDB";
-                public static readonly string ImplicitLinkPaths = "[project_name]_[config_name]_[config_compiler]_IMPLICIT_LINK_PATHS";
-                public static readonly string ImplicitLinkLibraries = "[project_name]_[config_name]_[config_compiler]_IMPLICIT_LINK_LIBRARIES";
-                public static readonly string LinkPaths = "[project_name]_[config_name]_[config_compiler]_LINK_PATHS";
-                public static readonly string LinkLibraries = "[project_name]_[config_name]_[config_compiler]_LINK_LIBRARIES";
-                public static readonly string PostBuild = "[project_name]_[config_name]_[config_compiler]_POST_BUILD";
-                public static readonly string PreBuild = "[project_name]_[config_name]_[config_compiler]_PRE_BUILD";
-                public static readonly string TargetFile = "[project_name]_[config_name]_[config_compiler]_TARGET_FILE";
-            }   
+                public static string LinkExe(GenerationContext context)
+                {
+                    return $"{RulePrefix}link_exe_{PerConfigFormat(context)}";
+                }
+
+                public static string LinkLib(GenerationContext context)
+                {
+                    return $"{RulePrefix}link_static_lib_{PerConfigFormat(context)}";
+                }
+
+                public static string LinkDll(GenerationContext context)
+                {
+                    return $"{RulePrefix}link_dynamic_lib_{PerConfigFormat(context)}";
+                }
+
+                public static string LinkToUse(GenerationContext context)
+                {
+                    switch (context.Configuration.Output)
+                    {
+                        case Project.Configuration.OutputType.Exe:
+                            return LinkExe(context);
+                        case Project.Configuration.OutputType.Lib:
+                            return LinkLib(context);
+                        case Project.Configuration.OutputType.Dll:
+                            return LinkDll(context);
+                        default:
+                            throw new Error("Invalid output type for rule");
+                    }
+                }
+
+                public static string Clean(GenerationContext context)
+                {
+                    return $"{RulePrefix}clean_{PerConfigFormat(context)}";
+                }
+                public static string CompilerDB(GenerationContext context)
+                {
+                    return $"{RulePrefix}compdb_{PerConfigFormat(context)}";
+                }
+            }
+
+            public static class BuildStatement
+            {
+                public static string Defines(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_DEFINES";
+                }
+                public static string Includes(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_INCLUDES";
+                }
+                public static string SystemIncludes(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_SYSTEM_INCLUDES";
+                }
+                public static string DepFile(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_DEP_FILE";
+                }
+                public static string CompilerImplicitFlags(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_COMPILER_IMPLICIT_FLAGS";
+                }
+                public static string CompilerFlags(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_COMPILER_FLAGS";
+                }
+                public static string LinkerImplicitFlags(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_LINKER_IMPLICIT_FLAGS";
+                }
+                public static string LinkerFlags(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_LINKER_FLAGS";
+                }
+                public static string TargetPdb(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_TARGET_PDB";
+                }
+                public static string ImplicitLinkerPaths(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_LINKER_IMPLICIT_PATHS";
+                }
+                public static string ImplicitLinkerLibraries(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_LINKER_IMPLICIT_LIBRARIES";
+                }
+                public static string LinkerPaths(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_LINKER_PATHS";
+                }
+                public static string LinkerLibraries(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_LINKER_LIBRARIES";
+                }
+                public static string PreBuild(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_PRE_BUILD";
+                }
+                public static string PostBuild(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_POST_BUILD";
+                }
+                public static string TargetFile(GenerationContext context)
+                {
+                    return $"{PerConfigFormat(context)}_TARGET_FILE";
+                }
+            }
         }
     }
 }
