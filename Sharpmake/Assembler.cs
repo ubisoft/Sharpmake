@@ -24,10 +24,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-#if NETFRAMEWORK
-using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net472;
-#else
+#if NET5_0
 using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net50;
+#else
+#error unhandled framework version
 #endif
 
 namespace Sharpmake
@@ -35,10 +35,10 @@ namespace Sharpmake
     public class Assembler
     {
         public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
-#if NETFRAMEWORK
-        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
-#else
+#if NET5_0
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net5_0;
+#else
+#error unhandled framework version
 #endif
 
         /// <summary>

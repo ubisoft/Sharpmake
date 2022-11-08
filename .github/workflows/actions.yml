@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2019, windows-2022]
-        framework: [net472, net5.0]
+        framework: [net5.0]
         configuration: [debug, release]
 
     steps:
@@ -30,46 +30,36 @@ jobs:
         if: runner.os == 'Windows'
         run: .\bootstrap.bat Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }} ${{ matrix.framework }}
 
-      - name: Bootstrap.dotnet.sh ${{ matrix.configuration }}
+      - name: Bootstrap.sh ${{ matrix.configuration }}
         if: runner.os != 'Windows'
         shell: bash
-        run: ./bootstrap.dotnet.sh Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }} ${{ matrix.framework }}
+        run: ./bootstrap.sh Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }} ${{ matrix.framework }}
 
       - name: CompileSharpmake.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
         run: .\CompileSharpmake.bat Sharpmake.sln "${{ matrix.configuration }}" "Any CPU"
 
-      - name: CompileSharpmake.dotnet.sh ${{ matrix.configuration }}
+      - name: CompileSharpmake.sh ${{ matrix.configuration }}
         if: runner.os != 'Windows'
-        run: ./CompileSharpmake.dotnet.sh Sharpmake.sln ${{ matrix.configuration }} "Any CPU" ${{ matrix.framework }}
+        run: ./CompileSharpmake.sh Sharpmake.sln ${{ matrix.configuration }} "Any CPU" ${{ matrix.framework }}
 
-      - name: GenerateMdbFiles.bat
-        if: runner.os == 'Windows' && matrix.framework == 'net472' && matrix.configuration == 'release'
-        run: .\GenerateMdbFiles.bat
-
-      - name: UnitTest ${{ matrix.framework }} - NUnit
-        if: runner.os == 'Windows' && matrix.framework == 'net472'
-        run: |
-          nuget install NUnit.ConsoleRunner -Version 3.12.0 -OutputDirectory tmp/pkg
-          tmp/pkg/NUnit.ConsoleRunner.3.12.0/tools/nunit3-console.exe tmp/unittests/${{ matrix.configuration }}/${{ matrix.framework }}/Sharpmake.UnitTests.dll
+      - name: Store MSBuild binary logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with: 
+          name: sharpmake-msbuild-logs-${{ github.sha }}
+          path: tmp/msbuild
 
       - name: UnitTest ${{ matrix.framework }} - dotnet test
-        if: runner.os == 'Windows' && matrix.framework != 'net472' # TODO: fix the tests on mac and linux and remove the first part of the if
+        if: runner.os == 'Windows' # TODO: fix the tests on mac and linux and remove the first part of the if
         run: dotnet test --no-build --no-restore tmp/projects/sharpmake.unittests/Sharpmake.UnitTests.csproj --framework ${{ matrix.framework }} --configuration ${{ matrix.configuration }}
 
       - name: RegressionTest
         if: runner.os == 'Windows'
         run: python regression_test.py --sharpmake_exe "tmp\bin\${{ matrix.configuration }}\${{ matrix.framework }}\Sharpmake.Application.exe"
 
-      - name: Upload sharpmake .net framework release binaries
-        if: matrix.configuration == 'release' && matrix.framework == 'net472'
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
-          path: tmp/bin/release/${{ matrix.framework }}
-
       - name: Upload sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
-        if: matrix.configuration == 'release' && matrix.framework != 'net472'
+        if: matrix.configuration == 'release'
         uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
@@ -82,21 +72,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2019] # only windows for now, but ideally should be all. TODO: add windows-2022
-        framework: [net472, net5.0]
+        framework: [net5.0]
 
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3.1.0
 
-      - name: Download sharpmake .net framework release binaries
-        if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v3
-        with:
-          name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
-          path: tmp/bin/release/${{ matrix.framework }}
-
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
-        if: matrix.framework != 'net472'
         uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
@@ -113,7 +95,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2019] # TODO: add windows-2022
-        framework: [net472, net5.0]
+        framework: [net5.0]
         configuration: [debug, release]
 
     env:
@@ -125,22 +107,14 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3.1.0
 
-      - name: Download sharpmake .net framework release binaries
-        if: matrix.framework == 'net472'
-        uses: actions/download-artifact@v3
-        with:
-          name: 'Sharpmake-${{ matrix.framework }}-${{ github.sha }}'
-          path: tmp/bin/release/${{ matrix.framework }}
-
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
-        if: matrix.framework != 'net472'
         uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
       - name: chmod +x on Sharpmake.Application
-        if: runner.os != 'Windows' && matrix.framework != 'net472'
+        if: runner.os != 'Windows'
         run: chmod +x $SHARPMAKE_UNIX_EXE
 
       - name: CompileCommandDatabase ${{ matrix.configuration }}
