@@ -30,7 +30,7 @@ namespace Sharpmake
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
         internal static DevEnv DevEnv { get; private set; }
-        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2019;
+        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2022;
 
         public interface IDebugProjectExtension
         {

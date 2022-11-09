@@ -18,7 +18,7 @@ if not "%~2" == "" (
     set SHARPMAKE_OPTIM=%~2
 )
 
-set SHARPMAKE_FRAMEWORK=net5.0
+set SHARPMAKE_FRAMEWORK=net6.0
 if not "%~3" == "" (
     set SHARPMAKE_FRAMEWORK=%~3
 )

@@ -26,11 +26,19 @@ namespace SharpmakeGen
 
             conf.ReferencesByNuGetPackage.Add("Microsoft.CodeAnalysis.CSharp", "4.0.1");
             conf.ReferencesByNuGetPackage.Add("Microsoft.VisualStudio.Setup.Configuration.Interop", "3.0.4492");
+            conf.ReferencesByNuGetPackage.Add("Microsoft.Win32.Registry", "5.0.0");
 
-            if (target.Framework.IsDotNetCore())
+            if (target.Framework == DotNetFramework.net5_0)
             {
                 conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net50", "1.2.4");
-                conf.ReferencesByNuGetPackage.Add("Microsoft.Win32.Registry", "5.0.0");
+            }
+            else if (target.Framework == DotNetFramework.net6_0)
+            {
+                conf.ReferencesByNuGetPackage.Add("Basic.Reference.Assemblies.Net60", "1.3.0");
+            }
+            else
+            {
+                throw new NotImplementedException("Need to add support for new .net version");
             }
         }
     }

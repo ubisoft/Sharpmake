@@ -7,7 +7,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake.Application</RootNamespace>
     <AssemblyName>Sharpmake.Application</AssemblyName>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
     <EnableDefaultItems>false</EnableDefaultItems>

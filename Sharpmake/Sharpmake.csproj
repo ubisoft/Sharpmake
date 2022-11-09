@@ -7,7 +7,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sharpmake</RootNamespace>
     <AssemblyName>Sharpmake</AssemblyName>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultItems>false</EnableDefaultItems>
@@ -136,7 +136,7 @@
     <None Include="Sharpmake.sharpmake.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Basic.Reference.Assemblies.Net50" Version="1.2.4" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net60" Version="1.3.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="3.0.4492" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
