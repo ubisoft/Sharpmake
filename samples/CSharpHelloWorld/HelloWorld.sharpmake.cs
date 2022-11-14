@@ -17,19 +17,36 @@ using Sharpmake;
 
 namespace CSharpHelloWorld
 {
+    public class TargetTypes
+    {
+        public static Target[] GetDefaultTargets()
+        {
+            return new Target[]
+            {
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2017,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    Blob.NoBlob,
+                    BuildSystem.MSBuild,
+                    DotNetFramework.v4_6_1),
+                new Target(
+                    Platform.anycpu,
+                    DevEnv.vs2022,
+                    Optimization.Debug | Optimization.Release,
+                    OutputType.Dll,
+                    framework: DotNetFramework.net7_0)
+            };
+        }
+    }
+    
     [Sharpmake.Generate]
     public class HelloWorld : CSharpProject
     {
         public HelloWorld()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2017,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_6_1));
+            AddTargets(TargetTypes.GetDefaultTargets());
 
             RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
@@ -53,14 +70,7 @@ namespace CSharpHelloWorld
     {
         public HelloWorldSolution()
         {
-            AddTargets(new Target(
-            Platform.anycpu,
-            DevEnv.vs2017,
-            Optimization.Debug | Optimization.Release,
-            OutputType.Dll,
-            Blob.NoBlob,
-            BuildSystem.MSBuild,
-            DotNetFramework.v4_6_1));
+            AddTargets(TargetTypes.GetDefaultTargets());
         }
 
         [Configure()]
