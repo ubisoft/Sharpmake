@@ -3374,8 +3374,8 @@ namespace Sharpmake
                     {
                         foreach (var child in alreadyExisting._childNodes)
                         {
-                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(child.Key));
-                            visitedNode._childNodes.Add(child.Key, child.Value);
+                            bool added = visitedNode._childNodes.TryAdd(child.Key, child.Value);
+                            System.Diagnostics.Debug.Assert(added);
                         }
                         continue;
                     }
@@ -3401,8 +3401,8 @@ namespace Sharpmake
                                 dependencySetting = DependencySetting.Default;
 
                             DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
-                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(childNode));
-                            visitedNode._childNodes.Add(childNode, dependencyType);
+                            bool added = visitedNode._childNodes.TryAdd(childNode, dependencyType);
+                            System.Diagnostics.Debug.Assert(added);
 
                             visiting.Push(childNode);
                         }
