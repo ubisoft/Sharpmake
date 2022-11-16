@@ -89,6 +89,7 @@
     <Compile Include="IAssemblerContext.cs" />
     <Compile Include="ICommandLineInterface.cs" />
     <Compile Include="IFastBuildCompilerSettings.cs" />
+    <Compile Include="IFileGenerator.cs" />
     <Compile Include="IPlatformDescriptor.cs" />
     <Compile Include="IResolverHelper.cs" />
     <Compile Include="IWindowsFastBuildCompilerSettings.cs" />
