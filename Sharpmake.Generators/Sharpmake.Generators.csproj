@@ -76,7 +76,6 @@
     <Compile Include="Generic\MakeProject.cs" />
     <Compile Include="Generic\Makefile.Template.cs" />
     <Compile Include="Generic\Makefile.cs" />
-    <Compile Include="IFileGenerator.cs" />
     <Compile Include="IGenerationContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualStudio\Androidproj.Template.cs" />

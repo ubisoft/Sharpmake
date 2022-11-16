@@ -205,9 +205,27 @@ namespace Sharpmake
             return generationOutput;
         }
 
+        public static GenerationOutput FileWriteIfDifferent(string outputFilePath, IFileGenerator generator, GenerationOutput generationOutput = null)
+        {
+            if (generationOutput == null)
+                generationOutput = new GenerationOutput();
+
+            if (FileWriteIfDifferent(new FileInfo(outputFilePath), generator))
+                generationOutput.Generated.Add(outputFilePath);
+            else
+                generationOutput.Skipped.Add(outputFilePath);
+
+            return generationOutput;
+        }
+
         public static bool FileWriteIfDifferent(FileInfo file, MemoryStream stream)
         {
             return Builder.Instance.Context.WriteGeneratedFile(null, file, stream);
+        }
+
+        public static bool FileWriteIfDifferent(FileInfo file, IFileGenerator generator)
+        {
+            return Builder.Instance.Context.WriteGeneratedFile(null, file, generator);
         }
 
         internal static bool RecordInAutoCleanupDatabase(string fullPath)
