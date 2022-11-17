@@ -45,12 +45,21 @@ namespace Sharpmake.UnitTests
 
         private class AssemblerContext : IAssemblerContext
         {
-            public List<string> References = new List<string>();
+            public List<string> RuntimeReferences = new List<string>();
+            public List<string> BuildReferences = new List<string>();
             public List<string> Sources = new List<string>();
 
-            public void AddReference(string file)
+            [Obsolete("Use AddRuntimeReference() instead")]
+            public void AddReference(string file) => AddRuntimeReference(file);
+
+            public void AddRuntimeReference(string file)
             {
-                References.Add(file);
+                RuntimeReferences.Add(file);
+            }
+
+            public void AddBuildReference(string file)
+            {
+                BuildReferences.Add(file);
             }
 
             public void AddSourceFile(string file)
@@ -58,7 +67,10 @@ namespace Sharpmake.UnitTests
                 Sources.Add(file);
             }
 
-            public void AddReference(IAssemblyInfo info)
+            [Obsolete("Use AddRuntimeReference() instead")]
+            public void AddReference(IAssemblyInfo info) => AddRuntimeReference(info);
+
+            public void AddRuntimeReference(IAssemblyInfo info)
             {
                 throw new NotImplementedException();
             }
@@ -282,8 +294,8 @@ namespace Sharpmake.UnitTests
             var assemblerContext = new AssemblerContext();
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(assemblerContext.References.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.References.First());
+            Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.RuntimeReferences.First());
         }
 
         [Test]
@@ -299,8 +311,8 @@ namespace Sharpmake.UnitTests
             var assemblerContext = new AssemblerContext();
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(assemblerContext.References.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.References.First());
+            Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.RuntimeReferences.First());
         }
 
         [Test]
@@ -316,8 +328,8 @@ namespace Sharpmake.UnitTests
             var assemblerContext = new AssemblerContext();
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(assemblerContext.References.Count, Is.EqualTo(1));
-            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.References.First());
+            Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeReferenceFullPath, assemblerContext.RuntimeReferences.First());
         }
 
         [Test]
@@ -332,7 +344,7 @@ namespace Sharpmake.UnitTests
             var assemblerContext = new AssemblerContext();
             new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
 
-            Assert.That(assemblerContext.References.Count, Is.EqualTo(0));
+            Assert.That(assemblerContext.RuntimeReferences.Count, Is.EqualTo(0));
         }
         #endregion
 

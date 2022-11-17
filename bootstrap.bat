@@ -2,7 +2,7 @@
 :: Batch arguments:
 :: %~1 Main sharpmake file
 :: %~2 Target(Normally should be Debug or Release)
-:: %~3 Framework (net472 or net5.0)
+:: %~3 Framework (net5.0 or any configured framework in Sharpmake.Main.sharpmake.cs)
 :: if none are passed, defaults to Sharpmake.Main.sharpmake.cs in Debug with net5.0
 
 setlocal enabledelayedexpansion
@@ -18,7 +18,7 @@ if not "%~2" == "" (
     set SHARPMAKE_OPTIM=%~2
 )
 
-set SHARPMAKE_FRAMEWORK=net5.0
+set SHARPMAKE_FRAMEWORK=net6.0
 if not "%~3" == "" (
     set SHARPMAKE_FRAMEWORK=%~3
 )

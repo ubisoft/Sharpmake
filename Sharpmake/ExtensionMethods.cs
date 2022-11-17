@@ -109,6 +109,8 @@ namespace Sharpmake
                     return "net5.0";
                 case DotNetFramework.net6_0:
                     return "net6.0";
+                case DotNetFramework.net7_0:
+                    return "net7.0";
                 case DotNetFramework.all_netframework:
                 case DotNetFramework.all_netcore:
                 case DotNetFramework.all_netstandard:
@@ -158,6 +160,8 @@ namespace Sharpmake
                     return "net5.0";
                 case DotNetFramework.net6_0:
                     return "net6.0";
+                case DotNetFramework.net7_0:
+                    return "net7.0";
                 case DotNetFramework.netstandard1_0:
                     return "netstandard1.0";
                 case DotNetFramework.netstandard1_1:

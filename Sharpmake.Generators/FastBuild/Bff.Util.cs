@@ -37,6 +37,7 @@ namespace Sharpmake.Generators.FastBuild
             public string UnityInputObjectLists = FileGeneratorUtilities.RemoveLineTag; // (optional) ObjectList(s) to use as input
             public string UnityInputIsolateWritableFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Build writable files individually (default false)
             public string UnityInputIsolateWritableFilesLimit = FileGeneratorUtilities.RemoveLineTag; // (optional) Disable isolation when many files are writable (default 0)
+            public string UnityInputIsolateListFile = FileGeneratorUtilities.RemoveLineTag; // (optional) Text file containing list of files to isolate
             public string UnityOutputPattern = FileGeneratorUtilities.RemoveLineTag; // (optional) Pattern of output Unity file names (default Unity*cpp)
             public string UnityNumFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
             public string UnityPCH = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
@@ -64,6 +65,7 @@ namespace Sharpmake.Generators.FastBuild
                     hash = hash * 23 + UnityInputObjectLists.GetDeterministicHashCode();
                     hash = hash * 23 + UnityInputIsolateWritableFiles.GetDeterministicHashCode();
                     hash = hash * 23 + UnityInputIsolateWritableFilesLimit.GetDeterministicHashCode();
+                    hash = hash * 23 + UnityInputIsolateListFile.GetDeterministicHashCode();
                     hash = hash * 23 + UnityOutputPattern.GetDeterministicHashCode();
                     hash = hash * 23 + UnityNumFiles.GetDeterministicHashCode();
                     hash = hash * 23 + UnityPCH.GetDeterministicHashCode();
@@ -99,6 +101,7 @@ namespace Sharpmake.Generators.FastBuild
                     && string.Equals(UnityInputObjectLists, unity.UnityInputObjectLists)
                     && string.Equals(UnityInputIsolateWritableFiles, unity.UnityInputIsolateWritableFiles)
                     && string.Equals(UnityInputIsolateWritableFilesLimit, unity.UnityInputIsolateWritableFilesLimit)
+                    && string.Equals(UnityInputIsolateListFile, unity.UnityInputIsolateListFile)
                     && string.Equals(UnityOutputPattern, unity.UnityOutputPattern)
                     && string.Equals(UnityNumFiles, unity.UnityNumFiles)
                     && string.Equals(UnityPCH, unity.UnityPCH)

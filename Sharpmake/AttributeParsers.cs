@@ -140,7 +140,7 @@ namespace Sharpmake
             {
                 string referenceAbsolutePath = Path.IsPathRooted(reference) ? reference : null;
                 referenceAbsolutePath = referenceAbsolutePath ?? Path.Combine(sourceFilePath.DirectoryName, reference);
-                context.AddReferences(Util.DirectoryGetFilesWithWildcards(referenceAbsolutePath));
+                context.AddRuntimeReferences(Util.DirectoryGetFilesWithWildcards(referenceAbsolutePath));
             }
             else
             {
@@ -155,7 +155,7 @@ namespace Sharpmake
                     {
                         if (Util.FileExists(candidateReferenceLocation))
                         {
-                            context.AddReference(candidateReferenceLocation);
+                            context.AddRuntimeReference(candidateReferenceLocation);
                             foundReference = true;
                             break;
                         }
@@ -211,7 +211,7 @@ namespace Sharpmake
             {
                 if (assemblyInfo == null)
                     throw new Error($"Circular Sharpmake.Package dependency on {includeFilename}");
-                context.AddReference(assemblyInfo);
+                context.AddRuntimeReference(assemblyInfo);
                 return;
             }
             s_assemblies[includeAbsolutePath] = null;

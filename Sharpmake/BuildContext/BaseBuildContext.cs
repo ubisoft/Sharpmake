@@ -42,6 +42,7 @@ namespace Sharpmake.BuildContext
         public virtual bool HaveToGenerate(Type type) { return true; }
 
         public abstract bool WriteGeneratedFile(Type type, FileInfo path, MemoryStream generated);
+        public abstract bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator);
 
         public abstract bool WriteLog { get; }
     }

@@ -941,6 +941,16 @@ namespace Sharpmake
             public string PrecompHeaderOutputFolder = null;
 
             /// <summary>
+            /// Gets or sets the name for the precompiled header's binary file in C and C++ projects,
+            /// e.g. <c>pch.pch</c>.
+            /// </summary>
+            /// <remarks>
+            /// If this property is set to <c>null</c>, Sharpmake will simply use the project's name.
+            /// To modify the output directory of this file, use <see cref="PrecompHeaderOutputFolder"/>.
+            /// </remarks>
+            public string PrecompHeaderOutputFile = null;
+
+            /// <summary>
             /// Gets a list of files that don't use the precompiled headers.
             /// </summary>
             public Strings PrecompSourceExclude = new Strings();
@@ -1325,6 +1335,19 @@ namespace Sharpmake
 
             // Disable isolation when many files are writable
             public int FastBuildUnityInputIsolateWritableFilesLimit = 10;
+
+            /// <summary>
+            /// Gets or sets the path of the list with files to isolate,
+            /// e.g.: @"temp\IsolateFileList.txt".
+            /// </summary>
+            /// <remarks>
+            /// <note>
+            /// Files in this list will be excluded from the FASTBuild unity build.
+            /// Their path must be relative to the FASTBuild working directory.
+            /// This is usually the location of the MasterBff file.
+            /// </note>
+            /// </remarks>
+            public string FastBuildUnityInputIsolateListFile = null;
 
             /// <summary>
             /// Custom Actions to do before invoking FastBuildExecutable.
