@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.IO;
 
-namespace Sharpmake.Generators
+namespace Sharpmake
 {
     /// <summary>
     /// Interface that exposes facilities for generating text-based files.
@@ -84,6 +85,21 @@ namespace Sharpmake.Generators
         /// <param name="variables">An array of <see cref="VariableAssignment"/> containing the variables to resolve.</param>
         /// <exception cref="ArgumentNullException"><paramref name="variables"/> is null.</exception>
         void ResolveEnvironmentVariables(Platform platform, params VariableAssignment[] variables);
+
+        /// <summary>
+        /// Check if the generated file is different than file on disk.
+        /// </summary>
+        /// <param name="file">file to check</param>
+        /// <returns>true: file is different. False: File is the same</returns>
+        bool IsFileDifferent(FileInfo file);
+
+        /// <summary>
+        /// Write the generated file if different than existing file on disk.
+        /// </summary>
+        /// <param name="file">file to write</param>
+        /// <param name="bypassAutoCleanupDatabase">Cleanup database is used so that if a previously written file is no longer written it is automatically deleted.</param>
+        /// <returns></returns>
+        bool FileWriteIfDifferent(FileInfo file, bool bypassAutoCleanupDatabase = false);
     }
 
     /// <summary>

@@ -804,22 +804,14 @@ namespace Sharpmake.Generators.VisualStudio
                 context.CommandLineOptions["MinimalRebuild"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
-            if (!clrSupport)
-            {
-                //Options.Vc.Compiler.RTTI.
-                //    Disable                                 RuntimeTypeInfo="false"                         /GR-
-                //    Enable                                  RuntimeTypeInfo="true"
-                context.SelectOption
-                (
-                Options.Option(Options.Vc.Compiler.RTTI.Disable, () => { context.Options["RuntimeTypeInfo"] = "false"; context.CommandLineOptions["RuntimeTypeInfo"] = "/GR-"; }),
-                Options.Option(Options.Vc.Compiler.RTTI.Enable, () => { context.Options["RuntimeTypeInfo"] = "true"; context.CommandLineOptions["RuntimeTypeInfo"] = "/GR"; })
-                );
-            }
-            else
-            {
-                context.Options["RuntimeTypeInfo"] = FileGeneratorUtilities.RemoveLineTag;
-                context.CommandLineOptions["RuntimeTypeInfo"] = FileGeneratorUtilities.RemoveLineTag;
-            }
+            //Options.Vc.Compiler.RTTI.
+            //    Disable                                 RuntimeTypeInfo="false"                         /GR-
+            //    Enable                                  RuntimeTypeInfo="true"
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.RTTI.Disable, () => { context.Options["RuntimeTypeInfo"] = "false"; context.CommandLineOptions["RuntimeTypeInfo"] = "/GR-"; }),
+            Options.Option(Options.Vc.Compiler.RTTI.Enable, () => { context.Options["RuntimeTypeInfo"] = "true"; context.CommandLineOptions["RuntimeTypeInfo"] = "/GR"; })
+            );
 
             //Options.Vc.Compiler.StructAlignment.
             //    Default                                 StructMemberAlignment="0"
@@ -1270,7 +1262,7 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["UsePrecompiledHeader"] = "Use";
                 context.Options["PrecompiledHeaderThrough"] = context.Configuration.PrecompHeader;
                 string pchOutputDirectoryRelative = string.IsNullOrEmpty(context.Configuration.PrecompHeaderOutputFolder) ? optionsContext.IntermediateDirectoryRelative : Util.PathGetRelative(context.ProjectDirectory, context.Configuration.PrecompHeaderOutputFolder);
-                context.Options["PrecompiledHeaderFile"] = Path.Combine(pchOutputDirectoryRelative, $"{context.Configuration.Project.Name}.pch");
+                context.Options["PrecompiledHeaderFile"] = Path.Combine(pchOutputDirectoryRelative, string.IsNullOrEmpty(context.Configuration.PrecompHeaderOutputFile) ? $"{context.Configuration.Project.Name}.pch" : context.Configuration.PrecompHeaderOutputFile);
                 context.Options["PrecompiledHeaderOutputFileDirectory"] = pchOutputDirectoryRelative;
                 context.CommandLineOptions["PrecompiledHeaderThrough"] = context.Options["PrecompiledHeaderThrough"];
                 context.CommandLineOptions["PrecompiledHeaderFile"] = FormatCommandLineOptionPath(context, context.Options["PrecompiledHeaderFile"]);

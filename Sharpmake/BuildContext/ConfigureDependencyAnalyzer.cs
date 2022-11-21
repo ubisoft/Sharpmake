@@ -69,6 +69,11 @@ namespace Sharpmake.BuildContext
                 return Util.IsFileDifferent(path, generated);
             }
 
+            public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+            {
+                return generator.IsFileDifferent(path);
+            }
+
             public override bool WriteLog
             {
                 get { return false; }
@@ -304,6 +309,11 @@ namespace Sharpmake.BuildContext
                 return Util.IsFileDifferent(path, generated);
             }
 
+            public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+            {
+                return generator.IsFileDifferent(path);
+            }
+
             #endregion
 
             public override string ToString()
@@ -427,6 +437,11 @@ namespace Sharpmake.BuildContext
                 return Util.FileWriteIfDifferentInternal(path, generated);
             }
 
+            public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+            {
+                return generator.FileWriteIfDifferent(path);
+            }
+
             public override string ToString()
             {
                 return "First pass analyze";
@@ -502,6 +517,11 @@ namespace Sharpmake.BuildContext
             public override bool WriteGeneratedFile(Type type, FileInfo path, MemoryStream generated)
             {
                 return _analyzers.Any(analyzer => analyzer.TargetTypes.Contains(type) && analyzer.WriteGeneratedFile(type, path, generated));
+            }
+
+            public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+            {
+                return _analyzers.Any(analyzer => analyzer.TargetTypes.Contains(type) && analyzer.WriteGeneratedFile(type, path, generator));
             }
 
             #endregion

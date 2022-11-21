@@ -181,6 +181,17 @@ namespace Sharpmake.Generators
             Flush();
             return _stream;
         }
+        public bool IsFileDifferent(FileInfo file)
+        {
+            Flush();
+            return Util.IsFileDifferent(file, _stream);
+        }
+
+        public bool FileWriteIfDifferent(FileInfo file, bool bypassAutoCleanupDatabase = false)
+        {
+            Flush();
+            return Util.FileWriteIfDifferentInternal(file, _stream, bypassAutoCleanupDatabase);
+        }
 
         public void RemoveTaggedLines()
         {

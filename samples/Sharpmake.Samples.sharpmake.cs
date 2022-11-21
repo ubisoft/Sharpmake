@@ -33,7 +33,6 @@ namespace SharpmakeGen.Samples
             conf.TargetPath = @"[project.RootPath]\tmp\samples\[target.Optimization]\[project.Name]";
 
             conf.AddPrivateDependency<SharpmakeProject>(target);
-            conf.AddPrivateDependency<SharpmakeApplicationProject>(target);
             conf.AddPrivateDependency<Platforms.CommonPlatformsProject>(target);
 
             conf.CsprojUserFile = new Project.Configuration.CsprojUserFileSettings

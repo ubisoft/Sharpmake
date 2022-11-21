@@ -16,6 +16,8 @@ namespace SharpmakeGen
             ApplicationManifest = "app.manifest";
 
             NoneFiles.Add(Path.Combine(Globals.AbsoluteRootPath, "Sharpmake.Main.sharpmake.cs"));
+
+            CustomProperties.Add("ServerGarbageCollection", "true");
         }
 
         public override void ConfigureAll(Configuration conf, Target target)
