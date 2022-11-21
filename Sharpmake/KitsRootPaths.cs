@@ -161,6 +161,7 @@ namespace Sharpmake
             const string MsvcArchiverName = "lib.exe";
             const string ClangArchiverName = "llvm-ar.exe";
             const string ClangRanLibName = "llvm-ranlib.exe";
+            const string GccArchiverName = "ar.exe";
 
             const string NinjaName = "ninja.exe";
 
@@ -174,6 +175,7 @@ namespace Sharpmake
             string MsvcArchiver = "";
             string ClangArchiver = "";
             string ClangRanLib = "";
+            string GccArchiver = "";
 
             string NinjaPath = "";
 
@@ -229,6 +231,10 @@ namespace Sharpmake
                     {
                         ClangRanLib = file;
                     }
+                    if (filename == GccArchiverName)
+                    {
+                        GccArchiver = file;
+                    }
                     if (filename == NinjaName)
                     {
                         NinjaPath = file;
@@ -238,7 +244,7 @@ namespace Sharpmake
 
             SetCompilerPaths(Compiler.MSVC, MsvcCompilerPath, MsvcLinkerPath, MsvcArchiver, "");
             SetCompilerPaths(Compiler.Clang, ClangCompilerPath, ClangLinkerPath, ClangArchiver, ClangRanLib);
-            SetCompilerPaths(Compiler.GCC, GccCompilerPath, GccLinkerPath, GccLinkerPath, "");
+            SetCompilerPaths(Compiler.GCC, GccCompilerPath, GccLinkerPath, GccArchiver, "");
             SetNinjaPath(NinjaPath);
         }
 

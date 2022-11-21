@@ -1193,6 +1193,7 @@ namespace Sharpmake.Generators.Generic
             context.CommandLineOptions["LanguageStandard"] = FileGeneratorUtilities.RemoveLineTag;
 
             //https://clang.llvm.org/docs/CommandGuide/clang.html
+            string cppLanguageStd = null;
             context.SelectOption
             (
             Options.Option(Options.Clang.Compiler.CppLanguageStandard.Default, () => { context.Options["ClangCppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; context.Options["CppLanguageStandard"] = FileGeneratorUtilities.RemoveLineTag; }),
@@ -1205,8 +1206,24 @@ namespace Sharpmake.Generators.Generic
             Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp11, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++11"; context.Options["CppLanguageStandard"] = "gnu++11"; }),
             Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp14, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++14"; context.Options["CppLanguageStandard"] = "gnu++14"; }),
             Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp17, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++17"; context.Options["CppLanguageStandard"] = "gnu++17"; }),
-            Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++2a"; context.Options["CppLanguageStandard"] = "gnu++2a"; })
-            );
+            Options.Option(Options.Clang.Compiler.CppLanguageStandard.GnuCpp2a, () => { context.Options["ClangCppLanguageStandard"] = "-std=gnu++2a"; context.Options["CppLanguageStandard"] = "gnu++2a"; }));
+
+            if (!context.Options.ContainsKey("ClangCppLanguageStandard") || string.IsNullOrEmpty(context.Options["ClangCppLanguageStandard"]) || context.Options["ClangCppLanguageStandard"] == FileGeneratorUtilities.RemoveLineTag)
+            {
+                context.SelectOption(
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP98, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP11, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP20, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++2a"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++14"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++17"; }),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { context.Options["ClangCppLanguageStandard"] = "-std=c++2a"; })
+                );
+            }
+
 
             context.SelectOption
             (
@@ -1226,8 +1243,9 @@ namespace Sharpmake.Generators.Generic
             context.CommandLineOptions["CppLanguageStd"] = context.Options["ClangCppLanguageStandard"];
             context.CommandLineOptions["CLanguageStd"] = context.Options["ClangCLanguageStandard"];
 
+            cppLanguageStd = context.CommandLineOptions["CppLanguageStd"];
+
             context.Options["AdditionalOptions"] = (context.Configuration.CustomBuildSettings is null) ? FileGeneratorUtilities.RemoveLineTag : context.Configuration.CustomBuildSettings.AdditionalOptions;
-            string cppLanguageStd = null;
             if (context.Configuration.CustomBuildSettings is null || context.Configuration.CustomBuildSettings.AutoConfigure)
             {
                 context.SelectOption

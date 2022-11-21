@@ -266,6 +266,11 @@ namespace Sharpmake.Generators.Generic
             {
                 GenerationContext context = new GenerationContext(builder, projectFilePath, project, config);
 
+                if (config.Output == Project.Configuration.OutputType.Dll && context.Compiler == Compiler.GCC)
+                {
+                    throw new Error("Shared library for GCC is currently not supported");
+                }
+
                 WritePerConfigFile(context, filesToCompile, generatedFiles, skipFiles);
                 WriteCompilerDatabaseFile(context);
             }
@@ -323,9 +328,21 @@ namespace Sharpmake.Generators.Generic
         private void WriteProjectFile(Builder builder, string projectFilePath, Project project, List<Project.Configuration> configurations, List<string> generatedFiles, List<string> skipFiles)
         {
             List<string> filePaths = new List<string>();
+            List<string> dependencyFilePaths = new List<string>();
+
             foreach (var config in configurations)
             {
                 GenerationContext context = new GenerationContext(builder, projectFilePath, project, config);
+
+                foreach (var dependency in config.ResolvedDependencies)
+                {
+                    string dependencyFilePath = FullProjectPath(dependency.Project);
+
+                    if (!dependencyFilePaths.Contains(dependencyFilePath))
+                    {
+                        dependencyFilePaths.Add(dependencyFilePath);
+                    }
+                }
 
                 filePaths.Add(GetPerConfigFilePath(context));
             }
@@ -334,10 +351,19 @@ namespace Sharpmake.Generators.Generic
 
             GenerateHeader(fileGenerator);
 
+            fileGenerator.WriteLine($"# Dependencies");
+            foreach (var path in dependencyFilePaths)
+            {
+                fileGenerator.WriteLine($"include {CreateNinjaFilePath(path)}");
+            }
+
+            fileGenerator.WriteLine($"");
+            fileGenerator.WriteLine($"# Ninja files");
             foreach (var path in filePaths)
             {
                 fileGenerator.WriteLine($"include {CreateNinjaFilePath(path)}");
             }
+            fileGenerator.WriteLine($"");
 
             string fullProjectPath = FullProjectPath(project);
 
@@ -565,6 +591,7 @@ namespace Sharpmake.Generators.Generic
             fileGenerator.WriteLine($"# Make sure we have the right version of Ninja");
             fileGenerator.WriteLine($"ninja_required_version = 1.1");
             fileGenerator.WriteLine($"builddir = .ninja");
+            fileGenerator.WriteLine($"");
         }
 
         private void GenerateRules(FileGenerator fileGenerator, GenerationContext context)
@@ -690,6 +717,8 @@ namespace Sharpmake.Generators.Generic
             switch (context.Configuration.Target.GetFragment<Compiler>())
             {
                 case Compiler.MSVC:
+                    flags.Add("/nologo"); // supress copyright banner in compiler
+                    flags.Add("/TP"); // treat all files on command line as C++ files
                     flags.Add(" /c"); // don't auto link
                     flags.Add($" /Fo\"{ninjaObjPath}\""); // obj output path
                     flags.Add($" /FS"); // force async pdb generation
@@ -699,6 +728,8 @@ namespace Sharpmake.Generators.Generic
                     flags.Add($" -o\"{ninjaObjPath}\""); // obj output path
                     break;
                 case Compiler.GCC:
+                    flags.Add(" -D_M_X64"); // used in corecrt_stdio_config.h
+                    flags.Add($" -o\"{ninjaObjPath}\""); // obj output path
                     flags.Add(" -c"); // don't auto link
                     break;
                 default:
@@ -713,6 +744,32 @@ namespace Sharpmake.Generators.Generic
                 }
             }
 
+            int index = context.Configuration.Options.FindIndex(x => x.GetType() == typeof(Options.Vc.Compiler.CppLanguageStandard));
+            if (index != -1)
+            {
+                object option = context.Configuration.Options[index];
+                Options.Vc.Compiler.CppLanguageStandard cppStandard = (Options.Vc.Compiler.CppLanguageStandard)option;
+
+                //switch (cppStandard)
+                //{
+                //    case Options.Vc.Compiler.CppLanguageStandard.CPP14:
+                //        flags.Add($" {CompilerFlagLookupTable.Get(context.Compiler, CompilerFlag.Define)}_MSVC_LANG=201402L");
+                //        break;
+                //    case Options.Vc.Compiler.CppLanguageStandard.CPP17:
+                //        flags.Add($" {CompilerFlagLookupTable.Get(context.Compiler, CompilerFlag.Define)}_MSVC_LANG=201703L");
+                //        break;
+                //    case Options.Vc.Compiler.CppLanguageStandard.CPP20:
+                //        flags.Add($" {CompilerFlagLookupTable.Get(context.Compiler, CompilerFlag.Define)}_MSVC_LANG=202002L");
+                //        break;
+                //    case Options.Vc.Compiler.CppLanguageStandard.Latest:
+                //        flags.Add($" {CompilerFlagLookupTable.Get(context.Compiler, CompilerFlag.Define)}_MSVC_LANG=202004L");
+                //        break;
+                //    default:
+                //        flags.Add($" {CompilerFlagLookupTable.Get(context.Compiler, CompilerFlag.Define)}_MSVC_LANG=201402L");
+                //        break;
+                //}
+            }
+
             return flags;
         }
         private Strings GetImplicitLinkerFlags(GenerationContext context, string outputPath)
@@ -721,6 +778,7 @@ namespace Sharpmake.Generators.Generic
             switch (context.Configuration.Target.GetFragment<Compiler>())
             {
                 case Compiler.MSVC:
+                    flags.Add("/nologo"); // supress copyright banner in compiler
                     flags.Add($" /OUT:{outputPath}"); // Output file
                     if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
                     {
@@ -747,9 +805,19 @@ namespace Sharpmake.Generators.Generic
                     break;
                 case Compiler.GCC:
                     //flags += " -fuse-ld=lld"; // use the llvm lld linker
-                    flags.Add(" -nostartfiles"); // Do not use the standard system startup files when linking
-                    flags.Add(" -nostdlib"); // Do not use the standard system startup files or libraries when linking
-                    flags.Add($" -o {outputPath}"); // Output file
+                    //flags.Add(" -nostdlib"); // Do not use the standard system startup files or libraries when linking
+                    if (context.Configuration.Output != Project.Configuration.OutputType.Exe)
+                    {
+                        flags.Add($"qc {outputPath}"); // Output file
+                    }
+                    else
+                    {
+                        flags.Add($"-o {outputPath}"); // Output file
+                    }
+                    if (context.Configuration.Output == Project.Configuration.OutputType.Dll)
+                    {
+                        flags.Add(" -shared");
+                    }
                     break;
                 default:
                     throw new Error("Unknown Compiler used for implicit linker flags");
@@ -780,10 +848,10 @@ namespace Sharpmake.Generators.Generic
                         linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
                         break;
                     case Compiler.GCC:
-                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
-                        linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
-                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
-                        linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
+                        //linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/lib/x64\"");
+                        //linkPath.Add("\"D:/Tools/MSVC/install/14.29.30133/atlmfc/lib/x64\"");
+                        //linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/ucrt/x64\"");
+                        //linkPath.Add("\"D:/Tools/Windows SDK/10.0.19041.0/lib/um/x64\"");
                         break;
                 }
             }
@@ -828,17 +896,17 @@ namespace Sharpmake.Generators.Generic
                     linkLibraries.Add("libcmt.lib");
                     break;
                 case Compiler.GCC:
-                    linkLibraries.Add("kernel32");
-                    linkLibraries.Add("user32");
-                    linkLibraries.Add("gdi32");
-                    linkLibraries.Add("winspool");
-                    linkLibraries.Add("shell32");
-                    linkLibraries.Add("ole32");
-                    linkLibraries.Add("oleaut32");
-                    linkLibraries.Add("uuid");
-                    linkLibraries.Add("comdlg32");
-                    linkLibraries.Add("advapi32");
-                    linkLibraries.Add("oldnames");
+                    //linkLibraries.Add("kernel32");
+                    //linkLibraries.Add("user32");
+                    //linkLibraries.Add("gdi32");
+                    //linkLibraries.Add("winspool");
+                    //linkLibraries.Add("shell32");
+                    //linkLibraries.Add("ole32");
+                    //linkLibraries.Add("oleaut32");
+                    //linkLibraries.Add("uuid");
+                    //linkLibraries.Add("comdlg32");
+                    //linkLibraries.Add("advapi32");
+                    //linkLibraries.Add("oldnames");
                     break;
             }
 
@@ -910,6 +978,8 @@ namespace Sharpmake.Generators.Generic
                     return FilterMsvcLinkerFlags(flags, context);
                 case Compiler.Clang:
                     return FilterClangLinkerFlags(flags, context);
+                case Compiler.GCC:
+                    return FilterGccLinkerFlags(flags, context);
                 default:
                     throw new Error($"Not linker flag filtering implemented for compiler {context.Compiler}");
             }
@@ -941,6 +1011,22 @@ namespace Sharpmake.Generators.Generic
             return flags;
         }
         private Strings FilterClangLinkerFlags(Strings flags, GenerationContext context)
+        {
+            switch (context.Configuration.Output)
+            {
+                case Project.Configuration.OutputType.Exe:
+                    break;
+                case Project.Configuration.OutputType.Lib:
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    break;
+                default:
+                    break;
+            }
+
+            return flags;
+        }
+        private Strings FilterGccLinkerFlags(Strings flags, GenerationContext context)
         {
             switch (context.Configuration.Output)
             {
