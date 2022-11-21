@@ -344,21 +344,13 @@ namespace Sharpmake.Generators.Generic
                     }
                 }
 
-                filePaths.Add(GetPerConfigFilePath(context));
+                filePaths.Add(GetPerConfigFilePath(context.Configuration, context.Compiler));
             }
 
             var fileGenerator = new FileGenerator();
 
             GenerateHeader(fileGenerator);
 
-            fileGenerator.WriteLine($"# Dependencies");
-            foreach (var path in dependencyFilePaths)
-            {
-                fileGenerator.WriteLine($"include {CreateNinjaFilePath(path)}");
-            }
-
-            fileGenerator.WriteLine($"");
-            fileGenerator.WriteLine($"# Ninja files");
             foreach (var path in filePaths)
             {
                 fileGenerator.WriteLine($"include {CreateNinjaFilePath(path)}");
@@ -404,6 +396,16 @@ namespace Sharpmake.Generators.Generic
             var fileGenerator = new FileGenerator();
 
             GenerateHeader(fileGenerator);
+
+            fileGenerator.WriteLine("# Dependencies");
+            foreach (var dependency in context.Configuration.ResolvedDependencies)
+            {
+                var compiler = dependency.Target.GetFragment<Compiler>();
+                var path = GetPerConfigFilePath(dependency, compiler);
+                fileGenerator.WriteLine($"include {CreateNinjaFilePath(path)}");
+            }
+            fileGenerator.WriteLine("");
+
             GenerateRules(fileGenerator, context);
 
             fileGenerator.RemoveTaggedLines();
@@ -420,7 +422,7 @@ namespace Sharpmake.Generators.Generic
 
             GenerateProjectBuilds(fileGenerator, context);
 
-            string filePath = GetPerConfigFilePath(context);
+            string filePath = GetPerConfigFilePath(context.Configuration, context.Compiler);
 
             if (SaveFileGeneratorToDisk(fileGenerator, context, filePath))
             {
@@ -445,9 +447,8 @@ namespace Sharpmake.Generators.Generic
                 File.Delete(outputPath);
             }
             
-
             string ninjaFilePath = KitsRootPaths.GetNinjaPath();
-            string command = $"-f {GetPerConfigFilePath(context)} {Template.CompDBBuildStatement(context)} --quiet >> {outputPath}";
+            string command = $"-f {GetPerConfigFilePath(context.Configuration, context.Compiler)} {Template.CompDBBuildStatement(context)} --quiet >> {outputPath}";
 
             Process process = new Process();
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -458,9 +459,9 @@ namespace Sharpmake.Generators.Generic
             process.Start();
         }
 
-        private string GetPerConfigFileName(GenerationContext context)
+        private string GetPerConfigFileName(Project.Configuration config, Compiler compiler)
         {
-            return $"{context.Project.Name}.{context.Configuration.Name}.{context.Compiler}{ProjectExtension}";
+            return $"{config.Project.Name}.{config.Name}.{compiler}{ProjectExtension}";
         }
 
         private string GetCompilerDBPath(GenerationContext context)
@@ -468,9 +469,9 @@ namespace Sharpmake.Generators.Generic
             return $"{Path.Combine(context.Configuration.ProjectPath, "clang_tools", $"{Template.PerConfigFolderFormat(context)}", "compile_commands.json")}";
         }
 
-        private string GetPerConfigFilePath(GenerationContext context)
+        private string GetPerConfigFilePath(Project.Configuration config, Compiler compiler)
         {
-            return Path.Combine(context.Configuration.ProjectPath, "ninja", GetPerConfigFileName(context));
+            return Path.Combine(config.ProjectPath, "ninja", GetPerConfigFileName(config, compiler));
         }
 
         private static void WriteIfNotEmpty(FileGenerator fileGenerator, string key, string value)
@@ -623,14 +624,14 @@ namespace Sharpmake.Generators.Generic
             // Cleaning
             fileGenerator.WriteLine($"# Rule to clean all built files");
             fileGenerator.WriteLine($"{Template.RuleBegin}{Template.RuleStatement.Clean(context)}");
-            fileGenerator.WriteLine($"{Template.CommandBegin}{KitsRootPaths.GetNinjaPath()} -f {GetPerConfigFilePath(context)} -t clean");
+            fileGenerator.WriteLine($"{Template.CommandBegin}{KitsRootPaths.GetNinjaPath()} -f {GetPerConfigFilePath(context.Configuration, context.Compiler)} -t clean");
             fileGenerator.WriteLine($"{Template.DescriptionBegin}Cleaning all build files");
             fileGenerator.WriteLine($"");
 
             // Compiler DB
             fileGenerator.WriteLine($"# Rule to generate compiler db");
             fileGenerator.WriteLine($"{Template.RuleBegin}{Template.RuleStatement.CompilerDB(context)}");
-            fileGenerator.WriteLine($"{Template.CommandBegin}{KitsRootPaths.GetNinjaPath()} -f {GetPerConfigFilePath(context)} -t compdb {Template.RuleStatement.CompileCppFile(context)}");
+            fileGenerator.WriteLine($"{Template.CommandBegin}{KitsRootPaths.GetNinjaPath()} -f {GetPerConfigFilePath(context.Configuration, context.Compiler)} -t compdb {Template.RuleStatement.CompileCppFile(context)}");
             fileGenerator.WriteLine($"");
         }
 
