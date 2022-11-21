@@ -3529,6 +3529,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             SelectOption
             (
+                Options.Option(Options.CSharp.GenerateBindingRedirectsOutputType.Enabled, () => { options["GenerateBindingRedirectsOutputType"] = "True"; }),
+                Options.Option(Options.CSharp.GenerateBindingRedirectsOutputType.Disabled, () => { options["GenerateBindingRedirectsOutputType"] = RemoveLineTag; })
+            );
+
+            SelectOption
+            (
             Options.Option(Options.CSharp.SonarQubeExclude.Disabled, () => { options["SonarQubeExclude"] = RemoveLineTag; }),
             Options.Option(Options.CSharp.SonarQubeExclude.Enabled, () => { options["SonarQubeExclude"] = "True"; })
             );

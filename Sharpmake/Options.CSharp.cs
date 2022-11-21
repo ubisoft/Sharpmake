@@ -600,6 +600,13 @@ namespace Sharpmake
                 Disabled
             }
 
+            public enum GenerateBindingRedirectsOutputType
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
             /// <summary>
             /// Exclude from SonarQube C# static analysis
             /// </summary>
