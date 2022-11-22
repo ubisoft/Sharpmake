@@ -25,6 +25,8 @@ if not defined VSMSBUILDCMD (
     goto error
 )
 
+SET MSBUILDLOGFILE="tmp/msbuild/windows/msbuild_%~2.binlog"
+
 echo MSBuild batch path: !VSMSBUILDCMD!
 call !VSMSBUILDCMD!
 if %errorlevel% NEQ 0 goto error
@@ -54,7 +56,7 @@ goto success
 :BuildSharpmakeDotnet
 echo Compiling %~1 in "%~2|%~3"...
 
-set DOTNET_BUILD_CMD=dotnet build "%~1" -nologo -v m -c "%~2"
+set DOTNET_BUILD_CMD=dotnet build "%~1" -nologo -v m -c "%~2" -bl:%MSBUILDLOGFILE%
 echo %DOTNET_BUILD_CMD%
 %DOTNET_BUILD_CMD%
 set ERROR_CODE=%errorlevel%
@@ -69,7 +71,7 @@ goto success
 :BuildSharpmakeMSBuild
 echo Compiling %~1 in "%~2|%~3"...
 
-set MSBUILD_CMD=msbuild -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3" /maxcpucount /p:CL_MPCount=%NUMBER_OF_PROCESSORS%
+set MSBUILD_CMD=msbuild -bl:%MSBUILDLOGFILE% -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true "%~1" /nologo /verbosity:m /p:Configuration="%~2" /p:Platform="%~3" /maxcpucount /p:CL_MPCount=%NUMBER_OF_PROCESSORS%
 echo %MSBUILD_CMD%
 %MSBUILD_CMD%
 set ERROR_CODE=%errorlevel%

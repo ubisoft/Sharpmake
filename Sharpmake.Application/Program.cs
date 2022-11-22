@@ -158,19 +158,10 @@ namespace Sharpmake.Application
         {
             if (CommandLine.ContainParameter("breakintodebugger"))
             {
-#if NETFRAMEWORK
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
+                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                 {
-                    System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
-                }
-                else
-#endif
-                {
-                    Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
-                    while (Console.ReadKey(true).Key != ConsoleKey.Enter)
-                    {
-                        Console.WriteLine("Press ENTER to continue");
-                    }
+                    Console.WriteLine("Press ENTER to continue");
                 }
                 Debugger.Break();
             }

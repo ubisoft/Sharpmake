@@ -1812,6 +1812,8 @@ namespace Sharpmake.Generators.FastBuild
 
             var fastbuildUnityInputExcludePathList = new Strings(project.SourcePathsBlobExclude.Select(Util.GetCapitalizedPath));
 
+            string fastBuildUnityInputIsolateListFile = FileGeneratorUtilities.RemoveLineTag;
+
             bool srcDirsAreEmpty = true;
             var items = new List<string>();
 
@@ -1915,6 +1917,9 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildUnityInputPattern = UtilityMethods.FBuildCollectionFormat(inputPatterns, spaceLength);
             }
 
+            if (!string.IsNullOrEmpty(conf.FastBuildUnityInputIsolateListFile))
+                fastBuildUnityInputIsolateListFile = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectoryCapitalized, conf.FastBuildUnityInputIsolateListFile, true));
+
             Unity unityFile = new Unity
             {
                 // Note that the UnityName and UnityOutputPattern are intentionally left empty: they will be set in the Resolve
@@ -1922,6 +1927,7 @@ namespace Sharpmake.Generators.FastBuild
                 UnityFullOutputPath = Path.Combine(context.ProjectDirectoryCapitalized, conf.FastBuildUnityPath),
                 UnityInputIsolateWritableFiles = conf.FastBuildUnityInputIsolateWritableFiles.ToString().ToLower(),
                 UnityInputIsolateWritableFilesLimit = conf.FastBuildUnityInputIsolateWritableFiles ? conf.FastBuildUnityInputIsolateWritableFilesLimit.ToString() : FileGeneratorUtilities.RemoveLineTag,
+                UnityInputIsolateListFile = fastBuildUnityInputIsolateListFile,
                 UnityPCH = conf.PrecompHeader ?? FileGeneratorUtilities.RemoveLineTag,
                 UnityInputExcludePath = fastBuildUnityInputExcludePath,
                 UnityNumFiles = fastBuildUnityCount,
