@@ -1067,6 +1067,16 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.EnableAsan.Enable, () => { context.Options["EnableASAN"] = "true"; context.CommandLineOptions["EnableASAN"] = "/fsanitize=address"; })
             );
 
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.JumboBuild.Disable, () => { context.Options["JumboBuild"] = FileGeneratorUtilities.RemoveLineTag; context.Options["MaxFilesPerUnityFile"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Compiler.JumboBuild.Enable, () => 
+            { 
+                context.Options["JumboBuild"] = "true";
+                context.Options["MaxFilesPerUnityFile"] = context.Configuration.MaxFilesPerUnityFile.ToString(); 
+            })
+            );
+
             if (context.DevelopmentEnvironment.IsVisualStudio() && context.DevelopmentEnvironment >= DevEnv.vs2017)
             {
                 //Options.Vc.Compiler.DefineCPlusPlus. See: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
