@@ -44,9 +44,9 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("0.21.1.0")]
+[assembly: AssemblyVersion("0.22.0.0")]
 #pragma warning disable CS7035
-[assembly: AssemblyFileVersion("0.21.1.0 (LocalBuild)")]
+[assembly: AssemblyFileVersion("0.22.0.0 (LocalBuild)")]
 #pragma warning restore
 
 [assembly: InternalsVisibleTo("Sharpmake.Application")]
