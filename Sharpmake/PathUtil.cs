@@ -819,6 +819,7 @@ namespace Sharpmake
             var pathsChunks = paths.Select(p => PathMakeStandard(p).Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
             if (pathsChunks.Any())
             {
+                bool firstCharIsPathSeparator = UsesUnixSeparator ? paths.Any(p => p[0] == UnixSeparator) : false;
                 var firstPathChunks = pathsChunks.First();
                 bool foundSomeCommonChunks = false;
                 int commonPathIndex = 0;
@@ -841,7 +842,10 @@ namespace Sharpmake
                 while (true);
 
                 if (foundSomeCommonChunks)
-                    return string.Join(Path.DirectorySeparatorChar.ToString(), firstPathChunks.Take(commonPathIndex));
+                {
+                    var commonRootPath = string.Join(Path.DirectorySeparatorChar.ToString(), firstPathChunks.Take(commonPathIndex));
+                    return firstCharIsPathSeparator ? UnixSeparator.ToString() + commonRootPath : commonRootPath;
+                }
             }
             return null;
         }

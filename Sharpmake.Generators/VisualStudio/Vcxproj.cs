@@ -182,7 +182,7 @@ namespace Sharpmake.Generators.VisualStudio
                 relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
                 // Build the command.
                 string command = string.Format(
-                    "{0} {1}",
+                    "\"{0}\" {1}",
                     relativeBuildStep.Executable,
                     relativeBuildStep.ExecutableArguments
                 );

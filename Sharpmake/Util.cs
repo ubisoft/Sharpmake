@@ -23,9 +23,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-#if NET5_0_OR_GREATER
 using System.Runtime.Versioning;
-#endif
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -207,9 +205,27 @@ namespace Sharpmake
             return generationOutput;
         }
 
+        public static GenerationOutput FileWriteIfDifferent(string outputFilePath, IFileGenerator generator, GenerationOutput generationOutput = null)
+        {
+            if (generationOutput == null)
+                generationOutput = new GenerationOutput();
+
+            if (FileWriteIfDifferent(new FileInfo(outputFilePath), generator))
+                generationOutput.Generated.Add(outputFilePath);
+            else
+                generationOutput.Skipped.Add(outputFilePath);
+
+            return generationOutput;
+        }
+
         public static bool FileWriteIfDifferent(FileInfo file, MemoryStream stream)
         {
             return Builder.Instance.Context.WriteGeneratedFile(null, file, stream);
+        }
+
+        public static bool FileWriteIfDifferent(FileInfo file, IFileGenerator generator)
+        {
+            return Builder.Instance.Context.WriteGeneratedFile(null, file, generator);
         }
 
         internal static bool RecordInAutoCleanupDatabase(string fullPath)
@@ -299,22 +315,6 @@ namespace Sharpmake
                             var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(dbAsJson, GetCleanupDatabaseJsonSerializerOptions());
                             dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
                         }
-#if NETFRAMEWORK
-                        else if (version == 2)
-                        {
-                            // Read the list of files.
-                            IFormatter formatter = new BinaryFormatter();
-                            var tmpDbFiles = (Dictionary<string, DateTime>)formatter.Deserialize(readStream);
-                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
-                        }
-                        else if (version == 1)
-                        {
-                            IFormatter formatter = new BinaryFormatter();
-                            ConcurrentDictionary<string, bool> dbFilesV1 = (ConcurrentDictionary<string, bool>)formatter.Deserialize(readStream);
-                            DateTime now = DateTime.Now;
-                            dbFiles = dbFilesV1.ToDictionary(kvp => kvp.Key, kvp => now);
-                        }
-#endif
                         else
                         {
                             LogWrite("Warning: found cleanup database in incompatible format v{0}, skipped.", version);
@@ -1107,13 +1107,8 @@ namespace Sharpmake
 
         private static bool IsVisualStudioInstalled(DevEnv devEnv)
         {
-#if NET5_0_OR_GREATER
             if (!OperatingSystem.IsWindows())
                 return false;
-#else
-            if (!GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
-                return false;
-#endif
 
             string registryKeyString = string.Format(
                 @"SOFTWARE{0}\Microsoft\VisualStudio\SxS\VS7",
@@ -1644,17 +1639,13 @@ namespace Sharpmake
             return (x << r) | (x >> (32 - r));
         }
 
-#if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
         public static object ReadRegistryValue(string key, string value, object defaultValue = null)
         {
             return Registry.GetValue(key, value, defaultValue);
         }
 
-#if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
         public static string[] GetRegistryLocalMachineSubKeyNames(string path)
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(path);
@@ -1679,11 +1670,7 @@ namespace Sharpmake
 
             string key = string.Empty;
 
-#if NET5_0_OR_GREATER
             if (OperatingSystem.IsWindows())
-#else
-            if (GetExecutingPlatform().HasAnyFlag(Platform.win32 | Platform.win64))
-#endif
             {
                 try
                 {

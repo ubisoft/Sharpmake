@@ -41,6 +41,7 @@ Exec( 'GenerateHeader' )
 #include ".\simpleexewithlib_vs2019_win64.bff"
 #include ".\spanmultiplesrcdirsfbunityexclude_vs2019_win64.bff"
 #include ".\spanmultiplesrcdirsfbunityinclude_vs2019_win64.bff"
+#include ".\spanmultiplesrcdirsfbunityisolate_vs2019_win64.bff"
 #include ".\useprecompexe_vs2019_win64.bff"
 #include ".\spanmultiplesrcdirsfbnoblobexclude_vs2019_win64.bff"
 #include ".\spanmultiplesrcdirsfbnoblobinclude_vs2019_win64.bff"

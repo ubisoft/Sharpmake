@@ -71,7 +71,7 @@ namespace Sharpmake.Application
             public bool GenerateDebugSolutionOnly = false;
             public string DebugSolutionStartArguments = string.Empty;
             public string DebugSolutionPath = string.Empty;
-            public DevEnv DebugSolutionDevEnv = DevEnv.vs2019;
+            public DevEnv DebugSolutionDevEnv = DebugProjectGenerator.DefaultDevEnv;
 
             [CommandLine.Option("sources", @"sharpmake sources files: ex: /sources( ""project1.sharpmake"", ""..\..\project2.sharpmake"" )")]
             public void SetSources(params string[] files)

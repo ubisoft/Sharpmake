@@ -52,6 +52,29 @@ namespace Sharpmake.BuildContext
             Util.FileWriteIfDifferentInternal(alternateFileInfo, stream, bypassAutoCleanupDatabase: true);
         }
 
+        public override bool WriteGeneratedFile(Type type, FileInfo path, IFileGenerator generator)
+        {
+            if (!_writeGeneratedFiles)
+                return generator.IsFileDifferent(path);
+
+            WriteToSecondaryPath(path, generator);
+            return generator.FileWriteIfDifferent(path);
+        }
+
+        internal static void WriteToSecondaryPath(FileInfo file, IFileGenerator generator)
+        {
+            // If a secondary path was specified to the commandline, also write a file under that folder with
+            // full path hierarchy.
+            if (s_fileWritesSecondaryPath == string.Empty)
+                return;
+
+            string alternateFilePath = file.FullName;
+            if (Path.IsPathRooted(file.FullName))
+                alternateFilePath = file.FullName.Substring(Path.GetPathRoot(file.FullName).Length);
+            FileInfo alternateFileInfo = new FileInfo(Path.Combine(s_fileWritesSecondaryPath, alternateFilePath));
+            generator.FileWriteIfDifferent(alternateFileInfo, bypassAutoCleanupDatabase: true);
+        }
+
         public override bool WriteLog { get { return _writeLog; } }
     }
 }
