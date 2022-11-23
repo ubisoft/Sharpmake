@@ -650,8 +650,12 @@ namespace Sharpmake.Generators.Generic
                 compileStatement.DepPath = objPath;
                 compileStatement.ImplicitCompilerFlags = GetImplicitCompilerFlags(context, objPath);
                 compileStatement.CompilerFlags = GetCompilerFlags(context);
-                compileStatement.Includes = context.Configuration.IncludePaths;
-                compileStatement.SystemIncludes = context.Configuration.IncludeSystemPaths;
+                OrderableStrings includePaths = context.Configuration.IncludePaths;
+                includePaths.AddRange(context.Configuration.DependenciesIncludePaths);
+                compileStatement.Includes = includePaths;
+                OrderableStrings systemIncludePaths = context.Configuration.IncludeSystemPaths;
+                systemIncludePaths.AddRange(context.Configuration.DependenciesIncludeSystemPaths);
+                compileStatement.SystemIncludes = systemIncludePaths;
                 compileStatement.TargetFilePath = context.Configuration.LinkerPdbFilePath;
 
                 statements.Add(compileStatement);
@@ -856,7 +860,6 @@ namespace Sharpmake.Generators.Generic
                         break;
                 }
             }
-
             return linkPath;
         }
 
