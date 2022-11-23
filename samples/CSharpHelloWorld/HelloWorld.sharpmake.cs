@@ -40,7 +40,7 @@ namespace CSharpHelloWorld
             };
         }
     }
-    
+
     [Sharpmake.Generate]
     public class HelloWorld : CSharpProject
     {

@@ -510,7 +510,7 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false";cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false"; cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.Compiler.PositionIndependentCode.Enable, () => { options["PositionIndependentCode"] = "true"; cmdLineOptions["PositionIndependentCode"] = "-fpic"; })
                 );
             }

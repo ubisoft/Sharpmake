@@ -113,7 +113,7 @@ namespace CLR_SharpmakeTest
 
             // Force full pdb otherwise we get this message: /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
             conf.Options.Add(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable);
-            
+
             // Force RTTI to be enabled
             conf.Options.Add(Sharpmake.Options.Vc.Compiler.RTTI.Enable);
         }

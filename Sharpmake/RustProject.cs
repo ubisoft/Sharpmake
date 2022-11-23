@@ -36,7 +36,7 @@ namespace Sharpmake
         /// </summary>
         protected readonly string ManifestPath;
 
-        private CargoBuildStep cargoBuildStep;
+        private CargoBuildStep _cargoBuildStep;
 
         /// <summary>
         /// Constructs a Rust project.
@@ -91,8 +91,8 @@ namespace Sharpmake
                     throw new ArgumentException(String.Format("Unknown library extension for platform: {0}", target.Platform));
             }
 
-            cargoBuildStep = new CargoBuildStep(target, CargoTargetDir, ManifestPath, libName);
-            conf.CustomFileBuildSteps.Add(cargoBuildStep);
+            _cargoBuildStep = new CargoBuildStep(target, CargoTargetDir, ManifestPath, libName);
+            conf.CustomFileBuildSteps.Add(_cargoBuildStep);
 
             conf.TargetCopyFiles.Add(Path.Combine(CargoTargetDir, "[target.Optimization]", libName));
         }
@@ -102,7 +102,7 @@ namespace Sharpmake
             base.PostResolve();
 
             // Add Rust source files as dependency
-            cargoBuildStep.AdditionalInputs.AddRange(ResolvedSourceFiles);
+            _cargoBuildStep.AdditionalInputs.AddRange(ResolvedSourceFiles);
         }
 
         public class CargoBuildStep : Configuration.CustomFileBuildStep

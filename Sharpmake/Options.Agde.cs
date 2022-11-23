@@ -67,7 +67,7 @@ namespace Sharpmake
                 /// <summary>
                 /// The apk file used for debugging which can be set per configuration, is usually for FastBuild configuration.
                 /// </summary>
-                public class AndroidApkLocation: PathOption
+                public class AndroidApkLocation : PathOption
                 {
                     public AndroidApkLocation(string androidApkLocation) : base(androidApkLocation) { }
                 }

@@ -86,16 +86,16 @@ namespace Sharpmake
             GC.SuppressFinalize(this);
         }
 
-        [Obsolete("This can't work on .net 6. Dead code", error:true)]
+        [Obsolete("This can't work on .net 6. Dead code", error: true)]
         public bool IsExtension(string assemblyPath)
         {
             return false;
         }
 
-        [Obsolete("This can't work on .net 6. Dead code", error:true)]
+        [Obsolete("This can't work on .net 6. Dead code", error: true)]
         public Assembly LoadExtension(string assemblyPath, bool fastLoad)
         {
-           return null;
+            return null;
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Sharpmake
             }
         }
 
-        [Obsolete("This can't work on .net 6. Dead code", error:true)]
+        [Obsolete("This can't work on .net 6. Dead code", error: true)]
         public IEnumerable<Assembly> LoadExtensionsInDirectory(string directory)
         {
             return null;

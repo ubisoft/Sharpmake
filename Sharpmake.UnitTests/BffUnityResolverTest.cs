@@ -126,16 +126,16 @@ namespace Sharpmake.UnitTests
 
         public class UnityResolverLogger : Bff.IUnityResolver
         {
-            private Bff.IUnityResolver UnityResolver;
+            private Bff.IUnityResolver _unityResolver;
 
             public UnityResolverLogger(Bff.IUnityResolver resolver)
             {
-                UnityResolver = resolver;
+                _unityResolver = resolver;
             }
 
             public void ResolveUnities(Project project, string projectPath, ref Dictionary<Bff.Unity, List<Project.Configuration>> unities)
             {
-                UnityResolver.ResolveUnities(project, projectPath, ref unities);
+                _unityResolver.ResolveUnities(project, projectPath, ref unities);
 
                 foreach (var unitySection in unities)
                 {

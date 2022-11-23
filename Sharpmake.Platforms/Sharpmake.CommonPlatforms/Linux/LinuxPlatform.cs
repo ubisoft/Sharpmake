@@ -198,7 +198,6 @@ namespace Sharpmake
                 string sysRoot = Sharpmake.Options.PathOption.Get<Options.General.SysRoot>(context.Configuration, rootpath: context.ProjectDirectoryCapitalized);
                 string bffSysRoot = Bff.CurrentBffPathKeyCombine(sysRoot);
                 context.CommandLineOptions["BffSysRoot"] = $" --sysroot=\"{bffSysRoot}\"";
-
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
