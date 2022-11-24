@@ -1009,9 +1009,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string projectDependenciesCopyLocal = firstConf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences).ToString().ToLower();
 
                 Options.ExplicitOptions options = new Options.ExplicitOptions();
-                options["ReferenceOutputAssembly"] = FileGeneratorUtilities.RemoveLineTag;
                 options["CopyLocalSatelliteAssemblies"] = FileGeneratorUtilities.RemoveLineTag;
-                options["LinkLibraryDependencies"] = FileGeneratorUtilities.RemoveLineTag;
                 options["UseLibraryDependencyInputs"] = FileGeneratorUtilities.RemoveLineTag;
 
                 // The check for the blobbed is so we add references to blobed projects over non blobed projects.
@@ -1021,16 +1019,17 @@ namespace Sharpmake.Generators.VisualStudio
                 var privateDotNetDependenciesConf = context.ProjectConfigurations.Where(x => x.IsBlobbed).FirstOrDefault(x => x.DotNetPrivateDependencies.Count > 0) ??
                                                     context.ProjectConfigurations.FirstOrDefault(x => x.DotNetPrivateDependencies.Count > 0);
 
-                var dotNetDependenciesLists = new List<IEnumerable<Project.Configuration>>();
+                var dotNetDependenciesLists = new List<IEnumerable<DotNetDependency>>();
                 if (publicDotNetDependenciesConf != null)
-                    dotNetDependenciesLists.Add(publicDotNetDependenciesConf.DotNetPublicDependencies.Select(x => x.Configuration));
+                    dotNetDependenciesLists.Add(publicDotNetDependenciesConf.DotNetPublicDependencies);
                 if (privateDotNetDependenciesConf != null)
-                    dotNetDependenciesLists.Add(privateDotNetDependenciesConf.DotNetPrivateDependencies.Select(x => x.Configuration));
+                    dotNetDependenciesLists.Add(privateDotNetDependenciesConf.DotNetPrivateDependencies);
 
                 foreach (var dotNetDependencies in dotNetDependenciesLists)
                 {
-                    foreach (var dependency in dotNetDependencies)
+                    foreach (var dotNetDependency in dotNetDependencies)
                     {
+                        var dependency = dotNetDependency.Configuration;
                         // Don't add any Fastbuild deps to fastbuild projects, that's already handled
                         if (fastbuildOnly && dependency.IsFastBuild)
                             continue;
@@ -1047,16 +1046,14 @@ namespace Sharpmake.Generators.VisualStudio
                                 dependency.ProjectGuid = ReadGuidFromProjectFile(dependency);
                         }
 
+                        bool? linkLibraryDependencies = dotNetDependency.ReferenceOutputAssembly;
                         // avoid linking with .lib from a dependency that doesn't create a lib
-                        if (dependency.Output == Project.Configuration.OutputType.DotNetClassLibrary &&
-                           !dependency.CppCliExportsNativeLib)
+                        if (dependency.Output == Project.Configuration.OutputType.DotNetClassLibrary && !dependency.CppCliExportsNativeLib)
                         {
-                            options["LinkLibraryDependencies"] = "false";
+                            linkLibraryDependencies = false;
                         }
-                        else
-                        {
-                            options["LinkLibraryDependencies"] = FileGeneratorUtilities.RemoveLineTag;
-                        }
+                        options["ReferenceOutputAssembly"] = (dotNetDependency.ReferenceOutputAssembly == false) ? "false" : FileGeneratorUtilities.RemoveLineTag;
+                        options["LinkLibraryDependencies"] = (linkLibraryDependencies == false) ? "false" : FileGeneratorUtilities.RemoveLineTag;
 
                         using (projectFilesWriter.Declare("include", include))
                         using (projectFilesWriter.Declare("projectGUID", dependency.ProjectGuid ?? FileGeneratorUtilities.RemoveLineTag))
