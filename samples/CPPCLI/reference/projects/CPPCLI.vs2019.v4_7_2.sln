@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCSharpConsole", "TestCS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLRCPPProj", "clrcppproj.vs2019.v4_7_2.vcxproj", "{3EB6F23B-6AF0-875B-6F8E-D1449D6B0280}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpProjBuildOrderDependency", "CSharpProjBuildOrderDependency.vs2019.v4_7_2.csproj", "{091EF017-0E3A-BA28-97CD-714D759BD4DF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtherCSharpProj", "OtherCSharpProj.vs2019.v4_7_2.csproj", "{81B57E84-A2EB-53E8-8AAC-3847232697E6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "theEmptyCPPProject", "theemptycppproject.vs2019.v4_7_2.vcxproj", "{0B7B372C-D9BE-10C9-80D0-EB5C7ABCABAE}"
@@ -24,6 +26,10 @@ Global
 		{3EB6F23B-6AF0-875B-6F8E-D1449D6B0280}.Debug|Win32.Build.0 = Debug|Win32
 		{3EB6F23B-6AF0-875B-6F8E-D1449D6B0280}.Release|Win32.ActiveCfg = Release|Win32
 		{3EB6F23B-6AF0-875B-6F8E-D1449D6B0280}.Release|Win32.Build.0 = Release|Win32
+		{091EF017-0E3A-BA28-97CD-714D759BD4DF}.Debug|Win32.ActiveCfg = Debug|x86
+		{091EF017-0E3A-BA28-97CD-714D759BD4DF}.Debug|Win32.Build.0 = Debug|x86
+		{091EF017-0E3A-BA28-97CD-714D759BD4DF}.Release|Win32.ActiveCfg = Release|x86
+		{091EF017-0E3A-BA28-97CD-714D759BD4DF}.Release|Win32.Build.0 = Release|x86
 		{81B57E84-A2EB-53E8-8AAC-3847232697E6}.Debug|Win32.ActiveCfg = Debug|x86
 		{81B57E84-A2EB-53E8-8AAC-3847232697E6}.Debug|Win32.Build.0 = Debug|x86
 		{81B57E84-A2EB-53E8-8AAC-3847232697E6}.Release|Win32.ActiveCfg = Release|x86

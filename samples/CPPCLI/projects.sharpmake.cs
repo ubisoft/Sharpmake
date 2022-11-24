@@ -91,6 +91,12 @@ namespace CLR_SharpmakeTest
     }
 
     [Sharpmake.Generate]
+    public class CSharpProjBuildOrderDependency : CommonCSharpProject
+    {
+        public CSharpProjBuildOrderDependency() { }
+    }
+    
+    [Sharpmake.Generate]
     public class CLR_CPP_Proj : CommonProject
     {
         public CLR_CPP_Proj()
@@ -108,7 +114,8 @@ namespace CLR_SharpmakeTest
                 "System.Xml"
             );
 
-            conf.AddPrivateDependency<OtherCSharpProj>(target, DependencySetting.OnlyBuildOrder);
+            conf.AddPrivateDependency<OtherCSharpProj>(target);
+            conf.AddPrivateDependency<CSharpProjBuildOrderDependency>(target, DependencySetting.OnlyBuildOrder);
             conf.AddPrivateDependency<TheEmptyCPPProject>(target);
 
             // Force full pdb otherwise we get this message: /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL

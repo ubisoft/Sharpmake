@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCSharpConsole", "TestCS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLRCPPProj", "clrcppproj.vs2017.v4_6_2.vcxproj", "{C0644B52-BB9C-2014-B639-85C0C52355DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpProjBuildOrderDependency", "CSharpProjBuildOrderDependency.vs2017.v4_6_2.csproj", "{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtherCSharpProj", "OtherCSharpProj.vs2017.v4_6_2.csproj", "{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "theEmptyCPPProject", "theemptycppproject.vs2017.v4_6_2.vcxproj", "{CE7B50A6-EFE2-4A32-3204-AD7714A268F7}"
@@ -22,6 +24,10 @@ Global
 		{C0644B52-BB9C-2014-B639-85C0C52355DE}.Debug|Win32.Build.0 = Debug|Win32
 		{C0644B52-BB9C-2014-B639-85C0C52355DE}.Release|Win32.ActiveCfg = Release|Win32
 		{C0644B52-BB9C-2014-B639-85C0C52355DE}.Release|Win32.Build.0 = Release|Win32
+		{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}.Debug|Win32.ActiveCfg = Debug|x86
+		{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}.Debug|Win32.Build.0 = Debug|x86
+		{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}.Release|Win32.ActiveCfg = Release|x86
+		{CABE51EB-3AED-01E0-3DDB-A72DFBA0ECE5}.Release|Win32.Build.0 = Release|x86
 		{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}.Debug|Win32.ActiveCfg = Debug|x86
 		{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}.Debug|Win32.Build.0 = Debug|x86
 		{8E3BF86E-9B9B-F4D1-16B3-47F6070A6D5C}.Release|Win32.ActiveCfg = Release|x86
