@@ -82,6 +82,8 @@ namespace Sharpmake
                 Full,
                 [Default(DefaultTarget.Release)]
                 Pdbonly,
+                Portable,
+                Embedded,
                 None
             }
 
