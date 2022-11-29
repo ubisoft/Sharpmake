@@ -407,6 +407,12 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Options["AdditionalOptions"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
+            if (useClangCl && context.Options["AdditionalOptions"] != FileGeneratorUtilities.RemoveLineTag)
+            {
+                // need to use a special syntax when compiler is clang or Visual Studio will generate intellisense errors
+                context.Options["AdditionalOptions"] = context.Options["AdditionalOptions"].Replace("/std:c++", "/Clangstdc++");
+            }
+
             // Compiler section
 
             context.SelectOption
