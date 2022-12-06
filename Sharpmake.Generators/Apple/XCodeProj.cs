@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.Apple
@@ -883,14 +884,19 @@ namespace Sharpmake.Generators.Apple
             // TODO: make this an option
             linkerOptions.Add("-ObjC");
 
-            // TODO: fix this to use proper lib prefixing
-            linkerOptions.AddRange(libFiles.Select(library => "-l" + library));
+            // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
+            linkerOptions.AddRange(libFiles.Select(library => {
+                if (library.EndsWith(".a", StringComparison.OrdinalIgnoreCase) || library.EndsWith(".dylib", StringComparison.OrdinalIgnoreCase))
+                {
+                    string libName = Path.GetFileNameWithoutExtension(library);
+                    if (libName.StartsWith("lib"))
+                        libName = libName.Remove(0, 3);
+                    return "-l" + libName;
+                }
+                return "-l" + library;
+            }));
 
-            // TODO: when the above is fixed, we won't need this anymore
-            if (conf.Output == Project.Configuration.OutputType.Dll)
-                options["ExecutablePrefix"] = "lib";
-            else
-                options["ExecutablePrefix"] = RemoveLineTag;
+            options["ExecutablePrefix"] = RemoveLineTag;
 
             if (conf.DefaultOption == Options.DefaultTarget.Debug)
                 conf.Defines.Add("_DEBUG");
