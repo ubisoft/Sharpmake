@@ -885,7 +885,8 @@ namespace Sharpmake.Generators.Apple
             linkerOptions.Add("-ObjC");
 
             // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
-            linkerOptions.AddRange(libFiles.Select(library => {
+            linkerOptions.AddRange(libFiles.Select(library =>
+            {
                 if (library.EndsWith(".a", StringComparison.OrdinalIgnoreCase) || library.EndsWith(".dylib", StringComparison.OrdinalIgnoreCase))
                 {
                     string libName = Path.GetFileNameWithoutExtension(library);

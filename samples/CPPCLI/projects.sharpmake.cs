@@ -95,7 +95,7 @@ namespace CLR_SharpmakeTest
     {
         public CSharpProjBuildOrderDependency() { }
     }
-    
+
     [Sharpmake.Generate]
     public class CLR_CPP_Proj : CommonProject
     {
