@@ -1706,6 +1706,18 @@ namespace Sharpmake
             // below checks are very very very costly, may take up to about 20 sec for huge codebase.
             if (Builder.Instance.Diagnostics && Util.CountFakeFiles() == 0)
             {
+                // Cache the following File/Directory.Exists, avoiding redundant call for files in multiple configs
+                var pathExistsCache = new Dictionary<string, bool>(256);
+                bool PathExists(string path, Func<string, bool> checker)
+                {
+                    bool result;
+                    if (!pathExistsCache.TryGetValue(path, out result))
+                        pathExistsCache.Add(path, result = checker(path));
+                    return result;
+                }
+                bool FileExists(string path) => PathExists(path, File.Exists);
+                bool DirectoryExists(string path) => PathExists(path, Directory.Exists);
+
                 foreach (Configuration conf in Configurations)
                 {
                     var includePathsExcludeFromWarningRegex = RegexCache.GetCachedRegexes(IncludePathsExcludeFromWarningRegex).ToArray();
@@ -1722,7 +1734,7 @@ namespace Sharpmake
                     {
                         foreach (string file in array.Key)
                         {
-                            if (!File.Exists(file))
+                            if (!FileExists(file))
                             {
                                 ReportError($@"{conf.Project.SharpmakeCsFileName}: Error: File contained in {array.Value} doesn't exist: {file}.");
                             }
@@ -1739,7 +1751,7 @@ namespace Sharpmake
                     {
                         foreach (string file in array.Key)
                         {
-                            if (!File.Exists(file))
+                            if (!FileExists(file))
                             {
                                 ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: File contained in {array.Value} doesn't exist: {file}.", onlyWarn: true);
                             }
@@ -1752,7 +1764,7 @@ namespace Sharpmake
                     {
                         foreach (string folder in includeArray)
                         {
-                            if (!folder.StartsWith("$", StringComparison.Ordinal) && !includePathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
+                            if (!folder.StartsWith("$", StringComparison.Ordinal) && !includePathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !DirectoryExists(folder))
                             {
                                 ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: Folder contained in include paths doesn't exist: {folder}.", true);
                             }
@@ -1775,7 +1787,7 @@ namespace Sharpmake
                     string platformLibExtension = configTasks.GetDefaultOutputFullExtension(Configuration.OutputType.Lib);
                     foreach (string folder in allLibraryPaths)
                     {
-                        if (!folder.StartsWith("$", StringComparison.Ordinal) && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !Directory.Exists(folder))
+                        if (!folder.StartsWith("$", StringComparison.Ordinal) && !libraryPathsExcludeFromWarningRegex.Any(regex => regex.Match(folder).Success) && !DirectoryExists(folder))
                         {
                             ReportError($@"{conf.Project.SharpmakeCsFileName}: Warning: Folder contained in conf.LibraryPaths doesn't exist. Folder: {folder}.", true);
                         }
@@ -1786,7 +1798,7 @@ namespace Sharpmake
                             foreach (string file in allLibraryFiles)
                             {
                                 string path = Path.Combine(folder, file);
-                                if (File.Exists(path) || File.Exists(path + platformLibExtension) || File.Exists(Path.Combine(folder, platformLibPrefix + file + platformLibExtension)))
+                                if (FileExists(path) || FileExists(path + platformLibExtension) || FileExists(Path.Combine(folder, platformLibPrefix + file + platformLibExtension)))
                                     toRemove.Add(file);
                             }
 
@@ -1795,7 +1807,7 @@ namespace Sharpmake
                     }
 
                     // Add all rooted files that are missing
-                    allLibraryFiles.Add(allRootedFiles.Where(file => !File.Exists(file)).ToArray());
+                    allLibraryFiles.Add(allRootedFiles.Where(file => !FileExists(file)).ToArray());
 
                     // everything that remains is a missing library file
                     foreach (string file in allLibraryFiles)
