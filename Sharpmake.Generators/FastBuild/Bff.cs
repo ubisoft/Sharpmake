@@ -250,6 +250,7 @@ namespace Sharpmake.Generators.FastBuild
             // Start writing Bff
             Resolver resolver = new Resolver();
             var bffGenerator = new FileGenerator(resolver);
+            var bffGeneratorProject = new FileGenerator(resolver);
             var bffWholeFileGenerator = new FileGenerator(resolver);
 
             using (bffWholeFileGenerator.Declare("fastBuildProjectName", projectName))
@@ -1377,6 +1378,8 @@ namespace Sharpmake.Generators.FastBuild
                     }
                 }
 
+                bffGenerator.WriteTo(bffGeneratorProject);
+                bffGenerator.Clear();
                 ++configIndex;
             }
 
@@ -1413,16 +1416,15 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             // Now combine all the streams.
-            bffWholeFileGenerator.Write(bffGenerator.ToString());
+            bffGeneratorProject.WriteTo(bffWholeFileGenerator);
 
             // remove all line that contain RemoveLineTag
             bffWholeFileGenerator.RemoveTaggedLines();
-            MemoryStream bffCleanMemoryStream = bffWholeFileGenerator.ToMemoryStream();
 
             // Write bff file
             FileInfo bffFileInfo = new FileInfo(projectBffFile);
 
-            if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffCleanMemoryStream))
+            if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffWholeFileGenerator))
             {
                 Project.IncrementFastBuildGeneratedFileCount();
                 generatedFiles.Add(bffFileInfo.FullName);

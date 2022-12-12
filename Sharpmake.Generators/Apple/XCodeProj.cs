@@ -148,7 +148,7 @@ namespace Sharpmake.Generators.Apple
             var fileGenerator = InitProjectGenerator(configurations);
 
             // Write the project file
-            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator.ToMemoryStream());
+            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator);
 
             string projectFileResult = projectFileInfo.FullName;
             return projectFileResult;
@@ -171,7 +171,7 @@ namespace Sharpmake.Generators.Apple
             var fileGenerator = InitProjectSchemeGenerator(configurations, projectFile);
 
             // Write the scheme file
-            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectSchemeFileInfo, fileGenerator.ToMemoryStream());
+            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectSchemeFileInfo, fileGenerator);
             string projectFileResult = projectSchemeFileInfo.FullName;
 
             return projectFileResult;

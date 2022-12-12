@@ -173,7 +173,7 @@ namespace Sharpmake.Generators.VisualStudio
                     fileGenerator.Write(Template.End);
                     fileGenerator.RemoveTaggedLines();
 
-                    bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(projectJsonPath), fileGenerator.ToMemoryStream());
+                    bool written = _builder.Context.WriteGeneratedFile(GetType(), new FileInfo(projectJsonPath), fileGenerator);
                     if (written)
                         generatedFiles.Add(projectJsonPath);
                     else

@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -418,8 +419,54 @@ namespace Sharpmake.UnitTests
         }
     }
 
-    public class MockFile
+    public class TestFileOperations
     {
+        // 
+        /// <summary>
+        /// Prepare a random memory stream with random data for tests
+        /// </summary>
+        /// <param name="size">size </param>
+        /// <param name="seed">see of random generator</param>
+        /// <param name="modificationOffset">offset for some modifications of a random subset span in the stream. -1= Not used</param>
+        /// <param name="modificationSize">Size of the modified span. Must be bigger than 0 when offset is different than -1 </param>
+        /// <returns>the new stream</returns>
+        private MemoryStream PrepareMemoryStream(int size, int seed, int modificationOffset, int modificationSize)
+        {
+            Random r = new Random(seed);
+            MemoryStream s = new MemoryStream();
+            {
+                byte[] buffer = new byte[size + 1];
+                r.NextBytes(buffer);
+                int sizeToWrite = size;
+
+                // optionally apply some modifications to the buffer
+                if (modificationOffset != -1)
+                {
+                    Trace.Assert(modificationSize > 0);
+                    r.NextBytes(new Span<byte>(buffer, modificationOffset, modificationSize));
+                }
+
+                // Write to stream
+                s.Write(buffer, 0, sizeToWrite);
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// Fill a file with random data for tests.
+        /// </summary>
+        /// <param name="filePath">file path to write</param>
+        /// <param name="size">size of file</param>
+        /// <param name="seed">seed of random generator</param>
+        private void PrepareFile(string filePath, int size, int seed)
+        {
+            using (var s = PrepareMemoryStream(size, seed, -1, 0))
+            using (FileStream fStream = new FileStream(filePath, FileMode.Create))
+            {
+                s.WriteTo(fStream);
+            }
+        }
+
         /// <summary>
         ///     Verify that it returns the name of the current file
         ///  </summary>
@@ -447,43 +494,142 @@ namespace Sharpmake.UnitTests
             File.Delete(mockPath);
         }
 
-        /// <summary>
-        ///     <c>FileWriteIfDifferentInternal</c> verify if the MemoryStream and the file have different values 
-        ///     The test cases are: 
-        ///     <list type="number">
-        ///         <item><description>Testing when the file is readonly</description></item>
-        ///         <item><description>Testing when the memorystream and the file are the same</description></item>
-        ///         <item><description>Testing when the memorystream and the file are different</description></item>
-        ///     </list>
-        ///  </summary>
-        [Test]
-        public void FileWriteIfDifferentInternal()
+        [TestCase(12, 42, 12, 42, -1, 0, ExpectedResult = false)] // Identical small file
+        [TestCase(5000, 42, 5000, 42, -1, 0, ExpectedResult = false)] // Identical medium file
+        [TestCase(32, 42, 33, 42, -1, 0, ExpectedResult = true)] // Small file identical but last byte different(one byte bigger file)
+        [TestCase(5000, 42, 5001, 42, -1, 0, ExpectedResult = true)] // medium file identical but last byte different(one byte bigger file)
+        [TestCase(4096, 42, 5000, 42, -1, 0, ExpectedResult = true)] // Same content for first 4096 bytes.
+        [TestCase(32, 42, 32, 1000, -1, 0, ExpectedResult = true)] // Same size but different file
+        [TestCase(512, 42, 512, 42, 150, 75, ExpectedResult = true)] // Same size but subset of file has been changed
+        [TestCase(5000, 42, 5000, 42, 4200, 64, ExpectedResult = true)] // Same size but subset of file has been changed after first 4096 bytes
+        public bool TestFileWriteIfDifferentInternal(int size1, int seed1, int size2, int seed2, int streamModOffset, int streamModSize)
         {
-            var mockPath1 = Path.GetTempFileName();
-            var mockPath2 = Path.GetTempFileName();
-            var mockPath3 = Path.GetTempFileName();
+            var filePath1 = Path.GetTempFileName();
+            try
+            {
+                PrepareFile(filePath1, size1, seed1);
+                using (MemoryStream s = PrepareMemoryStream(size2, seed2, streamModOffset, streamModSize))
+                {
+                    bool result = Util.FileWriteIfDifferentInternal(new FileInfo(filePath1), s, true);
 
-            File.WriteAllLines(mockPath1, new[] { "test", "memory", "stream" });
-            File.WriteAllLines(mockPath2, new[] { "test", "file", "wrap" });
-            File.WriteAllLines(mockPath3, new[] { "test", "memory", "streams" });
-            FileInfo fileInfo = new FileInfo(mockPath1);
-            fileInfo.IsReadOnly = true;
+                    // File should never be different anymore after the call above
+                    Assert.IsFalse(Util.IsFileDifferent(new FileInfo(filePath1), s));
 
-            MemoryStream memoryStream1 = new MemoryStream(File.ReadAllBytes(mockPath1));
-            MemoryStream memoryStream2 = new MemoryStream(File.ReadAllBytes(mockPath2));
-            MemoryStream memoryStream3 = new MemoryStream(File.ReadAllBytes(mockPath3));
+                    return result;
+                }
+            }
+            finally
+            {
+                File.Delete(filePath1);
+            }
+        }
 
-            Assert.False(Util.FileWriteIfDifferentInternal(fileInfo, memoryStream1, true));
-            fileInfo.IsReadOnly = false;
+        [Test]
+        public void TestFileWriteIfDifferentInternalInexistingFile()
+        {
+            var filePath1 = Path.GetTempFileName();
+            try
+            {
+                File.Delete(filePath1);
+                using (MemoryStream s = PrepareMemoryStream(12, 42, -1, 0))
+                {
+                    bool result = Util.FileWriteIfDifferentInternal(new FileInfo(filePath1), s, true);
 
-            Assert.False(Util.FileWriteIfDifferentInternal(fileInfo, memoryStream1, true));
-            Assert.True(Util.FileWriteIfDifferentInternal(fileInfo, memoryStream2, true));
-            Assert.True(Util.FileWriteIfDifferentInternal(fileInfo, memoryStream3, true));
+                    // File should never be different anymore after the call above
+                    Assert.IsFalse(Util.IsFileDifferent(new FileInfo(filePath1), s));
+                }
+            }
+            finally
+            {
+                File.Delete(filePath1);
+            }
+        }
 
-            fileInfo.Delete();
-            File.Delete(mockPath1);
-            File.Delete(mockPath2);
-            File.Delete(mockPath3);
+        [Test]
+        public void TestFileWriteIfDifferentInternalReadOnlyFile()
+        {
+            var filePath1 = Path.GetTempFileName();
+            try
+            {
+                // Prepare a file and set it readonly
+                PrepareFile(filePath1, 12, 50);
+                var fileInfo = new FileInfo(filePath1);
+                fileInfo.IsReadOnly = true;
+
+                // Prepare a different memory stream
+                using (MemoryStream s = PrepareMemoryStream(12, 42, -1, 0))
+                {
+                    bool result = Util.FileWriteIfDifferentInternal(fileInfo, s, true);
+
+                    // File should never be different anymore after the call above
+                    Assert.IsFalse(Util.IsFileDifferent(fileInfo, s));
+                }
+            }
+            finally
+            {
+                File.Delete(filePath1);
+            }
+        }
+
+        [Test]
+        public void TestFileWriteIfDifferentInternalDirectoryDoesNotExist()
+        {
+            var tempPath = Path.GetTempPath();
+            string filePath1 = Path.Combine(tempPath, Guid.NewGuid().ToString(), "file.txt");
+            try
+            {
+                var fileInfo = new FileInfo(filePath1);
+                Assert.IsFalse(fileInfo.Directory.Exists);
+                Assert.IsFalse(fileInfo.Exists);
+
+                // Prepare a different memory stream
+                using (MemoryStream s = PrepareMemoryStream(12, 42, -1, 0))
+                {
+                    bool result = Util.FileWriteIfDifferentInternal(fileInfo, s, true);
+
+                    // File should never be different anymore after the call above
+                    fileInfo.Refresh();
+                    Assert.IsFalse(Util.IsFileDifferent(fileInfo, s));
+                }
+            }
+            finally
+            {
+                File.Delete(filePath1);
+            }
+        }
+
+        [TestCase(12, 42, 12, 42, -1, 0, ExpectedResult = false)] // Identical small file
+        [TestCase(5000, 42, 5000, 42, -1, 0, ExpectedResult = false)] // Identical medium file
+        [TestCase(32, 42, 33, 42, -1, 0, ExpectedResult = true)] // Small file identical but last byte different(one byte bigger file)
+        [TestCase(5000, 42, 5001, 42, -1, 0, ExpectedResult = true)] // medium file identical but last byte different(one byte bigger file)
+        [TestCase(4096, 42, 5000, 42, -1, 0, ExpectedResult = true)] // Same content for first 4096 bytes.
+        [TestCase(32, 42, 32, 1000, -1, 0, ExpectedResult = true)] // Same size but different file
+        [TestCase(512, 42, 512, 42, 150, 75, ExpectedResult = true)] // Same size but subset of file has been changed
+        [TestCase(5000, 42, 5000, 42, 4200, 64, ExpectedResult = true)] // Same size but subset of file has been changed after first 4096 bytes
+        public bool TestIsFileDifferent(int size1, int seed1, int size2, int seed2, int streamModOffset, int streamModSize)
+        {
+            var filePath1 = Path.GetTempFileName();
+            try
+            {
+                PrepareFile(filePath1, size1, seed1);
+                using (MemoryStream s = PrepareMemoryStream(size2, seed2, streamModOffset, streamModSize))
+                {
+                    return Util.IsFileDifferent(new FileInfo(filePath1), s);    
+                }
+            }
+            finally
+            {
+                File.Delete(filePath1);
+            }
+        }
+
+        [Test]
+        public void TestIsFileDifferentInexistingFile()
+        {
+            using (var s = new MemoryStream())
+            {
+                Util.IsFileDifferent(new FileInfo("inexistingfile"), s);
+            }
         }
 
         /// <summary>

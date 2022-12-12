@@ -58,7 +58,7 @@ namespace Sharpmake.Generators.Generic
 
             fileGenerator.RemoveTaggedLines();
 
-            updated = _builder.Context.WriteGeneratedFile(project.GetType(), fileInfo, fileGenerator.ToMemoryStream());
+            updated = _builder.Context.WriteGeneratedFile(project.GetType(), fileInfo, fileGenerator);
 
             return fileInfo.FullName;
         }

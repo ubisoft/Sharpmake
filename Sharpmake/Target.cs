@@ -286,6 +286,9 @@ namespace Sharpmake
 
         public string GetTargetString()
         {
+            if (_valueCache != null)
+                return _valueCache;
+
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
 
             var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
@@ -303,6 +306,7 @@ namespace Sharpmake
                     return value.ToString();
                 }))
             );
+            _valueCache = result;
             return result;
         }
 
@@ -382,7 +386,9 @@ namespace Sharpmake
             if (other._valueCache == null)
                 other._valueCache = other.GetTargetString();
 
-            return _valueCache == other._valueCache;
+            if (_valueCache == other._valueCache)
+                return true;
+            return string.Compare(_valueCache, other._valueCache, StringComparison.Ordinal) == 0;
         }
 
         //possible to override this to make the associations with custom platforms and Sharpmake's
@@ -614,8 +620,16 @@ namespace Sharpmake
             return false;
         }
 
+        private static ConcurrentDictionary<Type, bool> _verifiedTargetTypes = new ConcurrentDictionary<Type, bool>();
+
         internal void Initialize(Type targetType)
         {
+            if (_verifiedTargetTypes.ContainsKey(targetType))
+            {
+                TargetType = targetType;
+                return; // Type already validated.
+            }
+
             if (targetType == null)
                 throw new InternalError();
 
@@ -702,6 +716,9 @@ namespace Sharpmake
                 throw new Error("Mandatory fragment type \"{0}\" not found in target type \"{1}\" (fields also must be public)", typeof(DevEnv).ToString(), targetType);
             if (!fragmentsType.Contains(typeof(Platform)))
                 throw new Error("Mandatory fragment type \"{0}\" not found in target type \"{1}\" (fields also must be public)", typeof(Platform).ToString(), targetType);
+
+            // Mark this type as validated successfully.
+            _verifiedTargetTypes.TryAdd(targetType, true);
         }
 
         internal void AddTargets(string callerInfo, params ITarget[] targetsMask)

@@ -675,7 +675,7 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Solution.GlobalEnd);
 
             // Write the solution file
-            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator.ToMemoryStream());
+            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileInfo, fileGenerator);
 
             solution.PostGenerationCallback?.Invoke(solutionPath, solutionFile, SolutionExtension);
 

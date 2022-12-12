@@ -100,6 +100,22 @@ namespace Sharpmake
         /// <param name="bypassAutoCleanupDatabase">Cleanup database is used so that if a previously written file is no longer written it is automatically deleted.</param>
         /// <returns></returns>
         bool FileWriteIfDifferent(FileInfo file, bool bypassAutoCleanupDatabase = false);
+
+        /// <summary>
+        /// Writes the content of this generator to another generator using efficient stream copy.
+        /// </summary>
+        /// <param name="generator"></param>
+        void WriteTo(IFileGenerator generator);
+
+        /// <summary>
+        /// This method clears the content of the generated file.
+        /// </summary>
+        void Clear();
+
+        /// <summary>
+        /// Check if the generator has been written to.
+        /// </summary>
+        bool IsEmpty();
     }
 
     /// <summary>

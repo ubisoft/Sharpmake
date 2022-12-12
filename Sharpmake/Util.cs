@@ -121,19 +121,33 @@ namespace Sharpmake
             return null;
         }
 
+        /// <summary>
+        /// Size of buffer used for stream comparisons.
+        /// </summary>
+        private const int _FileStreamBufferSize = 4096;
+
+        /// <summary>
+        /// Efficiently compare is two streams have the same content
+        /// </summary>
+        /// <param name="stream1">1st stream</param>
+        /// <param name="stream2">2nd stream</param>
+        /// <returns>true=equal, false=not equal</returns>
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
-            const int BufferSize = 4096;
-            var buffer1 = new byte[BufferSize];
-            var buffer2 = new byte[BufferSize];
+            var buffer1 = new byte[_FileStreamBufferSize];
+            var buffer2 = new byte[_FileStreamBufferSize];
+
+            ReadOnlySpan<byte> span1 = new ReadOnlySpan<byte>(buffer1);
+            ReadOnlySpan<byte> span2 = new ReadOnlySpan<byte>(buffer2);
 
             stream1.Position = 0;
             stream2.Position = 0;
 
             while (true)
             {
-                int count1 = stream1.Read(buffer1, 0, BufferSize);
-                int count2 = stream2.Read(buffer2, 0, BufferSize);
+                // Read from both streams
+                int count1 = stream1.Read(buffer1, 0, _FileStreamBufferSize);
+                int count2 = stream2.Read(buffer2, 0, _FileStreamBufferSize);
 
                 if (count1 != count2)
                     return false;
@@ -141,50 +155,33 @@ namespace Sharpmake
                 if (count1 == 0)
                     return true;
 
-                if (!buffer1.SequenceEqual(buffer2))
+                // Compare the streams efficiently without any copy.
+                if (!span1.SequenceEqual(span2))
                     return false;
             }
         }
 
+        [Obsolete("Call IsFileDifferent() with two parameters. Last parameter has been removed.")]
         public static bool IsFileDifferent(FileInfo file, Stream stream, bool compareEndLineCharacters = false)
+        {
+            return IsFileDifferent(file, stream);
+        }
+
+        /// <summary>
+        /// Check if a file is different than the stream content. Content is compared bit per bit.
+        /// </summary>
+        /// <param name="file">file to compare</param>
+        /// <param name="stream">stream to compare</param>
+        /// <returns>true=different, false=same</returns>
+        public static bool IsFileDifferent(FileInfo file, Stream stream)
         {
             if (!file.Exists)
                 return true;
 
-            using (var fstream = file.OpenRead())
+            // Note: Using same buffer size than AreStreamsEqual for better efficiency
+            using (var fstream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, _FileStreamBufferSize))
             {
-                if (compareEndLineCharacters)
-                {
-                    return !AreStreamsEqual(stream, fstream);
-                }
-                else
-                {
-                    stream.Position = 0;
-                    fstream.Position = 0;
-
-                    StreamReader streamReader = new StreamReader(stream);
-                    StreamReader fstreamReader = new StreamReader(fstream);
-
-                    int c0 = streamReader.Read();
-                    int c1 = fstreamReader.Read();
-
-                    while (c0 != -1 || c1 != -1)
-                    {
-                        // skip end of line for comparison
-                        while ((char)c0 == '\n' || (char)c0 == '\r')
-                            c0 = streamReader.Read();
-
-                        while ((char)c1 == '\n' || (char)c1 == '\r')
-                            c1 = fstreamReader.Read();
-
-                        if (c0 != c1)
-                            return true;
-
-                        c0 = streamReader.Read();
-                        c1 = fstreamReader.Read();
-                    }
-                    return false;
-                }
+                return !AreStreamsEqual(stream, fstream);
             }
         }
 
@@ -240,7 +237,7 @@ namespace Sharpmake
 
             if (file.Exists)
             {
-                if (!IsFileDifferent(file, stream, true))
+                if (!IsFileDifferent(file, stream))
                     return false;
 
                 if (file.IsReadOnly)
@@ -256,7 +253,7 @@ namespace Sharpmake
             // write the file
             using (FileStream outStream = file.Open(FileMode.Create))
             {
-                outStream.Write(stream.ToArray(), 0, (int)stream.Length);
+                stream.WriteTo(outStream);
             }
 
             return true;

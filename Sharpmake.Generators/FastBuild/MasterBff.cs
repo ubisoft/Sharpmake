@@ -177,7 +177,7 @@ namespace Sharpmake.Generators.FastBuild
             // Studio, even if all it does is include the real BFF.
             //
 
-            IEnumerable<ConfigurationsPerBff> confsPerBffs = ConfigurationsPerBff.Create(solution, solutionConfigurations).ToArray();
+            IEnumerable<ConfigurationsPerBff> confsPerBffs = ConfigurationsPerBff.Create(solution, solutionConfigurations);
             foreach (ConfigurationsPerBff confsPerBff in confsPerBffs)
             {
                 if (confsPerBff.Configurations.Any(conf => conf.SolutionFilePath != conf.MasterBffFilePath))
@@ -222,13 +222,10 @@ namespace Sharpmake.Generators.FastBuild
             using (fileGenerator.Declare("masterBffFilePath", Util.PathGetRelative(bffFileInfo.DirectoryName, confsPerBff.BffFilePathWithExtension)))
                 fileGenerator.Write(Bff.Template.ConfigurationFile.IncludeMasterBff);
 
-            using (var bffFileStream = fileGenerator.ToMemoryStream())
-            {
-                if (builder.Context.WriteGeneratedFile(null, bffFileInfo, bffFileStream))
-                    generatedFiles.Add(bffFilePath);
-                else
-                    skippedFiles.Add(bffFilePath);
-            }
+            if (builder.Context.WriteGeneratedFile(null, bffFileInfo, fileGenerator))
+                generatedFiles.Add(bffFilePath);
+            else
+                skippedFiles.Add(bffFilePath);
         }
 
         private static void GenerateMasterBffFiles(Builder builder, IEnumerable<ConfigurationsPerBff> confsPerSolutions)
@@ -516,11 +513,10 @@ namespace Sharpmake.Generators.FastBuild
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
-            MemoryStream bffCleanMemoryStream = fileGenerator.ToMemoryStream();
 
             // Write master .bff file
             FileInfo bffFileInfo = new FileInfo(masterBffFilePath);
-            bool updated = builder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream);
+            bool updated = builder.Context.WriteGeneratedFile(null, bffFileInfo, fileGenerator);
 
             foreach (var confsPerSolution in configurationsPerBff)
                 confsPerSolution.Solution.PostGenerationCallback?.Invoke(masterBffDirectory, Path.GetFileNameWithoutExtension(masterBffFileName), FastBuildSettings.FastBuildConfigFileExtension);
@@ -562,11 +558,10 @@ namespace Sharpmake.Generators.FastBuild
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
-            MemoryStream bffCleanMemoryStream = fileGenerator.ToMemoryStream();
 
             // Write master bff global settings file
             FileInfo bffFileInfo = new FileInfo(masterBffGlobalConfigFile);
-            if (builder.Context.WriteGeneratedFile(null, bffFileInfo, bffCleanMemoryStream))
+            if (builder.Context.WriteGeneratedFile(null, bffFileInfo, fileGenerator))
             {
                 Project.AddFastbuildMasterGeneratedFile(masterBffGlobalConfigFile);
             }

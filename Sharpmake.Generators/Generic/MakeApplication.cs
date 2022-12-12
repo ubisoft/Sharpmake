@@ -66,7 +66,7 @@ namespace Sharpmake.Generators.Generic
             }
 
             // Write the solution file
-            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileContentsInfo, fileGenerator.ToMemoryStream());
+            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileContentsInfo, fileGenerator);
 
             return solutionFileContentsInfo.FullName;
         }
@@ -86,7 +86,7 @@ namespace Sharpmake.Generators.Generic
             fileGenerator.Write(Template.MainProjectContent);
 
             // Write the solution file
-            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileContentsInfo, fileGenerator.ToMemoryStream());
+            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileContentsInfo, fileGenerator);
 
             return solutionFileContentsInfo.FullName;
         }

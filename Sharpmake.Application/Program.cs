@@ -167,6 +167,7 @@ namespace Sharpmake.Application
             }
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).
             System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+            Trace.Assert(System.Runtime.GCSettings.IsServerGC, "Server GC is not active! Sharpmake will be much slower!");
 
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += AppDomain_UnhandledException;

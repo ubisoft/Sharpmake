@@ -1612,13 +1612,7 @@ namespace Sharpmake
             if (target.GetType() != Targets.TargetType)
                 return null;
 
-            foreach (Project.Configuration conf in Configurations)
-            {
-                ITarget confTarget = conf.Target;
-                if (target.IsEqualTo(confTarget))
-                    return conf;
-            }
-            return null;
+            return ConfigurationsCache[target];
         }
 
         internal void Initialize(Type targetType, Type configurationType, bool isInternal = false)

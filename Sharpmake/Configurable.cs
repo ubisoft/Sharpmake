@@ -51,11 +51,24 @@ namespace Sharpmake
     public class Configurable<TConfiguration>
         where TConfiguration : Configuration, new()
     {
+        private class CacheTargetComparer : IEqualityComparer<ITarget>
+        {
+            public bool Equals(ITarget t1, ITarget t2)
+            {
+                return t1.CompareTo(t2) == 0;
+            }
+            public int GetHashCode(ITarget t)
+            {
+                return Util.GetDeterministicHashCode(t.GetTargetString());
+            }
+        }
         private bool _readOnly = false;
         public Targets Targets { get; } = new Targets();                 // Solution Targets
         public IReadOnlyList<TConfiguration> Configurations => _configurations;
 
         private readonly List<TConfiguration> _configurations = new List<TConfiguration>();
+        private readonly Dictionary<ITarget, TConfiguration> _configurationsCache = new Dictionary<ITarget, TConfiguration>(new CacheTargetComparer());
+        internal IReadOnlyDictionary<ITarget, TConfiguration> ConfigurationsCache => _configurationsCache;
 
         // Type of Configuration object, must derive from TConfiguration
         public Type ConfigurationType { get; internal protected set; }
@@ -225,6 +238,7 @@ namespace Sharpmake
                 TConfiguration conf = Activator.CreateInstance(ConfigurationType) as TConfiguration;
                 conf.Construct(this, target);
                 _configurations.Add(conf);
+                _configurationsCache.Add(target, conf);
                 var param = new object[] { conf, target };
                 foreach (MethodInfo method in configureMethods)
                 {

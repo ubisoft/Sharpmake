@@ -258,10 +258,9 @@ namespace Sharpmake.Generators.VisualStudio
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
-            MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream();
 
             FileInfo projectFileInfo = new FileInfo(context.ProjectPath + ProjectExtension);
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, cleanMemoryStream))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator))
                 generatedFiles.Add(projectFileInfo.FullName);
             else
                 skipFiles.Add(projectFileInfo.FullName);

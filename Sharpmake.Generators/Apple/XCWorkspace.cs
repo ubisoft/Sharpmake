@@ -96,7 +96,7 @@ namespace Sharpmake.Generators.Apple
             fileGenerator.Write(Template.Footer);
 
             // Write the solution file
-            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileContentsInfo, fileGenerator.ToMemoryStream());
+            updated = _builder.Context.WriteGeneratedFile(solution.GetType(), solutionFileContentsInfo, fileGenerator);
 
             return solutionFileContentsInfo.FullName;
         }
