@@ -58,7 +58,7 @@ can contact the SDK provider to get platform extension for Sharpmake.
 ## Contributing
 
 ### Tests
-We will only accept merge requests that pass every tests. The unit tests are
+We will only accept merge requests that pass all tests. The unit tests are
 written with NUnit and the regression tests are ran by comparing the samples'
 output with a reference output. You can run the *regression_tests.py* script
 after having built the solution in Visual Studio to run the regression tests.
