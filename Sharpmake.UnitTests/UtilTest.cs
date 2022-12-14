@@ -614,7 +614,7 @@ namespace Sharpmake.UnitTests
                 PrepareFile(filePath1, size1, seed1);
                 using (MemoryStream s = PrepareMemoryStream(size2, seed2, streamModOffset, streamModSize))
                 {
-                    return Util.IsFileDifferent(new FileInfo(filePath1), s);    
+                    return Util.IsFileDifferent(new FileInfo(filePath1), s);
                 }
             }
             finally

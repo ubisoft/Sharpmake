@@ -183,7 +183,7 @@ namespace Sharpmake.Generators
             var newLineBytes = _writer.Encoding.GetBytes(Environment.NewLine.ToCharArray()).AsSpan();
             var newStream = new MemoryStream((int)_stream.Length);
             int nextSlice = 0;
-            while(true)
+            while (true)
             {
                 // Looking for end of line
                 var restOfFileSlice = wholeStreamSpan.Slice(nextSlice);
@@ -197,7 +197,7 @@ namespace Sharpmake.Generators
                         endLineIndex = nextSlice + i;
                         endLineMarkerSize = 1;
 
-                        if (ch == '\r' && i + 1 < restOfFileSlice.Length && restOfFileSlice[i+1] == '\n')
+                        if (ch == '\r' && i + 1 < restOfFileSlice.Length && restOfFileSlice[i + 1] == '\n')
                         {
                             endLineMarkerSize = 2;
                         }
@@ -221,7 +221,7 @@ namespace Sharpmake.Generators
                     {
                         Debug.Assert(nextSlice == wholeStreamSpan.Length);
                         break;
-                   }
+                    }
                 }
                 else
                 {

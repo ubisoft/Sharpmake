@@ -1,9 +1,9 @@
-﻿using NUnit.Framework;
-using Sharpmake.Generators;
-using System;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
+using NUnit.Framework;
+using Sharpmake.Generators;
 
 namespace Sharpmake.UnitTests
 {
@@ -22,7 +22,7 @@ namespace Sharpmake.UnitTests
 
             public StreamWriter Writer { get; private set; }
 
-            public FileGeneratorTestHelper(Encoding encoding=null) 
+            public FileGeneratorTestHelper(Encoding encoding = null)
             {
                 if (encoding == null)
                 {
@@ -179,7 +179,7 @@ namespace Sharpmake.UnitTests
 
             testHelper.WriteLineWithFallback("abcdef", "fallback", "abcdef");
             testHelper.WriteLineWithFallback("abc[unkownfield]def", "fallback", "abcfallbackdef");
-            testHelper.WriteLineWithFallback("abc[obj.Value1]def", "fallback", "abc"+obj.Value1+"def");
+            testHelper.WriteLineWithFallback("abc[obj.Value1]def", "fallback", "abc" + obj.Value1 + "def");
             testHelper.WriteLineWithFallback("abc[obj.UnknownField]def", "fallback", "abcfallbackdef");
 
             testHelper.WriteWithFallback("abcdef", "fallback", "abcdef");
