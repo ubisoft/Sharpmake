@@ -85,7 +85,7 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
         {
             var netFrameworkTarget = new CommonTarget(
                 Platform.anycpu,
-                DevEnv.vs2019,
+                DevEnv.vs2022,
                 Optimization.Debug | Optimization.Release,
                 DotNetFramework.v4_7_2,
                 dotNetOS: 0 // OS is not applicable for .net framework
@@ -93,9 +93,9 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
 
             var netCoreTarget = new CommonTarget(
                 Platform.anycpu,
-                DevEnv.vs2019,
+                DevEnv.vs2022,
                 Optimization.Debug | Optimization.Release,
-                DotNetFramework.net5_0,
+                DotNetFramework.net7_0,
                 dotNetOS: dotNetOS
             );
 
@@ -169,7 +169,14 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
         public HelloWorldExe()
         {
             SourceRootPath = @"[project.RootPath]\HelloWorldMultiframeworks";
-            AddTargets(CommonTarget.GetDefaultTargets(DotNetOS.windows));
+            AddTargets(CommonTarget.GetDefaultTargets());
+            AddTargets(new CommonTarget(
+                Platform.anycpu,
+                DevEnv.vs2022,
+                Optimization.Debug | Optimization.Release,
+                DotNetFramework.net7_0,
+                dotNetOS: DotNetOS.windows
+            ));
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
@@ -177,6 +184,9 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
             base.ConfigureAll(conf, target);
             conf.Output = Configuration.OutputType.DotNetConsoleApp;
             conf.AddPrivateDependency<HelloWorldLib>(target.ToDefaultDotNetOSTarget());
+
+            if (target.DotNetFramework.IsDotNetCore())
+                conf.ReferencesByNuGetPackage.Add("Microsoft.Windows.Compatibility", "7.0.0");
         }
     }
 
