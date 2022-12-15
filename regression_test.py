@@ -13,9 +13,10 @@ if os.name != "nt":
     import select
 
 class Test:
-    def __init__(self, directory, script_name, project_root = ""):
+    def __init__(self, directory, script_name, assembly_dir = None, assembly = None, project_root = ""):
         self.directory = directory
-        self.assembly = directory + ".dll" # same name as the directory for now
+        self.assembly_dir = assembly_dir if assembly_dir is not None else directory
+        self.assembly = assembly if assembly is not None else directory + ".dll" # same name as the directory for now
         self.script_name = script_name
         self.runs_on_unix = os.name == "posix"
         if project_root == "":
@@ -31,7 +32,7 @@ class Test:
 
             # Builds the command line argument list.
             sources = "/sources(@\'{}\')".format(self.script_name)
-            assemblies = "/assemblies(@\'{}\')".format(find_assembly_path(root_directory, self.directory, self.assembly))
+            assemblies = "/assemblies(@\'{}\')".format(find_assembly_path(root_directory, self.assembly_dir, self.assembly))
             referencedir = "/referencedir(@\'{}\')".format("reference")
             outputdir = "/outputdir(@\'{}\')".format("projects")
             remaproot = "/remaproot(@\'{}\')".format(self.project_root)
@@ -157,11 +158,14 @@ def launch_tests():
             Test("CSharpHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("HelloWorld", "HelloWorld.sharpmake.cs"),
             Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
-            Test("CSharpWCF", "CSharpWCF.sharpmake.cs", "codebase"),
+            Test("CSharpWCF", "CSharpWCF.sharpmake.cs", project_root="codebase"),
             Test("CSharpImports", "CSharpImports.sharpmake.cs"),
             Test("PackageReferences", "PackageReferences.sharpmake.cs"),
             #Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"), # commented out since output has discrepancies between net472 and net5.0
-            Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs")
+            Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs"),
+            Test("NetCore\\DotNetOSMultiFrameworksHelloWorld", "HelloWorld.sharpmake.cs", 
+                assembly_dir="DotNetOSMultiFrameworksHelloWorld",
+                assembly="DotNetOSMultiFrameworksHelloWorld.dll"),
         ]
 
         # Run each test. Break and exit on error.

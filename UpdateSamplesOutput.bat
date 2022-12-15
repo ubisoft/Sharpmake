@@ -46,6 +46,8 @@ call :UpdateRef samples NetCore\DotNetFrameworkHelloWorld        HelloWorld.shar
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples NetCore\DotNetMultiFrameworksHelloWorld  HelloWorld.sharpmake.cs       reference         NetCore\DotNetMultiFrameworksHelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples NetCore\DotNetOSMultiFrameworksHelloWorld  HelloWorld.sharpmake.cs     reference         NetCore\DotNetOSMultiFrameworksHelloWorld
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 :: functional tests
 call :UpdateRef Sharpmake.FunctionalTests FastBuildFunctionalTest FastBuildFunctionalTest.sharpmake.cs reference FastBuildFunctionalTest
