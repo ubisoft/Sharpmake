@@ -71,6 +71,7 @@ namespace HelloEvents
             FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
 
             KitsRootPaths.SetKitsRoot10ToHighestInstalledVersion(DevEnv.vs2019);
+            KitsRootPaths.SetKitsRoot10ToHighestInstalledVersion(DevEnv.vs2022);
 
             // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(Globals.RootDirectory, @"..\..\..\tools\FastBuild");

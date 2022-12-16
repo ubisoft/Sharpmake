@@ -102,9 +102,7 @@ namespace HelloClangCl
                 dirNameParts.Add(Platform.ToString());
                 dirNameParts.Add(Compiler.ToString());
                 dirNameParts.Add(Optimization.ToString());
-
-                if (BuildSystem == BuildSystem.FastBuild)
-                    dirNameParts.Add(BuildSystem.ToString());
+                dirNameParts.Add(BuildSystem.ToString());
 
                 return string.Join("_", dirNameParts);
             }
@@ -140,7 +138,7 @@ namespace HelloClangCl
             var defaultTarget = new CommonTarget(
                 Platform.win64,
                 Compiler.MSVC | Compiler.ClangCl,
-                DevEnv.vs2019,
+                Globals.DevEnvVersion,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.MSBuild
