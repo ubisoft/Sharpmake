@@ -58,10 +58,6 @@ namespace HelloClangCl
             //conf.TargetLibraryPath = conf.IntermediatePath; // .lib files must be with the .obj files when running in fastbuild distributed mode or we'll have missing symbols due to merging of the .pdb
             conf.TargetLibraryPath = Path.Combine(Globals.TmpDirectory, @"lib\[target.DirectoryName]\[project.Name]");
 
-            conf.TargetFileName += "_" + target.Optimization.ToString().ToLowerInvariant().First(); // suffix with lowered first letter of optim
-            if (conf.IsFastBuild)
-                conf.TargetFileName += "x";
-
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
 
             conf.Options.Add(Options.Vc.Compiler.CppLanguageStandard.CPP17);

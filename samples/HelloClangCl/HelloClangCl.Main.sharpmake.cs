@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Sharpmake;
 using Sharpmake.Generators.FastBuild;
+using static Sharpmake.Options;
 
 [module: Sharpmake.DebugProjectName("Sharpmake.HelloClangCl")]
 
@@ -36,6 +37,21 @@ namespace HelloClangCl
         public static string RootDirectory;
         public static string TmpDirectory { get { return Path.Combine(RootDirectory, "temp"); } }
         public static string OutputDirectory { get { return Path.Combine(TmpDirectory, "bin"); } }
+
+        public static DevEnv DevEnvVersion = DevEnv.vs2019 | DevEnv.vs2022;
+        [CommandLine.Option("devenvversion", @"restrict vs version to a specific one")]
+        public static void CommandLineDevVersion(string value)
+        {
+            switch (value)
+            {
+                case "vs2019":
+                    DevEnvVersion |= DevEnv.vs2019;
+                    break;
+                case "vs2022":
+                    DevEnvVersion |= DevEnv.vs2022;
+                    break;
+            }
+        }
     }
 
     public static class Main
@@ -71,6 +87,7 @@ namespace HelloClangCl
             FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
 
             KitsRootPaths.SetKitsRoot10ToHighestInstalledVersion(DevEnv.vs2019);
+            KitsRootPaths.SetKitsRoot10ToHighestInstalledVersion(DevEnv.vs2022);
 
             // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(Globals.RootDirectory, @"..\..\..\tools\FastBuild");

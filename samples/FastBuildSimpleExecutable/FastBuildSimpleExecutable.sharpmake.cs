@@ -35,7 +35,7 @@ namespace FastBuild
 
             AddTargets(new Target(
                         Platform.win64,
-                        DevEnv.vs2019,
+                        DevEnv.vs2019 | DevEnv.vs2022,
                         Optimization.Debug | Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,
@@ -73,7 +73,7 @@ namespace FastBuild
 
             AddTargets(new Target(
                         Platform.win64,
-                        DevEnv.vs2019,
+                        DevEnv.vs2019 | DevEnv.vs2022,
                         Optimization.Debug | Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,
@@ -113,6 +113,7 @@ namespace FastBuild
             FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
 
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
 
             arguments.Generate<FastBuildSolution>();
         }
