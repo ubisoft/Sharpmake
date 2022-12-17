@@ -42,13 +42,14 @@ namespace HelloClangCl
         [CommandLine.Option("devenvversion", @"restrict vs version to a specific one")]
         public static void CommandLineDevVersion(string value)
         {
+            Console.WriteLine($"DevEnvVersion argument - {value}");
             switch (value)
             {
                 case "vs2019":
-                    DevEnvVersion |= DevEnv.vs2019;
+                    DevEnvVersion = DevEnv.vs2019;
                     break;
                 case "vs2022":
-                    DevEnvVersion |= DevEnv.vs2022;
+                    DevEnvVersion = DevEnv.vs2022;
                     break;
             }
         }
@@ -75,6 +76,7 @@ namespace HelloClangCl
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
+            CommandLine.ExecuteOnType(typeof(Globals));
             ConfigureRootDirectory();
             ConfigureAutoCleanup();
 

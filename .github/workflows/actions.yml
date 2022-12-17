@@ -226,7 +226,7 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: 'samples/HelloClangCl'
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloClangCl.Main.sharpmake.cs') /devenvversion(${env:VS_VERSION_SUFFIX})"
+          & $env:SHARPMAKE_WIN_EXE "/sources('HelloClangCl.Main.sharpmake.cs') /devenvversion('${env:VS_VERSION_SUFFIX}')"
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln "ClangCl ${{ matrix.configuration }}" "MSBuild"
           codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_msbuild\exe.exe
           & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln "ClangCl ${{ matrix.configuration }}" "FastBuild"
