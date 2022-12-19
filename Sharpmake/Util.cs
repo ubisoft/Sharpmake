@@ -269,6 +269,7 @@ namespace Sharpmake
         }
 
         public static List<string> FilesAlternatesAutoCleanupDBSuffixes = new List<string>(); // The alternates db suffixes using by other context
+        private static List<string> _FilesAlternatesAutoCleanupDBFullPaths = new List<string>();
         public static string FilesAutoCleanupDBPath = string.Empty;
         public static string FilesAutoCleanupDBSuffix = string.Empty;   // Current auto-cleanup suffix for the database.
         internal static bool s_forceFilesCleanup = false;
@@ -339,7 +340,6 @@ namespace Sharpmake
             return databaseFilename;
         }
 
-
         /// <summary>
         /// This method is used to execute files auto-cleanup. Which means deleting files that are no longer saved.
         /// When auto-cleanup is active, Sharpmake will save file paths of saved files into a simple database and then when we re-execute sharpmake
@@ -364,6 +364,19 @@ namespace Sharpmake
         /// </example>
         public static void ExecuteFilesAutoCleanup()
         {
+            ExecuteFilesAutoCleanup(false);
+        }
+
+        /// <summary>
+        /// This method is the same as the other ExecuteFilesAutoCleanup but this one gives control if we need to add the current context db
+        /// to alternateDB files list for proper cleanup execution if execution context changes in a subsequent execution
+        /// For example, _debugsolution context when generating debug solution followed
+        /// by a default execution context when executing normal generation.
+        /// </summary>
+        /// <param name="addDBToAlternateDB"></param>
+        /// <exception cref="Exception"></exception>
+        internal static void ExecuteFilesAutoCleanup(bool addDBToAlternateDB)
+        {
             if (!FilesAutoCleanupActive && !s_forceFilesCleanup)
                 return; // Auto cleanup not active. Nothing to do.
 
@@ -375,9 +388,13 @@ namespace Sharpmake
 
             // Note: We must take into account all databases when doing the cleanup otherwise we might end up deleting files still used in other contexts.
             List<Dictionary<string, DateTime>> alternateDatabases = new List<Dictionary<string, DateTime>>();
-            foreach (string alternateDBSuffix in FilesAlternatesAutoCleanupDBSuffixes)
-            {
-                string alternateDatabaseFilename = GetDatabaseFilename(alternateDBSuffix);
+
+            // Try to load all alternate db contexts
+            var alternateDBFullPaths = FilesAlternatesAutoCleanupDBSuffixes.Select(alternateDBSuffix => GetDatabaseFilename(alternateDBSuffix))
+                .Concat(_FilesAlternatesAutoCleanupDBFullPaths.AsEnumerable());
+
+            foreach (string alternateDatabaseFilename in alternateDBFullPaths)
+            { 
                 Dictionary<string, DateTime> alternateDBFiles = ReadCleanupDatabase(alternateDatabaseFilename);
                 if (alternateDBFiles != null)
                     alternateDatabases.Add(alternateDBFiles);
@@ -465,11 +482,18 @@ namespace Sharpmake
                     binWriter.Write(dbAsJson);
                     binWriter.Flush();
                 }
+
+                if (addDBToAlternateDB)
+                    _FilesAlternatesAutoCleanupDBFullPaths.Add(databaseFilename);
             }
             else
             {
                 TryDeleteFile(databaseFilename);
             }
+
+            // We are done! Clear the list of files to avoid problems as this context is now considered as complete.
+            // For example if generating debug solution and then executing normal generation
+            s_writtenFiles.Clear();
         }
 
         public static string WinFormSubTypesDbPath = string.Empty;
