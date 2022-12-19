@@ -147,11 +147,14 @@ namespace SharpmakeGen.FunctionalTests
 
     public abstract class CommonProject : Project
     {
+        private string CustomFileBuildStepExtension { get; }  = ".customfilebuildstep";
+
         public CommonProject()
             : base(typeof(Target))
         {
             RootPath = @"[project.SharpmakeCsPath]";
             SourceRootPath = @"[project.RootPath]\codebase\[project.Name]";
+            SourceFilesExtensions.Add(CustomFileBuildStepExtension);
 
             AddTargets(Target.GetDefaultTargets());
         }
@@ -197,6 +200,34 @@ namespace SharpmakeGen.FunctionalTests
         [Configure(Platform.win64)]
         public virtual void ConfigureWin64(Configuration conf, Target target)
         {
+        }
+
+        public override void PostResolve()
+        {
+            base.PostResolve();
+
+            foreach (var config in Configurations)
+            {
+                var outputDir = Path.Combine(config.IntermediatePath, "generated");
+                config.IncludePrivatePaths.Add(outputDir);
+
+                foreach (var sourcePath in ResolvedSourceFiles.Where(file => file.EndsWith(CustomFileBuildStepExtension)))
+                {
+                    var fileName = Path.GetFileName(sourcePath);
+                    var outputPath = Path.Combine(outputDir, fileName.Replace(CustomFileBuildStepExtension, ""));
+
+                    var buildStep = new Configuration.CustomFileBuildStep
+                    {
+                        KeyInput = sourcePath,
+                        Output = outputPath,
+                        Description = $"Build {Name}_{config.Name}_{fileName}",
+                        Executable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe"),
+                        ExecutableArguments = "/c copy \"[input]\" \"[output]\""
+                    };
+
+                    config.CustomFileBuildSteps.Add(buildStep);
+                }
+            }
         }
     }
 
@@ -574,10 +605,30 @@ namespace SharpmakeGen.FunctionalTests
     }
 
     [Generate]
-    public class SimpleLib : CommonProject
+    public class SimpleStaticLib : CommonProject
     {
-        public SimpleLib()
+        public SimpleStaticLib()
         {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.Output = Configuration.OutputType.Lib;
+        }
+    }
+
+    [Generate]
+    public class SimpleDynamicLib : CommonProject
+    {
+        public SimpleDynamicLib()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.Output = Configuration.OutputType.Dll;
         }
     }
 
@@ -590,7 +641,8 @@ namespace SharpmakeGen.FunctionalTests
         public override void ConfigureAll(Configuration conf, Target target)
         {
             base.ConfigureAll(conf, target);
-            conf.AddPublicDependency<SimpleLib>(target);
+            conf.AddPublicDependency<SimpleStaticLib>(target);
+            conf.AddPublicDependency<SimpleDynamicLib>(target);
         }
     }
 

@@ -1,0 +1,5 @@
+#pragma once
+
+// We must export a symbol in order for LIB file to
+// be created along DLL as we need to link it to EXE.
+__declspec(dllexport) void ExportFunction();

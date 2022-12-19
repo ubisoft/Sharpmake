@@ -1010,6 +1010,7 @@ namespace Sharpmake.Generators.FastBuild
                         var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
                         fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
                         fastBuildPreBuildDependencies.AddRange(preBuildTargets);
+                        fastBuildPreBuildDependencies.AddRange(fileCustomBuildKeys);
 
                         if (projectHasResourceFiles)
                             resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
