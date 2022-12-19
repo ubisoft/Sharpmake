@@ -29,7 +29,7 @@ namespace HelloClangCl
         public virtual void ConfigureAll(Configuration conf, CommonTarget target)
         {
             conf.SolutionFileName = "[solution.Name]_[target.Platform]";
-            if (target.DevEnv != DevEnv.xcode4ios)
+            if (target.DevEnv != DevEnv.xcode)
                 conf.SolutionFileName += "_[target.DevEnv]";
             conf.PlatformName = "[target.SolutionPlatformName]";
             conf.SolutionPath = System.IO.Path.Combine(Globals.TmpDirectory, "solutions");

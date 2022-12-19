@@ -1431,7 +1431,7 @@ namespace Sharpmake
                         }
                         break;
 
-                    case DevEnv.xcode4ios:
+                    case DevEnv.xcode:
                         return ".xcodeproj";
 
                     case DevEnv.eclipse:

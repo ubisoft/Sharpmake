@@ -108,7 +108,7 @@ namespace Sharpmake.Generators
                             BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
-                    case DevEnv.xcode4ios:
+                    case DevEnv.xcode:
                         {
                             XCodeProjectGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
