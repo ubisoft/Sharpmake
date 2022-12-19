@@ -207,14 +207,6 @@ namespace SharpmakeGen.FunctionalTests
             base.ConfigureAll(conf, target);
             conf.Output = Configuration.OutputType.Exe;
         }
-
-        public override void ConfigureWin64(Configuration conf, Target target)
-        {
-            base.ConfigureWin64(conf, target);
-
-            // workaround necessity of rc.exe
-            conf.Options.Add(Options.Vc.Linker.EmbedManifest.No);
-        }
     }
 
     [Generate]
@@ -594,6 +586,25 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class SimpleExeWithRC : CommonExeProject
+    {
+        public SimpleExeWithRC()
+        {
+            ResourceFilesExtensions.Add(".rc");
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // This option will make linker invoke rc.exe to embed manifest.
+            // Unless FastBuildSettings.SetPathToResourceCompilerInEnvironment is enabled,
+            // following error will occur: LINK : fatal error LNK1158: cannot run 'rc.exe'
+            conf.Options.Add(Options.Vc.Linker.EmbedManifest.Yes);
+        }
+    }
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -623,6 +634,7 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<PostBuildStampTest>(target);
             conf.AddProject<ExplicitlyOrderedPostBuildTest>(target);
             conf.AddProject<SimpleExeWithLib>(target);
+            conf.AddProject<SimpleExeWithRC>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {
