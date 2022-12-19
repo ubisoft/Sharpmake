@@ -651,7 +651,7 @@ namespace Sharpmake.Generators.FastBuild
 
             string envRemoveGuards = FileGeneratorUtilities.RemoveLineTag;
             string fastBuildEnvironments = string.Empty;
-            if (allDevEnv.Contains(DevEnv.xcode4ios))
+            if (allDevEnv.Contains(DevEnv.xcode))
             {
                 // we'll keep the #if guards if we have other devenv in the file
                 if (allDevEnv.Count > 1)

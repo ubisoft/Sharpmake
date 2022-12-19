@@ -101,7 +101,7 @@ namespace HelloXCode
                 if (BuildSystem == BuildSystem.FastBuild)
                     dirNameParts.Add(BuildSystem.ToString());
 
-                if (DevEnv != DevEnv.xcode4ios)
+                if (DevEnv != DevEnv.xcode)
                     dirNameParts.Add(DevEnv.ToString());
 
                 return string.Join("_", dirNameParts).ToLowerInvariant();
@@ -124,7 +124,7 @@ namespace HelloXCode
         {
             var defaultTarget = new CommonTarget(
                 Platform.mac,
-                DevEnv.xcode4ios,
+                DevEnv.xcode,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
