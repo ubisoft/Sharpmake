@@ -33,10 +33,12 @@ call :UpdateRef samples CSharpImports               CSharpImports.sharpmake.cs  
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples PackageReferences           PackageReferences.sharpmake.cs             reference         PackageReferences
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
-if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable\projects
-if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+:: skipped in regression tests
+::call :UpdateRef samples QTFileCustomBuild           QTFileCustomBuild.sharpmake.cs             reference         QTFileCustomBuild
+::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+:: skipped in regression tests
+::call :UpdateRef samples FastBuildSimpleExecutable   FastBuildSimpleExecutable.sharpmake.cs     reference         FastBuildSimpleExecutable\projects
+::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples SimpleExeLibDependency      SimpleExeLibDependency.sharpmake.cs        reference         SimpleExeLibDependency
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
@@ -50,8 +52,9 @@ call :UpdateRef samples NetCore\DotNetOSMultiFrameworksHelloWorld  HelloWorld.sh
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 :: functional tests
-call :UpdateRef Sharpmake.FunctionalTests FastBuildFunctionalTest FastBuildFunctionalTest.sharpmake.cs reference FastBuildFunctionalTest
-if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+:: Skipped in regression tests
+::call :UpdateRef Sharpmake.FunctionalTests FastBuildFunctionalTest FastBuildFunctionalTest.sharpmake.cs reference FastBuildFunctionalTest
+::if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 
 @COLOR 2F
 echo References update succeeded!
