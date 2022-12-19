@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
+// Copyright (c) 2017-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -440,6 +440,20 @@ namespace Sharpmake.Application
 
         private static void CreateBuilderAndGenerate(BuildContext.BaseBuildContext buildContext, Argument parameters, bool generateDebugSolution)
         {
+            string cleanupSuffixOldValue = Util.FilesAutoCleanupDBSuffix;
+            bool cleanupActiveOldValue = Util.FilesAutoCleanupActive;
+
+            if (generateDebugSolution)
+            {
+                // Set a cleanup context exclusive to debug solution
+                Util.FilesAutoCleanupDBSuffix = "_debugsolution";
+                Util.FilesAutoCleanupActive = true;
+                if (!string.IsNullOrEmpty(parameters.DebugSolutionPath))
+                    Util.FilesAutoCleanupDBPath = parameters.DebugSolutionPath;
+                else
+                    Util.FilesAutoCleanupDBPath = Path.GetDirectoryName(parameters.Sources[0]);
+            }
+
             using (Builder builder = CreateBuilder(buildContext, parameters, allowCleanBlobs: true, generateDebugSolution: generateDebugSolution))
             {
                 if (parameters.CleanBlobsOnly)
@@ -476,6 +490,16 @@ namespace Sharpmake.Application
 
             LogWriteLine("  time: {0:0.00} sec.", (DateTime.Now - s_startTime).TotalSeconds);
             LogWriteLine("  completed on {0}.", DateTime.Now);
+
+            if (generateDebugSolution)
+            {
+                // Execute cleanup for debug solution generation
+                Util.ExecuteFilesAutoCleanup(true);
+
+                // Restore original cleanup context
+                Util.FilesAutoCleanupDBSuffix = cleanupSuffixOldValue;
+                Util.FilesAutoCleanupActive = cleanupActiveOldValue;
+            }
         }
 
         private static void GenerateAll(BuildContext.BaseBuildContext buildContext, Argument parameters)
