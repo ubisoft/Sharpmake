@@ -594,57 +594,16 @@ namespace Sharpmake.Generators.FastBuild
                 additionalGlobalSettings = string.Join(Environment.NewLine, FastBuildSettings.AdditionalGlobalSettings.Select(setting => "    " + setting));
             }
 
-            string fastBuildPATH = FileGeneratorUtilities.RemoveLineTag;
-            if (FastBuildSettings.SetPathToResourceCompilerInEnvironment)
+            string fastBuildWinEnvironmentPaths = string.Empty;
+            if (FastBuildSettings.AdditionalWinEnvironmentPaths.Count > 0)
             {
-                // !FIX FOR LINK : fatal error LNK1158: cannot run rc.exe!
-                //
-                // link.exe on win64 executes rc.exe by itself on some occasions
-                // if it doesn't find it, link errors can occur
-                //
-                // link.exe will first search rc.exe next to it, and if it fails
-                // it will look for it in the folders listed by the PATH
-                // environment variable, so we'll try to replicate that process
-                // in sharpmake:
-                //
-                //       1) Get the linker path
-                //       2) Look for rc.exe near it
-                //       3) If found, exit
-                //       4) If not, add a PATH environment variable pointing to the rc.exe folder
+                fastBuildWinEnvironmentPaths = string.Join(";", FastBuildSettings.AdditionalWinEnvironmentPaths);
+            }
 
-                List<Platform> microsoftPlatforms = PlatformRegistry.GetAvailablePlatforms<IMicrosoftPlatformBff>().ToList();
-                var resourceCompilerPaths = new Strings();
-                foreach (CompilerSettings setting in masterBffInfo.CompilerSettings.Values)
-                {
-                    if (!microsoftPlatforms.Any(x => setting.PlatformFlags.HasFlag(x)))
-                        continue;
-
-                    string defaultResourceCompilerPath = Path.GetDirectoryName(setting.DevEnv.GetWindowsResourceCompiler(Platform.win64));
-                    foreach (var configurationPair in setting.Configurations)
-                    {
-                        var configuration = configurationPair.Value;
-
-                        // check if the configuration has a linker
-                        if (configuration.LinkerPath != FileGeneratorUtilities.RemoveLineTag)
-                        {
-                            // if so, try to find a rc.exe near it
-                            if (!File.Exists(Path.Combine(configuration.LinkerPath, "rc.exe")))
-                            {
-                                // if not found, get the folder of the custom
-                                // rc.exe or the default one to add it to PATH
-                                if (configuration.ResourceCompiler != FileGeneratorUtilities.RemoveLineTag)
-                                    resourceCompilerPaths.Add(Path.GetDirectoryName(configuration.ResourceCompiler));
-                                else
-                                    resourceCompilerPaths.Add(defaultResourceCompilerPath);
-                            }
-                        }
-                    }
-                }
-
-                if (resourceCompilerPaths.Count == 1)
-                    fastBuildPATH = Util.GetCapitalizedPath(resourceCompilerPaths.First());
-                else if (resourceCompilerPaths.Count > 1)
-                    throw new Error("Multiple conflicting resource compilers found in PATH! Please verify your ResourceCompiler settings.");
+            string fastBuildOsxEnvironmentPaths = string.Empty;
+            if (FastBuildSettings.AdditionalOsxEnvironmentPaths.Count > 0)
+            {
+                fastBuildOsxEnvironmentPaths = string.Join(":", FastBuildSettings.AdditionalOsxEnvironmentPaths);
             }
 
             var allDevEnv = masterBffInfo.CompilerSettings.Values.Select(s => s.DevEnv).Distinct().ToList();
@@ -671,7 +630,8 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("CachePluginDLL", cachePluginDLL))
             using (masterBffGenerator.Declare("WorkerConnectionLimit", workerConnectionLimit))
             using (masterBffGenerator.Declare("fastBuildSystemRoot", FastBuildSettings.SystemRoot))
-            using (masterBffGenerator.Declare("fastBuildPATH", fastBuildPATH))
+            using (masterBffGenerator.Declare("fastBuildWinEnvironmentPaths", fastBuildWinEnvironmentPaths))
+            using (masterBffGenerator.Declare("fastBuildOsxEnvironmentPaths", fastBuildOsxEnvironmentPaths))
             using (masterBffGenerator.Declare("fastBuildAllowDBMigration", FastBuildSettings.FastBuildAllowDBMigration ? "true" : FileGeneratorUtilities.RemoveLineTag))
             using (masterBffGenerator.Declare("AdditionalGlobalSettings", additionalGlobalSettings))
             using (masterBffGenerator.Declare("fastBuildEnvironments", fastBuildEnvironments))
@@ -727,6 +687,14 @@ namespace Sharpmake.Generators.FastBuild
                     }
                 }
 
+                var environmentPathSeparator = compilerSettings.DevEnv != DevEnv.xcode4ios ? ";" : ":";
+
+                var fastBuildCompilerEnvironmentPaths = new List<string>();
+                if (FastBuildSettings.AdditionalCompilerEnvironmentPaths.TryGetValue(compiler.Key, out var additionalCompilerEnvironmentPaths))
+                {
+                    fastBuildCompilerEnvironmentPaths.AddRange(additionalCompilerEnvironmentPaths);
+                }
+
                 using (masterBffGenerator.Declare("fastbuildCompilerName", compiler.Key))
                 using (masterBffGenerator.Declare("fastBuildCompilerRootPath", compilerSettings.RootPath))
                 using (masterBffGenerator.Declare("fastBuildCompilerExecutable", string.IsNullOrEmpty(compilerSettings.Executable) ? FileGeneratorUtilities.RemoveLineTag : compilerSettings.Executable))
@@ -734,12 +702,59 @@ namespace Sharpmake.Generators.FastBuild
                 using (masterBffGenerator.Declare("fastBuildCompilerFamily", string.IsNullOrEmpty(fastBuildCompilerFamily) ? FileGeneratorUtilities.RemoveLineTag : fastBuildCompilerFamily))
                 using (masterBffGenerator.Declare("fastBuildCompilerUseRelativePaths", fastBuildCompilerUseRelativePaths))
                 using (masterBffGenerator.Declare("fastBuildCompilerAdditionalSettings", fastBuildCompilerAdditionalSettings))
+                using (masterBffGenerator.Declare("fastBuildCompilerEnvironmentPaths", fastBuildCompilerEnvironmentPaths.Count > 0 ? $"{string.Join(environmentPathSeparator, fastBuildCompilerEnvironmentPaths)}{environmentPathSeparator}": FileGeneratorUtilities.RemoveLineTag))
                 {
                     masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerSetting);
                     foreach (var compilerConfiguration in compilerSettings.Configurations.OrderBy(x => x.Key))
                     {
                         var compConf = compilerConfiguration.Value;
                         string fastBuildLinkerType = UtilityMethods.GetFBuildLinkerType(compConf.FastBuildLinkerType);
+
+                        var fastBuildConfigEnvironmentPaths = new List<string>();
+                        if (FastBuildSettings.AdditionalConfigEnvironmentPaths.TryGetValue(compilerConfiguration.Key, out var additionalConfigEnvironmentPaths))
+                        {
+                            fastBuildConfigEnvironmentPaths.AddRange(additionalConfigEnvironmentPaths);
+                        }
+
+                        if (FastBuildSettings.SetPathToResourceCompilerInEnvironment)
+                        {
+                            // !FIX FOR LINK : fatal error LNK1158: cannot run rc.exe!
+                            //
+                            // link.exe on win64 executes rc.exe by itself on some occasions
+                            // if it doesn't find it, link errors can occur
+                            //
+                            // link.exe will first search rc.exe next to it, and if it fails
+                            // it will look for it in the folders listed by the PATH
+                            // environment variable, so we'll try to replicate that process
+                            // in sharpmake:
+                            //
+                            //       1) Get the linker path
+                            //       2) Look for rc.exe near it
+                            //       3) If found, exit
+                            //       4) If not, add a PATH environment variable pointing to the rc.exe folder
+
+                            List<Platform> microsoftPlatforms = PlatformRegistry.GetAvailablePlatforms<IMicrosoftPlatformBff>().ToList();
+                            if (microsoftPlatforms.Any(x => compilerSettings.PlatformFlags.HasFlag(x)))
+                            {
+                                // check if the configuration has a linker
+                                if (compConf.LinkerPath != FileGeneratorUtilities.RemoveLineTag)
+                                {
+                                    // if so, try to find a rc.exe near it
+                                    if (!File.Exists(Path.Combine(compConf.LinkerPath, "rc.exe")))
+                                    {
+                                        // if not found, get the folder of the custom
+                                        // rc.exe or the default one to add it to PATH
+                                        string resourceCompilerPath;
+                                        if (compConf.ResourceCompiler != FileGeneratorUtilities.RemoveLineTag)
+                                            resourceCompilerPath = Path.GetDirectoryName(compConf.ResourceCompiler);
+                                        else
+                                            resourceCompilerPath = Path.GetDirectoryName(compilerSettings.DevEnv.GetWindowsResourceCompiler(Platform.win64));
+
+                                        fastBuildConfigEnvironmentPaths.Add(Util.GetCapitalizedPath(resourceCompilerPath));
+                                    }
+                                }
+                            }
+                        }
 
                         using (masterBffGenerator.Declare("fastBuildConfigurationName", compilerConfiguration.Key))
                         using (masterBffGenerator.Declare("fastBuildBinPath", compConf.BinPath))
@@ -752,6 +767,7 @@ namespace Sharpmake.Generators.FastBuild
                         using (masterBffGenerator.Declare("fastBuildLibrarian", compConf.Librarian))
                         using (masterBffGenerator.Declare("fastBuildLinker", compConf.Linker))
                         using (masterBffGenerator.Declare("fastBuildLinkerType", string.IsNullOrEmpty(fastBuildLinkerType) ? FileGeneratorUtilities.RemoveLineTag : fastBuildLinkerType))
+                        using (masterBffGenerator.Declare("fastBuildConfigEnvironmentPaths", fastBuildConfigEnvironmentPaths.Count > 0 ? $"{string.Join(environmentPathSeparator, fastBuildConfigEnvironmentPaths)}{environmentPathSeparator}": FileGeneratorUtilities.RemoveLineTag))
                         using (masterBffGenerator.Declare("fastBuildPlatformLibPaths", string.IsNullOrWhiteSpace(compConf.PlatformLibPaths) ? FileGeneratorUtilities.RemoveLineTag : compConf.PlatformLibPaths))
                         using (masterBffGenerator.Declare("fastBuildExecutable", compConf.Executable))
                         using (masterBffGenerator.Declare("fastBuildUsing", compConf.UsingOtherConfiguration))

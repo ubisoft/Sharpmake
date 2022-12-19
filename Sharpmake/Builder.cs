@@ -1226,7 +1226,8 @@ namespace Sharpmake
                     for (int i = 0; i < configurations.Count; ++i)
                     {
                         Solution.Configuration conf = pair.Value[i];
-                        if (devEnv != conf.Target.GetFragment<DevEnv>())
+                        DevEnv confDevEnv = conf.Target.GetFragment<DevEnv>();
+                        if (devEnv != confDevEnv && !confDevEnv.IsVisualStudio())
                             throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\t'{0}' and '{1}' try to generate '{2}'",
                                 devEnv,
                                 conf.Target.GetFragment<DevEnv>(),
@@ -1283,7 +1284,8 @@ namespace Sharpmake
                         for (int i = 0; i < configurations.Count; ++i)
                         {
                             Project.Configuration conf = pair.Value[i];
-                            if (devEnv != conf.Target.GetFragment<DevEnv>())
+                            DevEnv confDevEnv = conf.Target.GetFragment<DevEnv>();
+                            if (devEnv != confDevEnv && !confDevEnv.IsVisualStudio())
                             {
                                 throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\tBoth {0} and {1} try to generate {2}",
                                     devEnv,

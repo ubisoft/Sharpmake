@@ -205,5 +205,25 @@ namespace Sharpmake
         /// Additional custom property groups. Only those referred will be written to the bff files.
         /// </summary>
         public static readonly IDictionary<string, List<string>> AdditionalPropertyGroups = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Additional environment paths that will be added to global settings function in master BFF.
+        /// </summary>
+        public static Strings AdditionalWinEnvironmentPaths = new Strings();
+        public static Strings AdditionalOsxEnvironmentPaths = new Strings();
+
+        /// <summary>
+        /// Additional environment paths that will be added to specific compiler node in master BFF.
+        /// These paths will only apply to compiler itself and not linker/librarian specified for its config.
+        /// These paths will take precedence before paths from global environment settings.
+        /// </summary>
+        public static readonly IDictionary<string, List<string>> AdditionalCompilerEnvironmentPaths = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Additional environment paths that will be added to specific compiler config in master BFF.
+        /// These paths will not apply to compiler itself, but to linker/librarian specified for its config.
+        /// These paths will take precedence before paths from global environment settings.
+        /// </summary>
+        public static readonly IDictionary<string, List<string>> AdditionalConfigEnvironmentPaths = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
     }
 }

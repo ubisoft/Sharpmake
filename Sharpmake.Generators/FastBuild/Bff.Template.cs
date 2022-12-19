@@ -57,9 +57,10 @@ namespace Sharpmake.Generators.FastBuild
 //=================================================================================================================
 // Global Settings
 //=================================================================================================================
+[fastBuildEnvironments]
 Settings
 {
-[fastBuildEnvironments]
+    .Environment = .EnvironmentBase + 'PATH=$EnvironmentPaths$'
     [CachePluginDLL]
     [CachePath]
     [WorkerConnectionLimit]
@@ -70,28 +71,32 @@ Settings
 
                 public const string WinEnvironment =
 @"#if __WINDOWS__[envRemoveGuards]
-    #import TMP
-    #import TEMP
-    #import USERPROFILE
-    .Environment =
-    {
-        ""TMP=$TMP$"",
-        ""TEMP=$TEMP$"",
-        ""USERPROFILE=$USERPROFILE$"",
-        ""SystemRoot=[fastBuildSystemRoot]""
-        ""PATH=[fastBuildPATH]""
-    }
+#import TMP
+#import TEMP
+#import USERPROFILE
+
+.EnvironmentBase =
+{
+    ""TMP=$TMP$"",
+    ""TEMP=$TEMP$"",
+    ""USERPROFILE=$USERPROFILE$"",
+    ""SystemRoot=[fastBuildSystemRoot]""
+}
+
+.EnvironmentPaths = ""[fastBuildWinEnvironmentPaths]""
 #endif[envRemoveGuards]
 ";
 
                 public const string OsxEnvironment =
 @"#if __OSX__[envRemoveGuards]
-    #import TMPDIR
-    .Environment =
-    {
-        ""TMPDIR=$TMPDIR$"",
-        ""PATH=[fastBuildPATH]""
-    }
+#import TMPDIR
+
+.EnvironmentBase =
+{
+    ""TMPDIR=$TMPDIR$""
+}
+
+.EnvironmentPaths = ""[fastBuildOsxEnvironmentPaths]""
 #endif[envRemoveGuards]
 ";
 
@@ -106,6 +111,7 @@ Compiler( '[fastbuildCompilerName]' )
     .Executable             = '[fastBuildCompilerExecutable]'
     .ExtraFiles             = [fastBuildExtraFiles]
     .CompilerFamily         = '[fastBuildCompilerFamily]'
+    .Environment            = .EnvironmentBase + 'PATH=[fastBuildCompilerEnvironmentPaths]$EnvironmentPaths$'
     .UseRelativePaths_Experimental = [fastBuildCompilerUseRelativePaths]
 [fastBuildCompilerAdditionalSettings]
 }
@@ -140,6 +146,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
     .PlatformLibPaths       = '[fastBuildPlatformLibPaths]'
     .Executable             = '[fastBuildExecutable]'
     .LinkerType             = '[fastBuildLinkerType]'
+    .Environment            = .EnvironmentBase + 'PATH=[fastBuildConfigEnvironmentPaths]$EnvironmentPaths$'
 ]
 ";
 

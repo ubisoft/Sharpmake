@@ -1027,7 +1027,7 @@ namespace Sharpmake
 
     public struct DevEnvRange
     {
-        public DevEnvRange(IEnumerable<Project.Configuration> configurations)
+        public DevEnvRange(IEnumerable<Configuration> configurations)
         {
             DevEnv minDevEnv = 0;
             DevEnv maxDevEnv = 0;
