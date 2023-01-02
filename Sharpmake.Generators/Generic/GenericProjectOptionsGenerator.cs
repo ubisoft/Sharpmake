@@ -1318,6 +1318,12 @@ namespace Sharpmake.Generators.Generic
             Options.Option(Options.Vc.Compiler.RTTI.Disable, () => { context.Options["RuntimeTypeInfo"] = "false"; context.CommandLineOptions["RuntimeTypeInfo"] = "-fno-rtti"; }),
             Options.Option(Options.Vc.Compiler.RTTI.Enable, () => { context.Options["RuntimeTypeInfo"] = "true"; context.CommandLineOptions["RuntimeTypeInfo"] = "-frtti"; })
             );
+
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.General.WholeProgramOptimization.Disable, () => { context.Options["WholeProgramOptimization"] = "false"; context.Options["CompilerWholeProgramOptimization"] = "false"; context.CommandLineOptions["CompilerWholeProgramOptimization"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.General.WholeProgramOptimization.LinkTime, () => { context.Options["WholeProgramOptimization"] = "true"; context.Options["CompilerWholeProgramOptimization"] = "true"; context.CommandLineOptions["CompilerWholeProgramOptimization"] = "-flto"; }),
+            );
         }
         private void GenerateGccCompilerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
@@ -2195,7 +2201,12 @@ namespace Sharpmake.Generators.Generic
         }
         private void GenerateClangLinkerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
-
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Linker.LinkTimeCodeGeneration.Default, () => { context.Options["LinkTimeCodeGeneration"] = "false"; context.LinkerCommandLineOptions["LinkTimeCodeGeneration"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Linker.LinkTimeCodeGeneration.UseLinkTimeCodeGeneration, () => { context.Options["LinkTimeCodeGeneration"] = "true"; context.LinkerCommandLineOptions["LinkTimeCodeGeneration"] = "-flto"; }),
+            Options.Option(Options.Vc.Linker.LinkTimeCodeGeneration.UseFastLinkTimeCodeGeneration, () => { context.Options["LinkTimeCodeGeneration"] = "true"; context.LinkerCommandLineOptions["LinkTimeCodeGeneration"] = "-flto"; }),
+            );
         }
         private void GenerateGccLinkerOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         { }
