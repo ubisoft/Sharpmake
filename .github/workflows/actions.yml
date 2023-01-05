@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.3.0
 
       - name: Bootstrap.bat ${{ matrix.configuration }}
         if: runner.os == 'Windows'
@@ -76,7 +76,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.3.0
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         uses: actions/download-artifact@v3
@@ -105,7 +105,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.3.0
 
       # Setting a VS_VERSION_SUFFIX variable for use by steps that are using solutions specific to VS2019 or VS2022
       - name: SetVSVersionSuffix-VS2019
