@@ -149,6 +149,11 @@ namespace HelloXCode
                 BuildSystem.Default
             );
 
+            // make a blob version of the target
+            var iosBlobTarget = (CommonTarget)iosTarget.Clone(
+                Blob.Blob
+            );
+
             // make a fastbuild version of the target
             var iosFastBuildTarget = (CommonTarget)iosTarget.Clone(
                 Blob.FastBuildUnitys,
@@ -171,7 +176,7 @@ namespace HelloXCode
 
             return new[] {
                 macosTarget, macosBlobTarget, macosFastBuildTarget,
-                iosTarget, iosFastBuildTarget,
+                iosTarget, iosBlobTarget, iosFastBuildTarget,
                 tvosTarget, tvosFastBuildTarget,
                 };
         }
