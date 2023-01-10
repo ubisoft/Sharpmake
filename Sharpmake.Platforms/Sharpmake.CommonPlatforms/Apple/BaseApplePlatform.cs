@@ -506,6 +506,8 @@ namespace Sharpmake
                 options["CodeSigningIdentity"] = codeSigningIdentity.Value;
             else if (conf.Platform == Platform.ios)
                 options["CodeSigningIdentity"] = "iPhone Developer"; //Previous Default value in the template
+            else if (conf.Platform == Platform.tvos)
+                options["CodeSigningIdentity"] = "AppleTV Developer"; //Previous Default value in the template
             else
                 options["CodeSigningIdentity"] = FileGeneratorUtilities.RemoveLineTag;
 
