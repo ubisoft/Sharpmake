@@ -136,8 +136,23 @@ namespace HelloXCode
                 BuildSystem.FastBuild
             );
 
+            var iosTarget = new CommonTarget(
+                Platform.ios,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a fastbuild version of the target
+            var iosFastBuildTarget = (CommonTarget)iosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
             return new[] {
                 macosTarget, macosFastBuildTarget,
+                iosTarget, iosFastBuildTarget,
                 };
         }
     }
