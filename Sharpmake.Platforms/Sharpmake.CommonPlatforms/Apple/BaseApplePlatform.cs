@@ -702,7 +702,8 @@ namespace Sharpmake
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad, () => options["TargetedDeviceFamily"] = "1,2"),
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ios, () => options["TargetedDeviceFamily"] = "1"),
-                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2")
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Tvos, () => options["TargetedDeviceFamily"] = "3")
             );
 
             Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);
