@@ -332,6 +332,11 @@ namespace Sharpmake
                 IosApp,
 
                 /// <summary>
+                /// The output is a tvOS app.
+                /// </summary>
+                TvosApp,
+
+                /// <summary>
                 /// The output is an iOS test bundle.
                 /// </summary>
                 IosTestBundle,
@@ -3262,6 +3267,7 @@ namespace Sharpmake
                             }
                             break;
                         case OutputType.IosApp:
+                        case OutputType.TvosApp:
                         case OutputType.Exe:
                             {
                                 if (hasPublicPathToRoot)

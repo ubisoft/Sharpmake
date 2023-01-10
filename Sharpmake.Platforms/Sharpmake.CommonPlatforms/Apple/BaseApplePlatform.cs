@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2022 Ubisoft Entertainment
+// Copyright (c) 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -281,6 +281,7 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Exe:
                     return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.IosApp:
+                case Project.Configuration.OutputType.TvosApp:
                     return ".app";
                 case Project.Configuration.OutputType.IosTestBundle:
                     return ".xctest";
@@ -669,6 +670,7 @@ namespace Sharpmake
             {
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.IosApp:
+                case Project.Configuration.OutputType.TvosApp:
                     options["MachOType"] = "mh_execute";
                     break;
                 case Project.Configuration.OutputType.Lib:
