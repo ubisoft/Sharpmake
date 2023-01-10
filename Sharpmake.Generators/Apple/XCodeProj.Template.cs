@@ -269,11 +269,11 @@ namespace Sharpmake.Generators.Apple
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
 				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
+				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
 				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = [item.Options.SpecificSimulatorLibraryPaths];
 				MACH_O_TYPE = ""[item.Options.MachOType]"";
-				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
 				OBJROOT = ""[item.Configuration.IntermediatePath]"";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
 				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
