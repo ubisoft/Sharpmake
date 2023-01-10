@@ -19,7 +19,7 @@ namespace Sharpmake
         public sealed partial class tvOsPlatform
         {
             public const string _compilerExtraOptionsGeneral = @"
-            + ' [cmdLineOptions.IPhoneOSDeploymentTarget]'
+            + ' [cmdLineOptions.TvOSDeploymentTarget]'
 ";
         }
     }

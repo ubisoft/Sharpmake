@@ -263,6 +263,15 @@ namespace Sharpmake
                     }
                 }
 
+                public class TvOSDeploymentTarget
+                {
+                    public string MinimumVersion;
+                    public TvOSDeploymentTarget(string minimumVersion)
+                    {
+                        MinimumVersion = minimumVersion;
+                    }
+                }
+
                 public class MacOSDeploymentTarget
                 {
                     public string MinimumVersion;

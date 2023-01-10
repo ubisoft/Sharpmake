@@ -73,17 +73,18 @@ namespace Sharpmake
 
                 // Target
                 options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
 
-                Options.XCode.Compiler.IPhoneOSDeploymentTarget tvosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.IPhoneOSDeploymentTarget>(conf);
+                Options.XCode.Compiler.TvOSDeploymentTarget tvosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.TvOSDeploymentTarget>(conf);
                 if (tvosDeploymentTarget != null)
                 {
-                    options["IPhoneOSDeploymentTarget"] = tvosDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["IPhoneOSDeploymentTarget"] = $"-target arm64-apple-tvos{tvosDeploymentTarget.MinimumVersion}";
+                    options["TvOSDeploymentTarget"] = tvosDeploymentTarget.MinimumVersion;
+                    cmdLineOptions["TvOSDeploymentTarget"] = $"-target arm64-apple-tvos{tvosDeploymentTarget.MinimumVersion}";
                 }
                 else
                 {
-                    options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                    cmdLineOptions["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
 
