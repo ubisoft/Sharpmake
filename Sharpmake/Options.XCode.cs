@@ -263,13 +263,6 @@ namespace Sharpmake
                     }
                 }
 
-                public enum LibraryStandard
-                {
-                    CppStandard,
-                    [Default]
-                    LibCxx
-                }
-
                 public class MacOSDeploymentTarget
                 {
                     public string MinimumVersion;
@@ -277,6 +270,13 @@ namespace Sharpmake
                     {
                         MinimumVersion = minimumVersion;
                     }
+                }
+
+                public enum LibraryStandard
+                {
+                    CppStandard,
+                    [Default]
+                    LibCxx
                 }
 
                 public enum ModelTuning
