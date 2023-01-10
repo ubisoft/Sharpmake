@@ -269,6 +269,7 @@ namespace Sharpmake.Generators.Apple
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
 				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
+				TVOS_DEPLOYMENT_TARGET = ""[item.Options.TvOSDeploymentTarget]"";
 				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
 				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
