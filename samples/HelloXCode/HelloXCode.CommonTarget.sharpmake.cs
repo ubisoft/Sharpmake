@@ -122,7 +122,7 @@ namespace HelloXCode
 
         public static CommonTarget[] GetMacTargets()
         {
-            var defaultTarget = new CommonTarget(
+            var macosTarget = new CommonTarget(
                 Platform.mac,
                 DevEnv.xcode,
                 Optimization.Debug | Optimization.Release,
@@ -131,12 +131,14 @@ namespace HelloXCode
             );
 
             // make a fastbuild version of the target
-            var fastBuildTarget = (CommonTarget)defaultTarget.Clone(
+            var macosFastBuildTarget = (CommonTarget)macosTarget.Clone(
                 Blob.FastBuildUnitys,
                 BuildSystem.FastBuild
             );
 
-            return new[] { defaultTarget, fastBuildTarget };
+            return new[] {
+                macosTarget, macosFastBuildTarget,
+                };
         }
     }
 }
