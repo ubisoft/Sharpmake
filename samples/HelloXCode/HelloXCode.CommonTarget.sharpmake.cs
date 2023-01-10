@@ -150,9 +150,24 @@ namespace HelloXCode
                 BuildSystem.FastBuild
             );
 
+            var tvosTarget = new CommonTarget(
+                Platform.tvos,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a fastbuild version of the target
+            var tvosFastBuildTarget = (CommonTarget)tvosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
             return new[] {
                 macosTarget, macosFastBuildTarget,
                 iosTarget, iosFastBuildTarget,
+                tvosTarget, tvosFastBuildTarget,
                 };
         }
     }
