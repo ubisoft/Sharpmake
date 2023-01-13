@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2020-2022 Ubisoft Entertainment
+// Copyright (c) 2017, 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -263,11 +263,13 @@ namespace Sharpmake
                     }
                 }
 
-                public enum LibraryStandard
+                public class TvOSDeploymentTarget
                 {
-                    CppStandard,
-                    [Default]
-                    LibCxx
+                    public string MinimumVersion;
+                    public TvOSDeploymentTarget(string minimumVersion)
+                    {
+                        MinimumVersion = minimumVersion;
+                    }
                 }
 
                 public class MacOSDeploymentTarget
@@ -277,6 +279,13 @@ namespace Sharpmake
                     {
                         MinimumVersion = minimumVersion;
                     }
+                }
+
+                public enum LibraryStandard
+                {
+                    CppStandard,
+                    [Default]
+                    LibCxx
                 }
 
                 public enum ModelTuning
@@ -386,6 +395,7 @@ namespace Sharpmake
                     [Default]
                     Ios = 1 << 0,
                     Ipad = 1 << 1,
+                    Tvos = 1 << 2,
 
                     IosAndIpad = Ios | Ipad
                 }

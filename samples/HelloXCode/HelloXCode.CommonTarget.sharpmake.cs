@@ -122,7 +122,7 @@ namespace HelloXCode
 
         public static CommonTarget[] GetMacTargets()
         {
-            var defaultTarget = new CommonTarget(
+            var macosTarget = new CommonTarget(
                 Platform.mac,
                 DevEnv.xcode,
                 Optimization.Debug | Optimization.Release,
@@ -130,13 +130,60 @@ namespace HelloXCode
                 BuildSystem.Default
             );
 
+            // make a blob version of the target
+            var macosBlobTarget = (CommonTarget)macosTarget.Clone(
+                Blob.Blob
+            );
+
             // make a fastbuild version of the target
-            var fastBuildTarget = (CommonTarget)defaultTarget.Clone(
+            var macosFastBuildTarget = (CommonTarget)macosTarget.Clone(
                 Blob.FastBuildUnitys,
                 BuildSystem.FastBuild
             );
 
-            return new[] { defaultTarget, fastBuildTarget };
+            var iosTarget = new CommonTarget(
+                Platform.ios,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var iosBlobTarget = (CommonTarget)iosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var iosFastBuildTarget = (CommonTarget)iosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+            var tvosTarget = new CommonTarget(
+                Platform.tvos,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a fastbuild version of the target
+            var tvosBlobTarget = (CommonTarget)tvosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var tvosFastBuildTarget = (CommonTarget)tvosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+            return new[] {
+                macosTarget, macosBlobTarget, macosFastBuildTarget,
+                iosTarget, iosBlobTarget, iosFastBuildTarget,
+                tvosTarget, tvosBlobTarget, tvosFastBuildTarget,
+                };
         }
     }
 }
