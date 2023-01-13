@@ -29,6 +29,7 @@ namespace Sharpmake
                             + ' [cmdLineOptions.NoExecStackRequired]'
                             + ' [cmdLineOptions.Relocation]'
                             + ' [cmdLineOptions.UnresolvedSymbolReferences]'
+                            + ' [cmdLineOptions.BuildId]'
                             // Additional linker options
                             //--------------------------
                             + ' [options.AdditionalLinkerOptions]'

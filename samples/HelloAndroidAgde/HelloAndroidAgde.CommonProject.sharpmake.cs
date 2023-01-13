@@ -73,6 +73,7 @@ namespace HelloAndroidAgde
             conf.Options.Add(new Options.Agde.General.AndroidGradleBuildDir("$(SolutionDir)"));
             conf.Options.Add(AndroidMinSdkVersion); // This will set AndroidMinSdkVersion when project is for AGDE
             conf.Options.Add(Options.Agde.General.UseOfStl.LibCpp_Shared);
+            conf.Options.Add(Options.Agde.Linker.BuildId.Md5); // This allow to match debug-stripped binaries with their original binary, similar to how ".pdb" work on Windows.
         }
         #endregion
         ////////////////////////////////////////////////////////////////////////
