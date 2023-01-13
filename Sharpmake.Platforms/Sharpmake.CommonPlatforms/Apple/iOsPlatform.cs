@@ -74,6 +74,7 @@ namespace Sharpmake
                 // Target
                 options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                options["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
 
                 Options.XCode.Compiler.IPhoneOSDeploymentTarget iosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.IPhoneOSDeploymentTarget>(conf);
                 if (iosDeploymentTarget != null)

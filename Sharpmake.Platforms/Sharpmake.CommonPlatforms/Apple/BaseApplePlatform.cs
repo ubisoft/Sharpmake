@@ -282,6 +282,7 @@ namespace Sharpmake
                     return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.IosApp:
                 case Project.Configuration.OutputType.TvosApp:
+                case Project.Configuration.OutputType.WatchosApp:
                     return ".app";
                 case Project.Configuration.OutputType.IosTestBundle:
                     return ".xctest";
@@ -673,6 +674,7 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.IosApp:
                 case Project.Configuration.OutputType.TvosApp:
+                case Project.Configuration.OutputType.WatchosApp:
                     options["MachOType"] = "mh_execute";
                     break;
                 case Project.Configuration.OutputType.Lib:
@@ -703,7 +705,8 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad, () => options["TargetedDeviceFamily"] = "1,2"),
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ios, () => options["TargetedDeviceFamily"] = "1"),
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2"),
-                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Tvos, () => options["TargetedDeviceFamily"] = "3")
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Tvos, () => options["TargetedDeviceFamily"] = "3"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Watchos, () => options["TargetedDeviceFamily"] = "4")
             );
 
             Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);

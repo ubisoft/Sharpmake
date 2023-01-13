@@ -271,6 +271,7 @@ namespace Sharpmake.Generators.Apple
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
 				TVOS_DEPLOYMENT_TARGET = ""[item.Options.TvOSDeploymentTarget]"";
 				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
+				WATCHOS_DEPLOYMENT_TARGET = ""[item.Options.WatchOSDeploymentTarget]"";
 				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = [item.Options.SpecificSimulatorLibraryPaths];

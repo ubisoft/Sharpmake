@@ -20,31 +20,31 @@ namespace Sharpmake
 {
     public static partial class Apple
     {
-        [PlatformImplementation(Platform.tvos,
+        [PlatformImplementation(Platform.watchos,
             typeof(IPlatformDescriptor),
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IClangPlatformBff),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
-        public sealed partial class tvOsPlatform : BaseApplePlatform
+        public sealed partial class watchOsPlatform : BaseApplePlatform
         {
-            public override Platform SharpmakePlatform => Platform.tvos;
+            public override Platform SharpmakePlatform => Platform.watchos;
 
             #region IPlatformDescriptor implementation.
-            public override string SimplePlatformString => "tvOS";
+            public override string SimplePlatformString => "watchOS";
             #endregion
 
-            public override string BffPlatformDefine => "_TVOS";
+            public override string BffPlatformDefine => "_WATCHOS";
 
             public override string CConfigName(Configuration conf)
             {
-                return ".tvosConfig";
+                return ".watchosConfig";
             }
 
             public override string CppConfigName(Configuration conf)
             {
-                return ".tvosppConfig";
+                return ".watchosppConfig";
             }
 
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
@@ -62,8 +62,8 @@ namespace Sharpmake
                 var conf = context.Configuration;
 
                 // Sysroot
-                options["SDKRoot"] = "appletvos";
-                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS.sdk";
+                options["SDKRoot"] = "watchos";
+                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/watchOS.platform/Developer/SDKs/watchOS.sdk";
                 Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
                 if (customSdkRoot != null)
                 {
@@ -74,18 +74,18 @@ namespace Sharpmake
                 // Target
                 options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                options["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
 
-                Options.XCode.Compiler.TvOSDeploymentTarget tvosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.TvOSDeploymentTarget>(conf);
-                if (tvosDeploymentTarget != null)
+                Options.XCode.Compiler.WatchOSDeploymentTarget watchosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.WatchOSDeploymentTarget>(conf);
+                if (watchosDeploymentTarget != null)
                 {
-                    options["TvOSDeploymentTarget"] = tvosDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["TvOSDeploymentTarget"] = $"-target arm64-apple-tvos{tvosDeploymentTarget.MinimumVersion}";
+                    options["WatchOSDeploymentTarget"] = watchosDeploymentTarget.MinimumVersion;
+                    cmdLineOptions["WatchOSDeploymentTarget"] = $"-target arm64-apple-watchos{watchosDeploymentTarget.MinimumVersion}";
                 }
                 else
                 {
-                    options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                    cmdLineOptions["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    options["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
 
@@ -98,7 +98,7 @@ namespace Sharpmake
                 var conf = context.Configuration;
 
                 // Sysroot
-                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS.sdk";
+                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/watchOS.platform/Developer/SDKs/watchOS.sdk";
                 Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
                 if (customSdkRoot != null)
                     cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
