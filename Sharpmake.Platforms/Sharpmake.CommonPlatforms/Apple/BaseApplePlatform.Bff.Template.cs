@@ -25,6 +25,9 @@ namespace Sharpmake
                             // Libraries
                             // ---------------------------
                             + ' [cmdLineOptions.AdditionalDependencies]'
+                            // SystemFrameworks
+                            //--------------------------
+                            + ' [cmdLineOptions.SystemFrameworks]'
                             // Options
                             //--------
                             + ' [cmdLineOptions.GenerateMapFile]'

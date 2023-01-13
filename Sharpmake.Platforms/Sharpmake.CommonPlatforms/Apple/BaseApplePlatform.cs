@@ -947,6 +947,10 @@ namespace Sharpmake
                 // xcode for some reason does not use arrays for this setting but space separated values
                 options["PreLinkedLibraries"] = prelinkedLibrary;
             }
+
+            OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
+            systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
+            cmdLineOptions["SystemFrameworks"] = systemFrameworks.Any() ? "-framework " + systemFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
