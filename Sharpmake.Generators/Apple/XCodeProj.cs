@@ -341,18 +341,29 @@ namespace Sharpmake.Generators.Apple
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPreBuildPhases, conf.EventPreBuild.GetEnumerator());
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPostBuildPhases, conf.EventPostBuild.GetEnumerator());
 
-                    Strings systemFrameworks = Options.GetStrings<Options.XCode.Compiler.SystemFrameworks>(conf);
-                    foreach (string systemFramework in systemFrameworks)
+                    switch (conf.Output)
                     {
-                        var systemFrameworkItem = new ProjectSystemFrameworkFile(systemFramework);
-                        var buildFileItem = new ProjectBuildFile(systemFrameworkItem);
-                        if (!_frameworksFolder.Children.Exists(item => item.FullPath == systemFrameworkItem.FullPath))
-                        {
-                            _frameworksFolder.Children.Add(systemFrameworkItem);
-                            _projectItems.Add(systemFrameworkItem);
-                        }
-                        _projectItems.Add(buildFileItem);
-                        _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                        case Project.Configuration.OutputType.IosApp:
+                        case Project.Configuration.OutputType.IosTestBundle:
+                        case Project.Configuration.OutputType.Exe:
+                        case Project.Configuration.OutputType.Dll:
+
+                            OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
+                            systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
+
+                            foreach (string systemFramework in systemFrameworks)
+                            {
+                                var systemFrameworkItem = new ProjectSystemFrameworkFile(systemFramework);
+                                var buildFileItem = new ProjectBuildFile(systemFrameworkItem);
+                                if (!_frameworksFolder.Children.Exists(item => item.FullPath == systemFrameworkItem.FullPath))
+                                {
+                                    _frameworksFolder.Children.Add(systemFrameworkItem);
+                                    _projectItems.Add(systemFrameworkItem);
+                                }
+                                _projectItems.Add(buildFileItem);
+                                _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                            }
+                            break;
                     }
 
                     // master bff path
@@ -684,7 +695,7 @@ namespace Sharpmake.Generators.Apple
         {
             _mainGroup = new ProjectFolder(project.GetType().Name, true);
 
-            if (Options.GetObjects<Options.XCode.Compiler.SystemFrameworks>(configuration).Any() || Options.GetObjects<Options.XCode.Compiler.UserFrameworks>(configuration).Any())
+            if (configuration.XcodeSystemFrameworks.Any() || configuration.XcodeDependenciesSystemFrameworks.Any() || Options.GetObjects<Options.XCode.Compiler.UserFrameworks>(configuration).Any())
             {
                 _frameworksFolder = new ProjectFolder("Frameworks", true);
                 _projectItems.Add(_frameworksFolder);

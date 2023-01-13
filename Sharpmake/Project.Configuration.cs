@@ -1152,6 +1152,35 @@ namespace Sharpmake
             public OrderableStrings LibraryFiles = new OrderableStrings();
 
             /// <summary>
+            /// Gets a list of the Frameworks to link to for Xcode project.
+            /// </summary>
+            private OrderableStrings _XcodeSystemFrameworks = null;
+            public OrderableStrings XcodeSystemFrameworks { 
+                get
+                {
+                    if (_XcodeSystemFrameworks == null)
+                    {
+                        _XcodeSystemFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeSystemFrameworks;
+                }
+                set { _XcodeSystemFrameworks = value; }
+            }
+
+            private OrderableStrings _XcodeDependenciesSystemFrameworks = null;
+            public OrderableStrings XcodeDependenciesSystemFrameworks {
+                get
+                {
+                    if (_XcodeDependenciesSystemFrameworks == null)
+                    {
+                        _XcodeDependenciesSystemFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeDependenciesSystemFrameworks;
+                }
+                private set{}
+            }
+
+            /// <summary>
             /// Gets a list of "using" directories for compiling WinRT C++ extensions.
             /// </summary>
             /// <remarks>
@@ -3052,6 +3081,11 @@ namespace Sharpmake
                 var visitingNodes = new Stack<Tuple<DependencyNode, PropagationSettings>>();
                 visitingNodes.Push(Tuple.Create(rootNode, new PropagationSettings(DependencySetting.Default, true, true, true, false)));
 
+                //backward compatible, systemframeworks might be added via options.
+                Strings xcodeSystemFrameworks = Sharpmake.Options.GetStrings<Options.XCode.Compiler.SystemFrameworks>(this);
+                if (xcodeSystemFrameworks.Count > 0)
+                    XcodeSystemFrameworks.AddRange(xcodeSystemFrameworks);
+
                 while (visitingNodes.Count > 0)
                 {
                     var visitedTuple = visitingNodes.Pop();
@@ -3180,6 +3214,9 @@ namespace Sharpmake
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
                                 }
+                                
+                                if ((dependency.Platform.Equals(Platform.mac) || dependency.Platform.Equals(Platform.ios)) && dependency.XcodeSystemFrameworks.Count > 0)
+                                    XcodeDependenciesSystemFrameworks.AddRange(dependency.XcodeSystemFrameworks);
 
                                 // If our no-output project is just a build-order dependency, update the build order accordingly
                                 if (!dependencyOutputLib && isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder && !isExport)
