@@ -179,10 +179,31 @@ namespace HelloXCode
                 BuildSystem.FastBuild
             );
 
+            var watchosTarget = new CommonTarget(
+                Platform.watchos,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var watchosBlobTarget = (CommonTarget)watchosTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a fastbuild version of the target
+            var watchosFastBuildTarget = (CommonTarget)watchosTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
+
+
             return new[] {
                 macosTarget, macosBlobTarget, macosFastBuildTarget,
                 iosTarget, iosBlobTarget, iosFastBuildTarget,
                 tvosTarget, tvosBlobTarget, tvosFastBuildTarget,
+                watchosTarget, watchosBlobTarget, watchosFastBuildTarget,
                 };
         }
     }
