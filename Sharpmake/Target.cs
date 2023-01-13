@@ -110,6 +110,11 @@ namespace Sharpmake
         /// </summary>
         tvos = 1 << 12,
 
+        /// <summary>
+        /// Apple Watch
+        /// </summary>
+        watchos = 1 << 13,
+
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
         _reserved7 = 1 << 24,

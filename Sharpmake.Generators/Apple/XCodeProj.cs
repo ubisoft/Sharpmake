@@ -1636,6 +1636,7 @@ namespace Sharpmake.Generators.Apple
                         break;
                     case Project.Configuration.OutputType.IosApp:
                     case Project.Configuration.OutputType.TvosApp:
+                    case Project.Configuration.OutputType.WatchosApp:
                         ProductType = "com.apple.product-type.application";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
@@ -1846,8 +1847,9 @@ namespace Sharpmake.Generators.Apple
                 // Lookup for the app in the unit test dependencies.
                 ProjectTargetDependency testHostTargetDependency =
                     nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null &&
-                    (dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp ||
-                     dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.TvosApp)
+                    (dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp  ||
+                     dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.TvosApp ||
+                     dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.WatchosApp)
                     );
 
                 if (testHostTargetDependency != null)

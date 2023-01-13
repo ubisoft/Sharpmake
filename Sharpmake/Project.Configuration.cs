@@ -337,6 +337,11 @@ namespace Sharpmake
                 TvosApp,
 
                 /// <summary>
+                /// The output is a watchOS app.
+                /// </summary>
+                WatchosApp,
+
+                /// <summary>
                 /// The output is an iOS test bundle.
                 /// </summary>
                 IosTestBundle,
@@ -3267,6 +3272,7 @@ namespace Sharpmake
                             }
                             break;
                         case OutputType.IosApp:
+                        case OutputType.WatchosApp:
                         case OutputType.TvosApp:
                         case OutputType.Exe:
                             {

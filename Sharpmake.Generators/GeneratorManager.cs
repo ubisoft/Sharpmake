@@ -129,9 +129,10 @@ namespace Sharpmake.Generators
                              List<string> generatedFiles,
                              List<string> skipFiles)
         {
-            if (configurations[0].Platform == Platform.ios ||
-                configurations[0].Platform == Platform.mac ||
-                configurations[0].Platform == Platform.tvos
+            if (configurations[0].Platform == Platform.ios  ||
+                configurations[0].Platform == Platform.mac  ||
+                configurations[0].Platform == Platform.tvos ||
+                configurations[0].Platform == Platform.watchos
             )
             {
                 XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);

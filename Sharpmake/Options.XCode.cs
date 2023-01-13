@@ -272,6 +272,15 @@ namespace Sharpmake
                     }
                 }
 
+                public class WatchOSDeploymentTarget
+                {
+                    public string MinimumVersion;
+                    public WatchOSDeploymentTarget(string minimumVersion)
+                    {
+                        MinimumVersion = minimumVersion;
+                    }
+                }
+
                 public class MacOSDeploymentTarget
                 {
                     public string MinimumVersion;
@@ -396,6 +405,7 @@ namespace Sharpmake
                     Ios = 1 << 0,
                     Ipad = 1 << 1,
                     Tvos = 1 << 2,
+                    Watchos = 1 << 3,
 
                     IosAndIpad = Ios | Ipad
                 }
