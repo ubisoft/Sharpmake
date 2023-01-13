@@ -49,6 +49,8 @@ namespace HelloXCode
                 default:
                     throw new Error("Unexpected optimization " + target.Optimization);
             }
+
+            conf.Options.Add(new Options.XCode.Compiler.SystemFrameworks("CoreFoundation"));
         }
     }
 }
