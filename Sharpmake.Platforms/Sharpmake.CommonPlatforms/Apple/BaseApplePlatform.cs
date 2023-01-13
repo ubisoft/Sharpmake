@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2022 Ubisoft Entertainment
+// Copyright (c) 2020-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -281,6 +281,7 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Exe:
                     return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.IosApp:
+                case Project.Configuration.OutputType.TvosApp:
                     return ".app";
                 case Project.Configuration.OutputType.IosTestBundle:
                     return ".xctest";
@@ -505,6 +506,8 @@ namespace Sharpmake
                 options["CodeSigningIdentity"] = codeSigningIdentity.Value;
             else if (conf.Platform == Platform.ios)
                 options["CodeSigningIdentity"] = "iPhone Developer"; //Previous Default value in the template
+            else if (conf.Platform == Platform.tvos)
+                options["CodeSigningIdentity"] = "AppleTV Developer"; //Previous Default value in the template
             else
                 options["CodeSigningIdentity"] = FileGeneratorUtilities.RemoveLineTag;
 
@@ -669,6 +672,7 @@ namespace Sharpmake
             {
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.IosApp:
+                case Project.Configuration.OutputType.TvosApp:
                     options["MachOType"] = "mh_execute";
                     break;
                 case Project.Configuration.OutputType.Lib:
@@ -698,7 +702,8 @@ namespace Sharpmake
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad, () => options["TargetedDeviceFamily"] = "1,2"),
                 Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ios, () => options["TargetedDeviceFamily"] = "1"),
-                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2")
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Ipad, () => options["TargetedDeviceFamily"] = "2"),
+                Options.Option(Options.XCode.Compiler.TargetedDeviceFamily.Tvos, () => options["TargetedDeviceFamily"] = "3")
             );
 
             Options.XCode.Compiler.ValidArchs validArchs = Options.GetObject<Options.XCode.Compiler.ValidArchs>(conf);

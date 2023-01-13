@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
+// Copyright (c) 2017-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,7 +129,10 @@ namespace Sharpmake.Generators
                              List<string> generatedFiles,
                              List<string> skipFiles)
         {
-            if (configurations[0].Platform == Platform.ios || configurations[0].Platform == Platform.mac)
+            if (configurations[0].Platform == Platform.ios ||
+                configurations[0].Platform == Platform.mac ||
+                configurations[0].Platform == Platform.tvos
+            )
             {
                 XCWorkspaceGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                 if (UtilityMethods.HasFastBuildConfig(configurations))
