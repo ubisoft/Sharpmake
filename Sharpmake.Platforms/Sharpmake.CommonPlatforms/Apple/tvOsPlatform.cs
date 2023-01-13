@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2017-2018, 2020-2021 Ubisoft Entertainment
-// 
+// Copyright (c) 2020-2021 Ubisoft Entertainment
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,29 +20,37 @@ namespace Sharpmake
 {
     public static partial class Apple
     {
-        [PlatformImplementation(Platform.mac,
+        [PlatformImplementation(Platform.tvos,
             typeof(IPlatformDescriptor),
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IClangPlatformBff),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
-        public sealed class MacOsPlatform : BaseApplePlatform
+        public sealed partial class tvOsPlatform : BaseApplePlatform
         {
-            public override Platform SharpmakePlatform => Platform.mac;
+            public override Platform SharpmakePlatform => Platform.tvos;
 
-            public override string SimplePlatformString => "Mac";
+            #region IPlatformDescriptor implementation.
+            public override string SimplePlatformString => "tvOS";
+            #endregion
 
-            public override string BffPlatformDefine => "APPLE_OSX";
+            public override string BffPlatformDefine => "_TVOS";
 
             public override string CConfigName(Configuration conf)
             {
-                return ".osxConfig";
+                return ".tvosConfig";
             }
 
             public override string CppConfigName(Configuration conf)
             {
-                return ".osxppConfig";
+                return ".tvosppConfig";
+            }
+
+            protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
+            {
+                base.WriteCompilerExtraOptionsGeneral(generator);
+                generator.Write(_compilerExtraOptionsGeneral);
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -54,8 +62,8 @@ namespace Sharpmake
                 var conf = context.Configuration;
 
                 // Sysroot
-                options["SDKRoot"] = "macosx";
-                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                options["SDKRoot"] = "appletvos";
+                cmdLineOptions["SDKRoot"] = $"-isysroot {XCodeDeveloperFolder}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS.sdk";
                 Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
                 if (customSdkRoot != null)
                 {
@@ -64,19 +72,19 @@ namespace Sharpmake
                 }
 
                 // Target
+                options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
 
-                var macOsDeploymentTarget = Options.GetObject<Options.XCode.Compiler.MacOSDeploymentTarget>(conf);
-                if (macOsDeploymentTarget != null)
+                Options.XCode.Compiler.TvOSDeploymentTarget tvosDeploymentTarget = Options.GetObject<Options.XCode.Compiler.TvOSDeploymentTarget>(conf);
+                if (tvosDeploymentTarget != null)
                 {
-                    options["MacOSDeploymentTarget"] = macOsDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag; // TODO: find what to write here
+                    options["TvOSDeploymentTarget"] = tvosDeploymentTarget.MinimumVersion;
+                    cmdLineOptions["TvOSDeploymentTarget"] = $"-target arm64-apple-tvos{tvosDeploymentTarget.MinimumVersion}";
                 }
                 else
                 {
-                    options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
             }
 
@@ -89,7 +97,7 @@ namespace Sharpmake
                 var conf = context.Configuration;
 
                 // Sysroot
-                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS.sdk";
                 Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
                 if (customSdkRoot != null)
                     cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
