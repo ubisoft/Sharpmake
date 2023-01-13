@@ -578,6 +578,15 @@ namespace Sharpmake
                 Options.Option(Options.Agde.Linker.Incremental.Disable, () => { options["IncrementalLink"] = "false"; cmdLineOptions["LinkIncremental"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.Linker.Incremental.Enable, () => { options["IncrementalLink"] = "true"; cmdLineOptions["LinkIncremental"] = $"{linkerOptionPrefix}--incremental"; })
                 );
+
+                context.SelectOption
+                (
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.None, () => { options["BuildId"] = "none"; cmdLineOptions["BuildId"] = RemoveLineTag; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Fast, () => { options["BuildId"] = "fast"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=fast"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Md5, () => { options["BuildId"] = "md5"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=md5"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Sha1, () => { options["BuildId"] = "sha1"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=sha1"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Uuid, () => { options["BuildId"] = "uuid"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=uuid"; })
+                );
             }
 
             public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

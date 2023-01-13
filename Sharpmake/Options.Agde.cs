@@ -731,6 +731,21 @@ namespace Sharpmake
                     Disable,
                     Enable,
                 }
+
+                /// <summary>
+                /// Tag the shared object with a build id.
+                ///
+                /// This is typically necessary to match debug symbols with a stripped executable.
+                /// </summary>
+                public enum BuildId
+                {
+                    [Default]
+                    None,
+                    Fast,
+                    Md5,
+                    Sha1,
+                    Uuid,
+                }
             }
         }
     }
