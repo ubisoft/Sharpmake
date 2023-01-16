@@ -407,7 +407,8 @@ namespace Sharpmake
                     Tvos = 1 << 2,
                     Watchos = 1 << 3,
 
-                    IosAndIpad = Ios | Ipad
+                    IosAndIpad = Ios | Ipad,
+                    MacCatalyst = Ipad,
                 }
 
                 public class AssetCatalogCompilerAppIconName : StringOption
