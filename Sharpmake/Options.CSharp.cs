@@ -82,9 +82,9 @@ namespace Sharpmake
                 Full,
                 [Default(DefaultTarget.Release)]
                 Pdbonly,
+                None,
                 Portable,
                 Embedded,
-                None
             }
 
             public enum ErrorReport
