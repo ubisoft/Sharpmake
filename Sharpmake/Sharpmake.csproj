@@ -34,7 +34,7 @@
     <WarningsNotAsErrors>618</WarningsNotAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
     <NoWarn>1570,1591</NoWarn>
-    <LangVersion>7</LangVersion>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -51,7 +51,7 @@
     <WarningsNotAsErrors>618</WarningsNotAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
     <NoWarn>1570,1591</NoWarn>
-    <LangVersion>7</LangVersion>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
