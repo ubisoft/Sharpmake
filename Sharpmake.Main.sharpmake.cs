@@ -33,7 +33,7 @@ namespace SharpmakeGen
             result.Add(
                 new Target(
                     Platform.anycpu,
-                    DevEnv.vs2019,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     framework: DotNetFramework.net6_0
                 )
