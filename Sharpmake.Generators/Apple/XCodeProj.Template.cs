@@ -287,6 +287,8 @@ namespace Sharpmake.Generators.Apple
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				GENERATE_MASTER_OBJECT_FILE = [item.Options.GenerateMasterObjectFile];
 				PRELINK_LIBS = ""[item.Options.PreLinkedLibraries]"";
+				SUPPORTS_MACCATALYST = ""[item.Options.SupportsMaccatalyst]"";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = ""[item.Options.SupportsMacDesignedForIphoneIpad]"";
 			};
 			name = [item.Options.TargetName];
 		};

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2021 Ubisoft Entertainment
+// Copyright (c) 2020-2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -198,13 +198,32 @@ namespace HelloXCode
                 BuildSystem.FastBuild
             );
 
+            var catalystTarget = new CommonTarget(
+                Platform.maccatalyst,
+                DevEnv.xcode,
+                Optimization.Debug | Optimization.Release,
+                Blob.NoBlob,
+                BuildSystem.Default
+            );
+
+            // make a blob version of the target
+            var catalystBlobTarget = (CommonTarget)catalystTarget.Clone(
+                Blob.Blob
+            );
+
+            // make a FastBuild version of the target
+            var catalystFastBuildTarget = (CommonTarget)catalystTarget.Clone(
+                Blob.FastBuildUnitys,
+                BuildSystem.FastBuild
+            );
 
             return new[] {
                 macosTarget, macosBlobTarget, macosFastBuildTarget,
                 iosTarget, iosBlobTarget, iosFastBuildTarget,
                 tvosTarget, tvosBlobTarget, tvosFastBuildTarget,
                 watchosTarget, watchosBlobTarget, watchosFastBuildTarget,
-                };
+                catalystTarget, catalystBlobTarget, catalystFastBuildTarget,
+            };
         }
     }
 }
