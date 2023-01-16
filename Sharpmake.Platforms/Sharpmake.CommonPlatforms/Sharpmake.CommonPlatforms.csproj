@@ -62,9 +62,15 @@
     <Compile Include="Android\Util.cs" />
     <Compile Include="Apple\BaseApplePlatform.Bff.Template.cs" />
     <Compile Include="Apple\BaseApplePlatform.cs" />
+    <Compile Include="Apple\MacCatalystPlatform.Bff.Template.cs" />
+    <Compile Include="Apple\MacCatalystPlatform.cs" />
     <Compile Include="Apple\MacOsPlatform.cs" />
     <Compile Include="Apple\iOsPlatform.Bff.Template.cs" />
     <Compile Include="Apple\iOsPlatform.cs" />
+    <Compile Include="Apple\tvOsPlatform.Bff.Template.cs" />
+    <Compile Include="Apple\tvOsPlatform.cs" />
+    <Compile Include="Apple\watchOSPlatform.Bff.Template.cs" />
+    <Compile Include="Apple\watchOsPlatform.cs" />
     <Compile Include="BaseMicrosoftPlatform.Vcxproj.Template.cs" />
     <Compile Include="BaseMicrosoftPlatform.cs" />
     <Compile Include="BasePlatform.Vcxproj.Template.cs" />
