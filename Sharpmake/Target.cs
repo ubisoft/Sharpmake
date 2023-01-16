@@ -115,6 +115,11 @@ namespace Sharpmake
         /// </summary>
         watchos = 1 << 13,
 
+        /// <summary>
+        /// macOS Catalyst
+        /// </summary>
+        maccatalyst = 1 << 14,
+
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
         _reserved7 = 1 << 24,

@@ -87,6 +87,9 @@ namespace Sharpmake
                     options["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                     cmdLineOptions["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
+
+                options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
+                options["SupportsMacDesignedForIphoneIpad"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)
