@@ -73,6 +73,24 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Commands to be executed after the APK is installed, before the app is started for run/debug
+                /// </summary>
+                public class AndroidPostApkInstallCommands: StringOption
+                {
+                    public AndroidPostApkInstallCommands(string androidPostApkInstallCommands)
+                       : base(androidPostApkInstallCommands) { }
+                }
+
+                /// <summary>
+                /// Commands to be executed after the APK is built, before the app is installed
+                /// </summary>
+                public class AndroidPreApkInstallCommands : StringOption
+                {
+                    public AndroidPreApkInstallCommands(string androidPreApkInstallCommands)
+                       : base(androidPreApkInstallCommands) { }
+                }
+
+                /// <summary>
                 /// Debug Information Format
                 /// </summary>
                 /// <remarks>
