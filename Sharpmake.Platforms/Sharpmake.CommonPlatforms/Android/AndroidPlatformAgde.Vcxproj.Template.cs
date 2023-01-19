@@ -61,6 +61,8 @@ namespace Sharpmake
     <CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
     <CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
     <AndroidApkLocation>[options.AndroidApkLocation]</AndroidApkLocation>
+    <AndroidPreApkInstallCommands>[options.AndroidPreApkInstallCommands]</AndroidPreApkInstallCommands>
+    <AndroidPostApkInstallCommands>[options.AndroidPostApkInstallCommands]</AndroidPostApkInstallCommands>
   </PropertyGroup>
 ";
 

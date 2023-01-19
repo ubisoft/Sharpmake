@@ -264,6 +264,15 @@ namespace Sharpmake
 
                     option = Options.StringOption.Get<Options.Agde.General.AndroidApkName>(conf);
                     options["AndroidApkName"] = option != RemoveLineTag ? option : @"$(RootNamespace)-$(PlatformTarget).apk";
+
+                    option = Options.GetObject<Options.Agde.General.AndroidApkLocation>(conf)?.Path ?? RemoveLineTag;
+                    options["AndroidApkLocation"] = option;
+
+                    option = Options.GetObject<Options.Agde.General.AndroidPostApkInstallCommands>(conf)?.Value ?? RemoveLineTag;
+                    options["AndroidPostApkInstallCommands"] = option;
+
+                    option = Options.GetObject<Options.Agde.General.AndroidPreApkInstallCommands>(conf)?.Value ?? RemoveLineTag;
+                    options["AndroidPreApkInstallCommands"] = option;
                 }
                 else
                 {
@@ -273,10 +282,10 @@ namespace Sharpmake
                     options["AndroidGradleBuildIntermediateDir"] = RemoveLineTag;
                     options["AndroidExtraGradleArgs"] = RemoveLineTag;
                     options["AndroidApkName"] = RemoveLineTag;
+                    options["AndroidApkLocation"] = RemoveLineTag;
+                    options["AndroidPostApkInstallCommands"] = RemoveLineTag;
+                    options["AndroidPreApkInstallCommands"] = RemoveLineTag;
                 }
-
-                var androidApkLocation = Options.GetObject<Options.Agde.General.AndroidApkLocation>(conf)?.Path ?? RemoveLineTag;
-                options["AndroidApkLocation"] = androidApkLocation;
 
                 context.SelectOption
                 (
