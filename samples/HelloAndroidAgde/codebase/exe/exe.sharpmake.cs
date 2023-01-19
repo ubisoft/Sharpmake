@@ -125,13 +125,10 @@ namespace HelloAndroidAgde
             var gradlewParam = "clean :" + Name + ":assemble" + target.Name;
             targetLibsPath = targetLibsPath.Replace("\\", "/");
             gradlewParam += string.Format(@" ""-PNDK_VERSION={0}"" ""-PMIN_SDK_VERSION={1}"" ""-PJNI_LIBS_SRC_DIR={2}"" ""-PANDROID_OUTPUT_APK_NAME={3}"" ""-PFastBuild=True"" ""-PLibCppShared={4}"" ""-PABI={5}""", ndkVersion, minSdkVersion, targetLibsPath, apkTargetFile, libCppShared, GetABI(target));
-            var packageBatFile = Util.SimplifyPath(conf.ProjectPath + @"\..\gradlew.bat ");
-
-            conf.PostBuildStampExes.Add(new Sharpmake.Project.Configuration.BuildStepExecutable(
-                    packageBatFile,
-                    "",
-                    "",
-                    gradlewParam));
+            var gradleBuildRoot = Util.SimplifyPath(Path.Combine(conf.ProjectPath, ".."));
+            var packageBatFile = "gradlew.bat ";
+            var cmd = $@"pushd {gradleBuildRoot} &amp;&amp; {packageBatFile} {gradlewParam}";
+            conf.Options.Add(new Options.Agde.General.AndroidPreApkInstallCommands(cmd));
         }
 
         private void CopyAndroidResources(string projectPath)
