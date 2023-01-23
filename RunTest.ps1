@@ -3,7 +3,7 @@
 Runs the given executable in the given working directory
 
 .DESCRIPTION
-runs the executable passed as parameter, in the given working folder
+run the executable passed as parameter, in the given working folder
 
 .PARAMETER workingDirectory
 specify the folder used as working folder for the executable. Omit if you want to use the current working folder.
