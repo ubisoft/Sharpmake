@@ -26,22 +26,29 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3.3.0
 
-      - name: Bootstrap.bat ${{ matrix.configuration }}
-        if: runner.os == 'Windows'
-        run: .\bootstrap.bat Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }} ${{ matrix.framework }}
+      - name: Bootstrap ${{ matrix.configuration }}
+        shell: pwsh
+        run: |
+          if ('${{runner.os}}' -eq 'Windows')
+          { 
+            .\Bootstrap.ps1 -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -vsVersion 2022
+          }
+          else
+          {
+            ./Bootstrap.ps1 -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} 
+          }
 
-      - name: Bootstrap.sh ${{ matrix.configuration }}
-        if: runner.os != 'Windows'
-        shell: bash
-        run: ./bootstrap.sh Sharpmake.Main.sharpmake.cs ${{ matrix.configuration }} ${{ matrix.framework }}
-
-      - name: CompileSharpmake.bat ${{ matrix.configuration }}
-        if: runner.os == 'Windows'
-        run: .\CompileSharpmake.bat Sharpmake.sln "${{ matrix.configuration }}" "Any CPU"
-
-      - name: CompileSharpmake.sh ${{ matrix.configuration }}
-        if: runner.os != 'Windows'
-        run: ./CompileSharpmake.sh Sharpmake.sln ${{ matrix.configuration }} "Any CPU" ${{ matrix.framework }}
+      - name: CompileSharpmake ${{ matrix.configuration }} ${{ matrix.os }}
+        shell: pwsh
+        run: |
+          if ('${{runner.os}}' -eq 'Windows')
+          { 
+            .\Compile.ps1 -slnOrPrjFile Sharpmake.sln -configuration "${{ matrix.configuration }}" -platform "Any CPU" -vsVersion "${{ matrix.os }}" -compiler "dotnet"
+          }
+          else
+          {
+            ./Compile.ps1 -slnOrPrjFile Sharpmake.sln -configuration ${{ matrix.configuration }} -platform "Any CPU" -compiler "dotnet" 
+          }
 
       - name: Store MSBuild binary logs
         if: always()
@@ -97,12 +104,6 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-2019, windows-2022]
         framework: [net6.0]
         configuration: [debug, release]
-
-    env:
-      SHARPMAKE_UNIX_EXE: ${{ github.workspace }}/tmp/bin/release/${{ matrix.framework }}/Sharpmake.Application
-      SHARPMAKE_WIN_EXE: ${{ github.workspace }}/tmp/bin/release/${{ matrix.framework }}/Sharpmake.Application.exe
-      COMPILE_BATCH: ${{ github.workspace }}/CompileSharpmake.bat
-
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3.3.0
@@ -124,252 +125,298 @@ jobs:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: tmp/bin/release/${{ matrix.framework }}
 
-      - name: chmod +x on Sharpmake.Application
-        if: runner.os != 'Windows'
-        run: chmod +x $SHARPMAKE_UNIX_EXE
-
-      - name: CompileCommandDatabase ${{ matrix.configuration }}
+      - name: CompileCommandDatabase ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.configuration == 'debug' # only has a debug config, so skip in release
-        working-directory: 'samples/CompileCommandDatabase'
+        env:
+          testFolder: 'samples\CompileCommandDatabase'
+        shell: pwsh
         run: | # TODO: ideally here we should try and compile the generated json file
-          & $env:SHARPMAKE_WIN_EXE "/sources('CompileCommandDatabase.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\CompileCommandDatabaseSolution_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
-          projects\exeprojectname\output\win64\${{ matrix.configuration }}\exeprojectname.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CompileCommandDatabase.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "CompileCommandDatabaseSolution_vs2017_win64.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\exeprojectname\output\win64\${{ matrix.configuration }}\exeprojectname.exe"
 
-      - name: ConfigureOrder ${{ matrix.configuration }}
+      - name: ConfigureOrder ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.configuration == 'release'
-        working-directory: 'samples/ConfigureOrder'
+        env:
+          testFolder: 'samples\ConfigureOrder'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('main.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\configureorderingsolution.sln "Release" "Win32"
-          projects\output\win32\${{ matrix.configuration }}\childproject.exe
-          projects\output\win32\${{ matrix.configuration }}\foobarproject.exe
-          projects\output\win32\${{ matrix.configuration }}\parentproject.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "main.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "configureorderingsolution.sln" -configuration ${{ matrix.configuration }} -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win32\${{ matrix.configuration }}\childproject.exe"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win32\${{ matrix.configuration }}\foobarproject.exe"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win32\${{ matrix.configuration }}\parentproject.exe"
 
       - name: CPPCLI ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.os == 'windows-2019'
-        working-directory: 'samples/CPPCLI'
+        env:
+          testFolder: 'samples/CPPCLI'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('CLRTest.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\CPPCLI.vs2017.v4_6_2.sln "${{ matrix.configuration }}" "Win32"
-          projects\output\vs2017\v4_6_2\${{ matrix.configuration }}\TestCSharpConsole.exe
-          & $env:COMPILE_BATCH projects\CPPCLI.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Win32"
-          projects\output\vs2019\v4_7_2\${{ matrix.configuration }}\TestCSharpConsole.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CLRTest.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "CPPCLI.vs2017.v4_6_2.sln" -configuration ${{ matrix.configuration }} -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\vs2017\v4_6_2\${{ matrix.configuration }}\TestCSharpConsole.exe"
+          .\Compile.ps1 -slnOrPrjFile "CPPCLI.vs2019.v4_7_2.sln" -configuration ${{ matrix.configuration }} -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\vs2019\v4_7_2\${{ matrix.configuration }}\TestCSharpConsole.exe"
 
       - name: CSharpHelloWorld old frameworks ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.os == 'windows-2019'
-        working-directory: 'samples/CSharpHelloWorld'
+        env:
+          testFolder: 'samples/CSharpHelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2017.v4_6_1.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\helloworld\output\anycpu\${{ matrix.configuration }}\the other name.exe"
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2022.v4_6_1.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\helloworld\output\anycpu\${{ matrix.configuration }}\the other name.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2017.v4_6_1.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\helloworld\output\anycpu\${{ matrix.configuration }}\the other name.exe"
 
       - name: CSharpHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.os == 'windows-2022'
-        working-directory: 'samples/CSharpHelloWorld'
+        env:
+          testFolder: 'samples/CSharpHelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2022.net7_0.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\helloworld\output\anycpu\${{ matrix.configuration }}\net7.0\the other name.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2022.net7_0.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\helloworld\output\anycpu\${{ matrix.configuration }}\net7.0\the other name.exe"
 
-      - name: CSharpImports ${{ matrix.configuration }}
+      - name: CSharpImports ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/CSharpImports'
+        env:
+          testFolder: 'samples/CSharpImports'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('CSharpImports.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\CSharpImportsSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\csharpimports\output\anycpu\${{ matrix.configuration }}\the other name.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CSharpImports.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "CSharpImportsSolution.vs2019.v4_7_2.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\csharpimports\output\anycpu\${{ matrix.configuration }}\the other name.exe"
 
-      - name: CSharpVsix ${{ matrix.configuration }}
+      - name: CSharpVsix ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/CSharpVsix'
-        run: | # that one can't be run unfortunately
-          & $env:SHARPMAKE_WIN_EXE "/sources('CSharpVsix.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\CSharpVsixSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-
-      - name: CustomBuildStep ${{ matrix.configuration }}
-        if: runner.os == 'Windows'
-        working-directory: 'samples/CustomBuildStep'
+        env:
+          testFolder: 'samples/CSharpVsix'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('CustomBuildStep.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\custombuildstepsolution_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
-          projects\output\win64\${{ matrix.configuration }}\custombuildstep.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CSharpVsix.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "CSharpVsixSolution.vs2017.v4_7_2.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+        # that one can't be run unfortunately
 
-      - name: CSharpWCF ${{ matrix.configuration }}
+      - name: CustomBuildStep ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/CSharpWCF'
+        env:
+          testFolder: 'samples/CustomBuildStep'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('CSharpWCF.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\CSharpWCFSolution.vs2015.v4_5_2.sln "${{ matrix.configuration }}" "Any CPU"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CustomBuildStep.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "custombuildstepsolution_vs2017_win64.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win64\${{ matrix.configuration }}\custombuildstep.exe"
+
+      - name: CSharpWCF ${{ matrix.configuration }} ${{ matrix.os }}
+        if: runner.os == 'Windows'
+        env:
+          testFolder: 'samples/CSharpWCF'
+        shell: pwsh
+        run: |
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CSharpWCF.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "CSharpWCFSolution.vs2015.v4_5_2.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\codebase" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+        # that one can't be run unfortunately
+
 
       - name: FastBuildSimpleExecutable ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/FastBuildSimpleExecutable'
+        env:
+          testFolder: 'samples/FastBuildSimpleExecutable'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('FastBuildSimpleExecutable.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\fastbuildsample_${env:VS_VERSION_SUFFIX}_win64.sln "${{ matrix.configuration }}" "x64"
-          projects\output\win64\${{ matrix.configuration }}\fastbuildsimpleexecutable.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "FastBuildSimpleExecutable.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "fastbuildsample_${env:VS_VERSION_SUFFIX}_win64.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win64\${{ matrix.configuration }}\fastbuildsimpleexecutable.exe"
 
       # Temp disable after Github VM update which updated the NDK and broke it
       # - name: HelloAndroid ${{ matrix.configuration }}
       #   if: runner.os == 'Windows'
-      #   working-directory: 'samples/HelloAndroid'
+      #   env:
+      #     testFolder: 'samples/HelloAndroid'
+      #   shell: pwsh
       #   run: |
       #     $env:JAVA_HOME = $env:JAVA_HOME_11_X64
-      #     & $env:SHARPMAKE_WIN_EXE "/sources('HelloAndroid.main.sharpmake.cs')"
-      #     & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "arm64_v8a"
-      #     & $env:COMPILE_BATCH codebase\temp\solutions\HelloAndroid_android_vs2019.sln "${{ matrix.configuration }}_NoBlob" "x86_64"
+      #     .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloAndroid.main.sharpmake.cs" -framework ${{ matrix.framework }}
+      #     .\Compile.ps1 -slnOrPrjFile "HelloAndroid_android_vs2019.sln" -configuration "${{ matrix.configuration }}_NoBlob" -platform arm64_v8a -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+      #     .\Compile.ps1 -slnOrPrjFile "HelloAndroid_android_vs2019.sln" -configuration "${{ matrix.configuration }}_NoBlob" -platform x86_64 -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
 
       - name: HelloClangCl ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/HelloClangCl'
+        env:
+          testFolder: 'samples/HelloClangCl'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloClangCl.Main.sharpmake.cs') /devenvversion('${env:VS_VERSION_SUFFIX}')"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln "ClangCl ${{ matrix.configuration }}" "MSBuild"
-          codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_msbuild\exe.exe
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln "ClangCl ${{ matrix.configuration }}" "FastBuild"
-          codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_fastbuild\exe.exe
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln "MSVC ${{ matrix.configuration }}" "MSBuild"
-          codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_msbuild\exe.exe
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln "MSVC ${{ matrix.configuration }}" "FastBuild"
-          codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_fastbuild\exe.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloClangCl.Main.sharpmake.cs" -framework ${{ matrix.framework }} -devenvVersion ${env:VS_VERSION_SUFFIX}
+          .\Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "ClangCl ${{ matrix.configuration }}" -platform MSBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_msbuild\exe.exe"
+          .\Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "ClangCl ${{ matrix.configuration }}" -platform FastBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_clangcl_${{ matrix.configuration }}_fastbuild\exe.exe"
+          .\Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "MSVC ${{ matrix.configuration }}" -platform MSBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_msbuild\exe.exe"
+          .\Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "MSVC ${{ matrix.configuration }}" -platform FastBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_msvc_${{ matrix.configuration }}_fastbuild\exe.exe"
 
       - name: HelloEvents ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/HelloEvents'
+        env:
+          testFolder: 'samples/HelloEvents'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloEvents.Main.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloEvents_win64_${env:VS_VERSION_SUFFIX}.sln "${{ matrix.configuration }}" "win64"
-          codebase\temp\bin\win64_${{ matrix.configuration }}_msbuild\exe\exe.exe
-          & $env:COMPILE_BATCH codebase\temp\solutions\HelloEvents_win64_${env:VS_VERSION_SUFFIX}.sln "${{ matrix.configuration }}_FastBuild" "win64"
-          codebase\temp\bin\win64_${{ matrix.configuration }}_fastbuild\exe\exe.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloEvents.Main.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloEvents_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration ${{ matrix.configuration }} -platform Win64 -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_${{ matrix.configuration }}_msbuild\exe\exe.exe"
+          .\Compile.ps1 -slnOrPrjFile "HelloEvents_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "${{ matrix.configuration }}_FastBuild" -platform Win64 -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_${{ matrix.configuration }}_fastbuild\exe\exe.exe"
 
-      - name: HelloLinux ${{ matrix.configuration }}
+      - name: HelloLinux ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Linux'
-        working-directory: 'samples/HelloLinux'
+        env:
+          testFolder: 'samples/HelloLinux'
+        shell: pwsh
         run: |
-          mono --debug $SHARPMAKE_WIN_EXE "/sources('HelloLinux.Main.sharpmake.cs')" || $SHARPMAKE_UNIX_EXE "/sources('HelloLinux.Main.sharpmake.cs')"
-          cd codebase/temp/solutions
-          make -f HelloLinux_linux_make.make config=${{ matrix.configuration }}
-          cd ../bin/linux_${{ matrix.configuration }}
-          ./exe
+          ./RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloLinux.Main.sharpmake.cs" -framework ${{ matrix.framework }} -addMono
+          ./Compile.ps1 -slnOrPrjFile "HelloLinux_linux_make.make" -configuration ${{ matrix.configuration }} -WorkingDirectory "${env:testFolder}/codebase/temp/solutions" -compiler "make"
+          ./RunTest.ps1  "${env:testFolder}/codebase/temp/bin/linux_${{ matrix.configuration }}/exe"
 
-      - name: HelloWorld ${{ matrix.configuration }}
+      - name: HelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/HelloWorld'
+        env:
+          testFolder: 'samples\HelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\helloworld_vs2019_win32.sln "${{ matrix.configuration }}" "Win32"
-          projects\output\win32\${{ matrix.configuration }}\helloworld.exe
-          & $env:COMPILE_BATCH projects\helloworld_vs2019_win64.sln "${{ matrix.configuration }}" "x64"
-          projects\output\win64\${{ matrix.configuration }}\helloworld.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "helloworld_vs2019_win32.sln" -configuration ${{ matrix.configuration }} -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win32\${{ matrix.configuration }}\helloworld.exe"
+          .\Compile.ps1 -slnOrPrjFile "helloworld_vs2019_win64.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win64\${{ matrix.configuration }}\helloworld.exe"
 
-      - name: HelloXCode ${{ matrix.configuration }}
+      - name: HelloXCode ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'macOS'
-        working-directory: 'samples/HelloXCode'
+        env:
+          testFolder: 'samples/HelloXCode'
         run: |
-          mono --debug $SHARPMAKE_WIN_EXE "/sources('HelloXCode.Main.sharpmake.cs')" || $SHARPMAKE_UNIX_EXE "/sources('HelloXCode.Main.sharpmake.cs')"
+          pwsh ./RunSharpmake.ps1 -workingDirectory $testFolder -sharpmakeFile "HelloXCode.Main.sharpmake.cs" -framework ${{ matrix.framework }} -addMono
           set -o pipefail
-          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme "exe FastBuild" | xcpretty
-          codebase/temp/bin/mac_${{ matrix.configuration }}_fastbuild/exe
-          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_prelinked_mac | xcpretty
-          codebase/temp/bin/mac_${{ matrix.configuration }}/exe_prelinked
-          xcodebuild -workspace codebase/temp/solutions/HelloXCode_mac.xcworkspace -configuration ${{ matrix.configuration }} -scheme exe_mac | xcpretty
-          cd codebase/temp/bin/mac_${{ matrix.configuration }}
+          pwsh ./Compile.ps1 -slnOrPrjFile "HelloXCode_mac.xcworkspace" -configuration ${{ matrix.configuration }} -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "xcode" -scheme 'exe FastBuild'
+          pwsh ./RunTest.ps1  "$testFolder/codebase/temp/bin/mac_${{ matrix.configuration }}_fastbuild/exe"
+          pwsh ./Compile.ps1 -slnOrPrjFile "HelloXCode_mac.xcworkspace" -configuration ${{ matrix.configuration }} -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "xcode" -scheme exe_prelinked_mac
+          pwsh ./RunTest.ps1  "$testFolder/codebase/temp/bin/mac_${{ matrix.configuration }}/exe_prelinked"
+          pwsh ./Compile.ps1 -slnOrPrjFile "HelloXCode_mac.xcworkspace" -configuration ${{ matrix.configuration }} -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "xcode" -scheme exe_mac
+          cd $testFolder/codebase/temp/bin/mac_${{ matrix.configuration }}
           DYLD_LIBRARY_PATH=. ./exe
 
-      - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }}
+      - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/NetCore/DotNetCoreFrameworkHelloWorld'
+        env:
+          testFolder: 'samples\NetCore\DotNetCoreFrameworkHelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\HelloWorldMultiFrameworkSolution.vs2019.sln "${{ matrix.configuration }}" "Any CPU"
-          dotnet "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1\the other name.dll"
-          dotnet "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\the other name.dll"
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2017.netcore2_1.sln "${{ matrix.configuration }}" "Any CPU"
-          dotnet "projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1\the other name.dll"
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2019.netcore3_1.sln "${{ matrix.configuration }}" "Any CPU"
-          dotnet "projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\the other name.dll"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldMultiFrameworkSolution.vs2019.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1" -arguments "`"the other name.dll`""
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2017.netcore2_1.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2019.netcore3_1.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1" -arguments "`"the other name.dll`""
+        # not working tests because .netcore 2.1.0 is not available on runner
+        #  .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1" -arguments "`"the other name.dll`""
+        #  .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1" -arguments "`"the other name.dll`""
 
-      - name: NetCore/DotNetFrameworkHelloWorld ${{ matrix.configuration }}
+      - name: NetCore/DotNetFrameworkHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/NetCore/DotNetFrameworkHelloWorld'
+        env:
+          testFolder: 'samples\NetCore\DotNetFrameworkHelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\HelloWorldMultiFrameworkSolution.vs2019.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\net461\the other name.exe"
-          & "projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\net472\the other name.exe"
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\helloworld\output\vs2019\${{ matrix.configuration }}\the other name.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldMultiFrameworkSolution.vs2019.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\net461\the other name.exe"
+          .\RunTest.ps1  "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\net472\the other name.exe"
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2019.v4_7_2.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\helloworld\output\vs2019\${{ matrix.configuration }}\the other name.exe"
 
-      - name: NetCore/DotNetFrameworkHelloWorld_OldFrameworks ${{ matrix.configuration }}
+      - name: NetCore/DotNetFrameworkHelloWorld_OldFrameworks ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.os == 'windows-2019'
-        working-directory: 'samples/NetCore/DotNetFrameworkHelloWorld'
+        env:
+          testFolder: 'samples/NetCore/DotNetFrameworkHelloWorld'
+        shell: pwsh
         run: |
-          & $env:COMPILE_BATCH projects\HelloWorldSolution.vs2017.v4_6_1.sln "${{ matrix.configuration }}" "Any CPU"
-          & "projects\helloworld\output\vs2017\${{ matrix.configuration }}\the other name.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2017.v4_6_1.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\helloworld\output\vs2017\${{ matrix.configuration }}\the other name.exe"
 
-      - name: NetCore/DotNetMultiFrameworksHelloWorld ${{ matrix.configuration }}
+      - name: NetCore/DotNetMultiFrameworksHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/NetCore/DotNetMultiFrameworksHelloWorld'
+        env:
+          testFolder: 'samples\NetCore\DotNetMultiFrameworksHelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\HelloWorldMultiFrameworksSolution.vs2019.sln "${{ matrix.configuration }}" "Any CPU"
-          dotnet "projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1\HelloWorldMultiFrameworks.dll"
-          & "projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\net461\HelloWorldMultiFrameworks.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "HelloWorldMultiFrameworksSolution.vs2019.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\netcoreapp3.1" -arguments HelloWorldMultiFrameworks.dll
+          .\RunTest.ps1 "${env:testFolder}\projects\helloworldmultiframeworks\output\anycpu\${{ matrix.configuration }}\net461\HelloWorldMultiFrameworks.exe"
 
-      - name: NetCore/DotNetOSMultiFrameworksHelloWorld ${{ matrix.configuration }}
+      - name: NetCore/DotNetOSMultiFrameworksHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.os == 'windows-2022'
-        working-directory: 'samples/NetCore/DotNetOSMultiFrameworksHelloWorld'
+        env:
+          testFolder: 'samples\NetCore\DotNetOSMultiFrameworksHelloWorld'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('HelloWorld.sharpmake.cs')"
-          & $env:COMPILE_BATCH codebase\temp\solutions\OSMultiFrameworksHelloWorldSolution.sln "${{ matrix.configuration }}" "Any CPU"
-          & "codebase\temp\bin\anycpu_${{ matrix.configuration }}\net7.0-windows\HelloWorldExe.exe"
-          & "codebase\temp\bin\anycpu_${{ matrix.configuration }}\net472\HelloWorldExe.exe"
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "OSMultiFrameworksHelloWorldSolution.sln" -configuration ${{ matrix.configuration }} -platform "Any CPU" -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\anycpu_${{ matrix.configuration }}\net7.0-windows\HelloWorldExe.exe"
+          .\RunTest.ps1  "${env:testFolder}\codebase\temp\bin\anycpu_${{ matrix.configuration }}\net472\HelloWorldExe.exe"
 
-      - name: PackageReferences ${{ matrix.configuration }}
+      - name: PackageReferences ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/PackageReferences'
+        env:
+          testFolder: 'samples\PackageReferences'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('PackageReferences.sharpmake.cs')"
-          nuget restore projects\PackageReferenceSolution.vs2017.v4_7_2.sln
-          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2017.v4_7_2.sln "${{ matrix.configuration }}" "x64"
-          projects\csharppackagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe
-          projects\cpppackagereferences\output\vs2017\${{ matrix.configuration }}\cpppackagereferences.exe
-          nuget restore projects\PackageReferenceSolution.vs2019.v4_7_2.sln
-          & $env:COMPILE_BATCH projects\PackageReferenceSolution.vs2019.v4_7_2.sln "${{ matrix.configuration }}" "x64"
-          projects\csharppackagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe
-          projects\cpppackagereferences\output\vs2019\${{ matrix.configuration }}\cpppackagereferences.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "PackageReferences.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\RunTest.ps1  -exeToRun nuget -arguments "restore PackageReferenceSolution.vs2017.v4_7_2.sln" -workingDirectory ${env:testFolder}\projects 
+          .\Compile.ps1 -slnOrPrjFile "PackageReferenceSolution.vs2017.v4_7_2.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\csharppackagereferences\output\vs2017\${{ matrix.configuration }}\PackageReference.exe"
+          .\RunTest.ps1  "${env:testFolder}\projects\cpppackagereferences\output\vs2017\${{ matrix.configuration }}\cpppackagereferences.exe"
+          .\RunTest.ps1  -exeToRun nuget -arguments "restore PackageReferenceSolution.vs2019.v4_7_2.sln" -workingDirectory ${env:testFolder}\projects
+          .\Compile.ps1 -slnOrPrjFile "PackageReferenceSolution.vs2019.v4_7_2.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\csharppackagereferences\output\vs2019\${{ matrix.configuration }}\PackageReference.exe"
+          .\RunTest.ps1  "${env:testFolder}\projects\cpppackagereferences\output\vs2019\${{ matrix.configuration }}\cpppackagereferences.exe"
 
       - name: Install Qt
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v3.0.0
 
-      - name: QTFileCustomBuild ${{ matrix.configuration }}
+      - name: QTFileCustomBuild ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/QTFileCustomBuild'
+        env:
+          testFolder: 'samples/QTFileCustomBuild'
+        shell: pwsh
         run: | # TODO: there's a retail config, compile it as well or remove it
-          & $env:SHARPMAKE_WIN_EXE "/sources('QTFileCustomBuild.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\qtfilecustombuild_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
-          projects\output\win64\${{ matrix.configuration }}\qtfilecustombuild.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "QTFileCustomBuild.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "qtfilecustombuild_vs2017_win64.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win64\${{ matrix.configuration }}\qtfilecustombuild.exe"
 
-      - name: SimpleExeLibDependency ${{ matrix.configuration }}
+      - name: SimpleExeLibDependency ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.configuration == 'debug'
-        working-directory: 'samples/SimpleExeLibDependency'
+        env:
+          testFolder: 'samples/SimpleExeLibDependency'
+        shell: pwsh
         run: |
-          & $env:SHARPMAKE_WIN_EXE "/sources('SimpleExeLibDependency.sharpmake.cs')"
-          & $env:COMPILE_BATCH projects\ExeLibSolutionName_vs2017_win64.sln "${{ matrix.configuration }}" "x64"
-          projects\output\win64\${{ matrix.configuration }}\simpleexeprojectname.exe
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "SimpleExeLibDependency.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "ExeLibSolutionName_vs2017_win64.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\projects\output\win64\${{ matrix.configuration }}\simpleexeprojectname.exe"
 
-      - name: vcpkg ${{matrix.os}} ${{matrix.configuration}} 
+      - name: vcpkg ${{matrix.configuration}} ${{ matrix.os }}
         if: runner.os == 'Windows'
-        working-directory: 'samples/vcpkg'
+        env:
+          testFolder: 'samples/vcpkg'
+        shell: pwsh
         run: |
-          .\bootstrap-sample.bat release ${{ matrix.framework }}
-          & $env:COMPILE_BATCH tmp\projects\vcpkgsample_${Env:VS_VERSION_SUFFIX}.sln "${{ matrix.configuration }}" "x64"
-          bin\${{ matrix.configuration }}-msbuild\vcpkgsample.exe
-          & $env:COMPILE_BATCH tmp\projects\vcpkgsample_${Env:VS_VERSION_SUFFIX}.sln "${{ matrix.configuration }}_FastBuild" "x64"
-          bin\${{ matrix.configuration }}-fastbuild\vcpkgsample.exe
-
+          .\extract-vcpkg.ps1 -workingDirectory ${env:testFolder}
+          .\RunSharpmake.ps1 -workingDirectory ${env:testFolder}\sharpmake -sharpmakeFile "main.sharpmake.cs" -framework ${{ matrix.framework }}
+          .\Compile.ps1 -slnOrPrjFile "vcpkgsample_${Env:VS_VERSION_SUFFIX}.sln" -configuration ${{ matrix.configuration }} -platform x64 -WorkingDirectory "${env:testFolder}\tmp\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\bin\${{ matrix.configuration }}-msbuild\vcpkgsample.exe"
+          .\Compile.ps1 -slnOrPrjFile "vcpkgsample_${Env:VS_VERSION_SUFFIX}.sln" -configuration ${{ matrix.configuration }}_FastBuild -platform x64 -WorkingDirectory "${env:testFolder}\tmp\projects" -VsVersion ${{ matrix.os }} -compiler "MsBuild"
+          .\RunTest.ps1  "${env:testFolder}\bin\${{ matrix.configuration }}-fastbuild\vcpkgsample.exe"
