@@ -138,10 +138,13 @@ try
             #dotnet compile
             $msBuildLog = Join-Path 'tmp' 'msbuild' 'windows' $binLogName
             $p=Start-Process -PassThru -NoNewWindow -FilePath "dotnet" -ArgumentList "build `"$slnOrPrjFile`" -nologo -v m -c `"$configuration`" -bl:`"$msBuildLog`"" 
-            Wait-Process -InputObject $p
-            if($p.ExitCode -ne 0) 
+            # need to query the handle so that the process gets porperly initialized
+            $handle = $p.Handle
+            $p.WaitForExit()
+            [int] $exitCode = $p.ExitCode
+            if($exitCode -ne 0) 
             {
-                throw "error $LASTEXITCODE during dotnet compile"
+                throw "error $exitCode during dotnet compile"
             }
             Write-Host "compile success"
         }
@@ -152,10 +155,13 @@ try
             $osPath = $ImageOS + $platform
             $msBuildLog = Join-Path 'tmp' 'msbuild' $osPath $binLogName
             $p=Start-Process -PassThru -NoNewWindow -FilePath "dotnet" -ArgumentList "build -nologo -v m -bl:`"$msBuildLog`" -p:UseAppHost=true /p:_EnableMacOSCodeSign=false `"$slnOrPrjFile`" --configuration `"$configuration`"" 
-            Wait-Process -InputObject $p
-            if($p.ExitCode -ne 0) 
+            # need to query the handle so that the process gets porperly initialized
+            $handle = $p.Handle
+            $p.WaitForExit()
+            [int] $exitCode = $p.ExitCode
+            if($exitCode -ne 0) 
             {
-                throw "error $LASTEXITCODE during dotnet compile"
+                throw "error $exitCode during dotnet compile"
             }
             Write-Host "compile success"
         }
@@ -178,10 +184,13 @@ try
         #make compile
         Write-Host "make compile"
         $p=Start-Process -PassThru -NoNewWindow -FilePath "make" -ArgumentList "-f `"$slnOrPrjFile`" config=`"$configuration`""
-        Wait-Process -InputObject $p
-        if($p.ExitCode -ne 0) 
+        # need to query the handle so that the process gets porperly initialized
+        $handle = $p.Handle
+        $p.WaitForExit()
+        [int] $exitCode = $p.ExitCode
+        if($exitCode -ne 0) 
         {
-            throw "error $LASTEXITCODE during make compile"
+            throw "error $exitCode during make compile"
         }
         Write-Host "compile success"
     }
@@ -193,10 +202,13 @@ try
         $arguments = "-bl:`"$msBuildLog`" -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true `"$slnOrPrjFile`" /nologo /verbosity:m /p:Configuration=`"$configuration`" /p:Platform=`"$platform`" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS" 
         Write-Host "msbuild $arguments"
         $p=Start-Process -PassThru -NoNewWindow -LoadUserProfile -FilePath "msbuild" -ArgumentList $arguments
-        Wait-Process -InputObject $p
-        if($p.ExitCode -ne 0) 
+        # need to query the handle so that the process gets porperly initialized
+        $handle = $p.Handle
+        $p.WaitForExit()
+        [int] $exitCode = $p.ExitCode
+        if($exitCode -ne 0) 
         {
-            throw "error $LASTEXITCODE during msBuild compile"
+            throw "error $exitCode during msBuild compile"
         }
         Write-Host "compile success"
     }

@@ -50,10 +50,13 @@ try
         Write-Host "running on windows"
         Write-Host "$sharpmakeWinExe $arguments"
         $p=Start-Process -passthru -NoNewWindow -FilePath $sharpmakeWinExe -ArgumentList $arguments -WorkingDirectory $workingDirectory
-        Wait-Process -InputObject $p
-        if($p.ExitCode -ne 0) 
+        # need to query the handle so that the process gets porperly initialized
+        $handle = $p.Handle
+        $p.WaitForExit()
+        [int] $exitCode = $p.ExitCode
+        if($exitCode -ne 0) 
         {
-            throw "error $LASTEXITCODE during Sharpmake.Application execution"
+            throw "error $exitCode during Sharpmake.Application execution"
         }
     }
     else 
@@ -66,10 +69,13 @@ try
             $monoArgs = "--debug $sharpmakeWinExe $arguments"
             Write-Host "mono $sharpmakeWinExe $monoArgs"
             $p=Start-Process -passthru -NoNewWindow -FilePath "mono" -ArgumentList $monoArgs -WorkingDirectory $workingDirectory
-            Wait-Process -InputObject $p
-            if($p.ExitCode -ne 0) 
+            # need to query the handle so that the process gets porperly initialized
+            $handle = $p.Handle
+            $p.WaitForExit()
+            [int] $exitCode = $p.ExitCode
+            if($exitCode -ne 0) 
             {
-                Write-Host "error $LASTEXITCODE during mono Sharpmake.Application.exe execution -- ignored"
+                Write-Host "error $exitCode during mono Sharpmake.Application.exe execution -- ignored"
             }
             else 
             {
@@ -82,10 +88,13 @@ try
         Write-Host "$sharpmakeLinuxExe $arguments"
         chmod +x "./$sharpmakeLinuxExe"
         $p=Start-Process -passthru -NoNewWindow -FilePath "./$sharpmakeLinuxExe" -ArgumentList $arguments -WorkingDirectory $workingDirectory 
-        Wait-Process -InputObject $p
-        if($p.ExitCode -ne 0) 
+        # need to query the handle so that the process gets porperly initialized
+        $handle = $p.Handle
+        $p.WaitForExit()
+        [int] $exitCode = $p.ExitCode
+        if($exitCode -ne 0) 
         {
-            throw "error $LASTEXITCODE during Sharpmake.Application execution"
+            throw "error $exitCode during Sharpmake.Application execution"
         }
     }
 }
