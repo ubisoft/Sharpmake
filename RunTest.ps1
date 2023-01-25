@@ -23,22 +23,22 @@ try
     {
         Write-Host "running $exeToRun $arguments, working folder $workingDirectory"
         $p=Start-Process -PassThru -NoNewWindow -FilePath $exeToRun -ArgumentList $arguments -WorkingDirectory $workingDirectory
-        Wait-Process -InputObject $p
     }
     else 
     {
         Write-Host "running $exeToRun $arguments"
         $p=Start-Process -PassThru -NoNewWindow -FilePath $exeToRun -ArgumentList $arguments
-        Wait-Process -InputObject $p
     }
+    # wait...
+    do {} until ($p.HasExited); 
     [int] $exitCode = $p.ExitCode
     if($exitCode -ne 0) 
     {
-        throw "exit code : $exitCode"
+        Exit $exitCode
     }
 }
 catch 
 {
-    Write-Error $PSItem.Exception
+    Write-Error "$_"
     exit 1
 }
