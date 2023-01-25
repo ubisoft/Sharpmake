@@ -137,14 +137,10 @@ try
             Write-Host "dotnet compile on Windows"
             #dotnet compile
             $msBuildLog = Join-Path 'tmp' 'msbuild' 'windows' $binLogName
-            $p=Start-Process -PassThru -NoNewWindow -FilePath "dotnet" -ArgumentList "build `"$slnOrPrjFile`" -nologo -v m -c `"$configuration`" -bl:`"$msBuildLog`"" 
-            # need to query the handle so that the process gets porperly initialized
-            $handle = $p.Handle
-            $p.WaitForExit()
-            [int] $exitCode = $p.ExitCode
-            if($exitCode -ne 0) 
+            dotnet build `"$slnOrPrjFile`" -nologo -v m -c `"$configuration`" -bl:`"$msBuildLog`" 
+            if($LASTEXITCODE -ne 0) 
             {
-                throw "error $exitCode during dotnet compile"
+                throw "error $LASTEXITCODE during dotnet compile"
             }
             Write-Host "compile success"
         }
@@ -154,14 +150,10 @@ try
             #dotnet compile
             $osPath = $ImageOS + $platform
             $msBuildLog = Join-Path 'tmp' 'msbuild' $osPath $binLogName
-            $p=Start-Process -PassThru -NoNewWindow -FilePath "dotnet" -ArgumentList "build -nologo -v m -bl:`"$msBuildLog`" -p:UseAppHost=true /p:_EnableMacOSCodeSign=false `"$slnOrPrjFile`" --configuration `"$configuration`"" 
-            # need to query the handle so that the process gets porperly initialized
-            $handle = $p.Handle
-            $p.WaitForExit()
-            [int] $exitCode = $p.ExitCode
-            if($exitCode -ne 0) 
+            dotnet build -nologo -v m -bl:`"$msBuildLog`" -p:UseAppHost=true /p:_EnableMacOSCodeSign=false `"$slnOrPrjFile`" --configuration `"$configuration`" 
+            if($LASTEXITCODE -ne 0) 
             {
-                throw "error $exitCode during dotnet compile"
+                throw "error $LASTEXITCODE during dotnet compile"
             }
             Write-Host "compile success"
         }
