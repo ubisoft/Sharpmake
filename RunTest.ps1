@@ -29,9 +29,8 @@ try
         Write-Host "running $exeToRun $arguments"
         $p=Start-Process -PassThru -NoNewWindow -FilePath $exeToRun -ArgumentList $arguments
     }
-    # need to query the handle so that the process gets porperly initialized
-    $handle = $p.Handle
-    $p.WaitForExit()
+    # wait...
+    do {} until ($p.HasExited); 
     [int] $exitCode = $p.ExitCode
     if($exitCode -ne 0) 
     {

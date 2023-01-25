@@ -176,9 +176,8 @@ try
         #make compile
         Write-Host "make compile"
         $p=Start-Process -PassThru -NoNewWindow -FilePath "make" -ArgumentList "-f `"$slnOrPrjFile`" config=`"$configuration`""
-        # need to query the handle so that the process gets porperly initialized
-        $handle = $p.Handle
-        $p.WaitForExit()
+        # wait...
+        do {} until ($p.HasExited); 
         [int] $exitCode = $p.ExitCode
         if($exitCode -ne 0) 
         {
@@ -194,9 +193,8 @@ try
         $arguments = "-bl:`"$msBuildLog`" -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true `"$slnOrPrjFile`" /nologo /verbosity:m /p:Configuration=`"$configuration`" /p:Platform=`"$platform`" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS" 
         Write-Host "msbuild $arguments"
         $p=Start-Process -PassThru -NoNewWindow -LoadUserProfile -FilePath "msbuild" -ArgumentList $arguments
-        # need to query the handle so that the process gets porperly initialized
-        $handle = $p.Handle
-        $p.WaitForExit()
+        # wait...
+        do {} until ($p.HasExited); 
         [int] $exitCode = $p.ExitCode
         if($exitCode -ne 0) 
         {

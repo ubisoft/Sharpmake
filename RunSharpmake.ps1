@@ -50,9 +50,8 @@ try
         Write-Host "running on windows"
         Write-Host "$sharpmakeWinExe $arguments"
         $p=Start-Process -passthru -NoNewWindow -FilePath $sharpmakeWinExe -ArgumentList $arguments -WorkingDirectory $workingDirectory
-        # need to query the handle so that the process gets porperly initialized
-        $handle = $p.Handle
-        $p.WaitForExit()
+        # wait...
+        do {} until ($p.HasExited); 
         [int] $exitCode = $p.ExitCode
         if($exitCode -ne 0) 
         {
@@ -69,9 +68,8 @@ try
             $monoArgs = "--debug $sharpmakeWinExe $arguments"
             Write-Host "mono $sharpmakeWinExe $monoArgs"
             $p=Start-Process -passthru -NoNewWindow -FilePath "mono" -ArgumentList $monoArgs -WorkingDirectory $workingDirectory
-            # need to query the handle so that the process gets porperly initialized
-            $handle = $p.Handle
-            $p.WaitForExit()
+            # wait...
+            do {} until ($p.HasExited); 
             [int] $exitCode = $p.ExitCode
             if($exitCode -ne 0) 
             {
@@ -88,9 +86,8 @@ try
         Write-Host "$sharpmakeLinuxExe $arguments"
         chmod +x "./$sharpmakeLinuxExe"
         $p=Start-Process -passthru -NoNewWindow -FilePath "./$sharpmakeLinuxExe" -ArgumentList $arguments -WorkingDirectory $workingDirectory 
-        # need to query the handle so that the process gets porperly initialized
-        $handle = $p.Handle
-        $p.WaitForExit()
+        # wait...
+        do {} until ($p.HasExited); 
         [int] $exitCode = $p.ExitCode
         if($exitCode -ne 0) 
         {
