@@ -1,4 +1,4 @@
-﻿namespace Sharpmake.Generators.Generic
+﻿namespace Sharpmake.Generators.Rider
 {
     public partial class RiderJson
     {

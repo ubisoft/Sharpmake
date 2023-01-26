@@ -8,7 +8,7 @@ using System.Text;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
-namespace Sharpmake.Generators.Generic
+namespace Sharpmake.Generators.Rider
 {
     /// <summary>
     /// Generator for Rider project model json files.

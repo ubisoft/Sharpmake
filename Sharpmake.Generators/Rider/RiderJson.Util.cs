@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using Sharpmake.Generators.VisualStudio;
 
-namespace Sharpmake.Generators.Generic
+namespace Sharpmake.Generators.Rider
 {
     public static class RiderJsonUtil
     {
