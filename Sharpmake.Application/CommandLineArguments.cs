@@ -81,10 +81,11 @@ namespace Sharpmake.Application
                 Array.ForEach(Sources, (string source) => DebugWriteLine("  " + source));
             }
 
-            [CommandLine.Option("assemblies")]
+            [CommandLine.Option("assemblies", "This option is *deprecated*, please use '/sources(...)' with '[module: Sharpmake.Reference(...)]' instead")]
             public void SetAssembly(params string[] files)
             {
                 Assemblies = ValidateFiles(files);
+                WarningWriteLine("'/assemblies(...)' is *deprecated*, please use '/sources(...)' with '[module: Sharpmake.Reference(...)]' instead");
                 DebugWriteLine("input assemblies: ");
                 Array.ForEach(Assemblies, (string assembly) => DebugWriteLine("  " + assembly));
             }
