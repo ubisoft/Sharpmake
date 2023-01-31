@@ -11,6 +11,7 @@ namespace Sharpmake.Generators.Rider
         {
             public const string Cpp14 = "Cpp14";
             public const string Cpp17 = "Cpp17";
+            public const string Cpp20 = "Cpp20";
             public const string Latest = "Latest";
             
             public const string Default = Cpp14;
@@ -107,6 +108,7 @@ namespace Sharpmake.Generators.Rider
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => res = CppLanguageStandard.Cpp14),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => res = CppLanguageStandard.Cpp17),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => res = CppLanguageStandard.Cpp17),
+                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP20, () => res = CppLanguageStandard.Cpp20),
                 Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => res = CppLanguageStandard.Latest)
                 );
                 return res;
@@ -147,7 +149,9 @@ namespace Sharpmake.Generators.Rider
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP14, () => res = CppLanguageStandard.Cpp14),
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU14, () => res = CppLanguageStandard.Cpp14),
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP17, () => res = CppLanguageStandard.Cpp17),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU17, () => res = CppLanguageStandard.Cpp17)
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU17, () => res = CppLanguageStandard.Cpp17),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP20, () => res = CppLanguageStandard.Cpp20),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU20, () => res = CppLanguageStandard.Cpp20)
                 );
                 return res;
             }
