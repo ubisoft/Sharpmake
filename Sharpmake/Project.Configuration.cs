@@ -1155,7 +1155,8 @@ namespace Sharpmake
             /// Gets a list of the Frameworks to link to for Xcode project.
             /// </summary>
             private OrderableStrings _XcodeSystemFrameworks = null;
-            public OrderableStrings XcodeSystemFrameworks { 
+            public OrderableStrings XcodeSystemFrameworks
+            {
                 get
                 {
                     if (_XcodeSystemFrameworks == null)
@@ -1168,7 +1169,8 @@ namespace Sharpmake
             }
 
             private OrderableStrings _XcodeDependenciesSystemFrameworks = null;
-            public OrderableStrings XcodeDependenciesSystemFrameworks {
+            public OrderableStrings XcodeDependenciesSystemFrameworks
+            {
                 get
                 {
                     if (_XcodeDependenciesSystemFrameworks == null)
@@ -1177,7 +1179,7 @@ namespace Sharpmake
                     }
                     return _XcodeDependenciesSystemFrameworks;
                 }
-                private set{}
+                private set { }
             }
 
             /// <summary>
@@ -3214,7 +3216,7 @@ namespace Sharpmake
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
                                 }
-                                
+
                                 if ((dependency.Platform.Equals(Platform.mac) || dependency.Platform.Equals(Platform.ios)) && dependency.XcodeSystemFrameworks.Count > 0)
                                     XcodeDependenciesSystemFrameworks.AddRange(dependency.XcodeSystemFrameworks);
 

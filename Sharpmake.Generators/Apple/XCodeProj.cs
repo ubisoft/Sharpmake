@@ -1937,7 +1937,7 @@ namespace Sharpmake.Generators.Apple
                 // Lookup for the app in the unit test dependencies.
                 ProjectTargetDependency testHostTargetDependency =
                     nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null &&
-                    (dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp  ||
+                    (dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp ||
                      dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.TvosApp ||
                      dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.WatchosApp)
                     );

@@ -415,7 +415,7 @@ namespace Sharpmake
                 .Concat(_FilesAlternatesAutoCleanupDBFullPaths.AsEnumerable());
 
             foreach (string alternateDatabaseFilename in alternateDBFullPaths)
-            { 
+            {
                 Dictionary<string, DateTime> alternateDBFiles = ReadCleanupDatabase(alternateDatabaseFilename);
                 if (alternateDBFiles != null)
                     alternateDatabases.Add(alternateDBFiles);

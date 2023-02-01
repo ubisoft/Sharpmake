@@ -68,9 +68,9 @@ namespace Sharpmake.Generators.VisualStudio
 
             public override int GetHashCode()
             {
-                int hash = DotNetFramework.GetHashCode()*5
+                int hash = DotNetFramework.GetHashCode() * 5
                     + (DotNetOSVersion.GetHashCode() * 7)
-                    + (DotNetOSVersionSuffix.GetHashCode()*11);
+                    + (DotNetOSVersionSuffix.GetHashCode() * 11);
                 return hash;
             }
             #endregion
