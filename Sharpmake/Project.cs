@@ -1612,7 +1612,14 @@ namespace Sharpmake
             if (target.GetType() != Targets.TargetType)
                 return null;
 
-            return ConfigurationsCache[target];
+            Configuration config;
+            bool hasConfig = ConfigurationsCache.TryGetValue(target, out config);
+            if (!hasConfig)
+            {
+                ReportError($"ConfigurationsCache in project '{Name}' does not contain configuration for '{target}'");
+            }
+
+            return config;
         }
 
         internal void Initialize(Type targetType, Type configurationType, bool isInternal = false)
