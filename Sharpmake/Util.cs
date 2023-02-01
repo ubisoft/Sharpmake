@@ -59,6 +59,27 @@ namespace Sharpmake
             return resultName;
         }
 
+        /// <summary>
+        /// Returns a OR regular expression for all the entries in the IEnumerable
+        /// e.g. {"foo", "bar"}.ToOrRegex() yields "(foo|bar)"
+        /// </summary>
+        public static string ToOrRegex(this IEnumerable<string> array)
+        {
+            return $"({string.Join("|", array)})";
+        }
+
+        /// <summary>
+        /// Returns a OR regular expression for all the entries in the IEnumerable, except those passed as `except`
+        /// e.g. {"foo", "bar", "hoge"}.ToOrRegexExcept("bar") yields "(foo|hoge)"
+        /// </summary>
+        public static string ToOrRegexExcept(this IEnumerable<string> array, params string[] except)
+        {
+            if (except.Length == 0)
+                return $"({string.Join("|", array)})";
+
+            return $"({string.Join("|", array.Except(except))})";
+        }
+
 
         public static bool FlagsTest<T>(T value, T flags)
         {
