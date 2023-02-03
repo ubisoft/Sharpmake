@@ -86,6 +86,11 @@ try
     if($workingDirectory -ne "")
     {
         Push-Location -Path $workingDirectory
+        if (-not $?)
+        {
+            throw "error when changing working dir : $LASTEXITCODE"
+        }
+
     }
     $currentDir = Get-Location
     Write-Host "working folder : $currentDir" 
@@ -113,6 +118,11 @@ try
         }
         # set msbuild batch path as current working folder
         Push-Location $msBuildCommand
+        if (-not $?)
+        {
+            throw "error when changing working dir : $LASTEXITCODE"
+        }
+
         # run visual studio setup batch and gather all changed environment variables. this is required because batch is run in another process, 
         # so we must gather result environment variable to update the ones in powershell process
         $modifiedEnvVars = cmd /c "VsMSBuildCmd.bat &set"
