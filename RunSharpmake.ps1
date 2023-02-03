@@ -53,6 +53,7 @@ try
         # wait...
         do {} until ($p.HasExited); 
         [int] $exitCode = $p.ExitCode
+        Write-Host "exit code : $exitCode"
         if($exitCode -ne 0) 
         {
             throw "error $exitCode during Sharpmake.Application execution"
@@ -71,6 +72,7 @@ try
             # wait...
             do {} until ($p.HasExited); 
             [int] $exitCode = $p.ExitCode
+            Write-Host "exit code : $exitCode"
             if($exitCode -ne 0) 
             {
                 Write-Host "error $exitCode during mono Sharpmake.Application.exe execution -- ignored"
@@ -89,6 +91,7 @@ try
         # wait...
         do {} until ($p.HasExited); 
         [int] $exitCode = $p.ExitCode
+        Write-Host "exit code : $exitCode"
         if($exitCode -ne 0) 
         {
             throw "error $exitCode during Sharpmake.Application execution"
