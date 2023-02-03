@@ -25,6 +25,8 @@ call :UpdateRef samples CSharpHelloWorld            HelloWorld.sharpmake.cs     
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples HelloWorld                  HelloWorld.sharpmake.cs                    reference         HelloWorld
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
+call :UpdateRef samples HelloLinux                  HelloLinux.Main.sharpmake.cs               reference         HelloLinux
+if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpVsix                  CSharpVsix.sharpmake.cs                    reference         CSharpVsix
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF\codebase
