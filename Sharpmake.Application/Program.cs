@@ -29,9 +29,10 @@ namespace Sharpmake.Application
     public enum ExitCode
     {
         Success = 0,
-        Error = -3,
-        InternalError = -3,
-        UnknownError = -10
+        GenerationError,
+        Error,
+        InternalError,
+        UnknownError,
     }
 
     public static partial class Program
@@ -170,12 +171,10 @@ namespace Sharpmake.Application
             Trace.Assert(System.Runtime.GCSettings.IsServerGC, "Server GC is not active! Sharpmake will be much slower!");
 
             AppDomain currentDomain = AppDomain.CurrentDomain;
-            currentDomain.UnhandledException += AppDomain_UnhandledException;
 
             Mutex oneInstanceMutex = null;
             Argument parameters = new Argument();
             ExitCode exitCode = ExitCode.Success;
-
             try
             {
                 DebugEnable = CommandLine.ContainParameter("verbose") || CommandLine.ContainParameter("debug") || CommandLine.ContainParameter("diagnostics");
@@ -365,14 +364,12 @@ namespace Sharpmake.Application
                 LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
                 exitCode = ExitCode.InternalError;
             }
-#if !DEBUG // Use this to catch right away if an exception throw
             catch (Exception e)
             {
                 LogWriteLine(Environment.NewLine + "Exception Error:");
                 LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
                 exitCode = ExitCode.UnknownError;
             }
-#endif
             finally
             {
                 if (oneInstanceMutex != null)
@@ -388,7 +385,8 @@ namespace Sharpmake.Application
                 }
             }
 
-            LogWriteLine(@"{0} errors, {1} warnings", s_errorCount, s_warningCount);
+            if (exitCode <= ExitCode.Error) // Do not display summary in case of unknown exception or internal error
+                LogWriteLine(@"{0} errors, {1} warnings", s_errorCount, s_warningCount);
             if (s_errorCount != 0)
             {
                 if (Debugger.IsAttached)
@@ -398,23 +396,17 @@ namespace Sharpmake.Application
                 }
             }
 
-            // returning exit code and error count separately because they can result in an exit code of 0 if they are added together.
-            if (s_errorCount != 0)
-                return s_errorCount;
+            // Always return the same error code no matter the number of errors.
+            if (exitCode == ExitCode.Success && s_errorCount != 0)
+            {
+                exitCode = ExitCode.GenerationError;
+            }
             return (int)exitCode;
         }
 
         private static void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             LogSharpmakeExtensionLoaded(args.LoadedAssembly);
-        }
-
-        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
-        {
-            LogWriteLine(Environment.NewLine + "Unhandled exception Error:");
-            LogWriteLine(Util.GetCompleteExceptionMessage(unhandledExceptionEventArgs.ExceptionObject as Exception, "\t"));
-
-            Environment.Exit((int)ExitCode.UnknownError);
         }
 
         private static void LogSharpmakeExtensionLoaded(Assembly extensionAssembly)
