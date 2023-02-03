@@ -176,13 +176,8 @@ functional_test:
 
 HelloLinux:
   extends: .linux_sample_test
-  variables:
-    testFolder: 'samples/HelloLinux'
   script:
-  - pwsh ./RunSharpmake.ps1 -workingDirectory $testFolder -sharpmakeFile "HelloLinux.Main.sharpmake.cs" -framework $framework
-  - pwsh ./Compile.ps1 -slnOrPrjFile "HelloLinux_linux_make.make" -configuration $configuration -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "make"
-  - pwsh ./RunTest.ps1  "$testFolder/codebase/temp/bin/linux_${configuration}/exe"
-
+  - pwsh ./RunSample.ps1 -sampleName HelloLinux -configuration $configuration -framework $framework
 
 #############
 # MacOs Sample tests
@@ -205,18 +200,8 @@ HelloLinux:
 
 HelloXCode:
   extends: .macos_sample_test
-  variables:
-    testFolder: 'samples/HelloXCode'
   script:
-  - pwsh ./RunSharpmake.ps1 -workingDirectory "$testFolder" -sharpmakeFile "HelloXCode.Main.sharpmake.cs" -framework "$framework"
-  - set -o pipefail
-  - pwsh ./Compile.ps1 -slnOrPrjFile "HelloXCode_mac.xcworkspace" -configuration $configuration -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "xcode" -scheme "\"exe FastBuild\"" 
-  - pwsh ./RunTest.ps1  "$testFolder/codebase/temp/bin/mac_${configuration}_fastbuild/exe"
-  - pwsh ./Compile.ps1 -slnOrPrjFile "HelloXCode_mac.xcworkspace" -configuration $configuration -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "xcode" -scheme exe_prelinked_mac
-  - pwsh ./RunTest.ps1  "$testFolder/codebase/temp/bin/mac_${configuration}/exe_prelinked"
-  - pwsh ./Compile.ps1 -slnOrPrjFile "HelloXCode_mac.xcworkspace" -configuration $configuration -WorkingDirectory "$testFolder/codebase/temp/solutions" -compiler "xcode" -scheme exe_mac
-  - cd $testFolder/codebase/temp/bin/mac_${configuration} 
-  - DYLD_LIBRARY_PATH=. ./exe
+  - pwsh ./RunSample.ps1 -sampleName HelloXCode -configuration $configuration -framework $framework
 
 #############
 # Windows Sample tests
@@ -248,12 +233,8 @@ CompileCommandDatabase:
   - if: $configuration == "debug"
     when: always
   - when: never
-  variables:
-    testFolder: samples\CompileCommandDatabase
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CompileCommandDatabase.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "CompileCommandDatabaseSolution_vs2017_win64.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\exeprojectname\output\win64\$configuration\exeprojectname.exe"
+  - pwsh RunSample.ps1 -sampleName CompileCommandDatabase -configuration $configuration -framework $framework -os $os
 
 ConfigureOrder:
   extends: .windows_sample_test
@@ -261,14 +242,8 @@ ConfigureOrder:
   - if: $configuration == "release"
     when: always
   - when: never
-  variables:
-    testFolder: samples\ConfigureOrder
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "main.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "configureorderingsolution.sln" -configuration $configuration -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win32\$configuration\childproject.exe"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win32\$configuration\foobarproject.exe"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win32\$configuration\parentproject.exe"
+  - pwsh RunSample.ps1 -sampleName ConfigureOrder -configuration $configuration -framework $framework -os $os
 
 CPPCLI:
   extends: .windows_sample_test
@@ -276,14 +251,8 @@ CPPCLI:
   - if: $os == "windows-2019"
     when: always
   - when: never
-  variables:
-    testFolder: samples\CPPCLI
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CLRTest.sharpmake.cs" -framework $framework 
-  - pwsh Compile.ps1 -slnOrPrjFile "CPPCLI.vs2017.v4_6_2.sln" -configuration $configuration -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\vs2017\v4_6_2\$configuration\TestCSharpConsole.exe"
-  - pwsh Compile.ps1 -slnOrPrjFile "CPPCLI.vs2019.v4_7_2.sln" -configuration $configuration -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\vs2019\v4_7_2\$configuration\TestCSharpConsole.exe"
+  - pwsh RunSample.ps1 -sampleName CPPCLI -configuration $configuration -framework $framework -os $os
 
 CSharpHelloWorld_old_frameworks:
   extends: .windows_sample_test
@@ -291,12 +260,8 @@ CSharpHelloWorld_old_frameworks:
   - if: $os == "windows-2019"
     when: always
   - when: never
-  variables:
-    testFolder: samples/CSharpHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2017.v4_6_1.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\helloworld\output\anycpu\$configuration\the other name.exe"
+  - pwsh RunSample.ps1 -sampleName CSharpHelloWorld_old_frameworks -configuration $configuration -framework $framework -os $os
 
 CSharpHelloWorld:
   extends: .windows_sample_test
@@ -314,144 +279,76 @@ CSharpHelloWorld:
 
 CSharpImports:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/CSharpImports
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CSharpImports.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "CSharpImportsSolution.vs2019.v4_7_2.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\csharpimports\output\anycpu\$configuration\the other name.exe"
+  - pwsh RunSample.ps1 -sampleName CSharpImports -configuration $configuration -framework $framework -os $os
 
 CSharpVsix:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/CSharpVsix
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CSharpVsix.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "CSharpVsixSolution.vs2017.v4_7_2.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
+  - pwsh RunSample.ps1 -sampleName CSharpVsix -configuration $configuration -framework $framework -os $os
   # that one can't be run unfortunately
 
 CustomBuildStep:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/CustomBuildStep
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CustomBuildStep.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "custombuildstepsolution_vs2017_win64.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win64\$configuration\custombuildstep.exe"
+  - pwsh RunSample.ps1 -sampleName CustomBuildStep -configuration $configuration -framework $framework -os $os
 
 CSharpWCF:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/CSharpWCF
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "CSharpWCF.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "CSharpWCFSolution.vs2015.v4_5_2.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\codebase" -VsVersion $os -compiler "MsBuild"
+  - pwsh RunSample.ps1 -sampleName CSharpWCF -configuration $configuration -framework $framework -os $os
   # that one can't be run unfortunately
 
 FastBuildSimpleExecutable:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/FastBuildSimpleExecutable
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "FastBuildSimpleExecutable.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "fastbuildsample_${env:VS_VERSION_SUFFIX}_win64.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win64\$configuration\fastbuildsimpleexecutable.exe"
+  - pwsh RunSample.ps1 -sampleName FastBuildSimpleExecutable -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
 
 # Temp disable after Github VM update which updated the NDK and broke it
 # HelloAndroid:
 #   extends: .windows_sample_test
 #   variables:
-#     testFolder: samples/HelloAndroid
 #     JAVA_HOME: ${Env:JAVA_HOME_11_X64}
 #   script:
-#   - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloAndroid.main.sharpmake.cs" -framework $framework
-#   - pwsh Compile.ps1 -slnOrPrjFile "HelloAndroid_android_vs2019.sln" -configuration ${env:configuration}_NoBlob -platform arm64_v8a -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-#   - pwsh Compile.ps1 -slnOrPrjFile "HelloAndroid_android_vs2019.sln" -configuration ${env:configuration}_NoBlob -platform x86_64 -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
+#  - pwsh RunSample.ps1 -sampleName HelloAndroid -configuration $configuration -framework $framework -os $os
 
-# Temp disable due to error : Couldn't find a version number folder for clang in C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\Llvm\x64
-# HelloClangCl:
-#   extends: .windows_sample_test
-#   variables:
-#     testFolder: samples/HelloClangCl
-#   script:
-#   - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloClangCl.Main.sharpmake.cs" -framework $framework -devenvVersion ${env:VS_VERSION_SUFFIX}
-#   - pwsh Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "ClangCl $configuration" -platform MSBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-#   - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_clangcl_${env:configuration}_msbuild\exe.exe"
-#   - pwsh Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "ClangCl $configuration" -platform FastBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-#   - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_clangcl_${env:configuration}_fastbuild\exe.exe"
-#   - pwsh Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "MSVC $configuration" -platform MSBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-#   - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_msvc_${env:configuration}_msbuild\exe.exe"
-#   - pwsh Compile.ps1 -slnOrPrjFile "HelloClangCl_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "MSVC $configuration" -platform FastBuild -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-#   - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_msvc_${env:configuration}_fastbuild\exe.exe"
+HelloClangCl:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName HelloClangCl -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
 HelloEvents:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/HelloEvents
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloEvents.Main.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloEvents_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration $configuration -platform Win64 -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_${env:configuration}_msbuild\exe\exe.exe"
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloEvents_win64_${env:VS_VERSION_SUFFIX}.sln" -configuration "${Env:configuration}_FastBuild" -platform Win64 -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\win64_${env:configuration}_fastbuild\exe\exe.exe"
-
+  - pwsh RunSample.ps1 -sampleName HelloEvents -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
 
 HelloWorld:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples\HelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "helloworld_vs2019_win32.sln" -configuration $configuration -platform Win32 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win32\$configuration\helloworld.exe"
-  - pwsh Compile.ps1 -slnOrPrjFile "helloworld_vs2019_win64.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win64\$configuration\helloworld.exe"
+  - pwsh RunSample.ps1 -sampleName HelloWorld -configuration $configuration -framework $framework -os $os
 
 NetCore-DotNetCoreFrameworkHelloWorld:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples\NetCore\DotNetCoreFrameworkHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldMultiFrameworkSolution.vs2019.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\$configuration\netcoreapp3.1" -arguments "`"`"the other name.dll`"`"" 
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2017.netcore2_1.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2019.netcore3_1.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworld\output\anycpu\$configuration\netcoreapp3.1" -arguments "`"`"the other name.dll`"`""
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetCoreFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
         # not working tests because .netcore 2.1.0 is not available on runner
         #   - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\$configuration\netcoreapp2.1" -arguments "`"`"the other name.dll`"`""
         #   - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworld\output\anycpu\$configuration\netcoreapp2.1" -arguments "`"`"the other name.dll`"`"" 
 
 NetCore-DotNetFrameworkHelloWorld:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples\NetCore\DotNetFrameworkHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldMultiFrameworkSolution.vs2019.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\$configuration\net461\the other name.exe"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\$configuration\net472\the other name.exe"
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2019.v4_7_2.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\helloworld\output\vs2019\$configuration\the other name.exe"
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
 
 NetCore-DotNetFrameworkHelloWorld_OldFrameworks:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples/NetCore/DotNetFrameworkHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2017.v4_6_1.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\helloworld\output\vs2017\$configuration\the other name.exe"
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld_OldFrameworks" -configuration $configuration -framework $framework -os $os
 
 NetCore-DotNetMultiFrameworksHelloWorld:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples\NetCore\DotNetMultiFrameworksHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldMultiFrameworksSolution.vs2019.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframeworks\output\anycpu\$configuration\netcoreapp3.1" -arguments HelloWorldMultiFrameworks.dll
-  - pwsh RunTest.ps1 "${env:testFolder}\projects\helloworldmultiframeworks\output\anycpu\$configuration\net461\HelloWorldMultiFrameworks.exe"
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetMultiFrameworksHelloWorld" -configuration $configuration -framework $framework -os $os
 
 NetCore-DotNetOSMultiFrameworksHelloWorld:
   extends: .windows_sample_test
@@ -470,19 +367,8 @@ NetCore-DotNetOSMultiFrameworksHelloWorld:
 
 PackageReferences:
   extends: .windows_sample_test
-  variables:
-    testFolder: samples\PackageReferences
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "PackageReferences.sharpmake.cs" -framework $framework
-  - pwsh RunTest.ps1  -exeToRun nuget -arguments "restore PackageReferenceSolution.vs2017.v4_7_2.sln" -workingDirectory ${env:testFolder}\projects 
-  - pwsh Compile.ps1 -slnOrPrjFile "PackageReferenceSolution.vs2017.v4_7_2.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\csharppackagereferences\output\vs2017\$configuration\PackageReference.exe"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\cpppackagereferences\output\vs2017\$configuration\cpppackagereferences.exe"
-  - pwsh RunTest.ps1  -exeToRun nuget -arguments "restore PackageReferenceSolution.vs2019.v4_7_2.sln" -workingDirectory ${env:testFolder}\projects
-  - pwsh Compile.ps1 -slnOrPrjFile "PackageReferenceSolution.vs2019.v4_7_2.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\csharppackagereferences\output\vs2019\$configuration\PackageReference.exe"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\cpppackagereferences\output\vs2019\$configuration\cpppackagereferences.exe"
-
+  - pwsh RunSample.ps1 -sampleName "PackageReferences" -configuration $configuration -framework $framework -os $os
 
 # temp disabled, requires this :
 #   - name: Install Qt
@@ -490,12 +376,8 @@ PackageReferences:
 # 
 # QTFileCustomBuild:
 #   extends: .windows_sample_test
-#   variables:
-#     testFolder: samples/QTFileCustomBuild
 #   script:
-#   - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "QTFileCustomBuild.sharpmake.cs" -framework $framework
-#   - pwsh Compile.ps1 -slnOrPrjFile "qtfilecustombuild_vs2017_win64.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-#   - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win64\$configuration\qtfilecustombuild.exe"
+#   - pwsh RunSample.ps1 -sampleName "QTFileCustomBuild" -configuration $configuration -framework $framework -os $os
 
 SimpleExeLibDependency:
   extends: .windows_sample_test
@@ -503,22 +385,13 @@ SimpleExeLibDependency:
   - if: $configuration == "debug"
     when: always
   - when: never
-  variables:
-    testFolder: samples/SimpleExeLibDependency
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "SimpleExeLibDependency.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "ExeLibSolutionName_vs2017_win64.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\projects\output\win64\$configuration\simpleexeprojectname.exe"
+  - pwsh RunSample.ps1 -sampleName "SimpleExeLibDependency" -configuration $configuration -framework $framework -os $os
 
 vcpkg:
   extends: .windows_sample_test
   variables:
     testFolder: samples/vcpkg
   script:
-  - pwsh Extract-vcpkg.ps1 -workingDirectory ${env:testFolder}
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder}\sharpmake -sharpmakeFile "main.sharpmake.cs" -framework $framework
-  - pwsh Compile.ps1 -slnOrPrjFile "vcpkgsample_${Env:VS_VERSION_SUFFIX}.sln" -configuration $configuration -platform x64 -WorkingDirectory "${env:testFolder}\tmp\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\bin\${Env:configuration}-msbuild\vcpkgsample.exe"
-  - pwsh Compile.ps1 -slnOrPrjFile "vcpkgsample_${Env:VS_VERSION_SUFFIX}.sln" -configuration ${Env:configuration}_FastBuild -platform x64 -WorkingDirectory "${env:testFolder}\tmp\projects" -VsVersion $os -compiler "MsBuild"
-  - pwsh RunTest.ps1  "${env:testFolder}\bin\${Env:configuration}-fastbuild\vcpkgsample.exe"
+  - pwsh RunSample.ps1 -sampleName vcpkg -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
 

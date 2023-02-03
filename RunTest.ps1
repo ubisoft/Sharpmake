@@ -39,6 +39,6 @@ try
 }
 catch 
 {
-    Write-Error "$_"
+    Write-Error $PSItem.Exception
     exit 1
 }
