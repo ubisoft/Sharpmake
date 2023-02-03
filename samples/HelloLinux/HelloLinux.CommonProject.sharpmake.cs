@@ -73,11 +73,15 @@ namespace HelloLinux
         {
             if (conf.Output == Configuration.OutputType.Exe || conf.Output == Configuration.OutputType.Dll)
             {
+                // To maintain consistency between Windows and Linux
+                // makefiles and paths, instead of absolute global paths via
+                // Sharpmake, we generate local ones using Make variables
+
                 // Create a separate package directory before building.
-                string packageDir = $@"{Globals.TmpDirectory}/package";
+                string packageDir = "$(TARGETDIR)/../../package";
                 conf.EventPreBuild.Add($"mkdir -p {packageDir}");
                 // Copy the build result to the package directory.
-                conf.EventPostBuild.Add($@"cp [conf.TargetPath]/[conf.TargetFileFullNameWithExtension] {packageDir}");
+                conf.EventPostBuild.Add($@"cp $(TARGET) {packageDir}");
             }
         }
 

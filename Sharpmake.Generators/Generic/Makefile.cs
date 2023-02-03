@@ -592,7 +592,8 @@ namespace Sharpmake.Generators.Generic
                 switch (depConf.Output)
                 {
                     case Project.Configuration.OutputType.None:
-                        continue;
+                    case Project.Configuration.OutputType.Utility:
+                        break;
                     case Project.Configuration.OutputType.Lib:
                     case Project.Configuration.OutputType.DotNetClassLibrary:
                         deps.Add(Path.Combine(depConf.TargetLibraryPath, depConf.TargetFileFullNameWithExtension), depConf.TargetFileOrderNumber);
@@ -609,17 +610,22 @@ namespace Sharpmake.Generators.Generic
             options["LDDEPS"] = depsRelative.JoinStrings(" ");
 
             // LinkCommand
-            if (conf.Output == Project.Configuration.OutputType.Lib)
+            switch (conf.Output)
             {
-                options["LinkCommand"] = Template.Project.LinkCommandLib;
-            }
-            else if (conf.Output == Project.Configuration.OutputType.Dll)
-            {
-                options["LinkCommand"] = Template.Project.LinkCommandDll;
-            }
-            else
-            {
-                options["LinkCommand"] = Template.Project.LinkCommandExe;
+                case Project.Configuration.OutputType.Lib:
+                    options["LinkCommand"] = Template.Project.LinkCommandLib;
+                    break;
+                case Project.Configuration.OutputType.Dll:
+                    options["LinkCommand"] = Template.Project.LinkCommandDll;
+                    break;
+                case Project.Configuration.OutputType.Exe:
+                    options["LinkCommand"] = Template.Project.LinkCommandExe;
+                    break;
+                case Project.Configuration.OutputType.None:
+                case Project.Configuration.OutputType.Utility:
+                default:
+                    options["LinkCommand"] = string.Empty;
+                    break;
             }
 
             if (conf.AdditionalLibrarianOptions.Any())
