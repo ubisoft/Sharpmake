@@ -1,4 +1,4 @@
-# Sharpmake
+# <img src="/docs/sharpmake_logo.svg" width="32" height="32"> Sharpmake
 
 ![build](https://github.com/ubisoft/Sharpmake/workflows/build/badge.svg)
 
