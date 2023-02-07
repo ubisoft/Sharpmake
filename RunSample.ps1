@@ -56,7 +56,6 @@ foreach ($sample in ($testDefs.Samples | Where-Object { $_.Name -eq $sampleName}
         try
         {
             Invoke-Expression "$resolvedCommand" 
-            Write-Host "default code : $?"
         }
         catch  
         {

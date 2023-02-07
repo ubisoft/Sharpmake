@@ -185,7 +185,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          .\RunSample.ps1 -sampleName "FastBuildSimpleExecutable" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
+          .\RunSample.ps1 -sampleName "FastBuildSimpleExecutable" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
 
       # Temp disable after Github VM update which updated the NDK and broke it
       # - name: HelloAndroid ${{ matrix.configuration }}
