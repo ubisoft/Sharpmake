@@ -34,10 +34,9 @@ try
 {
     Write-Host "run sharpmake.application on $sharpmakeFile"
     $curentDir = Get-Location
-    Write-Host "working folder : $curentDir" 
 
-    $sharpmakeWinExe = Join-Path 'tmp' 'bin' $configuration $framework 'Sharpmake.Application.exe'
-    $sharpmakeLinuxExe = Join-Path 'tmp' 'bin' $configuration $framework 'Sharpmake.Application'
+    $sharpmakeWinExe = Join-Path $curentDir 'tmp' 'bin' $configuration $framework 'Sharpmake.Application.exe'
+    $sharpmakeLinuxExe = Join-Path $curentDir 'tmp' 'bin' $configuration $framework 'Sharpmake.Application'
     $arguments = "/sources('$sharpmakeFile') /verbose"
     if ($devenvVersion -ne "")
     {
@@ -49,52 +48,32 @@ try
         # run on windows
         Write-Host "running on windows"
         Write-Host "$sharpmakeWinExe $arguments"
-        $p=Start-Process -passthru -NoNewWindow -FilePath $sharpmakeWinExe -ArgumentList $arguments -WorkingDirectory $workingDirectory
-        # wait...
-        do {} until ($p.HasExited); 
-        [int] $exitCode = $p.ExitCode
-        Write-Host "exit code : $exitCode"
-        if($exitCode -ne 0) 
+        Push-Location $workingDirectory
+        Write-Host "working folder : $(Get-Location)" 
+        & $sharpmakeWinExe $arguments
+        Pop-Location 
+        Write-Host "exit code : $LASTEXITCODE"
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0) 
         {
-            throw "error $exitCode during Sharpmake.Application execution"
+            Write-Error "error $LASTEXITCODE during Sharpmake.Application execution"
+            exit $LASTEXITCODE
         }
     }
     else 
     {
         #run on linux
         Write-Host "running on linux"
-        if ($addMono)
-        {
-            #run windows exe with mono
-            $monoArgs = "--debug $sharpmakeWinExe $arguments"
-            Write-Host "mono $sharpmakeWinExe $monoArgs"
-            $p=Start-Process -passthru -NoNewWindow -FilePath "mono" -ArgumentList $monoArgs -WorkingDirectory $workingDirectory
-            # wait...
-            do {} until ($p.HasExited); 
-            [int] $exitCode = $p.ExitCode
-            Write-Host "exit code : $exitCode"
-            if($exitCode -ne 0) 
-            {
-                Write-Host "error $exitCode during mono Sharpmake.Application.exe execution -- ignored"
-            }
-            else 
-            {
-                Write-Host "success"
-                return
-            }
-        }
-    
-        # run linux exe
         Write-Host "$sharpmakeLinuxExe $arguments"
-        chmod +x "./$sharpmakeLinuxExe"
-        $p=Start-Process -passthru -NoNewWindow -FilePath "./$sharpmakeLinuxExe" -ArgumentList $arguments -WorkingDirectory $workingDirectory 
-        # wait...
-        do {} until ($p.HasExited); 
-        [int] $exitCode = $p.ExitCode
-        Write-Host "exit code : $exitCode"
-        if($exitCode -ne 0) 
+        chmod +x "$sharpmakeLinuxExe"
+        Push-Location $workingDirectory
+        Write-Host "working folder : $curentDir" 
+        & $sharpmakeLinuxExe $arguments
+        Pop-Location 
+        Write-Host "exit code : $LASTEXITCODE"
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0) 
         {
-            throw "error $exitCode during Sharpmake.Application execution"
+            Write-Error "error $LASTEXITCODE during Sharpmake.Application execution"
+            exit $LASTEXITCODE
         }
     }
 }

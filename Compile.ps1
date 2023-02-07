@@ -81,6 +81,7 @@ function Get-MsBuildCmd
 
 try 
 {
+    $runProcessPath = Join-Path "$(Get-Location)" "RunProcess.ps1"
     Write-Host "--- Compile $slnOrPrjFile, $configuration|$platform with $vsVersion $compiler"
     # change working folder if one was given
     if($workingDirectory -ne "")
@@ -92,8 +93,7 @@ try
         }
 
     }
-    $currentDir = Get-Location
-    Write-Host "working folder : $currentDir" 
+    Write-Host "working folder : $(Get-Location)" 
 
     # if a VsVersion was requested, find and run matching VsMsBuildCommand, else just run the build that is supposed to be in the path already
     if($vsVersion -ne "")
@@ -139,6 +139,7 @@ try
         Pop-Location
     }
 
+    Write-Host "working folder : $(Get-Location)" 
     $binLogName = "msbuild_$configuration.binlog"
     if ($compiler -eq "dotnet")
     {
@@ -185,13 +186,12 @@ try
     {
         #make compile
         Write-Host "make compile"
-        $p=Start-Process -PassThru -NoNewWindow -FilePath "make" -ArgumentList "-f `"$slnOrPrjFile`" config=`"$configuration`""
-        # wait...
-        do {} until ($p.HasExited); 
-        [int] $exitCode = $p.ExitCode
-        if($exitCode -ne 0) 
+        make -f "$slnOrPrjFile" config="$configuration"
+        Write-Host "exit code : $LASTEXITCODE"
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0) 
         {
-            throw "error $exitCode during make compile"
+            Write-Error "error $LASTEXITCODE during make execution"
+            exit $LASTEXITCODE
         }
         Write-Host "compile success"
     }
@@ -200,15 +200,12 @@ try
         #msbuild compile
         Write-Host "msbuild compile"
         $msBuildLog = Join-Path 'tmp' 'msbuild' 'windows' $binLogName
-        $arguments = "-bl:`"$msBuildLog`" -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true `"$slnOrPrjFile`" /nologo /verbosity:m /p:Configuration=`"$configuration`" /p:Platform=`"$platform`" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS" 
-        Write-Host "msbuild $arguments"
-        $p=Start-Process -PassThru -NoNewWindow -LoadUserProfile -FilePath "msbuild" -ArgumentList $arguments
-        # wait...
-        do {} until ($p.HasExited); 
-        [int] $exitCode = $p.ExitCode
-        if($exitCode -ne 0) 
+        msbuild $slnOrPrjFile -bl:"$msBuildLog" -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true /nologo /verbosity:m /p:Configuration="$configuration" /p:Platform="$platform" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS 
+        Write-Host "exit code : $LASTEXITCODE"
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0) 
         {
-            throw "error $exitCode during msBuild compile"
+            Write-Error "error $LASTEXITCODE during mdbuild compile"
+            exit $LASTEXITCODE
         }
         Write-Host "compile success"
     }
@@ -224,7 +221,6 @@ finally
     if($workingDirectory -ne "")
     {
         Pop-Location
-        $currentDir = Get-Location
-        Write-Host "working folder : $currentDir" 
+        Write-Host "working folder : $(Get-Location)" 
     }
 }
