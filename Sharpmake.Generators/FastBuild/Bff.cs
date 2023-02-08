@@ -42,6 +42,7 @@ namespace Sharpmake.Generators.FastBuild
             public Options.ExplicitOptions Options { get; set; } = new Options.ExplicitOptions();
 
             public IDictionary<string, string> CommandLineOptions { get; set; } = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
+            public IDictionary<string, string> LinkerCommandLineOptions { get; set; } = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
 
             public DevEnv DevelopmentEnvironment => Configuration.Compiler;
 

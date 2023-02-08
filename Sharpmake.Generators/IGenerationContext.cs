@@ -25,7 +25,9 @@ namespace Sharpmake.Generators
         DevEnv DevelopmentEnvironment { get; }
 
         Options.ExplicitOptions Options { get; }
-        IDictionary<string, string> CommandLineOptions { get; }
+        IDictionary<string, string> CommandLineOptions { get; } // for the compiler
+        IDictionary<string, string> LinkerCommandLineOptions { get; } // for the linker
+
 
         string ProjectDirectoryCapitalized { get; }
         string ProjectSourceCapitalized { get; }

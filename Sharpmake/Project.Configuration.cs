@@ -1420,6 +1420,9 @@ namespace Sharpmake
             /// </remarks>
             public bool DoNotGenerateFastBuild = false;
 
+            // Unity builds support
+            public int MaxFilesPerUnityFile = 0;
+
             // container for executable
             /// <summary>
             /// Represents a build step that invokes an executable on the file system.

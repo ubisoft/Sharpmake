@@ -41,9 +41,9 @@ namespace Sharpmake
             return PlatformRegistry.Get<IPlatformDescriptor>(platform).IsLinkerInvokedViaCompiler;
         }
 
-        public static string GetLinkerOptionPrefix(this Platform platform)
+        public static string GetLinkerOptionPrefix(this Platform platform, Compiler compiler = Compiler.Auto)
         {
-            if (IsUsingClang(platform) && IsLinkerInvokedViaCompiler(platform))
+            if ((IsUsingClang(platform) || compiler == Compiler.Clang) && IsLinkerInvokedViaCompiler(platform))
                 return "-Wl,";
 
             return "";
