@@ -280,9 +280,7 @@ namespace Sharpmake
                 // for it.
                 case Project.Configuration.OutputType.Exe:
                     return ExecutableFileFullExtension;
-                case Project.Configuration.OutputType.IosApp:
-                case Project.Configuration.OutputType.TvosApp:
-                case Project.Configuration.OutputType.WatchosApp:
+                case Project.Configuration.OutputType.AppleApp:
                     return ".app";
                 case Project.Configuration.OutputType.IosTestBundle:
                     return ".xctest";
@@ -672,9 +670,7 @@ namespace Sharpmake
             switch (conf.Output)
             {
                 case Project.Configuration.OutputType.Exe:
-                case Project.Configuration.OutputType.IosApp:
-                case Project.Configuration.OutputType.TvosApp:
-                case Project.Configuration.OutputType.WatchosApp:
+                case Project.Configuration.OutputType.AppleApp:
                     options["MachOType"] = "mh_execute";
                     break;
                 case Project.Configuration.OutputType.Lib:
