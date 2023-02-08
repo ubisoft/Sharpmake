@@ -360,7 +360,7 @@ namespace Sharpmake.Generators.Apple
 
                     switch (conf.Output)
                     {
-                        case Project.Configuration.OutputType.IosApp:
+                        case Project.Configuration.OutputType.AppleApp:
                         case Project.Configuration.OutputType.IosTestBundle:
                         case Project.Configuration.OutputType.Exe:
                         case Project.Configuration.OutputType.Dll:
@@ -535,10 +535,10 @@ namespace Sharpmake.Generators.Apple
         }
 
         //Find Project.Configuration of the bundle loading app that matches the unit test target, if it exists.
-        //Should have OutputType IosApp assuming targets with different output type.
+        //Should have OutputType App assuming targets with different output type.
         private Project.Configuration FindBundleLoadingApp(List<Project.Configuration> configurations)
         {
-            return configurations.Find(element => (element.Output == Project.Configuration.OutputType.IosApp));
+            return configurations.Find(element => (element.Output == Project.Configuration.OutputType.AppleApp));
         }
 
         private static string GetTargetKey(Project.Configuration conf)
@@ -1724,9 +1724,7 @@ namespace Sharpmake.Generators.Apple
                         ProductType = "com.apple.product-type.bundle.unit-test";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
-                    case Project.Configuration.OutputType.IosApp:
-                    case Project.Configuration.OutputType.TvosApp:
-                    case Project.Configuration.OutputType.WatchosApp:
+                    case Project.Configuration.OutputType.AppleApp:
                         ProductType = "com.apple.product-type.application";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
@@ -1936,11 +1934,7 @@ namespace Sharpmake.Generators.Apple
 
                 // Lookup for the app in the unit test dependencies.
                 ProjectTargetDependency testHostTargetDependency =
-                    nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null &&
-                    (dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp ||
-                     dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.TvosApp ||
-                     dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.WatchosApp)
-                    );
+                    nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null && dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.AppleApp);
 
                 if (testHostTargetDependency != null)
                 {

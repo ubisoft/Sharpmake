@@ -327,19 +327,27 @@ namespace Sharpmake
                 DotNetWindowsApp,
 
                 /// <summary>
+                /// The output is an Apple (macOS|iOS|tvOS|watchOS) app.
+                /// </summary>
+                AppleApp,
+
+                /// <summary>
                 /// The output is an iOS app.
                 /// </summary>
-                IosApp,
+                [Obsolete("'IosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
+                IosApp = AppleApp,
 
                 /// <summary>
                 /// The output is a tvOS app.
                 /// </summary>
-                TvosApp,
+                [Obsolete("'TvosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
+                TvosApp = AppleApp,
 
                 /// <summary>
                 /// The output is a watchOS app.
                 /// </summary>
-                WatchosApp,
+                [Obsolete("'WatchosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
+                WatchosApp = AppleApp,
 
                 /// <summary>
                 /// The output is an iOS test bundle.
@@ -3310,9 +3318,7 @@ namespace Sharpmake
                                 }
                             }
                             break;
-                        case OutputType.IosApp:
-                        case OutputType.WatchosApp:
-                        case OutputType.TvosApp:
+                        case OutputType.AppleApp:
                         case OutputType.Exe:
                             {
                                 if (hasPublicPathToRoot)
