@@ -8,12 +8,17 @@
     <Authors>$(Company), Sharpmake contributors</Authors>
     <Version>0.24.0</Version>
 
+    <!-- Custom Variables -->
+    <!-- https://github.com/dotnet/sourcelink/blob/main/docs/README.md#continuousintegrationbuild -->
+    <ContinuousIntegrationBuild Condition="'$(GITLAB_CI)' == 'true' OR '$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
     <!-- Compile Options -->
     <LangVersion>10.0</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
     <Deterministic>true</Deterministic>
     <Features>strict</Features>
-    <TreatWarningsAsErrors Condition="'$(Configuration)' != 'Debug'">true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition="$(ContinuousIntegrationBuild) == 'true' OR '$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild Condition="$(ContinuousIntegrationBuild) == 'true' OR '$(Configuration)' == 'Release'">true</EnforceCodeStyleInBuild>
     <NoWarn>1570,1591</NoWarn> <!-- For xml documentation warnings -->
     <DefineConstants>TRACE</DefineConstants>
     <DebugType>pdbonly</DebugType>
