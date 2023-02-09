@@ -18,17 +18,18 @@ namespace Sharpmake
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType, string condition )
             {
                 Name = name;
                 Version = version;
                 DotNetHint = dotNetHint;
                 PrivateAssets = privateAssets;
                 ReferenceType = referenceType;
+                Condition = condition;
             }
 
             internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets)
-                : this(name, version, dotNetHint, privateAssets, null)
+                : this(name, version, dotNetHint, privateAssets, null, null )
             {
             }
 
@@ -36,6 +37,7 @@ namespace Sharpmake
             public string Version { get; internal set; }
             public string DotNetHint { get; internal set; }
             public string ReferenceType { get; internal set; }
+            public string Condition { get; internal set; }
 
             public AssetsDependency PrivateAssets { get; internal set; }
 
@@ -43,6 +45,7 @@ namespace Sharpmake
             {
                 using (resolver.NewScopedParameter("packageName", Name))
                 using (resolver.NewScopedParameter("packageVersion", Version))
+                using (resolver.NewScopedParameter("packageCondition", GetConditionParameter() ))
                 {
                     if (PrivateAssets == DefaultPrivateAssets)
                     {
@@ -60,9 +63,15 @@ namespace Sharpmake
             {
                 using (resolver.NewScopedParameter("packageName", Name))
                 using (resolver.NewScopedParameter("packageVersion", Version))
+                using (resolver.NewScopedParameter("packageCondition", GetConditionParameter()))
                 {
                     return resolver.Resolve(customTemplate);
                 }
+            }
+
+            private string GetConditionParameter()
+            {
+                return string.IsNullOrWhiteSpace(Condition) ? string.Empty : $"Condition=\"{Condition}\"";
             }
 
             public int CompareTo(PackageReference other)
@@ -141,13 +150,13 @@ namespace Sharpmake
 
         private readonly UniqueList<PackageReference> _packageReferences = new UniqueList<PackageReference>();
 
-        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null)
+        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null, string condition = null )
         {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
             if (existingPackage == null)
             {
-                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, referenceType));
+                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, referenceType, condition ));
                 return;
             }
 
@@ -162,11 +171,18 @@ namespace Sharpmake
                 existingPackage.PrivateAssets &= privateAssets;
                 Builder.Instance.LogWarningLine($"Package {packageName} was added twice with different private assets. Kept assets are {string.Join(",", PackageReference.GetFormatedAssetsDependency(existingPackage.PrivateAssets))}.");
             }
+
+            if ( !string.Equals( condition, existingPackage.Condition, StringComparison.Ordinal ))
+            {
+                existingPackage.Condition = condition;
+                Builder.Instance.LogWarningLine(
+                    $"Package {packageName} was added twice with different conditions. Condition '{condition}' will be used.");
+            }
         }
 
         public void Add(string packageName, string version, string dotNetHint, AssetsDependency privateAssets)
         {
-            Add(packageName, version, dotNetHint, privateAssets, null);
+            Add(packageName, version, dotNetHint, privateAssets, null, null);
         }
 
         public int Count => _packageReferences.Count;
