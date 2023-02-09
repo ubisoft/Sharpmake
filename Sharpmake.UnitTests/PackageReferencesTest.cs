@@ -61,6 +61,27 @@ namespace Sharpmake.UnitTests
                 Assert.True(configuration.ReferencesByNuGetPackage.SortedValues.Any(item => item.PrivateAssets == PackageReferences.DefaultPrivateAssets && item.Name == "NUnit"));
             }
         }
+
+        [Test]
+        public void PackageReferencesSupportConditions()
+        {
+            var project = GetProject<PackageReferencesTestProjects.ConditionalNuGetPackage>();
+            Assert.IsNotNull(project);
+            foreach (var configuration in project.Configurations)
+            {
+                Assert.AreEqual(2, configuration.ReferencesByNuGetPackage.Count);
+                CheckForPackageCondition("NUnit", "$(Configuration)='Release'");
+                CheckForPackageCondition("NUnit-debug", "$(Configuration)='Debug'");
+
+                void CheckForPackageCondition( string packageName, string expectedCondition )
+                {
+                    Assert.AreEqual(
+                        configuration.ReferencesByNuGetPackage.SortedValues
+                            .First(v => string.Equals(v.Name, packageName, StringComparison.Ordinal)).Condition,
+                        expectedCondition);
+                }
+            }
+        }
     }
 
     namespace PackageReferencesTestProjects
@@ -125,6 +146,17 @@ namespace Sharpmake.UnitTests
                 base.ConfigureAll(conf, target);
 
                 conf.ReferencesByNuGetPackage.Add("NUnit", "3.4.1");
+            }
+        }
+
+        [Generate]
+        public class ConditionalNuGetPackage : CSharpUnitTestCommonProject
+        {
+            [Configure()]
+            public virtual void ConfigureAll(Configuration conf, Target target)
+            {
+                conf.ReferencesByNuGetPackage.Add("NUnit", "3.4.1", condition: "$(Configuration)='Release'" );
+                conf.ReferencesByNuGetPackage.Add("NUnit-debug", "3.4.1", condition: "$(Configuration)='Debug'" );
             }
         }
     }
