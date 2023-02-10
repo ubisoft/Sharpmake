@@ -47,6 +47,7 @@ namespace Sharpmake.Generators.Apple
             public DevEnv DevelopmentEnvironment => Configuration.Compiler;
             public Options.ExplicitOptions Options { get; set; } = new Options.ExplicitOptions();
             public IDictionary<string, string> CommandLineOptions { get; set; } = new VisualStudio.ProjectOptionsGenerator.VcxprojCmdLineOptions();
+            public IDictionary<string, string> LinkerCommandLineOptions { get; set; } = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
 
             public string ProjectDirectoryCapitalized { get; }
             public string ProjectSourceCapitalized { get; }

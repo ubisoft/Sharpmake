@@ -1222,15 +1222,25 @@ namespace Sharpmake
 
                 try
                 {
-                    DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
                     for (int i = 0; i < configurations.Count; ++i)
                     {
-                        Solution.Configuration conf = pair.Value[i];
-                        if (devEnv != conf.Target.GetFragment<DevEnv>())
-                            throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\t'{0}' and '{1}' try to generate '{2}'",
-                                devEnv,
-                                conf.Target.GetFragment<DevEnv>(),
-                                solutionFile);
+                        for (int j = 0; j < configurations.Count; ++j)
+                        {
+                            Solution.Configuration confI = pair.Value[i];
+                            Solution.Configuration confJ = pair.Value[j];
+
+                            DevEnv envI = confI.Target.GetFragment<DevEnv>();
+                            DevEnv envJ = confJ.Target.GetFragment<DevEnv>();
+
+                            if (envI != envJ)
+                            {
+                                if (Util.GetSolutionExtension(envI) == Util.GetSolutionExtension(envJ))
+                                {
+                                    throw new Error("Multiple generator cannot output to the same file:" + Environment.NewLine + "\t'{0}' and '{1}' try to generate '{2}'",
+                                    envI, envJ, solutionFile);
+                                }
+                            }
+                        }
                     }
 
                     _getGeneratorsManagerCallBack().Generate(this, solution, configurations, solutionFile, output.Generated, output.Skipped);

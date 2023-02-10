@@ -433,6 +433,8 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
 
         public IDictionary<string, string> CommandLineOptions { get; set; }
 
+        public IDictionary<string, string> LinkerCommandLineOptions { get; set; } = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
+
         public DevEnv DevelopmentEnvironment { get { return Configuration.Compiler; } }
 
         public string ProjectDirectoryCapitalized { get; private set; }

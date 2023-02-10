@@ -356,7 +356,7 @@ namespace Sharpmake
             public override void SetupPlatformTargetOptions(IGenerationContext context)
             {
                 context.Options["TargetMachine"] = "MachineX64";
-                context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
+                context.LinkerCommandLineOptions["TargetMachine"] = "/MACHINE:X64";
             }
 
             public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)
