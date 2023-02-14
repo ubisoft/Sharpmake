@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sharpmake": {
+      "commandName": "Project",
+      "commandLineArgs": "/sources(\"C:\\Personal\\ElectronicJonaJoy\\main.Sharpmake.cs\") /multithread(false)"
+    }
+  }
+}

@@ -118,6 +118,7 @@ namespace SharpmakeGen.Samples
         }
     }
 
+
     [Generate]
     public class CustomBuildStepProject : SampleProject
     {
@@ -340,6 +341,16 @@ namespace SharpmakeGen.Samples
         public SimpleExeLibDependencyProject()
         {
             Name = "SimpleExeLibDependency";
+        }
+    }
+
+    [Generate]
+    public class PreBuildStepDependency : SampleProject
+    {
+        public PreBuildStepDependency()
+        {
+            Name = "PreBuildStepDependency";
+            SharpmakeMainFile = "PreBuildStepDependency.sharpmake.cs";
         }
     }
 

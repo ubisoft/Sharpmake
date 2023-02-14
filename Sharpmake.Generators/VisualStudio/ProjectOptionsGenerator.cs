@@ -1910,7 +1910,9 @@ namespace Sharpmake.Generators.VisualStudio
 
             if (!context.Configuration.IsFastBuild)
             {
-                if (context.Configuration.Output == Project.Configuration.OutputType.Exe || context.Configuration.ExecuteTargetCopy)
+                if (   context.Configuration.Output == Project.Configuration.OutputType.Exe 
+                    || context.Configuration.Output == Project.Configuration.OutputType.Lib 
+                    || context.Configuration.ExecuteTargetCopy)
                 {
                     foreach (var customEvent in context.Configuration.ResolvedEventPreBuildExe)
                     {
