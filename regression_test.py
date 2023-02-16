@@ -13,10 +13,8 @@ if os.name != "nt":
     import select
 
 class Test:
-    def __init__(self, directory, script_name, assembly_dir = None, assembly = None, project_root = ""):
+    def __init__(self, directory, script_name, project_root = ""):
         self.directory = directory
-        self.assembly_dir = assembly_dir if assembly_dir is not None else directory
-        self.assembly = assembly if assembly is not None else directory + ".dll" # same name as the directory for now
         self.script_name = script_name
         self.runs_on_unix = os.name == "posix"
         if project_root == "":
@@ -24,7 +22,7 @@ class Test:
         else:
             self.project_root = project_root
 
-    def run_test(self, sharpmake_path, as_source):
+    def run_test(self, sharpmake_path):
         root_directory = os.getcwd()
         try:
             sample_dir = os.path.join("samples", self.directory)
@@ -32,7 +30,6 @@ class Test:
 
             # Builds the command line argument list.
             sources = "/sources(@\'{}\')".format(self.script_name)
-            assemblies = "/assemblies(@\'{}\')".format(find_assembly_path(root_directory, self.assembly_dir, self.assembly))
             referencedir = "/referencedir(@\'{}\')".format("reference")
             outputdir = "/outputdir(@\'{}\')".format("projects")
             remaproot = "/remaproot(@\'{}\')".format(self.project_root)
@@ -40,7 +37,7 @@ class Test:
             verbose = "/verbose"
 
             args = [
-                sources if as_source else assemblies,
+                sources,
                 referencedir,
                 outputdir,
                 remaproot,
@@ -70,26 +67,19 @@ def find_sharpmake_path(root_directory, sharpmake_exe):
         else:
             return os.path.abspath(sharpmake_exe)
 
-    return find_target_path(root_directory, "bin", '', "Sharpmake.Application.exe")
+    return find_file_in_path(root_directory, "Sharpmake.Application/bin", "Sharpmake.Application.exe")
 
-def find_assembly_path(root_directory, directory, target):
-    return find_target_path(root_directory, "samples", directory, target)
-
-def find_target_path(root_directory, target_directory, subdirectory, target):
+def find_file_in_path(root_directory, directory, filename):
     optim_tokens = ["debug", "Debug", "release", "Release"]
     for optim_token in optim_tokens:
-        dir_path = os.path.abspath(os.path.join(root_directory, "tmp", target_directory, optim_token, subdirectory))
+        dir_path = os.path.abspath(os.path.join(root_directory, directory, optim_token))
         for root, dirs, files in os.walk(dir_path):
             for framework_dir in dirs:
-                # Skip any old executable lying around.
-                if (framework_dir == "net472" or framework_dir == "net5.0"):
-                    continue # We don't support anymore those framework versions
-
-                path = os.path.join(dir_path, framework_dir, target)
+                path = os.path.join(dir_path, framework_dir, filename)
                 if os.path.isfile(path):
                     return path
 
-    raise IOError("Cannot find " + target)
+    raise IOError("Cannot find " + filename)
 
 def write_line(str):
     print(str)
@@ -164,22 +154,13 @@ def launch_tests():
             Test("PackageReferences", "PackageReferences.sharpmake.cs"),
             #Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"), # commented out since output has discrepancies between net472 and net5.0
             Test("SimpleExeLibDependency", "SimpleExeLibDependency.sharpmake.cs"),
-            Test("NetCore\\DotNetOSMultiFrameworksHelloWorld", "HelloWorld.sharpmake.cs", 
-                assembly_dir="DotNetOSMultiFrameworksHelloWorld",
-                assembly="DotNetOSMultiFrameworksHelloWorld.dll"),
+            Test("NetCore\\DotNetOSMultiFrameworksHelloWorld", "HelloWorld.sharpmake.cs"),
         ]
 
         # Run each test. Break and exit on error.
         for test in tests:
-            write_line("Regression test in source mode on {}...".format(test.directory))
-            exit_code = test.run_test(sharpmake_path, True)
-            if exit_code != 0:
-                red_bg()
-                write_line("Test failed.")
-                return exit_code
-
-            write_line("Regression test in assembly mode on {}...".format(test.directory))
-            exit_code = test.run_test(sharpmake_path, False)
+            write_line("Regression test on {}...".format(test.directory))
+            exit_code = test.run_test(sharpmake_path)
             if exit_code != 0:
                 red_bg()
                 write_line("Test failed.")

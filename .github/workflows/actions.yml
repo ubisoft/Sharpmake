@@ -20,57 +20,38 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2022]
         framework: [net6.0]
-        configuration: [debug, release]
+        configuration: [Debug, Release]
 
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3.3.0
 
-      - name: Bootstrap ${{ matrix.configuration }}
-        shell: pwsh
-        run: |
-          if ('${{runner.os}}' -eq 'Windows')
-          { 
-            .\Bootstrap.ps1 -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -vsVersion 2022
-          }
-          else
-          {
-            ./Bootstrap.ps1 -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} 
-          }
-
       - name: CompileSharpmake ${{ matrix.configuration }} ${{ matrix.os }}
         shell: pwsh
         run: |
-          if ('${{runner.os}}' -eq 'Windows')
-          { 
-            .\Compile.ps1 -slnOrPrjFile Sharpmake.sln -configuration "${{ matrix.configuration }}" -platform "Any CPU" -vsVersion "${{ matrix.os }}" -compiler "dotnet"
-          }
-          else
-          {
-            ./Compile.ps1 -slnOrPrjFile Sharpmake.sln -configuration ${{ matrix.configuration }} -platform "Any CPU" -compiler "dotnet" 
-          }
+          dotnet build "Sharpmake.sln" -c "${{ matrix.configuration }}" -bl:Sharpmake_${{ matrix.configuration }}.binlog
 
       - name: Store MSBuild binary logs
         if: always()
         uses: actions/upload-artifact@v3
         with: 
           name: sharpmake-msbuild-logs-${{ github.sha }}
-          path: tmp/msbuild
+          path: Sharpmake_${{ matrix.configuration }}.binlog
 
       - name: UnitTest ${{ matrix.framework }} - dotnet test
         if: runner.os == 'Windows' # TODO: fix the tests on mac and linux and remove the first part of the if
-        run: dotnet test --no-build --no-restore tmp/projects/sharpmake.unittests/Sharpmake.UnitTests.csproj --framework ${{ matrix.framework }} --configuration ${{ matrix.configuration }}
+        run: dotnet test --no-build --no-restore Sharpmake.UnitTests/Sharpmake.UnitTests.csproj --framework ${{ matrix.framework }} --configuration ${{ matrix.configuration }}
 
       - name: RegressionTest
         if: runner.os == 'Windows'
-        run: python regression_test.py --sharpmake_exe "tmp\bin\${{ matrix.configuration }}\${{ matrix.framework }}\Sharpmake.Application.exe"
+        run: python regression_test.py --sharpmake_exe "Sharpmake.Application\bin\${{ matrix.configuration }}\${{ matrix.framework }}\Sharpmake.Application.exe"
 
       - name: Upload sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         if: matrix.configuration == 'release'
         uses: actions/upload-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
-          path: tmp/bin/release/${{ matrix.framework }}
+          path: Sharpmake.Application/bin/Release/${{ matrix.framework }}
 
   functional_test:
     needs: [build]
@@ -89,11 +70,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
-          path: tmp/bin/release/${{ matrix.framework }}
+          path: Sharpmake.Application/bin/Release/${{ matrix.framework }}
 
       - name: FunctionalTest
         if: runner.os == 'Windows'
-        run: python functional_test.py --sharpmake_exe "tmp/bin/release/${{ matrix.framework }}/Sharpmake.Application.exe"
+        run: python functional_test.py --sharpmake_exe "Sharpmake.Application/bin/release/${{ matrix.framework }}/Sharpmake.Application.exe"
 
   samples:
     needs: [build]
@@ -123,7 +104,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
-          path: tmp/bin/release/${{ matrix.framework }}
+          path: Sharpmake.Application/bin/Release/${{ matrix.framework }}
 
       - name: CompileCommandDatabase ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.configuration == 'debug' # only has a debug config, so skip in release
@@ -211,7 +192,7 @@ jobs:
         if: runner.os == 'Linux'
         shell: pwsh
         run: |
-          ./RunSample.ps1 -sampleName "HelloLinux" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -addMono
+          ./RunSample.ps1 -sampleName "HelloLinux" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }}
 
       - name: HelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
