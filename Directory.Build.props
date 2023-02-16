@@ -1,0 +1,29 @@
+<Project>
+  <PropertyGroup>
+	  <!-- Assembly Info -->
+    <Company>Ubisoft</Company>
+    <Copyright>Copyright © $(Company)</Copyright>
+    <Description>Sharpmake is a C#-based solution for generating project definition files, such as Visual Studio projects and solutions, GNU makefiles, Xcode projects...</Description>
+    <Product>Sharpmake</Product>
+    <Authors>$(Company), Sharpmake contributors</Authors>
+    <Version>0.24.0</Version>
+
+    <!-- Compile Options -->
+    <LangVersion>10.0</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
+    <Deterministic>true</Deterministic>
+    <Features>strict</Features>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' != 'Debug'">true</TreatWarningsAsErrors>
+    <NoWarn>1570,1591</NoWarn> <!-- For xml documentation warnings -->
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- NuGet -->
+    <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
+
+    <!-- Package info -->
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+</Project>

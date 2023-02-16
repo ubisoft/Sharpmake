@@ -4,7 +4,7 @@ Runs Sharpmake.application with given parameters.
 
 .DESCRIPTION
 Runs Sharpmake.application (linux or windows), with given parameters. 
-Sharpmake application is found in tmp/bin/$configuration/$framework folder.
+Sharpmake application is found in Sharpmake.Application/bin/$configuration/$framework folder.
 
 .PARAMETER workingDirectory
 specify the working folder to use when sharpmake is run. Omit if you want to use the current working folder.
@@ -13,7 +13,7 @@ specify the working folder to use when sharpmake is run. Omit if you want to use
 the .cs file used by Sharpmake (default to Sharpmake.Main.sharpmake.cs)
 
 .PARAMETER configuration
-the configuration used to compile Sharpmake. Default to 'release'. 
+the configuration used to compile Sharpmake. Default to 'Release'. 
 Used to find the folder from where sharpmake.application is run.
 
 .PARAMETER framework
@@ -23,20 +23,16 @@ Used to find the folder from where sharpmake.application is run.
 .PARAMETER devenvVersion
 if set, this parameter is passed as '/devenvversion' parameter to Sharpmake application. Omit if not required.
 
-.PARAMETER addMono
-Linux only (ignored when on windows).
-If specified, then Windows Sharpmake application is first executed through 'mono'. If it fails, then it fallbacks with no error on running sharpmake application for linux. 
-
 #>
-param ([string] $workingDirectory="./", [string] $sharpmakeFile='Sharpmake.Main.sharpmake.cs', [string] $configuration='release', [string] $framework='net6.0', [string] $devenvVersion, [switch] $addMono)
+param ([string] $workingDirectory="./", [string] $sharpmakeFile='Sharpmake.Main.sharpmake.cs', [string] $configuration='Release', [string] $framework='net6.0', [string] $devenvVersion)
 
 try 
 {
     Write-Host "run sharpmake.application on $sharpmakeFile"
     $curentDir = Get-Location
 
-    $sharpmakeWinExe = Join-Path $curentDir 'tmp' 'bin' $configuration $framework 'Sharpmake.Application.exe'
-    $sharpmakeLinuxExe = Join-Path $curentDir 'tmp' 'bin' $configuration $framework 'Sharpmake.Application'
+    $sharpmakeWinExe = Join-Path $curentDir 'Sharpmake.Application' 'bin' $configuration $framework 'Sharpmake.Application.exe'
+    $sharpmakeLinuxExe = Join-Path $curentDir 'Sharpmake.Application' 'bin' $configuration $framework 'Sharpmake.Application'
     $arguments = "/sources('$sharpmakeFile') /verbose"
     if ($devenvVersion -ne "")
     {

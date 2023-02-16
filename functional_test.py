@@ -178,18 +178,19 @@ def find_sharpmake_path(root_directory, sharpmake_exe):
         else:
             return os.path.abspath(sharpmake_exe)
 
-    optim_tokens = ["debug", "Debug", "release", "Release"]
-    target = "Sharpmake.Application.exe"
+    return find_file_in_path(root_directory, "Sharpmake.Application/bin", "Sharpmake.Application.exe")
 
+def find_file_in_path(root_directory, directory, filename):
+    optim_tokens = ["debug", "Debug", "release", "Release"]
     for optim_token in optim_tokens:
-        dir_path = os.path.abspath(os.path.join("tmp", "bin", optim_token))
+        dir_path = os.path.abspath(os.path.join(root_directory, directory, optim_token))
         for root, dirs, files in os.walk(dir_path):
             for framework_dir in dirs:
-                path = os.path.join(dir_path, framework_dir, target)
+                path = os.path.join(dir_path, framework_dir, filename)
                 if os.path.isfile(path):
                     return path
 
-    raise IOError("Cannot find " + target)
+    raise IOError("Cannot find " + filename)
 
 def write_line(str):
     print(str)
@@ -240,6 +241,7 @@ def launch_functional_tests(funcTests, sharpmake_exe):
     entry_path = os.getcwd()
     try:
         root_directory = os.path.dirname(os.path.realpath(__file__))
+        write_line("root_directory: " + root_directory)
 
         # Detects the path of the Sharpmake executable
         sharpmake_path = find_sharpmake_path(root_directory, sharpmake_exe)
