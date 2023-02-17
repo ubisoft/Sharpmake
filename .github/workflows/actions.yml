@@ -26,7 +26,7 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3.3.0
 
-      - name: CompileSharpmake ${{ matrix.configuration }} ${{ matrix.os }}
+      - name: Build Sharpmake ${{ matrix.configuration }} ${{ matrix.os }}
         shell: pwsh
         run: |
           dotnet build "Sharpmake.sln" -c "${{ matrix.configuration }}" -bl:Sharpmake_${{ matrix.configuration }}.binlog

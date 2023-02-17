@@ -39,12 +39,11 @@ The best place for the Sharpmake documentation is the
 source code also comes with samples that you can study.
 
 
-## Building Sharpmake
-Building Sharpmake is quite straightforward. Clone the repo on GitHub, run the 
-"bootstrap" script (".bat" for Windows, ".sh" for Unix platforms), open the
-solution in Visual Studio and build the solution in *Release*. The binaries
-will be found in the *tmp/bin/release* directory.
-
+## Building and running Sharpmake
+Building and running Sharpmake is quite straightforward:
+- Clone the Git repository
+- Open the `Sharpmake.sln` solution located in the root folder
+- Hit the run button (by default it will run the first sample)
 
 ## More Platforms
 Sharpmake originally had support for game consoles, but Ubisoft pulled it out

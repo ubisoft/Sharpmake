@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4A7E7701-4698-A5FE-F3FC-C8FE40D44680}"
@@ -22,8 +23,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99BFE406-6992-49E9-BE2A-2DF7560C9167}"
 	ProjectSection(SolutionItems) = preProject
 		Compile.ps1 = Compile.ps1
-		CompileSharpmake.bat = CompileSharpmake.bat
-		CompileSharpmake.sh = CompileSharpmake.sh
 		extract-vcpkg.ps1 = extract-vcpkg.ps1
 		functional_test.py = functional_test.py
 		regression_test.py = regression_test.py
@@ -34,11 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99BF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.Application", "Sharpmake.Application\Sharpmake.Application.csproj", "{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "samples\Samples.csproj", "{60452228-D411-4461-91D7-0894482D940C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake", "Sharpmake\Sharpmake.csproj", "{15F793C7-9E88-64A9-591C-7244FCC6B771}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.Application", "Sharpmake.Application\Sharpmake.Application.csproj", "{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.CommonPlatforms", "Sharpmake.Platforms\Sharpmake.CommonPlatforms\Sharpmake.CommonPlatforms.csproj", "{3B476462-28E6-4640-4257-7942657699ED}"
 EndProject

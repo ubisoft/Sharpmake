@@ -4,12 +4,11 @@
 COLOR
 
 :: First compile sharpmake to insure we are trying to deploy using an executable corresponding to the code.
-call CompileSharpmake.bat Sharpmake.sln Debug "Any CPU"
+dotnet build Sharpmake.sln -c Release
 if %errorlevel% NEQ 0 goto error
 
-set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\debug\net6.0\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% set SHARPMAKE_EXECUTABLE=%~dp0tmp\bin\release\net6.0\Sharpmake.Application.exe
-if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0tmp\bin\net6.0\[debug^|release] & pause & goto error
+set SHARPMAKE_EXECUTABLE=%~dp0Sharpmake.Application\bin\Release\net6.0\Sharpmake.Application.exe
+if not exist %SHARPMAKE_EXECUTABLE% echo Cannot find sharpmake executable in %~dp0Sharpmake.Application\bin\Release\net6.0 & pause & goto error
 
 echo Using executable %SHARPMAKE_EXECUTABLE%
 
