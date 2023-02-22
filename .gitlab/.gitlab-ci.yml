@@ -11,9 +11,6 @@ default:
   tags:
   - square_windows
 
-variables:
-  GIT_DEPTH: 1
-
 #############
 # Stage Build: compile sharpmake solution on all targets, keep the binaries for further steps.
 

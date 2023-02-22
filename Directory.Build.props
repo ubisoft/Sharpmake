@@ -6,7 +6,6 @@
     <Description>Sharpmake is a C#-based solution for generating project definition files, such as Visual Studio projects and solutions, GNU makefiles, Xcode projects...</Description>
     <Product>Sharpmake</Product>
     <Authors>$(Company), Sharpmake contributors</Authors>
-    <Version>0.24.0</Version>
 
     <!-- Custom Variables -->
     <!-- https://github.com/dotnet/sourcelink/blob/main/docs/README.md#continuousintegrationbuild -->
@@ -31,4 +30,9 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Version -->
+    <PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All" />
+  </ItemGroup>
 </Project>
