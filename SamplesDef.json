@@ -234,7 +234,7 @@
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"QTFileCustomBuild.sharpmake.cs\" -framework {framework}",
                 "./Compile.ps1 -slnOrPrjFile \"qtfilecustombuild_vs2017_win64.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "\"./{testFolder}/projects/output/win64/{configuration}/qtfilecustombuild.exe\""
+                "&'./{testFolder}/projects/output/win64/{configuration}/qtfilecustombuild.exe'"
             ]
         },
         {
