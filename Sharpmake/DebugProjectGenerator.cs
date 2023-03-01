@@ -375,12 +375,13 @@ namespace Sharpmake
 
             conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
 
-            // suppress assembly redirect warnings
-            // cf. https://github.com/dotnet/roslyn/issues/19640
+            // Suppress assembly redirect warnings: https://github.com/dotnet/roslyn/issues/19640
+            // Also suppress NuGet downgrade warnings, as this is not MsBuild that drive how Sharpmake load its assemblies.
             conf.Options.Add(
                 new Options.CSharp.SuppressWarning(
                     "CS1701",
-                    "CS1702"
+                    "CS1702",
+                    "NU1605"
                 )
             );
 
