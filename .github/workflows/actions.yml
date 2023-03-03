@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3.3.0
+        with:
+          fetch-depth: 0
 
       - name: Build Sharpmake ${{ matrix.configuration }} ${{ matrix.os }}
         shell: pwsh
