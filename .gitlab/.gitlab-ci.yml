@@ -2,7 +2,7 @@
 # Disable merge request pipelines, pipelines for merge results and merge trains.
 include:
  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
- 
+
 stages:
   - build
   - test
@@ -20,7 +20,7 @@ default:
     DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
     DOTNET_NOLOGO: "true"
     DOTNET_CLI_UI_LANGUAGE: "en"
-  parallel:  
+  parallel:
     matrix:
     - configuration: [debug, release]
   script:
@@ -46,7 +46,7 @@ compilation:linux:
 #############
 .unit_test:base:
   stage: test
-  parallel:  
+  parallel:
     matrix:
     - configuration: [debug, release]
   script:
@@ -106,7 +106,7 @@ functional_test:
   tags:
   - square-linux-k8s-compil
   image: quay.ubisoft.com/tgruntime/tg-ubuntu-cpp:0.6.2-sharpmake
-  parallel:  
+  parallel:
     matrix:
     - configuration: [debug, release]
       os: [ubuntu]
@@ -130,7 +130,7 @@ HelloLinux:
   stage: test
   tags:
   - square_mac
-  parallel:  
+  parallel:
     matrix:
     - configuration: [debug, release]
       os: [macos-latest]
@@ -152,12 +152,12 @@ HelloXCode:
 #############
 .windows_sample_test:
   stage: test
-  parallel:  
+  parallel:
     matrix:
     - configuration: [debug, release]
       os: [windows-2019, windows-2022]
       framework: [net6.0]
-  rules:      
+  rules:
   - if: $os == "windows-2019"
     variables:
       VS_VERSION_SUFFIX: "Vs2019"
@@ -216,10 +216,7 @@ CSharpHelloWorld:
   variables:
     testFolder: samples/CSharpHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  # .net7.0 compilation not available on current runners
-  # - pwsh Compile.ps1 -slnOrPrjFile "HelloWorldSolution.vs2022.net7_0.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\projects" -VsVersion $os -compiler "MsBuild"
-  # - pwsh RunTest.ps1  "${env:testFolder}\projects\helloworld\output\anycpu\$configuration\net7.0\the other name.exe"
+  - pwsh RunSample.ps1 -sampleName "CSharpHelloWorld" -configuration $configuration -framework $framework -os $os
 
 CSharpImports:
   extends: .windows_sample_test
@@ -246,7 +243,7 @@ CSharpWCF:
 FastBuildSimpleExecutable:
   extends: .windows_sample_test
   script:
-  - pwsh RunSample.ps1 -sampleName FastBuildSimpleExecutable -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
+  - pwsh RunSample.ps1 -sampleName FastBuildSimpleExecutable -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
 # Temp disable after Github VM update which updated the NDK and broke it
 # HelloAndroid:
@@ -264,7 +261,7 @@ HelloClangCl:
 HelloEvents:
   extends: .windows_sample_test
   script:
-  - pwsh RunSample.ps1 -sampleName HelloEvents -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
+  - pwsh RunSample.ps1 -sampleName HelloEvents -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
 HelloWorld:
   extends: .windows_sample_test
@@ -273,11 +270,11 @@ HelloWorld:
 
 NetCore-DotNetCoreFrameworkHelloWorld:
   extends: .windows_sample_test
+  rules:
+  - if: $os == "windows-2022"
+    when: on_success
   script:
   - pwsh RunSample.ps1 -sampleName "NetCore-DotNetCoreFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
-        # not working tests because .netcore 2.1.0 is not available on runner
-        #   - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\$configuration\netcoreapp2.1" -arguments "`"`"the other name.dll`"`""
-        #   - pwsh RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworld\output\anycpu\$configuration\netcoreapp2.1" -arguments "`"`"the other name.dll`"`"" 
 
 NetCore-DotNetFrameworkHelloWorld:
   extends: .windows_sample_test
@@ -303,11 +300,7 @@ NetCore-DotNetOSMultiFrameworksHelloWorld:
   variables:
     testFolder: samples\NetCore\DotNetOSMultiFrameworksHelloWorld
   script:
-  - pwsh RunSharpmake.ps1 -workingDirectory ${env:testFolder} -sharpmakeFile "HelloWorld.sharpmake.cs" -framework $framework
-  # .net7.0 compilation not available on current runners
-  # - pwsh Compile.ps1 -slnOrPrjFile "OSMultiFrameworksHelloWorldSolution.sln" -configuration $configuration -platform "Any CPU" -WorkingDirectory "${env:testFolder}\codebase\temp\solutions" -VsVersion $os -compiler "MsBuild"
-  # - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\anycpu_${env:configuration}\net7.0-windows\HelloWorldExe.exe"
-  # - pwsh RunTest.ps1  "${env:testFolder}\codebase\temp\bin\anycpu_${env:configuration}\net472\HelloWorldExe.exe"
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetOSMultiFrameworksHelloWorld" -configuration $configuration -framework $framework -os $os
 
 PackageReferences:
   extends: .windows_sample_test
@@ -341,5 +334,5 @@ vcpkg:
   variables:
     testFolder: samples/vcpkg
   script:
-  - pwsh RunSample.ps1 -sampleName vcpkg -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
+  - pwsh RunSample.ps1 -sampleName vcpkg -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
