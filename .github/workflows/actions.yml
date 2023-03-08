@@ -207,13 +207,10 @@ jobs:
           .\RunSample.ps1 -sampleName "HelloXCode" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
 
       - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.os == 'windows-2022'
         shell: pwsh
         run: |
           .\RunSample.ps1 -sampleName "NetCore-DotNetCoreFrameworkHelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-        # not working tests because .netcore 2.1.0 is not available on runner
-        #  .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworldmultiframework\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1" -arguments "`"the other name.dll`""
-        #  .\RunTest.ps1 -exeToRun dotnet -workingDirectory "${env:testFolder}\projects\helloworld\output\anycpu\${{ matrix.configuration }}\netcoreapp2.1" -arguments "`"the other name.dll`""
 
       - name: NetCore/DotNetFrameworkHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
