@@ -37,7 +37,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: sharpmake-msbuild-logs-${{ github.sha }}
+          name: sharpmake-msbuild-logs-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}-${{ matrix.configuration }}
           path: Sharpmake_${{ matrix.configuration }}.binlog
 
       - name: UnitTest ${{ matrix.framework }} - dotnet test
