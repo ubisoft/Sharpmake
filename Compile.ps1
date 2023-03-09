@@ -200,7 +200,7 @@ try
         #msbuild compile
         Write-Host "msbuild compile"
         $msBuildLog = Join-Path 'tmp' 'msbuild' 'windows' $binLogName
-        msbuild $slnOrPrjFile -bl:"$msBuildLog" -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true /nologo /verbosity:m /p:Configuration="$configuration" /p:Platform="$platform" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS
+        msbuild $slnOrPrjFile -bl:"$msBuildLog" -clp:Summary -t:rebuild -restore /nologo /verbosity:m /p:Configuration="$configuration" /p:Platform="$platform" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS
         Write-Host "exit code : $LASTEXITCODE"
         if($LASTEXITCODE -and $LASTEXITCODE -ne 0)
         {
