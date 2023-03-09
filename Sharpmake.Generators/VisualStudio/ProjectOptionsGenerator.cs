@@ -1833,12 +1833,22 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void GenerateManifestToolOptions(IGenerationContext context, ProjectOptionsGenerationContext optionsContext)
         {
+            DevEnv compilerDevEnv = context.DevelopmentEnvironment;
             if (!context.DevelopmentEnvironment.IsVisualStudio()) // TODO: ideally this option generator should be split between VS / non-VS
-                return;
+            {
+                var platformToolset = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration);
+                var platformDevEnv = platformToolset.GetDefaultDevEnvForToolset();
+                if (!platformDevEnv.HasValue)
+                {
+                    return;
+                }
+                
+                compilerDevEnv = platformDevEnv.Value;
+            }
 
             Strings manifestInputs = new Strings();
 
-            string vsManifestFilesPath = Util.SimplifyPath(Path.Combine(context.DevelopmentEnvironment.GetVisualStudioVCRootPath(), "Include", "Manifest"));
+            string vsManifestFilesPath = Util.SimplifyPath(Path.Combine(compilerDevEnv.GetVisualStudioVCRootPath(), "Include", "Manifest"));
 
             //EnableDpiAwareness
             context.SelectOption

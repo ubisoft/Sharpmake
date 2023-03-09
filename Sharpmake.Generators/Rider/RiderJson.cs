@@ -1,5 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -13,74 +15,12 @@ namespace Sharpmake.Generators.Rider
     /// <summary>
     /// Generator for Rider project model json files.
     /// </summary>
-    public partial class RiderJson : IProjectGenerator, ISolutionGenerator
+    public partial class RiderJson : ISolutionGenerator
     {
         public static bool Minimize = false;
         public static bool IgnoreDefaults = false;
         
-        /// <summary>
-        /// Callback which should be added to <see cref="Builder.EventPostGeneration"/> in order to generate Rider project model.
-        /// </summary>
-        public static void PostGenerationCallback(List<Project> projects, List<Solution> solutions, ConcurrentDictionary<Type, GenerationOutput> generationReport)
-        {
-            var builder = Builder.Instance;
-            var generator = new RiderJson();
-            
-            builder.LogWriteLine("      RdJson files generated:");
-
-            foreach (var project in projects)
-            {
-                foreach (var config in project.Configurations)
-                {
-                    if (!generator._projectsInfo.ContainsKey(config.Target))
-                    {
-                        generator._projectsInfo.Add(config.Target, new Dictionary<string, RiderProjectInfo>());
-                    }
-
-                    if (!generator._projectsInfo[config.Target].ContainsKey(project.Name))
-                    {
-                        generator._projectsInfo[config.Target].Add(project.Name, new RiderProjectInfo(project));
-                    }
-                    
-                    var riderProjInfo = generator._projectsInfo[config.Target][project.Name];
-                    riderProjInfo.ReadConfiguration(config);
-                }
-            }
-            
-            foreach (var solution in solutions)
-            {
-                foreach (var solutionFileEntry in solution.SolutionFilesMapping)
-                {
-                    var solutionFolder = Path.GetDirectoryName(solutionFileEntry.Key);
-
-                    var generationOutput = generationReport[solution.GetType()];
-                    var fileWithExtension = Path.Combine(solutionFileEntry.Key + ".rdjson");
-
-                    var configurations = solutionFileEntry.Value
-                        .Where(it => PlatformRegistry.Has<IPlatformVcxproj>(it.Platform)).ToList();
-                    
-                    generator.Generate(builder, solution, configurations, fileWithExtension, generationOutput.Generated,
-                        generationOutput.Skipped);
-                    
-                    builder.LogWriteLine("          {0,5}", fileWithExtension);
-
-                    var solutionFileName = Path.GetFileName(solutionFileEntry.Key);
-                    
-                    foreach (var projectInfo in configurations.SelectMany(solutionConfig => solutionConfig.IncludedProjectInfos))
-                    {
-                        if (projectInfo.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Generate)
-                        {
-                            continue;
-                        }
-                        
-                        var projectOutput = generationReport[projectInfo.Project.GetType()];
-                        generator.Generate(builder, projectInfo.Project,
-                            new List<Project.Configuration> {projectInfo.Configuration},
-                            Path.Combine(solutionFolder, $".{solutionFileName}"), projectOutput.Generated, projectOutput.Skipped);
-                    }
-                }
-            }
-        }
+        private const string RiderJsonFileExtension = ".rdjson";
 
         /// <summary>
         /// Helper class to keep all the project information for "Modules" section of json file.
@@ -141,12 +81,6 @@ namespace Sharpmake.Generators.Rider
         }
 
         /// <summary>
-        /// Maps projects information for later usage in "Modules" section.
-        /// </summary>
-        private readonly Dictionary<ITarget, Dictionary<string, RiderProjectInfo>> _projectsInfo
-            = new Dictionary<ITarget, Dictionary<string, RiderProjectInfo>>();
-
-        /// <summary>
         /// Helper class for storing all the project-related information.
         /// </summary>
         private class RiderGenerationContext : IGenerationContext
@@ -171,7 +105,7 @@ namespace Sharpmake.Generators.Rider
             
             public FastBuildMakeCommandGenerator FastBuildMakeCommandGenerator { get; }
             public string FastBuildArguments { get; }
-            
+
             public RiderGenerationContext(Builder builder, Project project, Project.Configuration configuration,
                 string projectPath, string solutionName)
             {
@@ -223,12 +157,25 @@ namespace Sharpmake.Generators.Rider
         public void Generate(Builder builder, Solution solution, List<Solution.Configuration> configurations, string solutionFile,
             List<string> generatedFiles, List<string> skipFiles)
         {
-            var projects = new OrderedDictionary();
+            var configurationMapping = new Dictionary<Project, List<Project.Configuration>>();
+            var fileInfo = new FileInfo(solutionFile);
+            var solutionPath = fileInfo.Directory.FullName;
+            
+            var solutionFileName = fileInfo.Name;
+            var file = new FileInfo(
+                Util.GetCapitalizedPath(solutionPath + Path.DirectorySeparatorChar + solutionFileName + RiderJsonFileExtension));
 
+            var projects = new OrderedDictionary();
+            
             foreach (var solutionConfig in configurations)
             {
                 foreach (var proj in solutionConfig.IncludedProjectInfos)
                 {
+                    if (proj.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Generate)
+                    {
+                        continue;
+                    }
+                    
                     var solutionFolder = string.IsNullOrEmpty(proj.SolutionFolder)
                         ? proj.Configuration.GetSolutionFolder(solution.Name)
                         : proj.SolutionFolder;
@@ -237,28 +184,25 @@ namespace Sharpmake.Generators.Rider
                     {
                         projects.Add(projectEntry, new Dictionary<string, List<object>>());
                     }
-                    
+                
                     var projObject = projects[projectEntry] as Dictionary<string, List<object>>;
                     var projConfig = new Dictionary<string, string>();
 
+                    var projectConfigurations = configurationMapping.GetValueOrAdd(proj.Project, new List<Project.Configuration>());
+                    projectConfigurations.Add(proj.Configuration);
+                    
                     projConfig.Add("ProjectConfig", proj.Configuration.Name);
                     projConfig.Add("SolutionConfig", solutionConfig.Name);
                     projConfig.Add("DoBuild", (proj.ToBuild != Solution.Configuration.IncludedProjectInfo.Build.No).ToString());
 
-                    if (!projObject.ContainsKey(proj.Configuration.Platform.ToString()))
-                    {
-                        projObject.Add(proj.Configuration.Platform.ToString(), new List<object>());
-                    }
-                    
-                    projObject[proj.Configuration.Platform.ToString()].Add(projConfig);
+                    var platformConfigurations = projObject.GetValueOrAdd(proj.Configuration.Platform.ToString(), new List<object>());
+                    platformConfigurations.Add(projConfig);
                 }
             }
-            
-            var file = new FileInfo(solutionFile);
 
             using (var stream = new MemoryStream())
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
-            using (var serializer = new Util.JsonSerializer(writer) { IsOutputFormatted = true })
+            using (var serializer = new Util.JsonSerializer(writer) {IsOutputFormatted = true})
             {
                 serializer.IsOutputFormatted = !Minimize;
                 serializer.Serialize(projects);
@@ -266,33 +210,42 @@ namespace Sharpmake.Generators.Rider
 
                 if (builder.Context.WriteGeneratedFile(null, file, stream))
                 {
-                    generatedFiles.Add(Path.Combine(file.DirectoryName, file.Name));
+                    generatedFiles.Add(file.FullName);
                 }
                 else
                 {
-                    skipFiles.Add(Path.Combine(file.DirectoryName, file.Name));
+                    skipFiles.Add(file.FullName);
                 }
             }
-        }
 
-        /// <summary>
-        /// Generates all <paramref name="project"/>-related configuration files.
-        /// </summary>
-        public void Generate(Builder builder, Project project, List<Project.Configuration> configurations, string projectFile,
-            List<string> generatedFiles, List<string> skipFiles)
-        {
-            foreach (var config in configurations)
+            builder.LogWriteLine("          {0,5}", file.Name);
+            
+            var projectInfos = new Dictionary<string, RiderProjectInfo>();
+            foreach (var projectInfo in configurations
+                         .SelectMany(solutionConfig => solutionConfig.IncludedProjectInfos))
             {
-                var context = new RiderGenerationContext(builder, project, config, projectFile,
-                        Path.GetFileName(projectFile).Substring(1));
+                if (projectInfo.Project.SharpmakeProjectType != Project.ProjectTypeAttribute.Generate)
+                {
+                    continue;
+                }
 
-                var projectOptionsGen = new ProjectOptionsGenerator();
-                projectOptionsGen.GenerateOptions(context);
-                GenerateConfiguration(context, generatedFiles, skipFiles);
+                GenerateConfiguration(builder, projectInfo.Project, projectInfos, projectInfo.Configuration,
+                    Path.Combine(solutionPath, $".{solutionFileName}"), generatedFiles, skipFiles);
             }
         }
 
-        private void GenerateConfiguration(RiderGenerationContext context, List<string> generatedFiles, List<string> skipFiles)
+        private static void GenerateConfiguration(Builder builder, Project project, Dictionary<string, RiderProjectInfo> projectInfos, Project.Configuration configuration, string projectFile,
+            List<string> generatedFiles, List<string> skipFiles)
+        {
+            var context = new RiderGenerationContext(builder, project, configuration, projectFile,
+                    Path.GetFileName(projectFile).Substring(1));
+
+            var projectOptionsGen = new ProjectOptionsGenerator();
+            projectOptionsGen.GenerateOptions(context);
+            GenerateConfiguration(context, projectInfos, generatedFiles, skipFiles);
+        }
+
+        private static void GenerateConfiguration(RiderGenerationContext context, Dictionary<string, RiderProjectInfo> projectInfos, List<string> generatedFiles, List<string> skipFiles)
         {
             var info = new OrderedDictionary();
             var includePaths = new Strings();
@@ -337,20 +290,43 @@ namespace Sharpmake.Generators.Rider
                 var winIncludePath = context.DevelopmentEnvironment.GetWindowsIncludePath();
                 includePaths.AddRange(winIncludePath.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
             }
-            
-            includePaths.AddRange(platformVcxproj.GetPlatformIncludePaths(context));
 
+            var platformIncludes = platformVcxproj.GetPlatformIncludePaths(context);
+            var includesString = context.Options["IncludePath"];
+            if (includesString != FileGeneratorUtilities.RemoveLineTag)
+            {
+                var includesEntries = includesString.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+                includePaths.AddRange(includesEntries);
+            }
+            
+            includePaths.AddRange(platformIncludes);
+            
             defines.AddRange(platformVcxproj.GetImplicitlyDefinedSymbols(context));
             defines.AddRange(context.Options.ExplicitDefines);
             
-            var curProjectInfo = _projectsInfo[context.Configuration.Target][context.Project.Name];
+            RiderProjectInfo GetOrCreateProjectInfo(Project.Configuration configuration)
+            {
+                var projectName = configuration.Project.Name;
+                if (projectInfos.TryGetValue(projectName, out RiderProjectInfo projectInfo))
+                {
+                    return projectInfo;
+                }
+
+                var newProjectInfo = new RiderProjectInfo(configuration.Project);
+                newProjectInfo.ReadConfiguration(configuration);
+                projectInfos.Add(projectName, newProjectInfo);
+
+                return projectInfos[projectName];
+            }
+            
+            var curProjectInfo = GetOrCreateProjectInfo(context.Configuration);
             modules.Add(curProjectInfo.Name, curProjectInfo.ToDictionary());
             
             foreach (var dependency in context.Configuration.ResolvedDependencies)
             {
-                var projectName = dependency.Project.GetQualifiedName();
-                var dependencyInfo = _projectsInfo[dependency.Target][dependency.Project.Name];
-                modules.Add(projectName, dependencyInfo.ToDictionary());
+                var dependencyInfo = GetOrCreateProjectInfo(dependency);
+                var dependencyName = dependency.Project.GetQualifiedName();
+                modules.Add(dependencyName, dependencyInfo.ToDictionary());
             }
 
             var sourceRoots = new Strings {context.Project.SourceRootPath};
@@ -406,7 +382,7 @@ namespace Sharpmake.Generators.Rider
             public string Clean;
         }
 
-        private BuildCommands GetBuildCommands(RiderGenerationContext context)
+        private static BuildCommands GetBuildCommands(RiderGenerationContext context)
         {
             if (context.Configuration.IsFastBuild)
             {
@@ -438,10 +414,19 @@ namespace Sharpmake.Generators.Rider
                 };
             }
 
-            using (context.Resolver.NewScopedParameter("ProjectFile", context.Configuration.ProjectFullFileNameWithExtension))
-            using (context.Resolver.NewScopedParameter("ConfigurationName", context.Configuration.Name))
-            using (context.Resolver.NewScopedParameter("PlatformName", 
-                Util.GetPlatformString(context.Configuration.Platform, context.Project, context.Configuration.Target)))
+            var msBuildProjectFile = Options.PathOption.Get<Options.Rider.MsBuildOverrideProjectFile>(context.Configuration, fallback: null);
+            if (msBuildProjectFile == null)
+            {
+                throw new Error(
+                    $"`Options.Rider.MsBuildOverrideProjectFile` should be overriden in \n {context.Configuration} in order to use MSBuild with Rider");
+            }
+            
+            var msBuildConfiguration = Options.StringOption.Get<Options.Rider.MsBuildOverrideConfigurationName>(context.Configuration) ?? context.Configuration.Name;
+            var msBuildPlatform = Options.StringOption.Get<Options.Rider.MsBuildOverridePlatformName>(context.Configuration) ?? Util.GetPlatformString(context.Configuration.Platform, context.Project, context.Configuration.Target);
+            
+            using (context.Resolver.NewScopedParameter("ProjectFile", msBuildProjectFile))
+            using (context.Resolver.NewScopedParameter("ConfigurationName", msBuildConfiguration))
+            using (context.Resolver.NewScopedParameter("PlatformName", msBuildPlatform))
             {
                 return new BuildCommands
                 {
@@ -452,7 +437,7 @@ namespace Sharpmake.Generators.Rider
             }
         }
         
-        private string GetFastBuildCommand(RiderGenerationContext context, FastBuildMakeCommandGenerator.BuildType commandType)
+        private static string GetFastBuildCommand(RiderGenerationContext context, FastBuildMakeCommandGenerator.BuildType commandType)
         {
             var unresolvedCommand = Template.FastBuildBuildCommand;
             using (context.Resolver.NewScopedParameter("BuildCommand",
@@ -466,7 +451,7 @@ namespace Sharpmake.Generators.Rider
             }
         }
 
-        private string GetFastBuildClean(RiderGenerationContext context)
+        private static string GetFastBuildClean(RiderGenerationContext context)
         {
             var unresolvedOutput = Template.FastBuildCleanCommand;
             if (context.Options["IntermediateDirectory"] == FileGeneratorUtilities.RemoveLineTag
@@ -483,7 +468,7 @@ namespace Sharpmake.Generators.Rider
             }
         }
 
-        private string GetMsBuildCommand(RiderGenerationContext context, string buildCommand)
+        private static string GetMsBuildCommand(RiderGenerationContext context, string buildCommand)
         {
             var unresolvedCommand = Template.MsBuildBuildCommand;
 

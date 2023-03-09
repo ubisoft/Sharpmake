@@ -658,11 +658,6 @@ namespace Sharpmake.Application
                         + $"  Make sure to have a static entry point method flagged with [{typeof(Main).FullName}] attribute, and add 'arguments.Generate<[your_class]>();' in it.");
                 builder.Context.ConfigureOrder = builder.Arguments.ConfigureOrder;
 
-                if (parameters.GenerateRdJson)
-                {
-                    builder.EventPostGenerationReport += RiderJson.PostGenerationCallback;
-                }
-
                 // Call all configuration's methods and resolve project/solution member's values
                 using (Builder.Instance.CreateProfilingScope("Build"))
                     builder.BuildProjectAndSolution();

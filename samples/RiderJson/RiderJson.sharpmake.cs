@@ -9,7 +9,7 @@ namespace RiderJson
         {
             AddTargets(new Target(
                            Platform.win64,
-                           DevEnv.vs2017 | DevEnv.vs2019,
+                           DevEnv.rider | DevEnv.vs2022,
                            Optimization.Debug | Optimization.Release,
                            OutputType.Lib,
                            Blob.FastBuildUnitys,
@@ -27,6 +27,17 @@ namespace RiderJson
             conf.FastBuildBlobbed = target.Blob == Blob.FastBuildUnitys;
             conf.AdditionalCompilerOptions.Add("/FS");
             conf.Options.Add(Options.Vc.Compiler.CppLanguageStandard.CPP17);
+            
+            if (conf.Compiler == DevEnv.rider)
+            {
+                if (target.BuildSystem == BuildSystem.MSBuild)
+                {
+                    conf.TargetPath = @"[conf.ProjectPath]\..\vs2022\output\[target.Platform]\[conf.Name]";
+                    conf.Options.Add(new Options.Rider.MsBuildOverrideProjectFile(@"[conf.ProjectPath]\..\vs2022\[project.Name].vcxproj"));    
+                }
+                
+                conf.Options.Add(Options.Vc.General.PlatformToolset.v143);
+            }
         }
     }
 
@@ -111,7 +122,7 @@ namespace RiderJson
         {
             AddTargets(new Target(
                            Platform.win64,
-                           DevEnv.vs2019 | DevEnv.vs2017,
+                           DevEnv.rider | DevEnv.vs2022,
                            Optimization.Debug | Optimization.Release,
                            OutputType.Lib,
                            Blob.FastBuildUnitys,

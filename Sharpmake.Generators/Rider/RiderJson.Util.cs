@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
+using System;
 using System.Collections;
 using System.Linq;
 using Sharpmake.Generators.VisualStudio;
@@ -81,7 +84,7 @@ namespace Sharpmake.Generators.Rider
                 return Compiler.Clang;
             }
 
-            switch (context.Configuration.Compiler)
+            switch (toolset.GetDefaultDevEnvForToolset())
             {
                 case DevEnv.vs2015:
                     return Compiler.Vs15;
