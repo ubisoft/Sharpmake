@@ -264,3 +264,10 @@ jobs:
         shell: pwsh
         run: |
           .\RunSample.ps1 -sampleName "vcpkg" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+
+      - name: Store MSBuild binary logs
+        if: ${{ failure() && runner.os == 'Windows' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: sharpmake-samples-msbuild-logs-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}-${{ matrix.configuration }}
+          path: samples/**/*.binlog
