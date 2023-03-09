@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <PlatformTarget Condition=" '$(Platform)' == '' ">AnyCPU</PlatformTarget>
-    <ProjectGuid>{199F07AD-EC4C-BF75-597B-1B2976D1D0ED}</ProjectGuid>
+    <ProjectGuid>{4C9F6EEF-7F4D-6517-2359-603E7998C883}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CSharpVsix</RootNamespace>
@@ -15,8 +15,8 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{82B43B9B-A64C-4715-B499-D71E9CA2BD60};{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
-    <OldToolsVersion>15.0</OldToolsVersion>
+    <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
+    <OldToolsVersion>17.0</OldToolsVersion>
     <UseCodebase>true</UseCodebase>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <IncludeDebugSymbolsInVSIXContainer>True</IncludeDebugSymbolsInVSIXContainer>
@@ -103,8 +103,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="15.0.1" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.36" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.5.33428.388" />
   </ItemGroup>
   <PropertyGroup>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
