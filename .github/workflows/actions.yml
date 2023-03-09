@@ -36,7 +36,7 @@ jobs:
       - name: Store MSBuild binary logs
         if: always()
         uses: actions/upload-artifact@v3
-        with: 
+        with:
           name: sharpmake-msbuild-logs-${{ github.sha }}
           path: Sharpmake_${{ matrix.configuration }}.binlog
 
@@ -113,11 +113,11 @@ jobs:
         shell: pwsh
         run: | # TODO: ideally here we should try and compile the generated json file
           .\RunSample.ps1 -sampleName "CompileCommandDatabase" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-      
+
       - name: ConfigureOrder ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows' && matrix.configuration == 'release'
         shell: pwsh
-        run: 
+        run:
           .\RunSample.ps1 -sampleName "ConfigureOrder" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
 
       - name: CPPCLI ${{ matrix.configuration }} ${{ matrix.os }}
@@ -168,7 +168,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          .\RunSample.ps1 -sampleName "FastBuildSimpleExecutable" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
+          .\RunSample.ps1 -sampleName "FastBuildSimpleExecutable" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
       # Temp disable after Github VM update which updated the NDK and broke it
       # - name: HelloAndroid ${{ matrix.configuration }}
@@ -182,13 +182,13 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          .\RunSample.ps1 -sampleName "HelloClangCl" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
+          .\RunSample.ps1 -sampleName "HelloClangCl" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
       - name: HelloEvents ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          .\RunSample.ps1 -sampleName "HelloEvents" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX} 
+          .\RunSample.ps1 -sampleName "HelloEvents" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
       - name: HelloLinux ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Linux'
