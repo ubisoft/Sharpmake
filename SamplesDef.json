@@ -71,7 +71,7 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"CSharpVsix.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"CSharpVsixSolution.vs2017.v4_7_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild"
+                "./Compile.ps1 -slnOrPrjFile \"CSharpVsixSolution.vs2022.v4_7_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild"
             ]
         },
         {

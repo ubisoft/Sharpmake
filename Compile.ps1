@@ -14,7 +14,7 @@ the project fileName whatever it is (sln, make, xcworkspace).
 Only provide the project filename here, path to this file must be set as the working folder.
 
 .PARAMETER configuration
-the configuration used to compile your project. Default to 'debug'. 
+the configuration used to compile your project. Default to 'debug'.
 
 .PARAMETER platform
 the platform used to compile your project (Any CPU, x64, win32,...)
@@ -44,28 +44,28 @@ function Get-MsBuildCmd
     if (-not(Test-Path -Path $VsWhere -PathType Leaf))
     {
         throw "could not find '$VsWhere' file on local machine"
-    } 
+    }
 
     if ($vsVersion -eq 0)
     {
         # latest available visual version requested
         $vsVersions = &"$VsWhere" -latest -products * -property installationPath
-        $vsMsBuildCmd = Join-Path $vsVersions 'Common7' 'Tools' 
-        if (Test-Path -Path $vsMsBuildCmd -PathType Container) 
+        $vsMsBuildCmd = Join-Path $vsVersions 'Common7' 'Tools'
+        if (Test-Path -Path $vsMsBuildCmd -PathType Container)
         {
             #found !
             Write-Host "msbuild batch path : $vsMsBuildCmd"
             return $vsMsBuildCmd
         }
     }
-    else 
+    else
     {
         # specific visual version required
         $vsVersions = &"$VsWhere" -products * -property installationPath
         # scan all available versions, find the first one with visual version number in the path
-        foreach ($vsVersionsItem in $vsVersions) 
+        foreach ($vsVersionsItem in $vsVersions)
         {
-            $vsMsBuildCmd = Join-Path $vsVersionsItem 'Common7' 'Tools' 
+            $vsMsBuildCmd = Join-Path $vsVersionsItem 'Common7' 'Tools'
             if (Test-Path -Path $vsMsBuildCmd -PathType Container )
             {
                 if ($vsMsBuildCmd -like "*$VsVersion*")
@@ -79,7 +79,7 @@ function Get-MsBuildCmd
     }
 }
 
-try 
+try
 {
     $runProcessPath = Join-Path "$(Get-Location)" "RunProcess.ps1"
     Write-Host "--- Compile $slnOrPrjFile, $configuration|$platform with $vsVersion $compiler"
@@ -93,7 +93,7 @@ try
         }
 
     }
-    Write-Host "working folder : $(Get-Location)" 
+    Write-Host "working folder : $(Get-Location)"
 
     # if a VsVersion was requested, find and run matching VsMsBuildCommand, else just run the build that is supposed to be in the path already
     if($vsVersion -ne "")
@@ -123,13 +123,13 @@ try
             throw "error when changing working dir : $LASTEXITCODE"
         }
 
-        # run visual studio setup batch and gather all changed environment variables. this is required because batch is run in another process, 
+        # run visual studio setup batch and gather all changed environment variables. this is required because batch is run in another process,
         # so we must gather result environment variable to update the ones in powershell process
         $modifiedEnvVars = cmd /c "VsMSBuildCmd.bat &set"
         # set powershell process env vars from the one returned by visual studio setup batch
         foreach ($line in $modifiedEnvVars)
         {
-            If ($line -match "=") 
+            If ($line -match "=")
             {
                 $v = $line.split("=")
                 Set-Item -Force -Path "ENV:\$($v[0])" -Value "$($v[1])"
@@ -139,7 +139,7 @@ try
         Pop-Location
     }
 
-    Write-Host "working folder : $(Get-Location)" 
+    Write-Host "working folder : $(Get-Location)"
     $binLogName = "msbuild_$configuration.binlog"
     if ($compiler -eq "dotnet")
     {
@@ -148,8 +148,8 @@ try
             Write-Host "dotnet compile on Windows"
             #dotnet compile
             $msBuildLog = Join-Path 'tmp' 'msbuild' 'windows' $binLogName
-            dotnet build `"$slnOrPrjFile`" -nologo -v m -c `"$configuration`" -bl:`"$msBuildLog`" 
-            if($LASTEXITCODE -ne 0) 
+            dotnet build `"$slnOrPrjFile`" -nologo -v m -c `"$configuration`" -bl:`"$msBuildLog`"
+            if($LASTEXITCODE -ne 0)
             {
                 throw "error $LASTEXITCODE during dotnet compile"
             }
@@ -161,8 +161,8 @@ try
             #dotnet compile
             $osPath = $ImageOS + $platform
             $msBuildLog = Join-Path 'tmp' 'msbuild' $osPath $binLogName
-            dotnet build -nologo -v m -bl:`"$msBuildLog`" -p:UseAppHost=true /p:_EnableMacOSCodeSign=false `"$slnOrPrjFile`" --configuration `"$configuration`" 
-            if($LASTEXITCODE -ne 0) 
+            dotnet build -nologo -v m -bl:`"$msBuildLog`" -p:UseAppHost=true /p:_EnableMacOSCodeSign=false `"$slnOrPrjFile`" --configuration `"$configuration`"
+            if($LASTEXITCODE -ne 0)
             {
                 throw "error $LASTEXITCODE during dotnet compile"
             }
@@ -176,7 +176,7 @@ try
         Write-Host $scheme
         # direct call xcodebuild, don't use start-process, so that the '| xcpretty' runs ok
         xcodebuild -workspace "$slnOrPrjFile" -configuration "$configuration" -scheme "$scheme" | xcpretty
-        if($LASTEXITCODE -ne 0) 
+        if($LASTEXITCODE -ne 0)
         {
             throw "error $LASTEXITCODE during xcode compile"
         }
@@ -188,7 +188,7 @@ try
         Write-Host "make compile"
         make -f "$slnOrPrjFile" config="$configuration"
         Write-Host "exit code : $LASTEXITCODE"
-        if($LASTEXITCODE -and $LASTEXITCODE -ne 0) 
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0)
         {
             Write-Error "error $LASTEXITCODE during make execution"
             exit $LASTEXITCODE
@@ -200,9 +200,9 @@ try
         #msbuild compile
         Write-Host "msbuild compile"
         $msBuildLog = Join-Path 'tmp' 'msbuild' 'windows' $binLogName
-        msbuild $slnOrPrjFile -bl:"$msBuildLog" -clp:Summary -t:rebuild -restore -p:RestoreUseStaticGraphEvaluation=true /nologo /verbosity:m /p:Configuration="$configuration" /p:Platform="$platform" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS 
+        msbuild $slnOrPrjFile -bl:"$msBuildLog" -clp:Summary -t:rebuild -restore /nologo /verbosity:m /p:Configuration="$configuration" /p:Platform="$platform" /maxcpucount /p:CL_MPCount=$env:NUMBER_OF_PROCESSORS
         Write-Host "exit code : $LASTEXITCODE"
-        if($LASTEXITCODE -and $LASTEXITCODE -ne 0) 
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0)
         {
             Write-Error "error $LASTEXITCODE during mdbuild compile"
             exit $LASTEXITCODE
@@ -210,7 +210,7 @@ try
         Write-Host "compile success"
     }
 }
-catch  
+catch
 {
     Write-Error $PSItem.Exception
     exit 1
@@ -221,6 +221,6 @@ finally
     if($workingDirectory -ne "")
     {
         Pop-Location
-        Write-Host "working folder : $(Get-Location)" 
+        Write-Host "working folder : $(Get-Location)"
     }
 }
