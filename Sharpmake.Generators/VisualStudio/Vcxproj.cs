@@ -1200,7 +1200,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             return conf.Output == Project.Configuration.OutputType.Exe
                 || conf.Output == Project.Configuration.OutputType.Dll
-                || (conf.Output == Project.Configuration.OutputType.Lib && conf.ExportAdditionalLibrariesEvenForStaticLib)
+                || (conf.Output == Project.Configuration.OutputType.Lib)
                 || conf.Output == Project.Configuration.OutputType.DotNetConsoleApp
                 || conf.Output == Project.Configuration.OutputType.DotNetClassLibrary
                 || conf.Output == Project.Configuration.OutputType.DotNetWindowsApp;
