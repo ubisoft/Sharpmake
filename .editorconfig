@@ -1,4 +1,4 @@
-# editorconfig.org
+﻿# editorconfig.org
 
 # top-most EditorConfig file
 root = true
@@ -16,6 +16,11 @@ indent_size = 2
 
 # C# files
 [*.cs]
+
+# file copyright header
+dotnet_diagnostic.IDE0073.severity = warning
+file_header_template = Copyright (c) Ubisoft. All Rights Reserved.\nLicensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 # New line preferences
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
