@@ -118,7 +118,7 @@ namespace Sharpmake
     /// </summary>
     public class OrderableStrings : IList<string>  // IList<string> for resolver
     {
-        private HashSet<string> _hashSet = new HashSet<string>();
+        private HashSet<string> _hashSet;
 
         private struct StringEntry : IComparable<StringEntry>
         {
@@ -161,9 +161,10 @@ namespace Sharpmake
 
         public OrderableStrings()
         {
+            _hashSet = new HashSet<string>();
         }
 
-        public OrderableStrings(IEnumerable<string> strings)
+        public OrderableStrings(IEnumerable<string> strings) : this()
         {
             AddRange(strings);
         }
@@ -171,7 +172,7 @@ namespace Sharpmake
         public OrderableStrings(OrderableStrings other)
         {
             _list.AddRange(other._list);
-            _hashSet.UnionWith(other._hashSet);
+            _hashSet = new HashSet<string>(other._hashSet);
         }
 
         public string JoinStrings(string separator)

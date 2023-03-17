@@ -2282,7 +2282,7 @@ namespace Sharpmake
                 return false;
             }
 
-            private Dictionary<KeyValuePair<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<KeyValuePair<Type, ITarget>, DependencySetting>();
+            private Dictionary<ValueTuple<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<ValueTuple<Type, ITarget>, DependencySetting>();
 
             // These dependencies will not be propagated to other projects that depend on us
             internal IDictionary<Type, ITarget> UnResolvedPrivateDependencies { get; } = new Dictionary<Type, ITarget>();
@@ -2625,7 +2625,7 @@ namespace Sharpmake
                 DependencySetting value
             )
             {
-                KeyValuePair<Type, ITarget> pair = new KeyValuePair<Type, ITarget>(projectType, target);
+                ValueTuple<Type, ITarget> pair = new ValueTuple<Type, ITarget>(projectType, target);
                 DependencySetting previousValue;
 
                 if (value < 0) //LCTODO remove when the deprecated dependency settings are removed
@@ -2721,7 +2721,7 @@ namespace Sharpmake
                 DependencySetting dependencyInheritance = DependencySetting.OnlyBuildOrder;
                 foreach (var dependency in _dependenciesSetting)
                 {
-                    if (dependency.Key.Key == projectType)
+                    if (dependency.Key.Item1 == projectType)
                         dependencyInheritance |= dependency.Value;
                 }
                 return dependencyInheritance;
@@ -2956,7 +2956,7 @@ namespace Sharpmake
 
                 internal Configuration _configuration;
                 internal DependencySetting _dependencySetting;
-                internal Dictionary<DependencyNode, DependencyType> _childNodes = new Dictionary<DependencyNode, DependencyType>();
+                internal List<(DependencyNode, DependencyType)> _childNodes = new List<(DependencyNode, DependencyType)>();
             }
 
             public class VcxprojUserFileSettings
@@ -3086,6 +3086,22 @@ namespace Sharpmake
                 if (xcodeSystemFrameworks.Count > 0)
                     XcodeSystemFrameworks.AddRange(xcodeSystemFrameworks);
 
+                (IConfigurationTasks, Platform)? lastPlatformConfigurationTasks = null;
+
+                IConfigurationTasks GetConfigurationTasks(Platform platform)
+                {
+                    if (lastPlatformConfigurationTasks.HasValue && lastPlatformConfigurationTasks.Value.Item2 == platform)
+                    {
+                        return lastPlatformConfigurationTasks.Value.Item1;
+                    }
+
+                    var tasks = PlatformRegistry.Get<IConfigurationTasks>(platform);
+
+                    lastPlatformConfigurationTasks = (tasks, platform);
+
+                    return tasks;
+                }
+
                 while (visitingNodes.Count > 0)
                 {
                     var visitedTuple = visitingNodes.Pop();
@@ -3112,12 +3128,12 @@ namespace Sharpmake
                     foreach (var childNode in visitedNode._childNodes)
                     {
                         var childTuple = Tuple.Create(
-                            childNode.Key,
+                            childNode.Item1,
                             new PropagationSettings(
-                                isRoot ? childNode.Key._dependencySetting : (propagationSetting._dependencySetting & childNode.Key._dependencySetting), // propagate the parent setting by masking it
+                                isRoot ? childNode.Item1._dependencySetting : (propagationSetting._dependencySetting & childNode.Item1._dependencySetting), // propagate the parent setting by masking it
                                 isRoot, // only children of root are immediate
-                                (isRoot || hasPublicPathToRoot) && childNode.Value == DependencyType.Public,
-                                (isImmediate || hasPublicPathToImmediate) && childNode.Value == DependencyType.Public,
+                                (isRoot || hasPublicPathToRoot) && childNode.Item2 == DependencyType.Public,
+                                (isImmediate || hasPublicPathToImmediate) && childNode.Item2 == DependencyType.Public,
                                 !isRoot && (goesThroughDLL || visitedNode._configuration.Output == OutputType.Dll)
                             )
                         );
@@ -3196,7 +3212,7 @@ namespace Sharpmake
                                 )
                                 {
                                     if (explicitDependenciesGlobal || !compile)
-                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
+                                        GetConfigurationTasks(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
                                     if (dependencySetting == DependencySetting.OnlyBuildOrder)
@@ -3225,7 +3241,7 @@ namespace Sharpmake
                             break;
                         case OutputType.Dll:
                             {
-                                var configTasks = PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform);
+                                var configTasks = GetConfigurationTasks(dependency.Platform);
 
                                 if (dependency.ExportDllSymbols && (isImmediate || hasPublicPathToRoot || !goesThroughDLL))
                                 {
@@ -3406,7 +3422,7 @@ namespace Sharpmake
             {
                 DependencyNode rootNode = new DependencyNode(conf, DependencySetting.Default);
 
-                Dictionary<Configuration, DependencyNode> visited = new Dictionary<Configuration, DependencyNode>();
+                Dictionary<Configuration, DependencyNode> visited = new Dictionary<Configuration, DependencyNode>(64);
 
                 Stack<DependencyNode> visiting = new Stack<DependencyNode>();
                 visiting.Push(rootNode);
@@ -3419,17 +3435,31 @@ namespace Sharpmake
                     DependencyNode alreadyExisting = null;
                     if (visited.TryGetValue(visitedConfiguration, out alreadyExisting))
                     {
+#if DEBUG
                         foreach (var child in alreadyExisting._childNodes)
                         {
-                            bool added = visitedNode._childNodes.TryAdd(child.Key, child.Value);
-                            System.Diagnostics.Debug.Assert(added);
+                            Debug.Assert(visitedNode._childNodes.All(c => c.Item1 != child.Item1));
                         }
+#endif
+
+                        visitedNode._childNodes.AddRange(alreadyExisting._childNodes);
+
                         continue;
                     }
 
                     visited.Add(visitedConfiguration, visitedNode);
 
                     var unresolvedDependencies = new[] { visitedConfiguration.UnResolvedPublicDependencies, visitedConfiguration.UnResolvedPrivateDependencies };
+
+                    int total = 0;
+
+                    foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
+                    {
+                        total += dependencies.Count;
+                    }
+
+                    visitedNode._childNodes.Capacity += total;
+
                     foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
                     {
                         if (dependencies.Count == 0)
@@ -3444,12 +3474,16 @@ namespace Sharpmake
 
                             // Get the dependency settings from the owner of the dependency.
                             DependencySetting dependencySetting;
-                            if (!visitedConfiguration._dependenciesSetting.TryGetValue(pair, out dependencySetting))
+                            var key = new ValueTuple<Type, ITarget>(pair.Key, pair.Value);
+
+                            if (!visitedConfiguration._dependenciesSetting.TryGetValue(key, out dependencySetting))
                                 dependencySetting = DependencySetting.Default;
 
                             DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
-                            bool added = visitedNode._childNodes.TryAdd(childNode, dependencyType);
-                            System.Diagnostics.Debug.Assert(added);
+#if DEBUG
+                            Debug.Assert(visitedNode._childNodes.All(c => c.Item1 != childNode));
+#endif
+                            visitedNode._childNodes.Add((childNode, dependencyType));
 
                             visiting.Push(childNode);
                         }

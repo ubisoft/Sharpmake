@@ -67,7 +67,7 @@ namespace Sharpmake
             Project projectFrom,
             Project.Configuration configFrom,
             IEnumerable<KeyValuePair<Type, ITarget>> dependencies,
-            IDictionary<KeyValuePair<Type, ITarget>, DependencySetting> dependenciesSetting
+            IDictionary<ValueTuple<Type, ITarget>, DependencySetting> dependenciesSetting
         )
         {
             lock (this)
@@ -77,8 +77,10 @@ namespace Sharpmake
                     TrackedConfiguration confFrom = FindConfiguration(projectFrom, configFrom);
                     TrackedConfiguration confTo = FindConfiguration(pair.Key, pair.Value);
 
+                    var key = new ValueTuple<Type, ITarget>(pair.Key, pair.Value);
+
                     DependencySetting dependencySetting;
-                    if (!dependenciesSetting.TryGetValue(pair, out dependencySetting))
+                    if (!dependenciesSetting.TryGetValue(key, out dependencySetting))
                         dependencySetting = DependencySetting.Default;
 
                     confFrom.AddDependency(confTo, dependencyType, dependencySetting);
