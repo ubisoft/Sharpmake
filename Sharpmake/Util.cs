@@ -145,13 +145,8 @@ namespace Sharpmake
         /// <returns>true=equal, false=not equal</returns>
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
-#if NET5_0_OR_GREATER
             Span<byte> buffer1 = new byte[_FileStreamBufferSize];
             Span<byte> buffer2 = new byte[_FileStreamBufferSize];
-#else
-            var buffer1 = new byte[_FileStreamBufferSize];
-            var buffer2 = new byte[_FileStreamBufferSize];
-#endif
 
             stream1.Position = 0;
             stream2.Position = 0;
@@ -159,13 +154,8 @@ namespace Sharpmake
             while (true)
             {
                 // Read from both streams
-#if NET5_0_OR_GREATER
                 int count1 = stream1.Read(buffer1);
                 int count2 = stream2.Read(buffer2);
-#else
-                int count1 = stream1.Read(buffer1, 0, _FileStreamBufferSize);
-                int count2 = stream2.Read(buffer2, 0, _FileStreamBufferSize);
-#endif
 
                 if (count1 != count2)
                     return false;

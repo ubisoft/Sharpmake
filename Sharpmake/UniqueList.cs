@@ -69,9 +69,7 @@ namespace Sharpmake
 
         private void GrowCapacity(int by)
         {
-#if NET5_0_OR_GREATER
             _hash.EnsureCapacity(_hash.Count + by);
-#endif
         }
 
         public void Add(T value1)
