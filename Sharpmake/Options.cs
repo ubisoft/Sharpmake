@@ -247,6 +247,7 @@ namespace Sharpmake
 
         private static ConcurrentDictionary<FieldInfo, object[]> s_cachedDefaultAttributes = new ConcurrentDictionary<FieldInfo, object[]>();
         private static ConcurrentDictionary<FieldInfo, object[]> s_cachedDevEnvAttributes = new ConcurrentDictionary<FieldInfo, object[]>();
+        private static ConcurrentDictionary<Type, FieldInfo[]> s_cachedFieldInfos = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         public static void SelectOption(Configuration conf, params OptionAction[] options)
         {
@@ -319,7 +320,7 @@ namespace Sharpmake
 
                 foreach (Options.Default defaultOption in attributes)
                 {
-                    if (Util.FlagsTest(defaultOption.DefaultTarget, conf.DefaultOption))
+                    if (defaultOption.DefaultTarget.HasFlag(conf.DefaultOption))
                     {
                         object fieldValue = field.GetValue(optionType);
                         foreach (OptionAction optionAction in options)
@@ -364,14 +365,15 @@ namespace Sharpmake
                 return default(T);
 
             // find the default options
-            FieldInfo[] optionTypeFields = optionType.GetFields();
+            FieldInfo[] optionTypeFields = s_cachedFieldInfos.GetOrAdd(optionType, type => type.GetFields());
+
             foreach (FieldInfo field in optionTypeFields)
             {
                 object[] attributes = s_cachedDefaultAttributes.GetOrAdd(field, fi => fi.GetCustomAttributes(typeof(Options.Default), true));
 
                 foreach (Default defaultOption in attributes)
                 {
-                    if (Util.FlagsTest(defaultOption.DefaultTarget, defaultTarget))
+                    if (defaultOption.DefaultTarget.HasFlag(defaultTarget))
                     {
                         object fieldValue = field.GetValue(optionType);
                         return (T)fieldValue;

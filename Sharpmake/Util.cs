@@ -145,11 +145,8 @@ namespace Sharpmake
         /// <returns>true=equal, false=not equal</returns>
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
-            var buffer1 = new byte[_FileStreamBufferSize];
-            var buffer2 = new byte[_FileStreamBufferSize];
-
-            ReadOnlySpan<byte> span1 = new ReadOnlySpan<byte>(buffer1);
-            ReadOnlySpan<byte> span2 = new ReadOnlySpan<byte>(buffer2);
+            Span<byte> buffer1 = new byte[_FileStreamBufferSize];
+            Span<byte> buffer2 = new byte[_FileStreamBufferSize];
 
             stream1.Position = 0;
             stream2.Position = 0;
@@ -157,8 +154,8 @@ namespace Sharpmake
             while (true)
             {
                 // Read from both streams
-                int count1 = stream1.Read(buffer1, 0, _FileStreamBufferSize);
-                int count2 = stream2.Read(buffer2, 0, _FileStreamBufferSize);
+                int count1 = stream1.Read(buffer1);
+                int count2 = stream2.Read(buffer2);
 
                 if (count1 != count2)
                     return false;
@@ -167,7 +164,7 @@ namespace Sharpmake
                     return true;
 
                 // Compare the streams efficiently without any copy.
-                if (!span1.SequenceEqual(span2))
+                if (!buffer1.SequenceEqual(buffer2))
                     return false;
             }
         }

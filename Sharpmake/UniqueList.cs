@@ -62,29 +62,59 @@ namespace Sharpmake
             }
         }
 
+        private void AddCore(T value)
+        {
+            _hash.Add(value);
+        }
+
+        private void GrowCapacity(int by)
+        {
+            _hash.EnsureCapacity(_hash.Count + by);
+        }
+
         public void Add(T value1)
         {
-            AddRange(new[] { value1 });
+            ValidateReadOnly();
+            AddCore(value1);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2)
         {
-            AddRange(new[] { value1, value2 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2, T value3)
         {
-            AddRange(new[] { value1, value2, value3 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            AddCore(value3);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2, T value3, T value4)
         {
-            AddRange(new[] { value1, value2, value3, value4 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            AddCore(value3);
+            AddCore(value4);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2, T value3, T value4, T value5)
         {
-            AddRange(new[] { value1, value2, value3, value4, value5 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            AddCore(value3);
+            AddCore(value4);
+            AddCore(value5);
+            _isDirty = true;
         }
 
         public void Add(params T[] values)
@@ -96,6 +126,32 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             _hash.UnionWith(collection);
+            _isDirty = true;
+        }
+
+        public void AddRange(UniqueList<T> other)
+        {
+            ValidateReadOnly();
+            GrowCapacity(other.Count);
+
+            foreach (T value in other._hash)
+            {
+                AddCore(value);
+            }
+
+            _isDirty = true;
+        }
+
+        public void AddRange(IReadOnlyList<T> collection)
+        {
+            ValidateReadOnly();
+            GrowCapacity(collection.Count);
+
+            for (int i = 0; i < collection.Count; i++)
+            {
+                AddCore(collection[i]);
+            }
+
             _isDirty = true;
         }
 
@@ -268,7 +324,12 @@ namespace Sharpmake
 
         #region IEnumerable
 
-        public IEnumerator<T> GetEnumerator()
+        public List<T>.Enumerator GetEnumerator()
+        {
+            return Values.GetEnumerator();
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return Values.GetEnumerator();
         }
