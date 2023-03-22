@@ -13,50 +13,21 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  builds:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2022]
         framework: [net6.0]
         configuration: [Debug, Release]
-
-    steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v3.4.0
-        with:
-          fetch-depth: 0
-
-      - name: Build Sharpmake ${{ matrix.configuration }} ${{ matrix.os }}
-        shell: pwsh
-        run: |
-          dotnet build "Sharpmake.sln" -c "${{ matrix.configuration }}" -bl:Sharpmake_${{ matrix.configuration }}.binlog
-
-      - name: Store MSBuild binary logs
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: sharpmake-msbuild-logs-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}-${{ matrix.configuration }}
-          path: Sharpmake_${{ matrix.configuration }}.binlog
-
-      - name: UnitTest ${{ matrix.framework }} - dotnet test
-        if: runner.os == 'Windows' # TODO: fix the tests on mac and linux and remove the first part of the if
-        run: dotnet test --no-build --no-restore Sharpmake.UnitTests/Sharpmake.UnitTests.csproj --framework ${{ matrix.framework }} --configuration ${{ matrix.configuration }}
-
-      - name: RegressionTest
-        if: runner.os == 'Windows'
-        run: python regression_test.py --sharpmake_exe "Sharpmake.Application\bin\${{ matrix.configuration }}\${{ matrix.framework }}\Sharpmake.Application.exe"
-
-      - name: Upload sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
-        if: matrix.configuration == 'release'
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
-          path: Sharpmake.Application/bin/Release/${{ matrix.framework }}
+    uses: ./.github/workflows/build.yml
+    with:
+      os: ${{ matrix.os }}
+      framework: ${{ matrix.framework }}
+      configuration: ${{ matrix.configuration }}
 
   functional_test:
-    needs: [build]
+    needs: [builds]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -79,7 +50,7 @@ jobs:
         run: python functional_test.py --sharpmake_exe "Sharpmake.Application/bin/release/${{ matrix.framework }}/Sharpmake.Application.exe"
 
   samples:
-    needs: [build]
+    needs: [builds]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
