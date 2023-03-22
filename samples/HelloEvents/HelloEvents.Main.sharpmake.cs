@@ -21,8 +21,6 @@ using System.Threading.Tasks;
 using Sharpmake;
 using Sharpmake.Generators.FastBuild;
 
-[module: Sharpmake.DebugProjectName("Sharpmake.HelloEvents")]
-
 [module: Sharpmake.Include("HelloEvents.*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*/*.sharpmake.cs")]

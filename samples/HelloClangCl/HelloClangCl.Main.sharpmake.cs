@@ -22,8 +22,6 @@ using Sharpmake;
 using Sharpmake.Generators.FastBuild;
 using static Sharpmake.Options;
 
-[module: Sharpmake.DebugProjectName("Sharpmake.HelloClangCl")]
-
 [module: Sharpmake.Include("HelloClangCl.*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*/*.sharpmake.cs")]
