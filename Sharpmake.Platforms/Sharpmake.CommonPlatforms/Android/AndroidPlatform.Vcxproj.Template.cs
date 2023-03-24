@@ -93,7 +93,7 @@ namespace Sharpmake
       <AssemblerOutput>NoListing</AssemblerOutput>
       <CompileAs>Default</CompileAs>
       <UndefinePreprocessorDefinitions>[options.UndefinePreprocessorDefinitions]</UndefinePreprocessorDefinitions>
-      <AdditionalOptions>[options.AdditionalCompilerOptions]</AdditionalOptions>
+      <AdditionalOptions>[options.AllAdditionalCompilerOptions]</AdditionalOptions>
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>

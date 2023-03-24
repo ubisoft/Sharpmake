@@ -32,7 +32,7 @@ namespace Sharpmake
       <MsExtensions>[options.MsExtensions]</MsExtensions>
       <RuntimeTypeInfo>[options.RuntimeTypeInfo]</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
-      <AdditionalOptions>[options.AdditionalCompilerOptions] %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>[options.AllAdditionalCompilerOptions] %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>[options.PrecompiledHeaderFile]</PrecompiledHeaderOutputFile>
       <CompileAs>Default</CompileAs>

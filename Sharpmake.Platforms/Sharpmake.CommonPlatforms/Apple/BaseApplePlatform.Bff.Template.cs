@@ -50,6 +50,7 @@ namespace Sharpmake
     .CompilerOptimizations = ''
             + ' [cmdLineOptions.OptimizationLevel]'
             + ' [cmdLineOptions.GenerateDebuggingSymbols]'
+            + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
     }
 }

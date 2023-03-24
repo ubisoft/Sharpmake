@@ -1,6 +1,6 @@
 
 //=================================================================================================================
-// fastbuildsample_vs2019_win64.bff FASTBuild config file
+// fastbuildsample_vs2022_win64_fastbuild.bff FASTBuild config file
 //=================================================================================================================
 #once
 
@@ -9,10 +9,10 @@
 //=================================================================================================================
 // Global Configuration include
 //=================================================================================================================
-#include "fastbuildsample_vs2019_win64-globalsettings.bff"
+#include "fastbuildsample_vs2022_win64_fastbuild-globalsettings.bff"
 
 //=================================================================================================================
-// fastbuildsample_vs2019_win64.bff .bff includes
+// fastbuildsample_vs2022_win64_fastbuild.bff .bff includes
 //=================================================================================================================
-#include ".\fastbuildsimpleexecutable_vs2019_win64.bff"
+#include ".\fastbuildsimpleexecutable_vs2022_win64_fastbuild.bff"
 

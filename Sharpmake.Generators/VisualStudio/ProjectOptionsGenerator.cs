@@ -1124,10 +1124,12 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
             }
 
+            List<string> optionResults = new List<string>();
             // Options.Vc.Compiler.AdditionalOptions
             foreach (Tuple<OrderableStrings, string> optionsTuple in new[]
                     {
                         Tuple.Create(context.Configuration.AdditionalCompilerOptions, "AdditionalCompilerOptions"),
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptimizeOptions, "AdditionalCompilerOptimizeOptions"),
                         Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHCreate, "AdditionalCompilerOptionsOnPCHCreate"),
                         Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHUse, "AdditionalCompilerOptionsOnPCHUse")
                     })
@@ -1138,12 +1140,26 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     optionsStrings.Sort();
                     string additionalCompilerOptions = optionsStrings.JoinStrings(" ");
+                    optionResults.Add(additionalCompilerOptions);
                     context.Options[optionsKey] = additionalCompilerOptions;
                 }
                 else
                 {
+                    optionResults.Add(FileGeneratorUtilities.RemoveLineTag);
                     context.Options[optionsKey] = FileGeneratorUtilities.RemoveLineTag;
                 }
+            }
+
+            // We need to merge together AdditionalCompilerOptions and AdditionalCompilerOptimizeOptions for writing them on a single line in vcxproj files.
+            string[] allAdditionalOptions = new string[] { optionResults[0], optionResults[1] };
+            var nonEmptyOptions = allAdditionalOptions.Where(a => a != FileGeneratorUtilities.RemoveLineTag);
+            if (nonEmptyOptions.Any())
+            {
+                context.Options["AllAdditionalCompilerOptions"] = string.Join(" ", nonEmptyOptions);
+            }
+            else
+            {
+                context.Options["AllAdditionalCompilerOptions"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
             optionsContext.HasClrSupport = clrSupport;

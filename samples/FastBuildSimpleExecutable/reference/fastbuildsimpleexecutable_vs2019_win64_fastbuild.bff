@@ -184,7 +184,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /TP'
             + ' /errorReport:queue'
             + ' /D"_MBCS"'
-            + ' /FS /Zc:__cplusplus'
+            + ' /bigobj /FS /Zc:__cplusplus'
 
     .CompilerOptimizations = ''
             + ' /Ox'
@@ -192,6 +192,7 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
             + ' /Oi'
             + ' /Ot'
             + ' /Oy-'
+            + ' /O2 /Os'
 
     // Compiler options
     // ----------------
@@ -202,6 +203,12 @@ ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
     .CompilerOutputPath       = '$Intermediate$'
     .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
 
+
+    .CompilerOptionsDeoptimized = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' /Od'
+
+    .DeoptimizeWritableFiles = true
 }
 
 
