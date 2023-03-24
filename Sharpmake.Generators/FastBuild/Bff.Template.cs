@@ -396,6 +396,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
             + ' [cmdLineOptions.OmitFramePointers]'
             + ' [cmdLineOptions.EnableFiberSafeOptimizations]'
             + ' [cmdLineOptions.CompilerWholeProgramOptimization]'
+            + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
 
                 public static string CPPCompilerOptionsDeoptimize = @"

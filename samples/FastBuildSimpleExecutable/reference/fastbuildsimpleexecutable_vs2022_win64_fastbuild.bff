@@ -1,0 +1,297 @@
+
+//=================================================================================================================
+// FastBuildSimpleExecutable FASTBuild config file
+//=================================================================================================================
+#once
+
+
+////////////////////////////////////////////////////////////////////////////////
+// PLATFORM SPECIFIC SECTION
+#if WIN64
+
+//=================================================================================================================
+ObjectList( 'FastBuildSimpleExecutable_Debug_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\include"'
+            + ' /I"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /D"_DEBUG"'
+            + ' /GF'
+            + ' /EHsc'
+            + ' /MTd'
+            + ' /GS'
+            + ' /Gy-'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\debug\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Od'
+            + ' /Ob1'
+            + ' /Oi'
+            + ' /Oy-'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
+
+}
+
+
+//=================================================================================================================
+Executable( 'FastBuildSimpleExecutable_Debug_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\debug\'
+    .Libraries              = 'FastBuildSimpleExecutable_Debug_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /MANIFEST:EMBED'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\debug\fastbuildsimpleexecutable.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:NOREF'
+                            + ' /OPT:NOICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildSimpleExecutable_Debug_win64' )
+{
+    .Targets = 'FastBuildSimpleExecutable_Debug_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildSimpleExecutable_Debug_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildSimpleExecutable_Debug_win64_Executable'
+}
+
+
+//=================================================================================================================
+ObjectList( 'FastBuildSimpleExecutable_Release_win64_objects' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+
+    .CompilerExtraOptions   = ''
+            + ' /I"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\include"'
+            + ' /I"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\atlmfc\include"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt"'
+            + ' /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt"'
+            + ' /Zi'
+            + ' /nologo'
+            + ' /W4'
+            + ' /WX-'
+            + ' /D"NDEBUG"'
+            + ' /D"WIN64"'
+            + ' /D"_CONSOLE"'
+            + ' /GF'
+            + ' /EHsc'
+            + ' /MT'
+            + ' /GS-'
+            + ' /Gy'
+            + ' /fp:fast'
+            + ' /fp:except-'
+            + ' /Zc:wchar_t'
+            + ' /Zc:forScope'
+            + ' /Zc:inline'
+            + ' /GR-'
+            + ' /openmp-'
+            + ' /Fd".\$_CURRENT_BFF_DIR_$\obj\win64\release\fastbuildsimpleexecutable_compiler.pdb"'
+            + ' /Gd'
+            + ' /TP'
+            + ' /errorReport:queue'
+            + ' /D"_MBCS"'
+            + ' /bigobj /FS /Zc:__cplusplus'
+
+    .CompilerOptimizations = ''
+            + ' /Ox'
+            + ' /Ob2'
+            + ' /Oi'
+            + ' /Ot'
+            + ' /Oy-'
+            + ' /O2 /Os'
+
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' $CompilerOptimizations$'
+
+    .CompilerOutputPath       = '$Intermediate$'
+    .CompilerInputFiles       = '.\$_CURRENT_BFF_DIR_$\..\codebase\main.cpp'
+
+
+    .CompilerOptionsDeoptimized = '"%1" /Fo"%2" /c'
+                            + ' $CompilerExtraOptions$'
+                            + ' /Od'
+
+    .DeoptimizeWritableFiles = true
+}
+
+
+//=================================================================================================================
+Executable( 'FastBuildSimpleExecutable_Release_win64_Executable' )
+{
+    Using( .win64Config )
+    .Intermediate           = '.\$_CURRENT_BFF_DIR_$\obj\win64\release\'
+    .Libraries              = 'FastBuildSimpleExecutable_Release_win64_objects'
+    .LinkerOutput           = '.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.exe'
+    .LinkerLinkObjects      = false
+
+    .LinkerOptions          = '/OUT:"%2"'
+                            // Input files
+                            // ---------------------------
+                            + ' "%1"'
+                            // General
+                            // ---------------------------
+                            + ' /INCREMENTAL:NO'
+                            + ' /NOLOGO'
+                            + ' /LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.30.30423\atlmfc\lib\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64"'
+                            + ' /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64"'
+                            // Input
+                            // ---------------------------
+                            + ' "kernel32.lib"'
+                            + ' "user32.lib"'
+                            + ' "gdi32.lib"'
+                            + ' "winspool.lib"'
+                            + ' "comdlg32.lib"'
+                            + ' "advapi32.lib"'
+                            + ' "shell32.lib"'
+                            + ' "ole32.lib"'
+                            + ' "oleaut32.lib"'
+                            + ' "uuid.lib"'
+                            + ' "odbc32.lib"'
+                            + ' "odbccp32.lib"'
+                            // Manifest
+                            // ---------------------------
+                            + ' /MANIFEST /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+                            + ' /MANIFEST:EMBED'
+                            // Debugging
+                            // ---------------------------
+                            + ' /DEBUG'
+                            + ' /PDB:".\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.pdb"'
+                            + ' /MAP":.\$_CURRENT_BFF_DIR_$\output\win64\release\fastbuildsimpleexecutable.map"'
+                            // System
+                            // ---------------------------
+                            + ' /SUBSYSTEM:CONSOLE'
+                            + ' /LARGEADDRESSAWARE'
+                            // Optimization
+                            // ---------------------------
+                            + ' /OPT:REF'
+                            + ' /OPT:ICF'
+                            // Embedded IDL
+                            // ---------------------------
+                            + ' /TLBID:1'
+                            // Windows Metadata
+                            // ---------------------------
+                            // Advanced
+                            // ---------------------------
+                            + ' /DYNAMICBASE'
+                            + ' /MACHINE:X64'
+                            + ' /errorReport:queue'
+                            // Additional linker options
+                            //--------------------------
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildSimpleExecutable_Release_win64' )
+{
+    .Targets = 'FastBuildSimpleExecutable_Release_win64_Executable'
+}
+
+
+//=================================================================================================================
+Alias( 'FastBuildSimpleExecutable_Release_win64_LibraryDependency' )
+{
+    .Targets = 'FastBuildSimpleExecutable_Release_win64_Executable'
+}
+
+
+#endif // WIN64
+////////////////////////////////////////////////////////////////////////////////

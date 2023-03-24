@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, 2021 Ubisoft Entertainment
+// Copyright (c) 2019, 2021 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace FastBuild
                         Optimization.Debug | Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,
-                        BuildSystem.FastBuild
+                        BuildSystem.FastBuild | BuildSystem.MSBuild
             ));
 
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
@@ -48,7 +48,7 @@ namespace FastBuild
         [Configure()]
         public void ConfigureAll(Configuration conf, Target target)
         {
-            conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]";
+            conf.ProjectFileName = "[project.Name]_[target.DevEnv]_[target.Platform]_[target.BuildSystem]";
             conf.ProjectPath = @"[project.SharpmakeCsPath]\projects";
             conf.Options.Add(Options.Vc.Compiler.Exceptions.Enable);
         }
@@ -61,6 +61,16 @@ namespace FastBuild
 
             // Force writing to pdb from different cl.exe process to go through the pdb server
             conf.AdditionalCompilerOptions.Add("/FS");
+        }
+
+        [Configure(Optimization.Release)]
+        public virtual void ConfigureRelease(Configuration conf, Target target)
+        {
+            // Testing generation of what is needed for working fastbuild deoptimization when using non-exposed compiler optimization options.
+            conf.AdditionalCompilerOptimizeOptions.Add("/O2"); // This switch is known but for the purpose of this test we will put in in this field.
+            conf.AdditionalCompilerOptimizeOptions.Add("/Os"); // This switch is known but for the purpose of this test we will put in in this field.
+            conf.AdditionalCompilerOptions.Add("/bigobj");
+            conf.FastBuildDeoptimization = Configuration.DeoptimizationWritableFiles.DeoptimizeWritableFiles;
         }
     }
 
@@ -77,14 +87,14 @@ namespace FastBuild
                         Optimization.Debug | Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,
-                        BuildSystem.FastBuild
+                        BuildSystem.FastBuild | BuildSystem.MSBuild
             ));
         }
 
         [Configure()]
         public void ConfigureAll(Configuration conf, Target target)
         {
-            conf.SolutionFileName = "[solution.Name]_[target.DevEnv]_[target.Platform]";
+            conf.SolutionFileName = "[solution.Name]_[target.DevEnv]_[target.Platform]_[target.BuildSystem]";
             conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects";
 
             conf.AddProject<FastBuildSimpleExecutable>(target);

@@ -204,7 +204,7 @@ try
         Write-Host "exit code : $LASTEXITCODE"
         if($LASTEXITCODE -and $LASTEXITCODE -ne 0)
         {
-            Write-Error "error $LASTEXITCODE during mdbuild compile"
+            Write-Error "error $LASTEXITCODE during msbuild compile"
             exit $LASTEXITCODE
         }
         Write-Host "compile success"

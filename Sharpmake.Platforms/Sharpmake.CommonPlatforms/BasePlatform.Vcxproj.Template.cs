@@ -65,7 +65,7 @@ namespace Sharpmake
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>[options.DisableSpecificWarnings]</DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>[options.UndefinePreprocessorDefinitions]</UndefinePreprocessorDefinitions>
-      <AdditionalOptions>[options.AdditionalCompilerOptions]</AdditionalOptions>
+      <AdditionalOptions>[options.AllAdditionalCompilerOptions]</AdditionalOptions>
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>[options.PrecompiledHeaderFile]</PrecompiledHeaderOutputFile>
       <ProgramDatabaseFileName>[options.CompilerProgramDatabaseFile]</ProgramDatabaseFileName>

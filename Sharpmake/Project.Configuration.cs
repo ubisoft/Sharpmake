@@ -868,6 +868,18 @@ namespace Sharpmake
             public OrderableStrings AdditionalCompilerOptions = new OrderableStrings();
 
             /// <summary>
+            /// Get a list of compiler optimization options to send when calling the compiler. It is necessary to properly implement the 
+            /// fastbuild .CompilerOptionsDeoptimized
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// This property is for the compiler. It is similar to 
+            /// <see cref="AdditionalCompilerOptions"/> but only for optimizations options not exposed by Sharpmake.
+            /// </para>
+            /// </remarks>
+            public OrderableStrings AdditionalCompilerOptimizeOptions = new OrderableStrings();
+
+            /// <summary>
             /// Compiler-specific options to pass when invoking the compiler to create PCHs.
             /// </summary>
             /// <remarks>

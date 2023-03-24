@@ -79,6 +79,7 @@ namespace Sharpmake
     // ---------------------
     .CompilerOptimizations = ''
             + ' [cmdLineOptions.Optimization]'
+            + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
         }
     }
