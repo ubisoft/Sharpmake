@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,9 +19,10 @@ namespace Sharpmake.Application
     public enum ExitCode
     {
         Success = 0,
-        Error = -3,
-        InternalError = -3,
-        UnknownError = -10
+        GenerationError,
+        Error,
+        InternalError,
+        UnknownError,
     }
 
     public static partial class Program
@@ -158,32 +149,22 @@ namespace Sharpmake.Application
         {
             if (CommandLine.ContainParameter("breakintodebugger"))
             {
-#if NETFRAMEWORK
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
+                while (Console.ReadKey(true).Key != ConsoleKey.Enter)
                 {
-                    System.Windows.Forms.MessageBox.Show("Debugger requested. Please attach a debugger and press OK");
-                }
-                else
-#endif
-                {
-                    Console.WriteLine("Debugger requested. Please attach a debugger and press ENTER to continue");
-                    while (Console.ReadKey(true).Key != ConsoleKey.Enter)
-                    {
-                        Console.WriteLine("Press ENTER to continue");
-                    }
+                    Console.WriteLine("Press ENTER to continue");
                 }
                 Debugger.Break();
             }
             // This GC gives a little bit better results than the other ones. "LowLatency" is giving really bad results(twice slower than the other ones).
             System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+            Trace.Assert(System.Runtime.GCSettings.IsServerGC, "Server GC is not active! Sharpmake will be much slower!");
 
             AppDomain currentDomain = AppDomain.CurrentDomain;
-            currentDomain.UnhandledException += AppDomain_UnhandledException;
 
             Mutex oneInstanceMutex = null;
             Argument parameters = new Argument();
             ExitCode exitCode = ExitCode.Success;
-
             try
             {
                 DebugEnable = CommandLine.ContainParameter("verbose") || CommandLine.ContainParameter("debug") || CommandLine.ContainParameter("diagnostics");
@@ -373,14 +354,12 @@ namespace Sharpmake.Application
                 LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
                 exitCode = ExitCode.InternalError;
             }
-#if !DEBUG // Use this to catch right away if an exception throw
             catch (Exception e)
             {
                 LogWriteLine(Environment.NewLine + "Exception Error:");
                 LogWriteLine(Util.GetCompleteExceptionMessage(e, "\t"));
                 exitCode = ExitCode.UnknownError;
             }
-#endif
             finally
             {
                 if (oneInstanceMutex != null)
@@ -396,7 +375,8 @@ namespace Sharpmake.Application
                 }
             }
 
-            LogWriteLine(@"{0} errors, {1} warnings", s_errorCount, s_warningCount);
+            if (exitCode <= ExitCode.Error) // Do not display summary in case of unknown exception or internal error
+                LogWriteLine(@"{0} errors, {1} warnings", s_errorCount, s_warningCount);
             if (s_errorCount != 0)
             {
                 if (Debugger.IsAttached)
@@ -406,23 +386,17 @@ namespace Sharpmake.Application
                 }
             }
 
-            // returning exit code and error count separately because they can result in an exit code of 0 if they are added together.
-            if (s_errorCount != 0)
-                return s_errorCount;
+            // Always return the same error code no matter the number of errors.
+            if (exitCode == ExitCode.Success && s_errorCount != 0)
+            {
+                exitCode = ExitCode.GenerationError;
+            }
             return (int)exitCode;
         }
 
         private static void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             LogSharpmakeExtensionLoaded(args.LoadedAssembly);
-        }
-
-        private static void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
-        {
-            LogWriteLine(Environment.NewLine + "Unhandled exception Error:");
-            LogWriteLine(Util.GetCompleteExceptionMessage(unhandledExceptionEventArgs.ExceptionObject as Exception, "\t"));
-
-            Environment.Exit((int)ExitCode.UnknownError);
         }
 
         private static void LogSharpmakeExtensionLoaded(Assembly extensionAssembly)
@@ -448,6 +422,20 @@ namespace Sharpmake.Application
 
         private static void CreateBuilderAndGenerate(BuildContext.BaseBuildContext buildContext, Argument parameters, bool generateDebugSolution)
         {
+            string cleanupSuffixOldValue = Util.FilesAutoCleanupDBSuffix;
+            bool cleanupActiveOldValue = Util.FilesAutoCleanupActive;
+
+            if (generateDebugSolution)
+            {
+                // Set a cleanup context exclusive to debug solution
+                Util.FilesAutoCleanupDBSuffix = "_debugsolution";
+                Util.FilesAutoCleanupActive = true;
+                if (!string.IsNullOrEmpty(parameters.DebugSolutionPath))
+                    Util.FilesAutoCleanupDBPath = parameters.DebugSolutionPath;
+                else
+                    Util.FilesAutoCleanupDBPath = Path.GetDirectoryName(parameters.Sources[0]);
+            }
+
             using (Builder builder = CreateBuilder(buildContext, parameters, allowCleanBlobs: true, generateDebugSolution: generateDebugSolution))
             {
                 if (parameters.CleanBlobsOnly)
@@ -484,6 +472,16 @@ namespace Sharpmake.Application
 
             LogWriteLine("  time: {0:0.00} sec.", (DateTime.Now - s_startTime).TotalSeconds);
             LogWriteLine("  completed on {0}.", DateTime.Now);
+
+            if (generateDebugSolution)
+            {
+                // Execute cleanup for debug solution generation
+                Util.ExecuteFilesAutoCleanup(true);
+
+                // Restore original cleanup context
+                Util.FilesAutoCleanupDBSuffix = cleanupSuffixOldValue;
+                Util.FilesAutoCleanupActive = cleanupActiveOldValue;
+            }
         }
 
         private static void GenerateAll(BuildContext.BaseBuildContext buildContext, Argument parameters)

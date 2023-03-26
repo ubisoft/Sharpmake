@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017, 2020 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -72,29 +62,59 @@ namespace Sharpmake
             }
         }
 
+        private void AddCore(T value)
+        {
+            _hash.Add(value);
+        }
+
+        private void GrowCapacity(int by)
+        {
+            _hash.EnsureCapacity(_hash.Count + by);
+        }
+
         public void Add(T value1)
         {
-            AddRange(new[] { value1 });
+            ValidateReadOnly();
+            AddCore(value1);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2)
         {
-            AddRange(new[] { value1, value2 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2, T value3)
         {
-            AddRange(new[] { value1, value2, value3 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            AddCore(value3);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2, T value3, T value4)
         {
-            AddRange(new[] { value1, value2, value3, value4 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            AddCore(value3);
+            AddCore(value4);
+            _isDirty = true;
         }
 
         public void Add(T value1, T value2, T value3, T value4, T value5)
         {
-            AddRange(new[] { value1, value2, value3, value4, value5 });
+            ValidateReadOnly();
+            AddCore(value1);
+            AddCore(value2);
+            AddCore(value3);
+            AddCore(value4);
+            AddCore(value5);
+            _isDirty = true;
         }
 
         public void Add(params T[] values)
@@ -106,6 +126,32 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             _hash.UnionWith(collection);
+            _isDirty = true;
+        }
+
+        public void AddRange(UniqueList<T> other)
+        {
+            ValidateReadOnly();
+            GrowCapacity(other.Count);
+
+            foreach (T value in other._hash)
+            {
+                AddCore(value);
+            }
+
+            _isDirty = true;
+        }
+
+        public void AddRange(IReadOnlyList<T> collection)
+        {
+            ValidateReadOnly();
+            GrowCapacity(collection.Count);
+
+            for (int i = 0; i < collection.Count; i++)
+            {
+                AddCore(collection[i]);
+            }
+
             _isDirty = true;
         }
 
@@ -278,7 +324,12 @@ namespace Sharpmake
 
         #region IEnumerable
 
-        public IEnumerator<T> GetEnumerator()
+        public List<T>.Enumerator GetEnumerator()
+        {
+            return Values.GetEnumerator();
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return Values.GetEnumerator();
         }

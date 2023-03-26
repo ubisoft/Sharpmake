@@ -14,6 +14,10 @@
 
 using Sharpmake;
 
+// This module attribut control how the debug project will be named.
+// It is used here only as an example as we doesn't generate debug solution/project for the samples.
+[module: Sharpmake.DebugProjectName("Sharpmake.HelloWorld")]
+
 namespace HelloWorld
 {
     [Sharpmake.Generate]

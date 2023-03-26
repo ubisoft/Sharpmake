@@ -1,16 +1,5 @@
-﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -264,6 +253,15 @@ namespace Sharpmake
 
                     option = Options.StringOption.Get<Options.Agde.General.AndroidApkName>(conf);
                     options["AndroidApkName"] = option != RemoveLineTag ? option : @"$(RootNamespace)-$(PlatformTarget).apk";
+
+                    option = Options.GetObject<Options.Agde.General.AndroidApkLocation>(conf)?.Path ?? RemoveLineTag;
+                    options["AndroidApkLocation"] = option;
+
+                    option = Options.GetObject<Options.Agde.General.AndroidPostApkInstallCommands>(conf)?.Value ?? RemoveLineTag;
+                    options["AndroidPostApkInstallCommands"] = option;
+
+                    option = Options.GetObject<Options.Agde.General.AndroidPreApkInstallCommands>(conf)?.Value ?? RemoveLineTag;
+                    options["AndroidPreApkInstallCommands"] = option;
                 }
                 else
                 {
@@ -273,10 +271,10 @@ namespace Sharpmake
                     options["AndroidGradleBuildIntermediateDir"] = RemoveLineTag;
                     options["AndroidExtraGradleArgs"] = RemoveLineTag;
                     options["AndroidApkName"] = RemoveLineTag;
+                    options["AndroidApkLocation"] = RemoveLineTag;
+                    options["AndroidPostApkInstallCommands"] = RemoveLineTag;
+                    options["AndroidPreApkInstallCommands"] = RemoveLineTag;
                 }
-
-                var androidApkLocation = Options.GetObject<Options.Agde.General.AndroidApkLocation>(conf)?.Path ?? RemoveLineTag;
-                options["AndroidApkLocation"] = androidApkLocation;
 
                 context.SelectOption
                 (
@@ -510,7 +508,7 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false";cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
+                Options.Option(Options.Agde.Compiler.PositionIndependentCode.Disable, () => { options["PositionIndependentCode"] = "false"; cmdLineOptions["PositionIndependentCode"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.Compiler.PositionIndependentCode.Enable, () => { options["PositionIndependentCode"] = "true"; cmdLineOptions["PositionIndependentCode"] = "-fpic"; })
                 );
             }
@@ -577,6 +575,15 @@ namespace Sharpmake
                 (
                 Options.Option(Options.Agde.Linker.Incremental.Disable, () => { options["IncrementalLink"] = "false"; cmdLineOptions["LinkIncremental"] = RemoveLineTag; }),
                 Options.Option(Options.Agde.Linker.Incremental.Enable, () => { options["IncrementalLink"] = "true"; cmdLineOptions["LinkIncremental"] = $"{linkerOptionPrefix}--incremental"; })
+                );
+
+                context.SelectOption
+                (
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.None, () => { options["BuildId"] = "none"; cmdLineOptions["BuildId"] = RemoveLineTag; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Fast, () => { options["BuildId"] = "fast"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=fast"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Md5, () => { options["BuildId"] = "md5"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=md5"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Sha1, () => { options["BuildId"] = "sha1"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=sha1"; }),
+                Sharpmake.Options.Option(Options.Agde.Linker.BuildId.Uuid, () => { options["BuildId"] = "uuid"; cmdLineOptions["BuildId"] = $"{linkerOptionPrefix}--build-id=uuid"; })
                 );
             }
 

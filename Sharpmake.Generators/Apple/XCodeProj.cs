@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2021 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.Apple
@@ -147,7 +138,7 @@ namespace Sharpmake.Generators.Apple
             var fileGenerator = InitProjectGenerator(configurations);
 
             // Write the project file
-            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator.ToMemoryStream());
+            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator);
 
             string projectFileResult = projectFileInfo.FullName;
             return projectFileResult;
@@ -170,7 +161,7 @@ namespace Sharpmake.Generators.Apple
             var fileGenerator = InitProjectSchemeGenerator(configurations, projectFile);
 
             // Write the scheme file
-            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectSchemeFileInfo, fileGenerator.ToMemoryStream());
+            updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectSchemeFileInfo, fileGenerator);
             string projectFileResult = projectSchemeFileInfo.FullName;
 
             return projectFileResult;
@@ -260,6 +251,23 @@ namespace Sharpmake.Generators.Apple
             return fileGenerator;
         }
 
+        private void PrepareSourceRootFolders(Project project, Project.Configuration configuration)
+        {
+            List<string> folders = new List<string>();
+            folders.Add(project.SourceRootPath);
+            foreach (var folder in project.AdditionalSourceRootPaths)
+            {
+                folders.Add(folder);
+            }
+
+            string projectPath = Directory.GetParent(configuration.ProjectFullFileNameWithExtension).FullName;
+            // add source root folders
+            foreach (string folder in folders)
+            {
+                AddFolderInFileSystem(folder, projectPath);
+            }
+        }
+
         private void PrepareSections(XCodeGenerationContext context, List<Project.Configuration> configurations)
         {
             Project project = context.Project;
@@ -340,18 +348,29 @@ namespace Sharpmake.Generators.Apple
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPreBuildPhases, conf.EventPreBuild.GetEnumerator());
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPostBuildPhases, conf.EventPostBuild.GetEnumerator());
 
-                    Strings systemFrameworks = Options.GetStrings<Options.XCode.Compiler.SystemFrameworks>(conf);
-                    foreach (string systemFramework in systemFrameworks)
+                    switch (conf.Output)
                     {
-                        var systemFrameworkItem = new ProjectSystemFrameworkFile(systemFramework);
-                        var buildFileItem = new ProjectBuildFile(systemFrameworkItem);
-                        if (!_frameworksFolder.Children.Exists(item => item.FullPath == systemFrameworkItem.FullPath))
-                        {
-                            _frameworksFolder.Children.Add(systemFrameworkItem);
-                            _projectItems.Add(systemFrameworkItem);
-                        }
-                        _projectItems.Add(buildFileItem);
-                        _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                        case Project.Configuration.OutputType.AppleApp:
+                        case Project.Configuration.OutputType.IosTestBundle:
+                        case Project.Configuration.OutputType.Exe:
+                        case Project.Configuration.OutputType.Dll:
+
+                            OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
+                            systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
+
+                            foreach (string systemFramework in systemFrameworks)
+                            {
+                                var systemFrameworkItem = new ProjectSystemFrameworkFile(systemFramework);
+                                var buildFileItem = new ProjectBuildFile(systemFrameworkItem);
+                                if (!_frameworksFolder.Children.Exists(item => item.FullPath == systemFrameworkItem.FullPath))
+                                {
+                                    _frameworksFolder.Children.Add(systemFrameworkItem);
+                                    _projectItems.Add(systemFrameworkItem);
+                                }
+                                _projectItems.Add(buildFileItem);
+                                _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                            }
+                            break;
                     }
 
                     // master bff path
@@ -506,10 +525,10 @@ namespace Sharpmake.Generators.Apple
         }
 
         //Find Project.Configuration of the bundle loading app that matches the unit test target, if it exists.
-        //Should have OutputType IosApp assuming targets with different output type.
+        //Should have OutputType App assuming targets with different output type.
         private Project.Configuration FindBundleLoadingApp(List<Project.Configuration> configurations)
         {
-            return configurations.Find(element => (element.Output == Project.Configuration.OutputType.IosApp));
+            return configurations.Find(element => (element.Output == Project.Configuration.OutputType.AppleApp));
         }
 
         private static string GetTargetKey(Project.Configuration conf)
@@ -592,32 +611,21 @@ namespace Sharpmake.Generators.Apple
         {
             foreach (string file in sourceFiles)
             {
+                bool build = !configuration.ResolvedSourceFilesBuildExclude.Contains(file);
+                string extension = Path.GetExtension(file);
+                bool source = project.SourceFilesCompileExtensions.Contains(extension) || (string.Compare(extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
+                if (!(source && build))
+                    continue;
+
                 bool alreadyPresent;
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath, true);
                 if (alreadyPresent)
                     continue;
 
-                item.Build = !configuration.ResolvedSourceFilesBuildExclude.Contains(item.FullPath);
-                item.Source = project.SourceFilesCompileExtensions.Contains(item.Extension) || (string.Compare(item.Extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(item.Extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
-
-                if (item.Source)
-                {
-                    if (item.Build)
-                    {
-                        var fileItem = (ProjectFile)item;
-                        var buildFileItem = new ProjectBuildFile(fileItem);
-                        _projectItems.Add(buildFileItem);
-                        _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
-                    }
-                }
-                else
-                {
-                    if (!item.Build)
-                    {
-                        // Headers not matching file restrictions : remove them from the solution.
-                        RemoveFromFileSystem(item);
-                    }
-                }
+                var fileItem = (ProjectFile)item;
+                var buildFileItem = new ProjectBuildFile(fileItem);
+                _projectItems.Add(buildFileItem);
+                _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
             }
         }
 
@@ -683,7 +691,7 @@ namespace Sharpmake.Generators.Apple
         {
             _mainGroup = new ProjectFolder(project.GetType().Name, true);
 
-            if (Options.GetObjects<Options.XCode.Compiler.SystemFrameworks>(configuration).Any() || Options.GetObjects<Options.XCode.Compiler.UserFrameworks>(configuration).Any())
+            if (configuration.XcodeSystemFrameworks.Any() || configuration.XcodeDependenciesSystemFrameworks.Any() || Options.GetObjects<Options.XCode.Compiler.UserFrameworks>(configuration).Any())
             {
                 _frameworksFolder = new ProjectFolder("Frameworks", true);
                 _projectItems.Add(_frameworksFolder);
@@ -692,15 +700,12 @@ namespace Sharpmake.Generators.Apple
 
             _projectItems.Add(_mainGroup);
 
-            string workspacePath = Directory.GetParent(configuration.ProjectFullFileNameWithExtension).FullName;
-            string sourceRootPath = project.SourceRootPath;
-            ProjectFolder rootGroup = new ProjectFolder(sourceRootPath, Util.PathGetRelative(workspacePath, sourceRootPath));
-            _projectItems.Add(rootGroup);
-
             _productsGroup = new ProjectFolder("Products", true);
-            _mainGroup.Children.Add(rootGroup);
             _mainGroup.Children.Add(_productsGroup);
             _projectItems.Add(_productsGroup);
+
+            // add source root folders to make sure the folder hierarchy created correctly.
+            PrepareSourceRootFolders(project, configuration);
         }
 
         private void Write(string value, TextWriter writer, Resolver resolver)
@@ -712,12 +717,46 @@ namespace Sharpmake.Generators.Apple
             writer.Flush();
         }
 
+        private void GetEmptyProjectFolders(IEnumerable<ProjectItem> projectItems, List<ProjectFileSystemItem> emptyProjectFolders)
+        {
+            foreach (var item in projectItems)
+            {
+                if (item is ProjectFolder)
+                {
+                    ProjectFolder folderItem = (ProjectFolder)item;
+
+                    if (folderItem.Children.Count == 0)
+                    {
+                        emptyProjectFolders.Add(folderItem);
+                        continue;
+                    }
+
+                    GetEmptyProjectFolders(folderItem.Children, emptyProjectFolders);
+                }
+            }
+        }
+
         private void WriteSection<ProjectItemType>(Project.Configuration configuration, IFileGenerator fileGenerator)
             where ProjectItemType : ProjectItem
         {
-            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType).OrderBy(item => item.Uid, StringComparer.Ordinal);
+            IEnumerable<ProjectItem> projectItems = _projectItems.Where(item => item is ProjectItemType);
             if (projectItems.Any())
             {
+                if (projectItems.Any(p => p is ProjectFolder))
+                {
+                    List<ProjectFileSystemItem> emptyProjectFolders = new List<ProjectFileSystemItem>();
+                    GetEmptyProjectFolders(projectItems, emptyProjectFolders);
+                    // clean empty node
+                    foreach (var c in emptyProjectFolders)
+                    {
+                        RemoveFromFileSystem(c);
+                    }
+                }
+                else
+                {
+                    projectItems = projectItems.OrderBy(item => item.Uid, StringComparer.Ordinal);
+                }
+
                 ProjectItem firstItem = projectItems.First();
                 using (fileGenerator.Declare("item", firstItem))
                 {
@@ -746,33 +785,73 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
+        private void AddFolderInFileSystem(string folder, string workspacePath = null)
+        {
+            // Search in existing roots.
+            var fileSystemItems = _projectItems.Where(item => item is ProjectFileSystemItem && item.Section == ItemSection.PBXGroup);
+            foreach (ProjectFileSystemItem item in fileSystemItems)
+            {
+                if (folder.StartsWith(item.FullPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (folder.Length > item.FullPath.Length)
+                    {
+                        AddFolderInFileSystem(item, folder.Substring(item.FullPath.Length + 1), workspacePath);
+                        return;
+                    }
+                }
+            }
+
+            // Not found in existing root, create a new root for this item.
+            ProjectFolder projectFolder = workspacePath != null ? new ProjectExternalFolder(folder, workspacePath) : new ProjectFolder(folder);
+            _projectItems.Add(projectFolder);
+            _mainGroup.Children.Insert(0, projectFolder);
+        }
+
+        private void AddFolderInFileSystem(ProjectFileSystemItem parent, string remainingPath, string workspacePath = null)
+        {
+            string[] remainingPathParts = remainingPath.Split(FolderSeparator);
+            for (int i = 0; i < remainingPathParts.Length; i++)
+            {
+                bool found = false;
+                string remainingPathPart = remainingPathParts[i];
+                foreach (ProjectFileSystemItem item in parent.Children)
+                {
+                    if (remainingPathPart == item.Name)
+                    {
+                        parent = item;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
+                    ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(fullPath, workspacePath) : new ProjectFolder(fullPath);
+                    _projectItems.Add(folder);
+                    parent.Children.Add(folder);
+                    parent = folder;
+                }
+            }
+        }
+
         private ProjectFileSystemItem AddInFileSystem(string fullPath, out bool alreadyPresent, string workspacePath = null, bool applyWorkspaceOnlyToRoot = false)
         {
             // Search in existing roots.
-            var fileSystemItems = _projectItems.Where(item => item is ProjectFileSystemItem);
+            var fileSystemItems = _projectItems.Where(item => item is ProjectFileSystemItem && item.Section == ItemSection.PBXGroup);
             foreach (ProjectFileSystemItem item in fileSystemItems)
             {
-                if (fullPath.StartsWith(item.FullPath, StringComparison.OrdinalIgnoreCase))
+                if (fullPath.StartsWith(item.FullPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                 {
                     if (fullPath.Length > item.FullPath.Length)
                         return AddInFileSystem(item, out alreadyPresent, fullPath.Substring(item.FullPath.Length + 1), applyWorkspaceOnlyToRoot ? null : workspacePath);
                 }
             }
-
             // Not found in existing root, create a new root for this item.
-            alreadyPresent = false;
-            string parentDirectoryPath = Directory.GetParent(fullPath).FullName;
-            //string fileName = fullPath.Substring(parentDirectoryPath.Length + 1);
-
-            ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(parentDirectoryPath, workspacePath) : new ProjectFolder(parentDirectoryPath);
-            _projectItems.Add(folder);
-            _mainGroup.Children.Insert(0, folder);
-
-            ProjectFile file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
-            _projectItems.Add(file);
-            folder.Children.Add(file);
-
-            return file;
+            string fileFolder = Directory.GetParent(fullPath).FullName;
+            AddFolderInFileSystem(fileFolder, workspacePath);
+            // add the file
+            return AddInFileSystem(fullPath, out alreadyPresent, workspacePath, applyWorkspaceOnlyToRoot);
         }
 
         private ProjectFileSystemItem AddInFileSystem(ProjectFileSystemItem parent, out bool alreadyPresent, string remainingPath, string workspacePath)
@@ -818,12 +897,13 @@ namespace Sharpmake.Generators.Apple
                     alreadyPresent = true;
                 }
             }
-            parent.Children.Sort((f1, f2) => string.Compare(f1.Name, f2.Name, StringComparison.OrdinalIgnoreCase));
             return parent;
         }
 
         private void RemoveFromFileSystem(ProjectFileSystemItem fileSystemItem)
         {
+            if (!_projectItems.Contains(fileSystemItem))
+                return;
             ProjectFileSystemItem itemToSearch = fileSystemItem;
             while (itemToSearch != null)
             {
@@ -883,10 +963,20 @@ namespace Sharpmake.Generators.Apple
             // TODO: make this an option
             linkerOptions.Add("-ObjC");
 
-            // TODO: fix this to use proper lib prefixing
-            linkerOptions.AddRange(libFiles.Select(library => "-l" + library));
+            // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
+            linkerOptions.AddRange(libFiles.Select(library =>
+            {
+                if (library.EndsWith(".a", StringComparison.OrdinalIgnoreCase) || library.EndsWith(".dylib", StringComparison.OrdinalIgnoreCase))
+                {
+                    string libName = Path.GetFileNameWithoutExtension(library);
+                    if (libName.StartsWith("lib"))
+                        libName = libName.Remove(0, 3);
+                    return "-l" + libName;
+                }
+                return "-l" + library;
+            }));
 
-            // TODO: when the above is fixed, we won't need this anymore
+            // this is needed to make sure the output dynamic library with proper prefix
             if (conf.Output == Project.Configuration.OutputType.Dll)
                 options["ExecutablePrefix"] = "lib";
             else
@@ -898,7 +988,7 @@ namespace Sharpmake.Generators.Apple
                 conf.Defines.Add("NDEBUG");
 
             options["PreprocessorDefinitions"] = XCodeUtil.XCodeFormatList(conf.Defines, 4, forceQuotes: true);
-            options["CompilerOptions"] = XCodeUtil.XCodeFormatList(conf.AdditionalCompilerOptions, 4, forceQuotes: true);
+            options["CompilerOptions"] = XCodeUtil.XCodeFormatList(Enumerable.Concat(conf.AdditionalCompilerOptions, conf.AdditionalCompilerOptimizeOptions), 4, forceQuotes: true);
             if (conf.AdditionalLibrarianOptions.Any())
                 throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with XCode generator");
             options["LinkerOptions"] = XCodeUtil.XCodeFormatList(linkerOptions, 4, forceQuotes: true);
@@ -1378,8 +1468,9 @@ namespace Sharpmake.Generators.Apple
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectFolder folderItem = (ProjectFolder)item;
+                var children = folderItem.Children.OrderByDescending(c => c.Section).ThenBy(c => c.Name);
                 string childrenList = "";
-                foreach (ProjectFileSystemItem childItem in folderItem.Children)
+                foreach (ProjectFileSystemItem childItem in children)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
@@ -1623,7 +1714,7 @@ namespace Sharpmake.Generators.Apple
                         ProductType = "com.apple.product-type.bundle.unit-test";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
-                    case Project.Configuration.OutputType.IosApp:
+                    case Project.Configuration.OutputType.AppleApp:
                         ProductType = "com.apple.product-type.application";
                         ProductInstallPath = "$(HOME)/Applications";
                         break;
@@ -1833,7 +1924,7 @@ namespace Sharpmake.Generators.Apple
 
                 // Lookup for the app in the unit test dependencies.
                 ProjectTargetDependency testHostTargetDependency =
-                    nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null && dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.IosApp);
+                    nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null && dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.AppleApp);
 
                 if (testHostTargetDependency != null)
                 {

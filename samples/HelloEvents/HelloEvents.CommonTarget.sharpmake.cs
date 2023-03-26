@@ -87,9 +87,7 @@ namespace HelloEvents
 
                 dirNameParts.Add(Platform.ToString());
                 dirNameParts.Add(Optimization.ToString());
-
-                if (BuildSystem == BuildSystem.FastBuild)
-                    dirNameParts.Add(BuildSystem.ToString());
+                dirNameParts.Add(BuildSystem.ToString());
 
                 return string.Join("_", dirNameParts);
             }
@@ -124,7 +122,7 @@ namespace HelloEvents
         {
             var defaultTarget = new CommonTarget(
                 Platform.win64,
-                DevEnv.vs2019,
+                DevEnv.vs2019 | DevEnv.vs2022,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.MSBuild

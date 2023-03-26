@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, 2019, 2021 Ubisoft Entertainment
+﻿// Copyright (c) 2017, 2019, 2021-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,6 +91,12 @@ namespace CLR_SharpmakeTest
     }
 
     [Sharpmake.Generate]
+    public class CSharpProjBuildOrderDependency : CommonCSharpProject
+    {
+        public CSharpProjBuildOrderDependency() { }
+    }
+
+    [Sharpmake.Generate]
     public class CLR_CPP_Proj : CommonProject
     {
         public CLR_CPP_Proj()
@@ -108,11 +114,15 @@ namespace CLR_SharpmakeTest
                 "System.Xml"
             );
 
-            conf.AddPrivateDependency<OtherCSharpProj>(target, DependencySetting.OnlyBuildOrder);
+            conf.AddPrivateDependency<OtherCSharpProj>(target);
+            conf.AddPrivateDependency<CSharpProjBuildOrderDependency>(target, DependencySetting.OnlyBuildOrder);
             conf.AddPrivateDependency<TheEmptyCPPProject>(target);
 
             // Force full pdb otherwise we get this message: /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
             conf.Options.Add(Options.Vc.Linker.GenerateFullProgramDatabaseFile.Enable);
+
+            // Force RTTI to be enabled
+            conf.Options.Add(Sharpmake.Options.Vc.Compiler.RTTI.Enable);
         }
     }
 

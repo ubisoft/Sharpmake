@@ -1,0 +1,338 @@
+# Pipelines runs only on branches and tags.
+# Disable merge request pipelines, pipelines for merge results and merge trains.
+include:
+ - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+
+stages:
+  - build
+  - test
+
+default:
+  tags:
+  - square_windows
+
+#############
+# Stage Build: compile sharpmake solution on all targets, keep the binaries for further steps.
+
+.compilation:base:
+  stage: build
+  variables:
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+    DOTNET_NOLOGO: "true"
+    DOTNET_CLI_UI_LANGUAGE: "en"
+  parallel:
+    matrix:
+    - configuration: [debug, release]
+  script:
+    - dotnet build Sharpmake.sln -c $configuration -bl:Sharpmake_$configuration.binlog
+  artifacts:
+    untracked: true
+    expire_in: 1 day
+
+compilation:windows:
+  extends: .compilation:base
+
+compilation:mac:
+  extends: .compilation:base
+  tags: [square_mac]
+
+compilation:linux:
+  extends: .compilation:base
+  tags: [square-linux-k8s-compil]
+  image: quay.ubisoft.com/tgruntime/tg-ubuntu-cpp:0.6.2-sharpmake
+
+#############
+# Unit tests
+#############
+.unit_test:base:
+  stage: test
+  parallel:
+    matrix:
+    - configuration: [debug, release]
+  script:
+    - dotnet test Sharpmake.sln -c $configuration
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+unit_test:debug:
+  extends: .unit_test:base
+  needs:
+  - "compilation:windows: [debug]"
+  variables:
+    Optimization: "debug"
+
+unit_test:release:
+  extends: .unit_test:base
+  needs:
+    - "compilation:windows: [release]"
+  variables:
+    Optimization: "release"
+
+#############
+# Regression tests
+#############
+regression_test:
+  stage: test
+  script:
+  - python regression_test.py
+  needs:
+  - "compilation:windows: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+#############
+# Functional tests
+#############
+functional_test:
+  stage: test
+  script:
+  - python functional_test.py
+  needs:
+  - "compilation:windows: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+#############
+# Linux Sample tests
+#############
+.linux_sample_test:
+  stage: test
+  tags:
+  - square-linux-k8s-compil
+  image: quay.ubisoft.com/tgruntime/tg-ubuntu-cpp:0.6.2-sharpmake
+  parallel:
+    matrix:
+    - configuration: [debug, release]
+      os: [ubuntu]
+      framework: [net6.0]
+  needs:
+  - "compilation:linux: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+HelloLinux:
+  extends: .linux_sample_test
+  script:
+  - pwsh ./RunSample.ps1 -sampleName HelloLinux -configuration $configuration -framework $framework
+
+#############
+# MacOs Sample tests
+#############
+.macos_sample_test:
+  stage: test
+  tags:
+  - square_mac
+  parallel:
+    matrix:
+    - configuration: [debug, release]
+      os: [macos-latest]
+      framework: [net6.0]
+  needs:
+  - "compilation:mac: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+HelloXCode:
+  extends: .macos_sample_test
+  script:
+  - pwsh ./RunSample.ps1 -sampleName HelloXCode -configuration $configuration -framework $framework
+
+#############
+# Windows Sample tests
+#############
+.windows_sample_test:
+  stage: test
+  parallel:
+    matrix:
+    - configuration: [debug, release]
+      os: [windows-2019, windows-2022]
+      framework: [net6.0]
+  rules:
+  - if: $os == "windows-2019"
+    variables:
+      VS_VERSION_SUFFIX: "Vs2019"
+  - if: $os == "windows-2022"
+    variables:
+      VS_VERSION_SUFFIX: "Vs2022"
+  needs:
+  - "compilation:windows: [release]"
+  artifacts:
+    when: on_failure
+    untracked: true
+    expire_in: 1 day
+
+CompileCommandDatabase:
+  extends: .windows_sample_test
+  rules:
+  - if: $configuration == "debug"
+    when: always
+  - when: never
+  script:
+  - pwsh RunSample.ps1 -sampleName CompileCommandDatabase -configuration $configuration -framework $framework -os $os
+
+ConfigureOrder:
+  extends: .windows_sample_test
+  rules:
+  - if: $configuration == "release"
+    when: always
+  - when: never
+  script:
+  - pwsh RunSample.ps1 -sampleName ConfigureOrder -configuration $configuration -framework $framework -os $os
+
+CPPCLI:
+  extends: .windows_sample_test
+  rules:
+  - if: $os == "windows-2019"
+    when: always
+  - when: never
+  script:
+  - pwsh RunSample.ps1 -sampleName CPPCLI -configuration $configuration -framework $framework -os $os
+
+CSharpHelloWorld_old_frameworks:
+  extends: .windows_sample_test
+  rules:
+  - if: $os == "windows-2019"
+    when: always
+  - when: never
+  script:
+  - pwsh RunSample.ps1 -sampleName CSharpHelloWorld_old_frameworks -configuration $configuration -framework $framework -os $os
+
+CSharpHelloWorld:
+  extends: .windows_sample_test
+  rules:
+  - if: $os == "windows-2022"
+    when: always
+  - when: never
+  variables:
+    testFolder: samples/CSharpHelloWorld
+  script:
+  - pwsh RunSample.ps1 -sampleName "CSharpHelloWorld" -configuration $configuration -framework $framework -os $os
+
+CSharpImports:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName CSharpImports -configuration $configuration -framework $framework -os $os
+
+CSharpVsix:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName CSharpVsix -configuration $configuration -framework $framework -os $os
+  # that one can't be run unfortunately
+
+CustomBuildStep:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName CustomBuildStep -configuration $configuration -framework $framework -os $os
+
+CSharpWCF:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName CSharpWCF -configuration $configuration -framework $framework -os $os
+  # that one can't be run unfortunately
+
+FastBuildSimpleExecutable:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName FastBuildSimpleExecutable -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+
+# Temp disable after Github VM update which updated the NDK and broke it
+# HelloAndroid:
+#   extends: .windows_sample_test
+#   variables:
+#     JAVA_HOME: ${Env:JAVA_HOME_11_X64}
+#   script:
+#  - pwsh RunSample.ps1 -sampleName HelloAndroid -configuration $configuration -framework $framework -os $os
+
+HelloClangCl:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName HelloClangCl -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+
+HelloEvents:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName HelloEvents -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+
+HelloWorld:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName HelloWorld -configuration $configuration -framework $framework -os $os
+
+NetCore-DotNetCoreFrameworkHelloWorld:
+  extends: .windows_sample_test
+  rules:
+  - if: $os == "windows-2022"
+    when: on_success
+  script:
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetCoreFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
+
+NetCore-DotNetFrameworkHelloWorld:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
+
+NetCore-DotNetFrameworkHelloWorld_OldFrameworks:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld_OldFrameworks" -configuration $configuration -framework $framework -os $os
+
+NetCore-DotNetMultiFrameworksHelloWorld:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetMultiFrameworksHelloWorld" -configuration $configuration -framework $framework -os $os
+
+NetCore-DotNetOSMultiFrameworksHelloWorld:
+  extends: .windows_sample_test
+  rules:
+  - if: $os == "windows-2022"
+    when: always
+  - when: never
+  variables:
+    testFolder: samples\NetCore\DotNetOSMultiFrameworksHelloWorld
+  script:
+  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetOSMultiFrameworksHelloWorld" -configuration $configuration -framework $framework -os $os
+
+PackageReferences:
+  extends: .windows_sample_test
+  script:
+  - pwsh RunSample.ps1 -sampleName "PackageReferences" -configuration $configuration -framework $framework -os $os
+
+QTFileCustomBuild:
+  extends: .windows_sample_test
+  variables:
+    Qt_BaseDir: "$CI_PROJECT_DIR\\Qt"
+    Qt5_Dir: "$Qt_BaseDir\\5.15.2\\msvc2019_64" # Needed by sample to build Qt paths.
+  before_script:
+  - choco install python3 --version 3.10.6 --side-by-side -y --no-progress
+  - py -m pip install aqtinstall
+  - py -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 --archives qtbase qttools --outputdir ${env:Qt_BaseDir}
+  - $Env:PATH = "${env:Qt5_Dir}\bin;" + $Env:PATH # Needed by sample executable to locate Qt DLLs.
+  script:
+  - pwsh RunSample.ps1 -sampleName "QTFileCustomBuild" -configuration $configuration -framework $framework -os $os
+
+SimpleExeLibDependency:
+  extends: .windows_sample_test
+  rules:
+  - if: $configuration == "debug"
+    when: always
+  - when: never
+  script:
+  - pwsh RunSample.ps1 -sampleName "SimpleExeLibDependency" -configuration $configuration -framework $framework -os $os
+
+vcpkg:
+  extends: .windows_sample_test
+  variables:
+    testFolder: samples/vcpkg
+  script:
+  - pwsh RunSample.ps1 -sampleName vcpkg -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+

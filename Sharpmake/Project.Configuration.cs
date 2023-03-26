@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -327,9 +317,27 @@ namespace Sharpmake
                 DotNetWindowsApp,
 
                 /// <summary>
+                /// The output is an Apple (macOS|iOS|tvOS|watchOS) app.
+                /// </summary>
+                AppleApp,
+
+                /// <summary>
                 /// The output is an iOS app.
                 /// </summary>
-                IosApp,
+                [Obsolete("'IosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
+                IosApp = AppleApp,
+
+                /// <summary>
+                /// The output is a tvOS app.
+                /// </summary>
+                [Obsolete("'TvosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
+                TvosApp = AppleApp,
+
+                /// <summary>
+                /// The output is a watchOS app.
+                /// </summary>
+                [Obsolete("'WatchosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
+                WatchosApp = AppleApp,
 
                 /// <summary>
                 /// The output is an iOS test bundle.
@@ -868,6 +876,18 @@ namespace Sharpmake
             public OrderableStrings AdditionalCompilerOptions = new OrderableStrings();
 
             /// <summary>
+            /// Get a list of compiler optimization options to send when calling the compiler. It is necessary to properly implement the 
+            /// fastbuild .CompilerOptionsDeoptimized
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// This property is for the compiler. It is similar to 
+            /// <see cref="AdditionalCompilerOptions"/> but only for optimizations options not exposed by Sharpmake.
+            /// </para>
+            /// </remarks>
+            public OrderableStrings AdditionalCompilerOptimizeOptions = new OrderableStrings();
+
+            /// <summary>
             /// Compiler-specific options to pass when invoking the compiler to create PCHs.
             /// </summary>
             /// <remarks>
@@ -947,6 +967,16 @@ namespace Sharpmake
             /// </para>
             /// </remarks>
             public string PrecompHeaderOutputFolder = null;
+
+            /// <summary>
+            /// Gets or sets the name for the precompiled header's binary file in C and C++ projects,
+            /// e.g. <c>pch.pch</c>.
+            /// </summary>
+            /// <remarks>
+            /// If this property is set to <c>null</c>, Sharpmake will simply use the project's name.
+            /// To modify the output directory of this file, use <see cref="PrecompHeaderOutputFolder"/>.
+            /// </remarks>
+            public string PrecompHeaderOutputFile = null;
 
             /// <summary>
             /// Gets a list of files that don't use the precompiled headers.
@@ -1138,6 +1168,37 @@ namespace Sharpmake
             /// </para>
             /// </remarks>
             public OrderableStrings LibraryFiles = new OrderableStrings();
+
+            /// <summary>
+            /// Gets a list of the Frameworks to link to for Xcode project.
+            /// </summary>
+            private OrderableStrings _XcodeSystemFrameworks = null;
+            public OrderableStrings XcodeSystemFrameworks
+            {
+                get
+                {
+                    if (_XcodeSystemFrameworks == null)
+                    {
+                        _XcodeSystemFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeSystemFrameworks;
+                }
+                set { _XcodeSystemFrameworks = value; }
+            }
+
+            private OrderableStrings _XcodeDependenciesSystemFrameworks = null;
+            public OrderableStrings XcodeDependenciesSystemFrameworks
+            {
+                get
+                {
+                    if (_XcodeDependenciesSystemFrameworks == null)
+                    {
+                        _XcodeDependenciesSystemFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeDependenciesSystemFrameworks;
+                }
+                private set { }
+            }
 
             /// <summary>
             /// Gets a list of "using" directories for compiling WinRT C++ extensions.
@@ -1333,6 +1394,19 @@ namespace Sharpmake
 
             // Disable isolation when many files are writable
             public int FastBuildUnityInputIsolateWritableFilesLimit = 10;
+
+            /// <summary>
+            /// Gets or sets the path of the list with files to isolate,
+            /// e.g.: @"temp\IsolateFileList.txt".
+            /// </summary>
+            /// <remarks>
+            /// <note>
+            /// Files in this list will be excluded from the FASTBuild unity build.
+            /// Their path must be relative to the FASTBuild working directory.
+            /// This is usually the location of the MasterBff file.
+            /// </note>
+            /// </remarks>
+            public string FastBuildUnityInputIsolateListFile = null;
 
             /// <summary>
             /// Custom Actions to do before invoking FastBuildExecutable.
@@ -2228,7 +2302,7 @@ namespace Sharpmake
                 return false;
             }
 
-            private Dictionary<KeyValuePair<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<KeyValuePair<Type, ITarget>, DependencySetting>();
+            private Dictionary<ValueTuple<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<ValueTuple<Type, ITarget>, DependencySetting>();
 
             // These dependencies will not be propagated to other projects that depend on us
             internal IDictionary<Type, ITarget> UnResolvedPrivateDependencies { get; } = new Dictionary<Type, ITarget>();
@@ -2571,7 +2645,7 @@ namespace Sharpmake
                 DependencySetting value
             )
             {
-                KeyValuePair<Type, ITarget> pair = new KeyValuePair<Type, ITarget>(projectType, target);
+                ValueTuple<Type, ITarget> pair = new ValueTuple<Type, ITarget>(projectType, target);
                 DependencySetting previousValue;
 
                 if (value < 0) //LCTODO remove when the deprecated dependency settings are removed
@@ -2667,7 +2741,7 @@ namespace Sharpmake
                 DependencySetting dependencyInheritance = DependencySetting.OnlyBuildOrder;
                 foreach (var dependency in _dependenciesSetting)
                 {
-                    if (dependency.Key.Key == projectType)
+                    if (dependency.Key.Item1 == projectType)
                         dependencyInheritance |= dependency.Value;
                 }
                 return dependencyInheritance;
@@ -2902,7 +2976,7 @@ namespace Sharpmake
 
                 internal Configuration _configuration;
                 internal DependencySetting _dependencySetting;
-                internal Dictionary<DependencyNode, DependencyType> _childNodes = new Dictionary<DependencyNode, DependencyType>();
+                internal List<(DependencyNode, DependencyType)> _childNodes = new List<(DependencyNode, DependencyType)>();
             }
 
             public class VcxprojUserFileSettings
@@ -3027,6 +3101,27 @@ namespace Sharpmake
                 var visitingNodes = new Stack<Tuple<DependencyNode, PropagationSettings>>();
                 visitingNodes.Push(Tuple.Create(rootNode, new PropagationSettings(DependencySetting.Default, true, true, true, false)));
 
+                //backward compatible, systemframeworks might be added via options.
+                Strings xcodeSystemFrameworks = Sharpmake.Options.GetStrings<Options.XCode.Compiler.SystemFrameworks>(this);
+                if (xcodeSystemFrameworks.Count > 0)
+                    XcodeSystemFrameworks.AddRange(xcodeSystemFrameworks);
+
+                (IConfigurationTasks, Platform)? lastPlatformConfigurationTasks = null;
+
+                IConfigurationTasks GetConfigurationTasks(Platform platform)
+                {
+                    if (lastPlatformConfigurationTasks.HasValue && lastPlatformConfigurationTasks.Value.Item2 == platform)
+                    {
+                        return lastPlatformConfigurationTasks.Value.Item1;
+                    }
+
+                    var tasks = PlatformRegistry.Get<IConfigurationTasks>(platform);
+
+                    lastPlatformConfigurationTasks = (tasks, platform);
+
+                    return tasks;
+                }
+
                 while (visitingNodes.Count > 0)
                 {
                     var visitedTuple = visitingNodes.Pop();
@@ -3053,12 +3148,12 @@ namespace Sharpmake
                     foreach (var childNode in visitedNode._childNodes)
                     {
                         var childTuple = Tuple.Create(
-                            childNode.Key,
+                            childNode.Item1,
                             new PropagationSettings(
-                                isRoot ? childNode.Key._dependencySetting : (propagationSetting._dependencySetting & childNode.Key._dependencySetting), // propagate the parent setting by masking it
+                                isRoot ? childNode.Item1._dependencySetting : (propagationSetting._dependencySetting & childNode.Item1._dependencySetting), // propagate the parent setting by masking it
                                 isRoot, // only children of root are immediate
-                                (isRoot || hasPublicPathToRoot) && childNode.Value == DependencyType.Public,
-                                (isImmediate || hasPublicPathToImmediate) && childNode.Value == DependencyType.Public,
+                                (isRoot || hasPublicPathToRoot) && childNode.Item2 == DependencyType.Public,
+                                (isImmediate || hasPublicPathToImmediate) && childNode.Item2 == DependencyType.Public,
                                 !isRoot && (goesThroughDLL || visitedNode._configuration.Output == OutputType.Dll)
                             )
                         );
@@ -3137,7 +3232,7 @@ namespace Sharpmake
                                 )
                                 {
                                     if (explicitDependenciesGlobal || !compile)
-                                        PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
+                                        GetConfigurationTasks(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                                         ConfigurationDependencies.Add(dependency);
                                     if (dependencySetting == DependencySetting.OnlyBuildOrder)
@@ -3156,6 +3251,9 @@ namespace Sharpmake
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
                                 }
 
+                                if ((dependency.Platform.Equals(Platform.mac) || dependency.Platform.Equals(Platform.ios)) && dependency.XcodeSystemFrameworks.Count > 0)
+                                    XcodeDependenciesSystemFrameworks.AddRange(dependency.XcodeSystemFrameworks);
+
                                 // If our no-output project is just a build-order dependency, update the build order accordingly
                                 if (!dependencyOutputLib && isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder && !isExport)
                                     GenericBuildDependencies.Add(dependency);
@@ -3163,7 +3261,7 @@ namespace Sharpmake
                             break;
                         case OutputType.Dll:
                             {
-                                var configTasks = PlatformRegistry.Get<IConfigurationTasks>(dependency.Platform);
+                                var configTasks = GetConfigurationTasks(dependency.Platform);
 
                                 if (dependency.ExportDllSymbols && (isImmediate || hasPublicPathToRoot || !goesThroughDLL))
                                 {
@@ -3246,7 +3344,7 @@ namespace Sharpmake
                                 }
                             }
                             break;
-                        case OutputType.IosApp:
+                        case OutputType.AppleApp:
                         case OutputType.Exe:
                             {
                                 if (hasPublicPathToRoot)
@@ -3344,7 +3442,7 @@ namespace Sharpmake
             {
                 DependencyNode rootNode = new DependencyNode(conf, DependencySetting.Default);
 
-                Dictionary<Configuration, DependencyNode> visited = new Dictionary<Configuration, DependencyNode>();
+                Dictionary<Configuration, DependencyNode> visited = new Dictionary<Configuration, DependencyNode>(64);
 
                 Stack<DependencyNode> visiting = new Stack<DependencyNode>();
                 visiting.Push(rootNode);
@@ -3357,17 +3455,31 @@ namespace Sharpmake
                     DependencyNode alreadyExisting = null;
                     if (visited.TryGetValue(visitedConfiguration, out alreadyExisting))
                     {
+#if DEBUG
                         foreach (var child in alreadyExisting._childNodes)
                         {
-                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(child.Key));
-                            visitedNode._childNodes.Add(child.Key, child.Value);
+                            Debug.Assert(visitedNode._childNodes.All(c => c.Item1 != child.Item1));
                         }
+#endif
+
+                        visitedNode._childNodes.AddRange(alreadyExisting._childNodes);
+
                         continue;
                     }
 
                     visited.Add(visitedConfiguration, visitedNode);
 
                     var unresolvedDependencies = new[] { visitedConfiguration.UnResolvedPublicDependencies, visitedConfiguration.UnResolvedPrivateDependencies };
+
+                    int total = 0;
+
+                    foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
+                    {
+                        total += dependencies.Count;
+                    }
+
+                    visitedNode._childNodes.Capacity += total;
+
                     foreach (Dictionary<Type, ITarget> dependencies in unresolvedDependencies)
                     {
                         if (dependencies.Count == 0)
@@ -3382,12 +3494,16 @@ namespace Sharpmake
 
                             // Get the dependency settings from the owner of the dependency.
                             DependencySetting dependencySetting;
-                            if (!visitedConfiguration._dependenciesSetting.TryGetValue(pair, out dependencySetting))
+                            var key = new ValueTuple<Type, ITarget>(pair.Key, pair.Value);
+
+                            if (!visitedConfiguration._dependenciesSetting.TryGetValue(key, out dependencySetting))
                                 dependencySetting = DependencySetting.Default;
 
                             DependencyNode childNode = new DependencyNode(dependencyConf, dependencySetting);
-                            System.Diagnostics.Debug.Assert(!visitedNode._childNodes.ContainsKey(childNode));
-                            visitedNode._childNodes.Add(childNode, dependencyType);
+#if DEBUG
+                            Debug.Assert(visitedNode._childNodes.All(c => c.Item1 != childNode));
+#endif
+                            visitedNode._childNodes.Add((childNode, dependencyType));
 
                             visiting.Push(childNode);
                         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019-2021 Ubisoft Entertainment
+﻿// Copyright (c) 2019-2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -309,6 +309,26 @@ namespace SharpmakeGen.FunctionalTests
     }
 
     [Generate]
+    public class SpanMultipleSrcDirsFBUnityIsolate : SpanMultipleSrcDirs
+    {
+        public SpanMultipleSrcDirsFBUnityIsolate()
+        {
+            AddFragmentMask(Blob.FastBuildUnitys);
+        }
+
+        public override void FastBuildUnitys(Configuration conf, Target target)
+        {
+            base.FastBuildUnitys(conf, target);
+
+            // Isolating writable files works well only for Perforce
+            conf.FastBuildUnityInputIsolateWritableFiles = false;
+
+            // Provides a list of files that should be manually isolated. It can be used for Git difference of names, for example
+            conf.FastBuildUnityInputIsolateListFile = @"[project.RootPath]\codebase\SpanMultipleSrcDirs\temp\isolate_list.txt";
+        }
+    }
+
+    [Generate]
     public class UsePrecompExe : CommonExeProject
     {
         public UsePrecompExe()
@@ -608,6 +628,7 @@ namespace SharpmakeGen.FunctionalTests
             {
                 conf.AddProject<SpanMultipleSrcDirsFBUnityInclude>(target);
                 conf.AddProject<SpanMultipleSrcDirsFBUnityExclude>(target);
+                conf.AddProject<SpanMultipleSrcDirsFBUnityIsolate>(target);
             }
             else if (target.Blob == Blob.NoBlob)
             {

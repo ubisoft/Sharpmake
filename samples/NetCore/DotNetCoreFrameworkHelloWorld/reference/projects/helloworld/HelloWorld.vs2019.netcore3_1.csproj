@@ -10,7 +10,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <EnableDefaultItems>true</EnableDefaultItems>
-    <UseWpf>true</UseWpf>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>

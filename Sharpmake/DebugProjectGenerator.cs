@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +20,7 @@ namespace Sharpmake
         internal static string RootPath { get; private set; }
         internal static string[] MainSources { get; private set; }
         internal static DevEnv DevEnv { get; private set; }
-        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2019;
+        internal static readonly DevEnv DefaultDevEnv = DevEnv.vs2022;
 
         public interface IDebugProjectExtension
         {
@@ -220,7 +210,7 @@ namespace Sharpmake
 
             // Add references
             var references = new HashSet<string>();
-            foreach (var assemblerRef in assemblyInfo.References)
+            foreach (var assemblerRef in assemblyInfo.RuntimeReferences)
             {
                 if (!assemblyInfo.SourceReferences.ContainsKey(assemblerRef))
                 {
@@ -375,12 +365,13 @@ namespace Sharpmake
 
             conf.Options.Add(Assembler.SharpmakeScriptsCSharpVersion);
 
-            // suppress assembly redirect warnings
-            // cf. https://github.com/dotnet/roslyn/issues/19640
+            // Suppress assembly redirect warnings: https://github.com/dotnet/roslyn/issues/19640
+            // Also suppress NuGet downgrade warnings, as this is not MsBuild that drive how Sharpmake load its assemblies.
             conf.Options.Add(
                 new Options.CSharp.SuppressWarning(
                     "CS1701",
-                    "CS1702"
+                    "CS1702",
+                    "NU1605"
                 )
             );
 

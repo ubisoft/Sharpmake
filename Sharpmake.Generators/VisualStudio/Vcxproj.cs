@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -359,7 +349,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             GenerateConfOptions(context);
 
-            var fileGenerator = new XmlFileGenerator();
+            var fileGenerator = new FileGenerator();
 
             // xml begin header
             using (fileGenerator.Declare("toolsVersion", context.DevelopmentEnvironmentsRange.MinDevEnv.GetVisualProjectToolsVersionString()))
@@ -788,12 +778,11 @@ namespace Sharpmake.Generators.VisualStudio
 
             // remove all line that contain RemoveLineTag
             fileGenerator.RemoveTaggedLines();
-            MemoryStream cleanMemoryStream = fileGenerator.ToMemoryStream();
 
             vcTargetsPathScopeVar.Dispose();
 
             FileInfo projectFileInfo = new FileInfo(context.ProjectPath + ProjectExtension);
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, cleanMemoryStream))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator))
                 generatedFiles.Add(projectFileInfo.FullName);
             else
                 skipFiles.Add(projectFileInfo.FullName);
@@ -1020,9 +1009,7 @@ namespace Sharpmake.Generators.VisualStudio
                 string projectDependenciesCopyLocal = firstConf.Project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences).ToString().ToLower();
 
                 Options.ExplicitOptions options = new Options.ExplicitOptions();
-                options["ReferenceOutputAssembly"] = FileGeneratorUtilities.RemoveLineTag;
                 options["CopyLocalSatelliteAssemblies"] = FileGeneratorUtilities.RemoveLineTag;
-                options["LinkLibraryDependencies"] = FileGeneratorUtilities.RemoveLineTag;
                 options["UseLibraryDependencyInputs"] = FileGeneratorUtilities.RemoveLineTag;
 
                 // The check for the blobbed is so we add references to blobed projects over non blobed projects.
@@ -1032,16 +1019,17 @@ namespace Sharpmake.Generators.VisualStudio
                 var privateDotNetDependenciesConf = context.ProjectConfigurations.Where(x => x.IsBlobbed).FirstOrDefault(x => x.DotNetPrivateDependencies.Count > 0) ??
                                                     context.ProjectConfigurations.FirstOrDefault(x => x.DotNetPrivateDependencies.Count > 0);
 
-                var dotNetDependenciesLists = new List<IEnumerable<Project.Configuration>>();
+                var dotNetDependenciesLists = new List<IEnumerable<DotNetDependency>>();
                 if (publicDotNetDependenciesConf != null)
-                    dotNetDependenciesLists.Add(publicDotNetDependenciesConf.DotNetPublicDependencies.Select(x => x.Configuration));
+                    dotNetDependenciesLists.Add(publicDotNetDependenciesConf.DotNetPublicDependencies);
                 if (privateDotNetDependenciesConf != null)
-                    dotNetDependenciesLists.Add(privateDotNetDependenciesConf.DotNetPrivateDependencies.Select(x => x.Configuration));
+                    dotNetDependenciesLists.Add(privateDotNetDependenciesConf.DotNetPrivateDependencies);
 
                 foreach (var dotNetDependencies in dotNetDependenciesLists)
                 {
-                    foreach (var dependency in dotNetDependencies)
+                    foreach (var dotNetDependency in dotNetDependencies)
                     {
+                        var dependency = dotNetDependency.Configuration;
                         // Don't add any Fastbuild deps to fastbuild projects, that's already handled
                         if (fastbuildOnly && dependency.IsFastBuild)
                             continue;
@@ -1058,16 +1046,14 @@ namespace Sharpmake.Generators.VisualStudio
                                 dependency.ProjectGuid = ReadGuidFromProjectFile(dependency);
                         }
 
+                        bool? linkLibraryDependencies = dotNetDependency.ReferenceOutputAssembly;
                         // avoid linking with .lib from a dependency that doesn't create a lib
-                        if (dependency.Output == Project.Configuration.OutputType.DotNetClassLibrary &&
-                           !dependency.CppCliExportsNativeLib)
+                        if (dependency.Output == Project.Configuration.OutputType.DotNetClassLibrary && !dependency.CppCliExportsNativeLib)
                         {
-                            options["LinkLibraryDependencies"] = "false";
+                            linkLibraryDependencies = false;
                         }
-                        else
-                        {
-                            options["LinkLibraryDependencies"] = FileGeneratorUtilities.RemoveLineTag;
-                        }
+                        options["ReferenceOutputAssembly"] = (dotNetDependency.ReferenceOutputAssembly == false) ? "false" : FileGeneratorUtilities.RemoveLineTag;
+                        options["LinkLibraryDependencies"] = (linkLibraryDependencies == false) ? "false" : FileGeneratorUtilities.RemoveLineTag;
 
                         using (projectFilesWriter.Declare("include", include))
                         using (projectFilesWriter.Declare("projectGUID", dependency.ProjectGuid ?? FileGeneratorUtilities.RemoveLineTag))
@@ -1156,11 +1142,10 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            var projectFilesText = projectFilesWriter.ToString();
-            if (!string.IsNullOrWhiteSpace(projectFilesText))
+            if (!projectFilesWriter.IsEmpty())
             {
                 fileGenerator.Write(Template.Project.ProjectFilesBegin);
-                fileGenerator.Write(projectFilesText);
+                projectFilesWriter.WriteTo(fileGenerator);
                 fileGenerator.Write(Template.Project.ProjectFilesEnd);
             }
 
@@ -1363,7 +1348,7 @@ namespace Sharpmake.Generators.VisualStudio
             // Write the project file
             FileInfo projectFiltersFileInfo = new FileInfo(filtersFileName);
 
-            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFiltersFileInfo, fileGenerator.ToMemoryStream()))
+            if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFiltersFileInfo, fileGenerator))
                 generatedFiles.Add(projectFiltersFileInfo.FullName);
             else
                 skipFiles.Add(projectFiltersFileInfo.FullName);
@@ -2057,7 +2042,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 FileInfo copyDependenciesFileInfo = new FileInfo(copyDependenciesFileName);
 
-                if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), copyDependenciesFileInfo, dependenciesFileGenerator.ToMemoryStream()))
+                if (context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), copyDependenciesFileInfo, dependenciesFileGenerator))
                     generatedFiles.Add(copyDependenciesFileInfo.FullName);
                 else
                     skipFiles.Add(copyDependenciesFileInfo.FullName);
