@@ -69,11 +69,6 @@ namespace Sharpmake
                 }
             }
 
-            private string GetConditionParameter()
-            {
-                return string.IsNullOrWhiteSpace(Condition) ? string.Empty : $"Condition=\"{Condition}\"";
-            }
-
             public int CompareTo(PackageReference other)
             {
                 if (ReferenceEquals(this, other))
@@ -145,6 +140,11 @@ namespace Sharpmake
                 {
                     yield return "buildTransitive";
                 }
+            }
+
+            private string GetConditionParameter()
+            {
+                return string.IsNullOrWhiteSpace(Condition) ? string.Empty : $"Condition=\"{Condition}\"";
             }
         }
 
