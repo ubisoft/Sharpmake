@@ -74,7 +74,7 @@ namespace Sharpmake.UnitTests
                 CheckForPackageCondition("NUnit", "$(Configuration)='Release'");
                 CheckForPackageCondition("NUnit-debug", "$(Configuration)='Debug'");
 
-                void CheckForPackageCondition( string packageName, string expectedCondition )
+                void CheckForPackageCondition(string packageName, string expectedCondition)
                 {
                     Assert.AreEqual(
                         configuration.ReferencesByNuGetPackage.SortedValues

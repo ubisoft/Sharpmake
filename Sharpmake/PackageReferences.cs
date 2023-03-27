@@ -18,7 +18,7 @@ namespace Sharpmake
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType, string condition )
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType, string condition)
             {
                 Name = name;
                 Version = version;
@@ -29,7 +29,7 @@ namespace Sharpmake
             }
 
             internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets)
-                : this(name, version, dotNetHint, privateAssets, null, null )
+                : this(name, version, dotNetHint, privateAssets, null, null)
             {
             }
 
@@ -150,7 +150,7 @@ namespace Sharpmake
 
         private readonly UniqueList<PackageReference> _packageReferences = new UniqueList<PackageReference>();
 
-        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null, string condition = null )
+        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null, string condition = null)
         {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
@@ -172,7 +172,7 @@ namespace Sharpmake
                 Builder.Instance.LogWarningLine($"Package {packageName} was added twice with different private assets. Kept assets are {string.Join(",", PackageReference.GetFormatedAssetsDependency(existingPackage.PrivateAssets))}.");
             }
 
-            if ( !string.Equals( condition, existingPackage.Condition, StringComparison.Ordinal ))
+            if (!string.Equals(condition, existingPackage.Condition, StringComparison.Ordinal))
             {
                 existingPackage.Condition = condition;
                 Builder.Instance.LogWarningLine(
