@@ -2,6 +2,8 @@
 name: build
 on:
   push:
+    branches:
+      - '**'
   pull_request:
   schedule:
     # Run at 02:17 every day
