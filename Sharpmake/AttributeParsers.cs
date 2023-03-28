@@ -44,7 +44,7 @@ namespace Sharpmake
         }
         public override void ParseParameter(string[] parameters, FileInfo sourceFilePath, int lineNumber, IAssemblerContext context)
         {
-            string includeFilename = parameters[0];
+            string includeFilename = Environment.ExpandEnvironmentVariables(parameters[0]);
             IncludeType matchType = IncludeType.Relative;
             if (parameters.Length > 1)
             {
