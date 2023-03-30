@@ -144,7 +144,7 @@ namespace Sharpmake
 
             private string GetConditionParameter()
             {
-                return string.IsNullOrWhiteSpace(Condition) ? string.Empty : $"Condition=\"{Condition}\"";
+                return string.IsNullOrWhiteSpace(Condition) ? string.Empty : $" Condition=\"{Condition}\"";
             }
         }
 
