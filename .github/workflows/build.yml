@@ -37,6 +37,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Requirement for GitVersion.
+      # This step ensure current commit exists on a branch.
+      # Its not the case when a workflow is triggered by a pull request coming from a fork.
+      # These commits only exists in a ref that isn't associated to any branch.
+      - name: Create branch on pull request from fork
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork
+        run: git checkout -b ${{ github.ref_name }}
+
       - name: Build Sharpmake ${{ inputs.configuration }} ${{ inputs.os }}
         shell: pwsh
         run: |
