@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -405,6 +395,12 @@ namespace Sharpmake.Generators.VisualStudio
             else if (string.IsNullOrEmpty(context.Options["AdditionalOptions"]))
             {
                 context.Options["AdditionalOptions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            if (useClangCl && context.Options["AdditionalOptions"] != FileGeneratorUtilities.RemoveLineTag)
+            {
+                // need to use a special syntax when compiler is clang or Visual Studio will generate intellisense errors
+                context.Options["AdditionalOptions"] = context.Options["AdditionalOptions"].Replace("/std:c++", "/Clangstdc++");
             }
 
             // Compiler section
@@ -1128,10 +1124,12 @@ namespace Sharpmake.Generators.VisualStudio
                 context.Configuration.AdditionalCompilerOptions.Add("-nostdinc");
             }
 
+            List<string> optionResults = new List<string>();
             // Options.Vc.Compiler.AdditionalOptions
             foreach (Tuple<OrderableStrings, string> optionsTuple in new[]
                     {
                         Tuple.Create(context.Configuration.AdditionalCompilerOptions, "AdditionalCompilerOptions"),
+                        Tuple.Create(context.Configuration.AdditionalCompilerOptimizeOptions, "AdditionalCompilerOptimizeOptions"),
                         Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHCreate, "AdditionalCompilerOptionsOnPCHCreate"),
                         Tuple.Create(context.Configuration.AdditionalCompilerOptionsOnPCHUse, "AdditionalCompilerOptionsOnPCHUse")
                     })
@@ -1142,12 +1140,26 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     optionsStrings.Sort();
                     string additionalCompilerOptions = optionsStrings.JoinStrings(" ");
+                    optionResults.Add(additionalCompilerOptions);
                     context.Options[optionsKey] = additionalCompilerOptions;
                 }
                 else
                 {
+                    optionResults.Add(FileGeneratorUtilities.RemoveLineTag);
                     context.Options[optionsKey] = FileGeneratorUtilities.RemoveLineTag;
                 }
+            }
+
+            // We need to merge together AdditionalCompilerOptions and AdditionalCompilerOptimizeOptions for writing them on a single line in vcxproj files.
+            string[] allAdditionalOptions = new string[] { optionResults[0], optionResults[1] };
+            var nonEmptyOptions = allAdditionalOptions.Where(a => a != FileGeneratorUtilities.RemoveLineTag);
+            if (nonEmptyOptions.Any())
+            {
+                context.Options["AllAdditionalCompilerOptions"] = string.Join(" ", nonEmptyOptions);
+            }
+            else
+            {
+                context.Options["AllAdditionalCompilerOptions"] = FileGeneratorUtilities.RemoveLineTag;
             }
 
             optionsContext.HasClrSupport = clrSupport;
@@ -1299,7 +1311,7 @@ namespace Sharpmake.Generators.VisualStudio
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                case Project.Configuration.OutputType.IosApp:
+                case Project.Configuration.OutputType.AppleApp:
                 case Project.Configuration.OutputType.IosTestBundle:
                     context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullNameWithExtension;
                     if (context.Configuration.Output == Project.Configuration.OutputType.Dll)

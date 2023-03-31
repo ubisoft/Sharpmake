@@ -53,6 +53,7 @@ namespace HelloClangCl
                     "[conf.TargetPath]"
                 )
             );
+            conf.EventPostBuild.Add($@"echo dll linked > {outputFileName}");
 
             conf.AddPrivateDependency<StaticLib1Project>(target);
         }

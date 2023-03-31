@@ -1,4 +1,4 @@
-# Sharpmake
+# <img src="/docs/sharpmake_logo.svg" width="32" height="32"> Sharpmake
 
 ![build](https://github.com/ubisoft/Sharpmake/workflows/build/badge.svg)
 
@@ -39,12 +39,11 @@ The best place for the Sharpmake documentation is the
 source code also comes with samples that you can study.
 
 
-## Building Sharpmake
-Building Sharpmake is quite straightforward. Clone the repo on GitHub, run the 
-"bootstrap" script (".bat" for Windows, ".sh" for Unix platforms), open the
-solution in Visual Studio and build the solution in *Release*. The binaries
-will be found in the *tmp/bin/release* directory.
-
+## Building and running Sharpmake
+Building and running Sharpmake is quite straightforward:
+- Clone the Git repository
+- Open the `Sharpmake.sln` solution located in the root folder
+- Hit the run button (by default it will run the first sample)
 
 ## More Platforms
 Sharpmake originally had support for game consoles, but Ubisoft pulled it out
@@ -58,7 +57,7 @@ can contact the SDK provider to get platform extension for Sharpmake.
 ## Contributing
 
 ### Tests
-We will only accept merge requests that pass every tests. The unit tests are
+We will only accept merge requests that pass all tests. The unit tests are
 written with NUnit and the regression tests are ran by comparing the samples'
 output with a reference output. You can run the *regression_tests.py* script
 after having built the solution in Visual Studio to run the regression tests.

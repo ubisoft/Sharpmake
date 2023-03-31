@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2021-2022 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 namespace Sharpmake
 {
     public static partial class Android
@@ -61,6 +51,8 @@ namespace Sharpmake
     <CppLanguageStandard>[options.CppLanguageStandard]</CppLanguageStandard>
     <CLanguageStandard>[options.CLanguageStandard]</CLanguageStandard>
     <AndroidApkLocation>[options.AndroidApkLocation]</AndroidApkLocation>
+    <AndroidPreApkInstallCommands>[options.AndroidPreApkInstallCommands]</AndroidPreApkInstallCommands>
+    <AndroidPostApkInstallCommands>[options.AndroidPostApkInstallCommands]</AndroidPostApkInstallCommands>
   </PropertyGroup>
 ";
 
@@ -120,7 +112,7 @@ namespace Sharpmake
       <AssemblerOutput>NoListing</AssemblerOutput>
       <CompileAs>Default</CompileAs>
       <UndefinePreprocessorDefinitions>[options.UndefinePreprocessorDefinitions]</UndefinePreprocessorDefinitions>
-      <AdditionalOptions>[options.AdditionalCompilerOptions]</AdditionalOptions>
+      <AdditionalOptions>[options.AllAdditionalCompilerOptions]</AdditionalOptions>
       <PrecompiledHeaderFile>[options.PrecompiledHeaderThrough]</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFileDirectory>[options.PrecompiledHeaderOutputFileDirectory]</PrecompiledHeaderOutputFileDirectory>
       <ShowIncludes>[options.ShowIncludes]</ShowIncludes>

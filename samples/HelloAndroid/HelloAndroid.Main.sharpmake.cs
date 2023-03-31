@@ -21,8 +21,6 @@ using System.Threading.Tasks;
 using Sharpmake;
 using Sharpmake.Generators.FastBuild;
 
-[module: Sharpmake.DebugProjectName("Sharpmake.HelloAndroid")]
-
 [module: Sharpmake.Include("HelloAndroid.*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*.sharpmake.cs")]
 [module: Sharpmake.Include("codebase/*/*.sharpmake.cs")]

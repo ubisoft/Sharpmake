@@ -44,7 +44,7 @@ namespace HelloAndroidAgde
                 {
                     using (StreamWriter sw = File.AppendText(gradlePropertiesFile))
                     {
-                        sw.WriteLine(string.Format("ndkRoot={0}", Android.GlobalSettings.NdkRoot.Replace("\\","/")));
+                        sw.WriteLine(string.Format("ndkRoot={0}", Android.GlobalSettings.NdkRoot.Replace("\\", "/")));
                     }
                 }
             }

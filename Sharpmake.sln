@@ -1,0 +1,97 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F98B3B09-EDAA-14FB-0685-514AECA28A85}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4A7E7701-4698-A5FE-F3FC-C8FE40D44680}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\actions.yml = .github\workflows\actions.yml
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".gitlab", ".gitlab", "{21B357A8-2C1D-4949-A63A-88D7DB6A41B0}"
+	ProjectSection(SolutionItems) = preProject
+		.gitlab\.gitlab-ci.yml = .gitlab\.gitlab-ci.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99BFE406-6992-49E9-BE2A-2DF7560C9167}"
+	ProjectSection(SolutionItems) = preProject
+		Compile.ps1 = Compile.ps1
+		extract-vcpkg.ps1 = extract-vcpkg.ps1
+		functional_test.py = functional_test.py
+		regression_test.py = regression_test.py
+		RunSharpmake.ps1 = RunSharpmake.ps1
+		RunTest.ps1 = RunTest.ps1
+		UpdateSamplesOutput.bat = UpdateSamplesOutput.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.Application", "Sharpmake.Application\Sharpmake.Application.csproj", "{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "samples\Samples.csproj", "{60452228-D411-4461-91D7-0894482D940C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake", "Sharpmake\Sharpmake.csproj", "{15F793C7-9E88-64A9-591C-7244FCC6B771}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.CommonPlatforms", "Sharpmake.Platforms\Sharpmake.CommonPlatforms\Sharpmake.CommonPlatforms.csproj", "{3B476462-28E6-4640-4257-7942657699ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.FunctionalTests", "Sharpmake.FunctionalTests\Sharpmake.FunctionalTests.csproj", "{E659DEAC-D040-459F-9E6C-E694AF802DBC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.Generators", "Sharpmake.Generators\Sharpmake.Generators.csproj", "{844F66DE-B015-340E-720A-8E158B517E93}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpmake.UnitTests", "Sharpmake.UnitTests\Sharpmake.UnitTests.csproj", "{3776B212-14C5-4038-9B97-2AACB2D10987}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60452228-D411-4461-91D7-0894482D940C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60452228-D411-4461-91D7-0894482D940C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60452228-D411-4461-91D7-0894482D940C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60452228-D411-4461-91D7-0894482D940C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15F793C7-9E88-64A9-591C-7244FCC6B771}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15F793C7-9E88-64A9-591C-7244FCC6B771}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15F793C7-9E88-64A9-591C-7244FCC6B771}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15F793C7-9E88-64A9-591C-7244FCC6B771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37CF3EE3-AFD3-3CC8-8F8E-B423292D491F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B476462-28E6-4640-4257-7942657699ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B476462-28E6-4640-4257-7942657699ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B476462-28E6-4640-4257-7942657699ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B476462-28E6-4640-4257-7942657699ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E659DEAC-D040-459F-9E6C-E694AF802DBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E659DEAC-D040-459F-9E6C-E694AF802DBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E659DEAC-D040-459F-9E6C-E694AF802DBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E659DEAC-D040-459F-9E6C-E694AF802DBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{844F66DE-B015-340E-720A-8E158B517E93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{844F66DE-B015-340E-720A-8E158B517E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{844F66DE-B015-340E-720A-8E158B517E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{844F66DE-B015-340E-720A-8E158B517E93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3776B212-14C5-4038-9B97-2AACB2D10987}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3776B212-14C5-4038-9B97-2AACB2D10987}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3776B212-14C5-4038-9B97-2AACB2D10987}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3776B212-14C5-4038-9B97-2AACB2D10987}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4A7E7701-4698-A5FE-F3FC-C8FE40D44680} = {F98B3B09-EDAA-14FB-0685-514AECA28A85}
+		{21B357A8-2C1D-4949-A63A-88D7DB6A41B0} = {F98B3B09-EDAA-14FB-0685-514AECA28A85}
+		{99BFE406-6992-49E9-BE2A-2DF7560C9167} = {F98B3B09-EDAA-14FB-0685-514AECA28A85}
+		{3B476462-28E6-4640-4257-7942657699ED} = {6CA349ED-D54F-E547-E2AC-E11BEF4F21CF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {68C27E5E-535C-4A07-8678-B1BDB3631936}
+	EndGlobalSection
+EndGlobal

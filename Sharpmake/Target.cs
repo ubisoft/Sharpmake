@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -50,8 +40,14 @@ namespace Sharpmake
         vs2022 = 1 << 6,
 
         /// <summary>
-        /// iOS project with Xcode.
+        /// Xcode projects
         /// </summary>
+        xcode = 1 << 7,
+
+        /// <summary>
+        /// iOS project with Xcode [deprecated]
+        /// </summary>
+        [Obsolete("xcode4ios has been deprecated, please use 'xcode'", error: true)]
         xcode4ios = 1 << 7,
 
         /// <summary>
@@ -93,10 +89,26 @@ namespace Sharpmake
         android = 1 << 8,
         linux = 1 << 9,
         mac = 1 << 10,
+
         /// <summary>
         /// Android Game Development Extension
         /// </summary>
         agde = 1 << 11,
+
+        /// <summary>
+        /// AppleTV
+        /// </summary>
+        tvos = 1 << 12,
+
+        /// <summary>
+        /// Apple Watch
+        /// </summary>
+        watchos = 1 << 13,
+
+        /// <summary>
+        /// macOS Catalyst
+        /// </summary>
+        maccatalyst = 1 << 14,
 
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
@@ -286,6 +298,9 @@ namespace Sharpmake
 
         public string GetTargetString()
         {
+            if (_valueCache != null)
+                return _valueCache;
+
             FieldInfo[] fieldInfos = GetFragmentFieldInfo();
 
             var fieldInfoValues = fieldInfos.Select(f => f.GetValue(this));
@@ -303,6 +318,7 @@ namespace Sharpmake
                     return value.ToString();
                 }))
             );
+            _valueCache = result;
             return result;
         }
 
@@ -382,7 +398,9 @@ namespace Sharpmake
             if (other._valueCache == null)
                 other._valueCache = other.GetTargetString();
 
-            return _valueCache == other._valueCache;
+            if (_valueCache == other._valueCache)
+                return true;
+            return string.Compare(_valueCache, other._valueCache, StringComparison.Ordinal) == 0;
         }
 
         //possible to override this to make the associations with custom platforms and Sharpmake's
@@ -614,8 +632,16 @@ namespace Sharpmake
             return false;
         }
 
+        private static ConcurrentDictionary<Type, bool> _verifiedTargetTypes = new ConcurrentDictionary<Type, bool>();
+
         internal void Initialize(Type targetType)
         {
+            if (_verifiedTargetTypes.ContainsKey(targetType))
+            {
+                TargetType = targetType;
+                return; // Type already validated.
+            }
+
             if (targetType == null)
                 throw new InternalError();
 
@@ -702,6 +728,9 @@ namespace Sharpmake
                 throw new Error("Mandatory fragment type \"{0}\" not found in target type \"{1}\" (fields also must be public)", typeof(DevEnv).ToString(), targetType);
             if (!fragmentsType.Contains(typeof(Platform)))
                 throw new Error("Mandatory fragment type \"{0}\" not found in target type \"{1}\" (fields also must be public)", typeof(Platform).ToString(), targetType);
+
+            // Mark this type as validated successfully.
+            _verifiedTargetTypes.TryAdd(targetType, true);
         }
 
         internal void AddTargets(string callerInfo, params ITarget[] targetsMask)

@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,21 +14,25 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-#if NETFRAMEWORK
-using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net472;
-#else
+#if NET5_0
 using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net50;
+#elif NET6_0
+using BasicReferenceAssemblies = Basic.Reference.Assemblies.Net60;
+#else
+#error unhandled framework version
 #endif
 
 namespace Sharpmake
 {
     public class Assembler
     {
-        public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp7;
-#if NETFRAMEWORK
-        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.v4_7_2;
-#else
+        public const Options.CSharp.LanguageVersion SharpmakeScriptsCSharpVersion = Options.CSharp.LanguageVersion.CSharp10;
+#if NET5_0
         public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net5_0;
+#elif NET6_0
+        public const DotNetFramework SharpmakeDotNetFramework = DotNetFramework.net6_0;
+#else
+#error unhandled framework version
 #endif
 
         /// <summary>

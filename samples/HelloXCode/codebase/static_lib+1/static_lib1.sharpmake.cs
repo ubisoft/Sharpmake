@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Ubisoft Entertainment
+﻿// Copyright (c) 2022 Ubisoft Entertainment
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ namespace HelloXCode
                 default:
                     throw new Error("Unexpected optimization " + target.Optimization);
             }
+
+            conf.Options.Add(new Options.XCode.Compiler.SystemFrameworks("CoreFoundation"));
         }
     }
 }

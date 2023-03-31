@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldExe", "..\..\HelloWorldMultiframeworks\HelloWorldExe.vs2022.csproj", "{03E8EE16-1CA3-7ED7-8D3A-8631F2FADA85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldLib", "..\..\HelloWorldLib\HelloWorldLib.vs2022.csproj", "{854A5E48-AA9B-C244-2088-0C41CB5AB42B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03E8EE16-1CA3-7ED7-8D3A-8631F2FADA85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03E8EE16-1CA3-7ED7-8D3A-8631F2FADA85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03E8EE16-1CA3-7ED7-8D3A-8631F2FADA85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03E8EE16-1CA3-7ED7-8D3A-8631F2FADA85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{854A5E48-AA9B-C244-2088-0C41CB5AB42B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{854A5E48-AA9B-C244-2088-0C41CB5AB42B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{854A5E48-AA9B-C244-2088-0C41CB5AB42B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{854A5E48-AA9B-C244-2088-0C41CB5AB42B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

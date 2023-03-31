@@ -46,7 +46,7 @@ namespace HelloClangCl
         public virtual void ConfigureAll(Configuration conf, CommonTarget target)
         {
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
-            if (target.DevEnv != DevEnv.xcode4ios)
+            if (target.DevEnv != DevEnv.xcode)
                 conf.ProjectFileName += "_[target.DevEnv]";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]");
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
@@ -57,10 +57,6 @@ namespace HelloClangCl
             // Note: uncomment the following line if we port this sample to windows
             //conf.TargetLibraryPath = conf.IntermediatePath; // .lib files must be with the .obj files when running in fastbuild distributed mode or we'll have missing symbols due to merging of the .pdb
             conf.TargetLibraryPath = Path.Combine(Globals.TmpDirectory, @"lib\[target.DirectoryName]\[project.Name]");
-
-            conf.TargetFileName += "_" + target.Optimization.ToString().ToLowerInvariant().First(); // suffix with lowered first letter of optim
-            if (conf.IsFastBuild)
-                conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
 

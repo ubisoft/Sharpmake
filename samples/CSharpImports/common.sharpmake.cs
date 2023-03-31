@@ -14,7 +14,7 @@
 
 using Sharpmake;
 
-namespace Common
+namespace CSharpImports
 {
     public class Common
     {

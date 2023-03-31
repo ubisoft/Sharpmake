@@ -1,16 +1,6 @@
-// Copyright (c) 2017-2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -250,6 +240,7 @@ namespace Sharpmake.Generators.FastBuild
             // Start writing Bff
             Resolver resolver = new Resolver();
             var bffGenerator = new FileGenerator(resolver);
+            var bffGeneratorProject = new FileGenerator(resolver);
             var bffWholeFileGenerator = new FileGenerator(resolver);
 
             using (bffWholeFileGenerator.Declare("fastBuildProjectName", projectName))
@@ -1377,6 +1368,8 @@ namespace Sharpmake.Generators.FastBuild
                     }
                 }
 
+                bffGenerator.WriteTo(bffGeneratorProject);
+                bffGenerator.Clear();
                 ++configIndex;
             }
 
@@ -1413,16 +1406,15 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             // Now combine all the streams.
-            bffWholeFileGenerator.Write(bffGenerator.ToString());
+            bffGeneratorProject.WriteTo(bffWholeFileGenerator);
 
             // remove all line that contain RemoveLineTag
             bffWholeFileGenerator.RemoveTaggedLines();
-            MemoryStream bffCleanMemoryStream = bffWholeFileGenerator.ToMemoryStream();
 
             // Write bff file
             FileInfo bffFileInfo = new FileInfo(projectBffFile);
 
-            if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffCleanMemoryStream))
+            if (builder.Context.WriteGeneratedFile(project.GetType(), bffFileInfo, bffWholeFileGenerator))
             {
                 Project.IncrementFastBuildGeneratedFileCount();
                 generatedFiles.Add(bffFileInfo.FullName);

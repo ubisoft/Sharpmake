@@ -1,16 +1,6 @@
-﻿// Copyright (c) 2022 Ubisoft Entertainment
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
+
 using System;
 using System.IO;
 using System.Text;
@@ -36,7 +26,7 @@ namespace Sharpmake
         /// </summary>
         protected readonly string ManifestPath;
 
-        private CargoBuildStep cargoBuildStep;
+        private CargoBuildStep _cargoBuildStep;
 
         /// <summary>
         /// Constructs a Rust project.
@@ -91,8 +81,8 @@ namespace Sharpmake
                     throw new ArgumentException(String.Format("Unknown library extension for platform: {0}", target.Platform));
             }
 
-            cargoBuildStep = new CargoBuildStep(target, CargoTargetDir, ManifestPath, libName);
-            conf.CustomFileBuildSteps.Add(cargoBuildStep);
+            _cargoBuildStep = new CargoBuildStep(target, CargoTargetDir, ManifestPath, libName);
+            conf.CustomFileBuildSteps.Add(_cargoBuildStep);
 
             conf.TargetCopyFiles.Add(Path.Combine(CargoTargetDir, "[target.Optimization]", libName));
         }
@@ -102,7 +92,7 @@ namespace Sharpmake
             base.PostResolve();
 
             // Add Rust source files as dependency
-            cargoBuildStep.AdditionalInputs.AddRange(ResolvedSourceFiles);
+            _cargoBuildStep.AdditionalInputs.AddRange(ResolvedSourceFiles);
         }
 
         public class CargoBuildStep : Configuration.CustomFileBuildStep

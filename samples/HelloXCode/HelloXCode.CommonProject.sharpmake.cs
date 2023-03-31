@@ -48,7 +48,7 @@ namespace HelloXCode
             conf.IncludePaths.Add(Globals.ExternalDirectory);
 
             conf.ProjectFileName = "[project.Name]_[target.Platform]";
-            if (target.DevEnv != DevEnv.xcode4ios)
+            if (target.DevEnv != DevEnv.xcode)
                 conf.ProjectFileName += "_[target.DevEnv]";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, @"projects\[project.Name]");
             conf.IsFastBuild = target.BuildSystem == BuildSystem.FastBuild;
