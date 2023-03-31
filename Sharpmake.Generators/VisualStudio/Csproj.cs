@@ -1287,7 +1287,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("NugetRestoreProjectStyleString", restoreProjectStyleString))
             using (resolver.NewScopedParameter("GenerateDocumentationFile", project.GenerateDocumentationFile ? "true" : RemoveLineTag))
             {
-                Write(Template.Project.ProjectDescription, writer, resolver);
+                Write(Template.Project.ProjectDescription, writer, resolver);  
             }
 
             if (!string.IsNullOrEmpty(project.ApplicationIcon))
@@ -3571,6 +3571,21 @@ namespace Sharpmake.Generators.VisualStudio
             defines.AddRange(conf.Defines);
 
             options["PreprocessorDefinitions"] = defines.JoinStrings(";").Replace(@"""", @"\&quot;");
+
+            // VS2022
+            {
+                HashSet<string> platorms = new HashSet<string>();
+                HashSet<string> configu = new HashSet<string>();
+
+                foreach (Project.Configuration config in _projectConfigurationList)
+                {
+                    platorms.Add(Util.GetPlatformString(config.Platform, config.Project, config.Target));
+                    configu.Add(config.Name);
+                }
+
+                options["Platforms"] = platorms.Count > 0 ? string.Join(";", platorms) : RemoveLineTag;
+                options["Configurations"] = configu.Count > 0 ? string.Join(";", configu) : RemoveLineTag;
+            }
 
             return options;
         }
