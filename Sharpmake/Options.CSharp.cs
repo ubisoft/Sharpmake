@@ -207,6 +207,13 @@ namespace Sharpmake
                 [Default]
                 Disabled
             }
+            public enum PublishAot
+            {
+                Enabled,
+                [Default]
+                Disabled
+            }
+
 
             public class UpdateInterval : IntOption
             {

@@ -3598,6 +3598,12 @@ namespace Sharpmake.Generators.VisualStudio
             );
 
             SelectOption
+           (
+               Options.Option(Options.CSharp.PublishAot.Enabled, () => { options["PublishAot"] = "true"; }),
+               Options.Option(Options.CSharp.PublishAot.Disabled, () => { options["PublishAot"] = RemoveLineTag; })
+           );
+
+            SelectOption
             (
                 Options.Option(Options.CSharp.UseWindowsForms.Enabled, () => { options["UseWindowsForms"] = "true"; }),
                 Options.Option(Options.CSharp.UseWindowsForms.Disabled, () => { options["UseWindowsForms"] = RemoveLineTag; })

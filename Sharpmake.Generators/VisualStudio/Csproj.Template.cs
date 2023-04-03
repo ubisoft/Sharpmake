@@ -111,6 +111,7 @@ namespace Sharpmake.Generators.VisualStudio
     <UseWpf>[options.UseWpf]</UseWpf>
     <UseWindowsForms>[options.UseWindowsForms]</UseWindowsForms>
     <Nullable>[options.Nullable]</Nullable>
+    <PublishAot>[options.PublishAot]</PublishAot>
   </PropertyGroup>
 ";
 
