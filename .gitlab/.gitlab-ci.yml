@@ -11,6 +11,13 @@ default:
   tags:
   - square_windows
 
+# Install .NET SDK version compatible with GitInfo.
+# Workaround until .NET SDK installed on square_windows is updated.
+.dotnet_sdk_workaround:
+  before_script:
+    - pwsh -Command { Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1 -MaximumRetryCount 3 }
+    - .\dotnet-install.ps1 -Version 6.0.408
+
 #############
 # Stage Build: compile sharpmake solution on all targets, keep the binaries for further steps.
 
@@ -30,7 +37,9 @@ default:
     expire_in: 1 day
 
 compilation:windows:
-  extends: .compilation:base
+  extends:
+    - .compilation:base
+    - .dotnet_sdk_workaround
 
 compilation:mac:
   extends: .compilation:base
@@ -45,6 +54,7 @@ compilation:linux:
 # Unit tests
 #############
 .unit_test:base:
+  extends: .dotnet_sdk_workaround
   stage: test
   parallel:
     matrix:
