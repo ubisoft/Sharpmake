@@ -31,7 +31,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- GitVersion -->
+    <GitVersion_NoFetchEnabled >true</GitVersion_NoFetchEnabled >
     <GitVersion_NoNormalizeEnabled>true</GitVersion_NoNormalizeEnabled>
+    <GitVersion_CommandLineArguments>-output json -output buildserver</GitVersion_CommandLineArguments>
   </PropertyGroup>
 
   <ItemGroup>
