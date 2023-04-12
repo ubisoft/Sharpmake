@@ -31,7 +31,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- GitVersion -->
-    <GitVersion_NoNormalizeEnabled>true</GitVersion_NoNormalizeEnabled>
+    <GitVersion_NoFetchEnabled >true</GitVersion_NoFetchEnabled >
+    <GitVersion_NoNormalizeEnabled>false</GitVersion_NoNormalizeEnabled>
+    <GitVersion_CommandLineArguments Condition="$(ContinuousIntegrationBuild) == 'true'">-output buildserver</GitVersion_CommandLineArguments>
   </PropertyGroup>
 
   <ItemGroup>
