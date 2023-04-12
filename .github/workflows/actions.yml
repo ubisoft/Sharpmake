@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v3.5.1
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         uses: actions/download-artifact@v3
@@ -62,7 +62,7 @@ jobs:
         configuration: [debug, release]
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v3.5.1
 
       # Setting a VS_VERSION_SUFFIX variable for use by steps that are using solutions specific to VS2019 or VS2022
       - name: SetVSVersionSuffix-VS2019
