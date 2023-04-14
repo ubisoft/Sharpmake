@@ -39,7 +39,7 @@ compilation:mac:
 compilation:linux:
   extends: .compilation:base
   tags: [square-linux-k8s-compil]
-  image: quay.ubisoft.com/tgruntime/tg-ubuntu-cpp:0.6.2-sharpmake
+  image: mcr.microsoft.com/dotnet/sdk:6.0
 
 #############
 # Unit tests
