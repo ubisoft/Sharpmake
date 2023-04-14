@@ -267,6 +267,26 @@ namespace Sharpmake.UnitTests
 
             Assert.That(assemblerContext.Sources.Count, Is.EqualTo(0));
         }
+
+        [Test]
+        public void SimpleIncludeWithEnvironmentVariable()
+        {
+            Environment.SetEnvironmentVariable("SIMPLE_INCLUDE_ENV_VAR", "someotherproject");
+
+            const string sharpmakeIncludedFile = "someotherproject.sharpmake.cs";
+            string sharpmakeIncludeFullPath = Path.Combine(_fakeFileInfo.DirectoryName, sharpmakeIncludedFile);
+
+            Util.AddNewFakeFile(sharpmakeIncludedFile, 0);
+
+            string line = $@"[module: Sharpmake.Include(""%SIMPLE_INCLUDE_ENV_VAR%.sharpmake.cs"")]";
+
+            var assemblerContext = new AssemblerContext();
+            new Assembler().ParseSourceAttributesFromLine(line, _fakeFileInfo, _fakeFileLine, assemblerContext);
+
+            Assert.That(assemblerContext.Sources.Count, Is.EqualTo(1));
+            StringAssert.AreEqualIgnoringCase(sharpmakeIncludeFullPath, assemblerContext.Sources.First());
+        }
+
         #endregion
 
         #region Reference
