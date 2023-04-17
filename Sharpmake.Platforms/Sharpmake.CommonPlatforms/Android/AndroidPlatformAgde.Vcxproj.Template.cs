@@ -20,25 +20,6 @@ namespace Sharpmake
     <PlatformToolset>Clang</PlatformToolset>
 ";
 
-            private const string _projectPropertySheets =
-@"  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-arm64-v8a'"" Label=""PropertySheets"">
-    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-arm64-v8a\Platform.default.props"" />
-    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-arm64-v8a\PlatformToolsets\Clang\Toolset.props"" />
-  </ImportGroup>
-  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-armeabi-v7a'"" Label=""PropertySheets"">
-    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-armeabi-v7a\Platform.default.props"" />
-    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-armeabi-v7a\PlatformToolsets\Clang\Toolset.props"" />
-  </ImportGroup>
-  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-x86'"" Label=""PropertySheets"">
-    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-x86\Platform.default.props"" />
-    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-x86\PlatformToolsets\Clang\Toolset.props"" />
-  </ImportGroup>
-  <ImportGroup Condition=""'$(Configuration)|$(Platform)'=='Debug|Android-x86_64'"" Label=""PropertySheets"">
-    <Import Project = ""$(AdditionalVCTargetsPath)Platforms\Android-x86_64\Platform.default.props"" />
-    <Import Project=""$(AdditionalVCTargetsPath)Platforms\Android-x86_64\PlatformToolsets\Clang\Toolset.props"" />
-  </ImportGroup>
-";
-
             private const string _projectConfigurationsGeneralTemplate =
 @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"" Label=""Configuration"">
     <ConfigurationType>[options.ConfigurationType]</ConfigurationType>

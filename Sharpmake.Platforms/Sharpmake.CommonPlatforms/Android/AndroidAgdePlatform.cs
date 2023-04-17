@@ -171,19 +171,6 @@ namespace Sharpmake
                 generator.Write(Vcxproj.Template.Project.ProjectDescriptionEnd);
             }
 
-            public override void GenerateProjectPlatformSdkDirectoryDescription(IVcxprojGenerationContext context, IFileGenerator generator)
-            {
-                base.GenerateProjectPlatformSdkDirectoryDescription(context, generator);
-
-                var devEnv = context.DevelopmentEnvironmentsRange.MinDevEnv;
-                if (devEnv.IsVisualStudio() && devEnv >= DevEnv.vs2019)
-                {
-                    string additionalVCTargetsPath = MSBuildGlobalSettings.GetAdditionalVCTargetsPath(devEnv, Platform.agde);
-                    if (!string.IsNullOrEmpty(additionalVCTargetsPath))
-                        generator.WriteVerbatim(_projectPropertySheets);
-                }
-            }
-
             public override void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
             {
                 generator.Write(_projectConfigurationsCompileTemplate);
