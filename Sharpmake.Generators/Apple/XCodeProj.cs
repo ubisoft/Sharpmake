@@ -140,8 +140,36 @@ namespace Sharpmake.Generators.Apple
             // Write the project file
             updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator);
 
+            OutputCustomProperties(context, projectFolder);
+
             string projectFileResult = projectFileInfo.FullName;
             return projectFileResult;
+        }
+
+        // export customproperties for xcode project
+        private void OutputCustomProperties(XCodeGenerationContext context, string projectFolder)
+        {
+            var project = context.Project;
+            if (project.CustomProperties.Any())
+            {
+                XNamespace xmlns = "http://schemas.microsoft.com/developer/msbuild/2003";
+                XElement customPropertiesProject = new XElement(xmlns + "Project");
+                XElement propertyGroup = new XElement(xmlns + "PropertyGroup");
+
+                customPropertiesProject.Add(propertyGroup);
+                foreach (var property in project.CustomProperties)
+                {
+                    propertyGroup.Add(new XElement(xmlns + property.Key, property.Value));
+                }
+
+                string xmlContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" + customPropertiesProject.ToString();
+                FileGenerator fileGenerator = new FileGenerator();
+                fileGenerator.WriteVerbatim(xmlContent);
+
+                string customPropertiesFile = Path.Combine(projectFolder, XCodeUtil.CustompropertiesFilename);
+                FileInfo customPropertiesFileInfo = new FileInfo(customPropertiesFile);
+                context.Builder.Context.WriteGeneratedFile(typeof(XDocument), customPropertiesFileInfo, fileGenerator);
+            }
         }
 
         private string GenerateProjectScheme(
