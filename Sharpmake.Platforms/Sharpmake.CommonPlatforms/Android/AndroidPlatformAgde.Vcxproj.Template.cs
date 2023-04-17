@@ -126,6 +126,7 @@ namespace Sharpmake
 @"    <Lib>
       <AdditionalOptions>[options.AdditionalLibrarianOptions]</AdditionalOptions>
       <OutputFile>[options.OutputFile]</OutputFile>
+      <NoWarnOnCreate>true</NoWarnOnCreate>
     </Lib>
 ";
         }
