@@ -10,6 +10,8 @@ namespace Sharpmake.Generators.Apple
 {
     public static class XCodeUtil
     {
+        public const string CustompropertiesFilename = "customproperties.xml";
+
         public static string XCodeFormatSingleItem(string item, bool forceQuotes = false)
         {
             if (forceQuotes || item.Contains(Util.DoubleQuotes) || item.Contains(' '))
