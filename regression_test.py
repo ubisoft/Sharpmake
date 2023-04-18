@@ -148,6 +148,7 @@ def launch_tests():
             Test("CSharpHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("HelloWorld", "HelloWorld.sharpmake.cs"),
             Test("HelloLinux", "HelloLinux.Main.sharpmake.cs"),
+            Test("HelloAssembly", "HelloAssembly.sharpmake.cs"),
             Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
             Test("CSharpWCF", "CSharpWCF.sharpmake.cs", project_root="codebase"),
             Test("CSharpImports", "CSharpImports.sharpmake.cs"),

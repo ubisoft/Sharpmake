@@ -8,6 +8,7 @@ namespace Sharpmake
         private const string _projectConfigurationsMasmTemplate =
             @"    <MASM>
       <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <IncludePaths>[options.AdditionalAssemblyIncludeDirectories]</IncludePaths>
     </MASM>
 ";
     }

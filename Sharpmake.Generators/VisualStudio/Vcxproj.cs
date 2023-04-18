@@ -803,6 +803,10 @@ namespace Sharpmake.Generators.VisualStudio
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);
             context.Options["AdditionalResourceIncludeDirectories"] = resourceIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, resourceIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
 
+            // Fill Assembly include dirs
+            var assemblyIncludePaths = platformVcxproj.GetAssemblyIncludePaths(context);
+            context.Options["AdditionalAssemblyIncludeDirectories"] = assemblyIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, assemblyIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+
             // Fill using dirs
             Strings additionalUsingDirectories = Options.GetStrings<Options.Vc.Compiler.AdditionalUsingDirectories>(context.Configuration);
             additionalUsingDirectories.AddRange(context.Configuration.AdditionalUsingDirectories);

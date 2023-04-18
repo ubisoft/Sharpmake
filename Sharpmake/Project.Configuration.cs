@@ -845,6 +845,14 @@ namespace Sharpmake
             #endregion
 
             /// <summary>
+            /// Include paths for Microsoft Macro Assembler compilation.
+            /// </summary>
+            /// <remarks>
+            /// The maximum number of these paths is 10.
+            /// </remarks>
+            public OrderableStrings AssemblyIncludePaths = new OrderableStrings();
+
+            /// <summary>
             /// Gets a list of compiler options to send when calling the compiler.
             /// </summary>
             /// <remarks>

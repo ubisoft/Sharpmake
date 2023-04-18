@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\codebase\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\codebase\hello_world.asm" />
+    <MASM Include="..\codebase\sub folder\utils.asm">
+      <Filter>sub folder</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sub folder">
+      <UniqueIdentifier>{35020117-99cd-fa2a-64e6-0f9208df45ab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
