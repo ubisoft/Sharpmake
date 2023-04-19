@@ -45,8 +45,11 @@ namespace Sharpmake
         {
             if (libFolderName == null)
             {
+                // Starting with LLVM 16, clangVersion only contains the major version (e.g. "15.0.7", "16" ...)
+                int majorVersion = int.Parse(clangVersion.Split(new char[1] { '.' }).First());
+
                 // Starting with LLVM 15, runtime library structure changes.
-                if (System.Version.Parse(clangVersion).Major >= 15)
+                if (majorVersion >= 15)
                     libFolderName = "x86_64-pc-windows-msvc";
                 else
                     libFolderName = "windows";
