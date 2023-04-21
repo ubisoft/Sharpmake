@@ -144,7 +144,7 @@ namespace Sharpmake
 
         private sealed unsafe class PathHelper
         {
-            public static readonly int MaxPath = 260;
+            public static readonly int MaxPath = 280;
             private int _capacity;
 
             // Array of stack members.
