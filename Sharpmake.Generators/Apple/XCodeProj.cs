@@ -948,7 +948,6 @@ namespace Sharpmake.Generators.Apple
 
             FillIncludeDirectoriesOptions(context, platformVcxproj);
             FillCompilerOptions(context, platformVcxproj);
-            SelectAdditionalLibraryDirectoriesOption(context, platformVcxproj);
 
             context.Options["GenerateMapFile"] = RemoveLineTag;
             platformVcxproj.SelectLinkerOptions(context);
@@ -966,6 +965,14 @@ namespace Sharpmake.Generators.Apple
             // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
             linkerOptions.AddRange(libFiles.Select(library =>
             {
+                if (library.IndexOf(Path.DirectorySeparatorChar) != -1)
+                {
+                    //deal with fullpath library
+                    var libPath = Path.GetDirectoryName(library);
+                    conf.LibraryPaths.Add(libPath);
+                    library = Path.GetFileName(library);
+                }
+
                 if (library.EndsWith(".a", StringComparison.OrdinalIgnoreCase) || library.EndsWith(".dylib", StringComparison.OrdinalIgnoreCase))
                 {
                     string libName = Path.GetFileNameWithoutExtension(library);
@@ -975,6 +982,8 @@ namespace Sharpmake.Generators.Apple
                 }
                 return "-l" + library;
             }));
+
+            SelectAdditionalLibraryDirectoriesOption(context, platformVcxproj);
 
             // this is needed to make sure the output dynamic library with proper prefix
             if (conf.Output == Project.Configuration.OutputType.Dll)
