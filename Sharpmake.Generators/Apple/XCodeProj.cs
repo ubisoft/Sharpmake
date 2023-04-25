@@ -641,8 +641,8 @@ namespace Sharpmake.Generators.Apple
             {
                 bool build = !configuration.ResolvedSourceFilesBuildExclude.Contains(file);
                 string extension = Path.GetExtension(file);
-                bool source = project.SourceFilesCompileExtensions.Contains(extension) || (string.Compare(extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
-                if (!(source && build))
+                bool source = project.SourceFilesExtensions.Contains(extension) || (string.Compare(extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
+                if (!source)
                     continue;
 
                 bool alreadyPresent;
@@ -650,10 +650,17 @@ namespace Sharpmake.Generators.Apple
                 if (alreadyPresent)
                     continue;
 
-                var fileItem = (ProjectFile)item;
-                var buildFileItem = new ProjectBuildFile(fileItem);
-                _projectItems.Add(buildFileItem);
-                _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                item.Build = build;
+                if (build)
+                {
+                    var buildFileItem = new ProjectBuildFile((ProjectFile)item);
+                    _projectItems.Add(buildFileItem);
+                    _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                }
+                else
+                {
+                    _projectItems.Add(item);
+                }
             }
         }
 

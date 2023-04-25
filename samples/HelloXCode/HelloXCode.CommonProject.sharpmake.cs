@@ -37,6 +37,8 @@ namespace HelloXCode
             IsFileNameToLower = false;
             IsTargetFileNameToLower = false;
 
+            SourceFilesExtensions.Add(".sc");
+
             SourceRootPath = @"[project.RootPath]\[project.Name]";
             AdditionalSourceRootPaths.Add(Globals.ExternalDirectory);
         }
