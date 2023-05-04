@@ -167,7 +167,8 @@ jobs:
         if: runner.os == 'Linux'
         shell: pwsh
         run: |
-          ./RunSample.ps1 -sampleName "HelloLinux" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }}
+          docker build -f samples/HelloLinux/Dockerfile -t sharpmake-hellolinux --build-arg CONFIGURATION=${{ matrix.configuration }} --build-arg FRAMEWORK=${{ matrix.framework }} .
+          docker run --rm sharpmake-hellolinux
 
       - name: HelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
         if: runner.os == 'Windows'

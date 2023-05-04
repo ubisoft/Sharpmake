@@ -104,24 +104,25 @@ functional_test:
 .linux_sample_test:
   stage: test
   tags:
-  - square-linux-k8s-compil
-  image: quay.ubisoft.com/tgruntime/tg-ubuntu-cpp:0.6.2-sharpmake
+  - square_linux_dind
+  services:
+    - docker:20.10.10-dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2376
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: /certs/client
   parallel:
     matrix:
     - configuration: [debug, release]
-      os: [ubuntu]
       framework: [net6.0]
   needs:
   - "compilation:linux: [release]"
-  artifacts:
-    when: on_failure
-    untracked: true
-    expire_in: 1 day
 
 HelloLinux:
   extends: .linux_sample_test
   script:
-  - pwsh ./RunSample.ps1 -sampleName HelloLinux -configuration $configuration -framework $framework
+    - docker build -f samples/HelloLinux/Dockerfile -t sharpmake-hellolinux --build-arg CONFIGURATION=$configuration --build-arg FRAMEWORK=$framework .
+    - docker run --rm sharpmake-hellolinux
 
 #############
 # MacOs Sample tests
