@@ -2331,7 +2331,7 @@ namespace Sharpmake
         public List<UsingTask> UsingTasks = new List<UsingTask>();
 
         public bool? WcfAutoStart; // Wcf Auto-Start service when debugging
-        public string WcfBaseStorage = @"Service References\";
+        public string WcfBaseStorage = "Service References" + Path.DirectorySeparatorChar;
 
         // writes Pre/Post BuildEvents per configuration instead of one for all, this will make editing events in Visual Studio impossible
         public bool ConfigurationSpecificEvents = false;
