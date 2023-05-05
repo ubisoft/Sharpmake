@@ -1,6 +1,8 @@
 // Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System;
+
 namespace Sharpmake
 {
     public static partial class Options
@@ -77,6 +79,20 @@ namespace Sharpmake
                 {
                     public AndroidPreApkInstallCommands(string androidPreApkInstallCommands)
                        : base(androidPreApkInstallCommands) { }
+                }
+
+
+                /// <summary>
+                /// Android Packaging with Gradle
+                /// </summary>
+                /// <remarks>
+                /// Specifies if you want to create the APK with Gradle
+                /// </remarks>
+                public enum AndroidGradlePackaging
+                {
+                    [Default]
+                    Enable,
+                    Disable
                 }
 
                 /// <summary>
@@ -268,11 +284,26 @@ namespace Sharpmake
                 /// <summary>
                 /// Multi-processor Compilation
                 /// </summary>
+                [Obsolete("Use NativeBuildBackend instead i.e.: Enable = MultiToolTaskMSBuild, Disable = OriginalMSBuild", true)]
                 public enum MultiProcessorCompilation
                 {
                     [Default]
                     Enable,
                     Disable
+                }
+
+                /// <summary>
+                /// NativeBuildBackend
+                /// </summary>
+                /// /// <remarks>
+                /// Determines which backend visual studio uses that are supported by AGDE
+                /// </remarks>
+                public enum NativeBuildBackend
+                {
+                    [Default]
+                    MultiToolTaskMSBuild,
+                    OriginalMSBuild,
+                    Ninja
                 }
 
                 /// <summary>

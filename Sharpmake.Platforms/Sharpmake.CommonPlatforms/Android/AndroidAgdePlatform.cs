@@ -231,6 +231,13 @@ namespace Sharpmake
                 if (conf.Output.Equals(Project.Configuration.OutputType.Exe))
                 {
                     options["AndroidEnablePackaging"] = "true";
+
+                    context.SelectOption
+                    (
+                        Options.Option(Options.Agde.General.AndroidGradlePackaging.Enable, () => { options["SkipAndroidPackaging"] = "false"; }),
+                        Options.Option(Options.Agde.General.AndroidGradlePackaging.Disable, () => { options["SkipAndroidPackaging"] = "true"; })
+                    );
+
                     string option = Options.StringOption.Get<Options.Agde.General.AndroidApplicationModule>(conf);
                     options["AndroidApplicationModule"] = option != RemoveLineTag ? option : context.Project.Name.ToLowerInvariant();
 
@@ -253,6 +260,7 @@ namespace Sharpmake
                 else
                 {
                     options["AndroidEnablePackaging"] = RemoveLineTag;
+                    options["SkipAndroidPackaging"] = RemoveLineTag;
                     options["AndroidApplicationModule"] = RemoveLineTag;
                     options["AndroidGradleBuildDir"] = RemoveLineTag;
                     options["AndroidGradleBuildIntermediateDir"] = RemoveLineTag;
@@ -471,8 +479,9 @@ namespace Sharpmake
 
                 context.SelectOption
                 (
-                Options.Option(Options.Agde.Compiler.MultiProcessorCompilation.Enable, () => { options["UseMultiToolTask"] = "true"; }),
-                Options.Option(Options.Agde.Compiler.MultiProcessorCompilation.Disable, () => { options["UseMultiToolTask"] = "false"; })
+                Options.Option(Options.Agde.Compiler.NativeBuildBackend.MultiToolTaskMSBuild, () => { options["NativeBuildBackend"] = "MultiToolTaskMSBuild"; }),
+                Options.Option(Options.Agde.Compiler.NativeBuildBackend.OriginalMSBuild, () => { options["NativeBuildBackend"] = "OriginalMSBuild"; }),
+                Options.Option(Options.Agde.Compiler.NativeBuildBackend.Ninja, () => { options["NativeBuildBackend"] = "Ninja"; })
                 );
 
                 context.SelectOption
