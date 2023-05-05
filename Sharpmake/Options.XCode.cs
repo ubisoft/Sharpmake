@@ -68,6 +68,13 @@ namespace Sharpmake
                     GNU11
                 }
 
+                public enum GenerateInfoPlist
+                {
+                    Enable,
+                    [Default]
+                    Disable
+                }
+
                 public class CodeSignEntitlements : StringOption
                 {
                     public CodeSignEntitlements(string value) : base(value)
@@ -82,9 +89,24 @@ namespace Sharpmake
                     }
                 }
 
+                public class ProductBundleDisplayName : StringOption
+                {
+                    public ProductBundleDisplayName(string value) : base(value) { }
+                }
+
                 public class ProductBundleIdentifier : StringOption
                 {
                     public ProductBundleIdentifier(string value) : base(value) { }
+                }
+
+                public class ProductBundleVersion : StringOption
+                {
+                    public ProductBundleVersion(string value) : base(value) { }
+                }
+
+                public class ProductBundleShortVersion : StringOption
+                {
+                    public ProductBundleShortVersion(string value) : base(value) { }
                 }
 
                 public enum EnableGpuFrameCaptureMode

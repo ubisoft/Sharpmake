@@ -48,14 +48,18 @@ namespace Sharpmake.Generators.Apple
             return strBuilder.ToString();
         }
 
-        public static string ResolveProjectPaths(Project project, string stringToResolve)
+        public static string ResolveProjectVariable(Project project, string stringToResolve)
         {
             Resolver resolver = new Resolver();
             using (resolver.NewScopedParameter("project", project))
             {
-                string resolvedString = resolver.Resolve(stringToResolve);
-                return Util.SimplifyPath(resolvedString);
+                return resolver.Resolve(stringToResolve);
             }
+        }
+
+        public static string ResolveProjectPaths(Project project, string stringToResolve)
+        {
+            return Util.SimplifyPath(ResolveProjectVariable(project, stringToResolve));
         }
 
         public static void ResolveProjectPaths(Project project, Strings stringsToResolve)

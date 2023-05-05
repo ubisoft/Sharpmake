@@ -171,10 +171,11 @@ namespace Sharpmake.Generators.Apple
 			};
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXProject ""[item.Identifier]"" */;
 			compatibilityVersion = ""[item.CompatibilityVersion]"";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = [item.MainGroup.Uid] /* [item.MainGroup.Name] */;
 			projectDirPath = """";
@@ -256,6 +257,7 @@ namespace Sharpmake.Generators.Apple
 				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
 				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
+				INFOPLIST_KEY_CFBundleDisplayName = [item.Options.ProductBundleDisplayName];
 				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
 				TVOS_DEPLOYMENT_TARGET = ""[item.Options.TvOSDeploymentTarget]"";
@@ -269,6 +271,8 @@ namespace Sharpmake.Generators.Apple
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = [item.Options.PreserveDeadCodeInitsAndTerms];
 				PRODUCT_BUNDLE_IDENTIFIER = ""[item.Options.ProductBundleIdentifier]"";
 				PRODUCT_NAME = ""[item.Configuration.TargetFileName]"";
+				MARKETING_VERSION = ""[item.Options.ProductBundleVersion]"";
+				CURRENT_PROJECT_VERSION = ""[item.Options.ProductBundleShortVersion]"";
 				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
 				STRIP_INSTALLED_PRODUCT = [item.Options.StripLinkedProduct];
@@ -278,6 +282,7 @@ namespace Sharpmake.Generators.Apple
 				PRELINK_LIBS = ""[item.Options.PreLinkedLibraries]"";
 				SUPPORTS_MACCATALYST = ""[item.Options.SupportsMaccatalyst]"";
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = ""[item.Options.SupportsMacDesignedForIphoneIpad]"";
+				GENERATE_INFOPLIST_FILE = [item.Options.GenerateInfoPlist];
 			};
 			name = [item.Options.TargetName];
 		};

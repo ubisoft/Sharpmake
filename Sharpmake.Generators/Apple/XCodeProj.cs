@@ -1210,7 +1210,7 @@ namespace Sharpmake.Generators.Apple
             {
                 Children = new List<ProjectFileSystemItem>();
                 FullPath = fullPath;
-                Name = fullPath.Substring(fullPath.LastIndexOf(FolderSeparator) + 1);
+                Name = System.IO.Path.GetFileName(fullPath);
             }
 
             public List<ProjectFileSystemItem> Children { get; protected set; }
@@ -1266,9 +1266,13 @@ namespace Sharpmake.Generators.Apple
                         return "sourcecode.c.c";
                     case ".cpp":
                         return "sourcecode.cpp.cpp";
+                    case ".cxx":
+                        return "sourcecode.cpp.cpp";
                     case ".h":
                         return "sourcecode.c.h";
                     case ".hpp":
+                        return "sourcecode.c.h";
+                    case ".hxx":
                         return "sourcecode.c.h";
                     case ".s":
                         return "sourcecode.asm";
@@ -1278,6 +1282,8 @@ namespace Sharpmake.Generators.Apple
                         return "sourcecode.c.objc";
                     case ".mm":
                         return "sourcecode.cpp.objcpp";
+                    case ".metal":
+                        return "sourcecode.metal";
 
                     case ".xcodeproj":
                         return "\"wrapper.pb-project\"";
@@ -1327,6 +1333,11 @@ namespace Sharpmake.Generators.Apple
                         return "file.gf";
                     case ".xib":
                         return "file.xib";
+                    case ".storyboard":
+                        return "file.storyboard";
+
+                    case ".xcassets":
+                        return "folder.assetcatalog";
                 }
 
                 return "\"?\"";
