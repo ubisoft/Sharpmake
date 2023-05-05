@@ -56,8 +56,9 @@ namespace Sharpmake
     <IncludePath>[options.IncludePath]</IncludePath>
     <LibraryPath>[options.LibraryPath]</LibraryPath>
     <ExcludePath>[options.ExcludePath]</ExcludePath>
-    <UseMultiToolTask>[options.UseMultiToolTask]</UseMultiToolTask>
+    <NativeBuildBackend>[options.NativeBuildBackend]</NativeBuildBackend>
     <AndroidEnablePackaging>[options.AndroidEnablePackaging]</AndroidEnablePackaging>
+    <SkipAndroidPackaging>[options.SkipAndroidPackaging]</SkipAndroidPackaging>
     <AndroidApplicationModule>[options.AndroidApplicationModule]</AndroidApplicationModule>
     <AndroidGradleBuildDir>[options.AndroidGradleBuildDir]</AndroidGradleBuildDir>
     <AndroidGradleBuildOutputDir>[options.AndroidGradleBuildIntermediateDir]</AndroidGradleBuildOutputDir>
