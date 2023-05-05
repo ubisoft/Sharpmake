@@ -487,6 +487,11 @@ namespace Sharpmake
                Options.Option(Options.XCode.Compiler.ClangEnableModules.Enable, () => options["ClangEnableModules"] = "YES")
             );
 
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.GenerateInfoPlist.Disable, () => options["GenerateInfoPlist"] = "NO"),
+                Options.Option(Options.XCode.Compiler.GenerateInfoPlist.Enable, () => options["GenerateInfoPlist"] = "YES")
+            );
+
             Options.XCode.Compiler.CodeSignEntitlements codeSignEntitlements = Options.GetObject<Options.XCode.Compiler.CodeSignEntitlements>(conf);
             if (codeSignEntitlements != null)
                 options["CodeSignEntitlements"] = XCodeUtil.ResolveProjectPaths(project, codeSignEntitlements.Value);
@@ -496,7 +501,7 @@ namespace Sharpmake
             Options.XCode.Compiler.CodeSigningIdentity codeSigningIdentity = Options.GetObject<Options.XCode.Compiler.CodeSigningIdentity>(conf);
             if (codeSigningIdentity != null)
                 options["CodeSigningIdentity"] = codeSigningIdentity.Value;
-            else if (conf.Platform == Platform.ios)
+            else if (conf.Platform == Platform.ios || conf.Platform == Platform.maccatalyst)
                 options["CodeSigningIdentity"] = "iPhone Developer"; //Previous Default value in the template
             else if (conf.Platform == Platform.tvos)
                 options["CodeSigningIdentity"] = "AppleTV Developer"; //Previous Default value in the template
@@ -508,7 +513,10 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.OnlyActiveArch.Enable, () => options["OnlyActiveArch"] = "YES")
             );
 
+            options["ProductBundleDisplayName"] = XCodeUtil.ResolveProjectVariable(project, Options.StringOption.Get<Options.XCode.Compiler.ProductBundleDisplayName>(conf));
             options["ProductBundleIdentifier"] = Options.StringOption.Get<Options.XCode.Compiler.ProductBundleIdentifier>(conf);
+            options["ProductBundleVersion"] = Options.StringOption.Get<Options.XCode.Compiler.ProductBundleVersion>(conf);
+            options["ProductBundleShortVersion"] = Options.StringOption.Get<Options.XCode.Compiler.ProductBundleShortVersion>(conf);
 
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP98, () => options["CppStandard"] = "c++98"),
