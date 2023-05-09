@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- overview of keys and values: https://developer.apple.com/documentation/bundleresources/information_property_list/?language=objc -->
+<dict>
+	<!-- Identification -->
+	<key>CFBundleIdentifier</key>
+	<string>com.ubisoft.sharpmake.sample.metalnostoryboard</string>
+
+	<!-- Naming -->
+	<key>CFBundleName</key>
+	<string>MetalNoStoryboard</string>
+	<key>CFBundleDisplayName</key>
+	<string>Sharpmake Sample Metal Without Storyboard</string>
+	<key>CFBundleSpokenName</key>
+	<string>Sharpmake Sample Metal Without Storyboard</string>
+
+	<!-- Bundle version -->
+	<key>CFBundleVersion</key>
+	<string>0.0.1</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.1</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>CC0</string>
+
+	<!-- Categorization -->
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.games</string>
+
+	<!-- OS version -->
+	<!--- macOS / Catalyst -->
+	<key>LSMinimumSystemVersion</key>
+	<string>13.1</string>
+	<!--- must be set per-platform -->
+	<key>MinimumOSVersion</key>
+	<string>13.1</string>
+	<!--- iOS only -->
+	<!--
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	-->
+
+	<!-- Localization -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+
+
+	<!-- App execution -->
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+
+	<!--- macOS specific -->
+	<key>LSMultipleInstancesProhibited</key>
+	<false/>
+	<key>LSRequiresNativeExecution</key>
+	<true/>
+	<!--- iOS/tvOS specific -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+		<string>metal</string>
+		<string>wifi</string>
+	</array>
+
+	<!-- User interface -->
+	<!--- Main user interface -->
+	<!-- when using storyboards
+	<key>NSMainStoryboardFile</key>
+	<string></string>
+	<key>UIMainStoryboardFile</key>
+	<string></string>
+	-->
+	<!--- macOS specific -->
+	<key>UISupportsTrueScreenSizeOnMac</key>
+	<true/>
+
+	<!--- Icons -->
+	<!--
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIconName</key>
+	<string></string>
+	-->
+
+	<!--- Orientation (iOS specific) -->
+	<key>UIInterfaceOrientation</key>
+	<string>UIInterfaceOrientationLandscapeLeft</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<!-- <string>UIInterfaceOrientationPortrait</string> -->
+		<!-- <string>UIInterfaceOrientationPortraitUpsideDown</string> -->
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<!-- <string>UIInterfaceOrientationPortrait</string> -->
+		<!-- <string>UIInterfaceOrientationPortraitUpsideDown</string> -->
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+
+	<!--- Styling -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Automatic</string>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<!--- macOS: for MacBooks with camera housing inside bezel -->
+	<key>NSPrefersDisplaySafeAreaCompatibilityMode</key>
+	<true/>
+
+	<!--- Status bar -->
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackTranslucent</string>
+
+	<!--- Pointer interaction *future proof* -->
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+
+	<!--- Graphics -->
+	<key>UIAppSupportsHDR</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+
+
+	<!-- OBSOLETE KEYS -->
+	<!--
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	-->
+</dict>
+</plist>

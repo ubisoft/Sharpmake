@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- overview of keys and values: https://www.matrixprojects.net/p/xcodebuild-export-options-plist/ -->
+<dict>
+	<key>compileBitcode</key>
+	<false/>
+	<key>method</key>
+	<string>development</string>
+	<!-- <key>signingStyle</key> -->
+	<!-- <string></string> -->
+	<key>teamID</key>
+	<string>9ZDGV2KBJX</string>
+</dict>
+</plist>
