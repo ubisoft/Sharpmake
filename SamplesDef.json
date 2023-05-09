@@ -288,6 +288,20 @@
                 "./Compile.ps1 -slnOrPrjFile \"HelloXCode_mac.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler xcode -scheme exe_mac",
                 "cd ./{testFolder}/codebase/temp/bin/mac_{configuration} ; $Env:DYLD_LIBRARY_PATH=\".\" ; ./exe"
             ]
+        },
+        {
+            "Name": "XCodeProjects",
+            "TestFolder": "samples/XCodeProjects",
+            "Commands":
+            [
+                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"XCodeProjects.Main.sharpmake.cs\" -framework {framework}",
+                "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_mac_xcode.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme \"CLIToolProject FastBuild\"",
+                "./{testFolder}/temp/bin/mac_{configuration}_fastbuild/CLIToolProject",
+                "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_mac_xcode.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme CLIToolProject_mac_xcode",
+                "./{testFolder}/temp/bin/mac_{configuration}_default/CLIToolProject",
+                "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_mac_xcode.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme \"MetalNoStoryboardProject FastBuild\"",
+                "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_mac_xcode.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme MetalNoStoryboardProject_mac_xcode"
+            ]
         }
     ]
 }
