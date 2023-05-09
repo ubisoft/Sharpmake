@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System;
 using NUnit.Framework;
 
 namespace Sharpmake.UnitTests
@@ -102,6 +103,24 @@ namespace Sharpmake.UnitTests
             var result = target.HaveFragment<IncludeType>();
 
             Assert.That(result, Is.False);
+        }
+
+        [Flags, Fragment]
+        enum BogusFragment
+        {
+            one = 1<<0,
+            two = 1<<1
+        }
+
+        [TestCase(Optimization.Release, true)]
+        [TestCase(Optimization.Debug, true)]
+        [TestCase(Platform.win64, true)]
+        [TestCase(OutputType.Dll, true)]
+        [TestCase(BogusFragment.one, false)]
+        public void HaveFragmentOfSameType_returnsExpected(object fragment, bool expectedResult)
+        {
+            var target = new Target();
+            Assert.AreEqual(expectedResult, target.HaveFragmentOfSameType(fragment));
         }
 
         [TestCase(Optimization.Release, true)]

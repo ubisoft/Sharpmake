@@ -472,6 +472,13 @@ namespace Sharpmake
             var tType = typeof(T);
             return fragments.Any(fragment => fragment.FieldType == tType);
         }
+        
+        public bool HaveFragmentOfSameType(object asFragment)
+        {
+            FieldInfo[] fragments = GetType().GetFields();
+            var tType = asFragment.GetType();
+            return fragments.Any(fragment => fragment.FieldType == tType);
+        }
 
         public void SetFragments(params object[] values)
         {
