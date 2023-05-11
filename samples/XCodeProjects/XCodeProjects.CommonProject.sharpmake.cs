@@ -130,6 +130,7 @@ namespace XCodeProjects
         {
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "iOS"));
             conf.Options.Add(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad);
+            conf.Options.Add(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Enable);
             conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks("UIKit"));
         }
 
