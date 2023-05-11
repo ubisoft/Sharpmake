@@ -77,8 +77,16 @@ namespace Sharpmake
                     cmdLineOptions["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
-                options["SupportsMaccatalyst"] = "NO";
-                options["SupportsMacDesignedForIphoneIpad"] = "NO";
+                context.SelectOptionWithFallback(
+                    () => options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag,
+                    Options.Option(Options.XCode.Compiler.SupportsMaccatalyst.Disable, () => options["SupportsMaccatalyst"] = "NO"),
+                    Options.Option(Options.XCode.Compiler.SupportsMaccatalyst.Enable, () => options["SupportsMaccatalyst"] = "YES")
+                );
+                context.SelectOptionWithFallback(
+                    () => options["SupportsMacDesignedForIphoneIpad"] = FileGeneratorUtilities.RemoveLineTag,
+                    Options.Option(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Disable, () => options["SupportsMacDesignedForIphoneIpad"] = "NO"),
+                    Options.Option(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Enable, () => options["SupportsMacDesignedForIphoneIpad"] = "YES")
+                );
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)
