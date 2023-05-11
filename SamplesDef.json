@@ -270,8 +270,6 @@
             "TestFolder": "samples/HelloLinux",
             "Commands":
             [
-                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloLinux.Main.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"HelloLinux_linux_make.make\" -configuration {configuration} -platform x64 -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler make",
                 "./{testFolder}/codebase/temp/bin/linux_{configuration}/exe"
             ]
         },
