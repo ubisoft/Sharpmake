@@ -15,7 +15,7 @@ default:
 # Workaround until .NET SDK installed on square_windows is updated.
 .dotnet_sdk_workaround:
   before_script:
-    - pwsh -Command { Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1 -MaximumRetryCount 3 }
+    - pwsh -Command { Invoke-WebRequest https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1 -MaximumRetryCount 3 }
     - .\dotnet-install.ps1 -Version 6.0.408
 
 #############
