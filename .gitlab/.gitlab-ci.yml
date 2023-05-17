@@ -186,7 +186,7 @@ CompileCommandDatabase:
   extends: .windows_sample_test
   rules:
   - if: $configuration == "debug"
-    when: always
+    when: on_success
   - when: never
   script:
   - pwsh RunSample.ps1 -sampleName CompileCommandDatabase -configuration $configuration -framework $framework -os $os
@@ -195,7 +195,7 @@ ConfigureOrder:
   extends: .windows_sample_test
   rules:
   - if: $configuration == "release"
-    when: always
+    when: on_success
   - when: never
   script:
   - pwsh RunSample.ps1 -sampleName ConfigureOrder -configuration $configuration -framework $framework -os $os
@@ -204,7 +204,7 @@ CPPCLI:
   extends: .windows_sample_test
   rules:
   - if: $os == "windows-2019"
-    when: always
+    when: on_success
   - when: never
   script:
   - pwsh RunSample.ps1 -sampleName CPPCLI -configuration $configuration -framework $framework -os $os
@@ -213,7 +213,7 @@ CSharpHelloWorld_old_frameworks:
   extends: .windows_sample_test
   rules:
   - if: $os == "windows-2019"
-    when: always
+    when: on_success
   - when: never
   script:
   - pwsh RunSample.ps1 -sampleName CSharpHelloWorld_old_frameworks -configuration $configuration -framework $framework -os $os
@@ -222,7 +222,7 @@ CSharpHelloWorld:
   extends: .windows_sample_test
   rules:
   - if: $os == "windows-2022"
-    when: always
+    when: on_success
   - when: never
   variables:
     testFolder: samples/CSharpHelloWorld
@@ -306,7 +306,7 @@ NetCore-DotNetOSMultiFrameworksHelloWorld:
   extends: .windows_sample_test
   rules:
   - if: $os == "windows-2022"
-    when: always
+    when: on_success
   - when: never
   variables:
     testFolder: samples\NetCore\DotNetOSMultiFrameworksHelloWorld
@@ -335,7 +335,7 @@ SimpleExeLibDependency:
   extends: .windows_sample_test
   rules:
   - if: $configuration == "debug"
-    when: always
+    when: on_success
   - when: never
   script:
   - pwsh RunSample.ps1 -sampleName "SimpleExeLibDependency" -configuration $configuration -framework $framework -os $os
