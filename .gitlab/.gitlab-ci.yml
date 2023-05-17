@@ -56,9 +56,6 @@ compilation:linux:
 .unit_test:base:
   extends: .dotnet_sdk_workaround
   stage: test
-  parallel:
-    matrix:
-    - configuration: [debug, release]
   script:
     - dotnet test Sharpmake.sln -c $configuration
   artifacts:
@@ -71,14 +68,14 @@ unit_test:debug:
   needs:
   - "compilation:windows: [debug]"
   variables:
-    Optimization: "debug"
+    configuration: "debug"
 
 unit_test:release:
   extends: .unit_test:base
   needs:
     - "compilation:windows: [release]"
   variables:
-    Optimization: "release"
+    configuration: "release"
 
 #############
 # Regression tests
