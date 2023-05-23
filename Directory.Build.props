@@ -1,5 +1,7 @@
 <Project>
-
+  <!-- To be redefined by GitInfo after restore. -->
+  <Target Name="GitVersion" />
+  
   <PropertyGroup>
     <!-- Assembly Info -->
     <Company>Ubisoft</Company>
