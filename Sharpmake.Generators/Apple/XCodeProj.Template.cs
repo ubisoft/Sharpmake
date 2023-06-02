@@ -126,11 +126,14 @@ namespace Sharpmake.Generators.Apple
 			isa = PBXNativeTarget;
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
 			buildPhases = (
-				[item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts */,
+				[item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts (PreBuild) */,
+				[item.CopyFilePreBuildPhasesUIDs] /* CopyFiles (PreBuild) */,
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
+				[item.CopyFileBuildPhasesUIDs] /* CopyFiles */,
 				[item.SourceBuildPhaseUID] /* Sources */,
 				[item.FrameworksBuildPhase.Uid] /* Frameworks */,
-				[item.ShellScriptPostBuildPhaseUIDs] /* ShellScripts */,
+				[item.CopyFilePostBuildPhasesUIDs] /* CopyFiles (Post Build) */,
+				[item.ShellScriptPostBuildPhaseUIDs] /* ShellScripts (PreBuild) */,
 			);
 			buildRules = (
 			);
@@ -214,6 +217,19 @@ namespace Sharpmake.Generators.Apple
 			files = (
 [itemChildren]			);
 			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
+		};
+"               },
+
+                { ItemSection.PBXCopyFilesBuildPhase,
+@"		[item.Uid] /* [item.Identifier] */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = [item.BuildActionMask];
+			name = ""[item.Identifier]"";
+			dstPath = ""[item.TargetPath]"";
+			dstSubfolderSpec = [item.FolderSpec];
+			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
+			files = (
+[itemChildren]			);
 		};
 "               },
 
