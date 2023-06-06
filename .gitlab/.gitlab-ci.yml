@@ -3,10 +3,6 @@
 include:
  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
 
-stages:
-  - build
-  - test
-
 default:
   tags:
   - square_windows
@@ -47,7 +43,7 @@ compilation:linux:
 .unit_test:base:
   stage: test
   script:
-    - dotnet test Sharpmake.sln -c $configuration
+    - dotnet test Sharpmake.sln -c $configuration --no-build
   artifacts:
     when: on_failure
     untracked: true
@@ -334,3 +330,15 @@ vcpkg:
   script:
   - pwsh RunSample.ps1 -sampleName vcpkg -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
 
+#############
+# Deploy stage
+#############
+sharpmakeextended:
+  stage: deploy
+  variables:
+    SHARPMAKE_COMMIT_SHA: $CI_COMMIT_SHA
+  trigger:
+    project: Sharpmake/sharpmakeextended
+    strategy: depend
+  needs: [ "compilation:windows" ]
+  allow_failure: true
