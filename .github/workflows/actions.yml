@@ -51,15 +51,32 @@ jobs:
         if: runner.os == 'Windows'
         run: python functional_test.py --sharpmake_exe "Sharpmake.Application/bin/release/${{ matrix.framework }}/Sharpmake.Application.exe"
 
-  samples:
+  generate_samples_matrix:
     needs: [builds]
+    runs-on: ubuntu-latest
+    outputs:
+          matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3.5.2
+
+      - name: Generate samples matrix
+        id: set-matrix
+        shell: pwsh
+        run: |
+          $sampleMatrix = .\.github\Get-SamplesMatrixJson.ps1
+          echo $sampleMatrix
+          $eof = [Convert]::ToBase64String((Get-Random -InputObject (0..255) -Count 15 | ForEach-Object { [byte]$_ }))
+          echo "matrix<<$eof" >> $env:GITHUB_OUTPUT
+          echo $sampleMatrix >> $env:GITHUB_OUTPUT
+          echo "$eof" >> $env:GITHUB_OUTPUT
+
+  samples:
+    needs: [generate_samples_matrix]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-2019, windows-2022]
-        framework: [net6.0]
-        configuration: [debug, release]
+      matrix: ${{fromJSON(needs.generate_samples_matrix.outputs.matrix)}}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3.5.2
@@ -81,167 +98,17 @@ jobs:
           name: 'Sharpmake-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}'
           path: Sharpmake.Application/bin/Release/${{ matrix.framework }}
 
-      - name: CompileCommandDatabase ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.configuration == 'debug' # only has a debug config, so skip in release
-        shell: pwsh
-        run: | # TODO: ideally here we should try and compile the generated json file
-          .\RunSample.ps1 -sampleName "CompileCommandDatabase" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: ConfigureOrder ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.configuration == 'release'
-        shell: pwsh
-        run:
-          .\RunSample.ps1 -sampleName "ConfigureOrder" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: CPPCLI ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.os == 'windows-2019'
+      - name: Run sample ${{ matrix.name }} ${{ matrix.os }} ${{ matrix.framework }} ${{ matrix.configuration }}
         shell: pwsh
         run: |
-          .\RunSample.ps1 -sampleName "CPPCLI" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: CSharpHelloWorld old frameworks ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.os == 'windows-2019'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "CSharpHelloWorld_old_frameworks" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: CSharpHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.os == 'windows-2022'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "CSharpHelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: CSharpImports ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "CSharpImports" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: CSharpVsix ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "CSharpVsix" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-        # that one can't be run unfortunately
-
-      - name: CustomBuildStep ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "CustomBuildStep" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: CSharpWCF ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "CSharpWCF" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-        # that one can't be run unfortunately
-
-      - name: FastBuildSimpleExecutable ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "FastBuildSimpleExecutable" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
-
-      # Temp disable after Github VM update which updated the NDK and broke it
-      # - name: HelloAndroid ${{ matrix.configuration }}
-      #   if: runner.os == 'Windows'
-      #   shell: pwsh
-      #   run: |
-      #     $env:JAVA_HOME = $env:JAVA_HOME_11_X64
-      #     .\RunSample.ps1 -sampleName "HelloAndroid" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: HelloClangCl ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "HelloClangCl" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
-
-      - name: HelloEvents ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "HelloEvents" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
-
-      - name: HelloLinux ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Linux'
-        shell: pwsh
-        run: |
-          docker build -f samples/HelloLinux/Dockerfile -t sharpmake-hellolinux --build-arg CONFIGURATION=${{ matrix.configuration }} --build-arg FRAMEWORK=${{ matrix.framework }} .
-          docker run --rm sharpmake-hellolinux
-
-      - name: HelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "HelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: HelloXCode ${{ matrix.configuration }} ${{ matrix.os }}
-        shell: pwsh
-        if: runner.os == 'macOS'
-        run: |
-          .\RunSample.ps1 -sampleName "HelloXCode" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: NetCore/DotNetCoreFrameworkHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.os == 'windows-2022'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "NetCore-DotNetCoreFrameworkHelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: NetCore/DotNetFrameworkHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: NetCore/DotNetFrameworkHelloWorld_OldFrameworks ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.os == 'windows-2019'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld_OldFrameworks" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: NetCore/DotNetMultiFrameworksHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "NetCore-DotNetMultiFrameworksHelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: NetCore/DotNetOSMultiFrameworksHelloWorld ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.os == 'windows-2022'
-        run: |
-          .\RunSample.ps1 -sampleName "NetCore-DotNetOSMultiFrameworksHelloWorld" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: PackageReferences ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "PackageReferences" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: Install Qt
-        if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v3.2.1
-
-      - name: QTFileCustomBuild ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: | # TODO: there's a retail config, compile it as well or remove it
-          .\RunSample.ps1 -sampleName "QTFileCustomBuild" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: SimpleExeLibDependency ${{ matrix.configuration }} ${{ matrix.os }}
-        if: runner.os == 'Windows' && matrix.configuration == 'debug'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "SimpleExeLibDependency" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }}
-
-      - name: vcpkg ${{matrix.configuration}} ${{ matrix.os }}
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .\RunSample.ps1 -sampleName "vcpkg" -configuration ${{ matrix.configuration }} -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+          foreach ($configuration in '${{ matrix.configurations }}'.Split(','))
+          {
+            .\RunSample.ps1 -sampleName "${{ matrix.name }}" -configuration $configuration -framework ${{ matrix.framework }} -os ${{ matrix.os }} -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+          }
 
       - name: Store MSBuild binary logs
         if: ${{ failure() && runner.os == 'Windows' }}
         uses: actions/upload-artifact@v3
         with:
-          name: sharpmake-samples-msbuild-logs-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}-${{ matrix.configuration }}
+          name: sharpmake-sample-msbuild-logs-${{ matrix.name }}-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}-${{ matrix.configuration }}
           path: samples/**/*.binlog

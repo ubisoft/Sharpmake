@@ -3,6 +3,10 @@
     [
         {
             "Name": "CompileCommandDatabase",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug" ],
             "TestFolder": "samples/CompileCommandDatabase",
             "Commands":
             [
@@ -13,6 +17,10 @@
         },
         {
             "Name": "ConfigureOrder",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "release" ],
             "TestFolder": "samples/ConfigureOrder",
             "Commands":
             [
@@ -25,6 +33,10 @@
         },
         {
             "Name": "CPPCLI",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CPPCLI",
             "Commands":
             [
@@ -36,7 +48,11 @@
             ]
         },
         {
-            "Name": "CSharpHelloWorld_old_frameworks",
+            "Name": "CSharpHelloWorld_old_Frameworks",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CSharpHelloWorld",
             "Commands":
             [
@@ -47,6 +63,10 @@
         },
         {
             "Name": "CSharpHelloWorld",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CSharpHelloWorld",
             "Commands":
             [
@@ -57,6 +77,10 @@
         },
         {
             "Name": "CSharpImports",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CSharpImports",
             "Commands":
             [
@@ -67,6 +91,10 @@
         },
         {
             "Name": "CSharpVsix",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CSharpVsix",
             "Commands":
             [
@@ -76,6 +104,10 @@
         },
         {
             "Name": "CustomBuildStep",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CustomBuildStep",
             "Commands":
             [
@@ -86,6 +118,10 @@
         },
         {
             "Name": "CSharpWCF",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/CSharpWCF",
             "Commands":
             [
@@ -95,6 +131,10 @@
         },
         {
             "Name": "FastBuildSimpleExecutable",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/FastBuildSimpleExecutable",
             "Commands":
             [
@@ -105,6 +145,10 @@
         },
         {
             "Name": "HelloAndroid",
+            "CIs": [],
+            "OSs": [ "windows-2019" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/HelloAndroid",
             "Commands":
             [
@@ -115,6 +159,10 @@
         },
         {
             "Name": "HelloClangCl",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/HelloClangCl",
             "Commands":
             [
@@ -131,6 +179,10 @@
         },
         {
             "Name": "HelloEvents",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/HelloEvents",
             "Commands":
             [
@@ -143,6 +195,10 @@
         },
         {
             "Name": "HelloWorld",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/HelloWorld",
             "Commands":
             [
@@ -155,6 +211,10 @@
         },
         {
             "Name": "NetCore-DotNetCoreFrameworkHelloWorld",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/NetCore/DotNetCoreFrameworkHelloWorld",
             "Commands":
             [
@@ -170,6 +230,10 @@
         },
         {
             "Name": "NetCore-DotNetFrameworkHelloWorld",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/NetCore/DotNetFrameworkHelloWorld",
             "Commands":
             [
@@ -183,6 +247,10 @@
         },
         {
             "Name": "NetCore-DotNetFrameworkHelloWorld_OldFrameworks",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/NetCore/DotNetFrameworkHelloWorld",
             "Commands":
             [
@@ -193,6 +261,10 @@
         },
         {
             "Name": "NetCore-DotNetMultiFrameworksHelloWorld",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/NetCore/DotNetMultiFrameworksHelloWorld",
             "Commands":
             [
@@ -204,6 +276,10 @@
         },
         {
             "Name": "NetCore-DotNetOSMultiFrameworksHelloWorld",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/NetCore/DotNetOSMultiFrameworksHelloWorld",
             "Commands":
             [
@@ -215,6 +291,10 @@
         },
         {
             "Name": "PackageReferences",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/PackageReferences",
             "Commands":
             [
@@ -231,9 +311,18 @@
         },
         {
             "Name": "QTFileCustomBuild",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/QTFileCustomBuild",
             "Commands":
             [
+                "$qtBaseDir = \"$pwd\\Qt\"",
+                "$env:Qt5_Dir = \"$qtBaseDir\\5.15.2\\msvc2019_64\"",
+                "$env:PATH += \";$env:Qt5_Dir\\bin\"",
+                "py -m pip install aqtinstall==2.1.*",
+                "py -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 --archives qtbase qttools --outputdir $qtBaseDir",
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"QTFileCustomBuild.sharpmake.cs\" -framework {framework}",
                 "./Compile.ps1 -slnOrPrjFile \"qtfilecustombuild_vs2017_win64.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
                 "&'./{testFolder}/projects/output/win64/{configuration}/qtfilecustombuild.exe'"
@@ -241,6 +330,10 @@
         },
         {
             "Name": "SimpleExeLibDependency",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug" ],
             "TestFolder": "samples/SimpleExeLibDependency",
             "Commands":
             [
@@ -251,6 +344,10 @@
         },
         {
             "Name": "vcpkg",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2019", "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/vcpkg",
             "Commands":
             [
@@ -262,19 +359,25 @@
                 "&'./{testFolder}/bin/{configuration}-fastbuild/vcpkgsample.exe'"
             ]
         },
-
-
-
         {
             "Name": "HelloLinux",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "linux" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/HelloLinux",
             "Commands":
             [
-                "./{testFolder}/codebase/temp/bin/linux_{configuration}/exe"
+                "docker build -f {testFolder}/Dockerfile -t sharpmake-hellolinux --build-arg CONFIGURATION={configuration} .",
+                "docker run --rm sharpmake-hellolinux"
             ]
         },
         {
             "Name": "HelloXCode",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "macos" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/HelloXCode",
             "Commands":
             [
@@ -289,6 +392,10 @@
         },
         {
             "Name": "XCodeProjects",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "macos" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
             "TestFolder": "samples/XCodeProjects",
             "Commands":
             [
