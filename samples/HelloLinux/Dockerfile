@@ -16,7 +16,7 @@ RUN dotnet Sharpmake/Sharpmake.Application.dll "/sources('samples/HelloLinux/Hel
 # This environment has no .NET runtime. But it contains the C++ libraries and tools needed to compile the sample.
 # Altough its not the latest GCC image version, its the highest that produce a compatible binary that can be run
 # with the libstdc++ used by the PowerShell image of the last stage.
-FROM gcc:10 AS compiler-env
+FROM gcc:10.4.0-bullseye AS compiler-env
 
 ARG CONFIGURATION=release
 
