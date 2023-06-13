@@ -1138,22 +1138,23 @@ namespace Sharpmake.Generators.Apple
             // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
             linkerOptions.AddRange(libFiles.Select(library =>
             {
-                if (library.IndexOf(Path.DirectorySeparatorChar) != -1)
+                // deal with full library path: add libdir and libname
+                if (Path.IsPathFullyQualified(library))
                 {
-                    //deal with fullpath library
-                    var libPath = Path.GetDirectoryName(library);
-                    conf.LibraryPaths.Add(libPath);
+                    conf.LibraryPaths.Add(Path.GetDirectoryName(library));
                     library = Path.GetFileName(library);
                 }
 
-                if (library.EndsWith(".a", StringComparison.OrdinalIgnoreCase) || library.EndsWith(".dylib", StringComparison.OrdinalIgnoreCase))
+                if (Path.HasExtension(library) &&
+                    ((Path.GetExtension(library).EndsWith(".a", StringComparison.OrdinalIgnoreCase ) ||
+                      Path.GetExtension(library).EndsWith(".dylib", StringComparison.OrdinalIgnoreCase )
+                    )))
                 {
-                    string libName = Path.GetFileNameWithoutExtension(library);
-                    if (libName.StartsWith("lib"))
-                        libName = libName.Remove(0, 3);
-                    return "-l" + libName;
+                    library = Path.GetFileNameWithoutExtension(library);
+                    if (library.StartsWith("lib"))
+                        library = library.Remove(0, 3);
                 }
-                return "-l" + library;
+                return $"-l{library}";
             }));
 
             SelectAdditionalLibraryDirectoriesOption(context, platformVcxproj);
