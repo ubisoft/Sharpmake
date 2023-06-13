@@ -1312,6 +1312,8 @@ namespace Sharpmake.Generators.VisualStudio
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
                 case Project.Configuration.OutputType.AppleApp:
+                case Project.Configuration.OutputType.AppleFramework:
+                case Project.Configuration.OutputType.AppleBundle:
                 case Project.Configuration.OutputType.IosTestBundle:
                     context.Options["OutputFile"] = optionsContext.OutputDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullNameWithExtension;
                     if (context.Configuration.Output == Project.Configuration.OutputType.Dll)

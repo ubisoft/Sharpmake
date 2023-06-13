@@ -271,6 +271,10 @@ namespace Sharpmake
                     return ExecutableFileFullExtension;
                 case Project.Configuration.OutputType.AppleApp:
                     return ".app";
+                case Project.Configuration.OutputType.AppleFramework:
+                    return ".framework";
+                case Project.Configuration.OutputType.AppleBundle:
+                    return ".bundle";
                 case Project.Configuration.OutputType.IosTestBundle:
                     return ".xctest";
                 case Project.Configuration.OutputType.Lib:
@@ -673,6 +677,12 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.AppleApp:
                     options["MachOType"] = "mh_execute";
+                    break;
+                case Project.Configuration.OutputType.AppleFramework:
+                    options["MachOType"] = "mh_dylib";
+                    break;
+                case Project.Configuration.OutputType.AppleBundle:
+                    options["MachOType"] = "mh_bundle";
                     break;
                 case Project.Configuration.OutputType.Lib:
                     options["MachOType"] = "staticlib";
