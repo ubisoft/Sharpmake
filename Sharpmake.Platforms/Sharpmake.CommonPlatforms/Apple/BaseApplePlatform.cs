@@ -315,14 +315,22 @@ namespace Sharpmake
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
+                    configuration.AddDependencyBuiltTargetLibraryFile(
+                        dependency.PreferRelativePaths ?
+                            dependency.TargetFileName :
+                            dependency.TargetFileFullNameWithExtension,
+                        dependency.TargetFileOrderNumber);
             }
             else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
+                    configuration.DependenciesOtherLibraryFiles.Add(
+                        dependency.PreferRelativePaths ?
+                            dependency.TargetFileName :
+                            dependency.TargetFileFullNameWithExtension,
+                        dependency.TargetFileOrderNumber);
             }
         }
 
@@ -334,14 +342,22 @@ namespace Sharpmake
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.AddDependencyBuiltTargetLibraryPath(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.AddDependencyBuiltTargetLibraryFile(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
+                    configuration.AddDependencyBuiltTargetLibraryFile(
+                        dependency.PreferRelativePaths ?
+                            dependency.TargetFileName :
+                            dependency.TargetFileFullNameWithExtension,
+                        dependency.TargetFileOrderNumber);
             }
             else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
                     configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.DependenciesOtherLibraryFiles.Add(dependency.TargetFileFullNameWithExtension, dependency.TargetFileOrderNumber);
+                    configuration.DependenciesOtherLibraryFiles.Add(
+                        dependency.PreferRelativePaths ?
+                            dependency.TargetFileName :
+                            dependency.TargetFileFullNameWithExtension,
+                        dependency.TargetFileOrderNumber);
             }
         }
 
