@@ -58,6 +58,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
 			isa = PBXBuildFile;
 			fileRef = [item.File.Uid] /* [item.File.Name] */;
+			settings = {ATTRIBUTES = (Public, ); };
 		};
 "               },
 
@@ -127,6 +128,7 @@ namespace Sharpmake.Generators.Apple
 			buildConfigurationList = [item.ConfigurationList.Uid] /* Build configuration list for PBXNativeTarget ""[item.Identifier]"" */;
 			buildPhases = (
 				[item.ShellScriptPreBuildPhaseUIDs] /* ShellScripts (PreBuild) */,
+				[item.HeadersBuildPhasesUIDs] /* Headers */,
 				[item.CopyFilePreBuildPhasesUIDs] /* CopyFiles (PreBuild) */,
 				[item.ResourcesBuildPhase.Uid] /* Resources */,
 				[item.CopyFileBuildPhasesUIDs] /* CopyFiles */,
@@ -213,6 +215,16 @@ namespace Sharpmake.Generators.Apple
                 { ItemSection.PBXSourcesBuildPhase,
 @"		[item.Uid] /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = [item.BuildActionMask];
+			files = (
+[itemChildren]			);
+			runOnlyForDeploymentPostprocessing = [item.RunOnlyForDeploymentPostprocessing];
+		};
+"               },
+
+                { ItemSection.PBXHeadersBuildPhase,
+@"		[item.Uid] /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
 			buildActionMask = [item.BuildActionMask];
 			files = (
 [itemChildren]			);

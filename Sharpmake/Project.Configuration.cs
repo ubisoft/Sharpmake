@@ -322,22 +322,14 @@ namespace Sharpmake
                 AppleApp,
 
                 /// <summary>
-                /// The output is an iOS app.
+                /// The output is an Apple (macOS|iOS|tvOS|watchOS) framework (i.e. a Bundle of DLL (dylib) and Headers).
                 /// </summary>
-                [Obsolete("'IosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
-                IosApp = AppleApp,
+                AppleFramework,
 
                 /// <summary>
-                /// The output is a tvOS app.
+                /// The output is an Apple (macOS|iOS|tvOS|watchOS) Bundle (i.e. kind of equivalent to DLL (dylib)).
                 /// </summary>
-                [Obsolete("'TvosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
-                TvosApp = AppleApp,
-
-                /// <summary>
-                /// The output is a watchOS app.
-                /// </summary>
-                [Obsolete("'WatchosApp' has been deprecated, please use 'AppleApp' instead", error: false)]
-                WatchosApp = AppleApp,
+                AppleBundle,
 
                 /// <summary>
                 /// The output is an iOS test bundle.
@@ -3260,6 +3252,8 @@ namespace Sharpmake
                             }
                             break;
                         case OutputType.Dll:
+                        case OutputType.AppleFramework:
+                        case OutputType.AppleBundle:
                             {
                                 var configTasks = GetConfigurationTasks(dependency.Platform);
 
