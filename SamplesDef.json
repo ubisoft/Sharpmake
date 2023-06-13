@@ -279,12 +279,12 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloXCode.Main.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"HelloXCode_mac.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler xcode -scheme \"exe FastBuild\"",
-                "./{testFolder}/codebase/temp/bin/mac_{configuration}_fastbuild/exe",
                 "./Compile.ps1 -slnOrPrjFile \"HelloXCode_mac.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler xcode -scheme exe_prelinked_mac",
                 "./{testFolder}/codebase/temp/bin/mac_{configuration}/exe_prelinked",
                 "./Compile.ps1 -slnOrPrjFile \"HelloXCode_mac.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler xcode -scheme exe_mac",
-                "cd ./{testFolder}/codebase/temp/bin/mac_{configuration} ; $Env:DYLD_LIBRARY_PATH=\".\" ; ./exe"
+                "pushd ./{testFolder}/codebase/temp/bin/mac_{configuration} ; $Env:DYLD_LIBRARY_PATH=\".\" ; ./exe; popd",
+                "./Compile.ps1 -slnOrPrjFile \"HelloXCode_mac.xcworkspace\" -configuration {configuration} -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -compiler xcode -scheme \"exe FastBuild\"",
+                "./{testFolder}/codebase/temp/bin/mac_{configuration}_fastbuild/exe"
             ]
         },
         {
