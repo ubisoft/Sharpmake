@@ -174,8 +174,8 @@ try
         #xcode compile
         Write-Host "xcode compile"
         Write-Host $scheme
-        # direct call xcodebuild, don't use start-process, so that the '| xcpretty' runs ok
-        xcodebuild -workspace "$slnOrPrjFile" -configuration "$configuration" -scheme "$scheme" | xcpretty
+        # directly call xcodebuild, don't use start-process
+        xcodebuild -workspace "$slnOrPrjFile" -configuration "$configuration" -scheme "$scheme"
         if($LASTEXITCODE -ne 0)
         {
             throw "error $LASTEXITCODE during xcode compile"
