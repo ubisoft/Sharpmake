@@ -1777,7 +1777,7 @@ namespace Sharpmake
             /// <summary>
             /// Gets the full file name of the target, without the path but with the prefix and suffix, and without the extension
             /// </summary>
-            public string TargetFileFullName { get; internal set; } = "[conf.TargetFilePlatformPrefix][conf.TargetFilePrefix][conf.TargetFileName][conf.TargetFileSuffix]";
+            public string TargetFileFullName = "[conf.TargetFilePlatformPrefix][conf.TargetFilePrefix][conf.TargetFileName][conf.TargetFileSuffix]";
 
             /// <summary>
             /// Gets or sets the project's full extension (ie: .dll, .self, .exe, .dlu).
@@ -1790,7 +1790,7 @@ namespace Sharpmake
             /// Gets the full file name of the target, without the path but with the suffix, and the extension
             /// and the prefix.
             /// </summary>
-            public string TargetFileFullNameWithExtension { get; internal set; } = "[conf.TargetFileFullName][conf.TargetFileFullExtension]";
+            public string TargetFileFullNameWithExtension = "[conf.TargetFileFullName][conf.TargetFileFullExtension]";
 
             /// <summary>
             /// Gets or sets the ordering index of the target when added as a library to another
