@@ -53,5 +53,8 @@ Sharpmake.VC.db
 .vscode
 .idea
 
+# Smart commandline Visual Studio extension configuration file
+Sharpmake.Application.args.json
+
 # Desktop Services Store on MacOS
 **/.DS_Store
