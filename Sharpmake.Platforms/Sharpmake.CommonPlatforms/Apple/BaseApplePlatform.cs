@@ -659,7 +659,7 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["StdLib"] = "libc++"; cmdLineOptions["StdLib"] = "-stdlib=libc++"; })
             );
 
-            Strings frameworkPaths = Options.GetStrings<Options.XCode.Compiler.FrameworkPaths>(conf);
+            var frameworkPaths = conf.XcodeFrameworkPaths;
             XCodeUtil.ResolveProjectPaths(project, frameworkPaths);
             options["FrameworkPaths"] = XCodeUtil.XCodeFormatList(frameworkPaths, 4);
 
@@ -985,6 +985,14 @@ namespace Sharpmake
             OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
             systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
             cmdLineOptions["SystemFrameworks"] = systemFrameworks.Any() ? "-framework " + systemFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
+
+            OrderableStrings developerFrameworks = new OrderableStrings(conf.XcodeDeveloperFrameworks);
+            developerFrameworks.AddRange(conf.XcodeDependenciesDeveloperFrameworks);
+            cmdLineOptions["DeveloperFrameworks"] = developerFrameworks.Any() ? "-framework " + developerFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
+
+            OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
+            userFrameworks.AddRange(conf.XcodeDependenciesUserFrameworks);
+            cmdLineOptions["UserFrameworks"] = userFrameworks.Any() ? "-framework " + userFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

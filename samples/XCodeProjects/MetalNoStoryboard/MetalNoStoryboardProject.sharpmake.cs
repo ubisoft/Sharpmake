@@ -35,11 +35,11 @@ namespace XCodeProjects
             base.ConfigureAll(conf, target);
 
             conf.Output = Configuration.OutputType.AppleApp;
-            conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks(
+            conf.XcodeSystemFrameworks.Add(
                 "Metal",
                 "MetalKit",
                 "GameController"
-            ));
+            );
 
             conf.Options.Add(new Sharpmake.Options.XCode.Compiler.ProductBundleVersion(@"1.0"));
             conf.Options.Add(new Sharpmake.Options.XCode.Compiler.ProductBundleShortVersion(@"1"));

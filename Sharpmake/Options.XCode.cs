@@ -220,6 +220,7 @@ namespace Sharpmake
                     { }
                 }
 
+                [Obsolete("Deprecated. Use `conf.XcodeSystemFrameworks` instead.", false)]
                 public class SystemFrameworks : Frameworks
                 {
                     public SystemFrameworks(params string[] frameworkNames)
@@ -227,6 +228,7 @@ namespace Sharpmake
                     { }
                 }
 
+                [Obsolete("Deprecated. Use `conf.XcodeUserFrameworks` instead.", false)]
                 public class UserFrameworks : Frameworks
                 {
                     public UserFrameworks(params string[] paths)
@@ -234,6 +236,7 @@ namespace Sharpmake
                     { }
                 }
 
+                [Obsolete("Deprecated. Use `conf.XcodeFrameworkPaths` instead.", false)]
                 public class FrameworkPaths : Strings
                 {
                     public FrameworkPaths(params string[] paths)

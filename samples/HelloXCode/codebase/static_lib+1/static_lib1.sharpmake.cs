@@ -50,7 +50,7 @@ namespace HelloXCode
                     throw new Error("Unexpected optimization " + target.Optimization);
             }
 
-            conf.Options.Add(new Options.XCode.Compiler.SystemFrameworks("CoreFoundation"));
+            conf.XcodeSystemFrameworks.Add("CoreFoundation");
         }
     }
 }

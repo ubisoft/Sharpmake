@@ -121,7 +121,7 @@ namespace XCodeProjects
         {
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "macOS"));
             conf.Options.Add(Options.XCode.Compiler.OnlyActiveArch.Enable);
-            conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks("AppKit"));
+            conf.XcodeSystemFrameworks.Add("AppKit");
         }
 
         [ConfigurePriority(ConfigurePriorities.Platform)]
@@ -131,7 +131,7 @@ namespace XCodeProjects
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "iOS"));
             conf.Options.Add(Options.XCode.Compiler.TargetedDeviceFamily.IosAndIpad);
             conf.Options.Add(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Enable);
-            conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks("UIKit"));
+            conf.XcodeSystemFrameworks.Add("UIKit");
         }
 
         [ConfigurePriority(ConfigurePriorities.Platform)]
@@ -140,7 +140,7 @@ namespace XCodeProjects
         {
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "tvOS"));
             conf.Options.Add(Options.XCode.Compiler.TargetedDeviceFamily.Tvos);
-            conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks("UIKit"));
+            conf.XcodeSystemFrameworks.Add("UIKit");
         }
 
         [ConfigurePriority(ConfigurePriorities.Platform)]
@@ -149,7 +149,7 @@ namespace XCodeProjects
         {
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "watchOS"));
             conf.Options.Add(Options.XCode.Compiler.TargetedDeviceFamily.Watchos);
-            conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks("UIKit"));
+            conf.XcodeSystemFrameworks.Add("UIKit");
         }
 
         [ConfigurePriority(ConfigurePriorities.Platform)]
@@ -158,7 +158,7 @@ namespace XCodeProjects
         {
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "iOS"));
             conf.Options.Add(Options.XCode.Compiler.TargetedDeviceFamily.MacCatalyst);
-            conf.Options.Add(new Sharpmake.Options.XCode.Compiler.SystemFrameworks("UIKit"));
+            conf.XcodeSystemFrameworks.Add("UIKit");
         }
 #endregion
         ////////////////////////////////////////////////////////////////////////

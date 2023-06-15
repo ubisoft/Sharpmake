@@ -70,5 +70,16 @@ namespace Sharpmake.Generators.Apple
                 stringsToResolve.UpdateValue(value, newValue);
             }
         }
+
+        public static void ResolveProjectPaths(Project project, OrderableStrings stringsToResolve)
+        {
+            var count = stringsToResolve.Count;
+            for (var i = 0; i < count; i++)
+            {
+                string value = stringsToResolve[i];
+                string newValue = ResolveProjectPaths(project, value);
+                stringsToResolve[i] = newValue;
+            }
+        }
     }
 }
