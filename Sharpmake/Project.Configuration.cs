@@ -539,6 +539,22 @@ namespace Sharpmake
             public bool ExportAdditionalLibrariesEvenForStaticLib = false;
 
             /// <summary>
+            /// Setting this boolean to true forces Sharpmake to bypass the additional dependencies prefix added normally
+            /// on libraries (-l{...}, or lib{...}.a).
+            /// </summary>
+            /// <remarks>
+            /// Since Sharpmake handles all dependencies, using an <c>AdditionalDependencies</c> field in
+            /// your project as librairies, it is impossible to add other dependencies like externally built objects
+            /// (i.e. *.asm files build externally as *.o). When this is the case, bypassing the prefixing can allow us
+            /// more flexibility on our build pipeline.
+            /// <para>
+            /// The default is <c>false</c>. Set this boolean to <c>true</c> to make Sharpmake skip the name mangling of
+            /// the additional dependencies.
+            /// </para>
+            /// </remarks>
+            public bool BypassAdditionalDependenciesPrefix = false;
+
+            /// <summary>
             /// Gets or sets the name of the project, as viewed by the configuration.
             /// </summary>
             /// <remarks>
