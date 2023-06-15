@@ -418,19 +418,24 @@ namespace Sharpmake.Generators.Apple
 
                             OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
                             systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
+                            RegisterFrameworkBuildPhases<ProjectSystemFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                systemFrameworks,
+                                (string systemFramework) => new ProjectSystemFrameworkFile(systemFramework)
+                            );
 
-                            foreach (string systemFramework in systemFrameworks)
-                            {
-                                var systemFrameworkItem = new ProjectSystemFrameworkFile(systemFramework);
-                                var buildFileItem = new ProjectBuildFile(systemFrameworkItem);
-                                if (!_frameworksFolder.Children.Exists(item => item.FullPath == systemFrameworkItem.FullPath))
-                                {
-                                    _frameworksFolder.Children.Add(systemFrameworkItem);
-                                    _projectItems.Add(systemFrameworkItem);
-                                }
-                                _projectItems.Add(buildFileItem);
-                                _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
-                            }
+                            OrderableStrings developerFrameworks = new OrderableStrings(conf.XcodeDeveloperFrameworks);
+                            developerFrameworks.AddRange(conf.XcodeDependenciesDeveloperFrameworks);
+                            RegisterFrameworkBuildPhases<ProjectDeveloperFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                developerFrameworks,
+                                (string developerFramework) => new ProjectDeveloperFrameworkFile(developerFramework)
+                            );
+
+                            OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
+                            userFrameworks.AddRange(conf.XcodeDependenciesUserFrameworks);
+                            RegisterFrameworkBuildPhases<ProjectUserFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                userFrameworks,
+                                (string userFramework) => new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath)
+                            );
 
                             break;
                     }
@@ -454,17 +459,6 @@ namespace Sharpmake.Generators.Apple
                                 throw new Error("Project {0} has a fastbuild target that has distinct master bff, sharpmake only supports 1.", conf);
                             masterBffFilePath = masterBffList[0];
                         }
-                    }
-
-                    Strings userFrameworks = Options.GetStrings<Options.XCode.Compiler.UserFrameworks>(conf);
-                    foreach (string userFramework in userFrameworks)
-                    {
-                        var userFrameworkItem = new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath);
-                        var buildFileItem = new ProjectBuildFile(userFrameworkItem);
-                        _frameworksFolder.Children.Add(userFrameworkItem);
-                        _projectItems.Add(userFrameworkItem);
-                        _projectItems.Add(buildFileItem);
-                        _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
                     }
 
                     if (conf.Output == Project.Configuration.OutputType.IosTestBundle)
@@ -709,6 +703,24 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
+        private void RegisterFrameworkBuildPhases<ProjectSystemFileType>(
+            string xCodeTargetName, Dictionary<string, ProjectFrameworksBuildPhase> frameworksBuildPhases,
+            OrderableStrings frameworks, Func<string, ProjectSystemFileType> createProjectSystemFileType)
+            where ProjectSystemFileType : ProjectFrameworkFile
+        {
+            foreach (string framework in frameworks)
+            {
+                var frameworkItem = createProjectSystemFileType(framework);
+                var buildFileItem = new ProjectBuildFile(frameworkItem as ProjectFileBase);
+                if (!_frameworksFolder.Children.Exists(item => item.FullPath == frameworkItem.FullPath))
+                {
+                    _frameworksFolder.Children.Add(frameworkItem);
+                    _projectItems.Add(frameworkItem);
+                }
+                _projectItems.Add(buildFileItem);
+                frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+            }
+        }
 
         private static void FillIncludeDirectoriesOptions(IGenerationContext context, IPlatformVcxproj platformVcxproj)
         {
@@ -864,7 +876,13 @@ namespace Sharpmake.Generators.Apple
         {
             _mainGroup = new ProjectFolder(project.GetType().Name, true);
 
-            if (configuration.XcodeSystemFrameworks.Any() || configuration.XcodeDependenciesSystemFrameworks.Any() || Options.GetObjects<Options.XCode.Compiler.UserFrameworks>(configuration).Any())
+            if (configuration.XcodeSystemFrameworks.Any() ||
+                configuration.XcodeDependenciesSystemFrameworks.Any() ||
+                configuration.XcodeDeveloperFrameworks.Any() ||
+                configuration.XcodeDependenciesDeveloperFrameworks.Any() ||
+                configuration.XcodeUserFrameworks.Any() ||
+                configuration.XcodeDependenciesUserFrameworks.Any()
+            )
             {
                 _frameworksFolder = new ProjectFolder("Frameworks", true);
                 _projectItems.Add(_frameworksFolder);
@@ -1589,14 +1607,6 @@ namespace Sharpmake.Generators.Apple
             public string BuildableName { get; }
         }
 
-        private abstract class ProjectFrameworkFile : ProjectFile
-        {
-            public ProjectFrameworkFile(string fullPath)
-                : base(fullPath)
-            {
-            }
-        }
-
         private class ProjectCopyFile : ProjectBuildFile
         {
             public ProjectCopyFile(string fullPath)
@@ -1605,13 +1615,24 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
+        private abstract class ProjectFrameworkFile : ProjectFile
+        {
+            protected const string FrameworkExtension = ".framework";
+
+            public ProjectFrameworkFile(string fullPath)
+                : base(System.IO.Path.GetExtension(fullPath) == FrameworkExtension ?
+                    fullPath :
+                    System.IO.Path.ChangeExtension(fullPath, FrameworkExtension))
+            {
+            }
+        }
+
         private class ProjectSystemFrameworkFile : ProjectFrameworkFile
         {
-            private static readonly string s_frameworkPath = "System" + FolderSeparator + "Library" + FolderSeparator + "Frameworks" + FolderSeparator;
-            private const string FrameworkExtension = ".framework";
+            private static readonly string s_frameworkPath = System.IO.Path.Combine("/System", "Library", "Frameworks");
 
             public ProjectSystemFrameworkFile(string frameworkFileName)
-                : base(s_frameworkPath + frameworkFileName + FrameworkExtension)
+                : base(System.IO.Path.Combine(s_frameworkPath, frameworkFileName))
             {
             }
 
@@ -1621,13 +1642,10 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectDeveloperFrameworkFile : ProjectFrameworkFile
         {
-            private static readonly string s_frameworkPath = ".." + FolderSeparator + ".." + FolderSeparator
-                + "Library" + FolderSeparator
-                + "Frameworks" + FolderSeparator;
-            private const string FrameworkExtension = ".framework";
+            private static readonly string s_frameworkPath = System.IO.Path.Combine("..",  "..", "Library", "Frameworks");
 
             public ProjectDeveloperFrameworkFile(string frameworkFileName)
-                : base(s_frameworkPath + frameworkFileName + FrameworkExtension)
+                : base(System.IO.Path.Combine(s_frameworkPath, frameworkFileName))
             {
             }
 

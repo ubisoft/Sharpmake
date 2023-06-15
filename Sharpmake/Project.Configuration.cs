@@ -1162,7 +1162,7 @@ namespace Sharpmake
             public OrderableStrings LibraryFiles = new OrderableStrings();
 
             /// <summary>
-            /// Gets a list of the Frameworks to link to for Xcode project.
+            /// Gets a list of the System Frameworks to link to for Xcode project.
             /// </summary>
             private OrderableStrings _XcodeSystemFrameworks = null;
             public OrderableStrings XcodeSystemFrameworks
@@ -1175,7 +1175,7 @@ namespace Sharpmake
                     }
                     return _XcodeSystemFrameworks;
                 }
-                set { _XcodeSystemFrameworks = value; }
+                private set { _XcodeSystemFrameworks = value; }
             }
 
             private OrderableStrings _XcodeDependenciesSystemFrameworks = null;
@@ -1189,7 +1189,96 @@ namespace Sharpmake
                     }
                     return _XcodeDependenciesSystemFrameworks;
                 }
-                private set { }
+            }
+
+            /// <summary>
+            /// Gets a list of the Developer Frameworks to link to for Xcode project.
+            /// </summary>
+            private OrderableStrings _XcodeDeveloperFrameworks = null;
+            public OrderableStrings XcodeDeveloperFrameworks
+            {
+                get
+                {
+                    if (_XcodeDeveloperFrameworks == null)
+                    {
+                        _XcodeDeveloperFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeDeveloperFrameworks;
+                }
+                private set { _XcodeDeveloperFrameworks = value; }
+            }
+
+            private OrderableStrings _XcodeDependenciesDeveloperFrameworks = null;
+            public OrderableStrings XcodeDependenciesDeveloperFrameworks
+            {
+                get
+                {
+                    if (_XcodeDependenciesDeveloperFrameworks == null)
+                    {
+                        _XcodeDependenciesDeveloperFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeDependenciesDeveloperFrameworks;
+                }
+            }
+
+            /// <summary>
+            /// Gets a list of the User Frameworks to link to for Xcode project.
+            /// </summary>
+            private OrderableStrings _XcodeUserFrameworks = null;
+            public OrderableStrings XcodeUserFrameworks
+            {
+                get
+                {
+                    if (_XcodeUserFrameworks == null)
+                    {
+                        _XcodeUserFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeUserFrameworks;
+                }
+                private set { _XcodeUserFrameworks = value; }
+            }
+
+            private OrderableStrings _XcodeDependenciesUserFrameworks = null;
+            public OrderableStrings XcodeDependenciesUserFrameworks
+            {
+                get
+                {
+                    if (_XcodeDependenciesUserFrameworks == null)
+                    {
+                        _XcodeDependenciesUserFrameworks = new OrderableStrings();
+                    }
+                    return _XcodeDependenciesUserFrameworks;
+                }
+            }
+
+            /// <summary>
+            /// Gets a list of the Framework paths to link to for Xcode project.
+            /// </summary>
+            private OrderableStrings _XcodeFrameworkPaths = null;
+            public OrderableStrings XcodeFrameworkPaths
+            {
+                get
+                {
+                    if (_XcodeFrameworkPaths == null)
+                    {
+                        _XcodeFrameworkPaths = new OrderableStrings();
+                    }
+                    return _XcodeFrameworkPaths;
+                }
+                private set { _XcodeFrameworkPaths = value; }
+            }
+
+            private OrderableStrings _XcodeDependenciesFrameworkPaths = null;
+            public OrderableStrings XcodeDependenciesFrameworkPaths
+            {
+                get
+                {
+                    if (_XcodeDependenciesFrameworkPaths == null)
+                    {
+                        _XcodeDependenciesFrameworkPaths = new OrderableStrings();
+                    }
+                    return _XcodeDependenciesFrameworkPaths;
+                }
             }
 
             /// <summary>
@@ -3093,11 +3182,6 @@ namespace Sharpmake
                 var visitingNodes = new Stack<Tuple<DependencyNode, PropagationSettings>>();
                 visitingNodes.Push(Tuple.Create(rootNode, new PropagationSettings(DependencySetting.Default, true, true, true, false)));
 
-                //backward compatible, systemframeworks might be added via options.
-                Strings xcodeSystemFrameworks = Sharpmake.Options.GetStrings<Options.XCode.Compiler.SystemFrameworks>(this);
-                if (xcodeSystemFrameworks.Count > 0)
-                    XcodeSystemFrameworks.AddRange(xcodeSystemFrameworks);
-
                 (IConfigurationTasks, Platform)? lastPlatformConfigurationTasks = null;
 
                 IConfigurationTasks GetConfigurationTasks(Platform platform)
@@ -3243,8 +3327,25 @@ namespace Sharpmake
                                         DependenciesForceUsingFiles.AddRange(dependency.ForceUsingFiles);
                                 }
 
-                                if ((dependency.Platform.Equals(Platform.mac) || dependency.Platform.Equals(Platform.ios)) && dependency.XcodeSystemFrameworks.Count > 0)
-                                    XcodeDependenciesSystemFrameworks.AddRange(dependency.XcodeSystemFrameworks);
+                                if (dependency.Platform.Equals(Platform.mac) ||
+                                    dependency.Platform.Equals(Platform.ios) ||
+                                    dependency.Platform.Equals(Platform.tvos) ||
+                                    dependency.Platform.Equals(Platform.watchos) ||
+                                    dependency.Platform.Equals(Platform.maccatalyst)
+                                )
+                                {
+                                    if (dependency.XcodeSystemFrameworks.Count > 0)
+                                        XcodeDependenciesSystemFrameworks.AddRange(dependency.XcodeSystemFrameworks);
+
+                                    if (dependency.XcodeDeveloperFrameworks.Count > 0)
+                                        XcodeDependenciesDeveloperFrameworks.AddRange(dependency.XcodeDeveloperFrameworks);
+
+                                    if (dependency.XcodeUserFrameworks.Count > 0)
+                                        XcodeDependenciesUserFrameworks.AddRange(dependency.XcodeUserFrameworks);
+
+                                    if (dependency.XcodeFrameworkPaths.Count > 0)
+                                        XcodeDependenciesFrameworkPaths.AddRange(dependency.XcodeFrameworkPaths);
+                                }
 
                                 // If our no-output project is just a build-order dependency, update the build order accordingly
                                 if (!dependencyOutputLib && isImmediate && dependencySetting == DependencySetting.OnlyBuildOrder && !isExport)
