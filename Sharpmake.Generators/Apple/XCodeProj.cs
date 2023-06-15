@@ -768,9 +768,6 @@ namespace Sharpmake.Generators.Apple
             {
                 bool build = !configuration.ResolvedSourceFilesBuildExclude.Contains(file);
                 string extension = Path.GetExtension(file);
-                bool source = project.SourceFilesExtensions.Contains(extension) || (string.Compare(extension, ".mm", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(extension, ".m", StringComparison.OrdinalIgnoreCase) == 0);
-                if (!source)
-                    continue;
 
                 bool alreadyPresent;
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath, true);
