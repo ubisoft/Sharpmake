@@ -486,11 +486,47 @@ namespace Sharpmake
             else
                 options["Archs"] = "\"$(ARCHS_STANDARD_64_BIT)\"";
 
-            Options.XCode.Compiler.AssetCatalogCompilerAppIconName assetcatalogCompilerAppiconName = Options.GetObject<Options.XCode.Compiler.AssetCatalogCompilerAppIconName>(conf);
-            if (assetcatalogCompilerAppiconName != null)
-                options["AssetCatalogCompilerAppIconName"] = assetcatalogCompilerAppiconName.Value;
-            else
-                options["AssetCatalogCompilerAppIconName"] = FileGeneratorUtilities.RemoveLineTag;
+            options["AssetCatalogCompilerAppIconName"] = Options.StringOption.Get<Options.XCode.Compiler.AssetCatalogCompilerAppIconName>(conf);
+            options["AssetCatalogCompilerLaunchImageName"] = Options.StringOption.Get<Options.XCode.Compiler.AssetCatalogCompilerLaunchImageName>(conf);
+            options["AssetCatalogCompilerAlternateAppIconNames"] = XCodeUtil.XCodeFormatList(Options.GetStrings<Options.XCode.Compiler.AssetCatalogCompilerAlternateAppIconNames>(conf), 4);
+            options["AssetCatalogCompilerGlobalAccentColorName"] = Options.StringOption.Get<Options.XCode.Compiler.AssetCatalogCompilerGlobalAccentColorName>(conf);
+            options["AssetCatalogCompilerWidgetBackgroundColorName"] = Options.StringOption.Get<Options.XCode.Compiler.AssetCatalogCompilerWidgetBackgroundColorName>(conf);
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogCompilerIncludeAllAppIconAssets"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerIncludeAllAppIconAssets.Enable, () => options["AssetCatalogCompilerIncludeAllAppIconAssets"] = "YES"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerIncludeAllAppIconAssets.Disable, () => options["AssetCatalogCompilerIncludeAllAppIconAssets"] = "NO")
+            );
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogCompilerIncludeInfoPlistLocalizations"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerIncludeInfoPlistLocalizations.Enable, () => options["AssetCatalogCompilerIncludeInfoPlistLocalizations"] = "YES"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerIncludeInfoPlistLocalizations.Disable, () => options["AssetCatalogCompilerIncludeInfoPlistLocalizations"] = "NO")
+            );
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogCompilerOptimization"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerOptimization.Time, () => options["AssetCatalogCompilerOptimization"] = "time"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerOptimization.Space, () => options["AssetCatalogCompilerOptimization"] = "space")
+            );
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogCompilerStandaloneIconBehavior"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerStandaloneIconBehavior.Default, () => options["AssetCatalogCompilerStandaloneIconBehavior"] = "Default"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerStandaloneIconBehavior.None, () => options["AssetCatalogCompilerStandaloneIconBehavior"] = "None"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerStandaloneIconBehavior.All, () => options["AssetCatalogCompilerStandaloneIconBehavior"] = "All")
+            );
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogCompilerSkipAppStoreDeployment"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerSkipAppStoreDeployment.Enable, () => options["AssetCatalogCompilerSkipAppStoreDeployment"] = "YES"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogCompilerSkipAppStoreDeployment.Disable, () => options["AssetCatalogCompilerSkipAppStoreDeployment"] = "NO")
+            );
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogNotices"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogNotices.Enable, () => options["AssetCatalogNotices"] = "YES"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogNotices.Disable, () => options["AssetCatalogNotices"] = "NO")
+            );
+            context.SelectOptionWithFallback(
+                () => options["AssetCatalogWarnings"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.AssetCatalogWarnings.Enable, () => options["AssetCatalogWarnings"] = "YES"),
+                Options.Option(Options.XCode.Compiler.AssetCatalogWarnings.Disable, () => options["AssetCatalogWarnings"] = "NO")
+            );
 
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Disable, () => options["AutomaticReferenceCounting"] = "NO"),
@@ -892,6 +928,77 @@ namespace Sharpmake
 
             options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
             options["SupportsMacDesignedForIphoneIpad"] = FileGeneratorUtilities.RemoveLineTag;
+
+            context.SelectOptionWithFallback(
+                () => options["SwiftEmitLocStrings"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.Compiler.SwiftEmitLocStrings.Disable, () => options["SwiftEmitLocStrings"] = "NO"),
+                Options.Option(Options.XCode.Compiler.SwiftEmitLocStrings.Enable, () => options["SwiftEmitLocStrings"] = "YES")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.MetalFastMath.Disable, () => options["MetalFastMath"] = "NO"),
+                Options.Option(Options.XCode.Compiler.MetalFastMath.Enable, () => options["MetalFastMath"] = "YES")
+            );
+
+        #region infoplist keys
+            /// common keys
+            options["CFBundleSpokenName"] = Options.StringOption.Get<Options.XCode.InfoPlist.CFBundleSpokenName>(conf);
+            options["CFBundleDevelopmentRegion"] = Options.StringOption.Get<Options.XCode.InfoPlist.CFBundleDevelopmentRegion>(conf);
+            options["CFBundleExecutable"] = Options.StringOption.Get<Options.XCode.InfoPlist.CFBundleExecutable>(conf);
+            options["CFBundleLocalizations"] = XCodeUtil.XCodeFormatList(Options.GetStrings<Options.XCode.InfoPlist.CFBundleLocalizations>(conf), 4);
+
+            context.SelectOptionWithFallback(
+                () => options["CFBundleAllowMixedLocalizations"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.InfoPlist.CFBundleAllowMixedLocalizations.Disable, () => options["CFBundleAllowMixedLocalizations"] = "NO"),
+                Options.Option(Options.XCode.InfoPlist.CFBundleAllowMixedLocalizations.Enable, () => options["CFBundleAllowMixedLocalizations"] = "YES")
+            );
+
+            context.SelectOptionWithFallback(
+                () => options["NSHighResolutionCapable"] = FileGeneratorUtilities.RemoveLineTag,
+                Options.Option(Options.XCode.InfoPlist.NSHighResolutionCapable.Disable, () => options["NSHighResolutionCapable"] = "NO"),
+                Options.Option(Options.XCode.InfoPlist.NSHighResolutionCapable.Enable, () => options["NSHighResolutionCapable"] = "YES")
+            );
+
+            /// - macOS specific, set to proper value in override method
+            options["NSHumanReadableCopyright"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSMainStoryboardFile"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSMainNibFile"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSPrefPaneIconFile"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSPrefPaneIconLabel"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSPrincipalClass"] = FileGeneratorUtilities.RemoveLineTag;
+            options["LSRequiresNativeExecution"] = FileGeneratorUtilities.RemoveLineTag;
+            options["LSMultipleInstancesProhibited"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSSupportsAutomaticGraphicsSwitching"] = FileGeneratorUtilities.RemoveLineTag;
+            options["NSPrefersDisplaySafeAreaCompatibilityMode"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UISupportsTrueScreenSizeOnMac"] = FileGeneratorUtilities.RemoveLineTag;
+
+            /// - iOS specific, set to proper value in override method
+            options["LSRequiresIPhoneOS"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIRequiredDeviceCapabilities"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIMainStoryboardFile"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UILaunchStoryboardName"] = FileGeneratorUtilities.RemoveLineTag;
+            options["CFBundleIconFile"] = FileGeneratorUtilities.RemoveLineTag;
+            options["CFBundleIconFiles"] = FileGeneratorUtilities.RemoveLineTag;
+            options["CFBundleIconName"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIPrerenderedIcon"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIInterfaceOrientation"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIInterfaceOrientation_iPhone"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIInterfaceOrientation_iPad"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIUserInterfaceStyle"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIWhitePointAdaptivityStyle"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIRequiresFullScreen"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIStatusBarHidden"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIViewControllerBasedStatusBarAppearance"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIStatusBarStyle"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIApplicationSupportsIndirectInputEvents"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UIRequiresPersistentWiFi"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UISupportedInterfaceOrientations"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UISupportedInterfaceOrientations_iPhone"] = FileGeneratorUtilities.RemoveLineTag;
+            options["UISupportedInterfaceOrientations_iPad"] = FileGeneratorUtilities.RemoveLineTag;
+
+            /// - tvOS specific, set to proper value in override method
+            options["UIAppSupportsHDR"] = FileGeneratorUtilities.RemoveLineTag;
+        #endregion // infoplist keys
         }
 
         public virtual void SelectPrecompiledHeaderOptions(IGenerationContext context)

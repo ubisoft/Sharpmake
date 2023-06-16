@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using Sharpmake.Generators;
+using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
@@ -80,6 +81,13 @@ namespace Sharpmake
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
                 options["SupportsMacDesignedForIphoneIpad"] = FileGeneratorUtilities.RemoveLineTag;
 
+            #region infoplist keys
+                context.SelectOptionWithFallback(
+                    () => options["UIAppSupportsHDR"] = FileGeneratorUtilities.RemoveLineTag,
+                    Options.Option(Options.XCode.InfoPlist.UIAppSupportsHDR.Disable, () => options["UIAppSupportsHDR"] = "NO"),
+                    Options.Option(Options.XCode.InfoPlist.UIAppSupportsHDR.Enable, () => options["UIAppSupportsHDR"] = "YES")
+                );
+            #endregion // infoplist keys
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)
