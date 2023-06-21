@@ -21,6 +21,8 @@ namespace XCodeProjects
     {
         public CLIToolProject()
         {
+            Name = @"CLITool";
+
             AddTargets(CommonTarget.GetMacTargets());
             AddTargets(CommonTarget.GetIosTargets());
             AddTargets(CommonTarget.GetTvosTargets());

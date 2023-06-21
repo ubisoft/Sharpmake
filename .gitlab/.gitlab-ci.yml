@@ -141,6 +141,11 @@ HelloXCode:
   script:
   - pwsh ./RunSample.ps1 -sampleName HelloXCode -configuration $configuration -framework $framework
 
+XCodeProjects:
+  extends: .macos_sample_test
+  script:
+  - pwsh ./RunSample.ps1 -sampleName XCodeProjects -configuration $configuration -framework $framework
+
 #############
 # Windows Sample tests
 #############
