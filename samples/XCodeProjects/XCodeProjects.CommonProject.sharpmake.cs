@@ -41,13 +41,13 @@ namespace XCodeProjects
             SourceRootPath = Path.Combine(@"[project.RootPath]", @"[project.Name]");
             AdditionalSourceRootPaths.Add(Globals.ExternalDirectory);
 
-            SourceFilesExtensions.Add(".m", ".mm", ".metal", ".plist");
+            SourceFilesExtensions.Add(".m", ".mm", ".metal", ".plist", ".storyboard", ".xcassets");
 
             // .storyboard .xcassets resources need to be marked as compilable for iOS.
             SourceFilesCompileExtensions.Add(".m", ".mm", ".metal", ".storyboard", ".xcassets");
 
             // Add the resource file extension
-            ResourceFilesExtensions.Add(".storyboard");
+            ResourceFilesExtensions.Add(".storyboard", ".xcassets");
 
             //!!! CAUTION: THIS IS COUNTERINTUITIVE !!!
             // Add ".plist" to compilable or resource extensions BUT DO NOT BUILD IT
@@ -62,8 +62,16 @@ namespace XCodeProjects
         [Configure]
         public virtual void ConfigureAll(Configuration conf, CommonTarget target)
         {
+            conf.PreferRelativePaths = true;
             conf.IncludePaths.Add(Globals.ExternalDirectory);
-            conf.IncludePaths.Add(Globals.IncludesDirectory);
+            conf.IncludePaths.Add(Globals.IncludesDirectories);
+
+            conf.Options.Add(Options.XCode.Compiler.CLanguageStandard.C11);
+            conf.Options.Add(Options.XCode.Compiler.CppLanguageStandard.CPP17);
+            conf.Options.Add(Options.Vc.Compiler.CLanguageStandard.C11);
+            conf.Options.Add(Options.Vc.Compiler.CppLanguageStandard.CPP17);
+            conf.Options.Add(Options.Clang.Compiler.CLanguageStandard.C11);
+            conf.Options.Add(Options.Clang.Compiler.CppLanguageStandard.Cpp17);
 
             conf.ProjectFileName = @"[project.Name]_[target.Platform]_[target.DevEnv]";
             conf.ProjectPath = Path.Combine(Globals.TmpDirectory, "projects", @"[project.Name]");
@@ -103,15 +111,14 @@ namespace XCodeProjects
         )]
         public virtual void ConfigureApple(Configuration conf, CommonTarget target)
         {
-            conf.AdditionalCompilerOptions.Add("-ObjC++");
             conf.Options.Add(Options.Vc.SourceFile.PrecompiledHeader.NotUsingPrecompiledHeaders);
             conf.Options.Add(Options.XCode.Compiler.LibraryStandard.LibCxx);
             conf.Options.Add(Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym);
-            conf.Options.Add(Options.XCode.Compiler.CppLanguageStandard.CPP17);
-            conf.Options.Add(Options.XCode.Compiler.CLanguageStandard.C11);
-            conf.Options.Add(Options.XCode.Compiler.EnableBitcode.Enable);
+            conf.Options.Add(Options.XCode.Compiler.EnableBitcode.Disable);
             conf.Options.Add(Options.XCode.Compiler.GenerateInfoPlist.Enable);
-            conf.Options.Add(new Options.XCode.Compiler.ProductBundleDisplayName(@"[project.Name]"));
+            conf.Options.Add(
+                new Options.XCode.Compiler.ProductBundleDisplayName(@"[project.Name]")
+            );
             conf.AdditionalLinkerOptions.Add("-lm"); // math functions
         }
 
@@ -158,6 +165,7 @@ namespace XCodeProjects
         {
             conf.LibraryPaths.Add(Path.Combine(Globals.LibrariesDirectory, "iOS"));
             conf.Options.Add(Options.XCode.Compiler.TargetedDeviceFamily.MacCatalyst);
+            conf.Options.Add(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Disable);
             conf.XcodeSystemFrameworks.Add("UIKit");
         }
 #endregion

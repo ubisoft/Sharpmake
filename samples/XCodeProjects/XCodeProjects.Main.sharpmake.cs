@@ -23,6 +23,7 @@ using Sharpmake.Generators.FastBuild;
 
 [module: Sharpmake.Include("XCodeProjects.*.sharpmake.cs")]
 [module: Sharpmake.Include("*/*.sharpmake.cs")]
+[module: Sharpmake.Include("extern/*/*.sharpmake.cs")]
 
 namespace XCodeProjects
 {
@@ -56,9 +57,14 @@ namespace XCodeProjects
             get => Path.Combine(RootDirectory, @"..\external");
         }
 
-        public static string IncludesDirectory
+        public static string[] IncludesDirectories
         {
-            get => Path.Combine(RootDirectory, "extern", "includes");
+            get =>
+                new string[]
+                {
+                    Path.Combine(RootDirectory, "extern", "includes"),
+                    Path.Combine(RootDirectory, "intern", "includes"),
+                };
         }
 
         public static string LibrariesDirectory
@@ -89,7 +95,7 @@ namespace XCodeProjects
             // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(
                 Globals.RootDirectory,
-                @"..\..\..\tools\FastBuild"
+                @"../../tools/FastBuild"
             );
             switch (Util.GetExecutingPlatform())
             {
