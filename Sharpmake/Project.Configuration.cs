@@ -1268,6 +1268,36 @@ namespace Sharpmake
             }
 
             /// <summary>
+            /// Gets a list of the System Framework paths to link to for Xcode project.
+            /// </summary>
+            private OrderableStrings _XcodeSystemFrameworkPaths = null;
+            public OrderableStrings XcodeSystemFrameworkPaths
+            {
+                get
+                {
+                    if (_XcodeSystemFrameworkPaths == null)
+                    {
+                        _XcodeSystemFrameworkPaths = new OrderableStrings();
+                    }
+                    return _XcodeSystemFrameworkPaths;
+                }
+                private set { _XcodeSystemFrameworkPaths = value; }
+            }
+
+            private OrderableStrings _XcodeDependenciesSystemFrameworkPaths = null;
+            public OrderableStrings XcodeDependenciesSystemFrameworkPaths
+            {
+                get
+                {
+                    if (_XcodeDependenciesSystemFrameworkPaths == null)
+                    {
+                        _XcodeDependenciesSystemFrameworkPaths = new OrderableStrings();
+                    }
+                    return _XcodeDependenciesSystemFrameworkPaths;
+                }
+            }
+
+            /// <summary>
             /// Gets a list of the Framework paths to link to for Xcode project.
             /// </summary>
             private OrderableStrings _XcodeFrameworkPaths = null;
@@ -3358,6 +3388,9 @@ namespace Sharpmake
 
                                     if (dependency.XcodeUserFrameworks.Count > 0)
                                         XcodeDependenciesUserFrameworks.AddRange(dependency.XcodeUserFrameworks);
+
+                                    if (dependency.XcodeSystemFrameworkPaths.Count > 0)
+                                        XcodeDependenciesSystemFrameworkPaths.AddRange(dependency.XcodeSystemFrameworkPaths);
 
                                     if (dependency.XcodeFrameworkPaths.Count > 0)
                                         XcodeDependenciesFrameworkPaths.AddRange(dependency.XcodeFrameworkPaths);
