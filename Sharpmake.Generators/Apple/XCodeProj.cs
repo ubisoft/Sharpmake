@@ -69,6 +69,7 @@ namespace Sharpmake.Generators.Apple
         private ProjectFolder _mainGroup = null;
         private ProjectFolder _productsGroup = null;
         private ProjectFolder _frameworksFolder = null;
+        private ProjectFolder _embedFrameworksFolder = null;
 
         private Dictionary<string, ProjectTarget> _nativeOrLegacyTargets = null;
         private Dictionary<string, ProjectResourcesBuildPhase> _resourcesBuildPhases = null;
@@ -419,6 +420,7 @@ namespace Sharpmake.Generators.Apple
                             OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
                             systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
                             RegisterFrameworkBuildPhases<ProjectSystemFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _frameworksFolder,
                                 systemFrameworks,
                                 (string systemFramework) => new ProjectSystemFrameworkFile(systemFramework)
                             );
@@ -426,6 +428,7 @@ namespace Sharpmake.Generators.Apple
                             OrderableStrings developerFrameworks = new OrderableStrings(conf.XcodeDeveloperFrameworks);
                             developerFrameworks.AddRange(conf.XcodeDependenciesDeveloperFrameworks);
                             RegisterFrameworkBuildPhases<ProjectDeveloperFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _frameworksFolder,
                                 developerFrameworks,
                                 (string developerFramework) => new ProjectDeveloperFrameworkFile(developerFramework)
                             );
@@ -433,8 +436,22 @@ namespace Sharpmake.Generators.Apple
                             OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
                             userFrameworks.AddRange(conf.XcodeDependenciesUserFrameworks);
                             RegisterFrameworkBuildPhases<ProjectUserFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _frameworksFolder,
                                 userFrameworks,
                                 (string userFramework) => new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath)
+                            );
+
+                            OrderableStrings embeddedFrameworks = new OrderableStrings(conf.XcodeEmbeddedFrameworks);
+                            embeddedFrameworks.AddRange(conf.XcodeDependenciesEmbeddedFrameworks);
+                            var embeddedFrameworkItems = RegisterFrameworkBuildPhases<ProjectEmbeddedFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
+                                _embedFrameworksFolder,
+                                embeddedFrameworks,
+                                (string embeddedFramework) => new ProjectEmbeddedFrameworkFile(XCodeUtil.ResolveProjectPaths(project, embeddedFramework), workspacePath)
+                            );
+                            RegisterFrameworkCopyFilesPhases(xCodeTargetName, _copyFilesPostBuildPhases,
+                                _embedFrameworksFolder,
+                                embeddedFrameworkItems,
+                                (string embeddedFramework) => new ProjectEmbeddedFrameworkFile(XCodeUtil.ResolveProjectPaths(project, embeddedFramework), workspacePath)
                             );
 
                             break;
@@ -492,7 +509,8 @@ namespace Sharpmake.Generators.Apple
                 if (_sourcesBuildPhases.ContainsKey(xCodeTargetName))
                     target.SourcesBuildPhase = _sourcesBuildPhases[xCodeTargetName];
 
-                target.FrameworksBuildPhase = _frameworksBuildPhases[xCodeTargetName];
+                if (_frameworksBuildPhases.ContainsKey(xCodeTargetName))
+                    target.FrameworksBuildPhase = _frameworksBuildPhases[xCodeTargetName];
                 if (_shellScriptPreBuildPhases.ContainsKey(xCodeTargetName))
                     target.ShellScriptPreBuildPhases = _shellScriptPreBuildPhases[xCodeTargetName];
 
@@ -635,20 +653,14 @@ namespace Sharpmake.Generators.Apple
 
         private void RegisterHeadersBuildPhase(string xCodeTargetName, Dictionary<string, UniqueList<ProjectHeadersBuildPhase>> headersBuildPhases)
         {
-            var isHeader = (string file) => {
-                var ext = Path.GetExtension(file);
-                return (ext == ".h" || ext == ".hpp" || ext == ".hxx" || ext == ".inl");
-            };
-
             var headerFiles =  _projectItems
                     .Where(p => p is ProjectBuildFile)
                     .Select(p => p as ProjectBuildFile)
-                    .Where(p => isHeader(p.File.FileName))
+                    .Where(p => p.File.IsHeader)
                     .ToList(); //< make a copy since we want to add to _projectItems
 
             foreach (var pitem in headerFiles)
             {
-                pitem.Settings = @"{ATTRIBUTES = (Public, ); }";
                 var headerPhase = headersBuildPhases[xCodeTargetName].Count > 0 ?
                     headersBuildPhases[xCodeTargetName].First() :
                     new ProjectHeadersBuildPhase(2147483647);
@@ -703,24 +715,67 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private void RegisterFrameworkBuildPhases<ProjectSystemFileType>(
-            string xCodeTargetName, Dictionary<string, ProjectFrameworksBuildPhase> frameworksBuildPhases,
-            OrderableStrings frameworks, Func<string, ProjectSystemFileType> createProjectSystemFileType)
+        private List<ProjectSystemFileType> RegisterFrameworkBuildPhases<ProjectSystemFileType>(
+            string xCodeTargetName,
+            Dictionary<string, ProjectFrameworksBuildPhase> frameworksBuildPhases,
+            ProjectFolder frameworksFolder,
+            OrderableStrings frameworks,
+            Func<string, ProjectSystemFileType> createProjectSystemFileType)
             where ProjectSystemFileType : ProjectFrameworkFile
         {
+            List<ProjectSystemFileType> buildFiles = new List<ProjectSystemFileType>();
             foreach (string framework in frameworks)
             {
                 var frameworkItem = createProjectSystemFileType(framework);
                 var buildFileItem = new ProjectBuildFile(frameworkItem as ProjectFileBase);
-                if (!_frameworksFolder.Children.Exists(item => item.FullPath == frameworkItem.FullPath))
+                if (!frameworksFolder.Children.Exists(item => item.FullPath == frameworkItem.FullPath))
                 {
-                    _frameworksFolder.Children.Add(frameworkItem);
+                    frameworksFolder.Children.Add(frameworkItem);
                     _projectItems.Add(frameworkItem);
+                    buildFiles.Add(frameworkItem);
                 }
-                _projectItems.Add(buildFileItem);
-                frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+
+                if (!_projectItems.Contains(buildFileItem))
+                {
+                    _projectItems.Add(buildFileItem);
+                    frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                }
+            }
+            return buildFiles;
+        }
+
+        private void RegisterFrameworkCopyFilesPhases(
+            string xCodeTargetName,
+            Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases,
+            ProjectFolder frameworksFolder,
+            List<ProjectEmbeddedFrameworkFile> frameworkItems,
+            Func<string, ProjectEmbeddedFrameworkFile> createProjectSystemFileType)
+        {
+            foreach (var frameworkItem in frameworkItems)
+            {
+                // add second entry for copy (Xcode does this as well)
+                var buildFileItem2 = new ProjectBuildFile(frameworkItem, settings: @"{ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }");
+                if (!frameworksFolder.Children.Exists(item => item.FullPath == frameworkItem.FullPath))
+                {
+                    frameworksFolder.Children.Add(frameworkItem);
+                }
+
+                if (!_projectItems.Contains(buildFileItem2))
+                {
+                    _projectItems.Add(buildFileItem2);
+
+                    // add to post-build phase
+                    var locator = (ProjectCopyFilesBuildPhase p) => p.FolderSpec == (int)FolderSpec.Frameworks;
+                    var copyBuildPhase = _copyFilesPostBuildPhases[xCodeTargetName].Where(locator).Any() ?
+                        _copyFilesPostBuildPhases[xCodeTargetName].Where(locator).First() :
+                        new ProjectCopyFilesBuildPhase("Embed Frameworks", 2147483647, string.Empty, FolderSpec.Frameworks);
+                    copyBuildPhase.Files.Add(buildFileItem2);
+                    _projectItems.Add(copyBuildPhase);
+                    copyFilesPhases[xCodeTargetName].Add(copyBuildPhase);
+                }
             }
         }
+
 
         private static void FillIncludeDirectoriesOptions(IGenerationContext context, IPlatformVcxproj platformVcxproj)
         {
@@ -777,7 +832,7 @@ namespace Sharpmake.Generators.Apple
                 item.Build = build;
                 if (build)
                 {
-                    var buildFileItem = new ProjectBuildFile((ProjectFile)item);
+                    var buildFileItem = new ProjectBuildFile((ProjectFile)item, item.IsHeader ? @"{ATTRIBUTES = (Public, ); }" : RemoveLineTag);
                     _projectItems.Add(buildFileItem);
                     _sourcesBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
                 }
@@ -878,12 +933,23 @@ namespace Sharpmake.Generators.Apple
                 configuration.XcodeDeveloperFrameworks.Any() ||
                 configuration.XcodeDependenciesDeveloperFrameworks.Any() ||
                 configuration.XcodeUserFrameworks.Any() ||
-                configuration.XcodeDependenciesUserFrameworks.Any()
+                configuration.XcodeDependenciesUserFrameworks.Any() ||
+                configuration.XcodeEmbeddedFrameworks.Any() ||
+                configuration.XcodeDependenciesEmbeddedFrameworks.Any()
             )
             {
                 _frameworksFolder = new ProjectFolder("Frameworks", true);
                 _projectItems.Add(_frameworksFolder);
                 _mainGroup.Children.Add(_frameworksFolder);
+            }
+
+            if (configuration.XcodeEmbeddedFrameworks.Any() ||
+                configuration.XcodeDependenciesEmbeddedFrameworks.Any()
+            )
+            {
+                _embedFrameworksFolder = new ProjectFolder("Embed Frameworks", true);
+                _projectItems.Add(_embedFrameworksFolder);
+                _mainGroup.Children.Add(_embedFrameworksFolder);
             }
 
             _projectItems.Add(_mainGroup);
@@ -1259,20 +1325,23 @@ namespace Sharpmake.Generators.Apple
             private string _internalIdentifier;
             private int _hashCode;
             private string _uid;
+            private string _settings;
 
-            public ProjectItem(ItemSection section, string identifier)
+            public ProjectItem(ItemSection section, string identifier, string settings = RemoveLineTag)
             {
                 _section = section;
                 _identifier = identifier;
-                _internalIdentifier = section.ToString() + "/" + Identifier;
+                _internalIdentifier = section.ToString() + "/" + Identifier + settings;
+                _settings = settings;
                 _hashCode = _internalIdentifier.GetHashCode();
                 _uid = XCodeProjIdGenerator.GetXCodeId(this);
             }
 
-            public ItemSection Section { get { return _section; } }
-            public string SectionString { get { return _section.ToString(); } }
-            public string Identifier { get { return _identifier; } }
-            public string Uid { get { return _uid; } }
+            public ItemSection Section { get => _section; }
+            public string SectionString { get => _section.ToString(); }
+            public string Identifier { get => _identifier; }
+            public string Uid { get => _uid; }
+            public string Settings { get => string.IsNullOrEmpty(_settings) ? RemoveLineTag : _settings; }
 
             public virtual void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
@@ -1372,6 +1441,13 @@ namespace Sharpmake.Generators.Apple
             public List<ProjectFileSystemItem> Children { get; protected set; }
             public abstract bool Build { get; set; }
             public abstract bool Source { get; set; }
+
+            /// <summary>
+            /// returns true if the file is a C|C++|ObjC header file
+            /// Header files require special classification inside Xcode projects,
+            /// e.g. for Framework projects, to embed the headers in the resulting bundle.
+            /// </summary>
+            public bool IsHeader { get => Extension == ".h" || Extension == ".hpp" || Extension == ".hxx" || Extension == ".inl"; }
             public string FullPath { get; protected set; }
             public string FileName => System.IO.Path.GetFileName(FullPath);
             public virtual string Name { get; protected set; }
@@ -1380,7 +1456,10 @@ namespace Sharpmake.Generators.Apple
                 get { return Name; }
                 protected set { Name = value; }
             }
-            public string Type => Source ? "Sources" : "Frameworks";
+            public string Type =>
+                IsHeader ? @"Headers" :
+                Source ? @"Sources" :
+                @"Frameworks";
             public abstract string Extension { get; }
             public string SourceTree => EnumExtensions.EnumToString(SourceTreeValue);
             public abstract SourceTreeSetting SourceTreeValue { get; }
@@ -1652,7 +1731,7 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectUserFrameworkFile : ProjectFrameworkFile
         {
-            private string _relativePath;
+            protected string _relativePath;
 
             public ProjectUserFrameworkFile(string frameworkFullPath, string workspacePath)
                 : base(frameworkFullPath)
@@ -1662,6 +1741,14 @@ namespace Sharpmake.Generators.Apple
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.SOURCE_ROOT; } }
             public override string Path { get { return _relativePath; } }
+        }
+
+        private class ProjectEmbeddedFrameworkFile : ProjectUserFrameworkFile
+        {
+            public ProjectEmbeddedFrameworkFile(string frameworkFullPath, string workspacePath)
+                : base(frameworkFullPath, workspacePath)
+            {
+            }
         }
 
         private class ProjectFolder : ProjectFileSystemItem
@@ -1725,21 +1812,13 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectBuildFile : ProjectItem
         {
-            public ProjectBuildFile(ProjectFileBase file)
-                : base(ItemSection.PBXBuildFile, file.Name)
+            public ProjectBuildFile(ProjectFileBase file, string settings = @"")
+                : base(ItemSection.PBXBuildFile, file.Name, settings)
             {
                 File = file;
-            }
-
-            public ProjectBuildFile(ProjectFileBase file, string settings)
-                : base(ItemSection.PBXBuildFile, file.Name)
-            {
-                File = file;
-                Settings = settings;
             }
 
             public ProjectFileBase File { get; }
-            public string Settings = RemoveLineTag;
         }
 
         private abstract class ProjectBuildPhase : ProjectItem
@@ -2077,7 +2156,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectOutputFile OutputFile { get; }
             public string ProductType { get; }
             public ProjectConfigurationList ConfigurationList { get; }
-            public string ProductInstallPath { get; }
+            public string ProductInstallPath { get; set; }
         }
 
         private class ProjectNativeTarget : ProjectTarget
