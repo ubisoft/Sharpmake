@@ -695,7 +695,8 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.LibraryStandard.LibCxx, () => { options["StdLib"] = "libc++"; cmdLineOptions["StdLib"] = "-stdlib=libc++"; })
             );
 
-            var frameworkPaths = conf.XcodeFrameworkPaths;
+            var frameworkPaths = conf.XcodeSystemFrameworkPaths;
+            frameworkPaths.AddRange(conf.XcodeFrameworkPaths);
             XCodeUtil.ResolveProjectPaths(project, frameworkPaths);
             options["FrameworkPaths"] = XCodeUtil.XCodeFormatList(frameworkPaths, 4);
 
@@ -1100,6 +1101,16 @@ namespace Sharpmake
             OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
             userFrameworks.AddRange(conf.XcodeDependenciesUserFrameworks);
             cmdLineOptions["UserFrameworks"] = userFrameworks.Any() ? "-framework " + userFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
+
+            OrderableStrings systemFrameworkPaths = new OrderableStrings(conf.XcodeSystemFrameworkPaths);
+            systemFrameworkPaths.AddRange(conf.XcodeDependenciesSystemFrameworkPaths);
+            cmdLineOptions["CompilerSystemFrameworkPaths"] = systemFrameworkPaths.Any() ? "-iframework " + systemFrameworkPaths.JoinStrings(" -iframework ") : FileGeneratorUtilities.RemoveLineTag;
+            cmdLineOptions["LinkerSystemFrameworkPaths"] = systemFrameworkPaths.Any() ? "-F " + systemFrameworkPaths.JoinStrings(" -F ") : FileGeneratorUtilities.RemoveLineTag;
+
+            OrderableStrings frameworkPaths = new OrderableStrings(conf.XcodeFrameworkPaths);
+            frameworkPaths.AddRange(conf.XcodeDependenciesFrameworkPaths);
+            cmdLineOptions["CompilerFrameworkPaths"] = frameworkPaths.Any() ? "-F " + frameworkPaths.JoinStrings(" -F ") : FileGeneratorUtilities.RemoveLineTag;
+            cmdLineOptions["LinkerFrameworkPaths"] = frameworkPaths.Any() ? "-F " + frameworkPaths.JoinStrings(" -F ") : FileGeneratorUtilities.RemoveLineTag;
         }
 
         public void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

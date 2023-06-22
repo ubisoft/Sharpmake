@@ -14,9 +14,13 @@ namespace Sharpmake
                             // Libraries
                             // ---------------------------
                             + ' [cmdLineOptions.AdditionalDependencies]'
-                            // SystemFrameworks
-                            //--------------------------
+                            // SystemFrameworks, DeveloperFrameworks, UserFrameworks and FrameworkPaths
+                            // -----------------------------------------------------------------------------
                             + ' [cmdLineOptions.SystemFrameworks]'
+                            + ' [cmdLineOptions.DeveloperFrameworks]'
+                            + ' [cmdLineOptions.UserFrameworks]'
+                            + ' [cmdLineOptions.LinkerSystemFrameworkPaths]'
+                            + ' [cmdLineOptions.LinkerFrameworkPaths]'
                             // Options
                             //--------
                             + ' [cmdLineOptions.GenerateMapFile]'
@@ -41,6 +45,13 @@ namespace Sharpmake
             // Additional compiler options
             //--------------------------
             + ' [options.AdditionalCompilerOptions]'
+            // SystemFrameworks, DeveloperFrameworks, UserFrameworks and FrameworkPaths
+            // ----------------------------------------------------------------------------
+            + ' [cmdLineOptions.SystemFrameworks]'
+            + ' [cmdLineOptions.DeveloperFrameworks]'
+            + ' [cmdLineOptions.UserFrameworks]'
+            + ' [cmdLineOptions.CompilerSystemFrameworkPaths]'
+            + ' [cmdLineOptions.CompilerFrameworkPaths]'
 ";
 
         private const string _compilerOptimizationOptions =
