@@ -13,16 +13,15 @@
 // limitations under the License.
 
 using Sharpmake;
-using System.IO;
 
 namespace XCodeProjects
 {
     [Sharpmake.Generate]
-    public class HelloKitConsumerProject : CommonProject
+    public class GUIToolProject : CommonProject
     {
-        public HelloKitConsumerProject()
+        public GUIToolProject()
         {
-            Name = @"HelloKitConsumer";
+            Name = @"GUITool";
 
             AddTargets(CommonTarget.GetMacTargets());
             AddTargets(CommonTarget.GetIosTargets());
@@ -37,18 +36,6 @@ namespace XCodeProjects
             base.ConfigureAll(conf, target);
 
             conf.Output = Configuration.OutputType.AppleApp;
-            conf.AddPublicDependency<FmtProject>(target);
-            conf.AddPublicDependency<HelloKitFrameworkProject>(
-                target,
-                DependencySetting.OnlyBuildOrder
-            );
-
-            conf.XcodeFrameworkPaths.Add(Globals.OutputDirectory, @"[conf.TargetPath]");
-
-            conf.XcodeEmbeddedFrameworks.Add(Path.Combine(@"[conf.TargetPath]", "HelloKit.framework"));
-
-            //adding `LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks @rpath/HelloKit.framework/Versions/A/HelloKit";`
-            conf.Options.Add(new Options.XCode.Compiler.LdRunPaths(@"@executable_path/Frameworks @rpath/HelloKit.framework/Versions/A/HelloKit"));
         }
     }
 }

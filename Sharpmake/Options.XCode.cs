@@ -113,6 +113,29 @@ namespace Sharpmake
                     public ProductBundleShortVersion(string value) : base(value) { }
                 }
 
+                /// <summary>
+                /// Resolves to `INSTALL_PATH` in Xcode build settings
+                /// Allows to override the default INSTALL_PATH to set a custom Xcode macro value
+                /// e.g. `@rpath/../Frameworks` for MacOS Frameworks
+                /// or `@rpath` for dylibs
+                /// </summary>
+                public class ProductInstallPath : StringOption
+                {
+                    public ProductInstallPath(string value) : base(value) { }
+                }
+
+                /// <summary>
+                /// Resolves to `LD_RUNPATH_SEARCH_PATHS` in Xcode build settings
+                /// Allows to set paths for LD_RUNPATH_SEARCH_PATHS to set a custom Xcode macro value
+                /// </summary>
+                public class LdRunPaths : Strings
+                {
+                    public LdRunPaths(params string[] paths)
+                        : base(paths)
+                    { }
+                }
+
+
                 public enum EnableGpuFrameCaptureMode
                 {
                     [Default]

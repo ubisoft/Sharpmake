@@ -486,6 +486,46 @@ namespace Sharpmake
             else
                 options["Archs"] = "\"$(ARCHS_STANDARD_64_BIT)\"";
 
+            var productInstallPath = Options.GetString<Options.XCode.Compiler.ProductInstallPath>(conf);
+            if (string.IsNullOrEmpty(productInstallPath) || productInstallPath == FileGeneratorUtilities.RemoveLineTag)
+            {
+                switch (conf.Output)
+                {
+                    case Project.Configuration.OutputType.Dll:
+                        options["ProductInstallPath"] = FileGeneratorUtilities.RemoveLineTag;
+                        break;
+                    case Project.Configuration.OutputType.Lib:
+                        options["ProductInstallPath"] = FileGeneratorUtilities.RemoveLineTag;
+                        break;
+                    case Project.Configuration.OutputType.IosTestBundle:
+                        options["ProductInstallPath"] = "$(HOME)/Applications";
+                        break;
+                    case Project.Configuration.OutputType.AppleApp:
+                        options["ProductInstallPath"] = "$(USER_APPS_DIR)";
+                        break;
+                    case Project.Configuration.OutputType.AppleFramework:
+                        options["ProductInstallPath"] = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+                        break;
+                    case Project.Configuration.OutputType.AppleBundle:
+                        options["ProductInstallPath"] = "$(LOCAL_LIBRARY_DIR)/Bundles";
+                        break;
+                    case Project.Configuration.OutputType.Exe:
+                    case Project.Configuration.OutputType.None:
+                    case Project.Configuration.OutputType.Utility:
+                        options["ProductInstallPath"] = FileGeneratorUtilities.RemoveLineTag;
+                        break;
+                    default:
+                        throw new NotSupportedException($"XCode generator doesn't handle {conf.Output}");
+                }
+            }
+            else
+            {
+                options["ProductInstallPath"] = productInstallPath;
+            }
+
+            Strings ldRunPaths = Options.GetStrings<Options.XCode.Compiler.LdRunPaths>(conf);
+            options["LdRunPaths"] = ldRunPaths.Count > 0 ? XCodeUtil.XCodeFormatList(ldRunPaths, 4) : FileGeneratorUtilities.RemoveLineTag;
+
             options["AssetCatalogCompilerAppIconName"] = Options.StringOption.Get<Options.XCode.Compiler.AssetCatalogCompilerAppIconName>(conf);
             options["AssetCatalogCompilerLaunchImageName"] = Options.StringOption.Get<Options.XCode.Compiler.AssetCatalogCompilerLaunchImageName>(conf);
             options["AssetCatalogCompilerAlternateAppIconNames"] = XCodeUtil.XCodeFormatList(Options.GetStrings<Options.XCode.Compiler.AssetCatalogCompilerAlternateAppIconNames>(conf), 4);
@@ -1101,6 +1141,10 @@ namespace Sharpmake
             OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
             userFrameworks.AddRange(conf.XcodeDependenciesUserFrameworks);
             cmdLineOptions["UserFrameworks"] = userFrameworks.Any() ? "-framework " + userFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
+
+            OrderableStrings embeddedFrameworks = new OrderableStrings(conf.XcodeEmbeddedFrameworks);
+            embeddedFrameworks.AddRange(conf.XcodeDependenciesEmbeddedFrameworks);
+            cmdLineOptions["EmbeddedFrameworks"] = embeddedFrameworks.Any() ? "-framework " + embeddedFrameworks.JoinStrings(" -framework ") : FileGeneratorUtilities.RemoveLineTag;
 
             OrderableStrings systemFrameworkPaths = new OrderableStrings(conf.XcodeSystemFrameworkPaths);
             systemFrameworkPaths.AddRange(conf.XcodeDependenciesSystemFrameworkPaths);

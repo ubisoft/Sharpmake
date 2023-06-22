@@ -29,6 +29,7 @@ namespace XCodeProjects
         {
             base.ConfigureAll(conf, target);
             conf.AddProject<CLIToolProject>(target);
+            conf.AddProject<GUIToolProject>(target);
             conf.AddProject<MetalNoStoryboardProject>(target);
             conf.AddProject<MetalWithStoryboardProject>(target);
 

@@ -45,5 +45,29 @@ namespace XCodeProjects
                 )
             );
         }
+
+        public override void ConfigureMacOS(Configuration conf, CommonTarget target)
+        {
+            base.ConfigureMacOS(conf, target);
+            conf.Options.Add(new Options.XCode.Compiler.ProductInstallPath(@"@executable_path/../Frameworks"));
+        }
+
+        public override void ConfigureIOS(Configuration conf, CommonTarget target)
+        {
+            base.ConfigureIOS(conf, target);
+            conf.Options.Add(new Options.XCode.Compiler.ProductInstallPath(@"@executable_path/Frameworks"));
+        }
+
+        public override void ConfigureTVOS(Configuration conf, CommonTarget target)
+        {
+            base.ConfigureTVOS(conf, target);
+            conf.Options.Add(new Options.XCode.Compiler.ProductInstallPath(@"@executable_path/Frameworks"));
+        }
+
+        public override void ConfigureCatalyst(Configuration conf, CommonTarget target)
+        {
+            base.ConfigureCatalyst(conf, target);
+            conf.Options.Add(new Options.XCode.Compiler.ProductInstallPath(@"@executable_path/Frameworks"));
+        }
     }
 }

@@ -19,6 +19,7 @@ namespace Sharpmake
                             + ' [cmdLineOptions.SystemFrameworks]'
                             + ' [cmdLineOptions.DeveloperFrameworks]'
                             + ' [cmdLineOptions.UserFrameworks]'
+                            + ' [cmdLineOptions.EmbeddedFrameworks]'
                             + ' [cmdLineOptions.LinkerSystemFrameworkPaths]'
                             + ' [cmdLineOptions.LinkerFrameworkPaths]'
                             // Options
@@ -50,6 +51,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.SystemFrameworks]'
             + ' [cmdLineOptions.DeveloperFrameworks]'
             + ' [cmdLineOptions.UserFrameworks]'
+            + ' [cmdLineOptions.EmbeddedFrameworks]'
             + ' [cmdLineOptions.CompilerSystemFrameworkPaths]'
             + ' [cmdLineOptions.CompilerFrameworkPaths]'
 ";

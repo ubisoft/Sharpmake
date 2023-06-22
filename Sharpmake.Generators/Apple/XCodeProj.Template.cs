@@ -58,7 +58,7 @@ namespace Sharpmake.Generators.Apple
 @"		[item.Uid] /* [item.File.Name] in [item.File.Type] */ = {
 			isa = PBXBuildFile;
 			fileRef = [item.File.Uid] /* [item.File.Name] */;
-			settings = {ATTRIBUTES = (Public, ); };
+			settings = [item.Settings];
 		};
 "               },
 
@@ -285,12 +285,13 @@ namespace Sharpmake.Generators.Apple
 				GCC_SYMBOLS_PRIVATE_EXTERN = [item.Options.PrivateSymbols];
 				HEADER_SEARCH_PATHS = [item.Options.IncludePaths];
 				INFOPLIST_FILE = ""[item.Options.InfoPListFile]"";
-				INSTALL_PATH = ""[item.Target.ProductInstallPath]"";
+				INSTALL_PATH = ""[item.Options.ProductInstallPath]"";
 				IPHONEOS_DEPLOYMENT_TARGET = ""[item.Options.IPhoneOSDeploymentTarget]"";
 				TVOS_DEPLOYMENT_TARGET = ""[item.Options.TvOSDeploymentTarget]"";
 				MACOSX_DEPLOYMENT_TARGET = [item.Options.MacOSDeploymentTarget];
 				WATCHOS_DEPLOYMENT_TARGET = ""[item.Options.WatchOSDeploymentTarget]"";
 				LIBRARY_SEARCH_PATHS = [item.Options.LibraryPaths];
+				LD_RUNPATH_SEARCH_PATHS = [item.Options.LdRunPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphoneos*]"" = [item.Options.SpecificDeviceLibraryPaths];
 				""LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]"" = [item.Options.SpecificSimulatorLibraryPaths];
 				MACH_O_TYPE = ""[item.Options.MachOType]"";
