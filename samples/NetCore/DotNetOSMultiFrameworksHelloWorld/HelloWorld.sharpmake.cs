@@ -197,7 +197,7 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
                 {
                     conf.Options.Add(Options.CSharp.UseWindowsForms.Enabled);
 
-                    conf.ReferencesByNuGetPackage.Add("Microsoft.Windows.Compatibility", "6.0.0");
+                    conf.ReferencesByNuGetPackage.Add("Microsoft.Windows.Compatibility", "6.0.6");
                 }
             }
         }
