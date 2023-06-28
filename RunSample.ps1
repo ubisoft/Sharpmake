@@ -27,6 +27,10 @@ param ([string] $sampleName, [string] $configuration, [string] $framework, [stri
 class SampleDef
 {
     [string] $Name
+    [string[]] $CIs
+    [string[]] $OSs
+    [string[]] $Frameworks
+    [string[]] $Configurations
     [string] $TestFolder = ""
     [string[]] $Commands
 }
