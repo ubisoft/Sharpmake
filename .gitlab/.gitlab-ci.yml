@@ -37,6 +37,18 @@ compilation:linux:
   tags: [square-linux-k8s-compil]
   image: mcr.microsoft.com/dotnet/sdk:6.0
 
+generate_samples_pipeline:
+  stage: build
+  script: |
+    pwsh -Command {      
+      Install-Module -Name powershell-yaml -RequiredVersion 0.4.7 -Force
+     .\.gitlab\Get-SamplesPipeline.ps1 | Tee-Object -FilePath .gitlab/samples.yml
+    }
+  artifacts:
+    paths:
+    - .gitlab/samples.yml
+    expire_in: 1 day
+
 #############
 # Unit tests
 #############
@@ -92,263 +104,17 @@ functional_test:
     expire_in: 1 day
 
 #############
-# Linux Sample tests
+# Samples
 #############
-.linux_sample_test:
+samples:
   stage: test
-  tags:
-  - square_linux_dind
-  services:
-    - docker:20.10.10-dind
   variables:
-    DOCKER_HOST: tcp://localhost:2376
-    DOCKER_TLS_VERIFY: 1
-    DOCKER_CERT_PATH: /certs/client
-  parallel:
-    matrix:
-    - configuration: [debug, release]
-      framework: [net6.0]
-  needs:
-  - "compilation:linux: [release]"
-
-HelloLinux:
-  extends: .linux_sample_test
-  script:
-    # Install Powershell on Alpine (https://learn.microsoft.com/en-us/powershell/scripting/install/install-alpine?view=powershell-7.2)
-    - apk add --no-cache
-        ca-certificates
-        less
-        ncurses-terminfo-base
-        krb5-libs
-        libgcc
-        libintl
-        libssl1.1
-        libstdc++
-        tzdata
-        userspace-rcu
-        zlib
-        icu-libs
-        curl
-    - apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache lttng-ust
-    - curl -L https://github.com/PowerShell/PowerShell/releases/download/v7.2.11/powershell-7.2.11-linux-alpine-x64.tar.gz -o /tmp/powershell.tar.gz
-    - mkdir -p /opt/microsoft/powershell/7
-    - tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/7
-    - chmod +x /opt/microsoft/powershell/7/pwsh
-    - ln -s /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh
-    # Run HelloLinux sample
-    - pwsh ./RunSample.ps1 -sampleName HelloLinux -configuration $configuration
-
-#############
-# MacOs Sample tests
-#############
-.macos_sample_test:
-  stage: test
-  tags:
-  - square_mac
-  parallel:
-    matrix:
-    - configuration: [debug, release]
-      os: [macos-latest]
-      framework: [net6.0]
-  needs:
-  - "compilation:mac: [release]"
-  artifacts:
-    when: on_failure
-    untracked: true
-    expire_in: 1 day
-
-HelloXCode:
-  extends: .macos_sample_test
-  script:
-  - pwsh ./RunSample.ps1 -sampleName HelloXCode -configuration $configuration -framework $framework
-
-XCodeProjects:
-  extends: .macos_sample_test
-  script:
-  - pwsh ./RunSample.ps1 -sampleName XCodeProjects -configuration $configuration -framework $framework
-
-#############
-# Windows Sample tests
-#############
-.windows_sample_test:
-  stage: test
-  parallel:
-    matrix:
-    - configuration: [debug, release]
-      os: [windows-2019, windows-2022]
-      framework: [net6.0]
-  rules:
-  - if: $os == "windows-2019"
-    variables:
-      VS_VERSION_SUFFIX: "Vs2019"
-  - if: $os == "windows-2022"
-    variables:
-      VS_VERSION_SUFFIX: "Vs2022"
-  needs:
-  - "compilation:windows: [release]"
-  artifacts:
-    when: on_failure
-    untracked: true
-    expire_in: 1 day
-
-CompileCommandDatabase:
-  extends: .windows_sample_test
-  rules:
-  - if: $configuration == "debug"
-    when: on_success
-  - when: never
-  script:
-  - pwsh RunSample.ps1 -sampleName CompileCommandDatabase -configuration $configuration -framework $framework -os $os
-
-ConfigureOrder:
-  extends: .windows_sample_test
-  rules:
-  - if: $configuration == "release"
-    when: on_success
-  - when: never
-  script:
-  - pwsh RunSample.ps1 -sampleName ConfigureOrder -configuration $configuration -framework $framework -os $os
-
-CPPCLI:
-  extends: .windows_sample_test
-  rules:
-  - if: $os == "windows-2019"
-    when: on_success
-  - when: never
-  script:
-  - pwsh RunSample.ps1 -sampleName CPPCLI -configuration $configuration -framework $framework -os $os
-
-CSharpHelloWorld_old_frameworks:
-  extends: .windows_sample_test
-  rules:
-  - if: $os == "windows-2019"
-    when: on_success
-  - when: never
-  script:
-  - pwsh RunSample.ps1 -sampleName CSharpHelloWorld_old_frameworks -configuration $configuration -framework $framework -os $os
-
-CSharpHelloWorld:
-  extends: .windows_sample_test
-  rules:
-  - if: $os == "windows-2022"
-    when: on_success
-  - when: never
-  variables:
-    testFolder: samples/CSharpHelloWorld
-  script:
-  - pwsh RunSample.ps1 -sampleName "CSharpHelloWorld" -configuration $configuration -framework $framework -os $os
-
-CSharpImports:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName CSharpImports -configuration $configuration -framework $framework -os $os
-
-CSharpVsix:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName CSharpVsix -configuration $configuration -framework $framework -os $os
-  # that one can't be run unfortunately
-
-CustomBuildStep:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName CustomBuildStep -configuration $configuration -framework $framework -os $os
-
-CSharpWCF:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName CSharpWCF -configuration $configuration -framework $framework -os $os
-  # that one can't be run unfortunately
-
-FastBuildSimpleExecutable:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName FastBuildSimpleExecutable -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
-
-# Temp disable after Github VM update which updated the NDK and broke it
-# HelloAndroid:
-#   extends: .windows_sample_test
-#   variables:
-#     JAVA_HOME: ${Env:JAVA_HOME_11_X64}
-#   script:
-#  - pwsh RunSample.ps1 -sampleName HelloAndroid -configuration $configuration -framework $framework -os $os
-
-HelloClangCl:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName HelloClangCl -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
-
-HelloEvents:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName HelloEvents -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
-
-HelloWorld:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName HelloWorld -configuration $configuration -framework $framework -os $os
-
-NetCore-DotNetCoreFrameworkHelloWorld:
-  extends: .windows_sample_test
-  rules:
-  - if: $os == "windows-2022"
-    when: on_success
-  script:
-  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetCoreFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
-
-NetCore-DotNetFrameworkHelloWorld:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld" -configuration $configuration -framework $framework -os $os
-
-NetCore-DotNetFrameworkHelloWorld_OldFrameworks:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetFrameworkHelloWorld_OldFrameworks" -configuration $configuration -framework $framework -os $os
-
-NetCore-DotNetMultiFrameworksHelloWorld:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetMultiFrameworksHelloWorld" -configuration $configuration -framework $framework -os $os
-
-NetCore-DotNetOSMultiFrameworksHelloWorld:
-  extends: .windows_sample_test
-  rules:
-  - if: $os == "windows-2022"
-    when: on_success
-  - when: never
-  variables:
-    testFolder: samples\NetCore\DotNetOSMultiFrameworksHelloWorld
-  script:
-  - pwsh RunSample.ps1 -sampleName "NetCore-DotNetOSMultiFrameworksHelloWorld" -configuration $configuration -framework $framework -os $os
-
-PackageReferences:
-  extends: .windows_sample_test
-  script:
-  - pwsh RunSample.ps1 -sampleName "PackageReferences" -configuration $configuration -framework $framework -os $os
-
-QTFileCustomBuild:
-  extends: .windows_sample_test
-  before_script:
-  - choco install python3 --version 3.10.6 --side-by-side -y --no-progress
-  script:
-  - pwsh RunSample.ps1 -sampleName "QTFileCustomBuild" -configuration $configuration -framework $framework -os $os
-
-SimpleExeLibDependency:
-  extends: .windows_sample_test
-  rules:
-  - if: $configuration == "debug"
-    when: on_success
-  - when: never
-  script:
-  - pwsh RunSample.ps1 -sampleName "SimpleExeLibDependency" -configuration $configuration -framework $framework -os $os
-
-vcpkg:
-  extends: .windows_sample_test
-  variables:
-    testFolder: samples/vcpkg
-  script:
-  - pwsh RunSample.ps1 -sampleName vcpkg -configuration $configuration -framework $framework -os $os -vsVersionSuffix ${env:VS_VERSION_SUFFIX}
+    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    include:
+    - artifact: .gitlab/samples.yml
+      job: generate_samples_pipeline
+    strategy: depend
 
 #############
 # Deploy stage
