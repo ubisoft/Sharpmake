@@ -1,7 +1,10 @@
 # Pipelines runs only on branches and tags.
 # Disable merge request pipelines, pipelines for merge results and merge trains.
 include:
- - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+  - project: 'Sharpmake/SharpmakeExtended'
+    file: 'build/sharpmake-ci.yml'
+
 
 default:
   tags:
@@ -40,7 +43,7 @@ compilation:linux:
 generate_samples_pipeline:
   stage: build
   script: |
-    pwsh -Command {      
+    pwsh -Command {
       Install-Module -Name powershell-yaml -RequiredVersion 0.4.7 -Force
      .\.gitlab\Get-SamplesPipeline.ps1 | Tee-Object -FilePath .gitlab/samples.yml
     }
@@ -115,16 +118,3 @@ samples:
     - artifact: .gitlab/samples.yml
       job: generate_samples_pipeline
     strategy: depend
-
-#############
-# Deploy stage
-#############
-sharpmakeextended:
-  stage: deploy
-  variables:
-    SHARPMAKE_COMMIT_SHA: $CI_COMMIT_SHA
-  trigger:
-    project: Sharpmake/sharpmakeextended
-    strategy: depend
-  needs: [ "compilation:windows" ]
-  allow_failure: true
