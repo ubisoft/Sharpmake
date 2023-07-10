@@ -122,6 +122,9 @@ namespace FastBuild
             // This is necessary since there is no rc.exe in the same directory than link.exe
             FastBuildSettings.SetPathToResourceCompilerInEnvironment = true;
 
+            // Add an additional environment variable for fastbuild for testing
+            FastBuildSettings.AdditionalGlobalEnvironmentVariables.Add("KEY", "VALUE");
+
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
 
