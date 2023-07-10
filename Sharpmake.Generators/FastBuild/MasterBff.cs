@@ -656,6 +656,12 @@ namespace Sharpmake.Generators.FastBuild
                 fastBuildEnvironments += Bff.Template.ConfigurationFile.WinEnvironment;
             }
 
+            string envAdditionalVariables = FileGeneratorUtilities.RemoveLineTag;
+            if (FastBuildSettings.AdditionalGlobalEnvironmentVariables.Any())
+            {
+                envAdditionalVariables = string.Join(Environment.NewLine, FastBuildSettings.AdditionalGlobalEnvironmentVariables.Select(keyValue => $"        \"{keyValue.Key}={keyValue.Value}\""));
+            }
+
             using (masterBffGenerator.Declare("fastBuildProjectName", "Master"))
             using (masterBffGenerator.Declare("CachePath", cachePath))
             using (masterBffGenerator.Declare("CachePluginDLL", cachePluginDLL))
@@ -666,6 +672,7 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("AdditionalGlobalSettings", additionalGlobalSettings))
             using (masterBffGenerator.Declare("fastBuildEnvironments", fastBuildEnvironments))
             using (masterBffGenerator.Declare("envRemoveGuards", envRemoveGuards))
+            using (masterBffGenerator.Declare("envAdditionalVariables", envAdditionalVariables))
             {
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.GlobalSettings);

@@ -69,6 +69,7 @@ Settings
         ""USERPROFILE=$USERPROFILE$"",
         ""SystemRoot=[fastBuildSystemRoot]""
         ""PATH=[fastBuildPATH]""
+[envAdditionalVariables]
     }
 #endif[envRemoveGuards]
 ";
@@ -80,6 +81,7 @@ Settings
     {
         ""TMPDIR=$TMPDIR$"",
         ""PATH=[fastBuildPATH]""
+[envAdditionalVariables]
     }
 #endif[envRemoveGuards]
 ";
