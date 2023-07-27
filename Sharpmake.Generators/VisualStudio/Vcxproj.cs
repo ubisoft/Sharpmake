@@ -440,6 +440,8 @@ namespace Sharpmake.Generators.VisualStudio
             string projectFilePath = FileName + ProjectExtension;
             UserFile uf = new UserFile(projectFilePath);
             uf.GenerateUserFile(context.Builder, context.Project, context.ProjectConfigurations, generatedFiles, skipFiles);
+			
+			bool clrSupportGenerated = false;
 
             // configuration general
             using (Builder.Instance.CreateProfilingScope("GenerateImpl:confs2", context.ProjectConfigurations.Count))
@@ -456,7 +458,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                         // .Net Core requires "NetCore" instead of "true", see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
                         clrSupportString = dotnetFrameWork.IsDotNetCore() ? "NetCore" : clrSupport.ToString().ToLower();
-                    }
+						clrSupportGenerated = true;
+					}
 
                     using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
@@ -598,7 +601,9 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         var compileAsManagedString = FileGeneratorUtilities.RemoveLineTag;
 
-                        if (clrSupport)
+						string clrSupportString = FileGeneratorUtilities.RemoveLineTag;
+
+                        if (clrSupport & !clrSupportGenerated )
                         {
                             var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
 
@@ -606,7 +611,11 @@ namespace Sharpmake.Generators.VisualStudio
                             {
                                 // This needs to be omitted when targeting .Net Core otherwise compilation fails due to internal compiler errors. Only info found is from here: https://stackoverflow.com/a/62773057
                                 compileAsManagedString = "true";
+								clrSupportString = clrSupport.ToString().ToLower();
                             }
+							else
+							    // .Net Core requires "NetCore" instead of "true", see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
+          						clrSupportString = "NetCore";
                         }
 
                         using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
@@ -614,7 +623,7 @@ namespace Sharpmake.Generators.VisualStudio
                         using (fileGenerator.Declare("project", conf.Project))
                         using (fileGenerator.Declare("target", conf.Target))
                         using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                        using (fileGenerator.Declare("clrSupport", !clrSupport ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
+                        using (fileGenerator.Declare("clrSupport", clrSupportString))
                         using (fileGenerator.Declare("compileAsManaged", compileAsManagedString))
                         {
                             fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
