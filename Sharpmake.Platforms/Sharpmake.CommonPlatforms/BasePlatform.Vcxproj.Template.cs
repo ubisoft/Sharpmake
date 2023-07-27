@@ -176,7 +176,6 @@ namespace Sharpmake
     <WholeProgramOptimization>[options.WholeProgramOptimization]</WholeProgramOptimization>
     <PlatformToolset>[options.PlatformToolset]</PlatformToolset>
     <TrackFileAccess>[options.TrackFileAccess]</TrackFileAccess>
-    <CLRSupport>[options.CLRSupport]</CLRSupport>
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
