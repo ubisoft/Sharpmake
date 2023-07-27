@@ -603,7 +603,7 @@ namespace Sharpmake.Generators.VisualStudio
 
 						string clrSupportString = FileGeneratorUtilities.RemoveLineTag;
 
-                        if (clrSupport && !clrSupportGenerated )
+                        if ( clrSupport && !clrSupportGenerated )
                         {
                             var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
 
