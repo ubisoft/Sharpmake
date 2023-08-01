@@ -56,6 +56,15 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Output Apk name for gradle build which can be set per configuration.
+                /// </summary>
+                public class AndroidGradlePackageOutputName : StringOption
+                {
+                    public AndroidGradlePackageOutputName(string androidGradlePackageOutputName)
+                       : base(androidGradlePackageOutputName) { }
+                }
+
+                /// <summary>
                 /// The apk file used for debugging which can be set per configuration, is usually for FastBuild configuration.
                 /// </summary>
                 public class AndroidApkLocation : PathOption

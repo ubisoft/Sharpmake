@@ -64,6 +64,7 @@ namespace Sharpmake
     <AndroidGradleBuildOutputDir>[options.AndroidGradleBuildIntermediateDir]</AndroidGradleBuildOutputDir>
     <AndroidExtraGradleArgs>[options.AndroidExtraGradleArgs]</AndroidExtraGradleArgs>
     <AndroidApkName>[options.AndroidApkName]</AndroidApkName>
+    <AndroidGradlePackageOutputName>[options.AndroidGradlePackageOutputName]</AndroidGradlePackageOutputName>
   </PropertyGroup>
 ";
 
