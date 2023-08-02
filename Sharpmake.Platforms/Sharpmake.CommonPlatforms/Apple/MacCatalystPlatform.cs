@@ -79,16 +79,16 @@ namespace Sharpmake
                     cmdLineOptions["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
-                 context.SelectOptionWithFallback(
-                    () => options["SupportsMaccatalyst"] = "YES",
-                    Options.Option(Options.XCode.Compiler.SupportsMaccatalyst.Disable, () => options["SupportsMaccatalyst"] = "NO")
-                );
+                context.SelectOptionWithFallback(
+                   () => options["SupportsMaccatalyst"] = "YES",
+                   Options.Option(Options.XCode.Compiler.SupportsMaccatalyst.Disable, () => options["SupportsMaccatalyst"] = "NO")
+               );
                 context.SelectOptionWithFallback(
                     () => options["SupportsMacDesignedForIphoneIpad"] = "YES",
                     Options.Option(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Disable, () => options["SupportsMacDesignedForIphoneIpad"] = "NO")
                 );
 
-            #region infoplist keys
+                #region infoplist keys
                 // MacOS specific flags
                 options["NSHumanReadableCopyright"] = Options.StringOption.Get<Options.XCode.InfoPlist.NSHumanReadableCopyright>(conf);
 
@@ -254,7 +254,7 @@ namespace Sharpmake
                     Options.Option(Options.XCode.InfoPlist.UIRequiresPersistentWiFi.Disable, () => options["UIRequiresPersistentWiFi"] = "NO"),
                     Options.Option(Options.XCode.InfoPlist.UIRequiresPersistentWiFi.Enable, () => options["UIRequiresPersistentWiFi"] = "YES")
                 );
-            #endregion //infoplist keys
+                #endregion //infoplist keys
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)

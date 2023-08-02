@@ -1,16 +1,5 @@
-// Copyright (c) 2022-2023 Ubisoft Entertainment
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (c) Ubisoft. All Rights Reserved.
+// Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System.IO;
 using System.Linq;
@@ -104,7 +93,7 @@ namespace XCodeProjects
         }
 
         ////////////////////////////////////////////////////////////////////////
-#region Platfoms
+        #region Platfoms
         [ConfigurePriority(ConfigurePriorities.Platform - 1)]
         [Configure(
             Platform.mac | Platform.ios | Platform.tvos | Platform.watchos | Platform.maccatalyst
@@ -168,11 +157,11 @@ namespace XCodeProjects
             conf.Options.Add(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Disable);
             conf.XcodeSystemFrameworks.Add("UIKit");
         }
-#endregion
+        #endregion
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
-#region Optimizations
+        #region Optimizations
         [ConfigurePriority(ConfigurePriorities.Optimization)]
         [Configure(Optimization.Debug)]
         public virtual void ConfigureDebug(Configuration conf, CommonTarget target)
@@ -186,11 +175,11 @@ namespace XCodeProjects
         {
             conf.DefaultOption = Options.DefaultTarget.Release;
         }
-#endregion
+        #endregion
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
-#region Blobs and unitys
+        #region Blobs and unitys
         [Configure(Blob.FastBuildUnitys)]
         [ConfigurePriority(ConfigurePriorities.Blobbing)]
         public virtual void FastBuildUnitys(Configuration conf, CommonTarget target)
@@ -215,11 +204,11 @@ namespace XCodeProjects
             if (conf.IsFastBuild)
                 conf.ProjectName += "_NoBlob";
         }
-#endregion
+        #endregion
         ////////////////////////////////////////////////////////////////////////
 
         ////////////////////////////////////////////////////////////////////////
-#region Compilers and toolchains
+        #region Compilers and toolchains
         [ConfigurePriority(ConfigurePriorities.BuildSystem)]
         [Configure(BuildSystem.FastBuild)]
         public virtual void ConfigureFastBuild(Configuration conf, CommonTarget target)
@@ -229,7 +218,7 @@ namespace XCodeProjects
 
             conf.Defines.Add("USES_FASTBUILD");
         }
-#endregion
+        #endregion
         ////////////////////////////////////////////////////////////////////////
     }
 }

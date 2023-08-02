@@ -81,13 +81,13 @@ namespace Sharpmake
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
                 options["SupportsMacDesignedForIphoneIpad"] = FileGeneratorUtilities.RemoveLineTag;
 
-            #region infoplist keys
+                #region infoplist keys
                 context.SelectOptionWithFallback(
                     () => options["UIAppSupportsHDR"] = FileGeneratorUtilities.RemoveLineTag,
                     Options.Option(Options.XCode.InfoPlist.UIAppSupportsHDR.Disable, () => options["UIAppSupportsHDR"] = "NO"),
                     Options.Option(Options.XCode.InfoPlist.UIAppSupportsHDR.Enable, () => options["UIAppSupportsHDR"] = "YES")
                 );
-            #endregion // infoplist keys
+                #endregion // infoplist keys
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)

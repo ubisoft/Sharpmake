@@ -653,7 +653,7 @@ namespace Sharpmake.Generators.Apple
 
         private void RegisterHeadersBuildPhase(string xCodeTargetName, Dictionary<string, UniqueList<ProjectHeadersBuildPhase>> headersBuildPhases)
         {
-            var headerFiles =  _projectItems
+            var headerFiles = _projectItems
                     .Where(p => p is ProjectBuildFile)
                     .Select(p => p as ProjectBuildFile)
                     .Where(p => p.File.IsHeader)
@@ -695,7 +695,7 @@ namespace Sharpmake.Generators.Apple
 
         private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, IEnumerator<KeyValuePair<string, string>> filesAndTargets)
         {
-            while(filesAndTargets.MoveNext())
+            while (filesAndTargets.MoveNext())
             {
                 var fileAndTarget = filesAndTargets.Current;
                 RegisterCopyFilesBuildPhases(xCodeTargetName, copyFilesPhases, fileAndTarget.Key, fileAndTarget.Value);
@@ -1227,8 +1227,8 @@ namespace Sharpmake.Generators.Apple
                 }
 
                 if (Path.HasExtension(library) &&
-                    ((Path.GetExtension(library).EndsWith(".a", StringComparison.OrdinalIgnoreCase ) ||
-                      Path.GetExtension(library).EndsWith(".dylib", StringComparison.OrdinalIgnoreCase )
+                    ((Path.GetExtension(library).EndsWith(".a", StringComparison.OrdinalIgnoreCase) ||
+                      Path.GetExtension(library).EndsWith(".dylib", StringComparison.OrdinalIgnoreCase)
                     )))
                 {
                     library = Path.GetFileNameWithoutExtension(library);
@@ -1718,7 +1718,7 @@ namespace Sharpmake.Generators.Apple
 
         private class ProjectDeveloperFrameworkFile : ProjectFrameworkFile
         {
-            private static readonly string s_frameworkPath = System.IO.Path.Combine("..",  "..", "Library", "Frameworks");
+            private static readonly string s_frameworkPath = System.IO.Path.Combine("..", "..", "Library", "Frameworks");
 
             public ProjectDeveloperFrameworkFile(string frameworkFileName)
                 : base(System.IO.Path.Combine(s_frameworkPath, frameworkFileName))

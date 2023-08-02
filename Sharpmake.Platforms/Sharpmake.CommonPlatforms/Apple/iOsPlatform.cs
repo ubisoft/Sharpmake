@@ -90,7 +90,7 @@ namespace Sharpmake
                     Options.Option(Options.XCode.Compiler.SupportsMacDesignedForIphoneIpad.Enable, () => options["SupportsMacDesignedForIphoneIpad"] = "YES")
                 );
 
-            #region infoplist keys
+                #region infoplist keys
                 context.SelectOptionWithFallback(
                     () => options["LSRequiresIPhoneOS"] = FileGeneratorUtilities.RemoveLineTag,
                     Options.Option(Options.XCode.InfoPlist.LSRequiresIPhoneOS.Disable, () => options["LSRequiresIPhoneOS"] = "NO"),
@@ -228,7 +228,7 @@ namespace Sharpmake
                     Options.Option(Options.XCode.InfoPlist.UIRequiresPersistentWiFi.Disable, () => options["UIRequiresPersistentWiFi"] = "NO"),
                     Options.Option(Options.XCode.InfoPlist.UIRequiresPersistentWiFi.Enable, () => options["UIRequiresPersistentWiFi"] = "YES")
                 );
-            #endregion //infoplist keys
+                #endregion //infoplist keys
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)

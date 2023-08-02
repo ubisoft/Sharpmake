@@ -944,14 +944,14 @@ namespace Sharpmake
 
                 public class UIInterfaceOrientation_iPhone : WithArgOption<UIInterfaceOrientation>
                 {
-                     public UIInterfaceOrientation_iPhone(UIInterfaceOrientation value)
-                        : base(value) { }
+                    public UIInterfaceOrientation_iPhone(UIInterfaceOrientation value)
+                       : base(value) { }
                 }
 
                 public class UIInterfaceOrientation_iPad : WithArgOption<UIInterfaceOrientation>
                 {
-                     public UIInterfaceOrientation_iPad(UIInterfaceOrientation value)
-                        : base(value) { }
+                    public UIInterfaceOrientation_iPad(UIInterfaceOrientation value)
+                       : base(value) { }
                 }
 
                 public class UISupportedInterfaceOrientations : UniqueList<UIInterfaceOrientation>
