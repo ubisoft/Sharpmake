@@ -108,8 +108,8 @@ namespace Sharpmake.UnitTests
         [Flags, Fragment]
         enum BogusFragment
         {
-            one = 1<<0,
-            two = 1<<1
+            one = 1 << 0,
+            two = 1 << 1
         }
 
         [TestCase(Optimization.Release, true)]

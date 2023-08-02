@@ -981,7 +981,7 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.MetalFastMath.Enable, () => options["MetalFastMath"] = "YES")
             );
 
-        #region infoplist keys
+            #region infoplist keys
             /// common keys
             options["CFBundleSpokenName"] = Options.StringOption.Get<Options.XCode.InfoPlist.CFBundleSpokenName>(conf);
             options["CFBundleDevelopmentRegion"] = Options.StringOption.Get<Options.XCode.InfoPlist.CFBundleDevelopmentRegion>(conf);
@@ -1039,7 +1039,7 @@ namespace Sharpmake
 
             /// - tvOS specific, set to proper value in override method
             options["UIAppSupportsHDR"] = FileGeneratorUtilities.RemoveLineTag;
-        #endregion // infoplist keys
+            #endregion // infoplist keys
         }
 
         public virtual void SelectPrecompiledHeaderOptions(IGenerationContext context)

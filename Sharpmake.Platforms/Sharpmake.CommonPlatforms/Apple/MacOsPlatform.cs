@@ -72,7 +72,7 @@ namespace Sharpmake
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
                 options["SupportsMacDesignedForIphoneIpad"] = FileGeneratorUtilities.RemoveLineTag;
 
-            #region infoplist keys
+                #region infoplist keys
                 // MacOS specific flags
                 options["NSHumanReadableCopyright"] = Options.StringOption.Get<Options.XCode.InfoPlist.NSHumanReadableCopyright>(conf);
                 options["NSMainStoryboardFile"] = Options.StringOption.Get<Options.XCode.InfoPlist.NSMainStoryboardFile>(conf);
@@ -110,7 +110,7 @@ namespace Sharpmake
                     Options.Option(Options.XCode.InfoPlist.UISupportsTrueScreenSizeOnMac.Disable, () => options["UISupportsTrueScreenSizeOnMac"] = "NO"),
                     Options.Option(Options.XCode.InfoPlist.UISupportsTrueScreenSizeOnMac.Enable, () => options["UISupportsTrueScreenSizeOnMac"] = "YES")
                 );
-            #endregion // infoplist keys
+                #endregion // infoplist keys
             }
 
             public override void SelectLinkerOptions(IGenerationContext context)
