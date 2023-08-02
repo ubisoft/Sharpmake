@@ -211,7 +211,7 @@
         },
         {
             "Name": "NetCore-DotNetCoreFrameworkHelloWorld",
-            "CIs": [ "github", "gitlab" ],
+            "CIs": [ "gitlab" ],
             "OSs": [ "windows-2022" ],
             "Frameworks": [ "net6.0" ],
             "Configurations": [ "debug", "release" ],
@@ -261,7 +261,7 @@
         },
         {
             "Name": "NetCore-DotNetMultiFrameworksHelloWorld",
-            "CIs": [ "github", "gitlab" ],
+            "CIs": [ "gitlab" ],
             "OSs": [ "windows-2019", "windows-2022" ],
             "Frameworks": [ "net6.0" ],
             "Configurations": [ "debug", "release" ],
