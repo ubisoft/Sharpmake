@@ -603,7 +603,7 @@ namespace Sharpmake.Generators.VisualStudio
 
 						string clrSupportString = FileGeneratorUtilities.RemoveLineTag;
 
-                        if ( clrSupport && !clrSupportGenerated )
+                        if (clrSupport && !clrSupportGenerated)
                         {
                             var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
 
@@ -614,8 +614,10 @@ namespace Sharpmake.Generators.VisualStudio
 								clrSupportString = clrSupport.ToString().ToLower();
                             }
 							else
+							{
 							    // .Net Core requires "NetCore" instead of "true", see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
           						clrSupportString = "NetCore";
+							}
                         }
 
                         using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
