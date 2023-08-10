@@ -53,7 +53,7 @@ namespace Sharpmake
             regex += $@"{Regex.Escape(attributeName)}{dp}";
             if (parameterCount == 0)
             {
-                regex += $@"(?:\({dp}\))";
+                regex += $@"(?:\({dp}\))?";
             }
             else
             {
