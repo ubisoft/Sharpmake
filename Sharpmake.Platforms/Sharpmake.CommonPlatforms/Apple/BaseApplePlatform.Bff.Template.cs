@@ -39,7 +39,8 @@ namespace Sharpmake
             + ' [cmdLineOptions.PreprocessorDefinitions]'
             + ' [cmdLineOptions.StdLib]'
             + ' [cmdLineOptions.SDKRoot]'
-            + ' [options.ClangCppLanguageStandard]'
+            + ' [cmdLineOptions.CppLanguageStd]'
+            + ' [cmdLineOptions.CLanguageStd]'
 ";
 
         private const string _compilerExtraOptionsAdditional = @"
