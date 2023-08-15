@@ -160,6 +160,19 @@ namespace Sharpmake
                     GNU20
                 }
 
+                /// <summary>
+                /// Add buildSettings options as needed by Xcode project with swift code
+                /// 4_0, 4_2, 5_0 correspond to 4.0, 4.2, 5.0, the 3 options in Xcode 15 by Aug 2023, add more when needed
+                /// </summary>
+                public enum SwiftLanguageVersion
+                {
+                    [Default]
+                    Disable,
+                    SWIFT4_0,
+                    SWIFT4_2,
+                    SWIFT5_0
+                }
+
                 public enum DeadStrip
                 {
                     Disable,
