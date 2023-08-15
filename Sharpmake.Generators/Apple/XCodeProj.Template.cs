@@ -462,6 +462,7 @@ namespace Sharpmake.Generators.Apple
 				OTHER_LDFLAGS = [item.Options.LinkerOptions];
 				SDKROOT = ""[item.Options.SDKRoot]"";
 				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
+				SWIFT_VERSION = [item.Options.SwiftVersion];
 			};
 			name = [item.Options.TargetName];
 		};
