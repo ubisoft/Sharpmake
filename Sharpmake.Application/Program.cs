@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -169,17 +170,8 @@ namespace Sharpmake.Application
             {
                 DebugEnable = CommandLine.ContainParameter("verbose") || CommandLine.ContainParameter("debug") || CommandLine.ContainParameter("diagnostics");
 
-                var sharpmakeAssembly = Assembly.GetExecutingAssembly();
-                Version version = sharpmakeAssembly.GetName().Version;
-                string versionString = string.Join(".", version.Major, version.Minor, version.Build);
-                string informationalVersion = sharpmakeAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-                if (version.Revision != 0 || (informationalVersion != null && informationalVersion.IndexOf("+Branch.") == -1))
-                {
-                    versionString += " (non-official)";
-                    if (DebugEnable && informationalVersion != null)
-                        versionString += " " + informationalVersion;
-                }
-
+                GetAssemblyInfo(Assembly.GetExecutingAssembly(), out var _, out var version, out var versionString, out var _);
+  
                 LogWriteLine($"sharpmake {versionString}");
                 LogWriteLine("  arguments: {0}", CommandLine.GetProgramCommandLine());
                 LogWriteLine("  directory: {0}", Directory.GetCurrentDirectory());
@@ -399,6 +391,44 @@ namespace Sharpmake.Application
             LogSharpmakeExtensionLoaded(args.LoadedAssembly);
         }
 
+        /// <summary>
+        /// Retrieve information from the assembly passed as argument
+        /// </summary>
+        /// <param name="assembly">The assembly to get information from</param>
+        /// <param name="name">The name of the assembly</param>
+        /// <param name="version">The version as read from the assembly (the 4th componant is not used by Sharpmake core, but may be used by Sharpmake extended assemblies)</param>
+        /// <param name="versionString">A string of the format "<x.y.z[.a]> [(non-official)] [(<complete version string as read from the InformationalVersion attribute>)]"</param>
+        /// <param name="location">The location of the assembly</param>
+        private static void GetAssemblyInfo(Assembly assembly, out string name, out Version version, out string versionString, out string location)
+        {
+            // Name
+            name = assembly.GetName().Name;
+
+            // Version
+            version = assembly.GetName().Version;
+            versionString = "(non-official)";
+            string informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            if (!string.IsNullOrEmpty(informationalVersion))
+            {
+                var endOfVersionIndex = informationalVersion.IndexOf("+", StringComparison.Ordinal);
+                if (endOfVersionIndex != -1)
+                {
+                    versionString = informationalVersion[..endOfVersionIndex];
+                    if (informationalVersion.IndexOf("-g", 0, endOfVersionIndex, StringComparison.Ordinal) != -1
+                        && informationalVersion.IndexOf(".Commits.0.", 0, endOfVersionIndex, StringComparison.Ordinal) == -1)
+                    {
+                        versionString += " (non-official)";
+                    }
+                }
+
+                if (DebugEnable)
+                    versionString += $" ({informationalVersion})";
+            }
+
+            // Location
+            location = assembly.Location;
+        }
+
         private static void LogSharpmakeExtensionLoaded(Assembly extensionAssembly)
         {
             if (extensionAssembly == null)
@@ -407,17 +437,8 @@ namespace Sharpmake.Application
             if (!ExtensionLoader.ExtensionChecker.IsSharpmakeExtension(extensionAssembly))
                 return;
 
-            AssemblyName extensionName = extensionAssembly.GetName();
-            Version version = extensionName.Version;
-            string versionString = string.Join(".", version.Major, version.Minor, version.Build);
-            string informationalVersion = extensionAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            if (version.Revision != 0 || informationalVersion == null || informationalVersion.IndexOf("+Branch.") == -1)
-            {
-                versionString += " (non-official)";
-                if (DebugEnable && informationalVersion != null)
-                    versionString += " " + informationalVersion;
-            }
-            LogWriteLine("    {0} {1} loaded from '{2}'", extensionName.Name, versionString, extensionAssembly.Location);
+            GetAssemblyInfo(extensionAssembly, out var extensionName, out var _, out var extensionVersion, out var extensionLocation);
+            LogWriteLine("    {0} {1} loaded from '{2}'", extensionName, extensionVersion, extensionLocation);
         }
 
         private static void CreateBuilderAndGenerate(BuildContext.BaseBuildContext buildContext, Argument parameters, bool generateDebugSolution)
