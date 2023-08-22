@@ -119,6 +119,7 @@ namespace Sharpmake.Generators.Apple
 			name = ""[item.Name]"";
 			path = ""[item.Path]"";
 			sourceTree = [item.SourceTree];
+			usesTabs = [editorOptions.IndentUseTabs];
 		};
 "               },
 

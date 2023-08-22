@@ -58,6 +58,7 @@ namespace HelloXCode
             //conf.TargetFileName += "x";
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
+            conf.Options.Add(Options.XCode.Editor.Indent.Spaces);
         }
 
         ////////////////////////////////////////////////////////////////////////

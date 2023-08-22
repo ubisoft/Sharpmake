@@ -140,7 +140,7 @@ namespace Sharpmake.Generators.Apple
             string projectFilePath = Path.Combine(projectFolder, ProjectFileName);
             FileInfo projectFileInfo = new FileInfo(projectFilePath);
 
-            var fileGenerator = InitProjectGenerator(configurations);
+            var fileGenerator = InitProjectGenerator(context, configurations);
 
             // Write the project file
             updated = context.Builder.Context.WriteGeneratedFile(context.Project.GetType(), projectFileInfo, fileGenerator);
@@ -200,7 +200,7 @@ namespace Sharpmake.Generators.Apple
             return projectFileResult;
         }
 
-        private FileGenerator InitProjectGenerator(IList<Project.Configuration> configurations)
+        private FileGenerator InitProjectGenerator(XCodeGenerationContext context, IList<Project.Configuration> configurations)
         {
             // Header.
             var fileGenerator = new FileGenerator();
@@ -210,24 +210,33 @@ namespace Sharpmake.Generators.Apple
                 fileGenerator.Write(Template.GlobalHeader);
             }
 
-            WriteSection<ProjectBuildFile>(configurations[0], fileGenerator);
-            WriteSection<ProjectContainerProxy>(configurations[0], fileGenerator);
-            WriteSection<ProjectFile>(configurations[0], fileGenerator);
-            WriteSection<ProjectFrameworksBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectHeadersBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectCopyFilesBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectFolder>(configurations[0], fileGenerator);
-            WriteSection<ProjectLegacyTarget>(configurations[0], fileGenerator);
-            WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
-            WriteSection<ProjectMain>(configurations[0], fileGenerator);
-            WriteSection<ProjectReferenceProxy>(configurations[0], fileGenerator);
-            WriteSection<ProjectResourcesBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectSourcesBuildPhase>(configurations[0], fileGenerator);
-            WriteSection<ProjectVariantGroup>(configurations[0], fileGenerator);
-            WriteSection<ProjectTargetDependency>(configurations[0], fileGenerator);
-            WriteSection<ProjectBuildConfiguration>(configurations[0], fileGenerator);
-            WriteSection<ProjectConfigurationList>(configurations[0], fileGenerator);
-            WriteSection<ProjectShellScriptBuildPhase>(configurations[0], fileGenerator);
+            var editorOptions = new Options.ExplicitOptions();
+            context.SelectOption(
+                Options.Option(Options.XCode.Editor.Indent.Tabs, () => { editorOptions["IndentUseTabs"] = "1"; }),
+                Options.Option(Options.XCode.Editor.Indent.Spaces, () => { editorOptions["IndentUseTabs"] = "0"; })
+            );
+
+            using (fileGenerator.Declare("editorOptions", editorOptions))
+            {
+                WriteSection<ProjectBuildFile>(configurations[0], fileGenerator);
+                WriteSection<ProjectContainerProxy>(configurations[0], fileGenerator);
+                WriteSection<ProjectFile>(configurations[0], fileGenerator);
+                WriteSection<ProjectFrameworksBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectHeadersBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectCopyFilesBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectFolder>(configurations[0], fileGenerator);
+                WriteSection<ProjectLegacyTarget>(configurations[0], fileGenerator);
+                WriteSection<ProjectNativeTarget>(configurations[0], fileGenerator);
+                WriteSection<ProjectMain>(configurations[0], fileGenerator);
+                WriteSection<ProjectReferenceProxy>(configurations[0], fileGenerator);
+                WriteSection<ProjectResourcesBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectSourcesBuildPhase>(configurations[0], fileGenerator);
+                WriteSection<ProjectVariantGroup>(configurations[0], fileGenerator);
+                WriteSection<ProjectTargetDependency>(configurations[0], fileGenerator);
+                WriteSection<ProjectBuildConfiguration>(configurations[0], fileGenerator);
+                WriteSection<ProjectConfigurationList>(configurations[0], fileGenerator);
+                WriteSection<ProjectShellScriptBuildPhase>(configurations[0], fileGenerator);
+            }
 
             // Footer.
             using (fileGenerator.Declare("RootObject", _projectMain))
