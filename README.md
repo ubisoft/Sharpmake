@@ -63,7 +63,7 @@ If you plan to version your *SharpmakeExtended* project under Git, you can use a
 
 *Platforms vs. Extensions*: there is no difference between them, these two folders are only used to tidy/split things a little.
 
-These two locations are where you can add any additional platforms (or extensions) in there own dedicated folder:
+These two locations are where you can add any additional platforms (or extensions) in their own dedicated folder:
 ```
 📁 Sharpmake.Platforms
  - 📁 Sharpmake.Platform_A
@@ -74,7 +74,7 @@ These two locations are where you can add any additional platforms (or extension
       - Sharpmake.Platform_B.csproj
 ```
 
-`Sharpmake.Application.csproj` (from Sharpmake *core*), automatically add `.csproj` from these folders to its dependency list. This means they will automatically be built and copied to its output folder, and simply hitting the "Start Debugging" button will *just work*.
+`Sharpmake.Application.csproj` (from Sharpmake *core*), automatically adds `.csproj` from these folders to its dependency list. This means they will automatically be built and copied to its output folder, and simply hitting the "Start Debugging" button will *just work*.
 
 3. `Directory.build.props`
 
