@@ -14,6 +14,16 @@ namespace Sharpmake
     {
         public static class XCode
         {
+            public static class Editor
+            {
+                public enum Indent
+                {
+                    [Default]
+                    Tabs,
+                    Spaces
+                }
+            };
+
             public static class Compiler
             {
                 public enum AlwaysSearchUserPaths
