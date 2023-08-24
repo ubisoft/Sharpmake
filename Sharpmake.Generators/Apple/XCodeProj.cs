@@ -280,6 +280,13 @@ namespace Sharpmake.Generators.Apple
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.OpenGLOnly, () => options["EnableGpuFrameCaptureMode"] = "2"),
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.Disable, () => options["EnableGpuFrameCaptureMode"] = "3")
             );
+            // An empty line means ON, "1" means OFF
+            // https://gitlab.kitware.com/cmake/cmake/-/issues/23857
+            Options.SelectOption(configurations[0],
+                Options.Option(Options.XCode.Scheme.MetalAPIValidation.Enable, () => options["MetalAPIValidation"] = RemoveLineTag),
+                Options.Option(Options.XCode.Scheme.MetalAPIValidation.Disable, () => options["MetalAPIValidation"] = "1")
+            );
+
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
             using (fileGenerator.Declare("options", options))

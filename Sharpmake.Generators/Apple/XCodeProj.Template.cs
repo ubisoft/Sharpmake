@@ -535,6 +535,7 @@ namespace Sharpmake.Generators.Apple
       ignoresPersistentStateOnLaunch = ""NO""
       debugDocumentVersioning = ""YES""
       enableGPUFrameCaptureMode = ""[options.EnableGpuFrameCaptureMode]""
+      enableGPUValidationMode = ""[options.MetalAPIValidation]""
       allowLocationSimulation = ""YES"">
       <BuildableProductRunnable>
           <BuildableReference
