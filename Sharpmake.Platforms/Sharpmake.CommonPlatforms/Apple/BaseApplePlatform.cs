@@ -569,8 +569,8 @@ namespace Sharpmake
             );
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Disable, () => options["AutomaticReferenceCounting"] = "NO"),
-                Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Enable, () => options["AutomaticReferenceCounting"] = "YES")
+                Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Disable, () => { options["AutomaticReferenceCounting"] = "NO"; cmdLineOptions["ClangEnableObjC_ARC"] = "-fno-objc-arc"; }),
+                Options.Option(Options.XCode.Compiler.AutomaticReferenceCounting.Enable, () => { options["AutomaticReferenceCounting"] = "YES"; cmdLineOptions["ClangEnableObjC_ARC"] = "-fobjc-arc"; })
             );
 
             context.SelectOption(
