@@ -41,6 +41,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.SDKRoot]'
             + ' [cmdLineOptions.CppLanguageStd]'
             + ' [cmdLineOptions.CLanguageStd]'
+            + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.ClangEnableObjC_ARC]'
 ";
 
