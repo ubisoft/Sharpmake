@@ -1111,6 +1111,22 @@ namespace Sharpmake
                     }
                 }
             }
+
+            /// <summary>
+            /// This exposes the scheme settings to Sharpmake
+            /// These settings have their own group for better grouping
+            /// https://developer.apple.com/documentation/xcode/customizing-the-build-schemes-for-a-project
+            /// Option class naming follows their equivalent key.
+            /// </summary>
+            public static class Scheme
+            {
+                public enum MetalAPIValidation
+                {
+                    [Default]
+                    Enable,
+                    Disable
+                }              
+            }
         }
     }
 }
