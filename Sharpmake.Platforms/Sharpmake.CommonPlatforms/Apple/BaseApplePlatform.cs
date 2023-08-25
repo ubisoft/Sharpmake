@@ -67,6 +67,7 @@ namespace Sharpmake
         protected virtual void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
         {
             generator.Write(_compilerExtraOptionsGeneral);
+            generator.Write(_compilerExtraOptionsAdditional);
         }
 
         public virtual void SelectPreprocessorDefinitionsBff(IBffGenerationContext context)
