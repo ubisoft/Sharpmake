@@ -614,16 +614,16 @@ namespace Sharpmake
             options["ProductBundleShortVersion"] = Options.StringOption.Get<Options.XCode.Compiler.ProductBundleShortVersion>(conf);
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP98, () => options["CppStandard"] = "c++98"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP11, () => options["CppStandard"] = "c++11"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP14, () => options["CppStandard"] = "c++14"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP17, () => options["CppStandard"] = "c++17"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP20, () => options["CppStandard"] = "c++20"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU98, () => options["CppStandard"] = "gnu++98"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU11, () => options["CppStandard"] = "gnu++11"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU14, () => options["CppStandard"] = "gnu++14"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU17, () => options["CppStandard"] = "gnu++17"),
-                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU20, () => options["CppStandard"] = "gnu++20")
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP98, () => { options["CppStandard"] = "c++98"; cmdLineOptions["CppLanguageStd"] = "-std=c++98"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP11, () => { options["CppStandard"] = "c++11"; cmdLineOptions["CppLanguageStd"] = "-std=c++11"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP14, () => { options["CppStandard"] = "c++14"; cmdLineOptions["CppLanguageStd"] = "-std=c++14"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP17, () => { options["CppStandard"] = "c++17"; cmdLineOptions["CppLanguageStd"] = "-std=c++17"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.CPP20, () => { options["CppStandard"] = "c++20"; cmdLineOptions["CppLanguageStd"] = "-std=c++20"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU98, () => { options["CppStandard"] = "gnu++98"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++98"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU11, () => { options["CppStandard"] = "gnu++11"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++11"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU14, () => { options["CppStandard"] = "gnu++14"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++14"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU17, () => { options["CppStandard"] = "gnu++17"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++17"; }),
+                Options.Option(Options.XCode.Compiler.CppLanguageStandard.GNU20, () => { options["CppStandard"] = "gnu++20"; cmdLineOptions["CppLanguageStd"] = "-std=gnu++20"; })
             );
 
             context.SelectOption(
@@ -669,13 +669,13 @@ namespace Sharpmake
             );
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.ANSI, () => options["CStandard"] = "ansi"),
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.C89, () => options["CStandard"] = "c89"),
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU89, () => options["CStandard"] = "gnu89"),
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.C99, () => options["CStandard"] = "c99"),
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU99, () => options["CStandard"] = "gnu99"),
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.C11, () => options["CStandard"] = "c11"),
-                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU11, () => options["CStandard"] = "gnu11"),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.ANSI, () => { options["CStandard"] = "ansi"; cmdLineOptions["CLanguageStd"] = "-std=ansi"; }),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.C89, () => { options["CStandard"] = "c89"; cmdLineOptions["CLanguageStd"] = "-std=c89"; }),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU89, () => { options["CStandard"] = "gnu89"; cmdLineOptions["CLanguageStd"] = "-std=gnu89"; }),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.C99, () => { options["CStandard"] = "c99"; cmdLineOptions["CLanguageStd"] = "-std=c99"; }),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU99, () => { options["CStandard"] = "gnu99"; cmdLineOptions["CLanguageStd"] = "-std=gnu99"; }),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.C11, () => { options["CStandard"] = "c11"; cmdLineOptions["CLanguageStd"] = "-std=c11"; }),
+                Options.Option(Options.XCode.Compiler.CLanguageStandard.GNU11, () => { options["CStandard"] = "gnu11"; cmdLineOptions["CLanguageStd"] = "-std=gnu11"; }),
                 Options.Option(Options.XCode.Compiler.CLanguageStandard.CompilerDefault, () => options["CStandard"] = FileGeneratorUtilities.RemoveLineTag)
             );
 
