@@ -280,6 +280,7 @@ namespace Sharpmake.Generators.Apple
 				GCC_ENABLE_CPP_EXCEPTIONS = [item.Options.CppExceptionHandling];
 				GCC_ENABLE_CPP_RTTI = [item.Options.RuntimeTypeInfo];
 				GCC_ENABLE_OBJC_EXCEPTIONS = [item.Options.ObjCExceptionHandling];
+				CLANG_ENABLE_OBJC_ARC_EXCEPTIONS = [item.Options.ObjCARCExceptionHandling];
 				GCC_GENERATE_DEBUGGING_SYMBOLS = [item.Options.GenerateDebuggingSymbols];
 				GCC_INLINES_ARE_PRIVATE_EXTERN = [item.Options.PrivateInlines];
 				GCC_MODEL_TUNING = [item.Options.ModelTuning];
