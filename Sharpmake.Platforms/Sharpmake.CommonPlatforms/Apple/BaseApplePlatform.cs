@@ -904,8 +904,8 @@ namespace Sharpmake
             );
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.WarningReturnType.Disable, () => options["WarningReturnType"] = "NO"),
-                Options.Option(Options.XCode.Compiler.WarningReturnType.Enable, () => options["WarningReturnType"] = "YES")
+                Options.Option(Options.XCode.Compiler.WarningReturnType.Disable, () => { options["WarningReturnType"] = "NO"; cmdLineOptions["WarningReturnType"] = "-Wno-return-type"; }),
+                Options.Option(Options.XCode.Compiler.WarningReturnType.Enable, () => { options["WarningReturnType"] = "YES"; cmdLineOptions["WarningReturnType"] = "-Wreturn-type"; })
             );
 
             context.SelectOption(
