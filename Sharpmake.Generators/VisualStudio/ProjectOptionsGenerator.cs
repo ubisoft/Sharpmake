@@ -46,10 +46,7 @@ namespace Sharpmake.Generators.VisualStudio
                 PlatformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(conf.Platform);
                 PlatformVcxproj = PlatformRegistry.Get<IPlatformVcxproj>(conf.Platform);
 
-                string platformLibraryExtension = ".lib";
-                string platformOutputLibraryExtension = ".lib";
-                string platformPrefixExtension = string.Empty;
-                PlatformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefixExtension);
+                PlatformVcxproj.SetupPlatformLibraryOptions(out var platformLibraryExtension, out var platformOutputLibraryExtension, out var platformPrefixExtension, out var platformLibPrefix);
 
                 PlatformLibraryExtension = platformLibraryExtension;
                 PlatformOutputLibraryExtension = platformOutputLibraryExtension;

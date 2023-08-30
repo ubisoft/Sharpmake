@@ -1287,11 +1287,12 @@ namespace Sharpmake
         }
 
         // TODO: Refactor this.
-        public void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
+        public void SetupPlatformLibraryOptions(out string platformLibExtension, out  string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix)
         {
             platformLibExtension = ".a";
-            platformOutputLibExtension = ".a";
+            platformOutputLibExtension = "";
             platformPrefixExtension = string.Empty;
+            platformLibPrefix = "";
         }
 
         private IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)

@@ -472,11 +472,12 @@ namespace Sharpmake
             yield break;
         }
 
-        public virtual void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
+        public virtual void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix)
         {
             platformLibExtension = ".lib";
-            platformOutputLibExtension = "";
+            platformOutputLibExtension = ".lib";
             platformPrefixExtension = string.Empty;
+            platformLibPrefix = string.Empty;
         }
 
         protected virtual string GetProjectLinkExecutableVcxprojTemplate()
