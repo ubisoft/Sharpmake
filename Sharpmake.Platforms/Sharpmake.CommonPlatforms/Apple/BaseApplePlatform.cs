@@ -703,8 +703,8 @@ namespace Sharpmake
             );
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.ObjCWeakReferences.Disable, () => options["ObjCWeakReferences"] = "NO"),
-                Options.Option(Options.XCode.Compiler.ObjCWeakReferences.Enable, () => options["ObjCWeakReferences"] = "YES")
+                Options.Option(Options.XCode.Compiler.ObjCWeakReferences.Disable, () => { options["ObjCWeakReferences"] = "NO"; cmdLineOptions["ClangEnableObjC_Weak"] = FileGeneratorUtilities.RemoveLineTag; }),
+                Options.Option(Options.XCode.Compiler.ObjCWeakReferences.Enable, () => { options["ObjCWeakReferences"] = "YES"; cmdLineOptions["ClangEnableObjC_Weak"] = "-fobjc-weak"; })
             );
 
             context.SelectOption(
