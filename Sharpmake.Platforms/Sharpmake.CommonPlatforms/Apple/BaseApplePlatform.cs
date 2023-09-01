@@ -723,8 +723,8 @@ namespace Sharpmake
             );
 
             context.SelectOption(
-                Options.Option(Options.XCode.Compiler.RTTI.Disable, () => { options["RuntimeTypeInfo"] = "NO"; }),
-                Options.Option(Options.XCode.Compiler.RTTI.Enable, () => { options["RuntimeTypeInfo"] = "YES"; })
+                Options.Option(Options.XCode.Compiler.RTTI.Disable, () => { options["RuntimeTypeInfo"] = "NO"; cmdLineOptions["RuntimeTypeInfo"] = "-fno-rtti"; }),
+                Options.Option(Options.XCode.Compiler.RTTI.Enable, () => { options["RuntimeTypeInfo"] = "YES"; cmdLineOptions["RuntimeTypeInfo"] = "-frtti"; })
             );
 
             context.SelectOption(
