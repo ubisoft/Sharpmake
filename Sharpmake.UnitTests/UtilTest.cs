@@ -110,30 +110,21 @@ namespace Sharpmake.UnitTests
 
     public class SimplifyPath
     {
-        /// <summary>
-        ///     Verify that an error is thrown when a path begin with three dots
-        /// </summary>
         [Test]
-        public void ThrowsErrorDot()
+        public void ThrowsOnInvalidNameWithOnlyDots()
         {
             Assert.Throws<ArgumentException>(() => Util.SimplifyPath(".../sharpmake/README.md"));
-        }
 
-        /// <summary>
-        ///     Verify that an error is thrown when a path start with dots but no slash
-        /// </summary>
-        [Test]
-        public void ThrowsErrorSeparator()
-        {
-            Assert.Throws<ArgumentException>(() => Util.SimplifyPath("..sharpmake/README.md"));
+            Assert.Throws<ArgumentException>(() => Util.SimplifyPath("sharpmake/..../README.md"));
+
+            Assert.Throws<ArgumentException>(() => Util.SimplifyPath("sharpmake/..."));
         }
 
         [Test]
         public void LeavesEmptyStringsUntouched()
         {
-            Assert.That(Util.SimplifyPath(string.Empty), Is.EqualTo(string.Empty));
-            Assert.That(Util.SimplifyPath(""), Is.EqualTo(string.Empty));
-            Assert.That(Util.SimplifyPath(""), Is.EqualTo(""));
+            Assert.That(Util.SimplifyPath(""),
+                Is.EqualTo(""));
         }
 
         [Test]
@@ -151,6 +142,40 @@ namespace Sharpmake.UnitTests
         {
             Assert.That(Util.SimplifyPath(@"test\..\test.cpp"),
                 Is.EqualTo("test.cpp"));
+        }
+
+        [Test]
+        public void HandlesDotsInFileNameOrFolder()
+        {
+            Assert.That(Util.SimplifyPath(@".test.cpp"),
+                Is.EqualTo(".test.cpp"));
+
+            Assert.That(Util.SimplifyPath(@"test.cpp."),
+                Is.EqualTo("test.cpp."));
+
+            Assert.That(Util.SimplifyPath(@"test.cpp.."),
+                Is.EqualTo("test.cpp.."));
+
+            Assert.That(Util.SimplifyPath(@"test.cpp..."),
+                Is.EqualTo("test.cpp..."));
+
+            Assert.That(Util.SimplifyPath(@".test\.test.cpp"),
+                Is.EqualTo(Path.Combine(".test", ".test.cpp")));
+
+            Assert.That(Util.SimplifyPath(@"test.\test.cpp."),
+                Is.EqualTo(Path.Combine("test.", "test.cpp.")));
+
+            Assert.That(Util.SimplifyPath(@"..test\..test.cpp"),
+                Is.EqualTo(Path.Combine("..test", "..test.cpp")));
+
+            Assert.That(Util.SimplifyPath(@"test..\test.cpp.."),
+                Is.EqualTo(Path.Combine("test..", "test.cpp..")));
+
+            Assert.That(Util.SimplifyPath(@"...test\...test.cpp"),
+                Is.EqualTo(Path.Combine("...test", "...test.cpp")));
+
+            Assert.That(Util.SimplifyPath(@"test...\test.cpp..."),
+                Is.EqualTo(Path.Combine("test...", "test.cpp...")));
         }
 
         [Test]
@@ -176,27 +201,201 @@ namespace Sharpmake.UnitTests
         [Test]
         public void HandlesSlashesInFullPath()
         {
-            var currentDirectory = Directory.GetCurrentDirectory();
-            Assert.That(Util.SimplifyPath(currentDirectory + "\\main/test//t.cpp"),
-                Is.EqualTo(Path.Combine(currentDirectory, "main", "test", "t.cpp")));
+            Assert.That(Util.SimplifyPath("c:\\main/test//t.cpp"),
+                Is.EqualTo(Path.Combine("c:", "main", "test", "t.cpp")));
+
+            Assert.That(Util.SimplifyPath("c:\\"),
+                Is.EqualTo("c:\\"));
+
+            Assert.That(Util.SimplifyPath("/main/test/t.cpp"),
+                Is.EqualTo(Path.Combine("/", "main", "test", "t.cpp")));
+
+            Assert.That(Util.SimplifyPath("/"),
+                Is.EqualTo("/"));
+        }
+
+        [Test]
+        public void LeaveTrailingPathSeparator()
+        {
+            Assert.That(Util.SimplifyPath(@"alpha\beta\"),
+                Is.EqualTo(Path.Combine("alpha", $"beta{Path.DirectorySeparatorChar}")));
+
+            Assert.That(Util.SimplifyPath(@"alpha\beta\\"),
+                Is.EqualTo(Path.Combine("alpha", $"beta{Path.DirectorySeparatorChar}")));
         }
 
         [Test]
         public void HandlesFolderParentsAtTheEnd()
         {
-            Assert.That(Util.SimplifyPath(@"alpha\beta\gamma\sigma\omega\zeta\..\.."),
-                Is.EqualTo(Path.Combine("alpha", "beta", "gamma", "sigma")));
+            Assert.That(Util.SimplifyPath(@"a\b\c\..\.."),
+                Is.EqualTo("a"));
+
+            Assert.That(Util.SimplifyPath(@"a\b\c\..\..\"),
+                Is.EqualTo($"a{Path.DirectorySeparatorChar}"));
         }
 
         [Test]
         public void LeavesCleanPathUntouched()
         {
             // Check that we do not change dot and dot dot
-            Assert.That(".", Is.EqualTo(Util.SimplifyPath(".")));
-            Assert.That("..", Is.EqualTo(Util.SimplifyPath("..")));
+            Assert.That(Util.SimplifyPath("."), Is.EqualTo("."));
+            Assert.That(Util.SimplifyPath(".."), Is.EqualTo(".."));
 
-            Assert.That(Util.SimplifyPath(Util.PathMakeStandard(@"alpha\beta\gamma\sigma\omega\zeta\lambda\phi\")),
+            Assert.That(Util.SimplifyPath(@"alpha\beta\gamma\sigma\omega\zeta\lambda\phi"),
                 Is.EqualTo(Path.Combine("alpha", "beta", "gamma", "sigma", "omega", "zeta", "lambda", "phi")));
+        }
+    }
+
+    public class PathGetRelative
+    {
+        [Test]
+        public void PathGetRelative_Highter()
+        {
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2",  "c:/folder1"),  Is.EqualTo(".."));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2/", "c:/folder1"),  Is.EqualTo(".."));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2",  "c:/folder1/"), Is.EqualTo(".."));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2/", "c:/folder1/"), Is.EqualTo(".."));
+
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2/folder3",  "c:/folder1"),  Is.EqualTo(Path.Combine("..", "..")));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2/folder3/", "c:/folder1"),  Is.EqualTo(Path.Combine("..", "..")));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2/folder3",  "c:/folder1/"), Is.EqualTo(Path.Combine("..", "..")));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2/folder3/", "c:/folder1/"), Is.EqualTo(Path.Combine("..", "..")));
+        }
+
+        [Test]
+        public void PathGetRelative_Deeper()
+        {
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder1/folder2"),  Is.EqualTo("folder2"));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder1/folder2"),  Is.EqualTo("folder2"));
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder1/folder2/"), Is.EqualTo("folder2")); // standard keep the last dirSep != sharpmake that remove it
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder1/folder2/"), Is.EqualTo("folder2")); // standard keep the last dirSep != sharpmake that remove it
+
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder1/folder2/folder3"),  Is.EqualTo(Path.Combine("folder2", "folder3")));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder1/folder2/folder3"),  Is.EqualTo(Path.Combine("folder2", "folder3")));
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder1/folder2/folder3/"), Is.EqualTo(Path.Combine("folder2", "folder3"))); // standard keep the last dirSep != sharpmake that remove it
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder1/folder2/folder3/"), Is.EqualTo(Path.Combine("folder2", "folder3"))); // standard keep the last dirSep != sharpmake that remove it
+        }
+
+        [Test]
+        public void PathGetRelativeSimple_Parallel()
+        {
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder2"),  Is.EqualTo(Path.Combine("..", "folder2")));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder2"),  Is.EqualTo(Path.Combine("..", "folder2")));
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder2/"), Is.EqualTo(Path.Combine("..", "folder2"))); // standard keep the last dirSep != sharpmake that remove it
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder2/"), Is.EqualTo(Path.Combine("..", "folder2"))); // standard keep the last dirSep != sharpmake that remove it
+
+            Assert.That(Util.PathGetRelative("c:/folder1/folderA",  "c:/folder2/folderB"),  Is.EqualTo(Path.Combine("..", "..", "folder2", "folderB")));
+            Assert.That(Util.PathGetRelative("c:/folder1/folderA/", "c:/folder2/folderB"),  Is.EqualTo(Path.Combine("..", "..", "folder2", "folderB")));
+            Assert.That(Util.PathGetRelative("c:/folder1/folderA",  "c:/folder2/folderB/"), Is.EqualTo(Path.Combine("..", "..", "folder2", "folderB"))); // standard keep the last dirSep != sharpmake that remove it
+            Assert.That(Util.PathGetRelative("c:/folder1/folderA/", "c:/folder2/folderB/"), Is.EqualTo(Path.Combine("..", "..", "folder2", "folderB"))); // standard keep the last dirSep != sharpmake that remove it
+        }
+
+        [Test]
+        public void PathGetRelative_Same()
+        {
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder1"),  Is.EqualTo("."));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder1"),  Is.EqualTo("."));
+            Assert.That(Util.PathGetRelative("c:/folder1",  "c:/folder1/"), Is.EqualTo("."));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "c:/folder1/"), Is.EqualTo("."));
+
+            Assert.That(Util.PathGetRelative("c:/", "c:/"), Is.EqualTo("."));
+            Assert.That(Util.PathGetRelative("/",   "/"),   Is.EqualTo("."));
+        }
+
+        [Test]
+        public void PathGetRelative_DifferentRoot()
+        {
+            Assert.That(Util.PathGetRelative("c:/folder1",  "d:/folder2"),  Is.EqualTo(Path.Combine("d:", "folder2")));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "d:/folder2"),  Is.EqualTo(Path.Combine("d:", "folder2")));
+            Assert.That(Util.PathGetRelative("c:/folder1",  "d:/folder2/"), Is.EqualTo(Path.Combine("d:", $"folder2{Path.DirectorySeparatorChar}")));
+            Assert.That(Util.PathGetRelative("c:/folder1/", "d:/folder2/"), Is.EqualTo(Path.Combine("d:", $"folder2{Path.DirectorySeparatorChar}")));
+        }
+
+        [Test]
+        public void PathGetRelative_Tricky()
+        {
+            // Names are halfway the same (common part must be properly computed)
+            Assert.That(Util.PathGetRelative("c:/abc",     "c:/abx/folder"), Is.EqualTo(Path.Combine("..", "abx", "folder")));
+            Assert.That(Util.PathGetRelative("c:/abc",     "c:/abc_"),       Is.EqualTo(Path.Combine("..", "abc_")));
+            Assert.That(Util.PathGetRelative("c:/abc_",    "c:/abc"),        Is.EqualTo(Path.Combine("..", "abc")));
+            Assert.That(Util.PathGetRelative("c:/abc_def", "c:/abc_xyz"),    Is.EqualTo(Path.Combine("..", "abc_xyz")));
+
+            // One character names
+            Assert.That(Util.PathGetRelative("c:/1/2/3", "c:/1"),     Is.EqualTo(Path.Combine("..", "..")));
+            Assert.That(Util.PathGetRelative("c:/1/",    "c:/1/2/3"), Is.EqualTo(Path.Combine("2", "3")));
+        }
+
+        [Test]
+        public void PathGetRelative_Invalid()
+        {
+            // Not rooted
+            Assert.That(Util.PathGetRelative("c:/folder1", "folder2"), Is.EqualTo("folder2")); // Should probably throw as not rooted
+            Assert.That(Util.PathGetRelative("folder1", "c:/folder2"), Is.EqualTo(Path.Combine("c:", "folder2"))); // Should probably throw as not rooted
+
+            // Empty
+            Assert.That(Util.PathGetRelative("", "c:/folder2"), Is.EqualTo(Path.Combine("c:", "folder2"))); // Should probably throw as empty
+            Assert.That(Util.PathGetRelative("c:/folder2", ""), Is.EqualTo("")); // Should probably throw as empty
+
+            // Null
+            Assert.Throws<NullReferenceException>(() => Util.PathGetRelative(null, "c:/folder2"));
+            Assert.Throws<NullReferenceException>(() => Util.PathGetRelative("c:/folder2", (string)null));
+        }
+
+
+        [Test]
+        public void PathGetRelative_IgnoreCase()
+        {
+            Assert.Inconclusive("The implementation expose a 'ignoreCase' argument, but never use it (it always ignore the case even with ignoreCase == false)");
+
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2", "c:/Folder1", ignoreCase: true),  Is.EqualTo(".."));
+            Assert.That(Util.PathGetRelative("c:/folder1/folder2", "c:/Folder1", ignoreCase: false), Is.EqualTo(Path.Combine("..", "..", "Folder1"))); // ori always ignore case, whatever the user ask
+
+            Assert.That(Util.PathGetRelative("c:/folder1", "C:/folder1", ignoreCase: true),  Is.EqualTo("."));
+            Assert.That(Util.PathGetRelative("c:/folder1", "C:/folder1", ignoreCase: false), Is.EqualTo(Path.Combine("C:", "folder1"))); // ori always ignore case, whatever the user ask
+        }
+
+        [Test]
+        public void PathGetRelativeStrings()
+        {
+            Strings stringsDest = new Strings(Util.PathMakeStandard(@"C:\Windows\local\cmd.exe"));
+            string stringsSource = Util.PathMakeStandard(@"C:\Windows\System32\cmd.exe");
+            string expectedString = Util.PathMakeStandard(@"..\..\local\cmd.exe");
+
+            Assert.AreEqual(expectedString, Util.PathGetRelative(stringsSource, stringsDest, false)[0]);
+        }
+
+        [Test]
+        public void PathGetRelativeOrderableStrings()
+        {
+            string stringsSource = Util.PathMakeStandard(@"F:\SharpMake\sharpmake\Sharpmake.Platforms");
+            OrderableStrings stringsDest = new OrderableStrings
+            {
+                @"F:\SharpMake\sharpmake\Sharpmake.Generators\Generic",
+                @"F:\SharpMake\sharpmake\Sharpmake.Platforms\subdir\test.txt",
+                @"F:\SharpMake\sharpmake\Sharpmake.Platforms\test2.txt"
+            };
+            Util.PathMakeStandard(stringsDest);
+            OrderableStrings listResult = Util.PathGetRelative(stringsSource, stringsDest, false);
+
+            Assert.AreEqual(Util.PathMakeStandard(@"..\Sharpmake.Generators\Generic", !Util.IsRunningInMono()), listResult[0]);
+            Assert.AreEqual(Util.PathMakeStandard(@"subdir\test.txt", !Util.IsRunningInMono()), listResult[1]);
+            Assert.AreEqual("test2.txt", listResult[2]);
+        }
+
+        [Test]
+        public void PathGetRelativeOrderableIEnumerable()
+        {
+            string stringsSource = Util.PathMakeStandard(@"F:\SharpMake\sharpmake\Sharpmake.Generators\Apple");
+            List<string> stringsDest = new List<string>()
+            {
+                @"F:\SharpMake\sharpmake\Sharpmake.Generators\Generic",
+                @"F:\SharpMake\sharpmake\Sharpmake.Generators\Properties"
+            };
+            Util.PathMakeStandard(stringsDest);
+
+            var result = Util.PathGetRelative(stringsSource, stringsDest, false);
+            Assert.AreEqual(Util.PathMakeStandard(@"..\Generic"), result[0]);
+            Assert.AreEqual(Util.PathMakeStandard(@"..\Properties"), result[1]);
         }
     }
 
@@ -1340,59 +1539,6 @@ namespace Sharpmake.UnitTests
         }
 
         /// <summary>
-        ///     Verify if the relative path to the destination directory is correct from the source path
-        ///  </summary>
-        [Test]
-        public void PathGetRelativeStrings()
-        {
-            Strings stringsDest = new Strings(Util.PathMakeStandard(@"C:\Windows\local\cmd.exe"));
-            string stringsSource = Util.PathMakeStandard(@"C:\Windows\System32\cmd.exe");
-            string expectedString = Util.PathMakeStandard(@"..\..\local\cmd.exe");
-
-            Assert.AreEqual(expectedString, Util.PathGetRelative(stringsSource, stringsDest, false)[0]);
-        }
-
-        /// <summary>
-        ///     Verify if the relative path to the destination directory is correct from the source path
-        ///  </summary>
-        [Test]
-        public void PathGetRelativeOrderableStrings()
-        {
-            string stringsSource = Util.PathMakeStandard(@"F:\SharpMake\sharpmake\Sharpmake.Platforms");
-            OrderableStrings stringsDest = new OrderableStrings
-            {
-                @"F:\SharpMake\sharpmake\Sharpmake.Generators\Generic",
-                @"F:\SharpMake\sharpmake\Sharpmake.Platforms\subdir\test.txt",
-                @"F:\SharpMake\sharpmake\Sharpmake.Platforms\test2.txt"
-            };
-            Util.PathMakeStandard(stringsDest);
-            OrderableStrings listResult = Util.PathGetRelative(stringsSource, stringsDest, false);
-
-            Assert.AreEqual(Util.PathMakeStandard(@"..\Sharpmake.Generators\Generic", !Util.IsRunningInMono()), listResult[0]);
-            Assert.AreEqual(Util.PathMakeStandard(@"subdir\test.txt", !Util.IsRunningInMono()), listResult[1]);
-            Assert.AreEqual("test2.txt", listResult[2]);
-        }
-
-        /// <summary>
-        ///     Verify if the relative path to the destination directory is correct from the source path
-        ///  </summary>
-        [Test]
-        public void PathGetRelativeOrderableIEnumerable()
-        {
-            string stringsSource = Util.PathMakeStandard(@"F:\SharpMake\sharpmake\Sharpmake.Generators\Apple");
-            List<string> stringsDest = new List<string>()
-            {
-                @"F:\SharpMake\sharpmake\Sharpmake.Generators\Generic",
-                @"F:\SharpMake\sharpmake\Sharpmake.Generators\Properties"
-            };
-            Util.PathMakeStandard(stringsDest);
-
-            var result = Util.PathGetRelative(stringsSource, stringsDest, false);
-            Assert.AreEqual(Util.PathMakeStandard(@"..\Generic"), result[0]);
-            Assert.AreEqual(Util.PathMakeStandard(@"..\Properties"), result[1]);
-        }
-
-        /// <summary>
         ///     Verify that the path and the file's name were separated
         ///  </summary>
         [Test]
@@ -1445,12 +1591,20 @@ namespace Sharpmake.UnitTests
 
             var root = @"C:\SharpMake\sharpmake\Sharpmake.Application\Properties";
 
-            var newRelativeToFullPath = "";
-            Assert.AreEqual(Path.Combine(absolutePath.ToLower(), fileName), Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath, false, null));
-            Assert.AreEqual(mockPath, Util.GetConvertedRelativePath(absolutePath, mockPath, newRelativeToFullPath, false, root));
-            Assert.AreEqual(Path.Combine(absolutePath.ToLower(), fileName), Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath, false, ""));
-            Assert.AreEqual(absolutePath, Util.GetConvertedRelativePath(absolutePath, null, newRelativeToFullPath, false, null));
-            Assert.AreEqual(Path.Combine(root.ToLower(), Path.GetTempPath()), Util.GetConvertedRelativePath(root, Path.GetTempPath(), newRelativeToFullPath, false, null));
+            Assert.AreEqual(Path.Combine(absolutePath.ToLower(), fileName),
+                Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath: "", false, null));
+
+            Assert.AreEqual(mockPath,
+                Util.GetConvertedRelativePath(absolutePath, mockPath, newRelativeToFullPath: "", false, root));
+
+            Assert.AreEqual(Path.Combine(absolutePath.ToLower(), fileName),
+                Util.GetConvertedRelativePath(absolutePath, fileName, newRelativeToFullPath: "", false, ""));
+
+            Assert.AreEqual(absolutePath,
+                Util.GetConvertedRelativePath(absolutePath, null, newRelativeToFullPath: "", false, null));
+
+            Assert.AreEqual(Path.GetTempPath(),
+                Util.GetConvertedRelativePath(root, Path.GetTempPath(), newRelativeToFullPath: "", false, null));
 
             File.Delete(mockPath);
         }
