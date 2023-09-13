@@ -56,7 +56,8 @@ namespace Sharpmake
                 Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
                 if (customSdkRoot != null)
                 {
-                    options["SDKRoot"] = customSdkRoot.Value;
+                    // Xcode doesn't accept the customized sdk path as SDKRoot
+                    //options["SDKRoot"] = customSdkRoot.Value;
                     cmdLineOptions["SDKRoot"] = $"-isysroot {customSdkRoot.Value}";
                 }
 
