@@ -2348,6 +2348,10 @@ namespace Sharpmake
                 set { }
             }
 
+            /// <summary>
+            /// Mark the configuration to be the default build configuration for XCode project
+            /// </summary>
+            public bool UseAsDefaultForXCode = false;
 
             // FastBuild configuration
             /// <summary>

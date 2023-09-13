@@ -287,11 +287,15 @@ namespace Sharpmake.Generators.Apple
                 Options.Option(Options.XCode.Scheme.MetalAPIValidation.Disable, () => options["MetalAPIValidation"] = "1")
             );
 
+            var defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault();
+            Project.Configuration activeConfiguration = defaultConfiguration != null ? defaultConfiguration : configurations[0];
+            string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
+
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
             using (fileGenerator.Declare("options", options))
             using (fileGenerator.Declare("testableElements", testableElements))
-            using (fileGenerator.Declare("optimization", configurations[0].Target.Name))
+            using (fileGenerator.Declare("DefaultTarget", targetName))
             {
                 fileGenerator.Write(Template.SchemeFileTemplate);
             }

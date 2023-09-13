@@ -519,7 +519,7 @@ namespace Sharpmake.Generators.Apple
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = ""[optimization]""
+      buildConfiguration = ""[DefaultTarget]""
       selectedDebuggerIdentifier = ""Xcode.DebuggerFoundation.Debugger.LLDB""
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
       shouldUseLaunchSchemeArgsEnv = ""YES"">
@@ -527,7 +527,7 @@ namespace Sharpmake.Generators.Apple
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = ""[optimization]""
+      buildConfiguration = ""[DefaultTarget]""
       selectedDebuggerIdentifier = ""Xcode.DebuggerFoundation.Debugger.LLDB""
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
       launchStyle = ""0""
@@ -550,17 +550,17 @@ namespace Sharpmake.Generators.Apple
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = ""[optimization]""
+      buildConfiguration = ""[DefaultTarget]""
       shouldUseLaunchSchemeArgsEnv = ""YES""
       savedToolIdentifier = """"
       useCustomWorkingDirectory = ""NO""
       debugDocumentVersioning = ""YES"">
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = ""[optimization]"">
+      buildConfiguration = ""[DefaultTarget]"">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = ""[optimization]""
+      buildConfiguration = ""[DefaultTarget]""
       revealArchiveInOrganizer = ""YES"">
    </ArchiveAction>
 </Scheme>
