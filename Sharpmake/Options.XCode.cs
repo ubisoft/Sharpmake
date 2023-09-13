@@ -233,6 +233,7 @@ namespace Sharpmake
                     Disable
                 }
 
+                [Obsolete("Deprecated. Use `CppExceptions`, `ObjCExceptions`, or `ObjCARCExceptions` instead.", error: true)]
                 public enum Exceptions
                 {
                     [Default]
@@ -240,6 +241,27 @@ namespace Sharpmake
                     Enable,
                     EnableCpp,
                     EnableObjC,
+                }
+
+                public enum CppExceptions
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
+
+                public enum ObjCExceptions
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
+
+                public enum ObjCARCExceptions
+                {
+                    [Default]
+                    Disable,
+                    Enable
                 }
 
                 public class ExternalResourceFolders : Strings
