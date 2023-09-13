@@ -25,6 +25,7 @@ namespace Sharpmake
                             // Options
                             //--------
                             + ' [cmdLineOptions.GenerateMapFile]'
+                            + ' [cmdLineOptions.DeadCodeStripping]'
                             // Additional linker options
                             //--------------------------
                             + ' [options.AdditionalLinkerOptions]'
