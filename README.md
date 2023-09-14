@@ -33,7 +33,7 @@ Building and running Sharpmake is quite straightforward:
 
 Sharpmake originally had support for game consoles, but Ubisoft pulled it out because those could not be open sourced. Sharpmake now has an extension system that allows support for these consoles to be added back at runtime.
 
-More information about platforms can be found [here](doc/Platforms.md).
+More information about platforms can be found [here](docs/Platforms.md).
 
 ## Extending Sharpmake
 
