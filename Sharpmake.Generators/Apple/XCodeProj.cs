@@ -270,6 +270,20 @@ namespace Sharpmake.Generators.Apple
                 }
             }
 
+            // Build commandLineArguments
+            var debugArguments = Options.GetObject<Options.XCode.Scheme.DebugArguments>(configurations[0]);
+            var commandLineArguments = new StringBuilder();
+            if (debugArguments != null)
+            {
+                commandLineArguments.Append(Template.CommandLineArgumentsBegin);
+                foreach(var argument in debugArguments)
+                {
+                    using (fileGenerator.Declare("argument", argument))
+                    commandLineArguments.Append(fileGenerator.Resolver.Resolve(Template.CommandLineArgument));
+                }
+                commandLineArguments.Append(Template.CommandLineArgumentsEnd);
+            }
+
             // Write the scheme file
             var defaultTarget = _nativeOrLegacyTargets.Values.Where(target => target.OutputFile.OutputType != Project.Configuration.OutputType.IosTestBundle).FirstOrDefault();
 
@@ -296,6 +310,7 @@ namespace Sharpmake.Generators.Apple
             using (fileGenerator.Declare("options", options))
             using (fileGenerator.Declare("testableElements", testableElements))
             using (fileGenerator.Declare("DefaultTarget", targetName))
+            using (fileGenerator.Declare("commandLineArguments", commandLineArguments))
             {
                 fileGenerator.Write(Template.SchemeFileTemplate);
             }
