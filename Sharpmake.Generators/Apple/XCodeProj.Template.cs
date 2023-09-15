@@ -481,6 +481,21 @@ namespace Sharpmake.Generators.Apple
 "               }
             };
 
+            public static string CommandLineArgumentsBegin =
+@"
+      <CommandLineArguments>";
+
+            public static string CommandLineArgument =
+@"
+         <CommandLineArgument
+            argument = ""[argument]""
+            isEnabled = ""YES"">
+         </CommandLineArgument>";
+
+            public static string CommandLineArgumentsEnd =
+@"
+      </CommandLineArguments>";
+
             public static string SchemeTestableReference =
 @"
          <TestableReference
@@ -546,7 +561,7 @@ namespace Sharpmake.Generators.Apple
               BlueprintName = ""[item.Identifier]""
               ReferencedContainer = ""container:[projectFile].xcodeproj"">
           </BuildableReference>
-      </BuildableProductRunnable>
+      </BuildableProductRunnable>[commandLineArguments]
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

@@ -1148,6 +1148,18 @@ namespace Sharpmake
                     Enable,
                     Disable
                 }              
+
+                /// <summary>
+                /// Resolve to <CommandLineArguments> in xcscheme, 
+                ///  for configuring 'Arguments Passed On Launch' as 'Edit Scheme' in XCode can do
+                /// </summary>
+                public class DebugArguments: List<string>
+                {
+                    public DebugArguments(List<string> args)
+                        : base(args) 
+                    {
+                    }
+                }
             }
         }
     }
