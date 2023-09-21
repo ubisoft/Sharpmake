@@ -1453,7 +1453,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private abstract class ProjectFileSystemItem : ProjectItem
+        internal abstract class ProjectFileSystemItem : ProjectItem
         {
             public enum SourceTreeSetting
             {
@@ -1500,7 +1500,7 @@ namespace Sharpmake.Generators.Apple
             public abstract SourceTreeSetting SourceTreeValue { get; }
         }
 
-        private abstract class ProjectFileBase : ProjectFileSystemItem
+        internal abstract class ProjectFileBase : ProjectFileSystemItem
         {
             private bool _build = false;
             private bool _source = false;
@@ -1621,7 +1621,7 @@ namespace Sharpmake.Generators.Apple
             public string IncludeInIndex { get { return _includeInIndex; } }
         }
 
-        private class ProjectFile : ProjectFileBase
+        internal class ProjectFile : ProjectFileBase
         {
             public ProjectFile(ItemSection section, string fullPath)
                 : base(section, fullPath)
@@ -1845,10 +1845,10 @@ namespace Sharpmake.Generators.Apple
             public override string Path { get { return RemoveLineTag; } }
         }
 
-        private class ProjectBuildFile : ProjectItem
+        internal class ProjectBuildFile : ProjectItem
         {
             public ProjectBuildFile(ProjectFileBase file, string settings = @"")
-                : base(ItemSection.PBXBuildFile, file.Name, settings)
+                : base(ItemSection.PBXBuildFile, file.FullPath, settings)
             {
                 File = file;
             }
