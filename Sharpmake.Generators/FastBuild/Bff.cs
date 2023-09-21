@@ -195,7 +195,7 @@ namespace Sharpmake.Generators.FastBuild
             var context = new BffGenerationContext(builder, project, projectPath, configurations);
             string projectBffFile = Bff.GetBffFileName(projectPath, firstConf.BffFileName); // TODO: bff file name could be different per conf, hence we would generate more than one file
             List<Vcxproj.ProjectFile> filesInNonDefaultSection;
-            Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles;
+            Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles;
             using (builder.CreateProfilingScope("BffGenerator.Generate:GetGeneratedFiles"))
             {
                 confSourceFiles = GetGeneratedFiles(context, configurations, out filesInNonDefaultSection);
@@ -318,6 +318,8 @@ namespace Sharpmake.Generators.FastBuild
                         bool isASMFileSection = tuple.Item6;
                         Options.Vc.Compiler.Exceptions exceptionsSetting = tuple.Item7;
                         bool isCompileAsNonCLRFile = tuple.Rest.Item1;
+                        bool isCompileAsObjCFile = tuple.Rest.Item2;
+                        bool isCompileAsObjCPPFile = tuple.Rest.Item3;
 
                         bool isFirstSubConfig = subConfigIndex == 0;
                         bool isLastSubConfig = subConfigIndex == confSubConfigs.Keys.Count - 1;
@@ -648,9 +650,41 @@ namespace Sharpmake.Generators.FastBuild
                             // MSVC
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
 
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangEnableObjC_ARC", FileGeneratorUtilities.RemoveLineTag));
+
                             if (clangPlatformBff != null)
                                 clangFileLanguage = "-x c "; // Compiler option to indicate that its a C file
                             fastBuildSourceFileType = "/TC";
+                        }
+                        else if (isCompileAsObjCFile)
+                        {
+                            // Do not take Cpp Language conformance into account while compiling in objc
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CppLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCppLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // and remove the stdlib specification as well
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "StdLib", FileGeneratorUtilities.RemoveLineTag));
+                            // MSVC
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+
+                            if (clangPlatformBff != null)
+                                clangFileLanguage = "-x objective-c ";
+                            fastBuildUsingPlatformConfig = platformBff.CConfigName(conf);
+
+                            fastBuildSourceFileType = "";
+                        }
+                        else if (isCompileAsObjCPPFile)
+                        {
+                            // Do not take C Language conformance into account while compiling in objcpp
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "CLanguageStd", FileGeneratorUtilities.RemoveLineTag));
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangCLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
+                            // MSVC
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard_C", FileGeneratorUtilities.RemoveLineTag));
+
+                            if (clangPlatformBff != null)
+                                clangFileLanguage = "-x objective-c++ ";
+                            fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
+
+                            fastBuildSourceFileType = "";
                         }
                         else
                         {
@@ -659,6 +693,8 @@ namespace Sharpmake.Generators.FastBuild
                             scopedOptions.Add(new Options.ScopedOption(confOptions, "ClangCLanguageStandard", FileGeneratorUtilities.RemoveLineTag));
                             // MSVC
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard_C", FileGeneratorUtilities.RemoveLineTag));
+
+                            scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangEnableObjC_ARC", FileGeneratorUtilities.RemoveLineTag));
 
                             fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
@@ -1781,7 +1817,7 @@ namespace Sharpmake.Generators.FastBuild
             return null;
         }
 
-        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles)
+        private void ConfigureUnities(IGenerationContext context, Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>>> confSourceFiles)
         {
             var conf = context.Configuration;
             // Only add unity build to non blobbed projects -> which they will be blobbed by FBuild
@@ -1955,7 +1991,7 @@ namespace Sharpmake.Generators.FastBuild
         }
 
         // For now, this will do.
-        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>> GetDefaultTupleConfig()
+        private static Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>> GetDefaultTupleConfig()
         {
             bool isConsumeWinRTExtensions = false;
             bool isCompileAsCLRFile = false;
@@ -1963,9 +1999,14 @@ namespace Sharpmake.Generators.FastBuild
             bool isASMFile = false;
             bool isCompileAsCPPFile = false;
             bool isCompileAsCFile = false;
+            bool isCompileAsObjCFile = false;
+            bool isCompileAsObjCPPFile = false;
             bool usePrecomp = true;
             Options.Vc.Compiler.Exceptions exceptionSetting = Options.Vc.Compiler.Exceptions.Disable;
-            var tuple = Tuple.Create(usePrecomp, isCompileAsCFile, isCompileAsCPPFile, isCompileAsCLRFile, isConsumeWinRTExtensions, isASMFile, exceptionSetting, isCompileAsNonCLRFile);
+            var tuple = new Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>
+                 (usePrecomp, isCompileAsCFile, isCompileAsCPPFile, isCompileAsCLRFile, isConsumeWinRTExtensions, isASMFile, exceptionSetting,
+                 new Tuple<bool, bool, bool>(isCompileAsNonCLRFile, isCompileAsObjCFile, isCompileAsObjCPPFile));
+
             return tuple;
         }
 
@@ -1997,14 +2038,14 @@ namespace Sharpmake.Generators.FastBuild
             writer.Flush();
         }
 
-        private static Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>
+        private static Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>>>
         GetGeneratedFiles(
             IGenerationContext context,
             List<Project.Configuration> configurations,
             out List<Vcxproj.ProjectFile> filesInNonDefaultSections
         )
         {
-            var confSubConfigs = new Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>>();
+            var confSubConfigs = new Dictionary<Project.Configuration, Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>>>();
             filesInNonDefaultSections = new List<Vcxproj.ProjectFile>();
 
             // Add source files
@@ -2038,6 +2079,8 @@ namespace Sharpmake.Generators.FastBuild
                                                 conf.PrecompSourceExcludeExtension.Contains(file.FileExtension);
                         bool isCompileAsCFile = conf.ResolvedSourceFilesWithCompileAsCOption.Contains(file.FileName);
                         bool isCompileAsCPPFile = conf.ResolvedSourceFilesWithCompileAsCPPOption.Contains(file.FileName);
+                        bool isCompileAsObjCFile = conf.ResolvedSourceFilesWithCompileAsObjCOption.Contains(file.FileName);
+                        bool isCompileAsObjCPPFile = conf.ResolvedSourceFilesWithCompileAsObjCPPOption.Contains(file.FileName);
                         bool isCompileAsCLRFile = conf.ResolvedSourceFilesWithCompileAsCLROption.Contains(file.FileName);
                         bool isCompileAsNonCLRFile = conf.ResolvedSourceFilesWithCompileAsNonCLROption.Contains(file.FileName);
                         bool isConsumeWinRTExtensions = (conf.ConsumeWinRTExtensions.Contains(file.FileName) ||
@@ -2055,8 +2098,12 @@ namespace Sharpmake.Generators.FastBuild
                             isDontUsePrecomp = true;
                             isCompileAsCFile = true;
                         }
+                        else if (isCompileAsObjCFile || isCompileAsObjCPPFile)
+                        {
+                            isDontUsePrecomp = true;
+                        }
 
-                        var tuple = Tuple.Create(
+                        var tuple = new Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>> (
                             !isDontUsePrecomp,
                             isCompileAsCFile,
                             isCompileAsCPPFile,
@@ -2064,12 +2111,13 @@ namespace Sharpmake.Generators.FastBuild
                             isConsumeWinRTExtensions,
                             isASMFile,
                             exceptionSetting,
-                            isCompileAsNonCLRFile);
+                            new Tuple<bool, bool, bool>(isCompileAsNonCLRFile, isCompileAsObjCFile, isCompileAsObjCPPFile));
 
-                        Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
+
+                        Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
                         if (!confSubConfigs.TryGetValue(conf, out subConfigs))
                         {
-                            subConfigs = new Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>();
+                            subConfigs = new Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>>();
                             confSubConfigs.Add(conf, subConfigs);
                         }
                         List<Vcxproj.ProjectFile> subConfigFiles = null;
@@ -2097,10 +2145,10 @@ namespace Sharpmake.Generators.FastBuild
                     // For now, this will do.
                     var tuple = GetDefaultTupleConfig();
 
-                    Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
+                    Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>> subConfigs = null;
                     if (!confSubConfigs.TryGetValue(conf, out subConfigs))
                     {
-                        subConfigs = new Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool>>, List<Vcxproj.ProjectFile>>();
+                        subConfigs = new Dictionary<Tuple<bool, bool, bool, bool, bool, bool, Options.Vc.Compiler.Exceptions, Tuple<bool, bool, bool>>, List<Vcxproj.ProjectFile>>();
                         confSubConfigs.Add(conf, subConfigs);
                     }
                     List<Vcxproj.ProjectFile> subConfigFiles = null;

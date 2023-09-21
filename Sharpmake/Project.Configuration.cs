@@ -790,6 +790,16 @@ namespace Sharpmake
             public Strings SourceFilesCompileAsCPPRegex = new Strings();
 
             /// <summary>
+            /// Source files that match this regex will be compiled as ObjC Files.
+            /// </summary>
+            public Strings SourceFilesCompileAsObjCRegex = new Strings();
+
+            /// <summary>
+            /// Source files that match this regex will be compiled as ObjCPP Files.
+            /// </summary>
+            public Strings SourceFilesCompileAsObjCPPRegex = new Strings();
+
+            /// <summary>
             /// Source files that match this regex will be compiled as CLR Files.
             /// </summary>
             public Strings SourceFilesCompileAsCLRRegex = new Strings();
@@ -2573,6 +2583,8 @@ namespace Sharpmake
 
             public Strings ResolvedSourceFilesWithCompileAsCOption = new Strings();
             public Strings ResolvedSourceFilesWithCompileAsCPPOption = new Strings();
+            public Strings ResolvedSourceFilesWithCompileAsObjCOption = new Strings();
+            public Strings ResolvedSourceFilesWithCompileAsObjCPPOption = new Strings();
             public Strings ResolvedSourceFilesWithCompileAsCLROption = new Strings();
             public Strings ResolvedSourceFilesWithCompileAsNonCLROption = new Strings();
             public Strings ResolvedSourceFilesWithCompileAsWinRTOption = new Strings();

@@ -130,6 +130,9 @@ namespace Sharpmake
         public Strings SourceFilesCompileAsCRegex = new Strings();                      // Sources file that match this regex will be compiled as C Files
         public Strings SourceFilesCompileAsCPPRegex = new Strings();                    // Sources file that match this regex will be compiled as CPP Files
 
+        public Strings SourceFilesCompileAsObjCRegex = new Strings();                   // Sources file that match this regex will be compiled as Obj-C Files
+        public Strings SourceFilesCompileAsObjCPPRegex = new Strings();                 // Sources file that match this regex will be compiled as Obj-CPP Files
+
         public Strings SourceFilesCompileAsCLRRegex = new Strings();                    // Sources file that match this regex will be compiled as CLR Files
         public Strings SourceFilesCompileAsCLRExcludeRegex = new Strings();             // Sources files that match this regex will not be compiled as CLR Files
         public Strings SourceFilesCompileAsNonCLRRegex = new Strings();                 // Sources files that match this regex will specifically be compiled with the CLR flag set to false.
@@ -410,6 +413,8 @@ namespace Sharpmake
             yield return SourceFilesBuildFiltersRegex;
             yield return SourceFilesCompileAsCRegex;
             yield return SourceFilesCompileAsCPPRegex;
+            yield return SourceFilesCompileAsObjCRegex;
+            yield return SourceFilesCompileAsObjCPPRegex;
             yield return SourceFilesCompileAsCLRRegex;
             yield return SourceFilesCompileAsCLRExcludeRegex;
             yield return SourceFilesCompileAsNonCLRRegex;
@@ -835,6 +840,8 @@ namespace Sharpmake
             var sourceFilesBuildFiltersRegex = RegexCache.GetCachedRegexes(SourceFilesBuildFiltersRegex);
             var sourceFilesCompileAsCRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsCRegex);
             var sourceFilesCompileAsCPPRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsCPPRegex);
+            var sourceFilesCompileAsObjCRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsObjCRegex);
+            var sourceFilesCompileAsObjCPPRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsObjCPPRegex);
             var sourceFilesCompileAsCLRRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsCLRRegex);
             var sourceFilesCompileAsCLRExcludeRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsCLRExcludeRegex);
             var sourceFilesCompileAsNonCLRRegex = RegexCache.GetCachedRegexes(SourceFilesCompileAsNonCLRRegex);
@@ -996,6 +1003,8 @@ namespace Sharpmake
             var resolvedSourceFilesBuildExclude = new Strings();
             var resolvedSourceFilesWithCompileAsCOption = new Strings();
             var resolvedSourceFilesWithCompileAsCPPOption = new Strings();
+            var resolvedSourceFilesWithCompileAsObjCOption = new Strings();
+            var resolvedSourceFilesWithCompileAsObjCPPOption = new Strings();
             var resolvedSourceFilesWithCompileAsCLROption = new Strings();
             var compileAsClrFilesExclude = new Strings();
             var resolvedSourceFilesWithCompileAsNonCLROption = new Strings();
@@ -1007,6 +1016,8 @@ namespace Sharpmake
                 AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesBuildExclude, sourceFilesBuildExcludeRegex);
                 AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsCOption, sourceFilesCompileAsCRegex);
                 AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsCPPOption, sourceFilesCompileAsCPPRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsObjCOption, sourceFilesCompileAsObjCRegex);
+                AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsObjCPPOption, sourceFilesCompileAsObjCPPRegex);
                 AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsCLROption, sourceFilesCompileAsCLRRegex);
                 AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref compileAsClrFilesExclude, sourceFilesCompileAsCLRExcludeRegex);
                 AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref resolvedSourceFilesWithCompileAsNonCLROption, sourceFilesCompileAsNonCLRRegex);
@@ -1033,6 +1044,12 @@ namespace Sharpmake
                         writer.Write(val);
                     writer.Write(conf.SourceFilesCompileAsCPPRegex.Count);
                     foreach (string val in conf.SourceFilesCompileAsCPPRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsObjCRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsObjCRegex)
+                        writer.Write(val);
+                    writer.Write(conf.SourceFilesCompileAsObjCPPRegex.Count);
+                    foreach (string val in conf.SourceFilesCompileAsObjCPPRegex)
                         writer.Write(val);
                     writer.Write(conf.SourceFilesCompileAsCLRRegex.Count);
                     foreach (string val in conf.SourceFilesCompileAsCLRRegex)
@@ -1078,6 +1095,16 @@ namespace Sharpmake
                     var configSourceFilesCompileAsCPPRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCPPRegex);
                     AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsCPPOption, configSourceFilesCompileAsCPPRegex);
 
+                    // Resolve files that will be built as ObjC Files 
+                    conf.ResolvedSourceFilesWithCompileAsObjCOption.AddRange(resolvedSourceFilesWithCompileAsObjCOption);
+                    var configSourceFilesCompileAsObjCRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsObjCRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsObjCOption, configSourceFilesCompileAsObjCRegex);
+
+                    // Resolve files that will be built as ObjCPP Files 
+                    conf.ResolvedSourceFilesWithCompileAsObjCPPOption.AddRange(resolvedSourceFilesWithCompileAsObjCPPOption);
+                    var configSourceFilesCompileAsObjCPPRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsObjCPPRegex);
+                    AddMatchFiles(RootPath, resolvedSourceFilesRelative, ResolvedSourceFiles, ref conf.ResolvedSourceFilesWithCompileAsObjCPPOption, configSourceFilesCompileAsObjCPPRegex);
+
                     // Resolve files that will be built as CLR Files 
                     conf.ResolvedSourceFilesWithCompileAsCLROption.AddRange(resolvedSourceFilesWithCompileAsCLROption);
                     var configSourceFilesCompileAsCLRRegex = RegexCache.GetCachedRegexes(conf.SourceFilesCompileAsCLRRegex);
@@ -1107,6 +1134,8 @@ namespace Sharpmake
 
                     conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCOption);
                     conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCPPOption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsObjCOption);
+                    conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsObjCPPOption);
                     conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsNonCLROption);
                     conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsCLROption);
                     conf.ResolvedSourceFilesBlobExclude.AddRange(conf.ResolvedSourceFilesWithCompileAsWinRTOption);
@@ -1126,6 +1155,8 @@ namespace Sharpmake
                     // To allow sharing with other configs
                     conf.ResolvedSourceFilesWithCompileAsCOption.SetReadOnly(true);
                     conf.ResolvedSourceFilesWithCompileAsCPPOption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithCompileAsObjCOption.SetReadOnly(true);
+                    conf.ResolvedSourceFilesWithCompileAsObjCPPOption.SetReadOnly(true);
                     conf.ResolvedSourceFilesWithCompileAsCLROption.SetReadOnly(true);
                     conf.ResolvedSourceFilesWithCompileAsNonCLROption.SetReadOnly(true);
                     conf.ResolvedSourceFilesWithCompileAsWinRTOption.SetReadOnly(true);
@@ -1162,6 +1193,8 @@ namespace Sharpmake
                         // Copy references here to be faster, these must not be modified from now on
                         conf.ResolvedSourceFilesWithCompileAsCOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsCOption;
                         conf.ResolvedSourceFilesWithCompileAsCPPOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsCPPOption;
+                        conf.ResolvedSourceFilesWithCompileAsObjCOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsObjCOption;
+                        conf.ResolvedSourceFilesWithCompileAsObjCPPOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsObjCPPOption;
                         conf.ResolvedSourceFilesWithCompileAsCLROption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsCLROption;
                         conf.ResolvedSourceFilesWithCompileAsNonCLROption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsNonCLROption;
                         conf.ResolvedSourceFilesWithCompileAsWinRTOption = doneConfWithSameRegexes.ResolvedSourceFilesWithCompileAsWinRTOption;
@@ -1719,6 +1752,8 @@ namespace Sharpmake
                             {conf.ResolvedSourceFilesWithCompileAsCLROption,      nameof(conf.ResolvedSourceFilesWithCompileAsCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsCOption,        nameof(conf.ResolvedSourceFilesWithCompileAsCOption)},
                             {conf.ResolvedSourceFilesWithCompileAsCPPOption,      nameof(conf.ResolvedSourceFilesWithCompileAsCPPOption)},
+                            {conf.ResolvedSourceFilesWithCompileAsObjCOption,     nameof(conf.ResolvedSourceFilesWithCompileAsObjCOption)},
+                            {conf.ResolvedSourceFilesWithCompileAsObjCPPOption,   nameof(conf.ResolvedSourceFilesWithCompileAsObjCPPOption)},
                             {conf.ResolvedSourceFilesWithCompileAsNonCLROption,   nameof(conf.ResolvedSourceFilesWithCompileAsNonCLROption)},
                             {conf.ResolvedSourceFilesWithCompileAsWinRTOption,    nameof(conf.ResolvedSourceFilesWithCompileAsWinRTOption)},
                         })
