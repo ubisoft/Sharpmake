@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.FastBuild
@@ -1723,11 +1724,7 @@ namespace Sharpmake.Generators.FastBuild
             // TODO: really not ideal, refactor and move the properties we need from it someplace else
             var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
 
-            string platformLibraryExtension = string.Empty;
-            string platformOutputLibraryExtension = string.Empty;
-            string platformPrefix = string.Empty;
-            platformVcxproj.SetupPlatformLibraryOptions(ref platformLibraryExtension, ref platformOutputLibraryExtension, ref platformPrefix);
-            string libPrefix = configurationTasks.GetOutputFileNamePrefix(Project.Configuration.OutputType.Lib);
+            platformVcxproj.SetupPlatformLibraryOptions(out var platformLibraryExtension, out var platformOutputLibraryExtension, out var platformPrefix, out var libPrefix);
 
             var additionalDependencies = new OrderableStrings();
 
@@ -1751,21 +1748,29 @@ namespace Sharpmake.Generators.FastBuild
                     //      Ex:  On clang we add -l (supposedly because the exact file is named lib<library>.a)
                     // - With a filename with a static or shared lib extension (eg. .a/.lib/.so), we shouldn't touch it as it's already set by the script.
                     string extension = Path.GetExtension(libraryFile).ToLower();
-
-                    // here we could also verify that the path is rooted
-                    if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
+                    string filenameOnly = Path.GetFileNameWithoutExtension(libraryFile);
+                    string finalFilename = null;
+                    if (string.IsNullOrEmpty(extension))
                     {
-                        libraryFile = libPrefix + libraryFile;
-                        if (!string.IsNullOrEmpty(platformVcxproj.StaticLibraryFileFullExtension))
-                            libraryFile += platformVcxproj.StaticLibraryFileFullExtension;
+                        finalFilename = libPrefix + filenameOnly + platformOutputLibraryExtension;
                     }
-                    libraryFile = platformPrefix + libraryFile + platformOutputLibraryExtension;
+                    else if (extension != platformVcxproj.StaticLibraryFileFullExtension && extension != platformVcxproj.SharedLibraryFileFullExtension)
+                    {
+                        // Handle case such SomeLib.Platform
+                        finalFilename = libPrefix + libraryFile + platformOutputLibraryExtension;
+                    }
+                    else
+                    {
+                        finalFilename = libraryFile;
+                    }
+
+                    string libDependencyFile = platformPrefix + finalFilename;
 
                     // LCTODO: this might be broken, clarify the rules for which this is supposed to work
-                    if (!ignoreSpecificLibraryNames.Contains(libraryFile))
-                        additionalDependencies.Add(libraryFile);
+                    if (!ignoreSpecificLibraryNames.Contains(libDependencyFile))
+                        additionalDependencies.Add(libDependencyFile);
                     else
-                        ignoreSpecificLibraryNames.Remove(libraryFile);
+                        ignoreSpecificLibraryNames.Remove(libDependencyFile);
                 }
             }
 

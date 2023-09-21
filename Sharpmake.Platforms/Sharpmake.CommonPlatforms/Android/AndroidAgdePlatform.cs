@@ -606,11 +606,12 @@ namespace Sharpmake
                 ));
             }
 
-            public override void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
+            public override void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix)
             {
                 platformLibExtension = ".a";
-                platformOutputLibExtension = string.Empty;
+                platformOutputLibExtension = StaticLibraryFileFullExtension;
                 platformPrefixExtension = "-l:";
+                platformLibPrefix = "lib";
             }
 
             protected override IEnumerable<string> GetIncludePathsImpl(IGenerationContext context)

@@ -394,11 +394,12 @@ namespace Sharpmake
                 generator.Write(_projectConfigurationsFastBuildMakefile);
             }
 
-            public override void SetupPlatformLibraryOptions(ref string platformLibExtension, ref string platformOutputLibExtension, ref string platformPrefixExtension)
+            public override void SetupPlatformLibraryOptions(out string platformLibExtension, out string platformOutputLibExtension, out string platformPrefixExtension, out string platformLibPrefix)
             {
                 platformLibExtension = ".a";
-                platformOutputLibExtension = "";
+                platformOutputLibExtension = ".a";
                 platformPrefixExtension = "-l:";
+                platformLibPrefix = "lib";
             }
 
             protected override string GetProjectLinkSharedVcxprojTemplate()
