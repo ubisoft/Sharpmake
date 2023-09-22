@@ -144,6 +144,7 @@ namespace Sharpmake.Generators.VisualStudio
             GenerateImpl(context, generatedFiles, skipFiles);
         }
 
+        [Obsolete("Deprecated. Use `FastBuildSettings.FastBuildCustomArguments` instead.", error: true)]
         public static string FastBuildCustomArguments = "";
         public const string ProjectExtension = ".vcxproj";
         private const string ProjectFilterExtension = ".filters";
@@ -558,8 +559,8 @@ namespace Sharpmake.Generators.VisualStudio
                             if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
                                 fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
 
-                            if (!string.IsNullOrEmpty(FastBuildCustomArguments))
-                                fastBuildCommandLineOptions.Add(FastBuildCustomArguments);
+                            if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
+                                fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
 
                             string commandLine = string.Join(" ", fastBuildCommandLineOptions);
 
