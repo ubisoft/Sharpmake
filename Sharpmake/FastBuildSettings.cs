@@ -200,5 +200,10 @@ namespace Sharpmake
         /// Additional custom property groups. Only those referred will be written to the bff files.
         /// </summary>
         public static readonly IDictionary<string, List<string>> AdditionalPropertyGroups = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Custom arguments pass to fastbuild
+        /// </summary>
+        public static string FastBuildCustomArguments = null;
     }
 }

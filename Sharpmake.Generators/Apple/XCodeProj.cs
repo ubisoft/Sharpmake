@@ -2279,6 +2279,12 @@ namespace Sharpmake.Generators.Apple
                     if (FastBuildSettings.FastBuildNoUnity)
                         fastBuildCommandLineOptions.Add("-nounity");
 
+                    if (FastBuildSettings.FastBuildDistribution)
+                        fastBuildCommandLineOptions.Add("-dist");
+
+                    if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
+                        fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
+
                     fastBuildCommandLineOptions.Add("-config " + Path.GetFileName(_masterBffFilePath));
 
                     return string.Join(" ", fastBuildCommandLineOptions);
