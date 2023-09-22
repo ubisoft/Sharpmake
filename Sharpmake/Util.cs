@@ -107,6 +107,24 @@ namespace Sharpmake
             }
         }
 
+        static readonly Dictionary<string, Regex> _ttDirectiveRegexes = new Dictionary<string, Regex>();
+        private static string GetTextTemplateDirectiveParam(string[] templateText, string directive, string paramName)
+        {
+            Regex regex = _ttDirectiveRegexes.GetValueOrAdd($"{directive}+{paramName}", () => 
+                new Regex(@"<#@\s*?" + directive + @"\s+?.*?" + paramName + @"=""(?<paramValue>.*?)"".*?#>", RegexOptions.Compiled)
+            );
+
+            foreach (var line in templateText)
+            {
+                Match m = regex.Match(line);
+                Group g = m.Groups["paramValue"];
+                if (g != null && g.Success)
+                    return g.Value;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Finds the first occurrence of directive and returns the 
         /// requested param value. Ex:
@@ -117,13 +135,32 @@ namespace Sharpmake
         /// </summary>
         public static string GetTextTemplateDirectiveParam(string filePath, string directive, string paramName)
         {
+            return GetTextTemplateDirectiveParam(File.ReadAllLines(filePath), directive, paramName);
+        }
+
+        /// <summary>
+        /// Finds the output type of a template, looking for both the directive form and the Host.SetFileExtension form
+        /// will match:
+        ///  <#@ output extension=".txt" #>
+        /// or
+        ///  Host.SetFileExtension(".txt")
+        /// and return ".txt"
+        /// </summary>
+        /// 
+        static readonly Regex _ttFileExtensionRegex = new Regex(@"Host.SetFileExtension\(""(?<paramValue>.*?)""\)", RegexOptions.Compiled);
+        public static string GetTextTemplateOutputExtension(string filePath)
+        {
             string[] templateText = File.ReadAllLines(filePath);
 
-            Regex regex = new Regex(@"<#@\s*?" + directive + @"\s+?.*?" + paramName + @"=""(?<paramValue>.*?)"".*?#>");
+            var output = Util.GetTextTemplateDirectiveParam(templateText, "output", "extension");
+            if (output != null)
+                return output;
+
+            // alternatively look for host.SetFileExtension
 
             foreach (var line in templateText)
             {
-                Match m = regex.Match(line);
+                Match m = _ttFileExtensionRegex.Match(line);
                 Group g = m.Groups["paramValue"];
                 if (g != null && g.Success)
                     return g.Value;
@@ -1504,6 +1541,28 @@ namespace Sharpmake
             dictionary.Add(key, addValue);
             return addValue;
         }
+
+        /// <summary>
+        /// Extension GetValueOrAdd gets the value at the given key or adds at the given key the value provided by the func argument
+        /// </summary>
+        /// <typeparam name="Key">Type of the key</typeparam>
+        /// <typeparam name="Value">Type of the value</typeparam>
+        /// <param name="dictionary">dictionary in which to search</param>
+        /// <param name="key">key of the value</param>
+        /// <param name="addValueFunc">functon to create the new value</param>
+        /// <returns>the value at the given key (created or not in this call)</returns>
+        public static Value GetValueOrAdd<Key, Value>(this IDictionary<Key, Value> dictionary, Key key, Func<Value> addValueFunc)
+        {
+            Value value;
+            if (dictionary.TryGetValue(key, out value) == false)
+            {
+                value = addValueFunc();
+                dictionary.Add(key, value);
+            }
+
+            return value;
+        }
+
 
         public static Value AddOrUpdateValue<Key, Value>(this IDictionary<Key, Value> dictionary, Key key, Value newValue, Func<Key, Value, Value, Value> update)
         {
