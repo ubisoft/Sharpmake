@@ -144,8 +144,13 @@ namespace Sharpmake.Generators.VisualStudio
             GenerateImpl(context, generatedFiles, skipFiles);
         }
 
-        [Obsolete("Deprecated. Use `FastBuildSettings.FastBuildCustomArguments` instead.", error: true)]
-        public static string FastBuildCustomArguments = "";
+        [Obsolete("Deprecated. Use `FastBuildSettings.FastBuildCustomArguments` instead.", error: false)]
+        public static string FastBuildCustomArguments
+        {
+            get { return FastBuildSettings.FastBuildCustomArguments; }
+            set { FastBuildSettings.FastBuildCustomArguments = value; }
+        }
+
         public const string ProjectExtension = ".vcxproj";
         private const string ProjectFilterExtension = ".filters";
         private const string CopyDependenciesExtension = "_runtimedependencies.txt";
