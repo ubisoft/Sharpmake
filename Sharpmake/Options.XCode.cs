@@ -233,7 +233,7 @@ namespace Sharpmake
                     Disable
                 }
 
-                [Obsolete("Deprecated. Use `CppExceptions`, `ObjCExceptions`, or `ObjCARCExceptions` instead.", error: true)]
+                [Obsolete("Deprecated. Use `CppExceptions`, `ObjCExceptions`, or `ObjCARCExceptions` instead.", error: false)]
                 public enum Exceptions
                 {
                     [Default]

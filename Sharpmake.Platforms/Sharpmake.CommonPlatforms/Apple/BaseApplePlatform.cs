@@ -657,6 +657,16 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Compiler.EnableBitcode.Enable, () => { options["EnableBitcode"] = "YES"; })
             );
 
+#pragma warning disable 618  // obsolete warning
+            // Convert options - Temporary measure
+            context.SelectOption(
+                Options.Option(Options.XCode.Compiler.Exceptions.Disable, () => { conf.Options.Add(Options.XCode.Compiler.CppExceptions.Disable); conf.Options.Add(Options.XCode.Compiler.ObjCExceptions.Disable); }),
+                Options.Option(Options.XCode.Compiler.Exceptions.Enable, () => { conf.Options.Add(Options.XCode.Compiler.CppExceptions.Enable); conf.Options.Add(Options.XCode.Compiler.ObjCExceptions.Enable); }),
+                Options.Option(Options.XCode.Compiler.Exceptions.EnableCpp, () => { conf.Options.Add(Options.XCode.Compiler.CppExceptions.Enable); conf.Options.Add(Options.XCode.Compiler.ObjCExceptions.Disable); }), 
+                Options.Option(Options.XCode.Compiler.Exceptions.EnableObjC, () => { conf.Options.Add(Options.XCode.Compiler.CppExceptions.Disable); conf.Options.Add(Options.XCode.Compiler.ObjCExceptions.Enable); }) 
+            );
+#pragma warning restore 618
+
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.CppExceptions.Disable, () => { options["CppExceptionHandling"] = "NO"; cmdLineOptions["CppExceptions"] = FileGeneratorUtilities.RemoveLineTag; }),
                 Options.Option(Options.XCode.Compiler.CppExceptions.Enable, () => { options["CppExceptionHandling"] = "YES"; cmdLineOptions["CppExceptions"] = "-fcxx-exceptions"; })
