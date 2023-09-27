@@ -348,7 +348,7 @@ namespace Sharpmake.Generators.Generic
                     using (fileGenerator.Declare("objectFile", file.GetObjectFileName()))
                     using (fileGenerator.Declare("sourceFile", PathMakeUnix(file.FileNameProjectRelative)))
                     {
-                        if (file.FileExtensionLower == ".c")
+                        if (!project.SourceFilesCPPExtensions.Contains(file.FileExtensionLower))
                         {
                             fileGenerator.Write(Template.Project.ObjectRuleC);
                         }
