@@ -17,6 +17,10 @@ namespace Sharpmake.Generators.VisualStudio
                 @"  <PropertyGroup>
 ";
 
+            public static string PropertyGroupWithConditionStart=
+                @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+";
+
             public static string PropertyGroupEnd =
                 @"  </PropertyGroup>
 ";

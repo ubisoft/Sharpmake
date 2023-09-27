@@ -51,6 +51,9 @@
     <OutputFile>output\win32\debug\helloworld.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomOptimizationProperty>Custom-Debug</CustomOptimizationProperty>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>helloworld</TargetName>
     <OutDir>output\win32\release\</OutDir>
@@ -60,6 +63,9 @@
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>output\win32\release\helloworld.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomOptimizationProperty>Custom-Release</CustomOptimizationProperty>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

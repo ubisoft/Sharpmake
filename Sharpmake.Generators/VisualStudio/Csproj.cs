@@ -1432,7 +1432,10 @@ namespace Sharpmake.Generators.VisualStudio
                 using (resolver.NewScopedParameter("target", conf.Target))
                 using (resolver.NewScopedParameter("options", options[conf]))
                 {
+                    Write(Template.PropertyGroupWithConditionStart, writer, resolver);
                     Write(Template.Project.ProjectConfigurationsGeneral, writer, resolver);
+                    WriteProperties(conf.CustomProperties, writer, resolver);
+                    Write(VsProjCommon.Template.PropertyGroupEnd, writer, resolver);
                 }
 
                 foreach (var dependencies in new[] { conf.DotNetPublicDependencies, conf.DotNetPrivateDependencies })
@@ -1499,6 +1502,7 @@ namespace Sharpmake.Generators.VisualStudio
                         Project = projectGuid,
                     });
                 }
+
             }
 
             if (project.RunPostBuildEvent != Options.CSharp.RunPostBuildEvent.OnBuildSuccess)
@@ -1694,19 +1698,30 @@ namespace Sharpmake.Generators.VisualStudio
             }
         }
 
-        // TODO: remove this and use Sharpmake.Generators.VisualStudio.VsProjCommon.WriteCustomProperties instead
+        /// TODO: remove this and use <see cref="VsProjCommon.WriteCustomProperties"/> instead. Note <see cref="CSproj"/> should be migrated to  <see cref="IFileGenerator"/>
         private static void WriteCustomProperties(Dictionary<string, string> customProperties, Project project, StreamWriter writer, Resolver resolver)
         {
             if (customProperties.Any())
             {
-                Write(Template.CustomPropertiesStart, writer, resolver);
-                foreach (var kvp in customProperties)
+                Write(VsProjCommon.Template.PropertyGroupStart, writer, resolver);
+                WriteProperties(customProperties, writer, resolver);
+                Write(VsProjCommon.Template.PropertyGroupEnd, writer, resolver);
+            }
+        }
+
+        private static void WriteProperties(
+            Dictionary<string, string> props,
+            StreamWriter writer, 
+            Resolver resolver
+        )
+        {
+            foreach (KeyValuePair<string, string> kvp in props)
+            {
+                using (resolver.NewScopedParameter("custompropertyname", kvp.Key))
+                using (resolver.NewScopedParameter("custompropertyvalue", kvp.Value))
                 {
-                    resolver.SetParameter("custompropertyname", kvp.Key);
-                    resolver.SetParameter("custompropertyvalue", kvp.Value);
-                    Write(Template.CustomProperty, writer, resolver);
+                    Write(VsProjCommon.Template.CustomProperty, writer, resolver);
                 }
-                Write(Template.CustomPropertiesEnd, writer, resolver);
             }
         }
 
