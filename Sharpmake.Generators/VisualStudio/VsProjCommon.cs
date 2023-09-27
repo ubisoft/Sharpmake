@@ -13,18 +13,30 @@ namespace Sharpmake.Generators.VisualStudio
     internal static partial class VsProjCommon
     {
         public static void WriteCustomProperties(Dictionary<string, string> customProperties, IFileGenerator fileGenerator)
-        {
-            if (customProperties.Count == 0)
-                return;
+            => WritePropertyGroup(customProperties, Template.PropertyGroupStart, fileGenerator);
 
-            fileGenerator.Write(Template.PropertyGroupStart);
-            foreach (var kvp in customProperties)
+        public static void WriteConfigurationsCustomProperties(Project.Configuration conf, IFileGenerator fileGenerator) 
+            => WritePropertyGroup(conf.CustomProperties, Template.PropertyGroupWithConditionStart, fileGenerator);
+        
+        private static void WritePropertyGroup(
+            Dictionary<string, string> props,
+            string headerTemplate,
+            IFileGenerator fileGenerator
+        )
+        {
+            if (props.Any())
             {
-                using (fileGenerator.Declare("custompropertyname", kvp.Key))
-                using (fileGenerator.Declare("custompropertyvalue", kvp.Value))
-                    fileGenerator.Write(Template.CustomProperty);
+                fileGenerator.Write(headerTemplate);
+                foreach (KeyValuePair<string, string> kvp in props)
+                {
+                    using (fileGenerator.Declare("custompropertyname", kvp.Key))
+                    using (fileGenerator.Declare("custompropertyvalue", kvp.Value))
+                    {
+                        fileGenerator.Write(VsProjCommon.Template.CustomProperty);
+                    }
+                }
+                fileGenerator.Write(Template.PropertyGroupEnd);
             }
-            fileGenerator.Write(Template.PropertyGroupEnd);
         }
 
         public static void WriteProjectConfigurationsDescription(IEnumerable<Project.Configuration> configurations, IFileGenerator fileGenerator)

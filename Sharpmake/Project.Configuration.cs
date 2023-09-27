@@ -3112,6 +3112,10 @@ namespace Sharpmake
             public Strings ForceUsingFiles = new Strings();
 
             public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
+            /// <summary>
+            /// CustomProperties for configuration level. Supported only in msbuild based targets(C++/C#)
+            /// </summary>
+            public Dictionary<string, string> CustomProperties = new Dictionary<string, string>();
             public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
 
             // NuGet packages (C# and visual studio c++ for now)

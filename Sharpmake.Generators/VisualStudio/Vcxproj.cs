@@ -584,6 +584,8 @@ namespace Sharpmake.Generators.VisualStudio
                         {
                             platformVcxproj.GenerateProjectConfigurationGeneral2(context, fileGenerator);
                         }
+
+                        VsProjCommon.WriteConfigurationsCustomProperties(conf, fileGenerator);
                     }
                 }
             }

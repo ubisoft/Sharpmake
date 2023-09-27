@@ -36,6 +36,8 @@ namespace HelloWorld
             // if not set, no precompile option will be used.
             conf.PrecompHeader = "stdafx.h";
             conf.PrecompSource = "stdafx.cpp";
+
+            conf.CustomProperties.Add("CustomOptimizationProperty", $"Custom-{target.Optimization}");
         }
     }
 

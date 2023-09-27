@@ -50,6 +50,8 @@ namespace CSharpHelloWorld
             conf.ProjectFileName = "[project.Name].[target.DevEnv].[target.Framework]";
             conf.ProjectPath = @"[project.RootPath]";
 
+            conf.CustomProperties.Add("CustomOptimizationProperty", $"Custom-{target.Optimization}");
+
             conf.Options.Add(Sharpmake.Options.CSharp.TreatWarningsAsErrors.Enabled);
         }
     }
