@@ -1305,7 +1305,7 @@ namespace Sharpmake
         {
             platformLibExtension = ".a";
             platformOutputLibExtension = "";
-            platformPrefixExtension = string.Empty;
+            platformPrefixExtension = "-l";
             platformLibPrefix = "";
         }
 
