@@ -1132,6 +1132,16 @@ namespace Sharpmake
                     {
                     }
                 }
+
+                /// <summary>
+                /// When enable, "-ObjC" will be added into LinkerOptions, then linker Loads all members of static archive libraries that implement an Objective-C class or category.
+                /// </summary>
+                public enum LinkObjC
+                {
+                    Disable,
+                    [Default]
+                    Enable
+                }
             }
 
             /// <summary>

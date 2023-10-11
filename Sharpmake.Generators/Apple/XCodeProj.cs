@@ -1248,8 +1248,9 @@ namespace Sharpmake.Generators.Apple
 
             var linkerOptions = new Strings(conf.AdditionalLinkerOptions);
 
-            // TODO: make this an option
-            linkerOptions.Add("-ObjC");
+            var linkObjC = Options.GetObject<Options.XCode.Linker.LinkObjC>(conf);
+            if (linkObjC == Options.XCode.Linker.LinkObjC.Enable)
+                linkerOptions.Add("-ObjC");
 
             // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
             linkerOptions.AddRange(libFiles.Select(library =>
