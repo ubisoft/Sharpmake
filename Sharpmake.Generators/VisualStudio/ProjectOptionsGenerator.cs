@@ -238,7 +238,7 @@ namespace Sharpmake.Generators.VisualStudio
             if (!context.Configuration.IsFastBuild)
             {
                 // support of PCH requires them to be set as ForceIncludes with ClangCl
-                if (useClangCl)
+                if (useClangCl && !string.IsNullOrEmpty(context.Configuration.PrecompHeader))
                 {
                     forcedIncludes.Add(context.Configuration.PrecompHeader);
                 }

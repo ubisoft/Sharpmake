@@ -64,10 +64,20 @@ namespace Sharpmake
 
         public void InsertSuffix(string suffix, bool addOnlyIfAbsent)
         {
+            InsertSuffix(suffix, addOnlyIfAbsent, null);
+        }
+
+        public void InsertSuffix(string suffix, bool addOnlyIfAbsent, IEnumerable<string> additionalSuffixesToKeep)
+        {
             foreach (string value in Values)
             {
-                if (addOnlyIfAbsent && value.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                if (addOnlyIfAbsent && 
+                        ( value.EndsWith(suffix, StringComparison.OrdinalIgnoreCase ) ||
+                        ( additionalSuffixesToKeep != null && additionalSuffixesToKeep.Any(suffixToKeep => value.EndsWith(suffixToKeep, StringComparison.OrdinalIgnoreCase)) ) )
+                    )
+                {
                     continue;
+                }
                 UpdateValue(value, value + suffix);
             }
         }
@@ -212,10 +222,23 @@ namespace Sharpmake
 
         public void InsertSuffix(string suffix, bool addOnlyIfAbsent)
         {
+            InsertSuffix(suffix, addOnlyIfAbsent, null);
+        }
+
+        public void InsertSuffix(string suffix, bool addOnlyIfAbsent, IEnumerable<string> additionalSuffixesToKeep)
+        {
             for (int i = 0; i < _list.Count; ++i)
             {
-                if (addOnlyIfAbsent && _list[i].StringValue.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                string value = _list[i].StringValue;
+                if (addOnlyIfAbsent && 
+                        ( value.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) || 
+                            ( additionalSuffixesToKeep != null && additionalSuffixesToKeep.Any(suffixToKeep => value.EndsWith(suffixToKeep, StringComparison.OrdinalIgnoreCase))
+                            )
+                        )
+                    )
+                {
                     continue;
+                }
                 _list[i] = new StringEntry(_list[i] + suffix, _list[i].OrderNumber);
             }
             _hashSet.Clear();
