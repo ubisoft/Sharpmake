@@ -649,6 +649,35 @@ namespace Sharpmake.UnitTests
         }
 
         /// <summary>
+        ///     Verify if the suffix was added to the string when absent or the original string
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixAbsentWithAdditionalSuffixes()
+        {
+            OrderableStrings strings = new OrderableStrings { "libatomic.a", "libatomic.so", "libcurl", "libthreads.dll" };
+            Strings expectedStrings = new Strings("libatomic.a", "libatomic.so", "libcurl.a", "libthreads.dll");
+
+            strings.InsertSuffix(".a", true, new[] { ".so", ".dll" });
+
+            Assert.AreEqual(expectedStrings.ToString(), strings.ToString());
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the strings if it's absent or not
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixOnlyIfAbsentFalseWithAdditionalSuffixes()
+        {
+            OrderableStrings strings = new OrderableStrings { "libatomic.a", "libatomic.so", "libcurl", "libthreads.dll" };
+            Strings expectedStrings = new Strings("libatomic.a.a", "libatomic.so.a", "libcurl.a", "libthreads.dll.a");
+
+            strings.InsertSuffix(".a", false, new[] { ".so", ".dll" });
+
+            Assert.AreEqual(expectedStrings.ToString(), strings.ToString());
+        }
+
+
+        /// <summary>
         ///     Verify if the prefix was added
         /// </summary>
         [Test]

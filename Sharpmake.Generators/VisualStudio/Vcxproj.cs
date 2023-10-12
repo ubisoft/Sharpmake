@@ -834,7 +834,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true, new[] { platformVcxproj.SharedLibraryFileFullExtension });
 
             context.Options["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
             context.Options["AdditionalLibraryDirectories"] = FileGeneratorUtilities.RemoveLineTag;

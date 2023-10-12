@@ -1642,7 +1642,7 @@ namespace Sharpmake.Generators.FastBuild
 
             Strings ignoreSpecificLibraryNames = Options.GetStrings<Options.Vc.Linker.IgnoreSpecificLibraryNames>(context.Configuration);
             ignoreSpecificLibraryNames.ToLower();
-            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true);
+            ignoreSpecificLibraryNames.InsertSuffix(platformVcxproj.StaticLibraryFileFullExtension, true, new[] { platformVcxproj.SharedLibraryFileFullExtension });
             dependenciesInfo.IgnoredLibraryNames = ignoreSpecificLibraryNames;
 
             context.CommandLineOptions["AdditionalDependencies"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1767,10 +1767,10 @@ namespace Sharpmake.Generators.FastBuild
                     string libDependencyFile = platformPrefix + finalFilename;
 
                     // LCTODO: this might be broken, clarify the rules for which this is supposed to work
-                    if (!ignoreSpecificLibraryNames.Contains(libDependencyFile))
+                    if (!ignoreSpecificLibraryNames.Contains(finalFilename))
                         additionalDependencies.Add(libDependencyFile);
                     else
-                        ignoreSpecificLibraryNames.Remove(libDependencyFile);
+                        ignoreSpecificLibraryNames.Remove(finalFilename);
                 }
             }
 

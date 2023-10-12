@@ -52,10 +52,10 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertSuffixAbsent()
         {
-            Strings strings = new Strings("test", "aa", "cc", "ppp");
-            Strings expectedStrings = new Strings("test", "aat", "cct", "pppt");
+            Strings strings = new Strings("libatomic.a", "libatomic.so", "libcurl", "libthreads.dll");
+            Strings expectedStrings = new Strings("libatomic.a", "libatomic.so.a", "libcurl.a", "libthreads.dll.a");
 
-            strings.InsertSuffix("t", true);
+            strings.InsertSuffix(".a", true);
 
             Assert.AreEqual(expectedStrings, strings);
         }
@@ -66,10 +66,39 @@ namespace Sharpmake.UnitTests
         [Test]
         public static void TestInsertSuffixOnlyIfAbsentFalse()
         {
-            Strings strings = new Strings("test", "ahhh", "abc", "jjjj");
-            Strings expectedStrings = new Strings("testto", "ahhhto", "abcto", "jjjjto");
+            Strings strings = new Strings("libatomic.a", "libatomic.so", "libcurl", "libthreads.dll");
+            Strings expectedStrings = new Strings("libatomic.a.a", "libatomic.so.a", "libcurl.a", "libthreads.dll.a");
 
-            strings.InsertSuffix("to", false);
+            strings.InsertSuffix(".a", false);
+
+
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the string when absent or the original string
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixAbsentWithAdditionalSuffixes()
+        {
+            Strings strings = new Strings("libatomic.a", "libatomic.so", "libcurl", "libthreads.dll");
+            Strings expectedStrings = new Strings("libatomic.a", "libatomic.so", "libcurl.a", "libthreads.dll");
+
+            strings.InsertSuffix(".a", true, new[] { ".so", ".dll" });
+
+            Assert.AreEqual(expectedStrings, strings);
+        }
+
+        /// <summary>
+        ///     Verify if the suffix was added to the strings if it's absent or not
+        /// </summary>
+        [Test]
+        public static void TestInsertSuffixOnlyIfAbsentFalseWithAdditionalSuffixes()
+        {
+            Strings strings = new Strings("libatomic.a", "libatomic.so", "libcurl", "libthreads.dll");
+            Strings expectedStrings = new Strings("libatomic.a.a", "libatomic.so.a", "libcurl.a", "libthreads.dll.a");
+
+            strings.InsertSuffix(".a", false, new[] { ".so", ".dll" });
 
             Assert.AreEqual(expectedStrings, strings);
         }
