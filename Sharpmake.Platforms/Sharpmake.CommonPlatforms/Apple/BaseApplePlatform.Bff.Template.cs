@@ -45,6 +45,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.WarningReturnType]'
             + ' [cmdLineOptions.RuntimeTypeInfo]'
             + ' [cmdLineOptions.ClangEnableObjC_ARC]'
+            + ' [cmdLineOptions.ClangEnableObjC_Weak]'
             + ' [cmdLineOptions.CppExceptions]'
             + ' [cmdLineOptions.ObjCExceptions]'
             + ' [cmdLineOptions.ObjCARCExceptions]'
