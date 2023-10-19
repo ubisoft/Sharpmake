@@ -180,6 +180,8 @@ namespace Sharpmake
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
+    <EnableUnitySupport>[options.JumboBuild]</EnableUnitySupport>
+    <MaxFilesInUnityFile>[options.MaxFilesPerUnityFile]</MaxFilesInUnityFile>
   </PropertyGroup>
 ";
 
