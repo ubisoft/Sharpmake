@@ -180,7 +180,14 @@ namespace Sharpmake
     <WindowsTargetPlatformVersion>[options.WindowsTargetPlatformVersion]</WindowsTargetPlatformVersion>
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
-  </PropertyGroup>
+    <EnableUnitySupport>[options.JumboBuild]</EnableUnitySupport>
+    <IncludeInUnityFile>True</IncludeInUnityFile>
+    <MaxFilesInUnityFile>[options.MaxFilesPerUnityFile]</MaxFilesInUnityFile>
+    <MinFilesInUnityFile>2></MinFilesInUnityFile>
+    <MinUnityFiles>1</MinUnityFiles>
+    <OrderInUnityFile>100</OrderInUnityFile>
+    <UnityFilesDirectory>.</UnityFilesDirectory> 
+    </PropertyGroup>
 ";
 
         private const string _projectConfigurationsGeneral2 =

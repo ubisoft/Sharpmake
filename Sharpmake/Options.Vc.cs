@@ -1348,6 +1348,20 @@ namespace Sharpmake
                     [DevEnvVersion(minimum = DevEnv.vs2019)]
                     Enable
                 }
+
+                /// <summary>
+                /// Enable Jumbo/Unity builds
+                /// </summary>
+                /// <remarks>
+                /// Merges multiple translation units together
+                /// </remarks>
+                public enum JumboBuild
+                {
+                    [Default]
+                    Disable,
+                    [DevEnvVersion(minimum = DevEnv.vs2019)]
+                    Enable
+                }
             }
 
             public static class CodeAnalysis
