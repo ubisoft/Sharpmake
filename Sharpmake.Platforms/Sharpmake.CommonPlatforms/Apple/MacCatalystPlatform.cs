@@ -41,7 +41,6 @@ namespace Sharpmake
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {
                 base.WriteCompilerExtraOptionsGeneral(generator);
-                generator.Write(_compilerExtraOptionsGeneral);
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -72,12 +71,13 @@ namespace Sharpmake
                 if (iosDeploymentTarget != null)
                 {
                     options["IPhoneOSDeploymentTarget"] = iosDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["IPhoneOSDeploymentTarget"] = $"-target arm64-apple-ios{iosDeploymentTarget.MinimumVersion}";
+                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? $"{GetDeploymentTargetPrefix(conf)}{iosDeploymentTarget.MinimumVersion}" : FileGeneratorUtilities.RemoveLineTag;
+
                 }
                 else
                 {
                     options["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                    cmdLineOptions["IPhoneOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["DeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 context.SelectOptionWithFallback(
@@ -262,15 +262,9 @@ namespace Sharpmake
             {
                 base.SelectLinkerOptions(context);
 
-                var options = context.Options;
-                var cmdLineOptions = context.CommandLineOptions;
-                var conf = context.Configuration;
-
                 // Sysroot
-                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk";
-                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
-                if (customSdkRoot != null)
-                    cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
+                var defaultSdkRoot = $"{XCodeDeveloperFolder}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk";
+                SelectCustomSysLibRoot(context, defaultSdkRoot);
             }
         }
     }

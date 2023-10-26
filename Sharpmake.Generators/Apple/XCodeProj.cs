@@ -1228,7 +1228,9 @@ namespace Sharpmake.Generators.Apple
             var project = context.Project;
             var conf = context.Configuration;
             var options = new Options.ExplicitOptions();
+            var cmdLineOptions = new ProjectOptionsGenerator.VcxprojCmdLineOptions();
             context.Options = options;
+            context.CommandLineOptions = cmdLineOptions;
 
             options["TargetName"] = XCodeUtil.XCodeFormatSingleItem(conf.Target.Name);
 

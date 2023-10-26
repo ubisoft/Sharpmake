@@ -62,12 +62,12 @@ namespace Sharpmake
                 if (macOsDeploymentTarget != null)
                 {
                     options["MacOSDeploymentTarget"] = macOsDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag; // TODO: find what to write here
+                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? $"{GetDeploymentTargetPrefix(conf)}{macOsDeploymentTarget.MinimumVersion}" : FileGeneratorUtilities.RemoveLineTag;
                 }
                 else
                 {
                     options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                    cmdLineOptions["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["DeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
@@ -118,15 +118,9 @@ namespace Sharpmake
             {
                 base.SelectLinkerOptions(context);
 
-                var options = context.Options;
-                var cmdLineOptions = context.CommandLineOptions;
-                var conf = context.Configuration;
-
                 // Sysroot
-                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
-                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
-                if (customSdkRoot != null)
-                    cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
+                var defaultSdkRoot = $"{XCodeDeveloperFolder}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
+                SelectCustomSysLibRoot(context, defaultSdkRoot);
             }
         }
     }

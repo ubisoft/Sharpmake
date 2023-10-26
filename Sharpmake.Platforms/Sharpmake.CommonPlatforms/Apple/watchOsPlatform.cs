@@ -4,6 +4,7 @@
 using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
+using static Sharpmake.Options.XCode.Compiler;
 
 namespace Sharpmake
 {
@@ -39,7 +40,6 @@ namespace Sharpmake
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {
                 base.WriteCompilerExtraOptionsGeneral(generator);
-                generator.Write(_compilerExtraOptionsGeneral);
             }
 
             public override void SelectCompilerOptions(IGenerationContext context)
@@ -70,12 +70,12 @@ namespace Sharpmake
                 if (watchosDeploymentTarget != null)
                 {
                     options["WatchOSDeploymentTarget"] = watchosDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["WatchOSDeploymentTarget"] = $"-target arm64-apple-watchos{watchosDeploymentTarget.MinimumVersion}";
+                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? $"{GetDeploymentTargetPrefix(conf)}{watchosDeploymentTarget.MinimumVersion}" : FileGeneratorUtilities.RemoveLineTag;
                 }
                 else
                 {
                     options["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
-                    cmdLineOptions["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["DeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;
@@ -86,15 +86,9 @@ namespace Sharpmake
             {
                 base.SelectLinkerOptions(context);
 
-                var options = context.Options;
-                var cmdLineOptions = context.CommandLineOptions;
-                var conf = context.Configuration;
-
                 // Sysroot
-                cmdLineOptions["SysLibRoot"] = $"-syslibroot {XCodeDeveloperFolder}/Platforms/watchOS.platform/Developer/SDKs/watchOS.sdk";
-                Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
-                if (customSdkRoot != null)
-                    cmdLineOptions["SysLibRoot"] = $"-isysroot {customSdkRoot.Value}";
+                var defaultSdkRoot = $"{XCodeDeveloperFolder}/Platforms/watchOS.platform/Developer/SDKs/watchOS.sdk";
+                SelectCustomSysLibRoot(context, defaultSdkRoot);
             }
         }
     }
