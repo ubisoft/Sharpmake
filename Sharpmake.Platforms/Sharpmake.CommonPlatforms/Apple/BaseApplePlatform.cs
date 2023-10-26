@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Sharpmake.Generators;
@@ -26,7 +27,17 @@ namespace Sharpmake
         public abstract string SimplePlatformString { get; }
         public bool IsMicrosoftPlatform => false;
         public bool IsUsingClang => true;
-        public bool IsLinkerInvokedViaCompiler { get; set; } = false;
+        public bool IsLinkerInvokedViaCompiler
+        {
+            get
+            {
+                bool isLinkerInvokedViaCompiler = false;
+                var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(SharpmakePlatform);
+                fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(DevEnv.xcode, out isLinkerInvokedViaCompiler);
+                return isLinkerInvokedViaCompiler;
+            }
+        }
+
         public bool HasDotNetSupport => false; // maybe? (.NET Core)
         public bool HasSharedLibrarySupport => true;
         public bool HasPrecompiledHeaderSupport => true;
@@ -123,7 +134,7 @@ namespace Sharpmake
                     outputTypeArgument = " -dylib";
                     break;
                 case Project.Configuration.OutputType.Exe:
-                    outputTypeArgument = " -execute";
+                    outputTypeArgument = IsLinkerInvokedViaCompiler ? "" : " -execute";
                     break;
                 case Project.Configuration.OutputType.Lib:
                 case Project.Configuration.OutputType.Utility:
@@ -227,11 +238,7 @@ namespace Sharpmake
 
                 string linkerExe;
                 if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
-                    linkerExe = "ld";
-
-                bool isLinkerInvokedViaCompiler;
-                if (fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(devEnv, out isLinkerInvokedViaCompiler))
-                    IsLinkerInvokedViaCompiler = isLinkerInvokedViaCompiler;
+                    linkerExe = IsLinkerInvokedViaCompiler ? "clang++" : "ld";
 
                 string librarianExe;
                 if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
@@ -1120,6 +1127,34 @@ namespace Sharpmake
             }
         }
 
+        private string GetDeploymentTargetPlatform(Platform platform)
+        {
+            switch (platform)
+            {
+                case Platform.mac:
+                    return "macos";
+                default:
+                    return platform.ToString();
+            }
+        }
+
+        public string GetDeploymentTargetPrefix(Project.Configuration conf)
+        {
+            var arch = Options.GetObject<Options.XCode.Compiler.Archs>(conf)?.Value ?? "arm64";
+            string deploymentTarget = $"-target {arch}-apple-{GetDeploymentTargetPlatform(conf.Platform)}";
+
+            return deploymentTarget;
+        }
+
+        public void SelectCustomSysLibRoot(IGenerationContext context, string defaultSdkRoot)
+        {
+            var conf = context.Configuration;
+            var cmdLineOptions = context.CommandLineOptions;
+
+            Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
+            cmdLineOptions["SysLibRoot"] = (IsLinkerInvokedViaCompiler ? "-isysroot " : "-syslibroot ") + (customSdkRoot?.Value ?? defaultSdkRoot);
+        }
+
         public virtual void SelectLinkerOptions(IGenerationContext context)
         {
             var options = context.Options;
@@ -1127,14 +1162,23 @@ namespace Sharpmake
             var conf = context.Configuration;
             var platform = context.Configuration.Platform;
 
-            if (context.Options["GenerateMapFile"] == "true")
+            switch (conf.Output)
             {
-                string mapFileArg = context.CommandLineOptions["GenerateMapFile"];
-                string mapOption = $"{platform.GetLinkerOptionPrefix()}-Map=";
-                if (!mapFileArg.StartsWith(mapOption, StringComparison.Ordinal))
-                    throw new Error("Map file argument was supposed to start with -Wl,-Map= but it changed! Please update this module!");
-                // since we directly invoke ld and not clang as a linker, we need to remove -Wl,-Map= and pass -map
-                context.CommandLineOptions["GenerateMapFile"] = "-map " + context.CommandLineOptions["GenerateMapFile"].Substring(mapOption.Length);
+                case Project.Configuration.OutputType.Dll:
+                case Project.Configuration.OutputType.AppleApp:
+                case Project.Configuration.OutputType.Exe:
+                case Project.Configuration.OutputType.AppleFramework:
+                    if (context.Options["GenerateMapFile"] == "true")
+                    {
+                        string mapFileArg = context.CommandLineOptions["GenerateMapFile"];
+                        string mapOption = $"{platform.GetLinkerOptionPrefix()}-Map=";
+                        if (!mapFileArg.StartsWith(mapOption, StringComparison.Ordinal))
+                            throw new Error("Map file argument was supposed to start with -Wl,-Map= but it changed! Please update this module!");
+                        cmdLineOptions["GenerateMapFile"] = (IsLinkerInvokedViaCompiler ? "-Wl,-map," : "-map ") + cmdLineOptions["GenerateMapFile"].Substring(mapOption.Length);
+                    }
+                    break;
+                default:
+                    break;
             }
 
             // TODO: implement me
