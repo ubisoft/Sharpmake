@@ -13,7 +13,7 @@ namespace CSharpWCF
         public CSharpWCFProject()
         {
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
-            RootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
+            RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
             ProjectTypeGuids = CSharpProjectType.Default;
 
@@ -61,7 +61,7 @@ namespace CSharpWCF
         public CSharpWCFAppProject()
         {
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
-            RootPath = @"[project.SharpmakeCsPath]\codebase\[project.Name]";
+            RootPath = @"[project.SharpmakeCsPath]\projects\[project.Name]";
 
             SourceFilesExcludeRegex.Add(@".*\.vs\.*");
 
@@ -136,7 +136,7 @@ namespace CSharpWCF
                                                   Name,
                                                   "[target.DevEnv]",
                                                   "[target.Framework]");
-            conf.SolutionPath = @"[solution.SharpmakeCsPath]\codebase\";
+            conf.SolutionPath = @"[solution.SharpmakeCsPath]\projects\";
 
             conf.AddProject<CSharpWCFProject>(target);
             conf.AddProject<CSharpWCFAppProject>(target);
