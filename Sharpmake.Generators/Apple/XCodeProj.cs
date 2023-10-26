@@ -64,7 +64,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private readonly HashSet<ProjectItem> _projectItems = new HashSet<ProjectItem>();
+        internal readonly HashSet<ProjectItem> _projectItems = new HashSet<ProjectItem>();
 
         private ProjectFolder _mainGroup = null;
         private ProjectFolder _productsGroup = null;
@@ -73,7 +73,7 @@ namespace Sharpmake.Generators.Apple
 
         private Dictionary<string, ProjectTarget> _nativeOrLegacyTargets = null;
         private Dictionary<string, ProjectResourcesBuildPhase> _resourcesBuildPhases = null;
-        private Dictionary<string, ProjectSourcesBuildPhase> _sourcesBuildPhases = null;
+        internal Dictionary<string, ProjectSourcesBuildPhase> _sourcesBuildPhases = null;
         private Dictionary<string, ProjectFrameworksBuildPhase> _frameworksBuildPhases = null;
         private Dictionary<string, UniqueList<ProjectHeadersBuildPhase>> _headersBuildPhases = null;
         private Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> _copyFilesPreBuildPhases = null;
@@ -852,12 +852,12 @@ namespace Sharpmake.Generators.Apple
             return true;
         }
 
-        private void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
+        internal void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
         {
             foreach (string file in sourceFiles)
             {
-                bool build = !configuration.ResolvedSourceFilesBuildExclude.Contains(file);
                 string extension = Path.GetExtension(file);
+                bool build = !configuration.ResolvedSourceFilesBuildExclude.Contains(file) && project.SourceFilesCompileExtensions.Contains(extension);
 
                 bool alreadyPresent;
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath, true);
@@ -959,7 +959,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private void SetRootGroup(Project project, Project.Configuration configuration)
+        internal void SetRootGroup(Project project, Project.Configuration configuration)
         {
             _mainGroup = new ProjectFolder(project.GetType().Name, true);
 
@@ -1859,7 +1859,7 @@ namespace Sharpmake.Generators.Apple
             public ProjectFileBase File { get; }
         }
 
-        private abstract class ProjectBuildPhase : ProjectItem
+        internal abstract class ProjectBuildPhase : ProjectItem
         {
             public ProjectBuildPhase(ItemSection section, string phaseName, uint buildActionMask)
                 : base(section, phaseName)
@@ -1902,7 +1902,7 @@ namespace Sharpmake.Generators.Apple
             }
         }
 
-        private class ProjectSourcesBuildPhase : ProjectBuildPhase
+        internal class ProjectSourcesBuildPhase : ProjectBuildPhase
         {
             public ProjectSourcesBuildPhase(uint buildActionMask)
                 : base(ItemSection.PBXSourcesBuildPhase, "Sources", buildActionMask)
