@@ -126,7 +126,7 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"CSharpWCF.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"CSharpWCFSolution.vs2015.v4_5_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/codebase\" -VsVersion {os} -compiler MsBuild"
+                "./Compile.ps1 -slnOrPrjFile \"CSharpWCFSolution.vs2015.v4_5_2.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild"
             ]
         },
         {

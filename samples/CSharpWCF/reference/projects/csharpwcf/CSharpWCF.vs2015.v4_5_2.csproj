@@ -70,31 +70,55 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service References\ServiceReference\Reference.cs">
+    <Compile Include="..\..\codebase\CSharpWCF\Class1.cs">
+      <Link>Class1.cs</Link>
+    </Compile>
+    <Compile Include="..\..\codebase\CSharpWCF\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
+      <Link>Service References\ServiceReference\Reference.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\ServiceReference\CSharpWCF.ServiceReference.CompositeType.datasource" />
-    <None Include="Service References\ServiceReference\Reference.svcmap">
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\CSharpWCF.ServiceReference.CompositeType.datasource">
+      <Link>Resources\CSharpWCF.ServiceReference.CompositeType.datasource</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
+      <Link>Service References\ServiceReference\Reference.svcmap</Link>
     </None>
-    <None Include="Service References\ServiceReference\Service1.disco" />
-    <None Include="Service References\ServiceReference\Service1.wsdl" />
-    <None Include="Service References\ServiceReference\Service1.xsd" />
-    <None Include="Service References\ServiceReference\Service11.xsd" />
-    <None Include="Service References\ServiceReference\Service12.xsd" />
-    <None Include="Service References\ServiceReference\configuration.svcinfo" />
-    <None Include="Service References\ServiceReference\configuration91.svcinfo" />
-    <None Include="app.config" />
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service1.disco">
+      <Link>Resources\Service1.disco</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service1.wsdl">
+      <Link>Resources\Service1.wsdl</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service1.xsd">
+      <Link>Resources\Service1.xsd</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service11.xsd">
+      <Link>Resources\Service11.xsd</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\Service12.xsd">
+      <Link>Resources\Service12.xsd</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\configuration.svcinfo">
+      <Link>Resources\configuration.svcinfo</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\Service References\ServiceReference\configuration91.svcinfo">
+      <Link>Resources\configuration91.svcinfo</Link>
+    </None>
+    <None Include="..\..\codebase\CSharpWCF\app.config">
+      <Link>Resources\app.config</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Service References\ServiceReference" />
+    <WCFMetadataStorage Include="..\..\codebase\CSharpWCF\Service References\ServiceReference" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

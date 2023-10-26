@@ -1,8 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCF", "CSharpWCF\CSharpWCF.vs2015.v4_5_2.csproj", "{3D46B916-6806-3778-DB08-02BDDE768A39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCF", "csharpwcf\CSharpWCF.vs2015.v4_5_2.csproj", "{3D46B916-6806-3778-DB08-02BDDE768A39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCFApp", "CSharpWCFApp\CSharpWCFApp.vs2015.v4_5_2.csproj", "{742456DD-70C9-26F7-F5DE-98386A8E8919}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpWCFApp", "csharpwcfapp\CSharpWCFApp.vs2015.v4_5_2.csproj", "{742456DD-70C9-26F7-F5DE-98386A8E8919}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

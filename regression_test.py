@@ -150,7 +150,7 @@ def launch_tests():
             Test("HelloLinux", "HelloLinux.Main.sharpmake.cs"),
             Test("HelloAssembly", "HelloAssembly.sharpmake.cs"),
             Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
-            Test("CSharpWCF", "CSharpWCF.sharpmake.cs", project_root="codebase"),
+            Test("CSharpWCF", "CSharpWCF.sharpmake.cs"),
             Test("CSharpImports", "CSharpImports.sharpmake.cs"),
             Test("PackageReferences", "PackageReferences.sharpmake.cs"),
             #Test("QTFileCustomBuild", "QTFileCustomBuild.sharpmake.cs"), # commented out since output has discrepancies between net472 and net5.0
