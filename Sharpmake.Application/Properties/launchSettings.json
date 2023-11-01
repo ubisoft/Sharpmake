@@ -1,157 +1,164 @@
 {
-  "profiles": {
-    "Sample (CompileCommandDatabase)": {
-      "commandName": "Project"
-    },
-    "Sample (ConfigureOrder)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\ConfigureOrder"
-    },
-    "Sample (CPPCLI)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'CLRTest.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\CPPCLI"
-    },
-    "Sample (CSharpHelloWorld)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloWorld.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpHelloWorld"
-    },
-    "Sample (CSharpImports)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'CSharpImports.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpImports"
-    },
-    "Sample (CSharpVsix)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'CSharpVsix.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpVsix"
-    },
-    "Sample (CSharpWCF)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'CSharpWCF.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpWCF"
-    },
-    "Sample (CustomBuildStep)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'CustomBuildStep.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\CustomBuildStep"
-    },
-    "Sample (FastBuildSimpleExecutable)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'FastBuildSimpleExecutable.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\FastBuildSimpleExecutable"
-    },
-    "Sample (HelloAndroid)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloAndroid.Main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloAndroid"
-    },
-    "Sample (HelloAndroidAgde)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloAndroidAgde.Main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloAndroidAgde"
-    },
-    "Sample (HelloClangCl)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloClangCl.Main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloClangCl"
-    },
-    "Sample (HelloEvents)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloEvents.Main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloEvents"
-    },
-    "Sample (HelloLinux)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloLinux.Main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloLinux"
-    },
-    "Sample (HelloRust)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloRust.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloRust"
-    },
-    "Sample (HelloWorld)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloWorld.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloWorld"
-    },
-    "Sample (HelloXCode)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloXCode.Main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloXCode"
-    },
-    "Sample (NetCore/DotNetCoreFrameworkHelloWorld)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloWorld.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetCoreFrameworkHelloWorld"
-    },
-    "Sample (NetCore/DotNetFrameworkHelloWorld)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloWorld.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetFrameworkHelloWorld"
-    },
-    "Sample (NetCore/DotNetMultiFrameworksHelloWorld)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloWorld.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetMultiFrameworksHelloWorld"
-    },
-    "Sample (NetCore/DotNetOSMultiFrameworksHelloWorld)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'HelloWorld.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetOSMultiFrameworksHelloWorld"
-    },
-    "Sample (PackageReferences)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'PackageReferences.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\PackageReferences"
-    },
-    "Sample (QTFileCustomBuild)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'QTFileCustomBuild.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\QTFileCustomBuild"
-    },
-    "Sample (SimpleExeLibDependency)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'SimpleExeLibDependency.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\SimpleExeLibDependency"
-    },
-    "Sample (vcpkg)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources(@'main.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\samples\\vcpkg\\sharpmake"
-    },
-    "FunctionalTest (FastBuildFunctionalTest)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources('FastBuildFunctionalTest.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\FastBuildFunctionalTest"
-    },
-    "FunctionalTest (NoAllFastBuildProjectFunctionalTest)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources('NoAllFastBuildProjectFunctionalTest.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\NoAllFastBuildProjectFunctionalTest"
-    },
-    "FunctionalTest (OnlyNeededFastBuildTest)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources('OnlyNeededFastBuildTest.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\OnlyNeededFastBuildTest"
-    },
-    "FunctionalTest (SharpmakePackageFunctionalTest)": {
-      "commandName": "Project",
-      "commandLineArgs": "/sources('SharpmakePackageFunctionalTest.sharpmake.cs')",
-      "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\SharpmakePackageFunctionalTest"
-    },
-    "FunctionalTest (functional_test.py)": {
-      "commandName": "Executable",
-      "executablePath": "python",
-      "commandLineArgs": "$(ProjectDir)\\..\\functional_test.py"
-    },
-    "FunctionalTest (regression_test.py)": {
-      "commandName": "Executable",
-      "executablePath": "python",
-      "commandLineArgs": "$(ProjectDir)\\..\\regression_test.py"
+    "profiles": {
+        // Samples
+        "Sample (CompileCommandDatabase)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027CompileCommandDatabase.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CompileCommandDatabase"
+        },
+        "Sample (ConfigureOrder)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\ConfigureOrder"
+        },
+        "Sample (CPPCLI)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027CLRTest.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CPPCLI"
+        },
+        "Sample (CSharpHelloWorld)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloWorld.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpHelloWorld"
+        },
+        "Sample (CSharpImports)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027CSharpImports.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpImports"
+        },
+        "Sample (CSharpVsix)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027CSharpVsix.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpVsix"
+        },
+        "Sample (CSharpWCF)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027CSharpWCF.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CSharpWCF"
+        },
+        "Sample (CustomBuildStep)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027CustomBuildStep.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\CustomBuildStep"
+        },
+        "Sample (FastBuildSimpleExecutable)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027FastBuildSimpleExecutable.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\FastBuildSimpleExecutable"
+        },
+        "Sample (HelloAndroid)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloAndroid.Main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloAndroid"
+        },
+        "Sample (HelloAndroidAgde)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloAndroidAgde.Main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloAndroidAgde"
+        },
+        "Sample (HelloClangCl)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloClangCl.Main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloClangCl"
+        },
+        "Sample (HelloEvents)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloEvents.Main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloEvents"
+        },
+        "Sample (HelloLinux)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloLinux.Main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloLinux"
+        },
+        "Sample (HelloRust)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloRust.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloRust"
+        },
+        "Sample (HelloWorld)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloWorld.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloWorld"
+        },
+        "Sample (HelloXCode)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloXCode.Main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\HelloXCode"
+        },
+        "Sample (NetCore/DotNetCoreFrameworkHelloWorld)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloWorld.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetCoreFrameworkHelloWorld"
+        },
+        "Sample (NetCore/DotNetFrameworkHelloWorld)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloWorld.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetFrameworkHelloWorld"
+        },
+        "Sample (NetCore/DotNetMultiFrameworksHelloWorld)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloWorld.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetMultiFrameworksHelloWorld"
+        },
+        "Sample (NetCore/DotNetOSMultiFrameworksHelloWorld)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027HelloWorld.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\NetCore\\DotNetOSMultiFrameworksHelloWorld"
+        },
+        "Sample (PackageReferences)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027PackageReferences.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\PackageReferences"
+        },
+        "Sample (QTFileCustomBuild)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027QTFileCustomBuild.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\QTFileCustomBuild"
+        },
+        "Sample (SimpleExeLibDependency)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027SimpleExeLibDependency.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\SimpleExeLibDependency"
+        },
+        "Sample (vcpkg)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027main.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\vcpkg\\sharpmake"
+        },
+
+        // FunctionalTest
+        "FunctionalTest (FastBuildFunctionalTest)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(\u0027FastBuildFunctionalTest.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\FastBuildFunctionalTest"
+        },
+        "FunctionalTest (NoAllFastBuildProjectFunctionalTest)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(\u0027NoAllFastBuildProjectFunctionalTest.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\NoAllFastBuildProjectFunctionalTest"
+        },
+        "FunctionalTest (OnlyNeededFastBuildTest)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(\u0027OnlyNeededFastBuildTest.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\OnlyNeededFastBuildTest"
+        },
+        "FunctionalTest (SharpmakePackageFunctionalTest)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(\u0027SharpmakePackageFunctionalTest.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\Sharpmake.FunctionalTests\\SharpmakePackageFunctionalTest"
+        },
+
+        // Python scripts
+        "FunctionalTest (functional_test.py)": {
+            "commandName": "Executable",
+            "executablePath": "python",
+            "commandLineArgs": "$(ProjectDir)\\..\\functional_test.py"
+        },
+        "FunctionalTest (regression_test.py)": {
+            "commandName": "Executable",
+            "executablePath": "python",
+            "commandLineArgs": "$(ProjectDir)\\..\\regression_test.py"
+        }
     }
-  }
 }

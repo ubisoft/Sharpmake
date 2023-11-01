@@ -102,8 +102,8 @@ namespace Sharpmake
         public Strings PreFilterSourceFiles { get { return _preFilterSourceFiles; } }
 
 
-        public Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm", ".ixx");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
-        public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm", ".ixx");         // File that match this regex compile
+        public Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
+        public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm");         // File that match this regex compile
         public Strings SourceFilesCPPExtensions = new Strings(".cpp", ".cc");
 
         public Strings SourceFilesFilters = null;                                        // if !=  null, include only file in this filter
