@@ -2479,11 +2479,13 @@ namespace Sharpmake
             private Dictionary<ValueTuple<Type, ITarget>, DependencySetting> _dependenciesSetting = new Dictionary<ValueTuple<Type, ITarget>, DependencySetting>();
 
             // These dependencies will not be propagated to other projects that depend on us
-            internal IDictionary<Type, ITarget> UnResolvedPrivateDependencies { get; } = new Dictionary<Type, ITarget>();
+            //internal IDictionary<Type, ITarget> UnResolvedPrivateDependencies { get; } = new Dictionary<Type, ITarget>(); // hbkim
+            public IDictionary<Type, ITarget> UnResolvedPrivateDependencies { get; } = new Dictionary<Type, ITarget>();
             // These dependencies will be propagated to other dependent projects, but not across dll dependencies.
             internal IDictionary<Type, ITarget> UnResolvedProtectedDependencies { get; } = new Dictionary<Type, ITarget>();
             // These dependencies are always propagated to other dependent projects.
-            internal Dictionary<Type, ITarget> UnResolvedPublicDependencies { get; } = new Dictionary<Type, ITarget>();
+            //internal Dictionary<Type, ITarget> UnResolvedPublicDependencies { get; } = new Dictionary<Type, ITarget>(); // hbkim
+            public Dictionary<Type, ITarget> UnResolvedPublicDependencies { get; } = new Dictionary<Type, ITarget>();
 
             private Strings _resolvedTargetCopyFiles = new Strings();
 
