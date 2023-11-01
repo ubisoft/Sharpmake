@@ -181,7 +181,7 @@ namespace Sharpmake
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
     <EnableUnitySupport>[options.JumboBuild]</EnableUnitySupport>
-    <MaxFilesInUnityFile>[options.MaxFilesPerUnityFile]</MaxFilesInUnityFile>
+    <MaxFilesInUnityFile>[options.MaxFilesPerJumboFile]</MaxFilesInUnityFile>
   </PropertyGroup>
 ";
 

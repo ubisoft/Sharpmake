@@ -1606,7 +1606,7 @@ namespace Sharpmake
             public bool DoNotGenerateFastBuild = false;
 
             // Unity builds support
-            public int MaxFilesPerUnityFile = 0;
+            public int MaxFilesPerJumboFile = 0;
 
             // container for executable
             /// <summary>
