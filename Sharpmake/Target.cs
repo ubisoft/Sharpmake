@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using static Sharpmake.EngineTarget;
+using static Sharpmake.Target;
 
 namespace Sharpmake
 {
@@ -248,6 +250,7 @@ namespace Sharpmake
         KitsRoot10
     }
 
+
     // Default Target, user may define its own if needed
     public class Target : ITarget
     {
@@ -284,6 +287,34 @@ namespace Sharpmake
             Framework = framework;
             BuildSystem = buildSystem;
             Blob = blob;
+        }
+    }
+
+    [Fragment, Flags]
+    public enum ELaunchType
+    {
+        Editor = 1 << 0,
+        Client = 1 << 1,
+        Server = 1 << 2
+    }
+
+    public class EngineTarget : Target
+    {
+        public ELaunchType LaunchType;
+
+        public EngineTarget() { }
+        public EngineTarget(
+            ELaunchType launchType,
+            Platform platform,
+            DevEnv devEnv,
+            Optimization optimization,
+            OutputType outputType = OutputType.Lib,
+            Blob blob = Blob.NoBlob,
+            BuildSystem buildSystem = BuildSystem.MSBuild,
+            DotNetFramework framework = DotNetFramework.v3_5) 
+        : base(platform, devEnv, optimization, outputType, blob, buildSystem, framework)
+        {
+            LaunchType = launchType; //ELaunchType.Editor | ELaunchType.Client | ELaunchType.Server;
         }
     }
 
