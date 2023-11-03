@@ -1607,6 +1607,8 @@ namespace Sharpmake
 
             // Jumbo builds support
             public int MaxFilesPerJumboFile = 0;
+            public int MinFilesPerJumboFile = 2;
+            public int MinJumboFiles = 1;
 
             // container for executable
             /// <summary>

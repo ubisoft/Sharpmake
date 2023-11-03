@@ -182,6 +182,8 @@ namespace Sharpmake
     <EnableASAN>[options.EnableASAN]</EnableASAN>
     <EnableUnitySupport>[options.JumboBuild]</EnableUnitySupport>
     <MaxFilesInUnityFile>[options.MaxFilesPerJumboFile]</MaxFilesInUnityFile>
+    <MinFilesInUnityFile>[options.MinFilesPerJumboFile]</MinFilesInUnityFile>
+    <MinUnityFiles>[options.MinJumboFiles]</MinUnityFiles>
   </PropertyGroup>
 ";
 

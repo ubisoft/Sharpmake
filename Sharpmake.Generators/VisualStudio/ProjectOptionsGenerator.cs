@@ -1054,11 +1054,19 @@ namespace Sharpmake.Generators.VisualStudio
 
             context.SelectOption
             (
-            Options.Option(Options.Vc.Compiler.JumboBuild.Disable, () => { context.Options["JumboBuild"] = FileGeneratorUtilities.RemoveLineTag; context.Options["MaxFilesPerJumboFile"] = FileGeneratorUtilities.RemoveLineTag; }),
+            Options.Option(Options.Vc.Compiler.JumboBuild.Disable, () => 
+            {
+                context.Options["JumboBuild"] = FileGeneratorUtilities.RemoveLineTag;
+                context.Options["MaxFilesPerJumboFile"] = FileGeneratorUtilities.RemoveLineTag; 
+                context.Options["MinFilesPerJumboFile"] = FileGeneratorUtilities.RemoveLineTag; 
+                context.Options["MinJumboFiles"] = FileGeneratorUtilities.RemoveLineTag; 
+            }),
             Options.Option(Options.Vc.Compiler.JumboBuild.Enable, () =>
             {
                 context.Options["JumboBuild"] = "true";
                 context.Options["MaxFilesPerJumboFile"] = context.Configuration.MaxFilesPerJumboFile.ToString();
+                context.Options["MinFilesPerJumboFile"] = context.Configuration.MinFilesPerJumboFile.ToString();
+                context.Options["MinJumboFiles"] = context.Configuration.MinJumboFiles.ToString();
             })
             );
 
