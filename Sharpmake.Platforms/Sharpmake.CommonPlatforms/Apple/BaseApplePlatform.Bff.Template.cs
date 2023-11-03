@@ -24,6 +24,7 @@ namespace Sharpmake
                             + ' [cmdLineOptions.LinkerFrameworkPaths]'
                             // Options
                             //--------
+                            + ' [cmdLineOptions.DeploymentTarget]'
                             + ' [cmdLineOptions.GenerateMapFile]'
                             + ' [cmdLineOptions.DeadCodeStripping]'
                             // Additional linker options
@@ -40,6 +41,7 @@ namespace Sharpmake
             + ' [cmdLineOptions.PreprocessorDefinitions]'
             + ' [cmdLineOptions.StdLib]'
             + ' [cmdLineOptions.SDKRoot]'
+            + ' [cmdLineOptions.DeploymentTarget]'
             + ' [cmdLineOptions.CppLanguageStd]'
             + ' [cmdLineOptions.CLanguageStd]'
             + ' [cmdLineOptions.WarningReturnType]'

@@ -1,7 +1,11 @@
 ﻿// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using NUnit.Framework;
+using Sharpmake.Generators.Apple;
 using static Sharpmake.Generators.Apple.XCodeProj;
 
 namespace Sharpmake.UnitTests
@@ -20,6 +24,31 @@ namespace Sharpmake.UnitTests
             var projectBuildFile2 = new ProjectBuildFile(projectFile2);
 
             Assert.IsFalse(projectBuildFile1.Equals(projectBuildFile2));
+        }
+
+        [Test]
+        public void TestUncompilableNotInCompileSources()
+        {
+            string xCodeTargetName = "test";
+            var srcRoot = Directory.GetCurrentDirectory();
+            List<string> sourceFiles = new List<string> { Path.Combine(srcRoot, "test.sc") };
+            Project project = new Project();
+            Project.Configuration configuration = new Project.Configuration();
+
+            configuration.ProjectFullFileNameWithExtension = "./test/test.xcodeproj";
+
+            var xcodePrj = new XCodeProj();
+
+            project.SourceRootPath = srcRoot;
+            xcodePrj._sourcesBuildPhases = new Dictionary<string, ProjectSourcesBuildPhase>();
+            var projectSourcesBuildPhase = new ProjectSourcesBuildPhase(xCodeTargetName, 2147483647);
+            xcodePrj._projectItems.Add(projectSourcesBuildPhase);
+            xcodePrj._sourcesBuildPhases.Add(xCodeTargetName, projectSourcesBuildPhase);
+            xcodePrj.SetRootGroup(project, configuration);
+            xcodePrj.PrepareSourceFiles(xCodeTargetName, sourceFiles, project, configuration);
+            var compileSources = xcodePrj._projectItems.Where(item => item is ProjectBuildFile);
+
+            Assert.IsTrue(compileSources.Count() == 0);
         }
     }
 }
