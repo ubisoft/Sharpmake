@@ -13,7 +13,7 @@ namespace Sharpmake
             private const string _projectConfigurationsCompileTemplate =
                 @"    <ClCompile>
       <PrecompiledHeader>[options.UsePrecompiledHeader]</PrecompiledHeader>
-      <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions];%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
       <Warnings>[options.Warnings]</Warnings>
