@@ -1,4 +1,6 @@
 #include <iostream>
+#include "test1.h"
+#include "test2.h"
 
 int main(int, char**)
 {
@@ -19,6 +21,9 @@ int main(int, char**)
 #endif
 
         << std::endl;
+
+    std::cout << "test1: " << test1() << std::endl;
+    std::cout << "test2: " << test2() << std::endl;
 
     return 0;
 }
