@@ -594,7 +594,8 @@ namespace Sharpmake
         private enum PropertyModifier
         {
             None,
-            Lower
+            Lower,
+            EscapeXML
         }
 
         private static readonly char[] s_modifierNameSplitter = new[] { ':' };
@@ -626,6 +627,8 @@ namespace Sharpmake
                     return input;
                 case PropertyModifier.Lower:
                     return input.ToLowerInvariant();
+                case PropertyModifier.EscapeXML:
+                    return Util.EscapeXml(input);
                 default:
                     throw new NotSupportedException($"Don't know how to apply modifier {modifier} to '{input}'");
             }

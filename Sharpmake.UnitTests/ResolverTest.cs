@@ -286,6 +286,21 @@ namespace Sharpmake.UnitTests
             Assert.That(obj.Value2, Is.EqualTo("propertyclass"));
             Assert.That(obj.Value3, Is.EqualTo("propertyclass"));
         }
+
+        [Test]
+        public void CanResolveStringsEscape()
+        {
+            var obj = new PropertyClass();
+            obj.Value1 = "<stuff>";
+
+            string someTemplate = @"<Field>[EscapeXML:obj.Value1]</Field>";
+
+            var resolver = new Resolver();
+            resolver.SetParameter("obj", obj);
+            string result = resolver.Resolve(someTemplate);
+
+            Assert.AreEqual("<Field>&lt;stuff&gt;</Field>", result);
+        }
     }
 }
 

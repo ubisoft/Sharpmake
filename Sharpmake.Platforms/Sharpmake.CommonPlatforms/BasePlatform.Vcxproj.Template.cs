@@ -14,7 +14,7 @@ namespace Sharpmake
       <ExternalWarningLevel>[options.ExternalWarningLevel]</ExternalWarningLevel>
       <ExternalTemplatesDiagnostics>[options.ExternalTemplatesDiagnostics]</ExternalTemplatesDiagnostics>
       <Optimization>[options.Optimization]</Optimization>
-      <PreprocessorDefinitions>[options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>[options.AdditionalIncludeDirectories]</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>[options.AdditionalUsingDirectories]</AdditionalUsingDirectories>
       <DebugInformationFormat>[options.DebugInformationFormat]</DebugInformationFormat>
@@ -271,7 +271,7 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].ilk"" &gt;NUL 2&gt;NUL
 del ""[options.OutputDirectory]\[conf.TargetFileFullName].lib"" &gt;NUL 2&gt;NUL
 del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL</NMakeCleanCommandLine>
     <NMakeOutput>[options.OutputFile]</NMakeOutput>
-    <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
     <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
     <AdditionalOptions>[options.AdditionalOptions]</AdditionalOptions>
@@ -286,7 +286,7 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL
     <NMakeReBuildCommandLine>[conf.CustomBuildSettings.RebuildCommand]</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>[conf.CustomBuildSettings.CleanCommand]</NMakeCleanCommandLine>
     <NMakeOutput>[conf.CustomBuildSettings.OutputFile]</NMakeOutput>
-    <NMakePreprocessorDefinitions>[options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.AdditionalIncludeDirectories]</NMakeIncludeSearchPath>
     <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
     <AdditionalOptions>[options.AdditionalOptions]</AdditionalOptions>
