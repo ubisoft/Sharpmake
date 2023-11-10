@@ -219,8 +219,6 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"JumboBuild.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"jumbobuild_vs2019_win32.sln\" -configuration {configuration} -platform \"Win32\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "&'./{testFolder}/projects/output/win32/{configuration}/jumboBuild.exe'",
                 "./Compile.ps1 -slnOrPrjFile \"jumbobuild_vs2019_win64.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
                 "&'./{testFolder}/projects/output/win64/{configuration}/jumboBuild.exe'"
             ]
