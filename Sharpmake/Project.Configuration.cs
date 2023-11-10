@@ -1605,7 +1605,7 @@ namespace Sharpmake
             /// </remarks>
             public bool DoNotGenerateFastBuild = false;
 
-            // Jumbo builds support
+            // Jumbo builds support for msbuild
             public int MaxFilesPerJumboFile = 0;
             public int MinFilesPerJumboFile = 2;
             public int MinJumboFiles = 1;
