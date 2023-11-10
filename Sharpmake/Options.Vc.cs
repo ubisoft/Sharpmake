@@ -1350,7 +1350,7 @@ namespace Sharpmake
                 }
 
                 /// <summary>
-                /// Enable Jumbo/Unity builds
+                /// Enable Jumbo/Unity builds for msbuild. Only usable with msbuild.
                 /// </summary>
                 /// <remarks>
                 /// Merges multiple translation units together
