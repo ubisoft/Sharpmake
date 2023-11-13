@@ -429,6 +429,25 @@ namespace Sharpmake.Generators.Apple
                     PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, conf);
                     PrepareExternalResourceFiles(xCodeTargetName, project, conf);
 
+                    // AppleApp project for fastbuild, append fastbuild script into conf.EventPreBuild, so xcode will start fastbuild after all PreBuild phase and before build phase(resources, plist build etc.).
+                    if (conf.IsFastBuild && conf.Output == Project.Configuration.OutputType.AppleApp)
+                    {
+                        var masterBff = conf.FastBuildMasterBffList.FirstOrDefault();
+                        if (masterBff != null)
+                        {
+                            var buildToolPath = Util.SimplifyPath(FastBuildSettings.FastBuildMakeCommand);
+                            var buildWorkingDirectory = Path.GetDirectoryName(masterBff);
+                            var buildArgumentsString = ProjectLegacyTarget.BuildArgumentsStringByCommandLineOptions(masterBff, true);
+                            var fastbuildCmd = @$"pushd {buildWorkingDirectory}
+{buildToolPath} {buildArgumentsString}
+exit_code=$?
+if (( $exit_code != 0 )); then
+    exit $exit_code
+fi
+popd";
+                            conf.EventPreBuild.Add(fastbuildCmd);
+                        }
+                    }
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPreBuildPhases, conf.EventPreBuild.GetEnumerator());
                     RegisterScriptBuildPhase(xCodeTargetName, _shellScriptPostBuildPhases, conf.EventPostBuild.GetEnumerator());
 
@@ -532,7 +551,7 @@ namespace Sharpmake.Generators.Apple
                 _projectItems.Add(targetOutputFile);
 
                 ProjectTarget target;
-                if (!firstConf.IsFastBuild)
+                if (!firstConf.IsFastBuild || firstConf.Output == Project.Configuration.OutputType.AppleApp)
                 {
                     target = new ProjectNativeTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, _targetDependencies[xCodeTargetName]);
                 }
@@ -573,7 +592,7 @@ namespace Sharpmake.Generators.Apple
                     ProjectBuildConfigurationForTarget configurationForTarget = null;
                     if (targetConf.Output == Project.Configuration.OutputType.IosTestBundle)
                         configurationForTarget = new ProjectBuildConfigurationForUnitTestTarget(targetConf, target, options);
-                    else if (!targetConf.IsFastBuild)
+                    else if (!targetConf.IsFastBuild || targetConf.Output == Project.Configuration.OutputType.AppleApp)
                         configurationForTarget = new ProjectBuildConfigurationForNativeTarget(targetConf, (ProjectNativeTarget)target, options);
                     else
                         configurationForTarget = new ProjectBuildConfigurationForLegacyTarget(targetConf, (ProjectLegacyTarget)target, options);
@@ -1706,8 +1725,19 @@ namespace Sharpmake.Generators.Apple
             {
             }
 
+            private static string GetFullPathFromConfiguration(Project.Configuration conf)
+            {
+                var targetPath = conf.Output == Project.Configuration.OutputType.Lib ?
+                    conf.TargetLibraryPath :
+                    conf.TargetPath;
+                var appleAppRootFolder = conf.TargetFileFullNameWithExtension + FolderSeparator + ProjectOptionsGenerator.AppleAppBinaryRootFolder(conf.Platform) + conf.TargetFileName;
+                var targetFilePath = conf.Output == Project.Configuration.OutputType.AppleApp ? appleAppRootFolder : conf.TargetFileFullNameWithExtension;
+
+                return targetPath + FolderSeparator + targetFilePath;
+            }
+
             public ProjectOutputFile(Project.Configuration conf, string name = null)
-                : this(((conf.Output == Project.Configuration.OutputType.Lib) ? conf.TargetLibraryPath : conf.TargetPath) + FolderSeparator + conf.TargetFileFullNameWithExtension)
+                : this(GetFullPathFromConfiguration(conf))
             {
                 Name = name ?? conf.Project.Name + " " + conf.Name;
                 BuildableName = System.IO.Path.GetFileName(FullPath);
@@ -2244,53 +2274,58 @@ namespace Sharpmake.Generators.Apple
                 _masterBffFilePath = masterBffFilePath;
             }
 
+            internal static string BuildArgumentsStringByCommandLineOptions(string masterBffFilePath, bool forShellCmd)
+            {
+                var fastBuildCommandLineOptions = new List<string>();
+
+                fastBuildCommandLineOptions.Add(forShellCmd ? "$FASTBUILD_TARGET" : "$(FASTBUILD_TARGET)"); // special envvar hardcoded in the template
+
+                if (FastBuildSettings.FastBuildUseIDE)
+                    fastBuildCommandLineOptions.Add("-ide");
+
+                if (FastBuildSettings.FastBuildReport)
+                    fastBuildCommandLineOptions.Add("-report");
+
+                if (FastBuildSettings.FastBuildNoSummaryOnError)
+                    fastBuildCommandLineOptions.Add("-nosummaryonerror");
+
+                if (FastBuildSettings.FastBuildSummary)
+                    fastBuildCommandLineOptions.Add("-summary");
+
+                if (FastBuildSettings.FastBuildVerbose)
+                    fastBuildCommandLineOptions.Add("-verbose");
+
+                if (FastBuildSettings.FastBuildMonitor)
+                    fastBuildCommandLineOptions.Add("-monitor");
+
+                if (FastBuildSettings.FastBuildWait)
+                    fastBuildCommandLineOptions.Add("-wait");
+
+                if (FastBuildSettings.FastBuildNoStopOnError)
+                    fastBuildCommandLineOptions.Add("-nostoponerror");
+
+                if (FastBuildSettings.FastBuildFastCancel)
+                    fastBuildCommandLineOptions.Add("-fastcancel");
+
+                if (FastBuildSettings.FastBuildNoUnity)
+                    fastBuildCommandLineOptions.Add("-nounity");
+
+                if (FastBuildSettings.FastBuildDistribution)
+                    fastBuildCommandLineOptions.Add("-dist");
+
+                if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
+                    fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
+
+                fastBuildCommandLineOptions.Add("-config " + masterBffFilePath);
+
+                return string.Join(" ", fastBuildCommandLineOptions);
+            }
+
             public string BuildArgumentsString
             {
                 get
                 {
-                    var fastBuildCommandLineOptions = new List<string>();
-
-                    fastBuildCommandLineOptions.Add("$(FASTBUILD_TARGET)"); // special envvar hardcoded in the template
-
-                    if (FastBuildSettings.FastBuildUseIDE)
-                        fastBuildCommandLineOptions.Add("-ide");
-
-                    if (FastBuildSettings.FastBuildReport)
-                        fastBuildCommandLineOptions.Add("-report");
-
-                    if (FastBuildSettings.FastBuildNoSummaryOnError)
-                        fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                    if (FastBuildSettings.FastBuildSummary)
-                        fastBuildCommandLineOptions.Add("-summary");
-
-                    if (FastBuildSettings.FastBuildVerbose)
-                        fastBuildCommandLineOptions.Add("-verbose");
-
-                    if (FastBuildSettings.FastBuildMonitor)
-                        fastBuildCommandLineOptions.Add("-monitor");
-
-                    if (FastBuildSettings.FastBuildWait)
-                        fastBuildCommandLineOptions.Add("-wait");
-
-                    if (FastBuildSettings.FastBuildNoStopOnError)
-                        fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                    if (FastBuildSettings.FastBuildFastCancel)
-                        fastBuildCommandLineOptions.Add("-fastcancel");
-
-                    if (FastBuildSettings.FastBuildNoUnity)
-                        fastBuildCommandLineOptions.Add("-nounity");
-
-                    if (FastBuildSettings.FastBuildDistribution)
-                        fastBuildCommandLineOptions.Add("-dist");
-
-                    if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
-                        fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
-
-                    fastBuildCommandLineOptions.Add("-config " + Path.GetFileName(_masterBffFilePath));
-
-                    return string.Join(" ", fastBuildCommandLineOptions);
+                    return BuildArgumentsStringByCommandLineOptions(Path.GetFileName(_masterBffFilePath), false);
                 }
             }
 

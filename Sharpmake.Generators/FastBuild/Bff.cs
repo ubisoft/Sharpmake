@@ -298,9 +298,10 @@ namespace Sharpmake.Generators.FastBuild
                     string outputFile = confOptions["OutputFile"];
 
                     bool isOutputTypeExe = conf.Output == Project.Configuration.OutputType.Exe;
+                    bool isOutputTypeAppleApp = conf.Output == Project.Configuration.OutputType.AppleApp;
                     bool isOutputTypeDll = conf.Output == Project.Configuration.OutputType.Dll;
                     bool isOutputTypeLib = conf.Output == Project.Configuration.OutputType.Lib;
-                    bool isOutputTypeExeOrDll = isOutputTypeExe || isOutputTypeDll;
+                    bool isOutputTypeExeOrDllOrAppleApp = isOutputTypeExe || isOutputTypeDll || isOutputTypeAppleApp;
 
                     var dependenciesInfo = dependenciesInfoPerConf[conf];
                     OrderableStrings additionalDependencies = dependenciesInfo.AdditionalDependencies;
@@ -400,7 +401,7 @@ namespace Sharpmake.Generators.FastBuild
                             useObjectLists = true;
                         }
 
-                        if (isOutputTypeExeOrDll)
+                        if (isOutputTypeExeOrDllOrAppleApp)
                         {
                             var orderedProjectDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false);
                             foreach (var depProjConfig in orderedProjectDeps)
@@ -414,6 +415,7 @@ namespace Sharpmake.Generators.FastBuild
                                     continue;
 
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
+                                    depProjConfig.Output != Project.Configuration.OutputType.AppleApp &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
                                     string shortProjectName = GetShortProjectName(depProjConfig.Project, depProjConfig);
@@ -441,6 +443,7 @@ namespace Sharpmake.Generators.FastBuild
                                     continue;
 
                                 if (depProjConfig.Output != Project.Configuration.OutputType.Exe &&
+                                    depProjConfig.Output != Project.Configuration.OutputType.AppleApp &&
                                     depProjConfig.Output != Project.Configuration.OutputType.Utility)
                                 {
                                     fastBuildBuildOnlyDependencies.Add(GetShortProjectName(depProjConfig.Project, depProjConfig));
@@ -461,6 +464,7 @@ namespace Sharpmake.Generators.FastBuild
                                 outputType = "Library";
                                 break;
                             case Project.Configuration.OutputType.Exe:
+                            case Project.Configuration.OutputType.AppleApp:
                                 outputType = "Executable";
                                 break;
                             case Project.Configuration.OutputType.Dll:
@@ -490,7 +494,7 @@ namespace Sharpmake.Generators.FastBuild
 
                                 foreach (string subConfigObject in subConfigObjectList)
                                 {
-                                    if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe)
+                                    if (!useObjectLists && conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe && conf.Output != Project.Configuration.OutputType.AppleApp)
                                         fastBuildProjectDependencies.Add(subConfigObject + "_" + outputType);
                                     else
                                         fastBuildProjectDependencies.Add(subConfigObject + "_objects");
@@ -513,7 +517,7 @@ namespace Sharpmake.Generators.FastBuild
                         {
                             if (isLastSubConfig) // post-build steps on the last subconfig
                             {
-                                if (isOutputTypeExe || conf.ExecuteTargetCopy)
+                                if (isOutputTypeExe || isOutputTypeAppleApp || conf.ExecuteTargetCopy)
                                 {
                                     if (conf.CopyDependenciesBuildStep != null)
                                         throw new NotImplementedException("CopyDependenciesBuildStep are not supported with FastBuild");
@@ -612,7 +616,7 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            if (conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe)
+                            if (conf.Output != Project.Configuration.OutputType.Dll && conf.Output != Project.Configuration.OutputType.Exe && conf.Output != Project.Configuration.OutputType.AppleApp)
                             {
                                 foreach (var subConfig in subConfigObjectList)
                                 {
@@ -864,7 +868,7 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildCompilerForceUsing = builderForceUsingFiles.ToString();
                         }
 
-                        if (isOutputTypeExeOrDll)
+                        if (isOutputTypeExeOrDllOrAppleApp)
                         {
                             var extraPlatformEvents = new List<Project.Configuration.BuildStepExecutable>();
                             if (FastBuildSettings.FastBuildSupportLinkerStampList)
@@ -890,7 +894,7 @@ namespace Sharpmake.Generators.FastBuild
                         }
 
                         bool linkObjects = false;
-                        if (isOutputTypeExeOrDll)
+                        if (isOutputTypeExeOrDllOrAppleApp)
                         {
                             linkObjects = confUseLibraryDependencyInputs;
                         }
@@ -1071,6 +1075,7 @@ namespace Sharpmake.Generators.FastBuild
                             {
                                 case Project.Configuration.OutputType.Lib:
                                 case Project.Configuration.OutputType.Exe:
+                                case Project.Configuration.OutputType.AppleApp:
                                 case Project.Configuration.OutputType.Dll:
                                     using (bffGenerator.Declare("$(ProjectName)", projectName))
                                     using (bffGenerator.Declare("options", confOptions))
@@ -1130,8 +1135,8 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                         }
 
-                                        // Exe and DLL will always add an extra objectlist
-                                        if (isOutputTypeExeOrDll && isLastSubConfig // only last subconfig will generate objectlist
+                                        // Exe, DLL and AppleApp will always add an extra objectlist
+                                        if (isOutputTypeExeOrDllOrAppleApp && isLastSubConfig // only last subconfig will generate objectlist
                                         )
                                         {
                                             bffGenerator.Write(Template.ConfigurationFile.ObjectListBeginSection);
@@ -1237,6 +1242,7 @@ namespace Sharpmake.Generators.FastBuild
                                             string beginSectionType = null;
                                             switch (conf.Output)
                                             {
+                                                case Project.Configuration.OutputType.AppleApp:
                                                 case Project.Configuration.OutputType.Exe:
                                                     {
                                                         if (isLastSubConfig)
@@ -1582,12 +1588,12 @@ namespace Sharpmake.Generators.FastBuild
             Project.Configuration projectConfig = context.Configuration;
 
             var natvisFiles = new Strings(projectConfig.Project.NatvisFiles);
-            if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe)
+            if (projectConfig.Output == Project.Configuration.OutputType.Dll || projectConfig.Output == Project.Configuration.OutputType.Exe || projectConfig.Output == Project.Configuration.OutputType.AppleApp)
             {
                 var visitedProjects = new HashSet<Project>();
                 foreach (Project.Configuration resolvedDepConfig in projectConfig.ResolvedDependencies)
                 {
-                    if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe)
+                    if (resolvedDepConfig.Output != Project.Configuration.OutputType.Dll && resolvedDepConfig.Output != Project.Configuration.OutputType.Exe && resolvedDepConfig.Output != Project.Configuration.OutputType.AppleApp)
                     {
                         if (!visitedProjects.Contains(resolvedDepConfig.Project))
                         {

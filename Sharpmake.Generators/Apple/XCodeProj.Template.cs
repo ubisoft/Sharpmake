@@ -276,6 +276,7 @@ namespace Sharpmake.Generators.Apple
 				ENABLE_BITCODE = [item.Options.EnableBitcode];
 				EXCLUDED_SOURCE_FILE_NAMES = [item.Options.ExcludedSourceFileNames];
 				FRAMEWORK_SEARCH_PATHS = [item.Options.FrameworkPaths];
+				FASTBUILD_TARGET = ""[item.Options.FastBuildTarget]"";
 				GCC_DYNAMIC_NO_PIC = [item.Options.DynamicNoPic];
 				GCC_ENABLE_CPP_EXCEPTIONS = [item.Options.CppExceptionHandling];
 				GCC_ENABLE_CPP_RTTI = [item.Options.RuntimeTypeInfo];

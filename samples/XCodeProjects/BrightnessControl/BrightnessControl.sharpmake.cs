@@ -35,29 +35,11 @@ namespace XCodeProjects
             conf.XcodeSystemFrameworks.Add("IOKit", "CoreDisplay", "DisplayServices");
 
             conf.XcodeFrameworkPaths.Add("/System/Library/PrivateFrameworks");
-
-            conf.AdditionalLinkerOptions.Add(
-                "-Wl,-U,_CoreDisplay_Display_SetUserBrightness",
-                "-Wl,-U,_CoreDisplay_Display_GetUserBrightness",
-                "-Wl,-U,_DisplayServicesCanChangeBrightness",
-                "-Wl,-U,_DisplayServicesBrightnessChanged",
-                "-Wl,-U,_DisplayServicesGetBrightness",
-                "-Wl,-U,_DisplayServicesSetBrightness"
-            );
         }
 
         public static void ApplyClientConfiguration(Configuration conf, CommonTarget target)
         {
             conf.XcodeFrameworkPaths.Add("/System/Library/PrivateFrameworks");
-
-            conf.AdditionalLinkerOptions.Add(
-                "-Wl,-U,_CoreDisplay_Display_SetUserBrightness",
-                "-Wl,-U,_CoreDisplay_Display_GetUserBrightness",
-                "-Wl,-U,_DisplayServicesCanChangeBrightness",
-                "-Wl,-U,_DisplayServicesBrightnessChanged",
-                "-Wl,-U,_DisplayServicesGetBrightness",
-                "-Wl,-U,_DisplayServicesSetBrightness"
-            );
         }
     }
 }

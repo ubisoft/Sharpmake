@@ -22,6 +22,7 @@ namespace XCodeProjects
             SourceRootPath = Util.GetCurrentSharpmakeFileInfo().DirectoryName;
         }
 
+        private bool _fileCopyAddedForFastbuild = false;
         public override void ConfigureAll(Configuration conf, CommonTarget target)
         {
             base.ConfigureAll(conf, target);
@@ -30,6 +31,11 @@ namespace XCodeProjects
             conf.AddPublicDependency<FmtProject>(target);
 
             conf.XcodeSystemFrameworks.Add("CoreFoundation");
+
+            if (_fileCopyAddedForFastbuild && conf.IsFastBuild)
+                return;
+            if (conf.IsFastBuild)
+                _fileCopyAddedForFastbuild = true;
 
             conf.TargetCopyFilesPath = Path.Join(@"./");
             conf.TargetCopyFiles.Add("foobar.dat");
