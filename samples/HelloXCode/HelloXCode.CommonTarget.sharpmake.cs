@@ -55,8 +55,10 @@ namespace HelloXCode
                 var nameParts = new List<string>();
 
                 nameParts.Add(Optimization.ToString().ToLowerInvariant());
+                if (BuildSystem == BuildSystem.FastBuild)
+                    nameParts.Add(BuildSystem.ToString().ToLowerInvariant());
 
-                return string.Join(" ", nameParts);
+                return string.Join("_", nameParts);
             }
         }
 

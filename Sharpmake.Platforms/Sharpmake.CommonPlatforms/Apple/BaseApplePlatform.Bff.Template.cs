@@ -57,12 +57,8 @@ namespace Sharpmake
             // Additional compiler options
             //--------------------------
             + ' [options.AdditionalCompilerOptions]'
-            // SystemFrameworks, DeveloperFrameworks, UserFrameworks and FrameworkPaths
+            // FrameworkPaths
             // ----------------------------------------------------------------------------
-            + ' [cmdLineOptions.SystemFrameworks]'
-            + ' [cmdLineOptions.DeveloperFrameworks]'
-            + ' [cmdLineOptions.UserFrameworks]'
-            + ' [cmdLineOptions.EmbeddedFrameworks]'
             + ' [cmdLineOptions.CompilerSystemFrameworkPaths]'
             + ' [cmdLineOptions.CompilerFrameworkPaths]'
 ";

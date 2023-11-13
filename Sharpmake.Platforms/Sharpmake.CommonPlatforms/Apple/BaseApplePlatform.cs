@@ -2,7 +2,6 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Sharpmake.Generators;
@@ -133,6 +132,7 @@ namespace Sharpmake
                 case Project.Configuration.OutputType.Dll:
                     outputTypeArgument = " -dylib";
                     break;
+                case Project.Configuration.OutputType.AppleApp:
                 case Project.Configuration.OutputType.Exe:
                     outputTypeArgument = IsLinkerInvokedViaCompiler ? "" : " -execute";
                     break;
@@ -306,9 +306,14 @@ namespace Sharpmake
 
         public string GetOutputFileNamePrefix(Project.Configuration.OutputType outputType)
         {
-            if (outputType != Project.Configuration.OutputType.Exe)
-                return "lib";
-            return string.Empty;
+            switch (outputType)
+            {
+                case Project.Configuration.OutputType.Exe:
+                case Project.Configuration.OutputType.AppleApp:
+                    return string.Empty;
+                default:
+                    return "lib";
+            }
         }
 
         public IEnumerable<string> GetPlatformLibraryPaths(Project.Configuration configuration)

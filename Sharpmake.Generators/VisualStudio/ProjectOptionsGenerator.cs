@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 
 namespace Sharpmake.Generators.VisualStudio
@@ -23,6 +24,10 @@ namespace Sharpmake.Generators.VisualStudio
 
     public class ProjectOptionsGenerator
     {
+        // Only MacOS have a subfolder, refer to https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/BundleTypes/BundleTypes.html
+        private static readonly string AppleAppBinaryRootFolderForMac = "Contents" + XCodeProj.FolderSeparator + "MacOS" + XCodeProj.FolderSeparator;
+        public static string AppleAppBinaryRootFolder(Platform platform) => platform.Equals(Platform.mac) ? AppleAppBinaryRootFolderForMac : "";
+
         private class ProjectOptionsGenerationContext
         {
             private readonly Project.Configuration _projectConfiguration;
@@ -1303,12 +1308,15 @@ namespace Sharpmake.Generators.VisualStudio
 
             switch (context.Configuration.Output)
             {
+                case Project.Configuration.OutputType.AppleApp:
+                    var conf = context.Configuration;
+                    context.Options["OutputFile"] = Path.Combine(optionsContext.OutputDirectoryRelative, conf.TargetFileFullNameWithExtension, AppleAppBinaryRootFolder(conf.Platform), conf.TargetFileName);
+                    break;
                 case Project.Configuration.OutputType.Dll:
                 case Project.Configuration.OutputType.DotNetClassLibrary:
                 case Project.Configuration.OutputType.Exe:
                 case Project.Configuration.OutputType.DotNetConsoleApp:
                 case Project.Configuration.OutputType.DotNetWindowsApp:
-                case Project.Configuration.OutputType.AppleApp:
                 case Project.Configuration.OutputType.AppleFramework:
                 case Project.Configuration.OutputType.AppleBundle:
                 case Project.Configuration.OutputType.IosTestBundle:

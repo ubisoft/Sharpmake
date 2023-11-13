@@ -44,7 +44,12 @@ namespace XCodeProjects
 
         public override string Name
         {
-            get => Optimization.ToString().ToLowerInvariant();
+            get
+            {
+                // Append BuildSystem to avoid non-fastbuild config overwriting fastbuild config in pbxproj
+                var name = BuildSystem == BuildSystem.FastBuild ? $"{Optimization.ToString()}_{BuildSystem.ToString()}" : Optimization.ToString();
+                return name.ToLowerInvariant();
+            }
         }
 
         public string SolutionPlatformName

@@ -12,7 +12,17 @@ int main(int argc, char** argv)
     CFBundleRef cf_mainBundle = CFBundleGetMainBundle();
     CFURLRef cf_resourceDir = CFURLCopyAbsoluteURL(CFBundleCopyResourcesDirectoryURL(cf_mainBundle));
     CFStringRef cf_resourceDirS = CFURLGetString(cf_resourceDir);
-    fmt::println("resourceDirS (CF): {}", CFStringGetCStringPtr(cf_resourceDirS, kCFStringEncodingUTF8));
+    auto stringEncoding = kCFStringEncodingUTF8;
+    const char* resourceDirS = CFStringGetCStringPtr(cf_resourceDirS, stringEncoding);
+    char resourceDirBuff[PATH_MAX];
+    if (!resourceDirS)
+    {
+        if (CFStringGetCString(cf_resourceDirS, resourceDirBuff, PATH_MAX, stringEncoding))
+        {
+            resourceDirS = const_cast<const char*>(resourceDirBuff);
+        }
+    }
+    fmt::println("resourceDirS (CF): {}", resourceDirS);
 
     NSBundle* mainBundle = [NSBundle mainBundle];
     NSURL* resourceDir = [mainBundle resourceURL];
