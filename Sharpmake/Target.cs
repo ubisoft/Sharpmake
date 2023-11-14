@@ -110,6 +110,7 @@ namespace Sharpmake
         /// </summary>
         maccatalyst = 1 << 14,
 
+        _reserved10 = 1 << 21,
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
         _reserved7 = 1 << 24,
