@@ -345,7 +345,6 @@ namespace Sharpmake.Generators.FastBuild
                         var useClr = dotNetConf && !isCompileAsNonCLRFile || isCompileAsCLRFile;
                         var fastBuildSubConfigClrSupport = useClr ? "/clr" : FileGeneratorUtilities.RemoveLineTag;
 
-                        Trace.Assert(!isCompileAsCPPFile, "Sharpmake-FastBuild : CompiledAsCPP isn't yet supported.");
                         Trace.Assert(!isCompileAsCLRFile || !isCompileAsNonCLRFile, "Sharpmake-FastBuild : a file cannot be simultaneously compiled with and without the CLR");
 
                         Strings fastBuildCompilerInputPatternList = isCompileAsCFile ? new Strings { ".c" } : project.SourceFilesCPPExtensions;
@@ -696,6 +695,10 @@ namespace Sharpmake.Generators.FastBuild
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "LanguageStandard_C", FileGeneratorUtilities.RemoveLineTag));
 
                             scopedOptions.Add(new Options.ScopedOption(confCmdLineOptions, "ClangEnableObjC_ARC", FileGeneratorUtilities.RemoveLineTag));
+
+                            // if files are specifically c++, we need to add the language flag to make sure the compiler sees them as c++
+                            if (isCompileAsCPPFile && clangPlatformBff != null)
+                                clangFileLanguage = "-x c++ ";
 
                             fastBuildSourceFileType = "/TP";
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
@@ -2098,7 +2101,7 @@ namespace Sharpmake.Generators.FastBuild
 
                         if (isCompileAsCLRFile || isConsumeWinRTExtensions)
                             isDontUsePrecomp = true;
-                        if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
+                        if (!isCompileAsCPPFile && string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             isDontUsePrecomp = true;
                             isCompileAsCFile = true;
