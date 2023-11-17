@@ -13,9 +13,9 @@ namespace JumboBuild
             Name = "JumboBuild";
 
             AddTargets(new Target(
-                    Platform.win64,
+                    Platform.win32 | Platform.win64,
                     DevEnv.vs2019,
-                    Optimization.Release
+                    Optimization.Debug | Optimization.Release
             ));
 
             SourceRootPath = @"[project.SharpmakeCsPath]\codebase";
