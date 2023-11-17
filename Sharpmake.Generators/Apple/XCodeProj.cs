@@ -1566,6 +1566,8 @@ popd";
                         return "sourcecode.c.h";
                     case ".hxx":
                         return "sourcecode.c.h";
+                    case ".inl":
+                        return "sourcecode.c.h";
                     case ".s":
                         return "sourcecode.asm";
                     case ".m":
