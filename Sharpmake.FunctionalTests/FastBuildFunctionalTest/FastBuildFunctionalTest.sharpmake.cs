@@ -594,6 +594,22 @@ namespace SharpmakeGen.FunctionalTests
         }
     }
 
+    [Generate]
+    public class AllCppWithDotCExe : CommonExeProject
+    {
+        public AllCppWithDotCExe()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            conf.SourceFilesCompileAsCPPRegex.Add(".*\\.c");
+        }
+    }
+
+
     [Sharpmake.Generate]
     public class FastBuildFunctionalTestSolution : Sharpmake.Solution
     {
@@ -623,6 +639,7 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<PostBuildStampTest>(target);
             conf.AddProject<ExplicitlyOrderedPostBuildTest>(target);
             conf.AddProject<SimpleExeWithLib>(target);
+            conf.AddProject<AllCppWithDotCExe>(target);
 
             if (target.Blob == Blob.FastBuildUnitys)
             {
