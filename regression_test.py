@@ -147,6 +147,7 @@ def launch_tests():
             Test("CPPCLI", "CLRTest.sharpmake.cs"),
             Test("CSharpHelloWorld", "HelloWorld.sharpmake.cs"),
             Test("HelloWorld", "HelloWorld.sharpmake.cs"),
+            Test("JumboBuild", "JumboBuild.sharpmake.cs"),
             Test("HelloLinux", "HelloLinux.Main.sharpmake.cs"),
             Test("HelloAssembly", "HelloAssembly.sharpmake.cs"),
             Test("CSharpVsix", "CSharpVsix.sharpmake.cs"),
