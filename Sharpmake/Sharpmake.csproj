@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="3.7.2175" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageReference Include="Basic.Reference.Assemblies.Net60" Version="1.3.0" />
   </ItemGroup>
 
