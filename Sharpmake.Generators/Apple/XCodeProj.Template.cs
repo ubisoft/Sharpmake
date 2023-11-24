@@ -253,7 +253,7 @@ namespace Sharpmake.Generators.Apple
                 { ItemSection.PBXTargetDependency,
 @"		[item.Uid] /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = [item.ProjectReference.Name];
+			name = ""[item.ProjectReference.Name]"";
 			targetProxy = [item.Proxy.Uid];
 			target = [item.TargetIdentifier];
 		};
