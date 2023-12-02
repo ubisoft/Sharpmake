@@ -74,6 +74,9 @@ namespace Sharpmake
       <ForcedIncludeFiles>[options.ForcedIncludeFiles]</ForcedIncludeFiles>
       <ForcedUsingFiles>[options.ForcedUsingFiles]</ForcedUsingFiles>
       <SupportJustMyCode>[options.SupportJustMyCode]</SupportJustMyCode>
+      <MaxFilesInUnityFile>[options.MaxFilesPerJumboFile]</MaxFilesInUnityFile>
+      <MinFilesInUnityFile>[options.MinFilesPerJumboFile]</MinFilesInUnityFile>
+      <MinUnityFiles>[options.MinJumboFiles]</MinUnityFiles>
     </ClCompile>
 ";
 
@@ -181,9 +184,6 @@ namespace Sharpmake
     <SpectreMitigation>[options.SpectreMitigation]</SpectreMitigation>
     <EnableASAN>[options.EnableASAN]</EnableASAN>
     <EnableUnitySupport>[options.JumboBuild]</EnableUnitySupport>
-    <MaxFilesInUnityFile>[options.MaxFilesPerJumboFile]</MaxFilesInUnityFile>
-    <MinFilesInUnityFile>[options.MinFilesPerJumboFile]</MinFilesInUnityFile>
-    <MinUnityFiles>[options.MinJumboFiles]</MinUnityFiles>
   </PropertyGroup>
 ";
 
