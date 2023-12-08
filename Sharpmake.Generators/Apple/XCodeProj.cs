@@ -19,6 +19,7 @@ namespace Sharpmake.Generators.Apple
         public const string ProjectExtension = ".xcodeproj";
         private const string ProjectFileName = "project.pbxproj";
         private const string ProjectSchemeExtension = ".xcscheme";
+        private const string XCTestBundleExtension = ".xctest";
 
         private const int ProjectArchiveVersion = 1;
         private const int ProjectObjectVersion = 46;
@@ -96,6 +97,26 @@ namespace Sharpmake.Generators.Apple
             FolderSeparator = Util.UnixSeparator;
         }
 
+        private void PrepareUnitTestSources(
+            Project project,
+            List<Project.Configuration> configurations
+            )
+        {
+            if (!string.IsNullOrEmpty(project.XcodeUnitTestSourceRootPath))
+            {
+                var files = Util.DirectoryGetFiles(Util.SimplifyPath(project.XcodeUnitTestSourceRootPath));
+                project.XcodeUnitTestSourceFiles.AddRange(files);
+            }
+
+            if (project.XcodeUnitTestSourceFilesBuildExclude.Count > 0)
+            {
+                foreach (Project.Configuration conf in configurations)
+                {
+                    conf.XcodeResolvedUnitTestSourceFilesBuildExclude.AddRange(project.XcodeUnitTestSourceFilesBuildExclude);
+                }
+            }
+        }
+
         public void Generate(
             Builder builder,
             Project project,
@@ -108,6 +129,8 @@ namespace Sharpmake.Generators.Apple
             FileInfo fileInfo = new FileInfo(projectFile);
             string projectPath = fileInfo.Directory.FullName;
             string projectFileName = fileInfo.Name;
+
+            PrepareUnitTestSources(project, configurations);
 
             var context = new XCodeGenerationContext(builder, projectPath, project);
             PrepareSections(context, configurations);
@@ -380,15 +403,27 @@ namespace Sharpmake.Generators.Apple
             _shellScriptPreBuildPhases = new Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>>();
             _shellScriptPostBuildPhases = new Dictionary<string, UniqueList<ProjectShellScriptBuildPhase>>();
 
+            bool createUnitTestTarget = project.XcodeUnitTestSourceFiles.Count > 0 && configurations.All(conf => conf.Output == Project.Configuration.OutputType.AppleApp);
+
             //Loop on each targets
             foreach (var projectTarget in projectTargetsList)
             {
                 string xCodeTargetName = projectTarget.Key;
                 var targetConfigurations = projectTarget.Value;
+                string xCodeUnitTestTargetName = project.XcodeUnitTestTargetName;
 
                 var configurationsForTarget = new HashSet<ProjectBuildConfiguration>();
                 var configurationListForNativeTarget = new ProjectConfigurationList(configurationsForTarget, xCodeTargetName);
                 _projectItems.Add(configurationListForNativeTarget);
+
+                HashSet<ProjectBuildConfiguration> configurationsForUnitTestTarget = null;
+                ProjectConfigurationList configurationListForUnitTestNativeTarget = null;
+                if (createUnitTestTarget)
+                {
+                    configurationsForUnitTestTarget = new HashSet<ProjectBuildConfiguration>();
+                    configurationListForUnitTestNativeTarget = new ProjectConfigurationList(configurationsForUnitTestTarget, xCodeUnitTestTargetName);
+                    _projectItems.Add(configurationListForUnitTestNativeTarget);
+                }
 
                 var firstConf = targetConfigurations.First();
 
@@ -399,13 +434,33 @@ namespace Sharpmake.Generators.Apple
                     _sourcesBuildPhases.Add(xCodeTargetName, projectSourcesBuildPhase);
                 }
 
+                if (createUnitTestTarget)
+                {
+                    // currently, unit Test target won't use fastbuild
+                    var projectUnitTestSourcesBuildPhase = new ProjectSourcesBuildPhase(xCodeUnitTestTargetName, 2147483647);
+                    _projectItems.Add(projectUnitTestSourcesBuildPhase);
+                    _sourcesBuildPhases.Add(xCodeUnitTestTargetName, projectUnitTestSourcesBuildPhase);
+                }
+
                 var resourceBuildPhase = new ProjectResourcesBuildPhase(xCodeTargetName, 2147483647);
                 _projectItems.Add(resourceBuildPhase);
                 _resourcesBuildPhases.Add(xCodeTargetName, resourceBuildPhase);
+                if (createUnitTestTarget)
+                {
+                    var unitTestResourceBuildPhase = new ProjectResourcesBuildPhase(xCodeUnitTestTargetName, 2147483647);
+                    _projectItems.Add(unitTestResourceBuildPhase);
+                    _resourcesBuildPhases.Add(xCodeUnitTestTargetName, unitTestResourceBuildPhase);
+                }
 
                 var frameworkBuildPhase = new ProjectFrameworksBuildPhase(xCodeTargetName, 2147483647);
                 _projectItems.Add(frameworkBuildPhase);
                 _frameworksBuildPhases.Add(xCodeTargetName, frameworkBuildPhase);
+                if (createUnitTestTarget)
+                {
+                    var unitTestFrameworkBuildPhase = new ProjectFrameworksBuildPhase(xCodeUnitTestTargetName, 2147483647);
+                    _projectItems.Add(unitTestFrameworkBuildPhase);
+                    _frameworksBuildPhases.Add(xCodeUnitTestTargetName, unitTestFrameworkBuildPhase);
+                }
 
                 var headersBuildPhases = new UniqueList<ProjectHeadersBuildPhase>();
                 _headersBuildPhases.Add(xCodeTargetName, headersBuildPhases);
@@ -419,13 +474,23 @@ namespace Sharpmake.Generators.Apple
 
                 var targetDependencies = new List<ProjectTargetDependency>();
                 _targetDependencies.Add(xCodeTargetName, targetDependencies);
+                if (createUnitTestTarget)
+                {
+                    var unitTestTargetDependencies = new List<ProjectTargetDependency>();
+                    _targetDependencies.Add(xCodeUnitTestTargetName, unitTestTargetDependencies);
+                }
 
                 string masterBffFilePath = null;
 
                 foreach (var conf in targetConfigurations)
                 {
                     if (!conf.IsFastBuild)
-                        PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, conf, workspacePath);
+                        PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, conf, forUnitTest: false, workspacePath);
+
+                    if (createUnitTestTarget)
+                    {
+                        PrepareSourceFiles(xCodeUnitTestTargetName, project.XcodeUnitTestSourceFiles, project, conf, forUnitTest: true, workspacePath);
+                    }
                     PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, conf);
                     PrepareExternalResourceFiles(xCodeTargetName, project, conf);
 
@@ -476,7 +541,9 @@ popd";
                             RegisterFrameworkBuildPhases<ProjectSystemFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
                                 _frameworksFolder,
                                 systemFrameworks,
-                                (string systemFramework) => new ProjectSystemFrameworkFile(systemFramework)
+                                (string systemFramework) => new ProjectSystemFrameworkFile(systemFramework),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
                             );
 
                             OrderableStrings developerFrameworks = new OrderableStrings(conf.XcodeDeveloperFrameworks);
@@ -484,7 +551,9 @@ popd";
                             RegisterFrameworkBuildPhases<ProjectDeveloperFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
                                 _frameworksFolder,
                                 developerFrameworks,
-                                (string developerFramework) => new ProjectDeveloperFrameworkFile(developerFramework)
+                                (string developerFramework) => new ProjectDeveloperFrameworkFile(developerFramework),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
                             );
 
                             OrderableStrings userFrameworks = new OrderableStrings(conf.XcodeUserFrameworks);
@@ -492,7 +561,9 @@ popd";
                             RegisterFrameworkBuildPhases<ProjectUserFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
                                 _frameworksFolder,
                                 userFrameworks,
-                                (string userFramework) => new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath)
+                                (string userFramework) => new ProjectUserFrameworkFile(XCodeUtil.ResolveProjectPaths(project, userFramework), workspacePath),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
                             );
 
                             OrderableStrings embeddedFrameworks = new OrderableStrings(conf.XcodeEmbeddedFrameworks);
@@ -500,7 +571,9 @@ popd";
                             var embeddedFrameworkItems = RegisterFrameworkBuildPhases<ProjectEmbeddedFrameworkFile>(xCodeTargetName, _frameworksBuildPhases,
                                 _embedFrameworksFolder,
                                 embeddedFrameworks,
-                                (string embeddedFramework) => new ProjectEmbeddedFrameworkFile(XCodeUtil.ResolveProjectPaths(project, embeddedFramework), workspacePath)
+                                (string embeddedFramework) => new ProjectEmbeddedFrameworkFile(XCodeUtil.ResolveProjectPaths(project, embeddedFramework), workspacePath),
+                                createUnitTestTarget,
+                                xCodeUnitTestTargetName
                             );
                             RegisterFrameworkCopyFilesPhases(xCodeTargetName, _copyFilesPostBuildPhases,
                                 _embedFrameworksFolder,
@@ -544,27 +617,63 @@ popd";
                     }
                 }
 
+                if (createUnitTestTarget)
+                {
+                    var testFrameworkItem = new ProjectDeveloperFrameworkFile(_unitTestFramework);
+                    var buildFileItem = new ProjectBuildFile(testFrameworkItem);
+                    if (_frameworksFolder != null)
+                        _frameworksFolder.Children.Add(testFrameworkItem);
+                    _projectItems.Add(testFrameworkItem);
+                    _projectItems.Add(buildFileItem);
+                    _frameworksBuildPhases[xCodeUnitTestTargetName].Files.Add(buildFileItem);
+                }
+
                 // use the first conf as file, but the target name
                 var targetOutputFile = new ProjectOutputFile(firstConf, xCodeTargetName);
                 _productsGroup.Children.Add(targetOutputFile);
 
                 _projectItems.Add(targetOutputFile);
 
+                ProjectOutputFile targetUnitTestOutputFile = null;
+                if (createUnitTestTarget)
+                {
+                    targetUnitTestOutputFile = new ProjectOutputFile(firstConf, xCodeUnitTestTargetName, forTestBundle : true);
+                    _productsGroup.Children.Add(targetUnitTestOutputFile);
+
+                    _projectItems.Add(targetUnitTestOutputFile);
+                }
+
                 ProjectTarget target;
+                ProjectTarget targetUnitTest = null;
                 if (!firstConf.IsFastBuild || firstConf.Output == Project.Configuration.OutputType.AppleApp)
                 {
                     target = new ProjectNativeTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, _targetDependencies[xCodeTargetName]);
+                    if (createUnitTestTarget)
+                    {
+                        targetUnitTest = new ProjectNativeTarget(xCodeUnitTestTargetName, targetUnitTestOutputFile, configurationListForUnitTestNativeTarget, _targetDependencies[xCodeUnitTestTargetName]);
+                    }
                 }
                 else
                 {
                     target = new ProjectLegacyTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, masterBffFilePath);
                 }
                 target.ResourcesBuildPhase = _resourcesBuildPhases[xCodeTargetName];
+                if (targetUnitTest != null)
+                {
+                    targetUnitTest.ResourcesBuildPhase = _resourcesBuildPhases[xCodeUnitTestTargetName];
+                }
+
                 if (_sourcesBuildPhases.ContainsKey(xCodeTargetName))
                     target.SourcesBuildPhase = _sourcesBuildPhases[xCodeTargetName];
+                if (targetUnitTest != null && _sourcesBuildPhases.ContainsKey(xCodeUnitTestTargetName))
+                    targetUnitTest.SourcesBuildPhase = _sourcesBuildPhases[xCodeUnitTestTargetName];
 
                 if (_frameworksBuildPhases.ContainsKey(xCodeTargetName))
                     target.FrameworksBuildPhase = _frameworksBuildPhases[xCodeTargetName];
+                if (targetUnitTest != null)
+                {
+                    targetUnitTest.FrameworksBuildPhase = _frameworksBuildPhases[xCodeUnitTestTargetName];
+                }
                 if (_shellScriptPreBuildPhases.ContainsKey(xCodeTargetName))
                     target.ShellScriptPreBuildPhases = _shellScriptPreBuildPhases[xCodeTargetName];
 
@@ -584,6 +693,12 @@ popd";
                 configurationListForNativeTarget.RelatedItem = target;
                 _projectItems.Add(target);
                 _nativeOrLegacyTargets.Add(xCodeTargetName, target);
+                if (targetUnitTest != null)
+                {
+                    configurationListForUnitTestNativeTarget.RelatedItem = targetUnitTest;
+                    _projectItems.Add(targetUnitTest);
+                    _nativeOrLegacyTargets.Add(xCodeUnitTestTargetName, targetUnitTest);
+                }
 
                 //Generate BuildConfigurations
                 foreach (Project.Configuration targetConf in targetConfigurations)
@@ -599,6 +714,13 @@ popd";
 
                     configurationsForTarget.Add(configurationForTarget);
                     _projectItems.Add(configurationForTarget);
+                    
+                    if (targetUnitTest != null)
+                    {
+                        configurationForTarget = new ProjectBuildConfigurationForUnitTestTarget(targetConf, targetUnitTest, options);
+                        configurationsForUnitTestTarget.Add(configurationForTarget);
+                        _projectItems.Add(configurationForTarget);
+                    }
                 }
             }
 
@@ -631,6 +753,11 @@ popd";
                     ((ProjectNativeTarget)_nativeOrLegacyTargets[GetTargetKey(unitTestConfig)]).Dependencies.Add(targetDependency);
                 }
             }
+            
+            if (createUnitTestTarget)
+            {
+                GenerateDependenciesForUnitTestTargets(project, configurations);
+            }
 
             HashSet<ProjectBuildConfiguration> configurationsForProject = new HashSet<ProjectBuildConfiguration>();
             ProjectConfigurationList configurationListForProject = new ProjectConfigurationList(configurationsForProject, "configurationListForProject");
@@ -660,6 +787,39 @@ popd";
             }
 
             _projectItems.Add(_projectMain);
+        }
+
+        private void GenerateDependenciesForUnitTestTargets(Project project, List<Project.Configuration> configurations)
+        {
+            // Generate dependencies for unit test targets refer to AppleApp.
+            var bundleLoadingAppConfigs = new List<Project.Configuration>(configurations).FindAll(conf => conf.Output == Project.Configuration.OutputType.AppleApp);
+            if (bundleLoadingAppConfigs != null && bundleLoadingAppConfigs.Count != 0)
+            {
+                string unitTestTargetKey = project.XcodeUnitTestTargetName;
+                foreach (Project.Configuration bundleLoadingAppConfig in bundleLoadingAppConfigs)
+                {
+                    string key = GetTargetKey(bundleLoadingAppConfig);
+                    ProjectTarget target;
+                    if (_nativeOrLegacyTargets.ContainsKey(key))
+                    {
+                        target = _nativeOrLegacyTargets[key];
+                        if (!(target is ProjectNativeTarget))
+                            continue;
+                        if (((ProjectNativeTarget)_nativeOrLegacyTargets[unitTestTargetKey]).Dependencies.Find(dep => (dep.Identifier == key)) != null)
+                            continue;
+
+                        ProjectNativeTarget bundleLoadingAppTarget = (ProjectNativeTarget)target;
+
+                        ProjectReference projectReference = new ProjectReference(ItemSection.PBXProject, bundleLoadingAppTarget.Identifier);
+                        ProjectContainerProxy projectProxy = new ProjectContainerProxy(projectReference, bundleLoadingAppTarget, ProjectContainerProxy.Type.Target);
+
+                        ProjectTargetDependency targetDependency = new ProjectTargetDependency(projectReference, projectProxy, bundleLoadingAppTarget);
+                        _projectItems.Add(targetDependency);
+
+                        ((ProjectNativeTarget)_nativeOrLegacyTargets[unitTestTargetKey]).Dependencies.Add(targetDependency);
+                    }
+                }
+            }
         }
 
         //Find Project.Configuration of the bundle loading app that matches the unit test target, if it exists.
@@ -774,7 +934,9 @@ popd";
             Dictionary<string, ProjectFrameworksBuildPhase> frameworksBuildPhases,
             ProjectFolder frameworksFolder,
             OrderableStrings frameworks,
-            Func<string, ProjectSystemFileType> createProjectSystemFileType)
+            Func<string, ProjectSystemFileType> createProjectSystemFileType,
+            bool createUnitTestTargetWithApp,
+            string xCodeUnitTestTargetName)
             where ProjectSystemFileType : ProjectFrameworkFile
         {
             List<ProjectSystemFileType> buildFiles = new List<ProjectSystemFileType>();
@@ -793,6 +955,11 @@ popd";
                 {
                     _projectItems.Add(buildFileItem);
                     frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
+                }
+
+                if (createUnitTestTargetWithApp)
+                {
+                    _frameworksBuildPhases[xCodeUnitTestTargetName].Files.Add(buildFileItem);
                 }
             }
             return buildFiles;
@@ -871,12 +1038,12 @@ popd";
             return true;
         }
 
-        internal void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, string workspacePath = null)
+        internal void PrepareSourceFiles(string xCodeTargetName, IEnumerable<string> sourceFiles, Project project, Project.Configuration configuration, bool forUnitTest, string workspacePath = null)
         {
             foreach (string file in sourceFiles)
             {
                 string extension = Path.GetExtension(file);
-                bool build = !configuration.ResolvedSourceFilesBuildExclude.Contains(file) && project.SourceFilesCompileExtensions.Contains(extension);
+                bool build = ((forUnitTest && !configuration.XcodeResolvedUnitTestSourceFilesBuildExclude.Contains(file)) || !configuration.ResolvedSourceFilesBuildExclude.Contains(file)) && project.SourceFilesCompileExtensions.Contains(extension);
 
                 bool alreadyPresent;
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath, true);
@@ -1720,35 +1887,35 @@ popd";
 
         private class ProjectOutputFile : ProjectFile
         {
-            private Project.Configuration _conf;
+            private Project.Configuration.OutputType _outputType;
 
             public ProjectOutputFile(string fullPath)
                 : base(fullPath)
             {
             }
 
-            private static string GetFullPathFromConfiguration(Project.Configuration conf)
+            public static string GetFullPathFromConfiguration(Project.Configuration conf, bool forTestBundle, string name)
             {
                 var targetPath = conf.Output == Project.Configuration.OutputType.Lib ?
                     conf.TargetLibraryPath :
                     conf.TargetPath;
-                var appleAppRootFolder = conf.TargetFileFullNameWithExtension + FolderSeparator + ProjectOptionsGenerator.AppleAppBinaryRootFolder(conf.Platform) + conf.TargetFileName;
+                var appleAppRootFolder = conf.TargetFileFullNameWithExtension + FolderSeparator + ProjectOptionsGenerator.AppleAppBinaryRootFolder(conf.Platform) + (forTestBundle ? "PLugIns" + FolderSeparator + name + XCTestBundleExtension : conf.TargetFileName);
                 var targetFilePath = conf.Output == Project.Configuration.OutputType.AppleApp ? appleAppRootFolder : conf.TargetFileFullNameWithExtension;
 
                 return targetPath + FolderSeparator + targetFilePath;
-            }
+            } 
 
-            public ProjectOutputFile(Project.Configuration conf, string name = null)
-                : this(GetFullPathFromConfiguration(conf))
+            public ProjectOutputFile(Project.Configuration conf, string name = null, bool forTestBundle = false)
+                : this(GetFullPathFromConfiguration(conf, forTestBundle, name))
             {
                 Name = name ?? conf.Project.Name + " " + conf.Name;
                 BuildableName = System.IO.Path.GetFileName(FullPath);
-                _conf = conf;
+                _outputType = forTestBundle ?  Project.Configuration.OutputType.IosTestBundle : conf.Output;
             }
 
             public override SourceTreeSetting SourceTreeValue { get { return SourceTreeSetting.BUILT_PRODUCTS_DIR; } }
 
-            public Project.Configuration.OutputType OutputType { get { return _conf.Output; } }
+            public Project.Configuration.OutputType OutputType { get { return _outputType; } }
 
             public string BuildableName { get; }
         }
@@ -2389,35 +2556,48 @@ popd";
 
         private class ProjectBuildConfigurationForUnitTestTarget : ProjectBuildConfigurationForTarget
         {
+            private string _UnitTestFilesExclude;
+            private string _SymRoot; // Identifies the root of the directory hierarchy that contains product files and intermediate build files. Product and build files are placed in subdirectories of this directory.
+            // Note: CONFIGURATION_BUILD_DIR has to be set to the AppleApp output directory instead of the folder of .xctest file otherwise Xcode complaint,
+            // error: could not compute relative build path for TEST_HOST: PlugIns folder relative to $(TEST_HOST) is not a descendant of $(TARGET_BUILD_DIR)
+
             public ProjectBuildConfigurationForUnitTestTarget(Project.Configuration configuration, ProjectTarget target, Options.ExplicitOptions options)
                 : base(ItemSection.XCBuildConfiguration_UnitTestTarget, configuration, target, options)
-            { }
+            {
+                _UnitTestFilesExclude = XCodeUtil.XCodeFormatList(configuration.XcodeResolvedUnitTestSourceFilesBuildExclude, 4);
+                _SymRoot = Path.GetDirectoryName(ProjectOutputFile.GetFullPathFromConfiguration(configuration, forTestBundle: true, configuration.Project.XcodeUnitTestTargetName));
+            }
 
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 string testHostParam = RemoveLineTag;
 
                 var nativeTarget = Target as ProjectNativeTarget;
-                if (nativeTarget == null)
-                    return;
-
-                // Lookup for the app in the unit test dependencies.
-                ProjectTargetDependency testHostTargetDependency =
-                    nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null && dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.AppleApp);
-
-                if (testHostTargetDependency != null)
+                if (nativeTarget != null)
                 {
-                    ProjectNativeTarget testHostTarget = testHostTargetDependency.NativeTarget;
+                    // Lookup for the app in the unit test dependencies.
+                    ProjectTargetDependency testHostTargetDependency =
+                        nativeTarget.Dependencies.Find(dependency => dependency.NativeTarget != null &&
+                        dependency.NativeTarget.OutputFile.OutputType == Project.Configuration.OutputType.AppleApp &&
+                        dependency.NativeTarget.ConfigurationList.Configurations.First(conf => (conf.Configuration.Name == this.Configuration.Name)).Configuration != null);
 
-                    // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration.
-                    // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app)
-                    // that match the unit tests bundle ProjectBuildConfiguration.
-                    Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
+                    if (testHostTargetDependency != null)
+                    {
+                        ProjectNativeTarget testHostTarget = testHostTargetDependency.NativeTarget;
 
-                    testHostParam = string.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}{2}/{0}{1}", testHostTarget.Identifier, testConfig.TargetFileSuffix, testConfig.Output);
+                        // Each ProjectNativeTarget have a list of ProjectBuildConfiguration that wrap a Project.Configuration.
+                        // Here we look for the Project.Configuration in the ProjectBuildConfiguration list of the test host target (app)
+                        // that match the unit tests bundle ProjectBuildConfiguration.
+                        Project.Configuration testConfig = testHostTarget.ConfigurationList.Configurations.First(config => config.Configuration.Name == this.Configuration.Name).Configuration;
+
+                        testHostParam = String.Format("$(BUILT_PRODUCTS_DIR)/{0}{1}/$(BUNDLE_EXECUTABLE_FOLDER_PATH){0}", testConfig.TargetFileName, testConfig.TargetFileFullExtension);
+                    }
                 }
 
                 resolverParameters.Add("testHost", testHostParam);
+
+                resolverParameters.Add("ExcludedSourceFileNames", _UnitTestFilesExclude);
+                resolverParameters.Add("SymRoot", _SymRoot);
             }
         }
 

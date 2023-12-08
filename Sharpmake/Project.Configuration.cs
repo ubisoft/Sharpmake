@@ -2582,6 +2582,33 @@ namespace Sharpmake
 
             public Strings ResolvedSourceFilesBuildExclude = new Strings();
 
+            private Strings _XcodeUnitTestSourceFilesBuildExclude = null;
+            public Strings XcodeUnitTestSourceFilesBuildExclude
+            {
+                get
+                {
+                    if (_XcodeUnitTestSourceFilesBuildExclude == null)
+                    {
+                        _XcodeUnitTestSourceFilesBuildExclude = new Strings();
+                    }
+                    return _XcodeUnitTestSourceFilesBuildExclude;
+                }
+                private set { _XcodeUnitTestSourceFilesBuildExclude = value; }
+            }
+            private Strings _XcodeResolvedUnitTestSourceFilesBuildExclude = null;
+            public Strings XcodeResolvedUnitTestSourceFilesBuildExclude
+            {
+                get
+                {
+                    if (_XcodeResolvedUnitTestSourceFilesBuildExclude == null)
+                    {
+                        _XcodeResolvedUnitTestSourceFilesBuildExclude = new Strings();
+                    }
+                    return _XcodeResolvedUnitTestSourceFilesBuildExclude;
+                }
+                private set { _XcodeResolvedUnitTestSourceFilesBuildExclude = value; }
+            }
+
             public Strings ResolvedSourceFilesBlobExclude = new Strings();
 
             public Strings ResolvedSourceFilesGenerateXmlDocumentationExclude = new Strings();

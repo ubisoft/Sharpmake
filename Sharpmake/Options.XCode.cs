@@ -333,6 +333,15 @@ namespace Sharpmake
                     }
                 }
 
+                public class UnitTestInfoPListFile
+                {
+                    public string Value;
+                    public UnitTestInfoPListFile(string value)
+                    {
+                        Value = value;
+                    }
+                }
+
                 public enum ICloud
                 {
                     [Default]

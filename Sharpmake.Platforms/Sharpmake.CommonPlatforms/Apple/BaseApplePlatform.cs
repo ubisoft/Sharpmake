@@ -793,6 +793,12 @@ namespace Sharpmake
             else
                 options["InfoPListFile"] = FileGeneratorUtilities.RemoveLineTag;
 
+            Options.XCode.Compiler.UnitTestInfoPListFile unitTestInfoPListFile = Options.GetObject<Options.XCode.Compiler.UnitTestInfoPListFile>(conf);
+            if (unitTestInfoPListFile != null)
+                options["UnitTestInfoPListFile"] = XCodeUtil.ResolveProjectPaths(project, unitTestInfoPListFile.Value);
+            else
+                options["UnitTestInfoPListFile"] = FileGeneratorUtilities.RemoveLineTag;
+
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.ICloud.Disable, () => options["iCloud"] = "0"),
                 Options.Option(Options.XCode.Compiler.ICloud.Enable, () => options["iCloud"] = "1")
