@@ -45,7 +45,7 @@ namespace Sharpmake.UnitTests
             xcodePrj._projectItems.Add(projectSourcesBuildPhase);
             xcodePrj._sourcesBuildPhases.Add(xCodeTargetName, projectSourcesBuildPhase);
             xcodePrj.SetRootGroup(project, configuration);
-            xcodePrj.PrepareSourceFiles(xCodeTargetName, sourceFiles, project, configuration);
+            xcodePrj.PrepareSourceFiles(xCodeTargetName, sourceFiles, project, configuration, false);
             var compileSources = xcodePrj._projectItems.Where(item => item is ProjectBuildFile);
 
             Assert.IsTrue(compileSources.Count() == 0);

@@ -472,6 +472,20 @@
                 "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_mac_xcode.xcworkspace\" -configuration {configuration}_fastbuild -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme \"GetBrightness FastBuild\"",
                 "./Compile.ps1 -slnOrPrjFile \"XCodeProjects_mac_xcode.xcworkspace\" -configuration {configuration}_fastbuild -WorkingDirectory \"{testFolder}/temp/solutions\" -compiler xcode -scheme \"SetBrightness FastBuild\""
             ]
+        },
+        {
+            "Name": "HelloIOS",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "macos" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
+            "TestFolder": "samples/HelloIOS",
+            "Commands":
+            [
+                "xcodebuild -version",
+                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
+                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_ios.xcworkspace -configuration {configuration} -scheme exe_ios -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12 Pro' test -derivedDataPath {testFolder}/test"
+            ]
         }
     ]
 }
