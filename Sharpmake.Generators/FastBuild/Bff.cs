@@ -535,7 +535,10 @@ namespace Sharpmake.Generators.FastBuild
                                 }
                             }
 
-                            if (isFirstSubConfig) // pre-build steps on the first config
+                            // When we have a Library/Dll/Executable section, put the prebuild dependencies there (which is the last subconfig).
+                            // Otherwise put it on the first object list
+                            var preBuildTargetsOnLastSubconfig = isOutputTypeExeOrDllOrAppleApp || (isOutputTypeLib && !confUseLibraryDependencyInputs);
+                            if ((preBuildTargetsOnLastSubconfig && isLastSubConfig) || (!preBuildTargetsOnLastSubconfig && isFirstSubConfig))
                             {
                                 // the pre-steps are written in the master bff, we only need to refer their aliases
                                 preBuildTargets.AddRange(conf.EventPreBuildExecute.Select(e => e.Key));
@@ -1038,12 +1041,23 @@ namespace Sharpmake.Generators.FastBuild
                                 return false;
                             });
 
-                        fastBuildBuildOnlyDependencies.AddRange(fileCustomBuildKeys);
-
                         Strings fastBuildPreBuildDependencies = new Strings();
                         var orderedForceUsingDeps = UtilityMethods.GetOrderedFlattenedProjectDependencies(conf, false, true);
                         fastBuildPreBuildDependencies.AddRange(orderedForceUsingDeps.Select(dep => GetShortProjectName(dep.Project, dep)));
-                        fastBuildPreBuildDependencies.AddRange(preBuildTargets);
+
+                        // fastBuildBuildOnlyDependencies only gets added to exe/dll sections.
+                        // Add the prebuild steps to fastBuildPreBuildDependencies if we are building a lib
+                        if (isOutputTypeExeOrDllOrAppleApp)
+                        {
+                            fastBuildBuildOnlyDependencies.AddRange(preBuildTargets);
+                            fastBuildBuildOnlyDependencies.AddRange(fileCustomBuildKeys);
+                        }
+                        else if (isOutputTypeLib)
+                        {
+                            fastBuildPreBuildDependencies.AddRange(preBuildTargets);
+                            if (isLastSubConfig)
+                                fastBuildPreBuildDependencies.AddRange(fileCustomBuildKeys);
+                        }
 
                         if (projectHasResourceFiles)
                             resourceFilesSections.Add(fastBuildOutputFileShortName + "_resources");
