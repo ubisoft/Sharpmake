@@ -27,9 +27,6 @@
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v142</PlatformToolset>
     <EnableUnitySupport>true</EnableUnitySupport>
-    <MaxFilesInUnityFile>0</MaxFilesInUnityFile>
-    <MinFilesInUnityFile>2</MinFilesInUnityFile>
-    <MinUnityFiles>1</MinUnityFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -38,9 +35,6 @@
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v142</PlatformToolset>
     <EnableUnitySupport>true</EnableUnitySupport>
-    <MaxFilesInUnityFile>0</MaxFilesInUnityFile>
-    <MinFilesInUnityFile>2</MinFilesInUnityFile>
-    <MinUnityFiles>1</MinUnityFiles>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -122,6 +116,9 @@
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ProgramDatabaseFileName>obj\win64\debug\jumbobuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MaxFilesInUnityFile>0</MaxFilesInUnityFile>
+      <MinFilesInUnityFile>2</MinFilesInUnityFile>
+      <MinUnityFiles>1</MinUnityFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -203,6 +200,9 @@
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ProgramDatabaseFileName>obj\win64\release\jumbobuild_compiler.pdb</ProgramDatabaseFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MaxFilesInUnityFile>0</MaxFilesInUnityFile>
+      <MinFilesInUnityFile>2</MinFilesInUnityFile>
+      <MinUnityFiles>1</MinUnityFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
