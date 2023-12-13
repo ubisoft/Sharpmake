@@ -175,7 +175,6 @@ namespace Sharpmake
     <TranslateIncludes>[options.TranslateIncludes]</TranslateIncludes>
     <CharacterSet>[options.CharacterSet]</CharacterSet>
     <UseOfMfc>[options.UseOfMfc]</UseOfMfc>
-    <CLRSupport>[clrSupport]</CLRSupport>
     <WholeProgramOptimization>[options.WholeProgramOptimization]</WholeProgramOptimization>
     <PlatformToolset>[options.PlatformToolset]</PlatformToolset>
     <TrackFileAccess>[options.TrackFileAccess]</TrackFileAccess>

@@ -419,7 +419,15 @@ namespace Sharpmake
                     SafeMsilClrSupport,  // clr:safe
 
                     [Obsolete("This option is not supported by msvc anymore.", true)]
-                    SafeMsilClrSupportOldSyntax  // clr:oldSyntax
+                    SafeMsilClrSupportOldSyntax,  // clr:oldSyntax
+
+                    /// <summary>
+                    /// Common Language RunTime Support for .NET Core
+                    /// </summary>
+                    /// <remarks>
+                    /// Creates metadata and code for the component using the latest cross-platform .NET framework, also known as .NET Core. The metadata can be consumed by other .NET Core applications. And, the option enables the component to consume types and data in the metadata of other .NET Core components.
+                    /// </remarks>
+                    ClrNetCoreSupport // clr:netcore
                 }
 
                 public enum MfcSupport
