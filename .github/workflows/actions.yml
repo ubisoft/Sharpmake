@@ -108,7 +108,7 @@ jobs:
 
       - name: Store MSBuild binary logs
         if: ${{ failure() && runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sharpmake-sample-msbuild-logs-${{ matrix.name }}-${{ matrix.framework }}-${{ runner.os }}-${{ github.sha }}-${{ matrix.configuration }}
           path: samples/**/*.binlog
