@@ -112,6 +112,8 @@ namespace CLR_SharpmakeTest
 
             // Force RTTI to be enabled
             conf.Options.Add(Sharpmake.Options.Vc.Compiler.RTTI.Enable);
+
+            conf.Options.Add(Sharpmake.Options.Vc.General.CommonLanguageRuntimeSupport.ClrSupport);
         }
     }
 

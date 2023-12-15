@@ -431,6 +431,17 @@ namespace Sharpmake.Generators.VisualStudio
             fileGenerator.Write(Template.Project.PropertyGroupEnd);
             // xml end header
 
+            if (clrSupport && firstConf.FrameworkReferences.Count > 0)
+            {
+                fileGenerator.Write(Template.Project.ItemGroupBegin);
+
+                foreach (var frameworkReference in firstConf.FrameworkReferences)
+                    using (fileGenerator.Declare("include", frameworkReference))
+                        fileGenerator.Write(CSproj.Template.ItemGroups.FrameworkReference);
+
+                fileGenerator.Write(Template.Project.ItemGroupEnd);
+            }
+
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GeneratePlatformSpecificProjectDescription(context, fileGenerator);
 
@@ -454,20 +465,9 @@ namespace Sharpmake.Generators.VisualStudio
                 {
                     context.Configuration = conf;
 
-                    string clrSupportString = FileGeneratorUtilities.RemoveLineTag;
-
-                    if (!conf.IsFastBuild && clrSupport)
-                    {
-                        var dotnetFrameWork = firstConf.Target.GetFragment<DotNetFramework>();
-
-                        // .Net Core requires "NetCore" instead of "true", see: https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli
-                        clrSupportString = dotnetFrameWork.IsDotNetCore() ? "NetCore" : clrSupport.ToString().ToLower();
-                    }
-
                     using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
                     using (fileGenerator.Declare("conf", conf))
                     using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                    using (fileGenerator.Declare("clrSupport", clrSupportString))
                     {
                         var platformVcxproj = context.PresentPlatforms[conf.Platform];
                         platformVcxproj.GenerateProjectConfigurationGeneral(context, fileGenerator);
@@ -622,7 +622,6 @@ namespace Sharpmake.Generators.VisualStudio
                         using (fileGenerator.Declare("project", conf.Project))
                         using (fileGenerator.Declare("target", conf.Target))
                         using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
-                        using (fileGenerator.Declare("clrSupport", !clrSupport ? FileGeneratorUtilities.RemoveLineTag : clrSupport.ToString().ToLower()))
                         using (fileGenerator.Declare("compileAsManaged", compileAsManagedString))
                         {
                             fileGenerator.Write(Template.Project.ProjectConfigurationBeginItemDefinition);
