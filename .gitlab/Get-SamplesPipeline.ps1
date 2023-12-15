@@ -47,7 +47,7 @@ foreach ($sample in $samplesDef.Samples)
                             # Install Powershell on Alpine (https://learn.microsoft.com/en-us/powershell/scripting/install/install-alpine?view=powershell-7.2)
                             # Required to run RunSample.ps1.
                             $script += @(
-                                'apk add --no-cache ca-certificates less ncurses-terminfo-base krb5-libs libgcc libintl libssl1.1 libstdc++ tzdata userspace-rcu zlib icu-libs curl'
+                                'apk add --no-cache ca-certificates less ncurses-terminfo-base krb5-libs libgcc libintl libssl3 libstdc++ tzdata userspace-rcu zlib icu-libs curl'
                                 'apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache lttng-ust'
                                 'curl -L https://github.com/PowerShell/PowerShell/releases/download/v7.2.11/powershell-7.2.11-linux-alpine-x64.tar.gz -o /tmp/powershell.tar.gz'
                                 'mkdir -p /opt/microsoft/powershell/7'
