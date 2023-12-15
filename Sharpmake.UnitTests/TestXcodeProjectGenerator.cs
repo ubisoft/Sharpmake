@@ -50,5 +50,29 @@ namespace Sharpmake.UnitTests
 
             Assert.IsTrue(compileSources.Count() == 0);
         }
+
+        [Test]
+        public void TestGetLongestCommonPath()
+        {
+            string folder = "sourceroot";
+            string refFolder = "differentSourceRoot";
+            string retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
+            Assert.IsTrue(retFolder.Equals(string.Empty));
+
+            folder = "sourceRoot/source";
+            refFolder = "sourceRoot";
+            retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
+            Assert.IsTrue(retFolder.Equals("sourceRoot/source"));
+
+            folder = "sourceRoot/source";
+            refFolder = "sourceRoot/other";
+            retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
+            Assert.IsTrue(retFolder.Equals("sourceRoot/source"));
+
+            folder = "sourceRoot";
+            refFolder = "sourceRoot/source";
+            retFolder = XCodeProj.GetLongestCommonPath(folder, refFolder);
+            Assert.IsTrue(retFolder.Equals("sourceRoot"));
+        }
     }
 }

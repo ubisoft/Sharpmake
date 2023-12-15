@@ -89,6 +89,8 @@ namespace Sharpmake.Generators.Apple
 
         private Dictionary<Project.Configuration, Options.ExplicitOptions> _optionMapping = null;
 
+        private string _projectSourceRootPath = null;
+
         // Unit Test Variables
         private string _unitTestFramework = "XCTest";
 
@@ -126,6 +128,8 @@ namespace Sharpmake.Generators.Apple
             List<string> skipFiles
         )
         {
+            _projectSourceRootPath = project.SourceRootPath;
+
             FileInfo fileInfo = new FileInfo(projectFile);
             string projectPath = fileInfo.Directory.FullName;
             string projectFileName = fileInfo.Name;
@@ -344,12 +348,77 @@ namespace Sharpmake.Generators.Apple
             return fileGenerator;
         }
 
+        /// <summary>
+        /// Get the possible next folder against the longest common path.
+        /// - the string.Empty will be returned if no common path found;
+        /// - the 'inFolder' will be returned if 'refFolder' start of it;
+        /// example,
+        /// 'inFolder=sourceRoot', 'refFolder=differentSourceRoot', return should be string.Empty
+        /// 'inFolder=sourceRoot/source', 'refFolder=sourceRoot', return should be 'sourceRoot/source'
+        /// 'inFolder=sourceRoot', 'refFolder=sourceRoot/source', return should be 'sourceRoot'
+        /// </summary>
+        /// <param name="inFolder"></param>
+        /// <param name="refFolder"></param>
+        /// <returns></returns>
+        internal static string GetLongestCommonPath(string inFolder, string refFolder)
+        {
+            string[] folders = inFolder.Split(FolderSeparator);
+            string[] refFolders = refFolder.Split(FolderSeparator);
+
+            int nbrCommonFolders = 0;
+            int maxNbrFolders = Math.Min(folders.Length, refFolders.Length);
+            for (int i = 0; i < maxNbrFolders; ++i)
+            {
+                if (folders[i].Equals(refFolders[i]))
+                {
+                    ++nbrCommonFolders;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (nbrCommonFolders > 0)
+                return string.Join(FolderSeparator, folders, 0, Math.Min(nbrCommonFolders + 1, folders.Length));
+            return string.Empty;
+        }
+
         private void PrepareSourceRootFolders(Project project, Project.Configuration configuration)
         {
             List<string> folders = new List<string>();
-            folders.Add(project.SourceRootPath);
+
+            // Add subfolders instead of SourceRootPath to make the project's hierarchy looks like VS
+            foreach (var folder in Directory.GetDirectories(project.SourceRootPath))
+                folders.Add(folder);
+
             foreach (var folder in project.AdditionalSourceRootPaths)
             {
+                // suppose 'workspaceFolder/projectA/tmp/autogen' in AdditionalSourceRootPaths
+                // SourceRootPath=workspaceFolder/projectA/src
+                // then 'workspaceFolder/projectA/tmp' is expected to be added into 'folders'.
+                // 'workspaceFolder/projectA/tmp/autogen' will be added later as child of ProjectFolder(workspaceFolder/projectA/tmp) in AddInFileSystem() if there's any file under 'workspaceFolder/projectA/tmp/autogen'
+                string candidateFolder = GetLongestCommonPath(folder, project.SourceRootPath);
+                if (candidateFolder.Equals(string.Empty))
+                {
+                    candidateFolder = folder;
+                }
+                if (folders.Contains(candidateFolder))
+                    continue;
+                folders.Add(candidateFolder);
+            }
+
+            // blob path
+            foreach (var conf in project.Configurations)
+            {
+                if (!conf.IsBlobbed)
+                    continue;
+                string folder = GetLongestCommonPath(conf.BlobPath, project.SourceRootPath);
+                if (folder.Equals(string.Empty))
+                {
+                    folder = conf.BlobPath;
+                }
+                if (folders.Contains(folder))
+                    continue;
                 folders.Add(folder);
             }
 
@@ -357,7 +426,7 @@ namespace Sharpmake.Generators.Apple
             // add source root folders
             foreach (string folder in folders)
             {
-                AddFolderInFileSystem(folder, projectPath);
+                AddOrGetFolderInFileSystem(folder, projectPath);
             }
         }
 
@@ -1049,7 +1118,7 @@ popd";
                 ProjectFileSystemItem item = AddInFileSystem(file, out alreadyPresent, workspacePath, true);
                 if (alreadyPresent)
                     continue;
-
+                item.Source = true;
                 item.Build = build;
                 if (build)
                 {
@@ -1260,18 +1329,18 @@ popd";
             }
         }
 
-        private void AddFolderInFileSystem(string folder, string workspacePath = null)
+        private ProjectFolder AddOrGetFolderInFileSystem(string folder, string workspacePath = null)
         {
             // Search in existing roots.
-            var fileSystemItems = _projectItems.Where(item => item is ProjectFileSystemItem && item.Section == ItemSection.PBXGroup);
-            foreach (ProjectFileSystemItem item in fileSystemItems)
+            foreach (ProjectFolder item in _projectItems.Where(item => item is ProjectFolder))
             {
+                if (folder.Equals(item.FullPath, StringComparison.OrdinalIgnoreCase))
+                    return item;
                 if (folder.StartsWith(item.FullPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                 {
                     if (folder.Length > item.FullPath.Length)
                     {
-                        AddFolderInFileSystem(item, folder.Substring(item.FullPath.Length + 1), workspacePath);
-                        return;
+                        return AddFolderInFileSystem(item, folder.Substring(item.FullPath.Length + 1), workspacePath);
                     }
                 }
             }
@@ -1280,16 +1349,17 @@ popd";
             ProjectFolder projectFolder = workspacePath != null ? new ProjectExternalFolder(folder, workspacePath) : new ProjectFolder(folder);
             _projectItems.Add(projectFolder);
             _mainGroup.Children.Insert(0, projectFolder);
+            return projectFolder;
         }
 
-        private void AddFolderInFileSystem(ProjectFileSystemItem parent, string remainingPath, string workspacePath = null)
+        private ProjectFolder AddFolderInFileSystem(ProjectFolder parent, string remainingPath, string workspacePath = null)
         {
             string[] remainingPathParts = remainingPath.Split(FolderSeparator);
             for (int i = 0; i < remainingPathParts.Length; i++)
             {
                 bool found = false;
                 string remainingPathPart = remainingPathParts[i];
-                foreach (ProjectFileSystemItem item in parent.Children)
+                foreach (ProjectFolder item in parent.Children.Where(item => item is ProjectFolder))
                 {
                     if (remainingPathPart == item.Name)
                     {
@@ -1308,71 +1378,53 @@ popd";
                     parent = folder;
                 }
             }
+
+            return parent;
+        }
+
+        private ProjectFile FindFileInFileSystem(ProjectFileSystemItem file)
+        {
+            ProjectItem itemFound;
+            return _projectItems.TryGetValue(file, out itemFound) ? itemFound as ProjectFile : null;
         }
 
         private ProjectFileSystemItem AddInFileSystem(string fullPath, out bool alreadyPresent, string workspacePath = null, bool applyWorkspaceOnlyToRoot = false)
         {
-            // Search in existing roots.
-            var fileSystemItems = _projectItems.Where(item => item is ProjectFileSystemItem && item.Section == ItemSection.PBXGroup);
-            foreach (ProjectFileSystemItem item in fileSystemItems)
+            // if file is under SourceRootPath, add it onto _mainGroup directly to make the project's hierarchy similar to VS 
+            if (Path.GetDirectoryName(fullPath).Equals(_projectSourceRootPath, StringComparison.OrdinalIgnoreCase))
             {
-                if (fullPath.StartsWith(item.FullPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                ProjectFileSystemItem candidateFile = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
+                ProjectFile file = FindFileInFileSystem(candidateFile);
+                alreadyPresent = file != null;
+                if (alreadyPresent)
                 {
-                    if (fullPath.Length > item.FullPath.Length)
-                        return AddInFileSystem(item, out alreadyPresent, fullPath.Substring(item.FullPath.Length + 1), applyWorkspaceOnlyToRoot ? null : workspacePath);
+                    return file;
                 }
+
+                _projectItems.Add(candidateFile);
+                _mainGroup.Children.Add(candidateFile);
+                return candidateFile;
             }
-            // Not found in existing root, create a new root for this item.
-            string fileFolder = Directory.GetParent(fullPath).FullName;
-            AddFolderInFileSystem(fileFolder, workspacePath);
+
+            ProjectFolder folder = AddOrGetFolderInFileSystem(Directory.GetParent(fullPath).FullName, workspacePath);
             // add the file
-            return AddInFileSystem(fullPath, out alreadyPresent, workspacePath, applyWorkspaceOnlyToRoot);
+            return AddInFileSystem(folder, out alreadyPresent, Path.GetFileName(fullPath), applyWorkspaceOnlyToRoot ? null : workspacePath);
         }
 
-        private ProjectFileSystemItem AddInFileSystem(ProjectFileSystemItem parent, out bool alreadyPresent, string remainingPath, string workspacePath)
+        private ProjectFileSystemItem AddInFileSystem(ProjectFolder parent, out bool alreadyPresent, string fileName, string workspacePath)
         {
-            alreadyPresent = false;
-
-            string[] remainingPathParts = remainingPath.Split(FolderSeparator);
-            for (int i = 0; i < remainingPathParts.Length; i++)
+            ProjectFileSystemItem file = parent.Children.FirstOrDefault(item => item.FileName.Equals(fileName));
+            alreadyPresent = file != null;
+            if (alreadyPresent)
             {
-                bool found = false;
-                string remainingPathPart = remainingPathParts[i];
-                foreach (ProjectFileSystemItem item in parent.Children)
-                {
-                    if (remainingPathPart == item.Name)
-                    {
-                        parent = item;
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                {
-                    if (i == remainingPathParts.Length - 1)
-                    {
-                        string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
-                        ProjectFile file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
-                        _projectItems.Add(file);
-                        parent.Children.Add(file);
-                        return file;
-                    }
-                    else
-                    {
-                        string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
-                        ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(fullPath, workspacePath) : new ProjectFolder(fullPath);
-                        _projectItems.Add(folder);
-                        parent.Children.Add(folder);
-                        parent = folder;
-                    }
-                }
-                else if (i == remainingPathParts.Length - 1)
-                {
-                    alreadyPresent = true;
-                }
+                return file;
             }
-            return parent;
+
+            string fullPath = parent.FullPath + FolderSeparator + fileName;
+            file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
+            _projectItems.Add(file);
+            parent.Children.Add(file);
+            return file;
         }
 
         private void RemoveFromFileSystem(ProjectFileSystemItem fileSystemItem)
