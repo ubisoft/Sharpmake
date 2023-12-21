@@ -2593,6 +2593,10 @@ namespace Sharpmake
         private List<string> _filteredEmbeddedAssemblies = null;
         public virtual string GetLinkFolder(string file)
         {
+            // file is under the influence of the project and is not a link
+            if (Util.PathIsUnderRoot(RootPath, file))
+                return null;
+
             if (PreserveLinkFolderPaths)
             {
                 string relativePath = Util.PathGetRelative(SourceRootPath, Path.GetDirectoryName(file));

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -804,6 +803,81 @@ namespace Sharpmake
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Checks is pathToTest is a subfolder or file under the rootPath directory. 
+        /// </summary>
+        /// <param name="rootPath">An absolute path to a directory or a file considered as the root for the test and resolivng relative paths.
+        /// If a file path is used, the file's direct parent directory will be used.</param>
+        /// <param name="pathToTest">An absolute or relative path to a file or directory to be tested.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static bool PathIsUnderRoot(string rootPath, string pathToTest) 
+        {
+            if (!Path.IsPathFullyQualified(rootPath))
+                throw new ArgumentException("rootPath needs to be absolute.", nameof(rootPath));
+
+            if (!Path.IsPathFullyQualified(pathToTest))
+                pathToTest = Path.GetFullPath(pathToTest, rootPath);
+
+            var intersection = GetPathIntersection(rootPath, pathToTest);
+
+            if(string.IsNullOrEmpty(intersection)) 
+                return false;
+
+            if (!Util.PathIsSame(intersection, rootPath))
+            {
+                if(rootPath.EndsWith(Path.DirectorySeparatorChar))
+                    return false;
+
+                // only way to make sure path point to file is to check on disk
+                // if file doesn't exist, treats this edge case as if path wasn't a file path
+                var fileInfo = new FileInfo(rootPath);
+                if(fileInfo.Exists && Util.PathIsSame(intersection, fileInfo.DirectoryName))
+                    return true; 
+                
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Removes every occurance of dotdot ("../") from the beginning of a relative path and returns it. 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string TrimAllLeadingDotDot(string path)
+        {
+            var spanStartIndex = 0;
+            ReadOnlySpan<char> trimmedSpan = path.AsSpan().Slice(start: spanStartIndex);
+            var platformSpecificDotDot = new List<string>();
+
+            foreach (var platformSeparator in _pathSeparators)
+            {
+                platformSpecificDotDot.Add(".." + platformSeparator);
+            }
+
+            var keepTrimming = true;
+            while (keepTrimming)
+            {
+                keepTrimming = false;
+
+                foreach (var dotdot in platformSpecificDotDot)
+                {
+                    if (trimmedSpan.StartsWith(dotdot))
+                    {
+                        spanStartIndex += dotdot.Length;
+                        trimmedSpan = path.AsSpan().Slice(start: spanStartIndex);
+
+                        keepTrimming = true;
+                        break;
+                    }
+                }
+            }
+
+            return trimmedSpan.ToString();
         }
     }
 }
