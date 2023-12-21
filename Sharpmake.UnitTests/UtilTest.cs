@@ -1642,4 +1642,113 @@ namespace Sharpmake.UnitTests
             Assert.That(list.Count, Is.EqualTo(1));
         }
     }
+
+    [TestFixture]
+    public class PathIsUnderRoot
+    {
+        [Test]
+        public void PathCombinationAbsoluteRelative()
+        {
+            var rootPath = "D:\\versioncontrol\\solutionname\\projectname\\src\\";
+
+            var absoluteFilePathUnderRoot = rootPath + "\\code\\factory.cs";
+            var absoluteFolderPathUnderRoot = rootPath + "\\code\\";
+            var relativeFilePathUnderRoot = "..\\src\\code\\factory.cs";
+            var relativeFolderPathUnderRoot = "..\\src\\code\\";
+
+            var absoluteFilePathNotUnderRoot = "C:\\.nuget\\dd\\llvm\\build\\native\\llvm.sharpmake.cs";
+            var absoluteFolderPathNotUnderRoot = "C:\\.nuget\\dd\\llvm\\build\\native\\";
+            var relativeFilePathNotUnderRoot = "..\\otherfolder\\code\\factory.cs";
+            var relativeFolderPathNotUnderRoot = "..\\otherfolder\\code\\";
+
+            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, absoluteFilePathUnderRoot));
+            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, absoluteFolderPathUnderRoot));
+            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, relativeFilePathUnderRoot));
+            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, relativeFolderPathUnderRoot));
+
+            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, absoluteFilePathNotUnderRoot));
+            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, absoluteFolderPathNotUnderRoot));
+            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, relativeFilePathNotUnderRoot));
+            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, relativeFolderPathNotUnderRoot));
+
+        }
+
+        [Test]
+        public void AssertsOnInvalidArguments()
+        {
+            var invalidRootPath = "projectname\\src\\";
+            var relativeFilePathUnderRoot = "..\\src\\code\\factory.cs";
+
+            Assert.Throws<ArgumentException>(() => Util.PathIsUnderRoot(invalidRootPath, relativeFilePathUnderRoot));
+        }
+
+        [Test]
+        public void RootFolderWithDotInName()
+        {
+            var rootPath = "D:\\versioncontrol\\solutionname\\projectname\\src\\version0.1";
+            var pathNotUnderRoot = "C:\\.nuget\\dd\\androidsdk";
+            var pathUnderRoot = rootPath + "\\foo\\bar";
+
+            Assert.IsFalse(Util.PathIsUnderRoot(rootPath, pathNotUnderRoot));
+            Assert.IsTrue(Util.PathIsUnderRoot(rootPath, pathUnderRoot));
+        }
+
+        [Test]
+        public void RootFilePath()
+        {
+            var root = @"..\..\..\..\samples\CPPCLI\";
+            root = Path.GetFullPath(root);
+            var rootWithFile = root + "CLRTest.sharpmake.cs";
+            var pathUnderRoot = root + "\\foo\\bar";
+
+            Assert.IsTrue(Util.PathIsUnderRoot(rootWithFile, pathUnderRoot));
+        }
+
+        [Test]
+        public void RootDirectoryPathOneIntersectionAway()
+        {
+            var root = @"D:\versioncontrol\solutionname\projectname\";
+            var rootWithExtraDir = root + "CLRTest";
+            var pathNotUnderRoot = root + @"\foo\";
+
+            Assert.IsFalse(Util.PathIsUnderRoot(rootWithExtraDir, pathNotUnderRoot));
+        }
+    }
+
+    [TestFixture]
+    public class TrimAllLeadingDotDot
+    {
+        [Test]
+        public void TrimsRelativePath()
+        {
+            var windowsFilePath = "..\\..\\..\\code\\file.cs";
+            var windowsFolderPath = "..\\..\\..\\code\\";
+            var unixFilePath = "../../../code/file.cs";
+            var unixFolderPath = "../../../code/";
+
+            Assert.AreEqual("code\\file.cs", Util.TrimAllLeadingDotDot(windowsFilePath));
+            Assert.AreEqual(Util.TrimAllLeadingDotDot(windowsFolderPath), "code\\");
+            Assert.AreEqual(Util.TrimAllLeadingDotDot(unixFilePath), "code/file.cs");
+            Assert.AreEqual(Util.TrimAllLeadingDotDot(unixFolderPath), "code/");
+        }
+
+
+        [Test]
+        public void DoesntTrimFolderNames()
+        {
+            var dotFolderRelativeWindows = "..\\.nuget\\packages";
+            var dotFolderRelativeUnix = "../.nuget/packages";
+
+            Assert.AreEqual(Util.TrimAllLeadingDotDot(dotFolderRelativeWindows), ".nuget\\packages");
+            Assert.AreEqual(Util.TrimAllLeadingDotDot(dotFolderRelativeUnix), ".nuget/packages");
+        }
+
+        [Test]
+        public void TrimsMixedSeparators()
+        {
+            var mixedSeparatorPath = "..\\../..\\code\\";
+
+            Assert.AreEqual(Util.TrimAllLeadingDotDot(mixedSeparatorPath), "code\\");
+        }
+    }
 }

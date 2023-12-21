@@ -241,9 +241,15 @@ namespace Sharpmake.Generators.VisualStudio
             internal class ItemGroupItem : IComparable<ItemGroupItem>, IEquatable<ItemGroupItem>
             {
                 public string Include;
-                public string LinkFolder = string.Empty;
 
-                private bool IsLink { get { return Include.StartsWith("..", StringComparison.Ordinal); } }
+                // This property is used to decide if this object is a Link
+                // If LinkFolder is null, this item is ín the project folder and is not a link
+                // If LinkFolder is empty, this item is in the project's SourceRootPath or RootPath folder
+                //      which are outside of the Project folder and is a link.
+                // If LinkedFolder is a file path, it's a link. 
+                public string LinkFolder = null;
+
+                private bool IsLink { get { return LinkFolder != null; } }
 
                 private string Link
                 {
@@ -2840,22 +2846,53 @@ namespace Sharpmake.Generators.VisualStudio
             return FileAssociationType.Unknown;
         }
 
-        private static string GetProjectLinkedFolder(string sourceFile, string projectPath, Project project)
+        /// <summary>
+        /// Gets a string meant to be used as a ItemGroupItem.LinkedFolder. This property controlls how the items get organised
+        /// in the Solution Explorer in Visual Studio, otherwise known as filters. 
+        /// 
+        /// For relative paths, a filter is created by removing any "traverse parent folder" (../) elements from the beginning 
+        /// of the path and using the remaining folder structure. 
+        /// 
+        /// For absolute paths, the drive letter is removed and the remaining folder structuer is used. 
+        /// </summary>
+        /// <param name="sourceFile">Path to the ItemGroupItem's file.</param>
+        /// <param name="projectPath">Path to the folder in which the project file will be located.</param>
+        /// <param name="project">The Project which the ItemGroupItem is a part of.</param>
+        /// <returns>Returns null if the file is in or under the projectPath, meaning it's within the project's influencec and is not a link.
+        /// Return empty string if the file is in the project.SourceRootPath or project.RootPath, not under it
+        /// Returns a valid filter resembling a folder structure in any other case. 
+        /// </returns>
+        internal static string GetProjectLinkedFolder(string sourceFile, string projectPath, Project project)
         {
-            // Exit out early if the file is not a relative path.
-            if (!sourceFile.StartsWith("..", StringComparison.Ordinal))
-                return string.Empty;
-
+            // file is under the influence of the project and has no LinkFolder
+            if (Util.PathIsUnderRoot(projectPath, sourceFile))
+                return null;
+            
             string absoluteFile = Util.PathGetAbsolute(projectPath, sourceFile);
-
             var directoryName = Path.GetDirectoryName(absoluteFile);
-            if (directoryName.StartsWith(project.SourceRootPath, StringComparison.OrdinalIgnoreCase))
+
+            // for files under SourceRootPath or RootPath, we use the subfolder structure 
+            if (Util.PathIsUnderRoot(project.SourceRootPath, directoryName))
                 return directoryName.Substring(project.SourceRootPath.Length).Trim(Util._pathSeparators);
 
-            if (directoryName.StartsWith(project.RootPath))
+            if (Util.PathIsUnderRoot(project.RootPath, directoryName))
                 return directoryName.Substring(project.RootPath.Length).Trim(Util._pathSeparators);
+            
+            // Files outside all three project folders with and aboslute path use the
+            // entire folder structure without the drive letter as filter
+            if (Path.IsPathFullyQualified(sourceFile))
+            {
+                var root = Path.GetPathRoot(directoryName);
+                return directoryName.Substring(root.Length).Trim(Util._pathSeparators);
+            }
 
-            return Path.GetFileName(directoryName);
+            // Files outside all three project folders with relative paths use their
+            // relative path with all the leading "traverse parent folder" (../) removed
+            // Example: "../../project/source/" becomes "project/source/"
+            var trimmedPath = Util.TrimAllLeadingDotDot(sourceFile);
+            var fileName = Path.GetFileName(absoluteFile);
+
+            return trimmedPath.Substring(0, trimmedPath.Length - fileName.Length).Trim(Util._pathSeparators);
         }
 
         private void WriteEvents(Dictionary<Project.Configuration, Options.ExplicitOptions> options, StreamWriter writer, Resolver resolver)
