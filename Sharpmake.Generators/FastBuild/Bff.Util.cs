@@ -1,4 +1,4 @@
-﻿// Copyright (c) Ubisoft. All Rights Reserved.
+// Copyright (c) Ubisoft. All Rights Reserved.
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
@@ -31,7 +31,7 @@ namespace Sharpmake.Generators.FastBuild
             public string UnityNumFiles = FileGeneratorUtilities.RemoveLineTag; // (optional) Number of Unity files to generate (default 1)
             public string UnityPCH = FileGeneratorUtilities.RemoveLineTag; // (optional) Precompiled Header file to add to generated Unity files
             public string UseRelativePaths = FileGeneratorUtilities.RemoveLineTag; // (optional) Use relative paths for generated Unity files
-
+            public Byte UnitySectionBucket = 0; // Internal sharpmake field used to force separate unity sections in certain cases.
             public const string DefaultUnityInputPatternExtension = ".cpp";
             public const string DefaultUnityOutputPatternExtension = "Unity*.cpp";
 
@@ -59,6 +59,7 @@ namespace Sharpmake.Generators.FastBuild
                     hash = hash * 23 + UnityNumFiles.GetDeterministicHashCode();
                     hash = hash * 23 + UnityPCH.GetDeterministicHashCode();
                     hash = hash * 23 + UseRelativePaths.GetDeterministicHashCode();
+                    hash = hash * 23 + UnitySectionBucket;
 
                     return hash;
                 }
@@ -94,7 +95,8 @@ namespace Sharpmake.Generators.FastBuild
                     && string.Equals(UnityOutputPattern, unity.UnityOutputPattern)
                     && string.Equals(UnityNumFiles, unity.UnityNumFiles)
                     && string.Equals(UnityPCH, unity.UnityPCH)
-                    && string.Equals(UseRelativePaths, unity.UseRelativePaths);
+                    && string.Equals(UseRelativePaths, unity.UseRelativePaths)
+                    && UnitySectionBucket == unity.UnitySectionBucket;
             }
         }
 
