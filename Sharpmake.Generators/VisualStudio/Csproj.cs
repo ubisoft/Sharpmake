@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using static Sharpmake.Solution.Configuration.IncludedProjectInfo;
 using StartActionSetting = Sharpmake.Project.Configuration.CsprojUserFileSettings.StartActionSetting;
 
 namespace Sharpmake.Generators.VisualStudio
