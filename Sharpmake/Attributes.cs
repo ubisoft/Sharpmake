@@ -141,10 +141,10 @@ namespace Sharpmake
     }
 
     /// <summary>
-    /// Marks elements of fragments that should not be considered individual fragments.
+    /// Marks elements of a fragment enum that should not be considered individual fragments.
     /// </summary>
     /// <remarks>
-    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensure that
+    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensures that
     /// each element sets 1 and only 1 bit. However, it is often useful in a bit enum to combine
     /// multiple bits together to create sets that go well together. To prevent Sharpmake from
     /// considering those errors, you must decorate these enum members with
@@ -152,6 +152,21 @@ namespace Sharpmake
     /// </remarks>
     [AttributeUsage(AttributeTargets.Field)]
     public class CompositeFragmentAttribute : Attribute
+    {
+    }
+
+    /// <summary>
+    /// Allows a field with a duplicate value in a fragment enum to be ignored.
+    /// </summary>
+    /// <remarks>
+    /// When an enumeration is marked with <see cref="Fragment"/>, Sharpmake normally ensures that
+    /// each element has a unique value. However, it is often useful in a bit enum to have special
+    /// values that represent sections or limits. To prevent Sharpmake from considering those
+    /// errors, you must decorate these enum members with
+    /// <see cref="IgnoreDuplicateFragmentValueAttribute"/>.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class IgnoreDuplicateFragmentValueAttribute : Attribute
     {
     }
 

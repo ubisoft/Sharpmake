@@ -110,6 +110,8 @@ namespace Sharpmake
         /// </summary>
         maccatalyst = 1 << 14,
 
+        [IgnoreDuplicateFragmentValue]
+        _reservedPlatformSection = 1 << 21, // This is a reverse-growing section for undisclosed platforms
         _reserved10 = 1 << 21,
         _reserved9 = 1 << 22,
         _reserved8 = 1 << 23,
@@ -314,7 +316,7 @@ namespace Sharpmake
                     if (value is Platform)
                     {
                         var platform = (Platform)value;
-                        if (platform >= Platform._reserved9)
+                        if (platform >= Platform._reservedPlatformSection)
                             return Util.GetPlatformString(platform, null, this).ToLower();
                     }
                     return value.ToString();
@@ -689,6 +691,10 @@ namespace Sharpmake
                     if (enumFields[i].GetCustomAttribute<CompositeFragmentAttribute>() != null)
                         continue;
 
+                    // skip duplicate fragment values that have been explicitely marked as ignored
+                    if (enumFields[i].GetCustomAttribute<IgnoreDuplicateFragmentValueAttribute>() != null)
+                        continue;
+
                     int enumFieldValue = (int)enumFields[i].GetRawConstantValue();
 
                     if (enumFieldValue == 0)
@@ -708,6 +714,10 @@ namespace Sharpmake
                                 continue;
 
                             if (enumFields[j].GetCustomAttribute<ObsoleteAttribute>() != null)
+                                continue;
+
+                            // skip duplicate fragment values that have been explicitely marked as ignored
+                            if (enumFields[j].GetCustomAttribute<IgnoreDuplicateFragmentValueAttribute>() != null)
                                 continue;
 
                             if (i != j)

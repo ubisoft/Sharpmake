@@ -112,7 +112,7 @@ namespace Sharpmake.Generators.FastBuild
             {
                 // use custom platform name if a reserved platform or append it if different
                 string fullPlatformString = Util.GetPlatformString(conf.Platform, project, conf.Target, isForSolution: false).ToLowerInvariant();
-                if (conf.Platform >= Platform._reserved9)
+                if (conf.Platform >= Platform._reservedPlatformSection)
                     platformString = fullPlatformString;
                 else if (!fullPlatformString.Equals(platformString, StringComparison.OrdinalIgnoreCase))
                     platformString += "_" + fullPlatformString;
