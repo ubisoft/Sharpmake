@@ -431,7 +431,7 @@ namespace Sharpmake.Generators.FastBuild
                         continue;
 
                     string platformString = platformEnum.ToString();
-                    if (platformEnum >= Platform._reserved9)
+                    if (platformEnum >= Platform._reservedPlatformSection)
                         platformString = Util.GetSimplePlatformString(platformEnum);
                     fragmentString += "_" + SanitizeForUnityName(platformString).ToLower();
                 }

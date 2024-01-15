@@ -967,7 +967,7 @@ namespace Sharpmake
                 if (typedFragment is Platform)
                 {
                     Platform platformFragment = (Platform)typedFragment;
-                    return platformFragment >= Platform._reserved9 ? Util.GetSimplePlatformString(platformFragment) : platformFragment.ToString();
+                    return platformFragment >= Platform._reservedPlatformSection ? Util.GetSimplePlatformString(platformFragment) : platformFragment.ToString();
                 }
                 return typedFragment.ToString();
             }
