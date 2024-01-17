@@ -1437,7 +1437,9 @@ namespace Sharpmake
         public static bool IsCpp(Project.Configuration conf)
         {
             string extension = Path.GetExtension(conf.ProjectFullFileNameWithExtension);
-            return (string.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0);
+            return (string.Compare(extension, ".vcxproj", StringComparison.OrdinalIgnoreCase) == 0) || 
+                   // RiderJson project files
+                   (string.Compare(extension, ".json", StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public static string GetProjectFileExtension(Project.Configuration conf)
@@ -1471,6 +1473,9 @@ namespace Sharpmake
 
                     case DevEnv.make:
                         return ".make";
+
+                    case DevEnv.rider:
+                        return ".json";
 
                     default:
                         throw new NotImplementedException("GetProjectFileExtension called with unknown DevEnv: " + devEnv);

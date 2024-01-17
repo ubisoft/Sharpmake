@@ -100,7 +100,12 @@ namespace Sharpmake
 
                 CompilerSettings compilerSettings = GetMasterCompilerSettings(masterCompilerSettings, compilerName, devEnv, projectRootPath, platformToolset, false);
                 compilerSettings.PlatformFlags |= Platform.win64;
-                SetConfiguration(conf, compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, false);
+                SetConfiguration(conf, compilerSettings.Configurations, CppConfigName(conf), projectRootPath, devEnv, platformToolset, false);
+            }
+
+            private static DevEnv? GetCompilerFromToolset(DevEnv devEnv, Options.Vc.General.PlatformToolset platformToolset)
+            {
+                return platformToolset == Options.Vc.General.PlatformToolset.Default ? devEnv : platformToolset.GetDefaultDevEnvForToolset();
             }
 
             public CompilerSettings GetMasterCompilerSettings(
@@ -120,33 +125,22 @@ namespace Sharpmake
                 }
                 else
                 {
-                    DevEnv? compilerDevEnv = null;
                     string platformToolSetPath = null;
                     string pathToCompiler = null;
                     string compilerExeName = null;
                     var compilerFamily = Sharpmake.CompilerFamily.Auto;
                     var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(Platform.win64);
+                    var compilerDevEnv = GetCompilerFromToolset(devEnv, platformToolset);
 
-                    switch (platformToolset)
+                    if (platformToolset.IsLLVMToolchain())
                     {
-                        case Options.Vc.General.PlatformToolset.Default:
-                            compilerDevEnv = devEnv;
-                            break;
-                        case Options.Vc.General.PlatformToolset.LLVM:
-                        case Options.Vc.General.PlatformToolset.ClangCL:
+                        platformToolSetPath = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.Settings.LLVMInstallDirVsEmbedded(devEnv) : ClangForWindows.Settings.LLVMInstallDir;
+                        pathToCompiler = Path.Combine(platformToolSetPath, "bin");
+                        compilerExeName = "clang-cl.exe";
 
-                            platformToolSetPath = platformToolset == Options.Vc.General.PlatformToolset.ClangCL ? ClangForWindows.Settings.LLVMInstallDirVsEmbedded(devEnv) : ClangForWindows.Settings.LLVMInstallDir;
-                            pathToCompiler = Path.Combine(platformToolSetPath, "bin");
-                            compilerExeName = "clang-cl.exe";
-
-                            var compilerFamilyKey = new FastBuildWindowsCompilerFamilyKey(devEnv, platformToolset);
-                            if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
-                                compilerFamily = Sharpmake.CompilerFamily.ClangCl;
-
-                            break;
-                        default:
-                            compilerDevEnv = platformToolset.GetDefaultDevEnvForToolset();
-                            break;
+                        var compilerFamilyKey = new FastBuildWindowsCompilerFamilyKey(devEnv, platformToolset);
+                        if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
+                            compilerFamily = Sharpmake.CompilerFamily.ClangCl;
                     }
 
                     if (compilerDevEnv.HasValue)
@@ -254,7 +248,7 @@ namespace Sharpmake
 
                     string executable = Path.Combine("$ExecutableRootPath$", compilerExeName);
 
-                    compilerSettings = new CompilerSettings(compilerName, compilerFamily, Platform.win64, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
+                    compilerSettings = new CompilerSettings(compilerName, compilerFamily, Platform.win64, extraFiles, executable, pathToCompiler, compilerDevEnv ?? devEnv, new Dictionary<string, CompilerSettings.Configuration>());
                     masterCompilerSettings.Add(compilerName, compilerSettings);
                 }
 
@@ -267,6 +261,7 @@ namespace Sharpmake
                 string configName,
                 string projectRootPath,
                 DevEnv devEnv,
+                Options.Vc.General.PlatformToolset platformToolset,
                 bool useCCompiler)
             {
                 if (configurations.ContainsKey(configName))
@@ -275,12 +270,13 @@ namespace Sharpmake
                 string linkerPathOverride = null;
                 string linkerExeOverride = null;
                 string librarianExeOverride = null;
+                var compilerDevEnv = GetCompilerFromToolset(devEnv, platformToolset) ?? devEnv;
                 GetLinkerExecutableInfo(conf, out linkerPathOverride, out linkerExeOverride, out librarianExeOverride);
 
                 var fastBuildCompilerSettings = PlatformRegistry.Get<IWindowsFastBuildCompilerSettings>(Platform.win64);
                 string binPath;
                 if (!fastBuildCompilerSettings.BinPath.TryGetValue(devEnv, out binPath))
-                    binPath = devEnv.GetVisualStudioBinPath(Platform.win64);
+                    binPath = compilerDevEnv.GetVisualStudioBinPath(Platform.win64);
 
                 string linkerPath;
                 if (!string.IsNullOrEmpty(linkerPathOverride))
@@ -302,7 +298,7 @@ namespace Sharpmake
 
                 string resCompiler;
                 if (!fastBuildCompilerSettings.ResCompiler.TryGetValue(devEnv, out resCompiler))
-                    resCompiler = devEnv.GetWindowsResourceCompiler(Platform.win64);
+                    resCompiler = compilerDevEnv.GetWindowsResourceCompiler(Platform.win64);
 
                 string capitalizedBinPath = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
                 configurations.Add(

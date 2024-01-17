@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.Generic;
+using Sharpmake.Generators.Rider;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators
@@ -25,6 +26,9 @@ namespace Sharpmake.Generators
         private MakeApplication _makeApplicationGenerator = null;
         public MakeApplication MakeApplicationGenerator => _makeApplicationGenerator ?? (_makeApplicationGenerator = new MakeApplication());
 
+        public RiderJson _riderJsonGenerator = null;
+        public RiderJson RiderJsonGenerator => _riderJsonGenerator ?? (_riderJsonGenerator = new RiderJson());
+        
         // Project generators
         private CSproj _csprojGenerator = null;
         public CSproj CsprojGenerator => _csprojGenerator ?? (_csprojGenerator = new CSproj());
@@ -104,6 +108,11 @@ namespace Sharpmake.Generators
                             BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
                             break;
                         }
+                    case DevEnv.rider:
+                        {
+                            BffGenerator.Generate(builder, project, configurations, projectFile, generatedFiles, skipFiles);
+                            break;
+                        }
                     default:
                         {
                             throw new Error("Generate called with unknown DevEnv: " + devEnv);
@@ -156,6 +165,17 @@ namespace Sharpmake.Generators
                             }
 
                             SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            break;
+                        }
+                    case DevEnv.rider:
+                        {                
+                            if (UtilityMethods.HasFastBuildConfig(configurations))
+                            {
+                                var masterBff = new MasterBff();
+                                masterBff.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                            }
+                            
+                            RiderJsonGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
                     default:

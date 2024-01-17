@@ -116,6 +116,11 @@
             "commandLineArgs": "/sources(@\u0027QTFileCustomBuild.sharpmake.cs\u0027)",
             "workingDirectory": "$(ProjectDir)\\..\\samples\\QTFileCustomBuild"
         },
+        "Sample (RiderJson)": {
+            "commandName": "Project",
+            "commandLineArgs": "/sources(@\u0027RiderJson.sharpmake.cs\u0027)",
+            "workingDirectory": "$(ProjectDir)\\..\\samples\\RiderJson"
+        },
         "Sample (SimpleExeLibDependency)": {
             "commandName": "Project",
             "commandLineArgs": "/sources(@\u0027SimpleExeLibDependency.sharpmake.cs\u0027)",

@@ -59,6 +59,11 @@ namespace Sharpmake
         /// GNU Makefiles.
         /// </summary>
         make = 1 << 9,
+        
+        /// <summary>
+        /// Rider project files
+        /// </summary>
+        rider = 1 << 10,
 
         /// <summary>
         /// All supported Visual Studio versions.

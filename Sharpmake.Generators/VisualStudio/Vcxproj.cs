@@ -506,63 +506,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                         if (conf.IsFastBuild)
                         {
-                            var fastBuildCommandLineOptions = new List<string>();
-
-                            if (FastBuildSettings.FastBuildUseIDE)
-                                fastBuildCommandLineOptions.Add("-ide");
-
-                            if (FastBuildSettings.FastBuildReport)
-                                fastBuildCommandLineOptions.Add("-report");
-
-                            if (FastBuildSettings.FastBuildNoSummaryOnError)
-                                fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                            if (FastBuildSettings.FastBuildSummary)
-                                fastBuildCommandLineOptions.Add("-summary");
-
-                            if (FastBuildSettings.FastBuildVerbose)
-                                fastBuildCommandLineOptions.Add("-verbose");
-
-                            if (FastBuildSettings.FastBuildMonitor)
-                                fastBuildCommandLineOptions.Add("-monitor");
-
-                            // Configuring cache mode if that configuration is allowed to use caching
-                            if (conf.FastBuildCacheAllowed)
-                            {
-                                // Setting the appropriate cache type commandline for that target.
-                                switch (FastBuildSettings.CacheType)
-                                {
-                                    case FastBuildSettings.CacheTypes.CacheRead:
-                                        fastBuildCommandLineOptions.Add("-cacheread");
-                                        break;
-                                    case FastBuildSettings.CacheTypes.CacheWrite:
-                                        fastBuildCommandLineOptions.Add("-cachewrite");
-                                        break;
-                                    case FastBuildSettings.CacheTypes.CacheReadWrite:
-                                        fastBuildCommandLineOptions.Add("-cache");
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-
-                            if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
-                                fastBuildCommandLineOptions.Add("-dist");
-
-                            if (FastBuildSettings.FastBuildWait)
-                                fastBuildCommandLineOptions.Add("-wait");
-
-                            if (FastBuildSettings.FastBuildNoStopOnError)
-                                fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                            if (FastBuildSettings.FastBuildFastCancel)
-                                fastBuildCommandLineOptions.Add("-fastcancel");
-
-                            if (FastBuildSettings.FastBuildNoUnity)
-                                fastBuildCommandLineOptions.Add("-nounity");
-
-                            if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
-                                fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
+                            var fastBuildCommandLineOptions = FastBuildMakeCommandGenerator.GetArguments(conf);
 
                             if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
                                 fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);

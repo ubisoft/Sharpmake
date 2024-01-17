@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Sharpmake.Generators.Rider;
 
 namespace Sharpmake.Application
 {
