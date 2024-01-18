@@ -3,11 +3,11 @@ samples/**/*.csproj
 samples/**/*.sln
 samples/**/projects/*
 samples/**/codebase/temp/*
+Sharpmake.Application/Properties/launchSettings.json
 Sharpmake.FunctionalTests/**/projects/*
 Sharpmake.FunctionalTests/**/blob/*
 Sharpmake.FunctionalTests/**/sharpmake_debug*.vs*.*
 Sharpmake.FunctionalTests/**/sharpmake_package*.vs*.csproj
-Sharpmake.FunctionalTests/**/launchSettings.json
 !**/reference/**
 
 ## Ignore Visual Studio temporary files, build results, and

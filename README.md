@@ -25,9 +25,15 @@ The Sharpmake source code also comes with samples that you can study.
 ## Building and running Sharpmake
 
 Building and running Sharpmake is quite straightforward:
+
 - Clone the Git repository
 - Open the `Sharpmake.sln` solution located in the root folder
-- Hit the run button (by default it will run the first sample)
+- If you want to debug Sharpmake using a _sample_:
+  1. Set the `Samples` project as the Startup Project
+  2. Choose from the dropdown list which sample you want to run
+- If you want to debug Sharpmake using a _functional test_:
+  1. Set the `Sharpmake.FunctionalTests` project as the Startup Project
+  2. Choose from the dropdown list which functional test you want to run
 
 ## More Platforms
 
