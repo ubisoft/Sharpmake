@@ -1,0 +1,38 @@
+{
+  "profiles": {
+    "FunctionalTest (FastBuildFunctionalTest)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources('FastBuildFunctionalTest.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\FastBuildFunctionalTest"
+    },
+    "FunctionalTest (NoAllFastBuildProjectFunctionalTest)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources('NoAllFastBuildProjectFunctionalTest.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\NoAllFastBuildProjectFunctionalTest"
+    },
+    "FunctionalTest (OnlyNeededFastBuildTest)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources('OnlyNeededFastBuildTest.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\OnlyNeededFastBuildTest"
+    },
+    "FunctionalTest (SharpmakePackageFunctionalTest)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources('SharpmakePackageFunctionalTest.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\SharpmakePackageFunctionalTest"
+    },
+    "FunctionalTest (functional_test.py)": {
+      "commandName": "Executable",
+      "executablePath": "python",
+      "commandLineArgs": "$(ProjectDir)\\..\\functional_test.py"
+    },
+    "FunctionalTest (regression_test.py)": {
+      "commandName": "Executable",
+      "executablePath": "python",
+      "commandLineArgs": "$(ProjectDir)\\..\\regression_test.py"
+    }
+  }
+}
