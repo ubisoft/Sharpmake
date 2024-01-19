@@ -579,6 +579,10 @@ namespace Sharpmake.Generators.Generic
             var deps = new OrderableStrings();
             foreach (Project.Configuration depConf in conf.ResolvedDependencies)
             {
+                // Ignore projects marked as Export
+                if (depConf.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
+                    continue;
+
                 switch (depConf.Output)
                 {
                     case Project.Configuration.OutputType.None:
