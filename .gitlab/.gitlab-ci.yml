@@ -34,11 +34,14 @@ compilation:windows:
 compilation:mac:
   extends: .compilation:base
   tags: [square_mac]
+  variables:
+    ANKA_TEMPLATE_UUID: '1c28e1d9-d8cf-4a36-89e5-b915ccb5f62f'
+    ANKA_TAG_NAME: '7.0.0'
 
 compilation:linux:
   extends: .compilation:base
   tags: [square-linux-k8s-compil]
-  image: mcr.microsoft.com/dotnet/sdk:6.0
+  image: mcr.microsoft.com/dotnet/sdk:8.0
 
 generate_samples_pipeline:
   stage: build

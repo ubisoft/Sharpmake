@@ -42,6 +42,14 @@ namespace Sharpmake.UnitTests
     public class PathMakeStandard
     {
         [Test]
+        public void ThrowWhenPathIsNull()
+        {
+            string nullPath = null;
+
+            Assert.Catch<ArgumentNullException>(() => Util.PathMakeStandard(nullPath));
+        }
+
+        [Test]
         public void LeavesEmptyStringsUntouched()
         {
             Assert.That(Util.PathMakeStandard(string.Empty), Is.EqualTo(string.Empty));
@@ -56,6 +64,47 @@ namespace Sharpmake.UnitTests
             if (!Util.IsRunningInMono())
                 expectedResult = expectedResult.ToLower();
             Assert.That(Util.PathMakeStandard("$(Console_SdkPackagesRoot)"), Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void LeaveUnixRootPathUntouched()
+        {
+            var notFullyQualifiedUnixPath = "MountedDiskName:";
+            var fullyQualifiedRoot = Path.DirectorySeparatorChar.ToString();
+
+            Assert.AreEqual(fullyQualifiedRoot, Util.PathMakeStandard(fullyQualifiedRoot));
+
+            // Check case sensitivness on Unix 
+            if (!Util.IsRunningOnUnix())
+                notFullyQualifiedUnixPath = notFullyQualifiedUnixPath.ToLower();
+
+            Assert.AreEqual(notFullyQualifiedUnixPath, Util.PathMakeStandard(notFullyQualifiedUnixPath));
+        }
+
+        [Test]
+        public void LeaveDriveRelativePathAsNotFullyQualified()
+        {
+            // For information about what is a drive relative path please check https://learn.microsoft.com/en-us/dotnet/standard/io/file-path-formats
+
+            var expectedResult = Path.Combine("d:toto", "tata");
+            var driveRelativePath = @"d:toto\tata\";
+            var fullyQualifiedPath = Path.Combine("d:", "toto", "tata");
+
+            Assert.AreEqual(expectedResult, Util.PathMakeStandard(driveRelativePath));
+            Assert.AreNotEqual(fullyQualifiedPath, Util.PathMakeStandard(driveRelativePath));
+        }
+
+        [Test]
+        public void ReturnFullyQualifiedRootPathOnWindows()
+        {
+            if (!Util.IsRunningOnUnix())
+            {
+                var notFullyQualifiedRoot = "d:";
+                var fullyQualifiedRoot = @"d:\";
+
+                Assert.AreEqual(fullyQualifiedRoot, Util.PathMakeStandard(notFullyQualifiedRoot));
+                Assert.AreEqual(fullyQualifiedRoot, Util.PathMakeStandard(fullyQualifiedRoot));
+            }
         }
 
         [Test]
@@ -426,13 +475,8 @@ namespace Sharpmake.UnitTests
         [Test]
         public void OnlyRoot()
         {
-            Assert.AreEqual(
-                Util.PathMakeStandard(@"C:"),
-                Util.FindCommonRootPath(new[] {
-                    @"C:\bla",
-                    @"C:\bli"
-                })
-            );
+            Assert.AreEqual(Util.PathMakeStandard("/"), Util.FindCommonRootPath(new[] {"/bla", "/bli"}));
+            Assert.AreEqual(Util.PathMakeStandard(@"c:\"), Util.FindCommonRootPath(new[] {@"c:\bla", @"c:\bli"}));
         }
 
         [Test]
@@ -1712,6 +1756,25 @@ namespace Sharpmake.UnitTests
             var pathNotUnderRoot = root + @"\foo\";
 
             Assert.IsFalse(Util.PathIsUnderRoot(rootWithExtraDir, pathNotUnderRoot));
+        }
+
+        [Test]
+        public void RootIsDrive()
+        {
+            if (Util.IsRunningOnUnix())
+            {
+                var fullyQualifiedRoot = Util.UnixSeparator.ToString();
+                var pathUnderRoot = "/versioncontrol/solutionname/projectname/src/code/factory.cs";
+
+                Assert.IsTrue(Util.PathIsUnderRoot(fullyQualifiedRoot, pathUnderRoot));
+            }
+            else
+            {
+                var fullyQualifiedRoot = @"D:\";
+                var pathUnderRoot = @"D:\versioncontrol\solutionname\projectname\src\code\factory.cs";
+
+                Assert.IsTrue(Util.PathIsUnderRoot(fullyQualifiedRoot, pathUnderRoot));
+            }
         }
     }
 

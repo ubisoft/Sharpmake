@@ -13,9 +13,9 @@ namespace Sharpmake
 {
     public static partial class Util
     {
-        public static readonly char UnixSeparator = '/';
-        public static readonly char WindowsSeparator = '\\';
-        private static readonly string s_unixMountPointForWindowsDrives = "/mnt/";
+        public const char UnixSeparator = '/';
+        public const char WindowsSeparator = '\\';
+        private const string s_unixMountPointForWindowsDrives = "/mnt/";
 
         public static readonly bool UsesUnixSeparator = Path.DirectorySeparatorChar == UnixSeparator;
 
@@ -34,11 +34,32 @@ namespace Sharpmake
             return PathMakeStandard(path, !Util.IsRunningOnUnix());
         }
 
+        /// <summary>
+        /// Cleanup the path by replacing the other separator by the correct one for the current OS
+        /// then trim every trailing separators, except if <paramref name="path"/> is a root (i.e. 'C:\' or '/')
+        /// </summary>
+        /// <remarks>Note that if the given <paramref name="path"/> is a drive letter with volume separator,
+        /// without slash/backslash, a directory separator will be added to make the path fully qualified.
+        /// <br>But if the given <paramref name="path"/> is not just a drive letter and also has missing slash/backslah
+        /// after volume separator (for example "C:toto/tata/"), then the return path won't be fully qualified
+        /// (see here for more information on drive relative paths <see href="https://learn.microsoft.com/en-us/dotnet/standard/io/file-path-formats"/>)</br>
+        /// <para>Note that Windows paths on Unix will have slashes (and vice versa)</para>
+        /// <para>Note that network paths (like NAS) starting with "\\" are not supported</para>
+        /// </remarks>
         public static string PathMakeStandard(string path, bool forceToLower)
         {
-            // cleanup the path by replacing the other separator by the correct one for this OS
-            // then trim every trailing separators
-            var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
+            ArgumentNullException.ThrowIfNull(path, nameof(path));
+
+            var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar);
+
+            standardPath = standardPath switch
+            {
+                [WindowsSeparator or UnixSeparator] => standardPath,
+                [_, ':'] => IsRunningOnUnix() ? standardPath : standardPath + Path.DirectorySeparatorChar,
+                [_, ':', WindowsSeparator or UnixSeparator] => standardPath,
+                _ => standardPath.TrimEnd(Path.DirectorySeparatorChar),
+            };
+
             return forceToLower ? standardPath.ToLower() : standardPath;
         }
 
@@ -142,7 +163,7 @@ namespace Sharpmake
             return newRelativePath;
         }
 
-        private static ConcurrentDictionary<string, string> s_cachedSimplifiedPaths = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> s_cachedSimplifiedPaths = new ConcurrentDictionary<string, string>();
 
         /// <summary>
         /// Take a path and compute a canonical version of it. It removes any extra: "..", ".", directory separators...
@@ -341,7 +362,7 @@ namespace Sharpmake
             [Obsolete("Directly use 'char.IsAsciiLetter()' in 'IsCharEqual()' bellow (char.IsAsciiLetter() is available starting net7)")]
 #endif
             static bool IsAsciiLetter(char c) => (uint)((c | 0x20) - 'a') <= 'z' - 'a';
-            static bool IsCharEqual(char a, char b, bool ignoreCase) =>  a == b || (ignoreCase && (a | 0x20) == (b | 0x20) && IsAsciiLetter(a));
+            static bool IsCharEqual(char a, char b, bool ignoreCase) => a == b || (ignoreCase && (a | 0x20) == (b | 0x20) && IsAsciiLetter(a));
 
             // Check if both paths are the same (ignoring the last directory separator if any)
             if ((relativeToLength == commonPartLength && pathLength == commonPartLength)
@@ -434,7 +455,7 @@ namespace Sharpmake
             return result;
         }
 
-        private static ConcurrentDictionary<string, string> s_cachedCombinedToAbsolute = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> s_cachedCombinedToAbsolute = new ConcurrentDictionary<string, string>();
 
         public static string PathGetAbsolute(string absolutePath, string relativePath)
         {
@@ -446,14 +467,12 @@ namespace Sharpmake
                 return relativePath;
 
             string cleanRelative = SimplifyPath(relativePath);
-            if (Path.IsPathRooted(cleanRelative))
+            if (Path.IsPathFullyQualified(cleanRelative))
                 return cleanRelative;
 
             string resultPath = s_cachedCombinedToAbsolute.GetOrAdd(string.Format("{0}|{1}", absolutePath, relativePath), combined =>
             {
                 string firstPart = PathMakeStandard(absolutePath);
-                if (firstPart.Last() == Path.VolumeSeparatorChar)
-                    firstPart += Path.DirectorySeparatorChar;
 
                 string result = Path.Combine(firstPart, cleanRelative);
                 return Path.GetFullPath(result);
@@ -616,7 +635,7 @@ namespace Sharpmake
             return Path.Combine(builder.ToString(), properFileName);
         }
 
-        private static ConcurrentDictionary<string, string> s_capitalizedPaths = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> s_capitalizedPaths = new ConcurrentDictionary<string, string>();
 
         private static void GetProperDirectoryCapitalization(DirectoryInfo dirInfo, DirectoryInfo childInfo, ref StringBuilder pathBuilder)
         {
@@ -771,37 +790,65 @@ namespace Sharpmake
 
         public static string FindCommonRootPath(IEnumerable<string> paths)
         {
-            var pathsChunks = paths.Select(p => PathMakeStandard(p).Split(Util._pathSeparators, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
+            paths = paths.Select(PathMakeStandard);
+            var pathsChunks = paths.Select(p => p.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)).Where(p => p.Any());
+
             if (pathsChunks.Any())
             {
-                bool firstCharIsPathSeparator = UsesUnixSeparator ? paths.Any(p => p[0] == UnixSeparator) : false;
-                var firstPathChunks = pathsChunks.First();
-                bool foundSomeCommonChunks = false;
-                int commonPathIndex = 0;
-                do
+                var sb = new StringBuilder();
+                var isFirst = true;
+                var chunkStartIndex = 0;
+
+                // Handle fully qualified paths
+                var fullyQualifiedPath = paths.FirstOrDefault(p => p is ([UnixSeparator or WindowsSeparator, ..]) or ([_, ':', UnixSeparator or WindowsSeparator, ..]));
+                if (fullyQualifiedPath is not null)
                 {
-                    if (firstPathChunks.Length > commonPathIndex)
+                    if (fullyQualifiedPath[0] == Path.DirectorySeparatorChar)
                     {
-                        string reference = firstPathChunks[commonPathIndex];
-                        if (!pathsChunks.Any(p => !string.Equals(p.Length > commonPathIndex ? p[commonPathIndex] : string.Empty, reference, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            ++commonPathIndex;
-                            foundSomeCommonChunks = true;
-                        }
-                        else
-                            break;
+                        sb.Append(Path.DirectorySeparatorChar);
                     }
                     else
-                        break;
-                }
-                while (true);
+                    {
+                        sb.Append(fullyQualifiedPath[0]);
+                        sb.Append(':');
+                        sb.Append(Path.DirectorySeparatorChar);
+                        chunkStartIndex++;
+                    }
 
+                    // All path should start with the same root path, else there is nothing in common
+                    var rootPath = sb.ToString();
+                    if (paths.Any(p => !p.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return null;
+                    }
+                }
+
+                var referenceChunks = pathsChunks.First();
+                int smallestChunksCount = pathsChunks.Min(p => p.Length);
+                for (var i = chunkStartIndex; i < smallestChunksCount; ++i)
+                {
+                    var reference = referenceChunks[i];
+                    if (pathsChunks.All(p => string.Equals(p[i], reference, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        if (!isFirst)
+                            sb.Append(Path.DirectorySeparatorChar);
+                        isFirst = false;
+
+                        sb.Append(reference);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                var foundSomeCommonChunks = sb.Length != 0;
                 if (foundSomeCommonChunks)
                 {
-                    var commonRootPath = string.Join(Path.DirectorySeparatorChar.ToString(), firstPathChunks.Take(commonPathIndex));
-                    return firstCharIsPathSeparator ? UnixSeparator.ToString() + commonRootPath : commonRootPath;
+                    return sb.ToString();
                 }
             }
+
             return null;
         }
 
@@ -813,7 +860,7 @@ namespace Sharpmake
         /// <param name="pathToTest">An absolute or relative path to a file or directory to be tested.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static bool PathIsUnderRoot(string rootPath, string pathToTest) 
+        public static bool PathIsUnderRoot(string rootPath, string pathToTest)
         {
             if (!Path.IsPathFullyQualified(rootPath))
                 throw new ArgumentException("rootPath needs to be absolute.", nameof(rootPath));
@@ -823,20 +870,20 @@ namespace Sharpmake
 
             var intersection = GetPathIntersection(rootPath, pathToTest);
 
-            if(string.IsNullOrEmpty(intersection)) 
+            if (string.IsNullOrEmpty(intersection))
                 return false;
 
             if (!Util.PathIsSame(intersection, rootPath))
             {
-                if(rootPath.EndsWith(Path.DirectorySeparatorChar))
+                if (rootPath.EndsWith(Path.DirectorySeparatorChar))
                     return false;
 
                 // only way to make sure path point to file is to check on disk
                 // if file doesn't exist, treats this edge case as if path wasn't a file path
                 var fileInfo = new FileInfo(rootPath);
-                if(fileInfo.Exists && Util.PathIsSame(intersection, fileInfo.DirectoryName))
-                    return true; 
-                
+                if (fileInfo.Exists && Util.PathIsSame(intersection, fileInfo.DirectoryName))
+                    return true;
+
                 return false;
             }
 
