@@ -18,8 +18,8 @@ ifeq ($(config),debug)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) -g -Wall 
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
-  LDFLAGS   += -L../../bin/linux_debug -L../../lib/linux_debug/static\ lib2 -Wl,-rpath='$$ORIGIN'
-  LDLIBS    += -l:libdll1.so -l:libstatic\ lib2.a -l:libuuid.so
+  LDFLAGS   += -L../../bin/linux_debug -L../../lib/linux_debug/curl -L../../lib/linux_debug/static\ lib2 -Wl,-rpath='$$ORIGIN'
+  LDLIBS    += -l:libcurl.a -l:libdll1.so -l:libstatic\ lib2.a -l:libuuid.so
   RESFLAGS  += $(DEFINES) $(INCLUDES)
   LDDEPS    += ../../bin/linux_debug/libdll1.so ../../lib/linux_debug/static\ lib2/libstatic\ lib2.a ../../lib/linux_debug/static_lib1/libstatic_lib1.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)
@@ -51,8 +51,8 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) -g -O3 -Wall 
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
-  LDFLAGS   += -L../../bin/linux_release -L../../lib/linux_release/static\ lib2 -Wl,-rpath='$$ORIGIN'
-  LDLIBS    += -l:libdll1.so -l:libstatic\ lib2.a -l:libuuid.so
+  LDFLAGS   += -L../../bin/linux_release -L../../lib/linux_release/curl -L../../lib/linux_release/static\ lib2 -Wl,-rpath='$$ORIGIN'
+  LDLIBS    += -l:libcurl.a -l:libdll1.so -l:libstatic\ lib2.a -l:libuuid.so
   RESFLAGS  += $(DEFINES) $(INCLUDES)
   LDDEPS    += ../../bin/linux_release/libdll1.so ../../lib/linux_release/static\ lib2/libstatic\ lib2.a ../../lib/linux_release/static_lib1/libstatic_lib1.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)
