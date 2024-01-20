@@ -2166,16 +2166,9 @@ namespace Sharpmake
                 /// </summary>
                 public string Executable = "";
                 /// <summary>
-                /// This passes the Executable string through a resolver
+                /// Use this to indicate the executable is in the system Path
                 /// </summary>
-                /// <remarks>
-                /// Set this to false to output Executable string without any changes
-                /// </remarks>
-                public bool ResolveExecutable = true;
-                /// <summary>
-                /// This adds the Executable to the list of AdditionalInputs to make sure its tracked
-                /// </summary>
-                public bool DependOnExecutable = true;
+                public bool UseExecutableFromSystemPath = false;
                 /// <summary>
                 /// These are the arguments to pass to the executable.
                 /// </summary>
@@ -2786,10 +2779,12 @@ namespace Sharpmake
                 {
                     customFileBuildStep.Resolve(resolver);
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.KeyInput);
-                    if(customFileBuildStep.ResolveExecutable)
+
+                    if(!customFileBuildStep.UseExecutableFromSystemPath)
                     {
                         Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Executable);
                     }
+
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Output);
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.AdditionalInputs);
                 }

@@ -174,7 +174,7 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var customBuildStep in buildSteps)
             {
                 var relativeBuildStep = customBuildStep.MakePathRelative(resolver, (path, commandRelative) => Util.SimplifyPath(Util.PathGetRelative(referencePath, path)));
-                if(customBuildStep.DependOnExecutable)
+                if(!customBuildStep.UseExecutableFromSystemPath)
                 {
                     relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
                 }
