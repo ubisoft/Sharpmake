@@ -10,4 +10,8 @@
     <None Include="**/*" Exclude="Sharpmake.FunctionalTests.csproj;obj/**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Sharpmake.Application\Sharpmake.Application.csproj" />
+  </ItemGroup>
+
 </Project>
