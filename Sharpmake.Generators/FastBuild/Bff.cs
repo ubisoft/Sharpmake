@@ -126,7 +126,7 @@ namespace Sharpmake.Generators.FastBuild
         {
             string define = PlatformRegistry.Get<IPlatformBff>(platform).BffPlatformDefine;
             if (define == null)
-                throw new NotImplementedException($"Please add {platform} specific define for bff sections, ideally the same as ExplicitDefine, to get Intellisense.");
+                throw new NotImplementedException($"Please add {Util.GetSimplePlatformString(platform)} specific define for bff sections, ideally the same as ExplicitDefine, to get Intellisense.");
 
             return define;
         }
