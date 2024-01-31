@@ -19,7 +19,7 @@ namespace Sharpmake
         { }
 
         internal PlatformNotSupportedException(Platform platform, Type implType)
-            : base($"No implementation of {implType.Name} for {platform} is provided.")
+            : base($"No implementation of {implType.Name} for {Util.GetSimplePlatformString(platform)} is provided.")
         { }
 
         protected PlatformNotSupportedException(SerializationInfo info, StreamingContext context)

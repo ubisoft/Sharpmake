@@ -486,7 +486,7 @@ namespace Sharpmake
                 var errorMessageBuilder = new StringBuilder();
                 foreach (var duplicate in duplicates)
                 {
-                    string platform = duplicate.Key.Platform.ToString();
+                    string platform = Util.GetSimplePlatformString(duplicate.Key.Platform);
                     string iface = duplicate.Key.InterfaceType.Name;
                     errorMessageBuilder.AppendLine($"Duplicate platform detected: Platform {platform} as interface {iface}");
                     foreach (var type in duplicate.Value)
@@ -530,7 +530,7 @@ namespace Sharpmake
                 object prevImpl = s_implementations[platformImpl];
                 if (object.ReferenceEquals(prevImpl, implementation))
                     return;
-                throw new InvalidOperationException($"There is already an implementation of interface {ifaceType} for platform {platform}. Cannot register {implementation.GetType().AssemblyQualifiedName}");
+                throw new InvalidOperationException($"There is already an implementation of interface {ifaceType} for platform {Util.GetSimplePlatformString(platform)}. Cannot register {implementation.GetType().AssemblyQualifiedName}");
             }
         }
 

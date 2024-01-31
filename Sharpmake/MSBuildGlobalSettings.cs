@@ -25,7 +25,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static void SetCppPlatformFolder(DevEnv devEnv, Platform platform, string value)
         {
-            SetCppPlatformFolder(devEnv, platform.ToString(), value);
+            SetCppPlatformFolder(devEnv, Util.GetSimplePlatformString(platform), value);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Sharpmake
         /// <returns>the registered msbuild foldervalue for the requested pair. null if not found</returns>
         public static string GetCppPlatformFolder(DevEnv devEnv, Platform platform)
         {
-            return GetCppPlatformFolder(devEnv, platform.ToString());
+            return GetCppPlatformFolder(devEnv, Util.GetSimplePlatformString(platform));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static void SetAdditionalVCTargetsPath(DevEnv devEnv, Platform platform, string value)
         {
-            SetAdditionalVCTargetsPath(devEnv, platform.ToString(), value);
+            SetAdditionalVCTargetsPath(devEnv, Util.GetSimplePlatformString(platform), value);
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Sharpmake
         /// <returns>the registered msbuild additional VC targets path for the requested pair. null if not found</returns>
         public static string GetAdditionalVCTargetsPath(DevEnv devEnv, Platform platform)
         {
-            return GetAdditionalVCTargetsPath(devEnv, platform.ToString());
+            return GetAdditionalVCTargetsPath(devEnv, Util.GetSimplePlatformString(platform));
         }
 
         /// <summary>
