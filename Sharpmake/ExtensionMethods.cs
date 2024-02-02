@@ -33,7 +33,7 @@ namespace Sharpmake
 
         public static string GetLinkerOptionPrefix(this Platform platform)
         {
-            if (IsUsingClang(platform) && IsLinkerInvokedViaCompiler(platform))
+            if(IsLinkerInvokedViaCompiler(platform))
                 return "-Wl,";
 
             return "";
