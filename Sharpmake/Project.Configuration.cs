@@ -2199,6 +2199,10 @@ namespace Sharpmake
                 /// </summary>
                 public string Executable = "";
                 /// <summary>
+                /// Use this to indicate the executable is in the system Path
+                /// </summary>
+                public bool UseExecutableFromSystemPath = false;
+                /// <summary>
                 /// These are the arguments to pass to the executable.
                 /// </summary>
                 /// <remarks>
@@ -2808,7 +2812,12 @@ namespace Sharpmake
                 {
                     customFileBuildStep.Resolve(resolver);
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.KeyInput);
-                    Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Executable);
+
+                    if(!customFileBuildStep.UseExecutableFromSystemPath)
+                    {
+                        Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Executable);
+                    }
+
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.Output);
                     Util.ResolvePath(Project.SourceRootPath, ref customFileBuildStep.AdditionalInputs);
                 }
