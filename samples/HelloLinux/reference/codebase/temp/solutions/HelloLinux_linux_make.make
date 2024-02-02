@@ -10,6 +10,7 @@ PROJECTS := \
 	dll1 \
 	exe \
 	header-only-lib \
+	lib_group \
 	static lib2 \
 	static_lib1 \
 
@@ -21,13 +22,17 @@ dll1: static_lib1
 	@echo " ==== Building dll1 ($(config)) ===="
 	@${MAKE} --no-print-directory -C "../projects/dll1" -f "dll1_linux_make.make"
 
-exe: dll1 header-only-lib static_lib1 static lib2 
+exe: dll1 header-only-lib lib_group static_lib1 static lib2 
 	@echo " ==== Building exe ($(config)) ===="
 	@${MAKE} --no-print-directory -C "../projects/exe" -f "exe_linux_make.make"
 
 header-only-lib: 
 	@echo " ==== Building header-only-lib ($(config)) ===="
 	@${MAKE} --no-print-directory -C "../projects/header-only-lib" -f "header-only-lib_linux_make.make"
+
+lib_group: dll1 static_lib1 
+	@echo " ==== Building lib_group ($(config)) ===="
+	@${MAKE} --no-print-directory -C "../projects/lib_group" -f "lib_group_linux_make.make"
 
 static lib2: 
 	@echo " ==== Building static lib2 ($(config)) ===="
@@ -41,6 +46,7 @@ clean:
 	@${MAKE} --no-print-directory -C "../projects/dll1" -f "dll1_linux_make.make" clean
 	@${MAKE} --no-print-directory -C "../projects/exe" -f "exe_linux_make.make" clean
 	@${MAKE} --no-print-directory -C "../projects/header-only-lib" -f "header-only-lib_linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/lib_group" -f "lib_group_linux_make.make" clean
 	@${MAKE} --no-print-directory -C "../projects/static lib2" -f "static lib2_linux_make.make" clean
 	@${MAKE} --no-print-directory -C "../projects/static_lib1" -f "static_lib1_linux_make.make" clean
 
@@ -57,6 +63,7 @@ help:
 	@echo "   dll1"
 	@echo "   exe"
 	@echo "   header-only-lib"
+	@echo "   lib_group"
 	@echo "   static lib2"
 	@echo "   static_lib1"
 

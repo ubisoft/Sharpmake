@@ -10,22 +10,22 @@ endif
 ifeq ($(config),debug)
   CXX        = g++
   AR         = ar
-  OBJDIR     = ../../obj/linux_debug/exe
+  OBJDIR     = ../../obj/linux_debug/lib_group
   TARGETDIR  = ../../bin/linux_debug
-  TARGET     = $(TARGETDIR)/exe
-  DEFINES   += -D "CREATION_DATE=\"October 2020\"" -D "UTIL_DLL_IMPORT" -D "_DEBUG"
-  INCLUDES  += -I../../../dll1 -I../../../header-only-lib -I../../../lib_group -I../../../static\ lib2
+  TARGET     = $(TARGETDIR)/liblib_group.so
+  DEFINES   += -D "UTIL_DLL_EXPORT" -D "UTIL_DLL_IMPORT" -D "_DEBUG"
+  INCLUDES  += -I../../../dll1 -I../../../lib_group -I../../../static_lib1
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) -g -Wall 
+  CFLAGS    += $(CPPFLAGS) -g -Wall -fPIC
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
-  LDFLAGS   += -L../../bin/linux_debug -L../../lib/linux_debug/curl -L../../lib/linux_debug/static\ lib2 -Wl,-rpath='$$ORIGIN'
-  LDLIBS    += -l:libcurl.a -l:libdll1.so -l:liblib_group.so -l:libstatic\ lib2.a -l:libuuid.so
+  LDFLAGS   += -L../../bin/linux_debug -L../../lib/linux_debug/curl -L../../lib/linux_debug/static_lib1 
+  LDLIBS    +=  -Wl,--start-group -l:libcurl.a -l:libdll1.so -l:libstatic_lib1.a -l:libm.a -Wl,--end-group 
   RESFLAGS  += $(DEFINES) $(INCLUDES)
-  LDDEPS    += ../../bin/linux_debug/libdll1.so ../../bin/linux_debug/liblib_group.so ../../lib/linux_debug/static\ lib2/libstatic\ lib2.a ../../lib/linux_debug/static_lib1/libstatic_lib1.a
-  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)
-  PCH        = ../../../exe/stdafx.h
-  PCHOUT     = $(OBJDIR)/stdafx.h
-  GCH        = $(OBJDIR)/stdafx.h.gch
+  LDDEPS    += ../../bin/linux_debug/libdll1.so ../../lib/linux_debug/static_lib1/libstatic_lib1.a
+  LINKCMD    = $(CXX) -shared -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)
+  PCH        = ../../../lib_group/precomp.h
+  PCHOUT     = $(OBJDIR)/precomp.h
+  GCH        = $(OBJDIR)/precomp.h.gch
   PCHCMD     = -include $(PCHOUT)
   define PREBUILDCMDS
     mkdir -p $(TARGETDIR)/../../package
@@ -43,22 +43,22 @@ endif
 ifeq ($(config),release)
   CXX        = g++
   AR         = ar
-  OBJDIR     = ../../obj/linux_release/exe
+  OBJDIR     = ../../obj/linux_release/lib_group
   TARGETDIR  = ../../bin/linux_release
-  TARGET     = $(TARGETDIR)/exe
-  DEFINES   += -D "CREATION_DATE=\"October 2020\"" -D "NDEBUG" -D "UTIL_DLL_IMPORT"
-  INCLUDES  += -I../../../dll1 -I../../../header-only-lib -I../../../lib_group -I../../../static\ lib2
+  TARGET     = $(TARGETDIR)/liblib_group.so
+  DEFINES   += -D "NDEBUG" -D "UTIL_DLL_EXPORT" -D "UTIL_DLL_IMPORT"
+  INCLUDES  += -I../../../dll1 -I../../../lib_group -I../../../static_lib1
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) -g -O3 -Wall 
+  CFLAGS    += $(CPPFLAGS) -g -O3 -Wall -fPIC
   CXXFLAGS  += $(CFLAGS) -fno-exceptions -fno-rtti 
-  LDFLAGS   += -L../../bin/linux_release -L../../lib/linux_release/curl -L../../lib/linux_release/static\ lib2 -Wl,-rpath='$$ORIGIN'
-  LDLIBS    += -l:libcurl.a -l:libdll1.so -l:liblib_group.so -l:libstatic\ lib2.a -l:libuuid.so
+  LDFLAGS   += -L../../bin/linux_release -L../../lib/linux_release/curl -L../../lib/linux_release/static_lib1 
+  LDLIBS    +=  -Wl,--start-group -l:libcurl.a -l:libdll1.so -l:libstatic_lib1.a -l:libm.a -Wl,--end-group 
   RESFLAGS  += $(DEFINES) $(INCLUDES)
-  LDDEPS    += ../../bin/linux_release/libdll1.so ../../bin/linux_release/liblib_group.so ../../lib/linux_release/static\ lib2/libstatic\ lib2.a ../../lib/linux_release/static_lib1/libstatic_lib1.a
-  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)
-  PCH        = ../../../exe/stdafx.h
-  PCHOUT     = $(OBJDIR)/stdafx.h
-  GCH        = $(OBJDIR)/stdafx.h.gch
+  LDDEPS    += ../../bin/linux_release/libdll1.so ../../lib/linux_release/static_lib1/libstatic_lib1.a
+  LINKCMD    = $(CXX) -shared -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(LDLIBS)
+  PCH        = ../../../lib_group/precomp.h
+  PCHOUT     = $(OBJDIR)/precomp.h
+  GCH        = $(OBJDIR)/precomp.h.gch
   PCHCMD     = -include $(PCHOUT)
   define PREBUILDCMDS
     mkdir -p $(TARGETDIR)/../../package
@@ -74,13 +74,13 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJECTS += $(OBJDIR)/main.o
-  OBJECTS += $(OBJDIR)/stdafx.o
+  OBJECTS += $(OBJDIR)/precomp.o
+  OBJECTS += $(OBJDIR)/util_dll.o
 endif
 
 ifeq ($(config),release)
-  OBJECTS += $(OBJDIR)/main.o
-  OBJECTS += $(OBJDIR)/stdafx.o
+  OBJECTS += $(OBJDIR)/precomp.o
+  OBJECTS += $(OBJDIR)/util_dll.o
 endif
 
 RESOURCES := \
@@ -99,7 +99,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
-	@echo Linking exe
+	@echo Linking lib_group
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -122,7 +122,7 @@ endif
 endif
 
 clean:
-	@echo Cleaning exe
+	@echo Cleaning lib_group
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -145,12 +145,12 @@ $(GCH): $(PCH) | $(OBJDIR)
 	$(SILENT) $(POSTFILECMDS)
 endif
 
-$(OBJDIR)/main.o: ../../../exe/main.cpp $(GCH) | $(OBJDIR)
+$(OBJDIR)/precomp.o: ../../../lib_group/precomp.cpp $(GCH) | $(OBJDIR)
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) $(PCHCMD) -o "$@" -c "$<"
 	$(SILENT) $(POSTFILECMDS)
 
-$(OBJDIR)/stdafx.o: ../../../exe/stdafx.cpp $(GCH) | $(OBJDIR)
+$(OBJDIR)/util_dll.o: ../../../lib_group/util_dll.cpp $(GCH) | $(OBJDIR)
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) $(PCHCMD) -o "$@" -c "$<"
 	$(SILENT) $(POSTFILECMDS)

@@ -22,6 +22,7 @@ namespace HelloLinux
             conf.AddProject<Dll1Project>(target);
             conf.AddProject<StaticLib1Project>(target);
             conf.AddProject<StaticLib2Project>(target);
+            conf.AddProject<LibGroupProject>(target);
         }
     }
 }
