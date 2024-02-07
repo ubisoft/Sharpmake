@@ -419,6 +419,7 @@ namespace Sharpmake
                     [Default(DefaultTarget.Release)]
                     Smallest,
                     Aggressive,
+                    AggressiveSize
                 }
 
                 public enum PreserveDeadCodeInitsAndTerms
