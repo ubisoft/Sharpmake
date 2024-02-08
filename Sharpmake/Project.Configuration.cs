@@ -2220,6 +2220,12 @@ namespace Sharpmake
                 /// This is what we tell the build system we're going to produce.
                 /// </summary>
                 public string Output = "";
+
+                /// <summary>
+                /// Optional string to hint to the build system at what to treat the output from the build command as
+                /// </summary>
+                public string OutputItemType = "";
+
                 /// <summary>
                 /// Not supported by FASTBuild.
                 /// Additional files that will cause a re-run of this custom build step can be be specified here.

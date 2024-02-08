@@ -299,6 +299,10 @@ namespace Sharpmake.Generators.VisualStudio
 @"      <LinkObjects Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">[linkobjects]</LinkObjects>
 ";
 
+                public static string ProjectFilesCustomBuildOutputItemType =
+@"      <OutputItemType>[outputItemType]</OutputItemType>
+";
+
                 public static string ProjectFilesCustomBuildEnd =
                 @"    </CustomBuild>
 ";
