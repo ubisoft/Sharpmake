@@ -2222,6 +2222,7 @@ namespace Sharpmake
                 public string Output = "";
 
                 /// <summary>
+                /// Not supported by FASTBuild.
                 /// Optional string to hint to the build system at what to treat the output from the build command as
                 /// </summary>
                 public string OutputItemType = "";
