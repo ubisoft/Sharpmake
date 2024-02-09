@@ -28,7 +28,7 @@ Here an example for the sample HelloWorld in `SamplesDef.json`:
 Here the description for each properties:
 
 - *Name*: Name of the sample.
-- *CIs*: CI systems where the sample can be executed. Valid values: "github" and "gitlab". An empty array here will completely disable the sample on CI systems.
+- *CIs*: CI systems where the sample can be executed. Valid values: "github" and "gitlab". An empty array here will completely disable the sample on CI systems. gitlab is used internally at Ubisoft.
 - *OSs*: Operating systems where can be executed. Valid values: "linux", "macos", "windows-2019" and "windows-2022".
 - *Frameworks*: .NET frameworks used by Sharpmake executable. Currently only "net6.0" is supported.
 - *Configuration*: Configurations that the sample support. Valid values: "debug" and "release".
