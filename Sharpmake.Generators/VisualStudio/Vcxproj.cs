@@ -1536,19 +1536,13 @@ namespace Sharpmake.Generators.VisualStudio
                                 using (fileGenerator.Declare("command", buildStep.Commands))
                                 using (fileGenerator.Declare("inputs", buildStep.AdditionalInputs))
                                 using (fileGenerator.Declare("outputs", buildStep.Outputs))
-                                using (fileGenerator.Declare("outputItemType", buildStep.OutputItemType))
+                                using (fileGenerator.Declare("outputItemType", string.IsNullOrEmpty(buildStep.OutputItemType) ? FileGeneratorUtilities.RemoveLineTag : buildStep.OutputItemType))
                                 {
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildDescription);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildCommand);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildInputs);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputs);
-
-                                    // An empty OutputItemtype tag will lead to unexpected errors and there is no sensible default
-                                    // Avoid writing the tag if the user hasn't specified a value.
-                                    if (!string.IsNullOrEmpty(buildStep.OutputItemType))
-                                    {
-                                        fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputItemType);
-                                    }
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputItemType);
                                 }
                             }
                         }
