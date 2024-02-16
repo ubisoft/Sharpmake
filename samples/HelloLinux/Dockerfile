@@ -26,7 +26,7 @@ COPY --from=sharpmake-env samples/HelloLinux samples/HelloLinux
 
 # Sample C++ compilation.
 WORKDIR /samples/HelloLinux/codebase/temp/solutions
-RUN make -f HelloLinux_linux_make.make config=$CONFIGURATION
+RUN make -f HelloLinux_Linux_make.make config=$CONFIGURATION
 
 # Last stage is the container app that will executed.
 # Its based on PowerShell image and contains binaries and scripts required to execute HelloLinux sample.

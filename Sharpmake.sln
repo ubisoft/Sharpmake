@@ -26,8 +26,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99BF
 		extract-vcpkg.ps1 = extract-vcpkg.ps1
 		functional_test.py = functional_test.py
 		regression_test.py = regression_test.py
+		RunProcess.ps1 = RunProcess.ps1
+		RunSample.ps1 = RunSample.ps1
 		RunSharpmake.ps1 = RunSharpmake.ps1
-		RunTest.ps1 = RunTest.ps1
 		UpdateSamplesOutput.bat = UpdateSamplesOutput.bat
 	EndProjectSection
 EndProject

@@ -24,6 +24,9 @@ namespace Sharpmake
 
         #region IPlatformDescriptor
         public abstract string SimplePlatformString { get; }
+        // The toolchain-specific platform string is not needed with Xcode so we just use the
+        // simple platform name in case some of the base/common generation code needs it
+        public string GetToolchainPlatformString(ITarget target) => SimplePlatformString;
         public bool IsMicrosoftPlatform => false;
         public bool IsUsingClang => true;
         public bool IsLinkerInvokedViaCompiler
@@ -47,8 +50,6 @@ namespace Sharpmake
         {
             return new EnvironmentVariableResolver(variables);
         }
-
-        public string GetPlatformString(ITarget target) => SimplePlatformString;
         #endregion
 
         #region IFastBuildCompilerSettings implementation
@@ -170,7 +171,7 @@ namespace Sharpmake
             var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(SharpmakePlatform);
 
             var platform = conf.Target.GetFragment<Platform>();
-            string compilerName = $"Compiler-{Util.GetSimplePlatformString(platform)}-{devEnv}";
+            string compilerName = $"Compiler-{Util.GetToolchainPlatformString(platform, conf.Target)}-{devEnv}";
             string CCompilerSettingsName = "C-" + compilerName;
             string CompilerSettingsName = compilerName;
 

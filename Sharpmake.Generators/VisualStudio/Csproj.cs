@@ -1169,7 +1169,7 @@ namespace Sharpmake.Generators.VisualStudio
                 if (conf.Output == Project.Configuration.OutputType.Dll)
                     throw new Error("OutputType for C# projects must be either DotNetClassLibrary, DotNetConsoleApp or DotNetWindowsApp");
 
-                string projectUniqueName = conf.Name + Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
+                string projectUniqueName = conf.Name + Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target);
 
                 configurationNameMapping[projectUniqueName] = conf;
 
@@ -1329,7 +1329,7 @@ namespace Sharpmake.Generators.VisualStudio
             using (resolver.NewScopedParameter("targetFrameworkVersionString", targetFrameworkVersionString))
             using (resolver.NewScopedParameter("projectTypeGuids", projectTypeGuids))
             using (resolver.NewScopedParameter("assemblyName", assemblyName))
-            using (resolver.NewScopedParameter("defaultPlatform", Util.GetPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
+            using (resolver.NewScopedParameter("defaultPlatform", Util.GetToolchainPlatformString(project.DefaultPlatform ?? configurations[0].Platform, project, null)))
             using (resolver.NewScopedParameter("netCoreEnableDefaultItems", netCoreEnableDefaultItems))
             using (resolver.NewScopedParameter("defaultItemExcludes", defaultItemExcludes))
             using (resolver.NewScopedParameter("GeneratedAssemblyConfigTemplate", generatedAssemblyConfigTemplate))
@@ -1439,7 +1439,7 @@ namespace Sharpmake.Generators.VisualStudio
             // configuration general
             foreach (Project.Configuration conf in _projectConfigurationList)
             {
-                using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                using (resolver.NewScopedParameter("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (resolver.NewScopedParameter("conf", conf))
                 using (resolver.NewScopedParameter("project", project))
                 using (resolver.NewScopedParameter("targetFramework", GetTargetFrameworksString(projectFrameworksPerConf[conf])))
@@ -2942,7 +2942,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private void WriteEvents(Project.Configuration conf, Options.ExplicitOptions options, bool conditional, StreamWriter writer, Resolver resolver)
         {
-            using (resolver.NewScopedParameter("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+            using (resolver.NewScopedParameter("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
             using (resolver.NewScopedParameter("conf", conf))
             using (resolver.NewScopedParameter("options", options))
             {

@@ -955,22 +955,22 @@ namespace Sharpmake.UnitTests
         ///     Verify the right managed project platform name was returned depending on the platform and the project type
         ///  </summary>
         [Test]
-        public void GetPlatformString()
+        public void GetVisualStudioPlatformString()
         {
-            Assert.AreEqual("x86", Util.GetPlatformString(Platform.win32, new CSharpProject(), null, false));
-            Assert.AreEqual("x64", Util.GetPlatformString(Platform.win64, new CSharpProject(), null, false));
-            Assert.AreEqual("AnyCPU", Util.GetPlatformString(Platform.win64, new PythonProject(), null, false));
-            Assert.AreEqual("Any CPU", Util.GetPlatformString(Platform.win64, new PythonProject(), null, true));
-            Assert.AreEqual("x64", Util.GetPlatformString(Platform.win64, new AndroidPackageProject(), null, true));
+            Assert.AreEqual("x86", Util.GetToolchainPlatformString(Platform.win32, new CSharpProject(), null, false));
+            Assert.AreEqual("x64", Util.GetToolchainPlatformString(Platform.win64, new CSharpProject(), null, false));
+            Assert.AreEqual("AnyCPU", Util.GetToolchainPlatformString(Platform.win64, new PythonProject(), null, false));
+            Assert.AreEqual("Any CPU", Util.GetToolchainPlatformString(Platform.win64, new PythonProject(), null, true));
+            Assert.AreEqual("x64", Util.GetToolchainPlatformString(Platform.win64, new AndroidPackageProject(), null, true));
         }
 
         /// <summary>
         ///     Verify that an exception is thrown if a platform is not supported
         ///  </summary>
         [Test]
-        public void GetPlatformStringException()
+        public void GetVisualStudioPlatformStringException()
         {
-            Assert.Catch<Exception>(() => Util.GetPlatformString(Platform.android, new CSharpProject(), null, false));
+            Assert.Catch<Exception>(() => Util.GetToolchainPlatformString(Platform.android, new CSharpProject(), null, false));
         }
     }
 

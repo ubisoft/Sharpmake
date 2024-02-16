@@ -12,7 +12,8 @@ namespace Sharpmake
     public sealed class DotNetPlatform : BasePlatform, Project.Configuration.IConfigurationTasks
     {
         #region IPlatformDescriptor implementation
-        public override string SimplePlatformString => "Any CPU";
+        public override string SimplePlatformString => "anycpu";
+        public override string GetToolchainPlatformString(ITarget target) => "Any CPU";
         public override bool IsMicrosoftPlatform => true;
         public override bool IsPcPlatform => true;
         public override bool IsUsingClang => false;

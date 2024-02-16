@@ -733,10 +733,10 @@ namespace Sharpmake
                 throw new NotFoundException(parameterName + name + " is null on target type " + refCountedReference.Value.GetType().Name + ", please set a proper value for sharpmake to resolve it");
             }
 
-            // Handle platform names in case they are provided by a platform extension, this allow "[target.Platform]" to be properly resolved
-            if (parameter is Platform platform && platform >= Platform._reservedPlatformSection)
+            // Handle platform names in case they are provided by a platform extension, this allows "[target.Platform]" to be properly resolved
+            if (parameter is Platform platformParameter)
             {
-                parameter = Util.GetSimplePlatformString(platform);
+                parameter = Util.GetSimplePlatformString(platformParameter);
             }
 
             return ApplyModifier(modifier, parameter.ToString());

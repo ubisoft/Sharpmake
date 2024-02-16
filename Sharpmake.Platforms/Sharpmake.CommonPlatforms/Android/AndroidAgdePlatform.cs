@@ -22,12 +22,12 @@ namespace Sharpmake
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed partial class AndroidAgdePlatform : BasePlatform, Project.Configuration.IConfigurationTasks, IFastBuildCompilerSettings, IClangPlatformBff
         {
-            #region IPlatformDescriptor implementation.
+            #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Agde";
-            public override string GetPlatformString(ITarget target)
+
+            public override string GetToolchainPlatformString(ITarget target)
             {
-                if (target == null)
-                    return SimplePlatformString;
+                ArgumentNullException.ThrowIfNull(target);
 
                 var buildTarget = target.GetFragment<AndroidBuildTargets>();
                 switch (buildTarget)
@@ -41,7 +41,7 @@ namespace Sharpmake
                     case AndroidBuildTargets.x86_64:
                         return "Android-x86_64";
                     default:
-                        throw new System.Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
+                        throw new Exception(string.Format("Unsupported Android AGDE architecture: {0}", buildTarget));
                 }
             }
 
@@ -708,7 +708,7 @@ namespace Sharpmake
                 var target = conf.Target;
                 var devEnv = target.GetFragment<DevEnv>();
 
-                string compilerName = string.Join("-", "Compiler", GetPlatformString(target), devEnv, SimplePlatformString);
+                string compilerName = string.Join("-", "Compiler", GetToolchainPlatformString(target), devEnv, SimplePlatformString);
                 string CompilerSettingsName = compilerName;
                 string CCompilerSettingsName = $"C-{compilerName}";
 

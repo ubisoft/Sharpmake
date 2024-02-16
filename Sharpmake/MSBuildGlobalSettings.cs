@@ -25,7 +25,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static void SetCppPlatformFolder(DevEnv devEnv, Platform platform, string value)
         {
-            SetCppPlatformFolder(devEnv, Util.GetSimplePlatformString(platform), value);
+            SetCppPlatformFolderInternal(devEnv, Util.GetSimplePlatformString(platform), value);
         }
 
         /// <summary>
@@ -36,7 +36,9 @@ namespace Sharpmake
         /// <param name="platform">Platform affected</param>
         /// <param name="value">The location of the MSBuild platform folder. Warning: this *must* end with a trailing separator</param>
         /// <returns></returns>
-        public static void SetCppPlatformFolder(DevEnv devEnv, string platform, string value)
+        [Obsolete("Use SetCppPlatformFolder with a Platform enum field instead")]
+        public static void SetCppPlatformFolder(DevEnv devEnv, string platform, string value) => SetCppPlatformFolderInternal(devEnv, platform, value);
+        private static void SetCppPlatformFolderInternal(DevEnv devEnv, string platform, string value)
         {
             var key = Tuple.Create(devEnv, platform);
             if (!string.Equals(s_cppPlatformFolders.GetOrAdd(key, value), value))
@@ -48,7 +50,19 @@ namespace Sharpmake
         /// </summary>
         /// <param name="devEnv">Visual studio version</param>
         /// <param name="platform">Platform</param>
-        public static void ResetCppPlatformFolder(DevEnv devEnv, string platform)
+        public static void ResetCppPlatformFolder(DevEnv devEnv, Platform platform)
+        {
+            ResetCppPlatformFolderInternal(devEnv, Util.GetSimplePlatformString(platform));
+        }
+
+        /// <summary>
+        /// Use to reset the override of a platform
+        /// </summary>
+        /// <param name="devEnv">Visual studio version</param>
+        /// <param name="platform">Platform</param>
+        [Obsolete("Use ResetCppPlatformFolder with a Platform enum field instead")]
+        public static void ResetCppPlatformFolder(DevEnv devEnv, string platform) => ResetCppPlatformFolderInternal(devEnv, platform);
+        private static void ResetCppPlatformFolderInternal(DevEnv devEnv, string platform)
         {
             var key = Tuple.Create(devEnv, platform);
             string value;
@@ -64,7 +78,7 @@ namespace Sharpmake
         /// <returns>the registered msbuild foldervalue for the requested pair. null if not found</returns>
         public static string GetCppPlatformFolder(DevEnv devEnv, Platform platform)
         {
-            return GetCppPlatformFolder(devEnv, Util.GetSimplePlatformString(platform));
+            return GetCppPlatformFolderInternal(devEnv, Util.GetSimplePlatformString(platform));
         }
 
         /// <summary>
@@ -74,7 +88,9 @@ namespace Sharpmake
         /// <param name="devEnv">Visual studio version affected</param>
         /// <param name="platform">Platform affected</param>
         /// <returns>the registered msbuild foldervalue for the requested pair. null if not found</returns>
-        public static string GetCppPlatformFolder(DevEnv devEnv, string platform)
+        [Obsolete("Use GetCppPlatformFolder with a Platform enum field instead")]
+        public static string GetCppPlatformFolder(DevEnv devEnv, string platform) => GetCppPlatformFolderInternal(devEnv, platform);
+        private static string GetCppPlatformFolderInternal(DevEnv devEnv, string platform)
         {
             var key = Tuple.Create(devEnv, platform);
             string value;
@@ -97,7 +113,7 @@ namespace Sharpmake
         /// <returns></returns>
         public static void SetAdditionalVCTargetsPath(DevEnv devEnv, Platform platform, string value)
         {
-            SetAdditionalVCTargetsPath(devEnv, Util.GetSimplePlatformString(platform), value);
+            SetAdditionalVCTargetsPathInternal(devEnv, Util.GetSimplePlatformString(platform), value);
         }
 
         /// <summary>
@@ -108,7 +124,9 @@ namespace Sharpmake
         /// <param name="platform">Platform affected</param>
         /// <param name="value">The location of the MSBuild additional VC target path. Warning: this *must* end with a trailing separator</param>
         /// <returns></returns>
-        public static void SetAdditionalVCTargetsPath(DevEnv devEnv, string platform, string value)
+        [Obsolete("Use SetAdditionalVCTargetsPath with a Platform enum field instead")]
+        public static void SetAdditionalVCTargetsPath(DevEnv devEnv, string platform, string value) => SetAdditionalVCTargetsPathInternal(devEnv, platform, value);
+        private static void SetAdditionalVCTargetsPathInternal(DevEnv devEnv, string platform, string value)
         {
             var key = Tuple.Create(devEnv, platform);
             if (!string.Equals(s_additionalVCTargetsPath.GetOrAdd(key, value), value))
@@ -120,7 +138,19 @@ namespace Sharpmake
         /// </summary>
         /// <param name="devEnv">Visual studio version</param>
         /// <param name="platform">Platform</param>
-        public static void ResetAdditionalVCTargetsPath(DevEnv devEnv, string platform)
+        public static void ResetAdditionalVCTargetsPath(DevEnv devEnv, Platform platform)
+        {
+            ResetAdditionalVCTargetsPathInternal(devEnv, Util.GetSimplePlatformString(platform));
+        }
+
+        /// <summary>
+        /// Use to reset the set of AdditionalVCTargetsPath
+        /// </summary>
+        /// <param name="devEnv">Visual studio version</param>
+        /// <param name="platform">Platform</param>
+        [Obsolete("Use ResetAdditionalVCTargetsPath with a Platform enum field instead")]
+        public static void ResetAdditionalVCTargetsPath(DevEnv devEnv, string platform) => ResetAdditionalVCTargetsPathInternal(devEnv, platform);
+        private static void ResetAdditionalVCTargetsPathInternal(DevEnv devEnv, string platform)
         {
             var key = Tuple.Create(devEnv, platform);
             string value;
@@ -136,7 +166,7 @@ namespace Sharpmake
         /// <returns>the registered msbuild additional VC targets path for the requested pair. null if not found</returns>
         public static string GetAdditionalVCTargetsPath(DevEnv devEnv, Platform platform)
         {
-            return GetAdditionalVCTargetsPath(devEnv, Util.GetSimplePlatformString(platform));
+            return GetAdditionalVCTargetsPathInternal(devEnv, Util.GetSimplePlatformString(platform));
         }
 
         /// <summary>
@@ -146,7 +176,9 @@ namespace Sharpmake
         /// <param name="devEnv">Visual studio version affected</param>
         /// <param name="platform">Platform affected</param>
         /// <returns>the registered msbuild additional VC targets for the requested pair. null if not found</returns>
-        public static string GetAdditionalVCTargetsPath(DevEnv devEnv, string platform)
+        [Obsolete("Use GetAdditionalVCTargetsPath with a Platform enum field instead")]
+        public static string GetAdditionalVCTargetsPath(DevEnv devEnv, string platform) => GetAdditionalVCTargetsPathInternal(devEnv, platform);
+        private static string GetAdditionalVCTargetsPathInternal(DevEnv devEnv, string platform)
         {
             var key = Tuple.Create(devEnv, platform);
             string value;
