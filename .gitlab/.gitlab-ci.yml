@@ -5,6 +5,12 @@ include:
   - project: 'Sharpmake/SharpmakeExtended'
     file: 'build/sharpmake-ci.yml'
 
+stages:
+  - build
+  - test
+  - validation
+  - deploy
+
 
 default:
   tags:
