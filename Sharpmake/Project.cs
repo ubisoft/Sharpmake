@@ -2434,8 +2434,8 @@ namespace Sharpmake
             AssemblyName = "[project.Name]";
             IsFileNameToLower = false;
             IsTargetFileNameToLower = false;
-            ResourcesPath = RootPath + @"\Resources\";
-            ContentPath = RootPath + @"\Content\";
+            ResourcesPath = @"[project.RootPath]\Resources\";
+            ContentPath = @"[project.RootPath]\Content\";
             ImportProjects.Add(new ImportProject { Project = DefaultImportProject });
             ApplicationDefinitionFilenames.Add("App.xaml", "MainApplication.xaml");
 
