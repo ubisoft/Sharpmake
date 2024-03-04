@@ -332,8 +332,14 @@ namespace Sharpmake
                         if (!configurationProject.Configuration.IsFastBuild && configurationProject.Configuration.ResolvedDependencies.Any(d => d.IsFastBuild))
                             unlinkedList.Add(configurationProject.Configuration);
                         unlinkedList.AddRange(dependenciesConfiguration.Where(c => !c.IsFastBuild && c.ResolvedDependencies.Any(d => d.IsFastBuild)));
+
                         foreach (Project.Configuration dependencyConfiguration in dependenciesConfiguration)
                         {
+                            // Skip configuration that only have swapped-to-dll dependencies
+                            var projectsSwappedToDll = configurationProject.Configuration.ConfigurationsSwappedToDll;
+                            if (projectsSwappedToDll is not null && projectsSwappedToDll.Contains(dependencyConfiguration))
+                                continue;
+
                             Project dependencyProject = dependencyConfiguration.Project;
                             if (dependencyProject.SharpmakeProjectType == Project.ProjectTypeAttribute.Export)
                                 continue;

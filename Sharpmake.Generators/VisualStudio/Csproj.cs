@@ -243,7 +243,7 @@ namespace Sharpmake.Generators.VisualStudio
                 public string Include;
 
                 // This property is used to decide if this object is a Link
-                // If LinkFolder is null, this item is ín the project folder and is not a link
+                // If LinkFolder is null, this item is in the project folder and is not a link
                 // If LinkFolder is empty, this item is in the project's SourceRootPath or RootPath folder
                 //      which are outside of the Project folder and is a link.
                 // If LinkedFolder is a file path, it's a link. 
@@ -1453,38 +1453,53 @@ namespace Sharpmake.Generators.VisualStudio
                         if (!Util.IsDotNet(dependencyConfiguration))
                             continue;
 
-                        string dependencyExtension = Util.GetProjectFileExtension(dependencyConfiguration);
-                        string projectFullFileNameWithExtension = Util.GetCapitalizedPath(dependencyConfiguration.ProjectFullFileName + dependencyExtension);
-                        string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized,
-                                                                            projectFullFileNameWithExtension);
-
-                        // If dependency project is marked as [Compile], read the GUID from the project file
-                        if (dependencyConfiguration.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Compile && dependencyConfiguration.ProjectGuid == null)
-                            dependencyConfiguration.ProjectGuid = ReadGuidFromProjectFile(dependencyConfiguration);
-
-                        // FIXME : MsBuild does not seem to properly detect ReferenceOutputAssembly setting. 
-                        // It may try to recompile the project if the output file of the dependency is missing. 
-                        // To counter this, the CopyLocal field is forced to false for build-only dependencies. 
-                        bool isPrivate = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences) && dependency.ReferenceOutputAssembly != false;
-
-                        string includeOutputGroupsInVsix = null;
-                        if (isPrivate && project.ProjectTypeGuids == CSharpProjectType.Vsix)
+                        if (dependency.ReferenceSwappedWithOutputAssembly)
                         {
-                            // Includes debug symbols of private (i.e. copy local) referenced projects in the VSIX.
-                            // This WILL override default values of <IncludeOutputGroupsInVSIX> and <IncludeOutputGroupsInVSIXLocalOnly> from Microsoft.VsSDK.targets,
-                            // so if the VSIXs stop working, this may be the cause...
-                            includeOutputGroupsInVsix = "DebugSymbolsProjectOutputGroup;BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup";
+                            var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
+                            string dllPath = Path.Combine(dependency.Configuration.TargetPath, $"{dependency.Configuration.AssemblyName}{dependency.Configuration.DllFullExtension}");
+                            var referencesByPath = new ItemGroups.Reference
+                            {
+                                Include = Path.GetFileNameWithoutExtension(dllPath),
+                                SpecificVersion = false,
+                                HintPath = Util.PathGetRelative(_projectPathCapitalized, dllPath),
+                                Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                            };
+                            itemGroups.AddReference(dotNetFramework, referencesByPath);
                         }
-
-                        itemGroups.ProjectReferences.Add(new ItemGroups.ProjectReference
+                        else
                         {
-                            Include = relativeToProjectFile,
-                            Name = dependencyConfiguration.ProjectName,
-                            Private = isPrivate,
-                            Project = new Guid(dependencyConfiguration.ProjectGuid),
-                            ReferenceOutputAssembly = dependency.ReferenceOutputAssembly,
-                            IncludeOutputGroupsInVSIX = includeOutputGroupsInVsix,
-                        });
+                            string dependencyExtension = Util.GetProjectFileExtension(dependencyConfiguration);
+                            string projectFullFileNameWithExtension = Util.GetCapitalizedPath(dependencyConfiguration.ProjectFullFileName + dependencyExtension);
+                            string relativeToProjectFile = Util.PathGetRelative(_projectPathCapitalized, projectFullFileNameWithExtension);
+
+                            // If dependency project is marked as [Compile], read the GUID from the project file
+                            if (dependencyConfiguration.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Compile && dependencyConfiguration.ProjectGuid == null)
+                                dependencyConfiguration.ProjectGuid = ReadGuidFromProjectFile(dependencyConfiguration);
+
+                            // FIXME : MsBuild does not seem to properly detect ReferenceOutputAssembly setting. 
+                            // It may try to recompile the project if the output file of the dependency is missing. 
+                            // To counter this, the CopyLocal field is forced to false for build-only dependencies. 
+                            bool isPrivate = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ProjectReferences) && dependency.ReferenceOutputAssembly != false;
+
+                            string includeOutputGroupsInVsix = null;
+                            if (isPrivate && project.ProjectTypeGuids == CSharpProjectType.Vsix)
+                            {
+                                // Includes debug symbols of private (i.e. copy local) referenced projects in the VSIX.
+                                // This WILL override default values of <IncludeOutputGroupsInVSIX> and <IncludeOutputGroupsInVSIXLocalOnly> from Microsoft.VsSDK.targets,
+                                // so if the VSIXs stop working, this may be the cause...
+                                includeOutputGroupsInVsix = "DebugSymbolsProjectOutputGroup;BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup";
+                            }
+
+                            itemGroups.ProjectReferences.Add(new ItemGroups.ProjectReference
+                            {
+                                Include = relativeToProjectFile,
+                                Name = dependencyConfiguration.ProjectName,
+                                Private = isPrivate,
+                                Project = new Guid(dependencyConfiguration.ProjectGuid),
+                                ReferenceOutputAssembly = dependency.ReferenceOutputAssembly,
+                                IncludeOutputGroupsInVSIX = includeOutputGroupsInVsix,
+                            });
+                        }
                     }
                 }
 
