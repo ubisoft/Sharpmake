@@ -57,6 +57,13 @@ namespace Sharpmake
         ForceUsingAssembly = 1 << 6,
 
         /// <summary>
+        /// The dependent project will reference the target assembly file instead of using a project reference.
+        /// Valid only for C# projects. Note that these assemblies are expected to be found in the project's output
+        /// directory and thus must be built otherwise.
+        /// </summary>
+        DependOnAssemblyOutput = 1 << 7,
+        
+        /// <summary>
         /// Specifies that the dependent project inherits the dependency's library files, library
         /// paths, include paths and defined symbols.
         /// </summary>
@@ -1643,6 +1650,8 @@ namespace Sharpmake
             public int MinFilesPerJumboFile = 2;
             public int MinJumboFiles = 1;
 
+            internal HashSet<Configuration> ConfigurationsSwappedToDll { get; set; }
+            
             // container for executable
             /// <summary>
             /// Represents a build step that invokes an executable on the file system.
@@ -3269,13 +3278,14 @@ namespace Sharpmake
 
             internal class PropagationSettings
             {
-                internal PropagationSettings(DependencySetting inDependencySetting, bool inIsImmediate, bool inHasPublicPathToRoot, bool inHasPublicPathToImmediate, bool inGoesThroughDLL)
+                internal PropagationSettings(DependencySetting inDependencySetting, bool inIsImmediate, bool inHasPublicPathToRoot, bool inHasPublicPathToImmediate, bool inGoesThroughDLL, bool isDotnetReferenceSwappedWithOutputAssembly)
                 {
                     _dependencySetting = inDependencySetting;
                     _isImmediate = inIsImmediate;
                     _hasPublicPathToRoot = inHasPublicPathToRoot;
                     _hasPublicPathToImmediate = inHasPublicPathToImmediate;
                     _goesThroughDLL = inGoesThroughDLL;
+                    _isDotnetReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly;
                 }
 
                 public override bool Equals(object obj)
@@ -3293,7 +3303,8 @@ namespace Sharpmake
                            _isImmediate == other._isImmediate &&
                            _hasPublicPathToRoot == other._hasPublicPathToRoot &&
                            _hasPublicPathToImmediate == other._hasPublicPathToImmediate &&
-                           _goesThroughDLL == other._goesThroughDLL;
+                           _goesThroughDLL == other._goesThroughDLL &&
+                           _isDotnetReferenceSwappedWithOutputAssembly == other._isDotnetReferenceSwappedWithOutputAssembly;
                 }
 
                 public override int GetHashCode()
@@ -3306,6 +3317,7 @@ namespace Sharpmake
                         hash = hash * 23 + _hasPublicPathToRoot.GetHashCode();
                         hash = hash * 23 + _hasPublicPathToImmediate.GetHashCode();
                         hash = hash * 23 + _goesThroughDLL.GetHashCode();
+                        hash = hash * 23 + _isDotnetReferenceSwappedWithOutputAssembly.GetHashCode();
                         return hash;
                     }
                 }
@@ -3315,6 +3327,7 @@ namespace Sharpmake
                 internal readonly bool _hasPublicPathToRoot;
                 internal readonly bool _hasPublicPathToImmediate;
                 internal readonly bool _goesThroughDLL;
+                internal readonly bool _isDotnetReferenceSwappedWithOutputAssembly;
             }
 
             internal void Link(Builder builder)
@@ -3347,10 +3360,16 @@ namespace Sharpmake
 
                 var resolvedDotNetPublicDependencies = new HashSet<DotNetDependency>();
                 var resolvedDotNetPrivateDependencies = new HashSet<DotNetDependency>();
+                
+                // Keep track of all configurations that have been swapped to dll as we don't want to include them in the final solution
+                HashSet<Configuration> configurationsSwappedToDll = null;
+
+                // We also keep track of configurations that have been added explicitly without swapping, to make sure the project is still included in the solution
+                HashSet<Configuration> configurationsStillUsedAsNotSwappedToDll = null;
 
                 var visitedNodes = new Dictionary<DependencyNode, List<PropagationSettings>>();
                 var visitingNodes = new Stack<Tuple<DependencyNode, PropagationSettings>>();
-                visitingNodes.Push(Tuple.Create(rootNode, new PropagationSettings(DependencySetting.Default, true, true, true, false)));
+                visitingNodes.Push(Tuple.Create(rootNode, new PropagationSettings(DependencySetting.Default, inIsImmediate: true, inHasPublicPathToRoot: true, inHasPublicPathToImmediate: true, inGoesThroughDLL: false, isDotnetReferenceSwappedWithOutputAssembly: false)));
 
                 (IConfigurationTasks, Platform)? lastPlatformConfigurationTasks = null;
 
@@ -3390,6 +3409,7 @@ namespace Sharpmake
                     bool hasPublicPathToRoot = propagationSetting._hasPublicPathToRoot;
                     bool hasPublicPathToImmediate = propagationSetting._hasPublicPathToImmediate;
                     bool goesThroughDLL = propagationSetting._goesThroughDLL;
+                    bool isDotnetReferenceSwappedWithOutputAssembly = propagationSetting._isDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput);
 
                     foreach (var childNode in visitedNode._childNodes)
                     {
@@ -3400,7 +3420,8 @@ namespace Sharpmake
                                 isRoot, // only children of root are immediate
                                 (isRoot || hasPublicPathToRoot) && childNode.Item2 == DependencyType.Public,
                                 (isImmediate || hasPublicPathToImmediate) && childNode.Item2 == DependencyType.Public,
-                                !isRoot && (goesThroughDLL || visitedNode._configuration.Output == OutputType.Dll)
+                                !isRoot && (goesThroughDLL || visitedNode._configuration.Output == OutputType.Dll),
+                                isDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput)
                             )
                         );
 
@@ -3659,8 +3680,20 @@ namespace Sharpmake
 
                                 var dotNetDependency = new DotNetDependency(dependency)
                                 {
-                                    ReferenceOutputAssembly = referenceOutputAssembly
+                                    ReferenceOutputAssembly = referenceOutputAssembly,
+                                    ReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly
                                 };
+                                
+                                if (isDotnetReferenceSwappedWithOutputAssembly)
+                                {
+                                    configurationsSwappedToDll ??= new HashSet<Configuration>();
+                                    configurationsSwappedToDll.Add(dotNetDependency.Configuration);
+                                }
+                                else
+                                {
+                                    configurationsStillUsedAsNotSwappedToDll ??= new HashSet<Configuration>();
+                                    configurationsStillUsedAsNotSwappedToDll.Add(dotNetDependency.Configuration);
+                                }
 
                                 if (!resolvedDotNetPublicDependencies.Contains(dotNetDependency))
                                 {
@@ -3697,7 +3730,15 @@ namespace Sharpmake
 
                 DotNetPublicDependencies = resolvedDotNetPublicDependencies.ToList();
                 DotNetPrivateDependencies = resolvedDotNetPrivateDependencies.ToList();
+                if (configurationsSwappedToDll is not null)
+                {
+                    ConfigurationsSwappedToDll = configurationsSwappedToDll;
 
+                    // Remove configurations that have been explicitly used as not swapped to dll
+                    if (configurationsStillUsedAsNotSwappedToDll is not null)
+                        ConfigurationsSwappedToDll.ExceptWith(configurationsStillUsedAsNotSwappedToDll);
+                }
+                
                 // sort base on DependenciesOrder
                 _resolvedPublicDependencies.Sort(SortConfigurationForLink);
                 _resolvedPrivateDependencies.Sort(SortConfigurationForLink);
