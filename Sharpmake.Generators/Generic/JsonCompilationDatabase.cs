@@ -141,6 +141,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             CreatePrecomp,
             PrecompPath,
             IncludePath,
+            IncludeSystemPath
         }
 
         private static readonly IDictionary<CompilerFlags, string> s_clangFlags = new Dictionary<CompilerFlags, string>
@@ -149,6 +150,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             { CompilerFlags.UsePrecomp, "-include-pch {0}" },
             { CompilerFlags.CreatePrecomp, "-x c++-header {0}" },
             { CompilerFlags.IncludePath, "-I" },
+            { CompilerFlags.IncludeSystemPath, "-isystem" },
         };
 
         private static readonly IDictionary<CompilerFlags, string> s_vcFlags = new Dictionary<CompilerFlags, string>
@@ -158,6 +160,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             { CompilerFlags.CreatePrecomp, "/Yc\"{0}\" /FI\"{0}\"" },
             { CompilerFlags.PrecompPath, "/Fp\"{0}\"" },
             { CompilerFlags.IncludePath, "/I" },
+            { CompilerFlags.IncludeSystemPath, "/external:I" },
         };
 
         private static readonly ProjectOptionsGenerator s_optionGenerator = new ProjectOptionsGenerator();
@@ -274,13 +277,18 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
 
             string defaultCmdLineIncludePrefix = _flags[CompilerFlags.IncludePath];
+            string defaultCmdLineIncludeSystemPrefix = _flags[CompilerFlags.IncludeSystemPath];
 
             // Fill include dirs
             var dirs = new List<string>();
 
-            var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
-            var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p.Path, p.CmdLinePrefix)).ToList();
+            var platformIncludePaths = context.Configuration.IncludePaths;
+            var platformIncludeSystemPaths = context.Configuration.IncludeSystemPaths;
+            var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludePrefix)).ToList();
+            var platformIncludeSystemPathsPrefixed = platformIncludeSystemPaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludeSystemPrefix)).ToList();
+
             dirs.AddRange(platformIncludePathsPrefixed);
+            dirs.AddRange(platformIncludeSystemPathsPrefixed);
 
             // TODO: move back up, just below the creation of the dirs list
             dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludePrefix)));
@@ -300,7 +308,7 @@ namespace Sharpmake.Generators.JsonCompilationDatabase
             {
                 // with LLVM as toolchain, we are still using the default resource compiler, so we need the default include prefix
                 // TODO: this is not great, ideally we would need the prefix to be per "compiler", and a platform can have many
-                var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p.Path, defaultCmdLineIncludePrefix));
+                var platformIncludePathsDefaultPrefix = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, p, defaultCmdLineIncludePrefix));
                 resourceDirs.AddRange(platformIncludePathsDefaultPrefix);
             }
             else
