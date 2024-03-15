@@ -164,6 +164,7 @@ namespace Sharpmake.Generators.VisualStudio
             public string Description = "";
             public string Outputs = "";
             public string AdditionalInputs = "";
+            public string OutputItemType = "";
         };
 
         public static Dictionary<string, CombinedCustomFileBuildStep> CombineCustomFileBuildSteps(string referencePath, Resolver resolver, IEnumerable<Project.Configuration.CustomFileBuildStep> buildSteps)
@@ -174,7 +175,7 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var customBuildStep in buildSteps)
             {
                 var relativeBuildStep = customBuildStep.MakePathRelative(resolver, (path, commandRelative) => Util.SimplifyPath(Util.PathGetRelative(referencePath, path)));
-                if(!customBuildStep.UseExecutableFromSystemPath)
+                if (!customBuildStep.UseExecutableFromSystemPath)
                 {
                     relativeBuildStep.AdditionalInputs.Add(relativeBuildStep.Executable);
                 }
@@ -205,6 +206,9 @@ namespace Sharpmake.Generators.VisualStudio
                 combinedCustomBuildStep.Description += relativeBuildStep.Description;
                 combinedCustomBuildStep.Outputs = Util.EscapeXml(relativeBuildStep.Output);
                 combinedCustomBuildStep.AdditionalInputs = Util.EscapeXml(relativeBuildStep.AdditionalInputs.JoinStrings(";"));
+
+                //Vcxproj only allows specifying one output item type per build command
+                combinedCustomBuildStep.OutputItemType = customBuildStep.OutputItemType;
             }
 
             return steps;
@@ -1532,11 +1536,13 @@ namespace Sharpmake.Generators.VisualStudio
                                 using (fileGenerator.Declare("command", buildStep.Commands))
                                 using (fileGenerator.Declare("inputs", buildStep.AdditionalInputs))
                                 using (fileGenerator.Declare("outputs", buildStep.Outputs))
+                                using (fileGenerator.Declare("outputItemType", string.IsNullOrEmpty(buildStep.OutputItemType) ? FileGeneratorUtilities.RemoveLineTag : buildStep.OutputItemType))
                                 {
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildDescription);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildCommand);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildInputs);
                                     fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputs);
+                                    fileGenerator.Write(Template.Project.ProjectFilesCustomBuildOutputItemType);
                                 }
                             }
                         }
