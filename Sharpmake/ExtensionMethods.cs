@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -392,6 +393,13 @@ namespace Sharpmake
             return version;
         }
 
+        public static Version GetVisualStudioVCToolsCompilerVersion(this DevEnv visualVersion, Platform platform)
+        {
+            string clExeFile = Path.Combine(visualVersion.GetVisualStudioBinPath(platform), "cl.exe");
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(clExeFile);
+            return new Version(fileVersionInfo.FileMajorPart, fileVersionInfo.FileMinorPart, fileVersionInfo.FileBuildPart, fileVersionInfo.FilePrivatePart);
+        }
+
         /// <summary>
         /// Will return the name of the root directory in MSBuild under Microsoft/VC for a particular devenv,
         /// since it uses yet another versioning pattern than the toolchain
@@ -485,7 +493,7 @@ namespace Sharpmake
                 case DevEnv.vs2019:
                 case DevEnv.vs2022:
                     {
-                        string targetPlatform = (platform == Platform.win64) ? "x64" : "x86";
+                        string targetPlatform = (platform == Platform.win32) ? "x86" : "x64";
                         string compilerHost = Environment.Is64BitOperatingSystem ? "HostX64" : "HostX86";
                         return Path.Combine(visualVersion.GetVisualStudioVCRootPath(), "bin", compilerHost, targetPlatform);
                     }
