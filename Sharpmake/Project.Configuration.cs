@@ -1827,9 +1827,10 @@ namespace Sharpmake
                     IsRecurse = buildStepCopy.IsRecurse;
                     IsNameSpecific = buildStepCopy.IsNameSpecific;
                     CopyPattern = buildStepCopy.CopyPattern;
+                    Mirror = buildStepCopy.Mirror;
                 }
 
-                public BuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*", bool fileCopy = true)
+                public BuildStepCopy(string sourcePath, string destinationPath, bool isNameSpecific = false, string copyPattern = "*", bool fileCopy = true, bool mirror = false)
                 {
                     SourcePath = sourcePath;
                     DestinationPath = destinationPath;
@@ -1838,12 +1839,15 @@ namespace Sharpmake
                     IsRecurse = true;
                     IsNameSpecific = isNameSpecific;
                     CopyPattern = copyPattern;
+                    Mirror = mirror;
                 }
+
                 public string SourcePath = "";
                 public string DestinationPath = "";
 
                 public bool IsFileCopy { get; set; }
                 public bool IsRecurse { get; set; }
+                public bool Mirror { get; set; }
                 public string CopyPattern { get; set; }
 
                 public virtual string GetCopyCommand(string workingPath, EnvironmentVariableResolver resolver)
@@ -1865,6 +1869,7 @@ namespace Sharpmake
                         "/njs", // /NJS :: No Job Summary.
                         "/ndl", // /NDL :: No Directory List - don't log directory names.
                         "/nfl", // /NFL :: No File List - don't log file names.
+                        Mirror ? "/mir" : string.Empty, // /MIR :: Mirrors a directory tree (equivalent to /e plus /purge).
 
                         // parameters
                         "\"" + sourceRelativePath + "\"",

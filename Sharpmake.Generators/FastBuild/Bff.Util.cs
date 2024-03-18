@@ -205,6 +205,9 @@ namespace Sharpmake.Generators.FastBuild
                 Destination = buildStep.DestinationPath;
                 Recurse = buildStep.IsRecurse;
                 FilePattern = buildStep.CopyPattern;
+
+                if (buildStep.Mirror)
+                    throw new Exception("Copy build step with the '{nameof(Project.Configuration.BuildStepCopy.Mirror)}' option enabled is not supported in a FastBuild context");
             }
 
             public override string Resolve(string rootPath, string bffFilePath, Resolver resolver)
