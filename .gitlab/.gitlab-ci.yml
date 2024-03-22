@@ -29,7 +29,7 @@ default:
     matrix:
     - configuration: [debug, release]
   script:
-    - dotnet build Sharpmake.sln -c $configuration -bl:Sharpmake_$configuration.binlog
+    - dotnet build Sharpmake.sln -c $configuration -bl:Sharpmake_$configuration.binlog -clp:ForceConsoleColor
   artifacts:
     untracked: true
     expire_in: 1 day
