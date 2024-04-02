@@ -120,12 +120,55 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
             conf.ProjectFileName = "[project.Name].[target.DevEnv]";
             conf.ProjectPath = @"[project.SourceRootPath]";
 
-            conf.IntermediatePath = Path.Combine(Globals.TmpDirectory, @"obj\[target.DirectoryName]\[project.Name]");
+            conf.IntermediatePath = Path.Combine(Globals.TmpDirectory, $@"obj\[target.DirectoryName]\[project.Name]{GetFrameworkSuffix(target)}");
             conf.TargetLibraryPath = Path.Combine(Globals.TmpDirectory, @"lib\[target.DirectoryName]\[project.Name]");
-            conf.TargetPath = Path.Combine(Globals.OutputDirectory, "[target.DirectoryName]");
+            conf.TargetPath = Path.Combine(Globals.OutputDirectory, $"[target.DirectoryName]{GetFrameworkSuffix(target)}");
 
             conf.Options.Add(Options.CSharp.WarningLevel.Level5);
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
+        }
+
+        /// <summary>
+        /// For a multiframework project, if the TargetPath for different frameworks is the same, msbuild will differentiate
+        /// by adding a folder in order to avoid overwriting the outputs. In such a case, the TargetPath property will be
+        /// different from the actual output folder (eg myLib/debug vs myLib/debug/{net472|net6.0|net6.0-windows})
+        /// This method helps differentiate the TargetPath so that it corresponds to the actual output folder
+        /// </summary>
+
+        private string GetFrameworkSuffix(CommonTarget target)
+        {
+            // Make sure we don't get something like bin/debug_net_6_0_windows/net6.0-windows, where the last dir is added by msbuild
+            if (!CustomProperties.ContainsKey("AppendTargetFrameworkToOutputPath"))
+            {
+                CustomProperties.Add("AppendTargetFrameworkToOutputPath", "false");
+            }
+
+            string frameworkSuffix = "_[target.DotNetFramework]";
+            frameworkSuffix += target.DotNetOS is DotNetOS.Default or 0 ? "" : "_[target.DotNetOS]";
+            return frameworkSuffix;
+        }
+    }
+
+    [Generate]
+    public class HelloWorldSwappedLib : CommonCSharpProject
+    {
+        public HelloWorldSwappedLib()
+        {
+            SourceRootPath = @"[project.RootPath]\[project.Name]";
+            AddTargets(CommonTarget.GetDefaultTargets());
+            AddTargets(new CommonTarget(
+                Platform.anycpu,
+                DevEnv.vs2022, 
+                Optimization.Debug | Optimization.Release, 
+                DotNetFramework.net6_0, 
+                dotNetOS: DotNetOS.windows
+                ));
+        }
+
+        public override void ConfigureAll(Configuration conf, CommonTarget target)
+        {
+            base.ConfigureAll(conf, target);
+            conf.Output = Configuration.OutputType.DotNetClassLibrary;
         }
     }
 
@@ -173,6 +216,7 @@ namespace NetCore.DotNetOSMultiFrameworksHelloWorld
             base.ConfigureAll(conf, target);
             conf.Output = Configuration.OutputType.DotNetConsoleApp;
             conf.AddPrivateDependency<HelloWorldLib>(target.ToDefaultDotNetOSTarget());
+            conf.AddPrivateDependency<HelloWorldSwappedLib>(target, DependencySetting.DependOnAssemblyOutput);
 
             if (target.DotNetFramework.IsDotNetCore())
             {
