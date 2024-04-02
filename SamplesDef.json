@@ -299,8 +299,8 @@
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloWorld.sharpmake.cs\" -framework {framework}",
                 "./Compile.ps1 -slnOrPrjFile \"OSMultiFrameworksHelloWorldSolution.sln\" -configuration {configuration} -platform \"Any CPU\" -WorkingDirectory \"{testFolder}/codebase/temp/solutions\" -VsVersion {os} -compiler MsBuild",
-                "./RunProcess.ps1 -exeToRun dotnet -workingDirectory \"{testFolder}/codebase/temp/bin/anycpu_{configuration}/net6.0-windows\" -arguments \"HelloWorldExe.dll\"",
-                "&'./{testFolder}/codebase/temp/bin/anycpu_{configuration}/net472/HelloWorldExe.exe'"
+                "./RunProcess.ps1 -exeToRun dotnet -workingDirectory \"{testFolder}/codebase/temp/bin/anycpu_{configuration}_net6_0_windows\" -arguments \"HelloWorldExe.dll\"",
+                "&'./{testFolder}/codebase/temp/bin/anycpu_{configuration}_v4_7_2/HelloWorldExe.exe'"
             ]
         },
         {

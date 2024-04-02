@@ -1021,9 +1021,15 @@ namespace Sharpmake.Generators.VisualStudio
                 };
             }
 
+            [Obsolete("Use AddReference(TargetFramework, Reference) instead")]
             public void AddReference(DotNetFramework dotNetFramework, Reference reference)
             {
-                AddTargetFrameworksCondition(References, new TargetFramework(dotNetFramework), reference);
+                AddReference(new TargetFramework(dotNetFramework), reference);
+            }
+
+            public void AddReference(TargetFramework targetFramework, Reference reference)
+            {
+                AddTargetFrameworksCondition(References, targetFramework, reference);
             }
 
             public void AddPackageReference(TargetFramework targetFramework, ItemTemplate itemTemplate)
@@ -1427,6 +1433,9 @@ namespace Sharpmake.Generators.VisualStudio
                 uf.GenerateUserFile(_builder, project, _projectConfigurationList, generatedFiles, skipFiles);
             }
 
+            // In case we need to swap out dependencies, we'll cache them here
+            Dictionary<string, List<DotNetDependency>> swappedNamesToDependencies = null;
+
             // configuration general
             foreach (Project.Configuration conf in _projectConfigurationList)
             {
@@ -1455,16 +1464,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                         if (dependency.ReferenceSwappedWithOutputAssembly)
                         {
-                            var dotNetFramework = conf.Target.GetFragment<DotNetFramework>();
-                            string dllPath = Path.Combine(dependency.Configuration.TargetPath, $"{dependency.Configuration.AssemblyName}{dependency.Configuration.DllFullExtension}");
-                            var referencesByPath = new ItemGroups.Reference
+                            // cache swapped dependencies and sort them out later since we have no visibility here regarding
+                            // multiple frameworks or optimizations from within a single Project.Configuration
+                            // Note: even if preallocating looks tempting, the time it takes to count the entries is actually longer than the time resizing
+                            swappedNamesToDependencies ??= new Dictionary<string, List<DotNetDependency>>(StringComparer.Ordinal);
+                            if (!swappedNamesToDependencies.TryAdd(dependency.Configuration.AssemblyName, new List<DotNetDependency>{ dependency }))
                             {
-                                Include = Path.GetFileNameWithoutExtension(dllPath),
-                                SpecificVersion = false,
-                                HintPath = Util.PathGetRelative(_projectPathCapitalized, dllPath),
-                                Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
-                            };
-                            itemGroups.AddReference(dotNetFramework, referencesByPath);
+                                swappedNamesToDependencies[dependency.Configuration.AssemblyName].Add(dependency);
+                            }
                         }
                         else
                         {
@@ -1523,7 +1530,28 @@ namespace Sharpmake.Generators.VisualStudio
                         Project = projectGuid,
                     });
                 }
+            }
+            
+            if(swappedNamesToDependencies is not null)
+            {
+                foreach (List<DotNetDependency> groupedDependencies in swappedNamesToDependencies.Values)
+                {
+                    bool isMultiFramework = groupedDependencies.Select(d => d.Configuration.Target.GetFragment<DotNetFramework>()).Distinct().Count() > 1;
 
+                    foreach (var dependency in groupedDependencies.OrderByDescending(d => d.Configuration.Target.GetOptimization()))
+                    {
+                        TargetFramework targetFramework = GetTargetFramework(dependency.Configuration);
+                        string dllPath = Path.Combine(dependency.Configuration.TargetPath, $"{dependency.Configuration.AssemblyName}{dependency.Configuration.DllFullExtension}");
+                        var referencesByPath = new ItemGroups.Reference
+                        {
+                            Include = $"{dependency.Configuration.AssemblyName}{(isMultiFramework ? "-" + GetTargetFrameworksString(targetFramework) : "")}",
+                            SpecificVersion = false,
+                            HintPath = Util.PathGetRelative(_projectPathCapitalized, dllPath),
+                            Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
+                        };
+                        itemGroups.AddReference(targetFramework, referencesByPath);
+                    }
+                }
             }
 
             if (project.RunPostBuildEvent != Options.CSharp.RunPostBuildEvent.OnBuildSuccess)
@@ -2396,7 +2424,7 @@ namespace Sharpmake.Generators.VisualStudio
                             Include = str,
                             Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetReferences) ? default(bool?) : false,
                         };
-                        itemGroups.AddReference(dotNetFramework, referencesByName);
+                        itemGroups.AddReference(GetTargetFramework(conf), referencesByName);
                     }
                 }
             }
@@ -2411,7 +2439,7 @@ namespace Sharpmake.Generators.VisualStudio
                         Include = str,
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.DotNetExtensions),
                     };
-                    itemGroups.AddReference(dotNetFramework, referencesByNameExternal);
+                    itemGroups.AddReference(GetTargetFramework(conf), referencesByNameExternal);
                 }
             }
 
@@ -2427,7 +2455,7 @@ namespace Sharpmake.Generators.VisualStudio
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
                         Private = project.DependenciesCopyLocal.HasFlag(Project.DependenciesCopyLocalTypes.ExternalReferences),
                     };
-                    itemGroups.AddReference(dotNetFramework, referencesByPath);
+                    itemGroups.AddReference(GetTargetFramework(conf), referencesByPath);
                 }
 
                 foreach (var str in project.AdditionalEmbeddedAssemblies.Select(Util.GetCapitalizedPath))
@@ -2439,7 +2467,7 @@ namespace Sharpmake.Generators.VisualStudio
                         HintPath = Util.PathGetRelative(_projectPathCapitalized, str),
                         Private = false
                     };
-                    itemGroups.AddReference(dotNetFramework, referencesByPath);
+                    itemGroups.AddReference(GetTargetFramework(conf), referencesByPath);
                 }
             }
 
@@ -2451,7 +2479,7 @@ namespace Sharpmake.Generators.VisualStudio
                     foreach (var r in conf.DotNetReferences)
                     {
                         var references = GetItemGroupsReference(r, project.DependenciesCopyLocal);
-                        itemGroups.AddReference(dotNetFramework, references);
+                        itemGroups.AddReference(GetTargetFramework(conf), references);
                     }
                 }
             }
@@ -2651,7 +2679,7 @@ namespace Sharpmake.Generators.VisualStudio
                             dotNetHint = dnfs.ToFolderName();
                         }
                         string hintPath = Path.Combine("$(SolutionDir)packages", references.Name + "." + references.Version, "lib", dotNetHint, references.Name + ".dll");
-                        itemGroups.AddReference(targetFramework.DotNetFramework, new ItemGroups.Reference { Include = references.Name, HintPath = hintPath });
+                        itemGroups.AddReference(targetFramework, new ItemGroups.Reference { Include = references.Name, HintPath = hintPath });
                     }
                 }
             }
