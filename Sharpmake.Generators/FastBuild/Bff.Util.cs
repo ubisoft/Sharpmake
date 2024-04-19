@@ -583,7 +583,7 @@ namespace Sharpmake.Generators.FastBuild
         internal static string GetBffFileCopyPattern(string copyPattern)
         {
             if (string.IsNullOrEmpty(copyPattern))
-                return copyPattern;
+                return FileGeneratorUtilities.RemoveLineTag;
 
             string[] patterns = copyPattern.Split(null);
 
