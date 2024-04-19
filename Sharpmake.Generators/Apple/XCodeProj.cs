@@ -588,7 +588,8 @@ popd";
                     if (conf.Output == Project.Configuration.OutputType.AppleFramework)
                         RegisterHeadersBuildPhase(xCodeTargetName, _headersBuildPhases);
 
-                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesBuildPhases, conf.ResolvedTargetCopyFiles.GetEnumerator(), conf.TargetCopyFilesPath);
+                    var folderSpec = conf.Output == Project.Configuration.OutputType.Exe ? FolderSpec.AbsolutePath : FolderSpec.Resources;
+                    RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesBuildPhases, conf.ResolvedTargetCopyFiles.GetEnumerator(), conf.TargetCopyFilesPath, folderSpec);
                     RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesBuildPhases, conf.ResolvedTargetCopyFilesToSubDirectory.GetEnumerator());
                     RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPostBuildPhases, conf.EventPostBuildCopies.GetEnumerator());
                     RegisterCopyFilesBuildPhases(xCodeTargetName, _copyFilesPreBuildPhases, conf.ResolvedEventPreBuildExe.GetEnumerator());
@@ -954,7 +955,7 @@ popd";
             }
         }
 
-        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, string file, string targetPath)
+        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, string file, string targetPath, FolderSpec folderSpec = FolderSpec.Resources)
         {
             PrepareCopyFiles(xCodeTargetName, file);
 
@@ -962,17 +963,17 @@ popd";
             _projectItems.Add(copyFileItem);
             var copyBuildPhase = copyFilesPhases[xCodeTargetName].Where(p => p.TargetPath == targetPath).Any() ?
                 copyFilesPhases[xCodeTargetName].Where(p => p.TargetPath == targetPath).First() :
-                new ProjectCopyFilesBuildPhase(2147483647, targetPath, FolderSpec.Resources);
+                new ProjectCopyFilesBuildPhase(2147483647, targetPath, folderSpec);
             copyBuildPhase.Files.Add(copyFileItem);
             _projectItems.Add(copyBuildPhase);
             copyFilesPhases[xCodeTargetName].Add(copyBuildPhase);
         }
 
-        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, IEnumerator<string> files, string targetPath)
+        private void RegisterCopyFilesBuildPhases(string xCodeTargetName, Dictionary<string, UniqueList<ProjectCopyFilesBuildPhase>> copyFilesPhases, IEnumerator<string> files, string targetPath, FolderSpec folderSpec)
         {
             while (files.MoveNext())
             {
-                RegisterCopyFilesBuildPhases(xCodeTargetName, copyFilesPhases, files.Current, targetPath);
+                RegisterCopyFilesBuildPhases(xCodeTargetName, copyFilesPhases, files.Current, targetPath, folderSpec);
             }
         }
 

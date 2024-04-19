@@ -39,6 +39,7 @@ namespace XCodeProjects
             conf.AddProject<OpenSettingsProject>(target);
             conf.AddProject<OpenAppStoreProject>(target);
             conf.AddProject<ReadAppDataProject>(target);
+            conf.AddProject<ReadExeDataProject>(target);
 
             conf.AddProject<SampleBundleProject>(target);
             conf.AddProject<HelloKitFrameworkProject>(target);
