@@ -436,6 +436,31 @@ namespace SharpmakeGen.FunctionalTests
     }
 
     [Generate]
+    public class PostBuildCopyDirNoPatternTest : CommonExeProject
+    {
+        public PostBuildCopyDirNoPatternTest()
+        {
+        }
+
+        public override void ConfigureAll(Configuration conf, Target target)
+        {
+            base.ConfigureAll(conf, target);
+
+            // Create a PostBuild step that copies all .cpp & .txt files from the source dir to another folder
+            // Note that this copy step will not depend on compilation output and thus FastBuild is free
+            // execute the copy operation during or before compilation.
+            var copyDirBuildStep = new Configuration.BuildStepCopy(
+                @"[project.SourceRootPath]",
+                @"[conf.TargetPath]\file_copy_destination_no_pattern");
+
+            copyDirBuildStep.IsFileCopy = false;
+            copyDirBuildStep.CopyPattern = string.Empty;
+
+            conf.EventCustomPostBuildExe.Add(copyDirBuildStep);
+        }
+    }
+
+    [Generate]
     public class ExplicitlyOrderedPostBuildTest : CommonExeProject
     {
         public ExplicitlyOrderedPostBuildTest()
@@ -633,6 +658,7 @@ namespace SharpmakeGen.FunctionalTests
             conf.AddProject<UsePrecompExe>(target);
             conf.AddProject<RequirePreBuildStep>(target);
             conf.AddProject<PostBuildCopySingleFileTest>(target);
+            conf.AddProject<PostBuildCopyDirNoPatternTest>(target);
             conf.AddProject<PostBuildCopyDirTest>(target);
             conf.AddProject<PostBuildExecuteTest>(target);
             conf.AddProject<PostBuildTestExecution>(target);
