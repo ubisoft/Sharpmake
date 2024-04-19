@@ -22,6 +22,7 @@ The main purpose of these projects is
 * `SysInfo` gathers system information through internal API
 * `ShellExec` showcases the MacOS/Objective-C method to run a shell command from within another program
 * `ReadAppData` showcases how to embed resource files inside an application bundle and how to read the embedded data
+* `ReadExeData` showcases how to copy a data file near a MacOS executable and how to read the data
 * `SampleBundle` illustrates how to set up a sharpmake script to create a 'Bundle' project
 * `MetalNoStoryboard` illustrates how to create a simple Metal application without using a storyboard
 * `MetalWithStoryboard` illustrates how to create a simple Metal application with a storyboard, as there are some specific settings to perform in the sharpmake script
