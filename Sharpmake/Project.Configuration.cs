@@ -1637,6 +1637,45 @@ namespace Sharpmake
             public Byte FastBuildUnitySectionBucket = 0;
 
             /// <summary>
+            /// List of version detection ways to set _MSC_VER and _MSC_FULL_VER preprocessor values when using ClangCl
+            /// </summary>
+            /// <remarks>
+            /// This is only used for FASTBuild generation when using ClangCl.
+            /// </remarks>
+            public enum FastBuildClangMscVersionDetectionType
+            {
+                /// <summary>
+                /// Sets the -fmsc-version compiler tag (ClangCl specific) in the command-line options in the FASTBuild (.bff) file with the "major" version, e.g. Any VS2022 (17.x) is 1930
+                /// </summary>
+                /// <remarks>
+                /// This sets the _MSC_VER preprocessor flag to the "major" version, e.g. for any VS2022, _MSC_VER is set to 1930
+                /// This sets the _MSC_FULL_VER preprocessor flag to the "major" version with additional zeros, e.g. for any VS2022, _MSC_FULL_VER is set to 193000000
+                /// </remarks>
+                MajorVersion,
+
+                /// <summary>
+                /// Sets the -fms-compatibility-version compiler tag (ClangCl specific) in the command-line options in the FASTBuild (.bff) file with the complete version, e.g. VS2022 17.4.0 is 19.34.31933.
+                /// </summary>
+                /// <remarks>
+                /// This sets the _MSC_VER preprocessor flag to the most 4-digits precise version, e.g. for VS2022 17.4.0, _MSC_VER is set to 1934
+                /// This sets the _MSC_FULL_VER preprocessor flag to the complete version, e.g. for VS2022 17.4.0, _MSC_FULL_VER is set to 193431933
+                /// If the full version cannot be detected, fallback to the behavior of MajorVersion
+                /// This option is not compatible with a non-empty value in Options.Clang.Compiler.MscVersion
+                /// </remarks>
+                FullVersion, // Replaces MajorVersion as the default value since it uses more accurate compiler versions (ClangCl compatibility is improved) and fallbacks to MajorVersion in case the more accurate versions couldn't be found
+
+                /// <summary>
+                /// Does not set any version.
+                /// </summary>
+                Disabled
+            }
+
+            /// <summary>
+            /// (Only for FastBuild with ClangCl) Sets how to detect the Microsoft compiler version to fill the _MSC_VER and _MSC_FULL_VER preprocessor values.
+            /// </summary>
+            public FastBuildClangMscVersionDetectionType FastBuildClangMscVersionDetectionInfo = FastBuildClangMscVersionDetectionType.FullVersion;
+
+            /// <summary>
             /// Gets or sets whether to generate a FASTBuild (.bff) file when using FASTBuild.
             /// </summary>
             /// <remarks>
