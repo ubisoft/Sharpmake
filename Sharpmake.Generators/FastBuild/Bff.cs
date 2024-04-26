@@ -9,8 +9,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Sharpmake.Generators.VisualStudio;
+using static Sharpmake.DebugBreaks;
+using static Sharpmake.Generators.VisualStudio.CSproj;
+using static Sharpmake.Options;
+using static Sharpmake.Options.CSharp;
 
 namespace Sharpmake.Generators.FastBuild
 {
@@ -781,51 +786,29 @@ namespace Sharpmake.Generators.FastBuild
                                 {
                                     case Options.Vc.General.PlatformToolset.LLVM:
                                     case Options.Vc.General.PlatformToolset.ClangCL:
-                                        // <!-- Set the value of _MSC_VER to claim for compatibility -->
-                                        string mscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
-                                        if (string.IsNullOrEmpty(mscVer))
-                                        {
-                                            Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
-                                            if (Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset)
-                                                && overridenPlatformToolset != Options.Vc.General.PlatformToolset.Default
-                                                && !overridenPlatformToolset.IsDefaultToolsetForDevEnv(context.DevelopmentEnvironment))
-                                            {
-                                                switch (overridenPlatformToolset)
-                                                {
-                                                    case Options.Vc.General.PlatformToolset.v141:
-                                                    case Options.Vc.General.PlatformToolset.v141_xp:
-                                                        mscVer = "1910";
-                                                        break;
-                                                    case Options.Vc.General.PlatformToolset.v142:
-                                                        mscVer = "1920";
-                                                        break;
-                                                    case Options.Vc.General.PlatformToolset.v143:
-                                                        mscVer = "1930";
-                                                        break;
-                                                    default:
-                                                        throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                switch (context.DevelopmentEnvironment)
-                                                {
-                                                    case DevEnv.vs2017:
-                                                        mscVer = "1910";
-                                                        break;
-                                                    case DevEnv.vs2019:
-                                                        mscVer = "1920";
-                                                        break;
-                                                    case DevEnv.vs2022:
-                                                        mscVer = "1930";
-                                                        break;
-                                                    default:
-                                                        throw new Error("Clang-cl used with unsupported DevEnv: " + context.DevelopmentEnvironment.ToString());
-                                                }
-                                            }
-                                        }
-                                        llvmClangCompilerOptions = string.Format("-m64 -fmsc-version={0}", mscVer); // -m$(PlatformArchitecture)
+                                        llvmClangCompilerOptions = "-m64"; // -m$(PlatformArchitecture)
                                         fastBuildPCHForceInclude = @"/FI""[cmdLineOptions.PrecompiledHeaderThrough]""";
+
+
+                                        // <!-- Set the value of _MSC_VER and _MSC_FULL_VER to claim for compatibility -->
+                                        Project.Configuration.FastBuildClangMscVersionDetectionType detectionType = conf.FastBuildClangMscVersionDetectionInfo;
+                                        string overridenMscVer = Options.GetString<Options.Clang.Compiler.MscVersion>(conf);
+                                        Options.Vc.General.PlatformToolset overridenPlatformToolset = Options.Vc.General.PlatformToolset.Default;
+                                        Options.WithArgOption<Options.Vc.General.PlatformToolset>.Get<Options.Clang.Compiler.LLVMVcPlatformToolset>(conf, ref overridenPlatformToolset);
+
+                                        CompilerVersionForClangCl detectedVersion = DetectCompilerVersionForClangCl(
+                                            detectionType, overridenMscVer, overridenPlatformToolset, context.DevelopmentEnvironment, conf.Target.GetPlatform());
+
+                                        switch (detectedVersion.versionType)
+                                        {
+                                            case CompilerVersionForClangClType.MscVersion :
+                                                llvmClangCompilerOptions += string.Format(" -fmsc-version={0}", detectedVersion.mscVersion);
+                                                break;
+                                            case CompilerVersionForClangClType.MsCompatibilityVersion :
+                                                llvmClangCompilerOptions += string.Format(" -fms-compatibility-version={0}.{1}.{2}", detectedVersion.msCompatibilityVersion.Major, detectedVersion.msCompatibilityVersion.Minor, detectedVersion.msCompatibilityVersion.Build);
+                                                break;
+                                        }
+                                        
                                         break;
                                 }
                             }
@@ -1534,6 +1517,197 @@ namespace Sharpmake.Generators.FastBuild
 
             var dependenciesInfo = FillLibrariesOptions(context);
             dependenciesInfoPerConf.Add(context.Configuration, dependenciesInfo);
+        }
+
+        internal enum CompilerVersionForClangClType
+        {
+            /// <summary>
+            /// Version is for the -fmsc-version compilation flag
+            /// </summary>
+            MscVersion,
+            /// <summary>
+            /// Version is for the -fms-compatibility-version compilation flag
+            /// </summary>
+            MsCompatibilityVersion,
+            /// <summary>
+            /// Version is not set
+            /// </summary>
+            None
+        }
+
+        internal class CompilerVersionForClangCl
+        {
+            public CompilerVersionForClangClType versionType { get; }
+
+            public string mscVersion { get; }
+            public System.Version msCompatibilityVersion { get; }
+            
+
+            public CompilerVersionForClangCl(System.Version version)
+            {
+                versionType = CompilerVersionForClangClType.MsCompatibilityVersion;
+                msCompatibilityVersion = version;
+            }
+            public CompilerVersionForClangCl(string version)
+            {
+                versionType = CompilerVersionForClangClType.MscVersion;
+                mscVersion = version;
+            }
+
+            public CompilerVersionForClangCl()
+            {
+                versionType = CompilerVersionForClangClType.None;
+            }
+
+            public override string ToString()
+            {
+                switch (versionType)
+                {
+                    case CompilerVersionForClangClType.MsCompatibilityVersion:
+                        return string.Format("MsCompatibilityVersion : {0}.{1}.{2}", msCompatibilityVersion.Major, msCompatibilityVersion.Minor, msCompatibilityVersion.Build);
+                    case CompilerVersionForClangClType.MscVersion:
+                        return string.Format("MscVersion : {0}", mscVersion);
+                    case CompilerVersionForClangClType.None:
+                    default:
+                        return string.Format("No version");
+                }
+            }
+
+            #region IEquatable
+            public override bool Equals(object obj)
+            {
+                CompilerVersionForClangCl other = obj as CompilerVersionForClangCl;
+                if (other != null)
+                {
+                    return Equals(other);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public override int GetHashCode()
+            {
+                switch (versionType)
+                {
+                    case CompilerVersionForClangClType.MsCompatibilityVersion:
+                        return msCompatibilityVersion.GetHashCode();
+                    case CompilerVersionForClangClType.MscVersion:
+                        return Int32.TryParse(mscVersion, out int numValue) ? numValue : -1;
+                    case CompilerVersionForClangClType.None:
+                        return 0;
+                    default:
+                        return -2;
+                }
+            }
+
+            public bool Equals(CompilerVersionForClangCl other)
+            {
+                if (other.versionType != versionType)
+                {
+                    return false;
+                }
+
+                switch (versionType)
+                {
+                    case CompilerVersionForClangClType.MsCompatibilityVersion:
+                        return other.msCompatibilityVersion == msCompatibilityVersion;
+                    case CompilerVersionForClangClType.MscVersion:
+                        return other.mscVersion == mscVersion;
+                    case CompilerVersionForClangClType.None:
+                    default:
+                        return true;
+                }
+            }
+            #endregion
+        }
+        internal static CompilerVersionForClangCl DetectCompilerVersionForClangCl(
+            Project.Configuration.FastBuildClangMscVersionDetectionType detectionType, string overridenMscVer, 
+            Options.Vc.General.PlatformToolset overridenPlatformToolset, DevEnv devenv, Platform platform)
+        {
+            switch (detectionType)
+            {
+                case Project.Configuration.FastBuildClangMscVersionDetectionType.MajorVersion :
+                    {
+                        if (!string.IsNullOrEmpty(overridenMscVer))
+                        {
+                            return new CompilerVersionForClangCl(overridenMscVer);
+                        }
+
+                        string mscVer = DetectMscVerForClang(devenv, overridenPlatformToolset);
+                        return new CompilerVersionForClangCl(mscVer);
+                    }
+
+                case Project.Configuration.FastBuildClangMscVersionDetectionType.FullVersion:
+                    {
+                        if (!string.IsNullOrEmpty(overridenMscVer))
+                        {
+                            throw new Error("Options.Clang.Compiler.MscVersion and FastBuildClangMscVersionDetection.FullVersion are both set but are mutually exclusive.");
+                        }
+
+                        System.Version mscFullVer = new System.Version();
+                        try
+                        {
+                            mscFullVer = devenv.GetVisualStudioVCToolsCompilerVersion(platform);
+                        }
+                        catch
+                        {
+                            // mscFullVer couldn't be retrieved, fallback to MajorVersion behavior
+                            string mscVer = DetectMscVerForClang(devenv, overridenPlatformToolset);
+                            return new CompilerVersionForClangCl(mscVer);
+                        }
+                        return new CompilerVersionForClangCl(mscFullVer);
+                    }
+
+                case Project.Configuration.FastBuildClangMscVersionDetectionType.Disabled:
+                    {
+                        if (!string.IsNullOrEmpty(overridenMscVer))
+                        {
+                            // Detection is disabled but the Clang option version is set, set the version
+                            return new CompilerVersionForClangCl(overridenMscVer);
+                        }
+
+                        return new CompilerVersionForClangCl();
+                    }
+                default:
+                    {
+                        return new CompilerVersionForClangCl();
+                    }
+            }
+        }
+
+        internal static string DetectMscVerForClang(DevEnv devenv, Options.Vc.General.PlatformToolset overridenPlatformToolset)
+        {
+            if (overridenPlatformToolset != Options.Vc.General.PlatformToolset.Default
+                && !overridenPlatformToolset.IsDefaultToolsetForDevEnv(devenv))
+            {
+                switch (overridenPlatformToolset)
+                {
+                    case Options.Vc.General.PlatformToolset.v141:
+                    case Options.Vc.General.PlatformToolset.v141_xp:
+                        return "1910";
+                    case Options.Vc.General.PlatformToolset.v142:
+                        return "1920";
+                    case Options.Vc.General.PlatformToolset.v143:
+                        return "1930";
+                    default:
+                        throw new Error("LLVMVcPlatformToolset! Platform toolset override '{0}' not supported", overridenPlatformToolset);
+                }
+            }
+            else
+            {
+                switch (devenv)
+                {
+                    case DevEnv.vs2017:
+                        return "1910";
+                    case DevEnv.vs2019:
+                        return "1920";
+                    case DevEnv.vs2022:
+                        return "1930";
+                    default:
+                        throw new Error("Clang-cl used with unsupported DevEnv: " + devenv.ToString());
+                }
+            }
         }
 
         private static void FillIncludeDirectoriesOptions(BffGenerationContext context)
