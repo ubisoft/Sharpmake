@@ -12,6 +12,28 @@ namespace Sharpmake.UnitTests
 {
     internal class GeneratorsBffTests
     {
+        private static bool HasVSCompiler(DevEnv devenv, Platform platform)
+        {
+            try
+            {
+                devenv.GetVisualStudioVCToolsCompilerVersion(platform);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [TestCase(Platform.win64)]
+        [TestCase(Platform._reserved7)]
+        public void HasVS2019orVS2022Compiler(Platform platform)
+        {
+            // Some setup on CI machines might test only one version of Visual Studio
+            // Ensure at least one of the supported version is installed.
+            Assert.That(HasVSCompiler(DevEnv.vs2019, platform) || HasVSCompiler(DevEnv.vs2019, platform), Is.EqualTo(true));
+        }
+
         [TestCase(DevEnv.vs2019, Platform.win64, Options.Vc.General.PlatformToolset.Default)]
         [TestCase(DevEnv.vs2019, Platform.win64, Options.Vc.General.PlatformToolset.ClangCL)]
         [TestCase(DevEnv.vs2019, Platform.win64, Options.Vc.General.PlatformToolset.v143)]
@@ -26,6 +48,12 @@ namespace Sharpmake.UnitTests
         [TestCase(DevEnv.vs2022, Platform._reserved7, Options.Vc.General.PlatformToolset.v143)]
         public void DetectCompilerVersionForClangCl_FullVersionOverrideToolset(DevEnv devenv, Platform platform, Options.Vc.General.PlatformToolset overridenPlatformToolset)
         {
+            if (!HasVSCompiler(devenv, platform))
+            {
+                // Probably on a CI machine having only one of the VS version (e.g. only VS2022), avoid testing this version
+                return;
+            }
+
             var detectionType = Project.Configuration.FastBuildClangMscVersionDetectionType.FullVersion;
             var overridenMscVer = "";
             var result = Bff.DetectCompilerVersionForClangCl(detectionType, overridenMscVer, overridenPlatformToolset, devenv, platform);
