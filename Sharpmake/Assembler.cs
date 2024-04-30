@@ -67,7 +67,7 @@ namespace Sharpmake
         [Obsolete("Default references are always used.")]
         public bool UseDefaultReferences = true;
 
-        public static readonly string[] DefaultReferences = BasicReferenceAssemblies.References.All.Select(r => r.FileName).ToArray();
+        public static readonly string[] DefaultReferences = BasicReferenceAssemblies.ReferenceInfos.All.Select(r => r.FileName).ToArray();
 
         private class AssemblyInfo : IAssemblyInfo
         {
@@ -490,12 +490,12 @@ namespace Sharpmake
             foreach (var reference in fileReferences.Where(r => !string.IsNullOrEmpty(r)))
             {
                 // Skip references that are already provided by the runtime
-                if (BasicReferenceAssemblies.All.Any(a => string.Equals(Path.GetFileName(reference), a.FilePath, StringComparison.OrdinalIgnoreCase)))
+                if (BasicReferenceAssemblies.References.All.Any(a => string.Equals(Path.GetFileName(reference), a.FilePath, StringComparison.OrdinalIgnoreCase)))
                     continue;
                 metadataReferences.Add(MetadataReference.CreateFromFile(reference));
             }
 
-            metadataReferences.AddRange(BasicReferenceAssemblies.All);
+            metadataReferences.AddRange(BasicReferenceAssemblies.References.All);
 
             // suppress assembly redirect warnings
             // cf. https://github.com/dotnet/roslyn/issues/19640
