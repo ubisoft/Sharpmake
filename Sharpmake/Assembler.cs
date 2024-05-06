@@ -75,6 +75,9 @@ namespace Sharpmake
             public string DebugProjectName { get; set; }
             public Assembly Assembly { get; set; }
             public IReadOnlyCollection<string> SourceFiles => _sourceFiles;
+            public IReadOnlyCollection<string> NoneFiles => _noneFiles;
+            
+            
             [Obsolete("Use RuntimeReference instead")]
             public IReadOnlyCollection<string> References => RuntimeReferences;
             public IReadOnlyCollection<string> RuntimeReferences => _runtimeReferences;
@@ -83,6 +86,8 @@ namespace Sharpmake
             public bool UseDefaultReferences { get; set; }
 
             public List<string> _sourceFiles = new List<string>();
+            public List<string> _noneFiles = new List<string>();
+
             public List<string> _runtimeReferences = new List<string>();
             public List<string> _buildReferences = new List<string>();
             public Dictionary<string, IAssemblyInfo> _sourceReferences = new Dictionary<string, IAssemblyInfo>();
@@ -365,6 +370,12 @@ namespace Sharpmake
                     _assemblyInfo._sourceFiles.Add(file);
                     _visiting.Add(file);
                 }
+            }
+
+            public void AddNoneFile(string file)
+            {
+                if (!_assemblyInfo._noneFiles.Contains(file))
+                    _assemblyInfo._noneFiles.Add(file);
             }
 
             [Obsolete("Use AddRuntimeReference() instead")]

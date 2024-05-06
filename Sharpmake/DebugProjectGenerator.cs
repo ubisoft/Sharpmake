@@ -138,6 +138,7 @@ namespace Sharpmake
 
             public string ProjectFolder;
             public readonly HashSet<string> ProjectFiles = new HashSet<string>();
+            public readonly HashSet<string> ProjectNoneFiles = new HashSet<string>();
 
             public readonly List<string> References = new List<string>();
             public readonly List<Type> ProjectReferences = new List<Type>();
@@ -207,6 +208,10 @@ namespace Sharpmake
             {
                 project.ProjectFiles.Add(source);
             }
+            
+            // Add files in project that aren't meant to be compiled
+            project.ProjectNoneFiles.UnionWith(assemblyInfo.NoneFiles);
+
 
             // Add references
             var references = new HashSet<string>();
@@ -321,13 +326,13 @@ namespace Sharpmake
             PreserveLinkFolderPaths = true;
 
             // set paths
-
             RootPath = Util.FindCommonRootPath(_projectInfo.ProjectFiles.Select(f => Path.GetDirectoryName(f)).Distinct()) ?? _projectInfo.ProjectFolder;
             SourceRootPath = RootPath;
 
             // add selected source files
             SourceFiles.AddRange(_projectInfo.ProjectFiles);
-
+            NoneFiles.AddRange(_projectInfo.ProjectNoneFiles);
+            
             // ensure that no file will be automagically added
             SourceFilesExtensions.Clear();
             ResourceFilesExtensions.Clear();
@@ -390,6 +395,32 @@ namespace Sharpmake
             {
                 conf.SetupProjectOptions(_projectInfo.StartArguments);
             }
+        }
+
+        /// <summary>
+        /// Get the link folder for a file considering that the path is relative to the debug project folder but that we want
+        /// the link to represent the path relative to the SourceRootPath. 
+        /// </summary>
+        public override string GetLinkFolder(string file)
+        {
+            string absolutePath = Path.IsPathFullyQualified(file) ? file : Path.GetFullPath(Path.Combine(DebugProjectGenerator.RootPath, file));
+            
+            string relativePath = Util.PathGetRelative(SourceRootPath, Path.GetDirectoryName(absolutePath));
+            
+            // Remove the root, if it exists.
+            // This will only happen if file is rooted *and* doesn't share the same root as SourceRootPath.
+            if (Path.IsPathRooted(relativePath))
+            {
+                relativePath = relativePath.Substring(Path.GetPathRoot(relativePath).Length);
+            }
+            
+            // If the relative path is elsewhere, we leave the file in the root.
+            if (relativePath.Contains(".."))
+            {
+                return string.Empty;
+            }
+            
+            return relativePath;
         }
     }
 
