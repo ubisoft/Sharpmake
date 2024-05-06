@@ -37,6 +37,7 @@ namespace Sharpmake.UnitTests
             public List<string> RuntimeReferences = new List<string>();
             public List<string> BuildReferences = new List<string>();
             public List<string> Sources = new List<string>();
+            public List<string> NoneFiles = new List<string>();
 
             [Obsolete("Use AddRuntimeReference() instead")]
             public void AddReference(string file) => AddRuntimeReference(file);
@@ -54,6 +55,11 @@ namespace Sharpmake.UnitTests
             public void AddSourceFile(string file)
             {
                 Sources.Add(file);
+            }
+            
+            public void AddNoneFile(string file)
+            {
+                NoneFiles.Add(file);
             }
 
             [Obsolete("Use AddRuntimeReference() instead")]
