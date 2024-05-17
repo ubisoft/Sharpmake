@@ -22,10 +22,11 @@ namespace Sharpmake
         {
             public override Platform SharpmakePlatform => Platform.maccatalyst;
 
-            #region IPlatformDescriptor implementation.
-            public override string SimplePlatformString => "MacCatalyst";
+            #region IPlatformDescriptor implementation
+            public override string SimplePlatformString => "MacCatalyst"; // "Mac Catalyst" is the actual name
             #endregion
 
+            #region IPlatformBff implementation
             public override string BffPlatformDefine => "_MACCATALYST";
 
             public override string CConfigName(Configuration conf)
@@ -37,6 +38,7 @@ namespace Sharpmake
             {
                 return ".maccatalystppConfig";
             }
+            #endregion
 
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {

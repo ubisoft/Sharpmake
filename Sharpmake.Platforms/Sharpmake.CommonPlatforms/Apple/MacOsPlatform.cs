@@ -20,8 +20,11 @@ namespace Sharpmake
         {
             public override Platform SharpmakePlatform => Platform.mac;
 
-            public override string SimplePlatformString => "Mac";
+            #region IPlatformDescriptor implementation
+            public override string SimplePlatformString => "macOS";
+            #endregion
 
+            #region IPlatformBff implementation
             public override string BffPlatformDefine => "APPLE_OSX";
 
             public override string CConfigName(Configuration conf)
@@ -33,6 +36,7 @@ namespace Sharpmake
             {
                 return ".osxppConfig";
             }
+            #endregion
 
             public override void SelectCompilerOptions(IGenerationContext context)
             {

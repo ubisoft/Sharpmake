@@ -185,7 +185,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.Configuration = conf;
 
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
                 {
@@ -208,7 +208,7 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 context.Configuration = conf;
 
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 using (fileGenerator.Declare("options", context.ProjectConfigurationOptions[conf]))
                 using (fileGenerator.Declare("androidPackageDirectory", androidPackageDirectory))

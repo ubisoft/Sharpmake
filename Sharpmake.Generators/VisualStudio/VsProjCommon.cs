@@ -43,21 +43,21 @@ namespace Sharpmake.Generators.VisualStudio
         {
             fileGenerator.Write(Template.Project.ProjectBeginConfigurationDescription);
 
-            var platformNames = new Strings();
+            var toolchainPlatformNames = new Strings();
             var configNames = new Strings();
             foreach (var conf in configurations)
             {
-                var platformName = Util.GetPlatformString(conf.Platform, conf.Project, conf.Target);
-                platformNames.Add(platformName);
+                var toolchainPlatformName = Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target);
+                toolchainPlatformNames.Add(toolchainPlatformName);
                 configNames.Add(conf.Name);
             }
 
             // write all combinations to avoid "Incomplete Configuration" VS warning
             foreach (var configName in configNames.SortedValues)
             {
-                foreach (var platformName in platformNames.SortedValues)
+                foreach (var toolchainPlatformName in toolchainPlatformNames.SortedValues)
                 {
-                    using (fileGenerator.Declare("platformName", platformName))
+                    using (fileGenerator.Declare("platformName", toolchainPlatformName))
                     using (fileGenerator.Declare("configName", configName))
                     {
                         fileGenerator.Write(Template.Project.ProjectConfigurationDescription);
@@ -94,7 +94,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             foreach (Project.Configuration conf in configurations)
             {
-                using (fileGenerator.Declare("platformName", Util.GetPlatformString(conf.Platform, conf.Project, conf.Target)))
+                using (fileGenerator.Declare("platformName", Util.GetToolchainPlatformString(conf.Platform, conf.Project, conf.Target)))
                 using (fileGenerator.Declare("conf", conf))
                 {
                     foreach (string propsFile in conf.CustomPropsFiles)

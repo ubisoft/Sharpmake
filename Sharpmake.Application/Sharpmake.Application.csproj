@@ -22,7 +22,7 @@
     <!-- Automatically add "extended" platforms and extensions if they are presents *and* if the build is not done from the core Sharpmake.sln solution -->
     <When Condition="'$(SolutionName)' != 'Sharpmake'">
       <ItemGroup>
-        <ProjectReference Condition="Exists('..\..\Sharpmake.Platforms')" Include="..\..\Sharpmake.Platforms\**\*.csproj" />
+		<ProjectReference Condition="Exists('..\..\Sharpmake.Platforms')" Include="..\..\Sharpmake.Platforms\**\*.csproj" />
         <ProjectReference Condition="Exists('..\..\Sharpmake.Extensions')" Include="..\..\Sharpmake.Extensions\**\*.csproj" />
       </ItemGroup>
     </When>

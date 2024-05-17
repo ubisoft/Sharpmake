@@ -1572,7 +1572,13 @@ namespace Sharpmake
             return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.SimplePlatformString ?? platform.ToString();
         }
 
+        [Obsolete("Use GetToolchainPlatformString instead")]
         public static string GetPlatformString(Platform platform, Project project, ITarget target, bool isForSolution = false)
+        {
+            return GetToolchainPlatformString(platform, project, target, isForSolution);
+        }
+
+        public static string GetToolchainPlatformString(Platform platform, Project project, ITarget target, bool isForSolution = false)
         {
             if (project is CSharpProject)
             {
@@ -1593,7 +1599,12 @@ namespace Sharpmake
                 return isForSolution ? "Any CPU" : "AnyCPU";
             }
 
-            return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetPlatformString(target) ?? platform.ToString();
+            return GetToolchainPlatformString(platform, target);
+        }
+
+        public static string GetToolchainPlatformString(Platform platform, ITarget target)
+        {
+            return PlatformRegistry.Query<IPlatformDescriptor>(platform)?.GetToolchainPlatformString(target) ?? platform.ToString();
         }
 
         public static string CallerInfoTag = "CALLER_INFO: ";

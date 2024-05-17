@@ -32,7 +32,7 @@ call :UpdateRef samples HelloAssembly               HelloAssembly.sharpmake.cs  
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpVsix                  CSharpVsix.sharpmake.cs                    reference         CSharpVsix
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
-call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF\codebase
+call :UpdateRef samples CSharpWCF                   CSharpWCF.sharpmake.cs                     reference         CSharpWCF
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error
 call :UpdateRef samples CSharpImports               CSharpImports.sharpmake.cs                 reference         CSharpImports
 if not "%ERRORLEVEL_BACKUP%" == "0" goto error

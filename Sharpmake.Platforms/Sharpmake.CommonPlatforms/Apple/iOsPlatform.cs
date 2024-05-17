@@ -21,10 +21,11 @@ namespace Sharpmake
         {
             public override Platform SharpmakePlatform => Platform.ios;
 
-            #region IPlatformDescriptor implementation.
+            #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "iOS";
             #endregion
 
+            #region IPlatformBff implementation
             public override string BffPlatformDefine => "_IOS";
 
             public override string CConfigName(Configuration conf)
@@ -36,6 +37,7 @@ namespace Sharpmake
             {
                 return ".iosppConfig";
             }
+            #endregion
 
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {

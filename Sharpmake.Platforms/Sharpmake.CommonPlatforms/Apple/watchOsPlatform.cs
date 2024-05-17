@@ -21,10 +21,11 @@ namespace Sharpmake
         {
             public override Platform SharpmakePlatform => Platform.watchos;
 
-            #region IPlatformDescriptor implementation.
+            #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "watchOS";
             #endregion
 
+            #region IPlatformBff implementation
             public override string BffPlatformDefine => "_WATCHOS";
 
             public override string CConfigName(Configuration conf)
@@ -36,6 +37,7 @@ namespace Sharpmake
             {
                 return ".watchosppConfig";
             }
+            #endregion
 
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {

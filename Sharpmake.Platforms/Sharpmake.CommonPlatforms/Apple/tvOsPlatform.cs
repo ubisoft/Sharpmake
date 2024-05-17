@@ -22,10 +22,11 @@ namespace Sharpmake
         {
             public override Platform SharpmakePlatform => Platform.tvos;
 
-            #region IPlatformDescriptor implementation.
+            #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "tvOS";
             #endregion
 
+            #region IPlatformBff implementation
             public override string BffPlatformDefine => "_TVOS";
 
             public override string CConfigName(Configuration conf)
@@ -37,6 +38,7 @@ namespace Sharpmake
             {
                 return ".tvosppConfig";
             }
+            #endregion
 
             protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
             {

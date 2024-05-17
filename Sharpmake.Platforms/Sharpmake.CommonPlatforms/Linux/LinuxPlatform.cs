@@ -23,7 +23,8 @@ namespace Sharpmake
         public sealed partial class LinuxPlatform : BasePlatform, Project.Configuration.IConfigurationTasks, IFastBuildCompilerSettings, IClangPlatformBff
         {
             #region IPlatformDescriptor implementation
-            public override string SimplePlatformString => "x64";
+            public override string SimplePlatformString => "Linux";
+            public override string GetToolchainPlatformString(ITarget target) => "x64";
             public override bool IsMicrosoftPlatform => false; // No way!
             public override bool IsPcPlatform => true;
             public override bool IsUsingClang => true; // Maybe now? Traditionally GCC but only the GNU project is backing it now.
@@ -366,7 +367,7 @@ namespace Sharpmake
                 string configurationsConditional = string.Join(" or ",
                     linuxConfigurations.Select(c => $"'$(Configuration)'=='{c.Name}'")
                 );
-                using (generator.Declare("platformName", SimplePlatformString))
+                using (generator.Declare("platformName", GetToolchainPlatformString(null)))
                 using (generator.Declare("configurationsConditional", configurationsConditional))
                 using (generator.Declare("applicationType", "Linux"))
                 using (generator.Declare("applicationTypeRevision", "1.0"))
@@ -554,7 +555,7 @@ namespace Sharpmake
                 var devEnv = conf.Target.GetFragment<DevEnv>();
 
                 var platform = conf.Target.GetFragment<Platform>();
-                string compilerName = $"Compiler-{Util.GetSimplePlatformString(platform)}-{devEnv}";
+                string compilerName = $"Compiler-{Util.GetToolchainPlatformString(platform, conf.Target)}-{devEnv}";
                 string CCompilerSettingsName = "C-" + compilerName + "-" + "Linux";
                 string CompilerSettingsName = compilerName + "-" + "Linux";
 

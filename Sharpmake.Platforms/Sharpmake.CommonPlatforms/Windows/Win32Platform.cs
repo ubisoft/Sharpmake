@@ -19,6 +19,7 @@ namespace Sharpmake
         {
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Win32";
+            public override string GetToolchainPlatformString(ITarget target) => "Win32";
             #endregion
 
             #region IPlatformVcxproj implementation

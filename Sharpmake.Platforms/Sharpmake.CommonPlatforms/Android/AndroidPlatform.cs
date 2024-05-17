@@ -22,10 +22,10 @@ namespace Sharpmake
         {
             #region IPlatformDescriptor implementation.
             public override string SimplePlatformString => "Android";
-            public override string GetPlatformString(ITarget target)
+
+            public override string GetToolchainPlatformString(ITarget target)
             {
-                if (target == null)
-                    return SimplePlatformString;
+                ArgumentNullException.ThrowIfNull(target);
 
                 var buildTarget = target.GetFragment<AndroidBuildTargets>();
                 switch (buildTarget)
@@ -39,7 +39,7 @@ namespace Sharpmake
                     case AndroidBuildTargets.x86_64:
                         return "x64";
                     default:
-                        throw new System.Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
+                        throw new Exception(string.Format("Unsupported Android architecture: {0}", buildTarget));
                 }
             }
 

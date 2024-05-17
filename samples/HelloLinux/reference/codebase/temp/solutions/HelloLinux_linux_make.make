@@ -20,35 +20,35 @@ all: $(PROJECTS)
 
 dll1: static_lib1 
 	@echo " ==== Building dll1 ($(config)) ===="
-	@${MAKE} --no-print-directory -C "../projects/dll1" -f "dll1_linux_make.make"
+	@${MAKE} --no-print-directory -C "../projects/dll1" -f "dll1_Linux_make.make"
 
 exe: dll1 header-only-lib lib_group static_lib1 static lib2 
 	@echo " ==== Building exe ($(config)) ===="
-	@${MAKE} --no-print-directory -C "../projects/exe" -f "exe_linux_make.make"
+	@${MAKE} --no-print-directory -C "../projects/exe" -f "exe_Linux_make.make"
 
 header-only-lib: 
 	@echo " ==== Building header-only-lib ($(config)) ===="
-	@${MAKE} --no-print-directory -C "../projects/header-only-lib" -f "header-only-lib_linux_make.make"
+	@${MAKE} --no-print-directory -C "../projects/header-only-lib" -f "header-only-lib_Linux_make.make"
 
 lib_group: dll1 static_lib1 
 	@echo " ==== Building lib_group ($(config)) ===="
-	@${MAKE} --no-print-directory -C "../projects/lib_group" -f "lib_group_linux_make.make"
+	@${MAKE} --no-print-directory -C "../projects/lib_group" -f "lib_group_Linux_make.make"
 
 static lib2: 
 	@echo " ==== Building static lib2 ($(config)) ===="
-	@${MAKE} --no-print-directory -C "../projects/static lib2" -f "static lib2_linux_make.make"
+	@${MAKE} --no-print-directory -C "../projects/static lib2" -f "static lib2_Linux_make.make"
 
 static_lib1: 
 	@echo " ==== Building static_lib1 ($(config)) ===="
-	@${MAKE} --no-print-directory -C "../projects/static_lib1" -f "static_lib1_linux_make.make"
+	@${MAKE} --no-print-directory -C "../projects/static_lib1" -f "static_lib1_Linux_make.make"
 
 clean:
-	@${MAKE} --no-print-directory -C "../projects/dll1" -f "dll1_linux_make.make" clean
-	@${MAKE} --no-print-directory -C "../projects/exe" -f "exe_linux_make.make" clean
-	@${MAKE} --no-print-directory -C "../projects/header-only-lib" -f "header-only-lib_linux_make.make" clean
-	@${MAKE} --no-print-directory -C "../projects/lib_group" -f "lib_group_linux_make.make" clean
-	@${MAKE} --no-print-directory -C "../projects/static lib2" -f "static lib2_linux_make.make" clean
-	@${MAKE} --no-print-directory -C "../projects/static_lib1" -f "static_lib1_linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/dll1" -f "dll1_Linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/exe" -f "exe_Linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/header-only-lib" -f "header-only-lib_Linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/lib_group" -f "lib_group_Linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/static lib2" -f "static lib2_Linux_make.make" clean
+	@${MAKE} --no-print-directory -C "../projects/static_lib1" -f "static_lib1_Linux_make.make" clean
 
 help:
 	@echo "Usage: make [config = name] [target]"

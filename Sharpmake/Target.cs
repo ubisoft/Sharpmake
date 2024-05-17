@@ -74,20 +74,66 @@ namespace Sharpmake
         vs2013 = -1,
     }
 
-    // Mandatory
+    /// <summary>
+    /// The platforms supported by Sharpmake generators.
+    /// Always use 'Util.GetSimplePlatformString' to get the correct name of these platforms.
+    /// </summary>
+    /// <remarks>
+    /// This fragment is mandatory in every target.
+    /// </remarks>
     [Fragment, Flags]
     public enum Platform
     {
+        /// <summary>
+        /// Windows 32-bit
+        /// </summary>
         win32 = 1 << 0,
+
+        /// <summary>
+        /// Windows 64-bit
+        /// </summary>
         win64 = 1 << 1,
+
+        /// <summary>
+        /// .NET CLR
+        /// </summary>
         anycpu = 1 << 2,
+
+        /// <summary>
+        /// Xbox One
+        /// </summary>
         durango = 1 << 3,
+
+        /// <summary>
+        /// Playstation 4
+        /// </summary>
         orbis = 1 << 4,
+
+        /// <summary>
+        /// Nintendo Switch
+        /// </summary>
         nx = 1 << 5,
-        ctr = 1 << 6,
+
+        _inactive1 = 1 << 6, // This used to be "ctr"
+
+        /// <summary>
+        /// Apple iPhone and iPad
+        /// </summary>
         ios = 1 << 7,
+
+        /// <summary>
+        /// Android
+        /// </summary>
         android = 1 << 8,
+
+        /// <summary>
+        /// Linux
+        /// </summary>
         linux = 1 << 9,
+
+        /// <summary>
+        /// macOS
+        /// </summary>
         mac = 1 << 10,
 
         /// <summary>
@@ -96,7 +142,7 @@ namespace Sharpmake
         agde = 1 << 11,
 
         /// <summary>
-        /// AppleTV
+        /// Apple TV
         /// </summary>
         tvos = 1 << 12,
 
@@ -106,22 +152,21 @@ namespace Sharpmake
         watchos = 1 << 13,
 
         /// <summary>
-        /// macOS Catalyst
+        /// Mac Catalyst (see https://developer.apple.com/mac-catalyst/)
         /// </summary>
         maccatalyst = 1 << 14,
 
-        [IgnoreDuplicateFragmentValue]
-        _reservedPlatformSection = 1 << 21, // This is a reverse-growing section for undisclosed platforms
-        _reserved10 = 1 << 21,
-        _reserved9 = 1 << 22,
-        _reserved8 = 1 << 23,
-        _reserved7 = 1 << 24,
-        _reserved6 = 1 << 25,
-        _reserved5 = 1 << 26,
-        _reserved4 = 1 << 27,
-        _reserved3 = 1 << 28,
-        _reserved2 = 1 << 29,
-        _reserved1 = 1 << 30,
+        // This is a reverse-growing section for undisclosed platforms
+        _reserved10 = 1 << 21, // ACTIVE
+        _reserved9  = 1 << 22, // ACTIVE
+        _reserved8  = 1 << 23, // ACTIVE
+        _reserved7  = 1 << 24, // ACTIVE
+        _reserved6  = 1 << 25, // Inactive
+        _reserved5  = 1 << 26, // Inactive
+        _reserved4  = 1 << 27, // Inactive
+        _reserved3  = 1 << 28, // Inactive
+        _reserved2  = 1 << 29, // Inactive
+        _reserved1  = 1 << 30, // Inactive
 
         [Obsolete]
         x360 = -1,
@@ -135,6 +180,8 @@ namespace Sharpmake
         wiiu = -1,
         [Obsolete]
         nvshield = -1,
+        [Obsolete]
+        ctr = -1,
     }
 
     [Fragment, Flags]
@@ -257,6 +304,7 @@ namespace Sharpmake
     {
         public Optimization Optimization;
         public Platform Platform;
+        public string ToolchainPlatform { get { return Util.GetToolchainPlatformString(Platform, this); } }
         public BuildSystem BuildSystem;
         public DevEnv DevEnv;
         public OutputType OutputType;
@@ -313,11 +361,9 @@ namespace Sharpmake
                 "_",
                 nonZeroValues.Select(f => s_cachedFieldValueToString.GetOrAdd(f, value =>
                 {
-                    if (value is Platform)
+                    if (value is Platform platformValue)
                     {
-                        var platform = (Platform)value;
-                        if (platform >= Platform._reservedPlatformSection)
-                            return Util.GetPlatformString(platform, null, this).ToLower();
+                        return Util.GetSimplePlatformString(platformValue);
                     }
                     return value.ToString();
                 }))

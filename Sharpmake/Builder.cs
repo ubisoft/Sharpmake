@@ -964,10 +964,9 @@ namespace Sharpmake
             private string GetFragmentInfoString(int fragmentValue)
             {
                 var typedFragment = Enum.ToObject(FieldInfo.FieldType, fragmentValue);
-                if (typedFragment is Platform)
+                if (typedFragment is Platform platformFragment)
                 {
-                    Platform platformFragment = (Platform)typedFragment;
-                    return platformFragment >= Platform._reservedPlatformSection ? Util.GetSimplePlatformString(platformFragment) : platformFragment.ToString();
+                    return Util.GetSimplePlatformString(platformFragment);
                 }
                 return typedFragment.ToString();
             }
