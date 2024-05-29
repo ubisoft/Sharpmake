@@ -16,7 +16,7 @@ namespace ConfigureOrdering
                 {
                     s_defaultTarget = new Target(
                         Platform.win32,
-                        DevEnv.vs2017,
+                        DevEnv.vs2022,
                         Optimization.Release,
                         OutputType.Lib,
                         Blob.NoBlob,

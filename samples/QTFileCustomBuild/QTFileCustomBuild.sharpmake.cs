@@ -44,7 +44,6 @@ namespace QTFileCustomBuild
 
         public QtSharpmakeMocTool()
         {
-            AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2017, "WIN32", "_MSC_VER=1910"));
             AdditionalDefines.Add(new AdditionalDefinition(Sharpmake.Platform.win64 | Sharpmake.Platform.win32, Sharpmake.DevEnv.vs2019, "WIN32", "_MSC_VER=1920"));
         }
 
@@ -511,7 +510,7 @@ namespace QTFileCustomBuild
 
             AddTargets(new Target(
                     Platform.win64,
-                    DevEnv.vs2017,
+                    DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release | Optimization.Retail,
                     OutputType.Dll
             ));
@@ -520,7 +519,7 @@ namespace QTFileCustomBuild
             // the same on each user's machine.
             //AddTargets(new Target(
             //        Platform.win64,
-            //        DevEnv.vs2017,
+            //        DevEnv.vs2019,
             //        Optimization.Debug | Optimization.Release | Optimization.Retail,
             //        OutputType.Dll,
             //        Blob.FastBuildUnitys,
@@ -577,7 +576,7 @@ namespace QTFileCustomBuild
 
             AddTargets(new Target(
                     Platform.win64,
-                    DevEnv.vs2017,
+                    DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release | Optimization.Retail,
                     OutputType.Dll
             ));
@@ -586,7 +585,7 @@ namespace QTFileCustomBuild
             // the same on each user's machine.
             //AddTargets(new Target(
             //        Platform.win64,
-            //        DevEnv.vs2017,
+            //        DevEnv.vs2019,
             //        Optimization.Debug | Optimization.Release | Optimization.Retail,
             //        OutputType.Dll,
             //        Blob.FastBuildUnitys,
@@ -625,7 +624,7 @@ namespace QTFileCustomBuild
 
             FastBuildSettings.FastBuildMakeCommand = @"\tools\FastBuild\start-fbuild.bat";
 
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
 
             arguments.Generate<QTFileCustomBuildSolution>();
         }

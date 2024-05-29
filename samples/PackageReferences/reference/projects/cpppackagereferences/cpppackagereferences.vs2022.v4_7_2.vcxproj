@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7FA7B25A-A15B-F71D-7E5B-B5E10C900153}</ProjectGuid>
+    <ProjectGuid>{5126AB06-1F57-1E19-9B3E-4447490B7ED2}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <RootNamespace>CPPPackageReferences</RootNamespace>
     <ProjectName>CPPPackageReferences</ProjectName>
@@ -25,14 +25,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,22 +43,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>cpppackagereferences</TargetName>
-    <OutDir>output\vs2017\debug\</OutDir>
+    <OutDir>output\vs2022\debug\</OutDir>
     <IntDir>obj\win64\debug\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\vs2017\debug\cpppackagereferences.exe</OutputFile>
+    <OutputFile>output\vs2022\debug\cpppackagereferences.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>cpppackagereferences</TargetName>
-    <OutDir>output\vs2017\release\</OutDir>
+    <OutDir>output\vs2022\release\</OutDir>
     <IntDir>obj\win64\release\</IntDir>
     <TargetExt>.exe</TargetExt>
     <GenerateManifest>true</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <OutputFile>output\vs2017\release\cpppackagereferences.exe</OutputFile>
+    <OutputFile>output\vs2022\release\cpppackagereferences.exe</OutputFile>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -112,9 +112,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\vs2017\debug\cpppackagereferences.exe</OutputFile>
+      <OutputFile>output\vs2022\debug\cpppackagereferences.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ProgramDatabaseFile>output\vs2017\debug\cpppackagereferences.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\vs2022\debug\cpppackagereferences.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -139,7 +139,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\vs2017\debug\cpppackagereferences.map</MapFileName>
+      <MapFileName>output\vs2022\debug\cpppackagereferences.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -165,7 +165,6 @@
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <PreprocessKeepComments>false</PreprocessKeepComments>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -194,9 +193,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>output\vs2017\release\cpppackagereferences.exe</OutputFile>
+      <OutputFile>output\vs2022\release\cpppackagereferences.exe</OutputFile>
       <ShowProgress>NotSet</ShowProgress>
-      <ProgramDatabaseFile>output\vs2017\release\cpppackagereferences.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>output\vs2022\release\cpppackagereferences.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>false</MapExports>
       <SwapRunFromCD>false</SwapRunFromCD>
@@ -221,7 +220,7 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries></IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
-      <MapFileName>output\vs2017\release\cpppackagereferences.map</MapFileName>
+      <MapFileName>output\vs2022\release\cpppackagereferences.map</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

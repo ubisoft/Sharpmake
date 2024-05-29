@@ -13,7 +13,7 @@ namespace SimpleExeLibDependency
         public SimpleExeProject()
         {
             Name = "SimpleExeProjectName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug));
             SourceRootPath = "[project.SharpmakeCsPath]/src";
 
             IsFileNameToLower = false;
@@ -41,7 +41,7 @@ namespace SimpleExeLibDependency
         public ExeLibSolution()
         {
             Name = "ExeLibSolutionName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug));
 
             IsFileNameToLower = false;
         }
@@ -60,7 +60,7 @@ namespace SimpleExeLibDependency
         [Sharpmake.Main]
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
 
             arguments.Generate<ExeLibSolution>();
         }
