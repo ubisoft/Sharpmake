@@ -29,7 +29,7 @@ namespace CompileDataBaseCommand
         protected BaseLibProject(string name)
         {
             Name = name + "ProjectName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug, OutputType.Lib));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug, OutputType.Lib));
             SourceRootPath = "[project.SharpmakeCsPath]/" + name;
         }
 
@@ -63,7 +63,7 @@ namespace CompileDataBaseCommand
         public ExeProject()
         {
             Name = "ExeProjectName";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug));
             SourceRootPath = "[project.SharpmakeCsPath]/src";
         }
 
@@ -83,7 +83,7 @@ namespace CompileDataBaseCommand
         public MainSolution()
         {
             Name = "CompileCommandDatabaseSolution";
-            AddTargets(new Target(Platform.win64, DevEnv.vs2017, Optimization.Debug));
+            AddTargets(new Target(Platform.win64, DevEnv.vs2022, Optimization.Debug));
 
             IsFileNameToLower = false;
         }
@@ -106,7 +106,7 @@ namespace CompileDataBaseCommand
             arguments.Builder.EventPostProjectLink += GenerateProjectDatabase;
             arguments.Builder.EventPostSolutionLink += GenerateSolutionDatabase;
 
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
 
             arguments.Generate<MainSolution>();
         }

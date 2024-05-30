@@ -16,7 +16,7 @@ namespace SimpleExeLibDependency
 
             AddTargets(new Target(
                 Platform.win64,
-                DevEnv.vs2017,
+                DevEnv.vs2022,
                 Optimization.Debug,
                 OutputType.Lib
             ));

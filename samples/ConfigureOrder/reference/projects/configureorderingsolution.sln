@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
+# Visual Studio Version 17
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChildProject", "childproject.vcxproj", "{BBE4416F-6E16-43B4-BFB1-D83310280DEE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FooBarProject", "foobarproject.vcxproj", "{4D10CB07-4E09-3F8E-412E-E6DA311CC3C5}"

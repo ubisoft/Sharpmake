@@ -20,7 +20,7 @@ namespace FastBuild
             AddTargets(
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2017,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Lib,
                     Blob.NoBlob,
@@ -65,7 +65,7 @@ namespace FastBuild
             AddTargets(
                 new Target(
                     Platform.win64,
-                    DevEnv.vs2017,
+                    DevEnv.vs2022,
                     Optimization.Debug | Optimization.Release,
                     OutputType.Lib,
                     Blob.NoBlob,
@@ -93,7 +93,7 @@ namespace FastBuild
         public static void SharpmakeMain(Sharpmake.Arguments arguments)
         {
             FastBuildSettings.FastBuildMakeCommand = @"..\..\..\tools\FastBuild\Windows-x64\FBuild.exe";
-            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2017, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
+            KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_17763_0);
 
             arguments.Generate<CustomBuildStepSolution>();
         }

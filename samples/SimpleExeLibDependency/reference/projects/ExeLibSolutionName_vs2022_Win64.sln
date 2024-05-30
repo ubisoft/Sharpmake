@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleExeProjectName", "SimpleExeProjectName_vs2017_Win64.vcxproj", "{7F5C4BE5-CE2D-1AFE-F5AC-710CA9245159}"
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleExeProjectName", "SimpleExeProjectName_vs2022_Win64.vcxproj", "{142D798F-1BB2-988A-A311-B5249207F55A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibStuffProject_ProjectName", "LibStuffProject_ProjectName.vcxproj", "{35DD105C-63C3-377C-CA28-2377EF12C9CC}"
 EndProject
@@ -9,8 +9,8 @@ Global
 		Debug|x64 = Debug|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7F5C4BE5-CE2D-1AFE-F5AC-710CA9245159}.Debug|x64.ActiveCfg = Debug|x64
-		{7F5C4BE5-CE2D-1AFE-F5AC-710CA9245159}.Debug|x64.Build.0 = Debug|x64
+		{142D798F-1BB2-988A-A311-B5249207F55A}.Debug|x64.ActiveCfg = Debug|x64
+		{142D798F-1BB2-988A-A311-B5249207F55A}.Debug|x64.Build.0 = Debug|x64
 		{35DD105C-63C3-377C-CA28-2377EF12C9CC}.Debug|x64.ActiveCfg = Debug|x64
 		{35DD105C-63C3-377C-CA28-2377EF12C9CC}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
