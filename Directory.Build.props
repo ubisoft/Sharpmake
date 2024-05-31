@@ -15,7 +15,7 @@
     <ContinuousIntegrationBuild Condition="'$(GITLAB_CI)' == 'true' OR '$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
     <!-- Compile Options -->
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
     <Deterministic>true</Deterministic>
     <Features>strict</Features>

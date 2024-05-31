@@ -52,13 +52,31 @@ namespace Sharpmake
 
             var standardPath = path.Replace(OtherSeparator, Path.DirectorySeparatorChar);
 
-            standardPath = standardPath switch
+            // C#11 is currently disable until Sharpmake is fully ported to .net8
+            //standardPath = standardPath switch
+            //{
+            //    [WindowsSeparator or UnixSeparator] => standardPath,
+            //    [_, ':'] => IsRunningOnUnix() ? standardPath : standardPath + Path.DirectorySeparatorChar,
+            //    [_, ':', WindowsSeparator or UnixSeparator] => standardPath,
+            //    _ => standardPath.TrimEnd(Path.DirectorySeparatorChar),
+            //};
+
+            if (standardPath.Length == 1 && (standardPath[0] == WindowsSeparator || standardPath[0] == UnixSeparator))
             {
-                [WindowsSeparator or UnixSeparator] => standardPath,
-                [_, ':'] => IsRunningOnUnix() ? standardPath : standardPath + Path.DirectorySeparatorChar,
-                [_, ':', WindowsSeparator or UnixSeparator] => standardPath,
-                _ => standardPath.TrimEnd(Path.DirectorySeparatorChar),
-            };
+                // Nothing to do to make the path standard
+            }
+            else if (standardPath.Length == 2 && standardPath[1] == ':')
+            {
+                standardPath = IsRunningOnUnix() ? standardPath : standardPath + Path.DirectorySeparatorChar;
+            }
+            else if (standardPath.EndsWith($":{WindowsSeparator}", StringComparison.Ordinal) || standardPath.EndsWith($":{UnixSeparator}", StringComparison.Ordinal))
+            {
+                // Nothing to do to make the path standard
+            }
+            else
+            {
+                standardPath = standardPath.TrimEnd(Path.DirectorySeparatorChar);
+            }
 
             return forceToLower ? standardPath.ToLower() : standardPath;
         }
@@ -800,7 +818,21 @@ namespace Sharpmake
                 var chunkStartIndex = 0;
 
                 // Handle fully qualified paths
-                var fullyQualifiedPath = paths.FirstOrDefault(p => p is ([UnixSeparator or WindowsSeparator, ..]) or ([_, ':', UnixSeparator or WindowsSeparator, ..]));
+                // C#11 is currently disable until Sharpmake is fully ported to .net8
+                //var fullyQualifiedPath = paths.FirstOrDefault(p => p is ([UnixSeparator or WindowsSeparator, ..]) or ([_, ':', UnixSeparator or WindowsSeparator, ..]));
+                string fullyQualifiedPath = null;
+                foreach (var path in paths)
+                {
+                    if (path[0] == UnixSeparator || path[0] == WindowsSeparator
+                        || (path.Length >= 3 && path[1] == ':' && (path[2] == UnixSeparator || path[2] == WindowsSeparator)))
+                    {
+                        fullyQualifiedPath = path;
+                        break;
+                    }
+                }
+
+                // If no fully qualified path is found, it remains null
+
                 if (fullyQualifiedPath is not null)
                 {
                     if (fullyQualifiedPath[0] == Path.DirectorySeparatorChar)
