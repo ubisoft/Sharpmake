@@ -62,7 +62,13 @@ namespace Sharpmake
         /// directory and thus must be built otherwise.
         /// </summary>
         DependOnAssemblyOutput = 1 << 7,
-        
+
+        /// <summary>
+        /// The dependent project won't have a ProjectReference added.
+        /// Valid only when the project is a C or a C++ project.
+        /// </summary>
+        NoProjectReference = 1 << 8,
+
         /// <summary>
         /// Specifies that the dependent project inherits the dependency's library files, library
         /// paths, include paths and defined symbols.
@@ -3329,7 +3335,14 @@ namespace Sharpmake
 
             internal class PropagationSettings
             {
-                internal PropagationSettings(DependencySetting inDependencySetting, bool inIsImmediate, bool inHasPublicPathToRoot, bool inHasPublicPathToImmediate, bool inGoesThroughDLL, bool isDotnetReferenceSwappedWithOutputAssembly)
+                internal PropagationSettings(
+                    DependencySetting inDependencySetting,
+                    bool inIsImmediate,
+                    bool inHasPublicPathToRoot,
+                    bool inHasPublicPathToImmediate,
+                    bool inGoesThroughDLL,
+                    bool isDotnetReferenceSwappedWithOutputAssembly,
+                    bool hasProjectReference)
                 {
                     _dependencySetting = inDependencySetting;
                     _isImmediate = inIsImmediate;
@@ -3337,6 +3350,7 @@ namespace Sharpmake
                     _hasPublicPathToImmediate = inHasPublicPathToImmediate;
                     _goesThroughDLL = inGoesThroughDLL;
                     _isDotnetReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly;
+                    _hasProjectReference = hasProjectReference;
                 }
 
                 public override bool Equals(object obj)
@@ -3355,7 +3369,8 @@ namespace Sharpmake
                            _hasPublicPathToRoot == other._hasPublicPathToRoot &&
                            _hasPublicPathToImmediate == other._hasPublicPathToImmediate &&
                            _goesThroughDLL == other._goesThroughDLL &&
-                           _isDotnetReferenceSwappedWithOutputAssembly == other._isDotnetReferenceSwappedWithOutputAssembly;
+                           _isDotnetReferenceSwappedWithOutputAssembly == other._isDotnetReferenceSwappedWithOutputAssembly &&
+                           _hasProjectReference == other._hasProjectReference;
                 }
 
                 public override int GetHashCode()
@@ -3369,6 +3384,7 @@ namespace Sharpmake
                         hash = hash * 23 + _hasPublicPathToImmediate.GetHashCode();
                         hash = hash * 23 + _goesThroughDLL.GetHashCode();
                         hash = hash * 23 + _isDotnetReferenceSwappedWithOutputAssembly.GetHashCode();
+                        hash = hash * 23 + _hasProjectReference.GetHashCode();
                         return hash;
                     }
                 }
@@ -3379,6 +3395,7 @@ namespace Sharpmake
                 internal readonly bool _hasPublicPathToImmediate;
                 internal readonly bool _goesThroughDLL;
                 internal readonly bool _isDotnetReferenceSwappedWithOutputAssembly;
+                internal readonly bool _hasProjectReference;
             }
 
             internal void Link(Builder builder)
@@ -3420,7 +3437,17 @@ namespace Sharpmake
 
                 var visitedNodes = new Dictionary<DependencyNode, List<PropagationSettings>>();
                 var visitingNodes = new Stack<Tuple<DependencyNode, PropagationSettings>>();
-                visitingNodes.Push(Tuple.Create(rootNode, new PropagationSettings(DependencySetting.Default, inIsImmediate: true, inHasPublicPathToRoot: true, inHasPublicPathToImmediate: true, inGoesThroughDLL: false, isDotnetReferenceSwappedWithOutputAssembly: false)));
+                visitingNodes.Push(
+                    Tuple.Create(
+                        rootNode,
+                        new PropagationSettings(
+                            DependencySetting.Default,
+                            inIsImmediate: true,
+                            inHasPublicPathToRoot: true,
+                            inHasPublicPathToImmediate: true,
+                            inGoesThroughDLL: false,
+                            isDotnetReferenceSwappedWithOutputAssembly: false,
+                            hasProjectReference: true)));
 
                 (IConfigurationTasks, Platform)? lastPlatformConfigurationTasks = null;
 
@@ -3461,6 +3488,7 @@ namespace Sharpmake
                     bool hasPublicPathToImmediate = propagationSetting._hasPublicPathToImmediate;
                     bool goesThroughDLL = propagationSetting._goesThroughDLL;
                     bool isDotnetReferenceSwappedWithOutputAssembly = propagationSetting._isDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput);
+                    bool hasProjectReference = propagationSetting._hasProjectReference && !visitedNode._dependencySetting.HasFlag(DependencySetting.NoProjectReference);
 
                     foreach (var childNode in visitedNode._childNodes)
                     {
@@ -3472,7 +3500,8 @@ namespace Sharpmake
                                 (isRoot || hasPublicPathToRoot) && childNode.Item2 == DependencyType.Public,
                                 (isImmediate || hasPublicPathToImmediate) && childNode.Item2 == DependencyType.Public,
                                 !isRoot && (goesThroughDLL || visitedNode._configuration.Output == OutputType.Dll),
-                                isDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput)
+                                isDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput),
+                                hasProjectReference && !visitedNode._dependencySetting.HasFlag(DependencySetting.NoProjectReference)
                             )
                         );
 
@@ -3551,9 +3580,9 @@ namespace Sharpmake
                                 {
                                     if (explicitDependenciesGlobal || !compile)
                                         GetConfigurationTasks(dependency.Platform).SetupStaticLibraryPaths(this, dependencySetting, dependency);
-                                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles) && hasProjectReference)
                                         ConfigurationDependencies.Add(dependency);
-                                    if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                    if (dependencySetting == DependencySetting.OnlyBuildOrder && hasProjectReference)
                                         BuildOrderDependencies.Add(dependency);
                                 }
 
@@ -3610,11 +3639,11 @@ namespace Sharpmake
                                 {
                                     if (explicitDependenciesGlobal || !compile || (IsFastBuild && Util.IsDotNet(dependency)))
                                         configTasks.SetupDynamicLibraryPaths(this, dependencySetting, dependency);
-                                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                                    if (dependencySetting.HasFlag(DependencySetting.LibraryFiles) && hasProjectReference)
                                         ConfigurationDependencies.Add(dependency);
                                     if (dependencySetting.HasFlag(DependencySetting.ForceUsingAssembly))
                                         ForceUsingDependencies.Add(dependency);
-                                    if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                    if (dependencySetting == DependencySetting.OnlyBuildOrder && hasProjectReference)
                                         BuildOrderDependencies.Add(dependency);
 
                                     // check if that case is valid: dll with additional libs
@@ -3695,10 +3724,13 @@ namespace Sharpmake
                                 else if (isImmediate)
                                     resolvedDotNetPrivateDependencies.Add(new DotNetDependency(dependency));
 
-                                if (dependencySetting == DependencySetting.OnlyBuildOrder)
-                                    BuildOrderDependencies.Add(dependency);
-                                else
-                                    ConfigurationDependencies.Add(dependency);
+                                if (hasProjectReference)
+                                {
+                                    if (dependencySetting == DependencySetting.OnlyBuildOrder)
+                                        BuildOrderDependencies.Add(dependency);
+                                    else
+                                        ConfigurationDependencies.Add(dependency);
+                                }
                             }
                             break;
                         case OutputType.Utility:
