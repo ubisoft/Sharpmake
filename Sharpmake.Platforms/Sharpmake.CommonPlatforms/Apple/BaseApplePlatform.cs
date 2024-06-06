@@ -617,6 +617,8 @@ namespace Sharpmake
             else
                 options["CodeSigningIdentity"] = FileGeneratorUtilities.RemoveLineTag;
 
+            options["DyLibInstallName"] = XCodeUtil.ResolveProjectVariable(project, Options.StringOption.Get<Options.XCode.Linker.DyLibInstallName>(conf));
+
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.OnlyActiveArch.Disable, () => options["OnlyActiveArch"] = "NO"),
                 Options.Option(Options.XCode.Compiler.OnlyActiveArch.Enable, () => options["OnlyActiveArch"] = "YES")
@@ -1215,6 +1217,12 @@ namespace Sharpmake
             {
                 // xcode for some reason does not use arrays for this setting but space separated values
                 options["PreLinkedLibraries"] = prelinkedLibrary;
+            }
+
+            var dylibInstallName = XCodeUtil.ResolveProjectVariable(context.Project, Options.StringOption.Get<Options.XCode.Linker.DyLibInstallName>(conf));
+            if (!string.IsNullOrEmpty(dylibInstallName))
+            {
+                cmdLineOptions["DyLibInstallName"] = $"-install_name \"{dylibInstallName}\"";
             }
 
             OrderableStrings systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
