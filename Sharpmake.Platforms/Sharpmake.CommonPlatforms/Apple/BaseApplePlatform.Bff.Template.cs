@@ -30,6 +30,7 @@ namespace Sharpmake
                             // Additional linker options
                             //--------------------------
                             + ' [options.AdditionalLinkerOptions]'
+                            + ' [cmdLineOptions.DyLibInstallName]'
 ";
 
         private const string _compilerExtraOptionsGeneral = @"

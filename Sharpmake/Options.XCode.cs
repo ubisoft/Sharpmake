@@ -1152,6 +1152,17 @@ namespace Sharpmake
                     [Default]
                     Enable
                 }
+
+                /// <summary>
+                /// Sets an internal install path (LC_ID_DYLIB) in a dynamic library. Any clients linked against the library will record that path as the way dyld should locate this library.
+                /// </summary>
+                public class DyLibInstallName : StringOption
+                {
+                    public DyLibInstallName(string value) : base(value)
+                    {
+                    }
+                }
+
             }
 
             /// <summary>

@@ -32,5 +32,12 @@ namespace HelloXCode
 
             conf.AddPrivateDependency<StaticLib1Project>(target);
         }
+
+        public override void ConfigureMac(Configuration conf, CommonTarget target)
+        {
+            base.ConfigureMac(conf, target);
+
+            conf.Options.Add(new Options.XCode.Linker.DyLibInstallName(@"@executable_path/libdll1.dylib"));
+        }
     }
 }
