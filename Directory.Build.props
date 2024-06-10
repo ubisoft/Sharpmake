@@ -23,7 +23,7 @@
     <EnforceCodeStyleInBuild Condition="$(ContinuousIntegrationBuild) == 'true' OR '$(Configuration)' == 'Release'">true</EnforceCodeStyleInBuild>
     <NoWarn>1570,1591</NoWarn> <!-- For xml documentation warnings -->
     <DefineConstants>TRACE</DefineConstants>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <InvariantGlobalization>true</InvariantGlobalization>
 
     <!-- Package info -->
