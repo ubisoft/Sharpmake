@@ -321,7 +321,7 @@
         },
         {
             "Name": "QTFileCustomBuild",
-            "CIs": [ "github", "gitlab" ],
+            "CIs": [],
             "OSs": [ "windows-2019" ],
             "Frameworks": [ "net6.0" ],
             "Configurations": [ "debug", "release" ],
