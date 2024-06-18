@@ -31,6 +31,7 @@ namespace HelloXCode
             conf.IncludePaths.Add(SourceRootPath);
 
             conf.AddPrivateDependency<StaticLib1Project>(target);
+            conf.IncludeSystemPaths.Add("[project.SourceRootPath]/systemincludedll");
         }
 
         public override void ConfigureMac(Configuration conf, CommonTarget target)
