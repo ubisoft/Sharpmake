@@ -4,6 +4,8 @@
 #include "sub folder/useless_static_lib2.h"
 
 #include <external.h>
+#include "systeminclude.h"
+#include "systemincludedll.h"
 
 int main(int, char**)
 {
@@ -21,5 +23,7 @@ int main(int, char**)
     Util2 utilityStatic;
     utilityStatic.DoSomethingUseful();
     StaticLib2::UselessMethod();
+    SystemFct();
+    SystemIncludeDllFct();
     return 0;
 }

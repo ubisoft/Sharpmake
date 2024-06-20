@@ -27,6 +27,7 @@ namespace HelloXCode
             conf.AddPrivateDependency<StaticLib2Project>(target);
 
             conf.Defines.Add("CREATION_DATE=\"July 2020\"");
+            conf.IncludeSystemPaths.Add("[project.SourceRootPath]/systeminclude");
         }
     }
 }
