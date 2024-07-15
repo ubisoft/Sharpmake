@@ -649,7 +649,11 @@ namespace Sharpmake.Generators.FastBuild
                     envRemoveGuards = string.Empty;
                     fastBuildEnvironments += Bff.Template.ConfigurationFile.WinEnvironment;
                 }
-                fastBuildEnvironments += Bff.Template.ConfigurationFile.OsxEnvironment;
+
+                if (Util.GetExecutingPlatform() == Platform.win64)
+                    fastBuildEnvironments += Bff.Template.ConfigurationFile.OsxEnvironmentOnWindows;
+                else
+                    fastBuildEnvironments += Bff.Template.ConfigurationFile.OsxEnvironment;
             }
             else
             {

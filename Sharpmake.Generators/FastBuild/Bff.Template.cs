@@ -86,6 +86,18 @@ Settings
 #endif[envRemoveGuards]
 ";
 
+                public const string OsxEnvironmentOnWindows =
+@"#if __OSX__[envRemoveGuards]
+    #import TMP
+    .Environment =
+    {
+        ""TMPDIR=$TMP$"",
+        ""PATH=[fastBuildPATH]""
+[envAdditionalVariables]
+    }
+#endif[envRemoveGuards]
+";
+
                 public static string MasmConfigNameSuffix = "Masm";
                 public static string Win64ConfigName = ".win64Config";
 

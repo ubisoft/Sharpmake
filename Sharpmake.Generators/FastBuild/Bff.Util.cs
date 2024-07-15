@@ -589,6 +589,74 @@ namespace Sharpmake.Generators.FastBuild
             return "{ " + string.Join(", ", patterns.Select(p => "'" + p + "'")) + " }";
         }
 
+        internal static string GetFastBuildCommandLineArguments(this Project.Configuration conf)
+        {
+            // FastBuild command line
+            var fastBuildCommandLineOptions = new List<string>();
+
+            if (FastBuildSettings.FastBuildUseIDE)
+                fastBuildCommandLineOptions.Add("-ide");
+
+            if (FastBuildSettings.FastBuildReport)
+                fastBuildCommandLineOptions.Add("-report");
+
+            if (FastBuildSettings.FastBuildNoSummaryOnError)
+                fastBuildCommandLineOptions.Add("-nosummaryonerror");
+
+            if (FastBuildSettings.FastBuildSummary)
+                fastBuildCommandLineOptions.Add("-summary");
+
+            if (FastBuildSettings.FastBuildVerbose)
+                fastBuildCommandLineOptions.Add("-verbose");
+
+            if (FastBuildSettings.FastBuildMonitor)
+                fastBuildCommandLineOptions.Add("-monitor");
+
+            // Configuring cache mode if that configuration is allowed to use caching
+            if (conf.FastBuildCacheAllowed)
+            {
+                // Setting the appropriate cache type commandline for that target.
+                switch (FastBuildSettings.CacheType)
+                {
+                    case FastBuildSettings.CacheTypes.CacheRead:
+                        fastBuildCommandLineOptions.Add("-cacheread");
+                        break;
+                    case FastBuildSettings.CacheTypes.CacheWrite:
+                        fastBuildCommandLineOptions.Add("-cachewrite");
+                        break;
+                    case FastBuildSettings.CacheTypes.CacheReadWrite:
+                        fastBuildCommandLineOptions.Add("-cache");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (FastBuildSettings.FastBuildDistribution && conf.FastBuildDistribution)
+                fastBuildCommandLineOptions.Add("-dist");
+
+            if (FastBuildSettings.FastBuildWait)
+                fastBuildCommandLineOptions.Add("-wait");
+
+            if (FastBuildSettings.FastBuildNoStopOnError)
+                fastBuildCommandLineOptions.Add("-nostoponerror");
+
+            if (FastBuildSettings.FastBuildFastCancel)
+                fastBuildCommandLineOptions.Add("-fastcancel");
+
+            if (FastBuildSettings.FastBuildNoUnity)
+                fastBuildCommandLineOptions.Add("-nounity");
+
+            if (!string.IsNullOrEmpty(conf.FastBuildCustomArgs))
+                fastBuildCommandLineOptions.Add(conf.FastBuildCustomArgs);
+
+            if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
+                fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
+
+            string commandLine = string.Join(" ", fastBuildCommandLineOptions);
+            return commandLine;
+        }
+
         internal static List<Project.Configuration> GetOrderedFlattenedProjectDependencies(Project.Configuration conf, bool allDependencies = true, bool fuDependencies = false)
         {
             var dependencies = new UniqueList<Project.Configuration>();

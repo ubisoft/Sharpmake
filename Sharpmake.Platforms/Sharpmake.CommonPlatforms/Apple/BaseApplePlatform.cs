@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sharpmake.Generators;
 using Sharpmake.Generators.Apple;
@@ -98,7 +99,12 @@ namespace Sharpmake
                 foreach (string define in defines.SortedValues)
                 {
                     if (!string.IsNullOrWhiteSpace(define))
-                        fastBuildDefines.Add(string.Concat(platformDefineSwitch, define));
+                    {
+                        if (Util.GetExecutingPlatform() == Platform.win64)
+                            fastBuildDefines.Add(string.Format(@"{0}{1}{2}{1}", platformDefineSwitch, Util.DoubleQuotes, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                        else
+                            fastBuildDefines.Add(string.Concat(platformDefineSwitch, define));
+                    }
                 }
                 context.CommandLineOptions["PreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildDefines);
             }
@@ -115,7 +121,12 @@ namespace Sharpmake
                 foreach (string resourceDefine in resourceDefines.SortedValues)
                 {
                     if (!string.IsNullOrWhiteSpace(resourceDefine))
-                        fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
+                    {
+                        if (Util.GetExecutingPlatform() == Platform.win64)
+                            fastBuildDefines.Add(string.Format(@"""{0}{1}""", platformDefineSwitch, resourceDefine.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                        else
+                            fastBuildDefines.Add(string.Concat(platformDefineSwitch, resourceDefine));
+                    }
                 }
                 context.CommandLineOptions["ResourcePreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}                                    + ' ", fastBuildDefines);
             }
@@ -215,7 +226,8 @@ namespace Sharpmake
                 if (!fastBuildSettings.CompilerFamily.TryGetValue(compilerFamilyKey, out compilerFamily))
                     compilerFamily = Sharpmake.CompilerFamily.Clang;
 
-                string executable = useCCompiler ? @"$ExecutableRootPath$\clang" : @"$ExecutableRootPath$\clang++";
+                string exeExtension = Util.GetExecutingPlatform() == Platform.win64 ? ".exe" : "";
+                string executable = Path.Combine(@"$ExecutableRootPath$", (useCCompiler ? "clang" : "clang++") + exeExtension);
 
                 compilerSettings = new CompilerSettings(compilerName, compilerFamily, SharpmakePlatform, extraFiles, executable, pathToCompiler, devEnv, new Dictionary<string, CompilerSettings.Configuration>());
                 masterCompilerSettings.Add(compilerName, compilerSettings);
@@ -239,11 +251,21 @@ namespace Sharpmake
 
                 string linkerExe;
                 if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
-                    linkerExe = IsLinkerInvokedViaCompiler ? "clang++" : "ld";
+                {
+                    if (Util.GetExecutingPlatform() == Platform.win64)
+                        linkerExe = IsLinkerInvokedViaCompiler ? "clang++.exe" : "ld64.lld.exe";
+                    else
+                        linkerExe = IsLinkerInvokedViaCompiler ? "clang++" : "ld";
+                }
 
                 string librarianExe;
                 if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
-                    librarianExe = "ar";
+                {
+                    if (Util.GetExecutingPlatform() == Platform.win64)
+                        librarianExe = "llvm-ar.exe";
+                    else
+                        librarianExe = "ar";
+                }
 
                 configurations.Add(configName,
                     new CompilerSettings.Configuration(
@@ -251,8 +273,8 @@ namespace Sharpmake
                         compiler: compilerName,
                         binPath: binPath,
                         linkerPath: Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, linkerPath)),
-                        librarian: @"$LinkerPath$\" + librarianExe,
-                        linker: @"$LinkerPath$\" + linkerExe,
+                        librarian: Path.Combine("$LinkerPath$", librarianExe),
+                        linker: Path.Combine("$LinkerPath$", linkerExe),
                         fastBuildLinkerType: CompilerSettings.LinkerType.GCC // Workaround: set GCC linker type since it will only enable response files
                     )
                 );
