@@ -54,7 +54,10 @@ namespace Sharpmake
                 {
                     // Xcode doesn't accept the customized sdk path as SDKRoot
                     //options["SDKRoot"] = customSdkRoot.Value;
-                    cmdLineOptions["SDKRoot"] = $"-isysroot {customSdkRoot.Value}";
+                    if (!string.IsNullOrEmpty(customSdkRoot.Value))
+                        cmdLineOptions["SDKRoot"] = $"-isysroot {customSdkRoot.Value}";
+                    else
+                        cmdLineOptions["SDKRoot"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 // Target

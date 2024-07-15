@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
+using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
 
 namespace Sharpmake.Generators.Apple
@@ -96,7 +97,7 @@ namespace Sharpmake.Generators.Apple
 
         static XCodeProj()
         {
-            FolderSeparator = Util.UnixSeparator;
+            FolderSeparator = Path.DirectorySeparatorChar;
         }
 
         private void PrepareUnitTestSources(
@@ -654,9 +655,9 @@ popd";
                             break;
                     }
 
-                    // master bff path
                     if (conf.IsFastBuild)
                     {
+                        // master bff path
                         // we only support projects in one or no master bff, but in that last case just output a warning
                         var masterBffList = conf.FastBuildMasterBffList.Distinct().ToArray();
                         if (masterBffList.Length == 0)
@@ -673,6 +674,10 @@ popd";
                                 throw new Error("Project {0} has a fastbuild target that has distinct master bff, sharpmake only supports 1.", conf);
                             masterBffFilePath = masterBffList[0];
                         }
+
+                        // Make the commandline written in the bff available, except the master bff -config
+                        string commandLine = conf.GetFastBuildCommandLineArguments();
+                        Bff.SetCommandLineArguments(conf, commandLine);
                     }
 
                     if (conf.Output == Project.Configuration.OutputType.IosTestBundle)
