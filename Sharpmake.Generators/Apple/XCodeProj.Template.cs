@@ -469,6 +469,7 @@ namespace Sharpmake.Generators.Apple
 				LD_DYLIB_INSTALL_NAME = ""[item.Options.DyLibInstallName]"";
 				ONLY_ACTIVE_ARCH = [item.Options.OnlyActiveArch];
 				OTHER_CPLUSPLUSFLAGS = [item.Options.CompilerOptions];
+				OTHER_CFLAGS = [item.Options.CompilerOptions];
 				OTHER_LDFLAGS = [item.Options.LinkerOptions];
 				SDKROOT = ""[item.Options.SDKRoot]"";
 				TARGETED_DEVICE_FAMILY = ""[item.Options.TargetedDeviceFamily]"";
