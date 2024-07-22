@@ -360,6 +360,11 @@ namespace Sharpmake
                             dependency.TargetFileFullNameWithExtension,
                         dependency.TargetFileOrderNumber);
             }
+            else if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export && configuration.IsFastBuild)
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.AddDependencyBuiltTargetLibraryFile(Path.Combine(dependency.TargetLibraryPath, dependency.TargetFileFullNameWithExtension), dependency.TargetFileOrderNumber);
+            }
             else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
@@ -386,6 +391,11 @@ namespace Sharpmake
                             dependency.TargetFileName :
                             dependency.TargetFileFullNameWithExtension,
                         dependency.TargetFileOrderNumber);
+            }
+            else if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export && configuration.IsFastBuild)
+            {
+                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
+                    configuration.DependenciesOtherLibraryFiles.Add(Path.Combine(dependency.TargetLibraryPath, dependency.TargetFileFullNameWithExtension), dependency.TargetFileOrderNumber);
             }
             else
             {
