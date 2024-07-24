@@ -360,21 +360,10 @@ namespace Sharpmake
                             dependency.TargetFileFullNameWithExtension,
                         dependency.TargetFileOrderNumber);
             }
-            else if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export && configuration.IsFastBuild)
+            else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                     configuration.AddDependencyBuiltTargetLibraryFile(Path.Combine(dependency.TargetLibraryPath, dependency.TargetFileFullNameWithExtension), dependency.TargetFileOrderNumber);
-            }
-            else
-            {
-                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                    configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetPath, dependency.TargetLibraryPathOrderNumber);
-                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.DependenciesOtherLibraryFiles.Add(
-                        dependency.PreferRelativePaths ?
-                            dependency.TargetFileName :
-                            dependency.TargetFileFullNameWithExtension,
-                        dependency.TargetFileOrderNumber);
             }
         }
 
@@ -392,21 +381,10 @@ namespace Sharpmake
                             dependency.TargetFileFullNameWithExtension,
                         dependency.TargetFileOrderNumber);
             }
-            else if (dependency.Project.SharpmakeProjectType == Project.ProjectTypeAttribute.Export && configuration.IsFastBuild)
+            else
             {
                 if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
                     configuration.DependenciesOtherLibraryFiles.Add(Path.Combine(dependency.TargetLibraryPath, dependency.TargetFileFullNameWithExtension), dependency.TargetFileOrderNumber);
-            }
-            else
-            {
-                if (dependencySetting.HasFlag(DependencySetting.LibraryPaths))
-                    configuration.DependenciesOtherLibraryPaths.Add(dependency.TargetLibraryPath, dependency.TargetLibraryPathOrderNumber);
-                if (dependencySetting.HasFlag(DependencySetting.LibraryFiles))
-                    configuration.DependenciesOtherLibraryFiles.Add(
-                        dependency.PreferRelativePaths ?
-                            dependency.TargetFileName :
-                            dependency.TargetFileFullNameWithExtension,
-                        dependency.TargetFileOrderNumber);
             }
         }
 

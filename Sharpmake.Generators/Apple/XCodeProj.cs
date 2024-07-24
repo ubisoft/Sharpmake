@@ -1501,17 +1501,25 @@ popd";
             // linker(ld) of Xcode: only accept libfilename without prefix and suffix.
             linkerOptions.AddRange(libFiles.Select(library =>
             {
+                bool hasLibraryExtension = Path.HasExtension(library) &&
+                    ((Path.GetExtension(library).EndsWith(".a", StringComparison.OrdinalIgnoreCase) ||
+                      Path.GetExtension(library).EndsWith(".dylib", StringComparison.OrdinalIgnoreCase)
+                    ));
+
                 // deal with full library path: add libdir and libname
                 if (Path.IsPathFullyQualified(library))
                 {
+                    // Special case with full path: pass them as is.
+                    // This is to leave the possibility to force the extension,
+                    // preventing conflict if the folder contains both .a and .dylib version.
+                    if (hasLibraryExtension)
+                        return library;
+
                     conf.LibraryPaths.Add(Path.GetDirectoryName(library));
                     library = Path.GetFileName(library);
                 }
 
-                if (Path.HasExtension(library) &&
-                    ((Path.GetExtension(library).EndsWith(".a", StringComparison.OrdinalIgnoreCase) ||
-                      Path.GetExtension(library).EndsWith(".dylib", StringComparison.OrdinalIgnoreCase)
-                    )))
+                if (hasLibraryExtension)
                 {
                     library = Path.GetFileNameWithoutExtension(library);
                     if (library.StartsWith("lib"))
