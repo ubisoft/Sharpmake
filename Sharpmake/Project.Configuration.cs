@@ -1965,6 +1965,7 @@ namespace Sharpmake
                 public string BuildCommand = RemoveLineTag;
                 public string RebuildCommand = RemoveLineTag;
                 public string CleanCommand = RemoveLineTag;
+                public string CompileFileCommand = RemoveLineTag;
                 public string OutputFile = RemoveLineTag;
                 public string AdditionalOptions = "";
 
