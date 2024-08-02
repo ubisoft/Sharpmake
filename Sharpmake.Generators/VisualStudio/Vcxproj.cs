@@ -523,6 +523,7 @@ namespace Sharpmake.Generators.VisualStudio
                             using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
                             using (fileGenerator.Declare("fastBuildMakeCommandBuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
                             using (fileGenerator.Declare("fastBuildMakeCommandRebuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
+                            using (fileGenerator.Declare("fastBuildMakeCommandCompileFile", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.CompileFile, conf, commandLine)))
                             {
                                 platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                             }

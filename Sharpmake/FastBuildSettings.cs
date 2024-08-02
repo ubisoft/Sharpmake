@@ -11,7 +11,8 @@ namespace Sharpmake
         public enum BuildType
         {
             Build,
-            Rebuild
+            Rebuild,
+            CompileFile
         };
 
         public abstract string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments);
