@@ -402,7 +402,7 @@
         },
         {
             "Name": "XCodeProjects",
-            "CIs": [ "github", "gitlab" ],
+            "CIs": [ "gitlab" ],
             "OSs": [ "macos" ],
             "Frameworks": [ "net6.0" ],
             "Configurations": [ "debug", "release" ],
