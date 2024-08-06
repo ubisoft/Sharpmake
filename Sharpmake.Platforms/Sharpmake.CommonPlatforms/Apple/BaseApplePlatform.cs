@@ -166,7 +166,29 @@ namespace Sharpmake
 
         public IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
         {
-            return Enumerable.Empty<Project.Configuration.BuildStepBase>();
+            if (Util.GetExecutingPlatform() == Platform.mac)
+            {
+                // Note: We only generate dsym for applications and bundles
+                if (configuration.IsFastBuild && 
+                   (configuration.Output == Project.Configuration.OutputType.AppleApp ||
+                   configuration.Output == Project.Configuration.OutputType.Exe ||
+                   configuration.Output == Project.Configuration.OutputType.AppleBundle || 
+                   configuration.Output == Project.Configuration.OutputType.Dll
+                   ))
+                {
+                    var debugFormat = Options.GetObject<Sharpmake.Options.XCode.Compiler.DebugInformationFormat>(configuration);
+                    if (debugFormat == Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym)
+                    {
+                        string outputPath = Path.Combine(configuration.TargetPath, configuration.TargetFileFullNameWithExtension + ".dSYM");
+                        yield return new Project.Configuration.BuildStepExecutable(
+                            "/usr/bin/dsymutil",
+                            fastBuildOutputFile,
+                            Path.Combine(configuration.IntermediatePath, configuration.TargetFileName + ".dsymdone"),
+                            $"{fastBuildOutputFile} -o {outputPath}",
+                            useStdOutAsOutput: true);
+                    }
+                }
+            }
         }
 
         public IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)

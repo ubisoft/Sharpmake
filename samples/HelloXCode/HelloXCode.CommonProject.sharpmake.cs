@@ -59,6 +59,11 @@ namespace HelloXCode
 
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
             conf.Options.Add(Options.XCode.Editor.Indent.Spaces);
+
+            if (target.Optimization == Optimization.Debug)
+                conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym);
+            else
+                conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.Dwarf);
         }
 
         ////////////////////////////////////////////////////////////////////////
