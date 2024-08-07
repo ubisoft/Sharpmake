@@ -590,7 +590,7 @@ namespace Sharpmake.Generators.FastBuild
                                 }
 
                                 var extraPlatformEvents = new List<Project.Configuration.BuildStepBase>();
-                                if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+                                if (!FastBuildSettings.FastBuildSupportLinkerStampList && isOutputTypeExeOrDllOrAppleApp)
                                     extraPlatformEvents.AddRange(platformBff.GetExtraStampEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
 
                                 extraPlatformEvents.AddRange(platformBff.GetExtraPostBuildEvents(conf, fastBuildOutputFile).Select(step => { step.Resolve(resolver); return step; }));
