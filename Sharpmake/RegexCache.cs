@@ -156,8 +156,27 @@ namespace Sharpmake
 
         private static CachedRegex CreateCachedRegex(string expression)
         {
-            if (Util.UsesUnixSeparator && expression.IndexOf(@"\\", System.StringComparison.Ordinal) >= 0)
-                expression = expression.Replace(@"\\", Regex.Escape(Util.UnixSeparator.ToString()));
+            if (Util.UsesUnixSeparator)
+            {
+                if (expression.Contains(@"\\", System.StringComparison.Ordinal))
+                {
+                    expression = expression.Replace(@"\\", Regex.Escape(Util.UnixSeparator.ToString()));
+                }
+            }
+            else
+            {
+                if (expression.Contains(@"/", System.StringComparison.Ordinal))
+                {
+                    string oldExpression = expression;
+                    // Handle the case where there are character escapes:
+                    //   \/ is equivalent to /, but only if \ is not itself escaped.
+                    expression = expression.Replace(@"\\\", @"/")  // First get the double backslashes out of the way (they will be converted back). Now the only backslashes left are not escaped.
+                                           .Replace(@"\/", @"/")
+                                           .Replace(@"/", Regex.Escape(Util.WindowsSeparator.ToString()));
+
+                    Util.LogWrite($"Warning: Converting regex to native separators, to avoid breaking cross-compilation on Windows: {oldExpression} changed to {expression}");
+                }
+            }
 
             return new CachedRegex(
                 new Regex(
