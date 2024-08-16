@@ -154,6 +154,8 @@ namespace Sharpmake
             return s_cachedRegexes.GetOrAdd(expression, CreateCachedRegex);
         }
 
+        private static string s_escapedWinSeparator = Regex.Escape(Util.WindowsSeparator.ToString());
+
         private static CachedRegex CreateCachedRegex(string expression)
         {
             if (Util.UsesUnixSeparator)
@@ -165,16 +167,21 @@ namespace Sharpmake
             }
             else
             {
-                if (expression.Contains(@"/", System.StringComparison.Ordinal))
+                if (expression.Contains('/', System.StringComparison.Ordinal))
                 {
                     string oldExpression = expression;
+                    // Ignore valid patterns that contain forward /
+                    string refExpression = oldExpression.Replace(@"[/\\]", s_escapedWinSeparator)
+                                                        .Replace(@"[\\/]", s_escapedWinSeparator);
+
                     // Handle the case where there are character escapes:
                     //   \/ is equivalent to /, but only if \ is not itself escaped.
-                    expression = expression.Replace(@"\\\", @"/")  // First get the double backslashes out of the way (they will be converted back). Now the only backslashes left are not escaped.
-                                           .Replace(@"\/", @"/")
-                                           .Replace(@"/", Regex.Escape(Util.WindowsSeparator.ToString()));
+                    expression = refExpression.Replace(s_escapedWinSeparator, @"/")  // First get the double backslashes out of the way (they will be converted back). Now the only backslashes left are not escaped.
+                                              .Replace(@"\/", @"/")
+                                              .Replace(@"/", s_escapedWinSeparator);
 
-                    Util.LogWrite($"Warning: Converting regex to native separators, to avoid breaking cross-compilation on Windows: {oldExpression} changed to {expression}");
+                    if (!string.Equals(refExpression, expression, System.StringComparison.Ordinal))
+                        Util.LogWrite($"Warning: Converting regex to native separators, to avoid breaking cross-compilation on Windows: {oldExpression} changed to {expression}");
                 }
             }
 
