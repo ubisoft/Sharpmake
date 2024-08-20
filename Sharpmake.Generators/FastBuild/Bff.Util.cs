@@ -267,25 +267,42 @@ namespace Sharpmake.Generators.FastBuild
             }
         }
 
-        // This NMake command generator is for supporting legacy code without any client code change.
-        internal class FastBuildDefaultNMakeCommandGenerator : FastBuildMakeCommandGenerator
+        /// <summary>
+        /// This class is used as a helper for generating fastbuild commands for vcxproj and xcode projects. 
+        /// By default is uses the default fastbuild executable defined in FastBuildSettings but scripts could define another class to 
+        /// to launch a totally different launcher with other parameters.
+        /// </summary>
+        internal class FastBuildDefaultCommandGenerator : FastBuildMakeCommandGenerator
         {
-            public override string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
+            public override string GetExecutablePath(Sharpmake.Project.Configuration conf)
             {
-                Project project = conf.Project;
-                string fastBuildShortProjectName = Bff.GetShortProjectName(project, conf);
+                string fastbuildMakeCommand = FastBuildSettings.FastBuildMakeCommand;
+                if (fastbuildMakeCommand != null)
+                {
+                    if (!Path.IsPathRooted(FastBuildSettings.FastBuildMakeCommand))
+                        fastbuildMakeCommand = Path.Combine(conf.Project.RootPath, FastBuildSettings.FastBuildMakeCommand);
+                    fastbuildMakeCommand = Util.SimplifyPath(fastbuildMakeCommand);
+                }
+                return fastbuildMakeCommand ?? "<Please define FastBuildSettings.FastBuildMakeCommand>";
+            }
 
-                string makePath = FastBuildSettings.FastBuildMakeCommand;
-                if (!Path.IsPathRooted(FastBuildSettings.FastBuildMakeCommand))
-                    makePath = conf.Project.RootPath + Path.DirectorySeparatorChar + FastBuildSettings.FastBuildMakeCommand;
-                makePath = Util.SimplifyPath(makePath);
+            public override string GetArguments(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments)
+            {
+                // Note: XCode is special, the target identifier is written in the xcode project file for each target using the FASTBUILD_TARGET special variable.
+                string targetIdentifier = "";
+                if (!conf.Target.TryGetFragment<DevEnv>(out DevEnv devEnv) || devEnv != DevEnv.xcode)
+                {
+                    targetIdentifier = GetTargetIdentifier(conf);
+                }
 
-                string fastBuildExecutable = Util.PathGetRelative(conf.ProjectPath, makePath, true);
+                string buildCommand = buildType == BuildType.Rebuild ? " -clean" : "";
 
-                string rebuildCmd = buildType == BuildType.Rebuild ? " -clean" : "";
+                return $@"{buildCommand} {targetIdentifier} {fastbuildArguments}";
+            }
 
-                // $(ProjectDir) has a trailing slash
-                return $@"""$(ProjectDir){fastBuildExecutable}""{rebuildCmd} {fastBuildShortProjectName} {fastbuildArguments}";
+            public override string GetTargetIdentifier(Sharpmake.Project.Configuration conf)
+            {
+                return Bff.GetShortProjectName(conf.Project, conf);
             }
         }
 

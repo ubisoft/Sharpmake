@@ -513,7 +513,7 @@ namespace Sharpmake
 
             if (conf.IsFastBuild)
             {
-                options["FastBuildTarget"] = Bff.GetShortProjectName(project, conf);
+                options["FastBuildTarget"] = FastBuildSettings.MakeCommandGenerator.GetTargetIdentifier(conf);
             }
             else
             {
