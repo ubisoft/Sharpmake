@@ -117,7 +117,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 PresentPlatforms = ProjectConfigurations.Select(conf => conf.Platform).Distinct().ToDictionary(p => p, p => PlatformRegistry.Get<IPlatformVcxproj>(p));
 
-                FastBuildMakeCommandGenerator = FastBuildSettings.MakeCommandGenerator ?? new Bff.FastBuildDefaultNMakeCommandGenerator();
+                FastBuildMakeCommandGenerator = FastBuildSettings.MakeCommandGenerator;
             }
 
             public void Reset()
@@ -520,10 +520,11 @@ namespace Sharpmake.Generators.VisualStudio
 
                             commandLine += " -config $(SolutionName)" + FastBuildSettings.FastBuildConfigFileExtension;
 
+                            string makeExecutable = context.FastBuildMakeCommandGenerator.GetExecutablePath(conf);
                             using (fileGenerator.Declare("relativeMasterBffPath", "$(SolutionDir)"))
-                            using (fileGenerator.Declare("fastBuildMakeCommandBuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)))
-                            using (fileGenerator.Declare("fastBuildMakeCommandRebuild", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)))
-                            using (fileGenerator.Declare("fastBuildMakeCommandCompileFile", context.FastBuildMakeCommandGenerator.GetCommand(FastBuildMakeCommandGenerator.BuildType.CompileFile, conf, commandLine)))
+                            using (fileGenerator.Declare("fastBuildMakeCommandBuild", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, conf, commandLine)}"))
+                            using (fileGenerator.Declare("fastBuildMakeCommandRebuild", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Rebuild, conf, commandLine)}"))
+                            using (fileGenerator.Declare("fastBuildMakeCommandCompileFile", $"{makeExecutable} {context.FastBuildMakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.CompileFile, conf, commandLine)}"))
                             {
                                 platformVcxproj.GenerateProjectConfigurationFastBuildMakeFile(context, fileGenerator);
                             }

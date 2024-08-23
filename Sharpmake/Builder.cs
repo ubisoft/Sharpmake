@@ -1153,6 +1153,8 @@ namespace Sharpmake
             using (new Util.StopwatchProfiler(ms => { LogWriteLine("    generation done in {0:0.0} sec", ms / 1000.0f); }))
             using (CreateProfilingScope("Generation"))
             {
+                _getGeneratorsManagerCallBack().BeforeGenerate();
+
                 var projects = new List<Project>(_projects.Values);
                 var solutions = new List<Solution>(_solutions.Values);
 

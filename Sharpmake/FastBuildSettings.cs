@@ -15,7 +15,9 @@ namespace Sharpmake
             CompileFile
         };
 
-        public abstract string GetCommand(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments);
+        public abstract string GetTargetIdentifier(Sharpmake.Project.Configuration conf);
+        public abstract string GetExecutablePath(Sharpmake.Project.Configuration conf);
+        public abstract string GetArguments(BuildType buildType, Sharpmake.Project.Configuration conf, string fastbuildArguments);
     }
 
 

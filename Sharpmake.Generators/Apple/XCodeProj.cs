@@ -570,11 +570,12 @@ namespace Sharpmake.Generators.Apple
                         var masterBff = conf.FastBuildMasterBffList.FirstOrDefault();
                         if (masterBff != null)
                         {
-                            var buildToolPath = Util.SimplifyPath(FastBuildSettings.FastBuildMakeCommand);
+                            string fastBuildCommandLine = ProjectLegacyTarget.BuildArgumentsStringByCommandLineOptions(conf, true);
+                            var fastbuildMakeArguments = FastBuildSettings.MakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, conf, fastBuildCommandLine);
+                            var fastbuildMakeExe = FastBuildSettings.MakeCommandGenerator.GetExecutablePath(conf);
                             var buildWorkingDirectory = Path.GetDirectoryName(masterBff);
-                            var buildArgumentsString = ProjectLegacyTarget.BuildArgumentsStringByCommandLineOptions(masterBff, true);
                             var fastbuildCmd = @$"pushd {buildWorkingDirectory}
-{buildToolPath} {buildArgumentsString}
+{fastbuildMakeExe} {fastbuildMakeArguments}
 exit_code=$?
 if (( $exit_code != 0 )); then
     exit $exit_code
@@ -730,7 +731,7 @@ popd";
                 }
                 else
                 {
-                    target = new ProjectLegacyTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, masterBffFilePath);
+                    target = new ProjectLegacyTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, firstConf);
                 }
                 target.ResourcesBuildPhase = _resourcesBuildPhases[xCodeTargetName];
                 if (targetUnitTest != null)
@@ -2501,57 +2502,21 @@ popd";
 
         private class ProjectLegacyTarget : ProjectTarget
         {
-            private string _masterBffFilePath;
+            private Project.Configuration _conf;
 
-            public ProjectLegacyTarget(string identifier, ProjectOutputFile outputFile, ProjectConfigurationList configurationList, string masterBffFilePath)
+            public ProjectLegacyTarget(string identifier, ProjectOutputFile outputFile, ProjectConfigurationList configurationList, Project.Configuration conf)
                 : base(ItemSection.PBXLegacyTarget, identifier, outputFile, configurationList)
             {
-                _masterBffFilePath = masterBffFilePath;
+                _conf = conf;
             }
 
-            internal static string BuildArgumentsStringByCommandLineOptions(string masterBffFilePath, bool forShellCmd)
+            internal static string BuildArgumentsStringByCommandLineOptions(Project.Configuration conf, bool forShellCmd)
             {
                 var fastBuildCommandLineOptions = new List<string>();
 
+                fastBuildCommandLineOptions.Add(FastBuild.UtilityMethods.GetFastBuildCommandLineArguments(conf));
+                fastBuildCommandLineOptions.Add("-config " + conf.FastBuildMasterBffList.First());
                 fastBuildCommandLineOptions.Add(forShellCmd ? "$FASTBUILD_TARGET" : "$(FASTBUILD_TARGET)"); // special envvar hardcoded in the template
-
-                if (FastBuildSettings.FastBuildUseIDE)
-                    fastBuildCommandLineOptions.Add("-ide");
-
-                if (FastBuildSettings.FastBuildReport)
-                    fastBuildCommandLineOptions.Add("-report");
-
-                if (FastBuildSettings.FastBuildNoSummaryOnError)
-                    fastBuildCommandLineOptions.Add("-nosummaryonerror");
-
-                if (FastBuildSettings.FastBuildSummary)
-                    fastBuildCommandLineOptions.Add("-summary");
-
-                if (FastBuildSettings.FastBuildVerbose)
-                    fastBuildCommandLineOptions.Add("-verbose");
-
-                if (FastBuildSettings.FastBuildMonitor)
-                    fastBuildCommandLineOptions.Add("-monitor");
-
-                if (FastBuildSettings.FastBuildWait)
-                    fastBuildCommandLineOptions.Add("-wait");
-
-                if (FastBuildSettings.FastBuildNoStopOnError)
-                    fastBuildCommandLineOptions.Add("-nostoponerror");
-
-                if (FastBuildSettings.FastBuildFastCancel)
-                    fastBuildCommandLineOptions.Add("-fastcancel");
-
-                if (FastBuildSettings.FastBuildNoUnity)
-                    fastBuildCommandLineOptions.Add("-nounity");
-
-                if (FastBuildSettings.FastBuildDistribution)
-                    fastBuildCommandLineOptions.Add("-dist");
-
-                if (!string.IsNullOrEmpty(FastBuildSettings.FastBuildCustomArguments))
-                    fastBuildCommandLineOptions.Add(FastBuildSettings.FastBuildCustomArguments);
-
-                fastBuildCommandLineOptions.Add("-config " + masterBffFilePath);
 
                 return string.Join(" ", fastBuildCommandLineOptions);
             }
@@ -2560,7 +2525,8 @@ popd";
             {
                 get
                 {
-                    return BuildArgumentsStringByCommandLineOptions(Path.GetFileName(_masterBffFilePath), false);
+                    string fastbuildArgs = BuildArgumentsStringByCommandLineOptions(_conf, false);
+                    return FastBuildSettings.MakeCommandGenerator.GetArguments(FastBuildMakeCommandGenerator.BuildType.Build, _conf, fastbuildArgs);
                 }
             }
 
@@ -2568,7 +2534,7 @@ popd";
             {
                 get
                 {
-                    return XCodeUtil.XCodeFormatSingleItem(Util.SimplifyPath(FastBuildSettings.FastBuildMakeCommand));
+                    return FastBuildSettings.MakeCommandGenerator.GetExecutablePath(_conf);
                 }
             }
 
@@ -2576,7 +2542,7 @@ popd";
             {
                 get
                 {
-                    return XCodeUtil.XCodeFormatSingleItem(Path.GetDirectoryName(_masterBffFilePath));
+                    return XCodeUtil.XCodeFormatSingleItem(Path.GetDirectoryName(_conf.FastBuildMasterBffList.First()));
                 }
             }
         }
