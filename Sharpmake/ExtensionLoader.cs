@@ -2,10 +2,12 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Runtime.Loader;
 
 namespace Sharpmake
 {
@@ -19,44 +21,14 @@ namespace Sharpmake
     /// </remarks>
     public class ExtensionLoader : IDisposable
     {
+        public const string TempContextNamePrefix = "Temp extension check AssemblyLoadContext";
         public class ExtensionChecker : MarshalByRefObject
         {
-            private readonly Dictionary<string, bool> _loadedAssemblies = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
             public bool IsSharpmakeExtension(string assemblyPath)
             {
-                if (assemblyPath == null)
-                    throw new ArgumentNullException(nameof(assemblyPath));
-                if (!File.Exists(assemblyPath))
-                    throw new FileNotFoundException("Cannot find the assembly DLL.", assemblyPath);
-
-                lock (_loadedAssemblies)
-                {
-                    // If the assembly has already been loaded, check if it is.
-                    bool result;
-                    if (_loadedAssemblies.TryGetValue(assemblyPath, out result))
-                        return result;
-
-                    try
-                    {
-                        Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                        result = IsSharpmakeExtension(assembly);
-                    }
-                    catch (BadImageFormatException)
-                    {
-                        // This is either a native C/C++ assembly, or there is a x86/x64 mismatch
-                        // that prevents it to load. Sharpmake platforms have no reason to not be
-                        // AnyCPU so just assume that it's not a Sharpmake extension.
-                        result = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Error("An unexpected error has occurred while loading a potential Sharpmake extension assembly: {0}", ex.Message);
-                    }
-
-                    _loadedAssemblies.Add(assemblyPath, result);
-                    return result;
-                }
+                ExtensionLoader extensionLoader = new();
+                bool result =  extensionLoader.LoadExtension(assemblyPath) != null;
+                return result;
             }
 
             public static bool IsSharpmakeExtension(Assembly assembly)
@@ -68,6 +40,12 @@ namespace Sharpmake
             }
         }
 
+        public static bool IsTempAssembly(Assembly assembly)
+        {
+            return AssemblyLoadContext.GetLoadContext(assembly)?.Name?.StartsWith(ExtensionLoader.TempContextNamePrefix) ?? false;
+        }
+
+        private static ConcurrentDictionary<string, byte> _nonExtensionAssemblyPaths = new();
         /// <summary>
         /// Releases the remote <see cref="AppDomain"/> if one was created.
         /// </summary>
@@ -92,22 +70,74 @@ namespace Sharpmake
         /// Loads a Sharpmake extension assembly.
         /// </summary>
         /// <param name="assemblyPath">The path of the assembly that contains the Sharpmake extension.</param>
-        /// <returns>The loaded extension's <see cref="Assembly"/>.</returns>
+        /// <returns>The loaded extension's <see cref="Assembly"/> or null if it's not a Sharpmake extension.</returns>
         public Assembly LoadExtension(string assemblyPath)
         {
             if (assemblyPath == null)
                 throw new ArgumentNullException(nameof(assemblyPath));
 
+            if (!File.Exists(assemblyPath))
+                throw new FileNotFoundException("Cannot find the assembly DLL.", assemblyPath);
+            
+            if (_nonExtensionAssemblyPaths.Keys.Contains(assemblyPath))
+                return null;
+
+            // If we've already loaded the assembly in some loading context, check the attributes without loading it again
+            foreach (AssemblyLoadContext alc in AssemblyLoadContext.All)
+            {
+                Assembly assembly = alc.Assemblies.FirstOrDefault(a => AssemblyHasSamePath(a, assemblyPath));
+                if (assembly != null)
+                {
+                    if (ExtensionChecker.IsSharpmakeExtension(assembly))
+                        return assembly;
+                    
+                    _nonExtensionAssemblyPaths.TryAdd(assemblyPath, 0);
+
+                    return null;
+                }
+            }
+
+            // Check the attributes via an unloadable context (reflexion only is not a thing anymore in .net 6)
+            var contextName = $"{TempContextNamePrefix} - {Path.GetFileNameWithoutExtension(assemblyPath)}";
+            AssemblyLoadContext tempLoadContext = new(contextName, true);
+
+            bool isSharpmakeExtension;
+
             try
             {
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                if (!ExtensionChecker.IsSharpmakeExtension(assembly))
-                    return null;
-                return assembly;
+                var tempAssembly = tempLoadContext.LoadFromAssemblyPath(assemblyPath);
+                isSharpmakeExtension = ExtensionChecker.IsSharpmakeExtension(tempAssembly);
+                // log unloading of contexts, only log info for Sharpmake extensions
+                Action<string, object[]> logger = isSharpmakeExtension ? Builder.Instance.LogWriteLine : Builder.Instance.DebugWriteLine;
+                tempLoadContext.Unloading += (context) => logger($"    [ExtensionLoader] Attempting to unload temporary context {context.Name}", new object[]{});
             }
             catch (BadImageFormatException)
             {
+                // This is either a native C/C++ assembly, or there is a x86/x64 mismatch
+                // that prevents it to load. Sharpmake platforms have no reason to not be
+                // AnyCPU so just assume that it's not a Sharpmake extension.
                 return null;
+            }
+            finally
+            {
+                // Unload the AssemblyLoadContext
+                // NOTE: the unloading event is fired on calling unload for the context, the assembly might not be unloaded
+                //  if there are references to it (make sure it is not used on temp assembly loading)
+                tempLoadContext.Unload();
+            }
+
+            if (isSharpmakeExtension)
+                return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+
+            _nonExtensionAssemblyPaths.TryAdd(assemblyPath, 0);
+
+            return null;
+
+            static bool AssemblyHasSamePath(Assembly assembly, string assemblyPath)
+            {
+                return assembly != null
+                       && !string.IsNullOrEmpty(assemblyPath) && !assembly.IsDynamic &&
+                       string.Equals(assembly.Location, assemblyPath, StringComparison.Ordinal);
             }
         }
 

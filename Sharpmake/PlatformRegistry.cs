@@ -104,7 +104,7 @@ namespace Sharpmake
             if (extensionAssembly == null)
                 throw new ArgumentNullException(nameof(extensionAssembly));
 
-            if (extensionAssembly.ReflectionOnly)
+            if (ExtensionLoader.IsTempAssembly(extensionAssembly))
                 return;
 
             // Don't support loading dynamically compiled assemblies
