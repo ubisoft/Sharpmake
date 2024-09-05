@@ -1295,6 +1295,7 @@ popd";
             {
                 if (projectItems.Any(p => p is ProjectFolder))
                 {
+                    // TODO those transformations should probably be made during PrepareSections()
                     List<ProjectFileSystemItem> emptyProjectFolders = new List<ProjectFileSystemItem>();
                     GetEmptyProjectFolders(projectItems, emptyProjectFolders);
                     // clean empty node
@@ -1303,10 +1304,8 @@ popd";
                         RemoveFromFileSystem(c);
                     }
                 }
-                else
-                {
-                    projectItems = projectItems.OrderBy(item => item.Uid, StringComparer.Ordinal);
-                }
+
+                projectItems = projectItems.OrderBy(item => item.Uid, StringComparer.Ordinal);
 
                 ProjectItem firstItem = projectItems.First();
                 using (fileGenerator.Declare("item", firstItem))
@@ -1657,7 +1656,7 @@ popd";
 
             public bool Equals(ProjectItem other)
             {
-                return _hashCode == other._hashCode;
+                return _uid == other._uid;
             }
 
             public int CompareTo(ProjectItem other)
