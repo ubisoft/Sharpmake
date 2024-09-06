@@ -272,7 +272,7 @@ namespace Sharpmake.Generators.FastBuild
         /// By default is uses the default fastbuild executable defined in FastBuildSettings but scripts could define another class to 
         /// to launch a totally different launcher with other parameters.
         /// </summary>
-        internal class FastBuildDefaultCommandGenerator : FastBuildMakeCommandGenerator
+        public class FastBuildDefaultCommandGenerator : FastBuildMakeCommandGenerator
         {
             public override string GetExecutablePath(Sharpmake.Project.Configuration conf)
             {
