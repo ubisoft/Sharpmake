@@ -450,6 +450,7 @@ namespace Sharpmake
                     Enable
                 }
 
+                [Obsolete("Deprecated and Ignored. Use `ApplePlatform.Settings.MacOSSDKPath` instead.", error: true)]
                 public class SDKRoot
                 {
                     public string Value;
