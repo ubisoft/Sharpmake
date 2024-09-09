@@ -1656,7 +1656,7 @@ popd";
 
             public bool Equals(ProjectItem other)
             {
-                return _uid == other._uid;
+                return _internalIdentifier == other._internalIdentifier;
             }
 
             public int CompareTo(ProjectItem other)
