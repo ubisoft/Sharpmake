@@ -3284,6 +3284,18 @@ namespace Sharpmake
                 return string.Compare(l.Project.FullClassName, r.Project.FullClassName, StringComparison.Ordinal);
             }
 
+            private static int SortDotNetDependencyForLink(DotNetDependency l, DotNetDependency r)
+            {
+                return SortConfigurationForLink(l.Configuration, r.Configuration);
+            }
+            private static int SortDependencyForLink((DependencyNode, DependencyType) l, (DependencyNode, DependencyType) r)
+            {
+                int cmpType = l.Item2.CompareTo(r.Item2);
+                if (cmpType != 0)
+                    return -cmpType; // reverse order (public first, private last)
+                return SortConfigurationForLink(l.Item1._configuration, r.Item1._configuration);
+            }
+
             internal class DependencyNode
             {
                 internal DependencyNode(Configuration inConfiguration, DependencySetting inDependencySetting)
@@ -3815,6 +3827,10 @@ namespace Sharpmake
 
                 DotNetPublicDependencies = resolvedDotNetPublicDependencies.ToList();
                 DotNetPrivateDependencies = resolvedDotNetPrivateDependencies.ToList();
+
+                DotNetPublicDependencies.Sort(SortDotNetDependencyForLink);
+                DotNetPrivateDependencies.Sort(SortDotNetDependencyForLink);
+
                 if (configurationsSwappedToDll is not null)
                 {
                     ConfigurationsSwappedToDll = configurationsSwappedToDll;
@@ -3905,6 +3921,7 @@ namespace Sharpmake
                             visiting.Push(childNode);
                         }
                     }
+                    visitedNode._childNodes.Sort(SortDependencyForLink);
                 }
 
                 return rootNode;
