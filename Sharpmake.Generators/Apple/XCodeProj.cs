@@ -1492,6 +1492,7 @@ popd";
             libFiles.AddRange(conf.DependenciesOtherLibraryFiles);
             libFiles.Sort();
 
+            conf.AdditionalLinkerOptions.Sort();
             var linkerOptions = new Strings(conf.AdditionalLinkerOptions);
 
             var linkObjC = Options.GetObject<Options.XCode.Linker.LinkObjC>(conf);
@@ -1542,6 +1543,8 @@ popd";
                 conf.Defines.Add("NDEBUG");
 
             options["PreprocessorDefinitions"] = XCodeUtil.XCodeFormatList(conf.Defines, 4, forceQuotes: true);
+            conf.AdditionalCompilerOptions.Sort();
+            conf.AdditionalCompilerOptimizeOptions.Sort();
             options["CompilerOptions"] = XCodeUtil.XCodeFormatList(Enumerable.Concat(conf.AdditionalCompilerOptions, conf.AdditionalCompilerOptimizeOptions), 4, forceQuotes: true);
             if (conf.AdditionalLibrarianOptions.Any())
                 throw new NotImplementedException(nameof(conf.AdditionalLibrarianOptions) + " not supported with XCode generator");
