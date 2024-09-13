@@ -332,6 +332,14 @@ namespace Sharpmake.Generators.Apple
             var defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault();
             Project.Configuration activeConfiguration = defaultConfiguration != null ? defaultConfiguration : configurations[0];
             string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
+            string buildImplicitDependencies = activeConfiguration.IsFastBuild ? "NO" : "YES";
+            bool useBuildableProductRunnableSection = true;
+            string runnableFilePath = string.Empty;
+            if (activeConfiguration.IsFastBuild && activeConfiguration.Output == Project.Configuration.OutputType.AppleApp && !activeConfiguration.XcodeUseNativeProjectForFastBuildApp)
+            {
+                useBuildableProductRunnableSection = false;
+                runnableFilePath = Path.Combine(activeConfiguration.TargetPath, activeConfiguration.TargetFileFullNameWithExtension);
+            }
 
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
@@ -339,8 +347,15 @@ namespace Sharpmake.Generators.Apple
             using (fileGenerator.Declare("testableElements", testableElements))
             using (fileGenerator.Declare("DefaultTarget", targetName))
             using (fileGenerator.Declare("commandLineArguments", commandLineArguments))
+            using (fileGenerator.Declare("buildImplicitDependencies", buildImplicitDependencies))
+            using (fileGenerator.Declare("runnableFilePath", runnableFilePath))
             {
-                fileGenerator.Write(Template.SchemeFileTemplate);
+                fileGenerator.Write(Template.SchemeFileTemplatePart1);
+                if (useBuildableProductRunnableSection)
+                    fileGenerator.Write(Template.SchemeRunnableNativeProject);
+                else
+                    fileGenerator.Write(Template.SchemeRunnableMakeFileProject);
+                fileGenerator.Write(Template.SchemeFileTemplatePart2);
             }
 
             // Remove all line that contain RemoveLineTag
@@ -497,7 +512,8 @@ namespace Sharpmake.Generators.Apple
 
                 var firstConf = targetConfigurations.First();
 
-                if (!firstConf.IsFastBuild) // since we grouped all FastBuild conf together, we only need to test the first conf
+                bool canIncludeSourceFiles = !firstConf.IsFastBuild || firstConf.Output != Project.Configuration.OutputType.AppleApp || !firstConf.XcodeUseNativeProjectForFastBuildApp;
+                if (canIncludeSourceFiles)
                 {
                     var projectSourcesBuildPhase = new ProjectSourcesBuildPhase(xCodeTargetName, 2147483647);
                     _projectItems.Add(projectSourcesBuildPhase);
@@ -554,7 +570,7 @@ namespace Sharpmake.Generators.Apple
 
                 foreach (var conf in targetConfigurations)
                 {
-                    if (!conf.IsFastBuild)
+                    if (canIncludeSourceFiles)
                         PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, conf, forUnitTest: false, workspacePath);
 
                     if (createUnitTestTarget)
@@ -721,7 +737,7 @@ popd";
 
                 ProjectTarget target;
                 ProjectTarget targetUnitTest = null;
-                if (!firstConf.IsFastBuild || firstConf.Output == Project.Configuration.OutputType.AppleApp)
+                if (!firstConf.IsFastBuild || (firstConf.Output == Project.Configuration.OutputType.AppleApp && firstConf.XcodeUseNativeProjectForFastBuildApp))
                 {
                     target = new ProjectNativeTarget(xCodeTargetName, targetOutputFile, configurationListForNativeTarget, _targetDependencies[xCodeTargetName]);
                     if (createUnitTestTarget)
@@ -783,7 +799,7 @@ popd";
                     ProjectBuildConfigurationForTarget configurationForTarget = null;
                     if (targetConf.Output == Project.Configuration.OutputType.IosTestBundle)
                         configurationForTarget = new ProjectBuildConfigurationForUnitTestTarget(targetConf, target, options);
-                    else if (!targetConf.IsFastBuild || targetConf.Output == Project.Configuration.OutputType.AppleApp)
+                    else if (!targetConf.IsFastBuild || (targetConf.Output == Project.Configuration.OutputType.AppleApp && targetConf.XcodeUseNativeProjectForFastBuildApp))
                         configurationForTarget = new ProjectBuildConfigurationForNativeTarget(targetConf, (ProjectNativeTarget)target, options);
                     else
                         configurationForTarget = new ProjectBuildConfigurationForLegacyTarget(targetConf, (ProjectLegacyTarget)target, options);

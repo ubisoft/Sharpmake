@@ -2713,6 +2713,21 @@ namespace Sharpmake
                 private set { _XcodeResolvedUnitTestSourceFilesBuildExclude = value; }
             }
 
+            /// <summary>
+            /// This property is used to override default behavior for XCode executable projects 
+            /// configuration compiled using fastbuild.
+            /// If true(default), it will use a native XCode project to execute fastbuild
+            /// If false, it will use a makefile project to execute fastbuild.
+            /// </summary>
+            /// <remarks>
+            /// When using the default value, the project will not contain source files. The reason is we can't have source files 
+            /// in the project as otherwise xcode will compile them itself and it will then try to relink the executable with those.
+            /// This will create unresolved errors.
+            /// When a native project is used Xcode will handle signing, package creation. These steps must be implemented by yourself if you
+            /// decide to use a makefile project. However only a makefile project can have source files.
+            /// </remarks>
+            public bool XcodeUseNativeProjectForFastBuildApp { get; set; } = true;
+
             public Strings ResolvedSourceFilesBlobExclude = new Strings();
 
             public Strings ResolvedSourceFilesGenerateXmlDocumentationExclude = new Strings();
