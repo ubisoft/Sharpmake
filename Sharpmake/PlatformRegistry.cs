@@ -66,7 +66,7 @@ namespace Sharpmake
 
         private static readonly ConcurrentDictionary<PlatformImplementation, object> s_implementations = new ConcurrentDictionary<PlatformImplementation, object>(new PlatformImplementationComparer());
         private static readonly ConcurrentDictionary<Type, object> s_defaultImplementations = new ConcurrentDictionary<Type, object>();
-        private static readonly ConcurrentDictionary<object, bool> s_implementationInstances = new ConcurrentDictionary<object, bool>(); // Value is dummy
+        private static readonly ConcurrentDictionary<Type, object> s_implementationInstances = new ConcurrentDictionary<Type, object>();
         private static readonly ConcurrentDictionary<Assembly, bool> s_parsedAssemblies = new ConcurrentDictionary<Assembly, bool>(); // Value is dummy
 
         static PlatformRegistry()
@@ -499,26 +499,7 @@ namespace Sharpmake
 
         private static object GetImplementationInstance(Type implType)
         {
-            var result = s_implementationInstances.SingleOrDefault(obj => obj.GetType().AssemblyQualifiedName == implType.AssemblyQualifiedName);
-            object instance = null;
-            if (result.Key == null)
-            {
-                try
-                {
-                    instance = Activator.CreateInstance(implType);
-                    s_implementationInstances.TryAdd(instance, false);
-                }
-                catch (Exception ex)
-                {
-                    throw new PlatformImplementationCreationException(implType, ex);
-                }
-            }
-            else
-            {
-                instance = result.Key;
-            }
-
-            return instance;
+            return s_implementationInstances.GetOrAdd(implType, t => Activator.CreateInstance(t));
         }
 
         private static void RegisterImplementationImpl(Platform platform, Type ifaceType, object implementation)
