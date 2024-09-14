@@ -160,6 +160,15 @@ namespace Sharpmake.Generators.VisualStudio
 @"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets'))"" />
 ";
 
+                public static string ProjectTargetsNugetReferenceImportExplicitPath =
+@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\[packageTargets]"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\[packageTargets]')"" />
+";
+                
+                public static string ProjectTargetsNugetReferenceErrorExplicitPath =
+@"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\[packageTargets]')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\[packageTargets]'))"" />
+";
+
+
                 public static string ProjectTargetsEnd =
 @"  </ImportGroup>
 ";

@@ -18,23 +18,25 @@ namespace Sharpmake
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string targetsPath, string referenceType)
             {
                 Name = name;
                 Version = version;
                 DotNetHint = dotNetHint;
                 PrivateAssets = privateAssets;
+                TargetsPath = targetsPath;
                 ReferenceType = referenceType;
             }
 
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets)
-                : this(name, version, dotNetHint, privateAssets, null)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string targetsPath)
+                : this(name, version, dotNetHint, privateAssets, targetsPath, null)
             {
             }
 
             public string Name { get; internal set; }
             public string Version { get; internal set; }
             public string DotNetHint { get; internal set; }
+            public string TargetsPath { get; internal set; }
             public string ReferenceType { get; internal set; }
 
             public AssetsDependency PrivateAssets { get; internal set; }
@@ -60,6 +62,7 @@ namespace Sharpmake
             {
                 using (resolver.NewScopedParameter("packageName", Name))
                 using (resolver.NewScopedParameter("packageVersion", Version))
+                using (resolver.NewScopedParameter("packageTargets", TargetsPath))
                 {
                     return resolver.Resolve(customTemplate);
                 }
@@ -141,13 +144,13 @@ namespace Sharpmake
 
         private readonly UniqueList<PackageReference> _packageReferences = new UniqueList<PackageReference>();
 
-        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null)
+        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string targetsPath = null, string referenceType = null)
         {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
             if (existingPackage == null)
             {
-                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, referenceType));
+                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, targetsPath, referenceType));
                 return;
             }
 
@@ -199,5 +202,6 @@ namespace Sharpmake
 
         internal const AssetsDependency DefaultPrivateAssets =
             AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build;
+        internal static readonly string[] DefaultTargetPaths = new string[]{ @"build\[packageName].targets", @"build\native\[packageName].targets" };
     }
 }
