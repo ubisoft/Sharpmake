@@ -623,13 +623,12 @@ namespace Sharpmake.Generators.VisualStudio
                 GenerateBffFilesSection(context, fileGenerator);
 
             // Generate and add reference to packages.config file for project
-            if (firstConf.ReferencesByNuGetPackage.Count > 0)
+            if (firstConf.ReferencesByNuGetPackage.Count > 0 && hasFastBuildConfig)
             {
-                if (hasFastBuildConfig)
-                {
-                    throw new NotImplementedException("Nuget packages in c++ is not currently supported by FastBuild");
-                }
-
+                throw new NotImplementedException("Nuget packages in c++ is not currently supported by FastBuild");
+            }
+            else
+            {
                 var packagesConfig = new PackagesConfig();
                 packagesConfig.Generate(context.Builder, firstConf, "native", context.ProjectDirectory, generatedFiles, skipFiles);
                 if (packagesConfig.IsGenerated)
