@@ -202,6 +202,5 @@ namespace Sharpmake
 
         internal const AssetsDependency DefaultPrivateAssets =
             AssetsDependency.ContentFiles | AssetsDependency.Analyzers | AssetsDependency.Build;
-        internal static readonly string[] DefaultTargetPaths = new string[]{ @"build\[packageName].targets", @"build\native\[packageName].targets" };
     }
 }
