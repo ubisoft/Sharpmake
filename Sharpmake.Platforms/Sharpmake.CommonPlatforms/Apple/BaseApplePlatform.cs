@@ -19,8 +19,6 @@ namespace Sharpmake
         , IClangPlatformBff
         , IPlatformVcxproj // TODO: this is really sad, nuke it
     {
-        protected const string XCodeDeveloperFolder = "/Applications/Xcode.app/Contents/Developer";
-
         public abstract Platform SharpmakePlatform { get; }
 
         #region IPlatformDescriptor
@@ -36,7 +34,8 @@ namespace Sharpmake
             {
                 bool isLinkerInvokedViaCompiler = false;
                 var fastBuildSettings = PlatformRegistry.Get<IFastBuildCompilerSettings>(SharpmakePlatform);
-                fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(DevEnv.xcode, out isLinkerInvokedViaCompiler);
+                if (fastBuildSettings.LinkerInvokedViaCompiler.TryGetValue(DevEnv.xcode, out bool isLinkerInvokedViaCompilerOverride))
+                    isLinkerInvokedViaCompiler = isLinkerInvokedViaCompilerOverride;
                 return isLinkerInvokedViaCompiler;
             }
         }
@@ -232,7 +231,7 @@ namespace Sharpmake
 
                 string binPath;
                 if (!fastBuildSettings.BinPath.TryGetValue(devEnv, out binPath))
-                    binPath = $"{XCodeDeveloperFolder}/Toolchains/XcodeDefault.xctoolchain/usr/bin";
+                    binPath = ClangForApple.GetClangExecutablePath();
 
                 string pathToCompiler = Util.GetCapitalizedPath(Util.PathGetAbsolute(projectRootPath, binPath));
 
@@ -271,23 +270,19 @@ namespace Sharpmake
                 if (!fastBuildSettings.LinkerPath.TryGetValue(devEnv, out linkerPath))
                     linkerPath = binPath;
 
+                string exeExtension = (Util.GetExecutingPlatform() == Platform.win64) ? ".exe" : "";
                 string linkerExe;
                 if (!fastBuildSettings.LinkerExe.TryGetValue(devEnv, out linkerExe))
                 {
-                    if (Util.GetExecutingPlatform() == Platform.win64)
-                        linkerExe = IsLinkerInvokedViaCompiler ? "clang++.exe" : "ld64.lld.exe";
+                    if (IsLinkerInvokedViaCompiler)
+                        linkerExe = "clang++" + exeExtension;
                     else
-                        linkerExe = IsLinkerInvokedViaCompiler ? "clang++" : "ld";
+                        linkerExe = ClangForApple.Settings.IsAppleClang ? "ld" : "ld64.lld" + exeExtension;
                 }
 
                 string librarianExe;
                 if (!fastBuildSettings.LibrarianExe.TryGetValue(devEnv, out librarianExe))
-                {
-                    if (Util.GetExecutingPlatform() == Platform.win64)
-                        librarianExe = "llvm-ar.exe";
-                    else
-                        librarianExe = "ar";
-                }
+                    librarianExe = ClangForApple.Settings.IsAppleClang ? "ar" : "llvm-ar" + exeExtension;
 
                 configurations.Add(configName,
                     new CompilerSettings.Configuration(
@@ -876,10 +871,6 @@ namespace Sharpmake
 
             options["ProvisioningProfile"] = Options.StringOption.Get<Options.XCode.Compiler.ProvisioningProfile>(conf);
 
-            Options.XCode.Compiler.SDKRoot sdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
-            if (sdkRoot != null)
-                options["SDKRoot"] = sdkRoot.Value;
-
             context.SelectOption(
                 Options.Option(Options.XCode.Compiler.SkipInstall.Disable, () => options["SkipInstall"] = "NO"),
                 Options.Option(Options.XCode.Compiler.SkipInstall.Enable, () => options["SkipInstall"] = "YES")
@@ -1199,8 +1190,7 @@ namespace Sharpmake
             var conf = context.Configuration;
             var cmdLineOptions = context.CommandLineOptions;
 
-            Options.XCode.Compiler.SDKRoot customSdkRoot = Options.GetObject<Options.XCode.Compiler.SDKRoot>(conf);
-            cmdLineOptions["SysLibRoot"] = (IsLinkerInvokedViaCompiler ? "-isysroot " : "-syslibroot ") + (customSdkRoot?.Value ?? defaultSdkRoot);
+            cmdLineOptions["SysLibRoot"] = (IsLinkerInvokedViaCompiler ? "-isysroot " : "-syslibroot ") + defaultSdkRoot;
         }
 
         public virtual void SelectLinkerOptions(IGenerationContext context)
