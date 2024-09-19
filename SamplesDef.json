@@ -474,8 +474,23 @@
             ]
         },
         {
-            "Name": "HelloIOS",
-            "CIs": [ "github", "gitlab" ],
+            "Name": "HelloIOS-github",
+            "CIs": [ "github" ],
+            "OSs": [ "macos" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
+            "TestFolder": "samples/HelloIOS",
+            "Commands":
+            [
+                "xcodebuild -version",
+                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"HelloIOS.Main.sharpmake.cs\" -framework {framework}",
+                "xcodebuild build-for-testing CODE_SIGNING_ALLOWED=NO -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15 Pro'",
+                "xcodebuild test-without-building  -workspace {testFolder}/codebase/temp/solutions/HelloIOS_iOS.xcworkspace -configuration {configuration} -scheme exe_iOS -destination 'platform=iOS Simulator,name=iPhone 15 Pro' -derivedDataPath {testFolder}/test; $global:LastExitCode = 0"
+            ]
+        },
+        {
+            "Name": "HelloIOS-gitlab",
+            "CIs": [ "gitlab" ],
             "OSs": [ "macos" ],
             "Frameworks": [ "net6.0" ],
             "Configurations": [ "debug", "release" ],
