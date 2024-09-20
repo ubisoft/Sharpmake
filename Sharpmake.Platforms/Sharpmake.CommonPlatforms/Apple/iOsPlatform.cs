@@ -54,7 +54,7 @@ namespace Sharpmake
 
                 // Sysroot
                 options["SDKRoot"] = "iphoneos";
-                cmdLineOptions["SDKRoot"] = $"-isysroot {ApplePlatform.Settings.IPhoneOSSDkPath}";
+                cmdLineOptions["SDKRoot"] = $"-isysroot {ApplePlatform.Settings.IPhoneOSSDKPath}";
 
                 // Target
                 options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
@@ -230,7 +230,7 @@ namespace Sharpmake
                 base.SelectLinkerOptions(context);
 
                 // Sysroot
-                SelectCustomSysLibRoot(context, ApplePlatform.Settings.IPhoneOSSDkPath);
+                SelectCustomSysLibRoot(context, ApplePlatform.Settings.IPhoneOSSDKPath);
             }
         }
     }
