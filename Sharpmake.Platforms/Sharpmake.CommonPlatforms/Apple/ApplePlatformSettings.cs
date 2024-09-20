@@ -41,7 +41,7 @@ namespace Sharpmake
             }
 
             private static string s_iphoneOSSDKPath;
-            public static string IPhoneOSSDkPath
+            public static string IPhoneOSSDKPath
             {
                 get
                 {
