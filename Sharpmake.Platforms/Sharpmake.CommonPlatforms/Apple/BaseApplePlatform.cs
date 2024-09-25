@@ -71,14 +71,9 @@ namespace Sharpmake
 
         public void SetupClangOptions(IFileGenerator generator)
         {
-            WriteCompilerExtraOptionsGeneral(generator);
-            generator.Write(_compilerOptimizationOptions);
-        }
-
-        protected virtual void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
-        {
             generator.Write(_compilerExtraOptionsGeneral);
             generator.Write(_compilerExtraOptionsAdditional);
+            generator.Write(_compilerOptimizationOptions);
         }
 
         public virtual void SelectPreprocessorDefinitionsBff(IBffGenerationContext context)
