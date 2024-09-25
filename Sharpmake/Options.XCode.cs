@@ -180,7 +180,8 @@ namespace Sharpmake
                     Disable,
                     SWIFT4_0,
                     SWIFT4_2,
-                    SWIFT5_0
+                    SWIFT5_0,
+                    SWIFT6_0
                 }
 
                 public enum DeadStrip
