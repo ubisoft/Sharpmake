@@ -286,6 +286,9 @@ namespace Sharpmake.Generators.Apple
             // Setup resolvers
             var fileGenerator = new FileGenerator();
 
+            var defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault();
+            Project.Configuration activeConfiguration = defaultConfiguration != null ? defaultConfiguration : configurations[0];
+
             // Build testable elements
             var testableTargets = _nativeOrLegacyTargets.Values.Where(target => target.OutputFile.OutputType == Project.Configuration.OutputType.IosTestBundle);
             var testableElements = new StringBuilder();
@@ -299,7 +302,7 @@ namespace Sharpmake.Generators.Apple
             }
 
             // Build commandLineArguments
-            var debugArguments = Options.GetObject<Options.XCode.Scheme.DebugArguments>(configurations[0]);
+            var debugArguments = Options.GetObject<Options.XCode.Scheme.DebugArguments>(activeConfiguration);
             var commandLineArguments = new StringBuilder();
             if (debugArguments != null)
             {
@@ -311,12 +314,16 @@ namespace Sharpmake.Generators.Apple
                 }
                 commandLineArguments.Append(Template.CommandLineArgumentsEnd);
             }
+            else
+            {
+                commandLineArguments.Append(RemoveLineTag);
+            }
 
             // Write the scheme file
             var defaultTarget = _nativeOrLegacyTargets.Values.Where(target => target.OutputFile.OutputType != Project.Configuration.OutputType.IosTestBundle).FirstOrDefault();
 
             var options = new Options.ExplicitOptions();
-            Options.SelectOption(configurations[0],
+            Options.SelectOption(activeConfiguration,
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.AutomaticallyEnable, () => options["EnableGpuFrameCaptureMode"] = RemoveLineTag),
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.MetalOnly, () => options["EnableGpuFrameCaptureMode"] = "1"),
                 Options.Option(Options.XCode.Compiler.EnableGpuFrameCaptureMode.OpenGLOnly, () => options["EnableGpuFrameCaptureMode"] = "2"),
@@ -324,13 +331,11 @@ namespace Sharpmake.Generators.Apple
             );
             // An empty line means ON, "1" means OFF
             // https://gitlab.kitware.com/cmake/cmake/-/issues/23857
-            Options.SelectOption(configurations[0],
+            Options.SelectOption(activeConfiguration,
                 Options.Option(Options.XCode.Scheme.MetalAPIValidation.Enable, () => options["MetalAPIValidation"] = RemoveLineTag),
                 Options.Option(Options.XCode.Scheme.MetalAPIValidation.Disable, () => options["MetalAPIValidation"] = "1")
             );
 
-            var defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault();
-            Project.Configuration activeConfiguration = defaultConfiguration != null ? defaultConfiguration : configurations[0];
             string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
             string buildImplicitDependencies = activeConfiguration.IsFastBuild ? "NO" : "YES";
             bool useBuildableProductRunnableSection = true;
@@ -338,7 +343,31 @@ namespace Sharpmake.Generators.Apple
             if (activeConfiguration.IsFastBuild && activeConfiguration.Output == Project.Configuration.OutputType.AppleApp && !activeConfiguration.XcodeUseNativeProjectForFastBuildApp)
             {
                 useBuildableProductRunnableSection = false;
-                runnableFilePath = Path.Combine(activeConfiguration.TargetPath, activeConfiguration.TargetFileFullNameWithExtension);
+                var customRunnablePath = Options.GetObject<Options.XCode.Scheme.CustomRunnablePath>(activeConfiguration);
+                if (customRunnablePath != null)
+                    runnableFilePath = customRunnablePath.Path;
+                else
+                    runnableFilePath = Path.Combine(activeConfiguration.TargetPath, activeConfiguration.TargetFileFullNameWithExtension);
+            }
+
+            var environmentVariables = Options.GetObject<Options.XCode.Scheme.EnvironmentVariables>(activeConfiguration);
+            var environmentVariablesBuilder = new StringBuilder();
+            if (environmentVariables != null)
+            {
+                environmentVariablesBuilder.Append(Template.EnvironmentVariablesBegin);
+                foreach (var variable in environmentVariables.Variables)
+                {
+                    using (fileGenerator.Declare("name", variable.Key))
+                    using (fileGenerator.Declare("value", variable.Value))
+                    {
+                        environmentVariablesBuilder.Append(fileGenerator.Resolver.Resolve(Template.EnvironmentVariable));
+                    }
+                }
+                environmentVariablesBuilder.Append(Template.EnvironmentVariablesEnd);
+            }
+            else
+            {
+                environmentVariablesBuilder.Append(RemoveLineTag);
             }
 
             using (fileGenerator.Declare("projectFile", projectFile))
@@ -347,8 +376,12 @@ namespace Sharpmake.Generators.Apple
             using (fileGenerator.Declare("testableElements", testableElements))
             using (fileGenerator.Declare("DefaultTarget", targetName))
             using (fileGenerator.Declare("commandLineArguments", commandLineArguments))
+            using (fileGenerator.Declare("environmentVariables", environmentVariablesBuilder))
             using (fileGenerator.Declare("buildImplicitDependencies", buildImplicitDependencies))
             using (fileGenerator.Declare("runnableFilePath", runnableFilePath))
+            using (fileGenerator.Declare("project", activeConfiguration.Project))
+            using (fileGenerator.Declare("target", activeConfiguration.Target))
+            using (fileGenerator.Declare("conf", activeConfiguration))
             {
                 fileGenerator.Write(Template.SchemeFileTemplatePart1);
                 if (useBuildableProductRunnableSection)

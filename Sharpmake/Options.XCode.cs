@@ -1199,6 +1199,21 @@ namespace Sharpmake
                     {
                     }
                 }
+
+                public class EnvironmentVariables
+                {
+                    public Dictionary<string, string> Variables { get; set; } = new Dictionary<string, string>();
+                }
+
+                /// <summary>
+                /// This option can be used to set a custom runnable path in the scheme file for fastbuild targets
+                /// </summary>
+                public class CustomRunnablePath : PathOption
+                {
+                    public CustomRunnablePath(string path) : base(path)
+                    {
+                    }
+                }
             }
         }
     }
