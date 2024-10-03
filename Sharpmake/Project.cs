@@ -104,8 +104,8 @@ namespace Sharpmake
         public Strings PreFilterSourceFiles { get { return _preFilterSourceFiles; } }
 
 
-        public Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
-        public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm");         // File that match this regex compile
+        public Strings SourceFilesExtensions = new Strings(".cpp", ".c", ".cc", ".h", ".inl", ".hpp", ".hh", ".asm", ".nasm");// All files under SourceRootPath are evaluated, if match found, it will be added to SourceFiles
+        public Strings SourceFilesCompileExtensions = new Strings(".cpp", ".cc", ".c", ".asm", ".nasm");         // File that match this regex compile
         public Strings SourceFilesCPPExtensions = new Strings(".cpp", ".cc");
 
         public Strings SourceFilesFilters = null;                                        // if !=  null, include only file in this filter
@@ -229,6 +229,11 @@ namespace Sharpmake
         public Strings CustomPropsFiles = new Strings();  // vs2010+ .props files
         public Strings CustomTargetsFiles = new Strings();  // vs2010+ .targets files
 
+        public string NasmPropsFile = "";
+        public string NasmTargetsFile = "";
+        public string NasmExePath = "";
+        public Strings NasmPreIncludedFiles = new Strings();
+
         public Strings LibraryPathsExcludeFromWarningRegex = new Strings();                 // Library paths where we want to ignore the path doesn't exist warning
         public Strings IncludePathsExcludeFromWarningRegex = new Strings();                 // Include paths where we want to ignore the path doesn't exist warning
 
@@ -240,6 +245,7 @@ namespace Sharpmake
         public Dictionary<string, string> CustomFilterMapping = new Dictionary<string, string>();  /// maps relative source directory to a custom filter path for vcxproj.filter files
 
         public bool ContainsASM = false;
+        public bool ContainsNASM = false;
 
         // Some projects don't support changelist filter. and will generate build errors when trying to compile the resulting projects.
         public bool SkipProjectWhenFiltersActive = false;
@@ -1213,7 +1219,10 @@ namespace Sharpmake
                 if (sourceFile.EndsWith(".asm", StringComparison.OrdinalIgnoreCase))
                 {
                     ContainsASM = true;
-                    break;
+                }
+                if (sourceFile.EndsWith(".nasm", StringComparison.OrdinalIgnoreCase))
+                {
+                    ContainsNASM = true;
                 }
             }
 
@@ -1659,6 +1668,8 @@ namespace Sharpmake
             ConfigurationType = configurationType;
 
             ExtensionBuildTools[".asm"] = "MASM";
+            ExtensionBuildTools[".nasm"] = "NASM";
+
             ClassName = GetType().Name;
             FullClassName = GetType().FullName;
             Targets.Initialize(targetType);

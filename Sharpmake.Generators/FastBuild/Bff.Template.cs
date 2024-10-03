@@ -91,6 +91,7 @@ Settings
 ";
 
                 public static string MasmConfigNameSuffix = "Masm";
+                public static string NasmConfigNameSuffix = "Nasm";
                 public static string Win64ConfigName = ".win64Config";
 
                 public static string CompilerSetting = @"
@@ -118,6 +119,15 @@ Compiler( '[fastBuildResourceCompilerName]' )
 Compiler( '[fastBuildMasmCompilerName]' )
 {
     .Executable             = '[fastBuildMasmCompiler]'
+    .CompilerFamily         = 'custom'
+}
+";
+
+                // TODOANT
+                internal static string NasmCompilerSettings = @"
+Compiler( '[fastBuildNasmCompilerName]' )
+{
+    .Executable             = '[fastBuildNasmCompiler]'
     .CompilerFamily         = 'custom'
 }
 ";
@@ -297,6 +307,14 @@ Compiler( '[fastBuildMasmCompilerName]' )
     .CompilerOptions        = ' $CompilerExtraOptions$'
                             + ' /Fo""%2"" /c /Ta ""%1""'
 ";
+                // TODOANT
+                public static string CompilerOptionsNasm = @"
+    // Compiler options
+    // ----------------
+    .CompilerOptions        = ' $CompilerExtraOptions$'
+                            + ' -Xvc -Ox -o""%2"" ""%1""'
+                            + ' [cmdLineOptions.NasmCompilerFormat] '
+";
                 public static string CompilerOptionsClang = @"
     // Compiler options
     // ----------------
@@ -332,6 +350,14 @@ Compiler( '[fastBuildMasmCompilerName]' )
             + ' /W3'
             + ' /errorReport:queue'
             + ' [cmdLineOptions.PreprocessorDefinitions]'
+";
+
+                // TODOANT: NasmCompilerExtraOptions
+                public static string NasmCompilerExtraOptions = @"
+    .CompilerExtraOptions   = ''
+            + ' [cmdLineOptions.AdditionalAssemblyNasmIncludeDirectories]'
+            + ' [cmdLineOptions.NasmPreprocessorDefinitions]'
+            + ' [cmdLineOptions.PreIncludedFiles]'
 ";
 
                 public static string CPPCompilerExtraOptions = @"

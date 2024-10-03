@@ -304,5 +304,14 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName].pdb"" &gt;NUL 2&gt;NUL
     </NMakeCompile>
   </ItemDefinitionGroup>
 ";
+
+        private const string _projectConfigurationsNasmTemplate =
+    @"    <NASM>
+      <PreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions];%(PreprocessorDefinitions);$(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <IncludePaths>[options.AdditionalAssemblyIncludeDirectories]</IncludePaths>
+      <Path>[ExePath]</Path>
+      <PreIncludeFiles>[PreIncludedFiles]</PreIncludeFiles>
+    </NASM>
+";
     }
 }

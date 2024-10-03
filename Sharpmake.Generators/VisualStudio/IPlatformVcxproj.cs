@@ -82,6 +82,7 @@ namespace Sharpmake.Generators.VisualStudio
         void GenerateProjectCompileVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectLinkVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateProjectMasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
+        void GenerateProjectNasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator);
         void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator); // Should take IVcxprojGenerationContext but this is called by BaseUserFile which should not know that interface.
         void GenerateRunFromPcDeployment(IVcxprojGenerationContext context, IFileGenerator generator);
 

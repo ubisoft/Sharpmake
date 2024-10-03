@@ -126,6 +126,7 @@ namespace Sharpmake
                 context.Options["RandomizedBaseAddress"] = "true";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
                 context.CommandLineOptions["RandomizedBaseAddress"] = "/DYNAMICBASE";
+                context.CommandLineOptions["NasmCompilerFormat"] = "-felf64";
             }
 
             public override void SetupSdkOptions(IGenerationContext context)

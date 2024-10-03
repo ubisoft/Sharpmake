@@ -36,6 +36,7 @@ namespace Sharpmake
             {
                 context.Options["TargetMachine"] = "MachineX86";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X86";
+                context.CommandLineOptions["NasmCompilerFormat"] = "-fwin32";
             }
 
             public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

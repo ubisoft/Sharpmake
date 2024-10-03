@@ -485,7 +485,21 @@ namespace Sharpmake.Generators.VisualStudio
             // .props files
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
             if (context.Project.ContainsASM)
+            {
                 fileGenerator.Write(Template.Project.ProjectImportedMasmProps);
+            }
+
+            if (context.Project.ContainsNASM)
+            {
+                if (context.Project.NasmExePath.Length == 0)
+                {
+                    throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                }
+                using (fileGenerator.Declare("importedNasmPropsFile", context.Project.NasmPropsFile))
+                {
+                    fileGenerator.Write(Template.Project.ProjectImportedNasmProps);
+                }
+            }
 
             VsProjCommon.WriteProjectCustomPropsFiles(context.Project.CustomPropsFiles, context.ProjectDirectoryCapitalized, fileGenerator);
             VsProjCommon.WriteConfigurationsCustomPropsFiles(context.ProjectConfigurations, context.ProjectDirectoryCapitalized, fileGenerator);
@@ -579,7 +593,13 @@ namespace Sharpmake.Generators.VisualStudio
                             platformVcxproj.GenerateProjectLinkVcxproj(context, fileGenerator);
 
                             if (conf.Project.ContainsASM)
+                            {
                                 platformVcxproj.GenerateProjectMasmVcxproj(context, fileGenerator);
+                            }
+                            if (conf.Project.ContainsNASM)
+                            {
+                                platformVcxproj.GenerateProjectNasmVcxproj(context, fileGenerator);
+                            }
 
                             if (conf.EventPreBuild.Count != 0)
                                 fileGenerator.Write(Template.Project.ProjectConfigurationsPreBuildEvent);
@@ -651,6 +671,18 @@ namespace Sharpmake.Generators.VisualStudio
             {
                 fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
             }
+            if (context.Project.ContainsNASM)
+            {
+                if (context.Project.NasmExePath.Length == 0)
+                {
+                    throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                }
+                using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                {
+                    fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                }
+            }
+
             foreach (string targetsFiles in context.Project.CustomTargetsFiles)
             {
                 string capitalizedFile = Project.GetCapitalizedFile(targetsFiles) ?? targetsFiles;
