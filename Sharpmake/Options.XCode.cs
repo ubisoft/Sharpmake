@@ -265,6 +265,12 @@ namespace Sharpmake
                     Enable
                 }
 
+                public enum AsyncExceptions
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
                 public class ExternalResourceFolders : Strings
                 {
                     public ExternalResourceFolders(params string[] paths)
