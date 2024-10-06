@@ -695,6 +695,16 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.Vc.Compiler.KeepComment.Enable, () => { context.Options["KeepComments"] = "true"; context.CommandLineOptions["KeepComments"] = "/C"; })
             );
 
+            //Options.Vc.Compiler.UseStandardConformingPreprocessor.    See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-preprocessor?view=msvc-170
+            //    Disable                                 /Zc:preprocessor-
+            //    Enable                                  /Zc:preprocessor
+            context.SelectOption
+            (
+            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Default, () => { }),
+            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Disable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:preprocessor-"); }),
+            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Enable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:preprocessor"); })
+            );
+
             //Options.Vc.Compiler.StringPooling.
             //    Disable                                 StringPooling="false"
             //    Enable                                  StringPooling="true"                            /GF
