@@ -491,19 +491,33 @@ namespace Sharpmake.Generators.Apple
             };
 
             public static string CommandLineArgumentsBegin =
-@"
-      <CommandLineArguments>";
+@"      <CommandLineArguments>
+";
 
             public static string CommandLineArgument =
-@"
-         <CommandLineArgument
+@"         <CommandLineArgument
             argument = ""[argument]""
             isEnabled = ""YES"">
-         </CommandLineArgument>";
+         </CommandLineArgument>
+";
 
             public static string CommandLineArgumentsEnd =
-@"
-      </CommandLineArguments>";
+@"      </CommandLineArguments>";
+
+            public static string EnvironmentVariablesBegin =
+@"      <EnvironmentVariables>
+";
+
+            public static string EnvironmentVariablesEnd =
+@"      </EnvironmentVariables>";
+
+            public static string EnvironmentVariable =
+@"         <EnvironmentVariable
+            key = ""[name]""
+            value = ""[value]""
+            isEnabled = ""YES"">
+         </EnvironmentVariable>
+";
 
             public static string SchemeTestableReference =
 @"
@@ -522,8 +536,7 @@ namespace Sharpmake.Generators.Apple
             /// This section is used to configure the executable to run for native projects.
             /// </summary>
             public static string SchemeRunnableNativeProject = 
-@"
-      <BuildableProductRunnable>
+@"      <BuildableProductRunnable>
           <BuildableReference
               BuildableIdentifier = ""primary""
               BlueprintIdentifier = ""[item.Uid]""
@@ -531,17 +544,18 @@ namespace Sharpmake.Generators.Apple
               BlueprintName = ""[item.Identifier]""
               ReferencedContainer = ""container:[projectFile].xcodeproj"">
           </BuildableReference>
-      </BuildableProductRunnable>";
+      </BuildableProductRunnable>
+";
 
             /// <summary>
             /// This section is used to configure the executable to run for makefile projects.
             /// </summary>
             public static string SchemeRunnableMakeFileProject =
-@"
-      <PathRunnable
+@"      <PathRunnable
          runnableDebuggingMode = ""0""
          FilePath = ""[runnableFilePath]"">
-      </PathRunnable>";
+      </PathRunnable>
+";
 
             /// <summary>
             /// First part of schema file
@@ -595,13 +609,15 @@ namespace Sharpmake.Generators.Apple
       debugDocumentVersioning = ""YES""
       enableGPUFrameCaptureMode = ""[options.EnableGpuFrameCaptureMode]""
       enableGPUValidationMode = ""[options.MetalAPIValidation]""
-      allowLocationSimulation = ""YES"">";
+      allowLocationSimulation = ""YES"">
+";
 
             /// <summary>
             /// Secondpart of schema file
             /// </summary>
             public static string SchemeFileTemplatePart2 = 
 @"[commandLineArguments]
+[environmentVariables]
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
