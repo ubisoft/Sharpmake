@@ -284,6 +284,8 @@ namespace Sharpmake.Generators.FastBuild
 
             var allFileCustomBuild = new Dictionary<string, Project.Configuration.CustomFileBuildStepData>();
 
+            Dictionary<string, bool> confBffHasMasters = new Dictionary<string, bool>();
+
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
             {
@@ -295,6 +297,11 @@ namespace Sharpmake.Generators.FastBuild
                 var applePlatformBff = PlatformRegistry.Query<IApplePlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
                 var dotNetConf = Util.IsDotNet(conf);
+
+                if (conf.FastBuildMasterBffList.Any())
+                    confBffHasMasters[conf.BffFullFileName] = true;
+                else
+                    confBffHasMasters.TryAdd(conf.BffFullFileName, false);
 
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
@@ -1445,6 +1452,9 @@ namespace Sharpmake.Generators.FastBuild
                 bffGenerator.Clear();
                 ++configIndex;
             }
+
+            foreach (string masterlessBff in confBffHasMasters.Where(x => !x.Value).Select(x => x.Key))
+                Builder.Instance.LogWarningLine("Bff {0} doesn't appear in any master bff, it won't be buildable.", masterlessBff + FastBuildSettings.FastBuildConfigFileExtension);
 
             // Write all unity sections together at the beginning of the .bff just after the header.
             if (_unities.Any())
