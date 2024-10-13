@@ -680,6 +680,17 @@ namespace Sharpmake
                 }
 
                 /// <summary>
+                /// Enables a token-based preprocessor that conforms to C99 and C++11 and later standards.
+                /// </summary>
+                public enum UseStandardConformingPreprocessor
+                {
+                    [Default]
+                    Default,
+                    Disable,
+                    Enable
+                }
+
+                /// <summary>
                 /// Enables the compiler to create a single read-only copy of identical strings in the program image and in memory during execution, resulting in smaller programs, an optimization called string pooling. /O1, /O2, and /ZI  automatically set /GF option.
                 /// </summary>
                 public enum StringPooling

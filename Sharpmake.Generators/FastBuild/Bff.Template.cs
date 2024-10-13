@@ -355,6 +355,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
             + ' [cmdLineOptions.IgnoreStandardIncludePath]'
             + ' [cmdLineOptions.GeneratePreprocessedFile]'
             + ' [cmdLineOptions.KeepComments]'
+            + ' [cmdLineOptions.UseStandardConformingPreprocessor]'
             + ' [cmdLineOptions.StringPooling]'
             + ' [cmdLineOptions.MinimalRebuild]'
             + ' [cmdLineOptions.ExceptionHandling]'

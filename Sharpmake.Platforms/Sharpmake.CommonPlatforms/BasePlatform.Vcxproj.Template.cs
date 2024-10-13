@@ -35,6 +35,7 @@ namespace Sharpmake
       <PreprocessToFile>[options.GeneratePreprocessedFile]</PreprocessToFile>
       <PreprocessSuppressLineNumbers>[options.PreprocessSuppressLineNumbers]</PreprocessSuppressLineNumbers>
       <PreprocessKeepComments>[options.KeepComments]</PreprocessKeepComments>
+      <UseStandardPreprocessor>[options.UseStandardConformingPreprocessor]</UseStandardPreprocessor>
       <StringPooling>[options.StringPooling]</StringPooling>
       <MinimalRebuild>[options.MinimalRebuild]</MinimalRebuild>
       <ExceptionHandling>[options.ExceptionHandling]</ExceptionHandling>
