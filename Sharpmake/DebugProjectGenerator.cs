@@ -69,7 +69,7 @@ namespace Sharpmake
             {
                 string sharpmakeApplicationExePath = Process.GetCurrentProcess().MainModule.FileName;
 
-                if (Util.IsRunningInMono())
+                if (Util.IsRunningInMono() || Util.GetExecutingPlatform() == Platform.mac)
                 {
                     // When running within Mono, sharpmakeApplicationExePath will at this point wrongly refer to the
                     // mono (or mono-sgen) executable. Fix it so that it points to Sharpmake.Application.exe.
