@@ -700,9 +700,21 @@ namespace Sharpmake.Generators.VisualStudio
             //    Enable                                  /Zc:preprocessor
             context.SelectOption
             (
-            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Default, () => { }),
-            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Disable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:preprocessor-"); }),
-            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Enable, () => { context.Configuration.AdditionalCompilerOptions.Add("/Zc:preprocessor"); })
+            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Default, () =>
+            {
+                context.Options["UseStandardConformingPreprocessor"] = FileGeneratorUtilities.RemoveLineTag;
+                context.CommandLineOptions["UseStandardConformingPreprocessor"] = FileGeneratorUtilities.RemoveLineTag;
+            }),
+            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Disable, () =>
+            {
+                context.Options["UseStandardConformingPreprocessor"] = "false";
+                context.CommandLineOptions["UseStandardConformingPreprocessor"] = "/Zc:preprocessor-";
+            }),
+            Options.Option(Options.Vc.Compiler.UseStandardConformingPreprocessor.Enable, () =>
+            {
+                context.Options["UseStandardConformingPreprocessor"] = "true";
+                context.CommandLineOptions["UseStandardConformingPreprocessor"] = "/Zc:preprocessor";
+            })
             );
 
             //Options.Vc.Compiler.StringPooling.
