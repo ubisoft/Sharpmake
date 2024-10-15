@@ -393,11 +393,18 @@ namespace Sharpmake
             return version;
         }
 
+        private static ConcurrentDictionary<(DevEnv, Platform), Version> s_visualStudioCompilerVersionCache = new ConcurrentDictionary<(DevEnv, Platform), Version>();
+
         public static Version GetVisualStudioVCToolsCompilerVersion(this DevEnv visualVersion, Platform platform)
         {
-            string clExeFile = Path.Combine(visualVersion.GetVisualStudioBinPath(platform), "cl.exe");
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(clExeFile);
-            return new Version(fileVersionInfo.FileMajorPart, fileVersionInfo.FileMinorPart, fileVersionInfo.FileBuildPart, fileVersionInfo.FilePrivatePart);
+            var cacheKey = (visualVersion, platform);
+            Version version = s_visualStudioCompilerVersionCache.GetOrAdd(cacheKey, ((DevEnv, Platform) key) =>
+            {
+                string clExeFile = Path.Combine(visualVersion.GetVisualStudioBinPath(platform), "cl.exe");
+                FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(clExeFile);
+                return new Version(fileVersionInfo.FileMajorPart, fileVersionInfo.FileMinorPart, fileVersionInfo.FileBuildPart, fileVersionInfo.FilePrivatePart);
+            });
+            return version;
         }
 
         /// <summary>
