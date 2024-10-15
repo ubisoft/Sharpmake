@@ -1984,8 +1984,7 @@ namespace Sharpmake
                     if (!file.EndsWith(BlobExtension, StringComparison.OrdinalIgnoreCase))
                         files.Add(file);
 
-                    string fileNameLC = file.ToLower();
-                    s_capitalizedMapFiles.TryAdd(fileNameLC, file);
+                    Util.RegisterCapitalizedPath(file);
                 }
                 s_cachedDirectoryFiles[directoryCapitalizedFullName] = files;
             }
@@ -2004,19 +2003,9 @@ namespace Sharpmake
         private bool _resolvedDependencies = false;
         private static ConcurrentDictionary<string, List<string>> s_cachedDirectoryFiles = new ConcurrentDictionary<string, List<string>>();
 
-        // use as cache because Util.GetProperFilePathCapitalization is slow
-        private static ConcurrentDictionary<string, string> s_capitalizedMapFiles = new ConcurrentDictionary<string, string>();
-
         public static string GetCapitalizedFile(string file)
         {
-            string filenameLC = file.ToLower();
-            string capitalizedFile;
-            if (!s_capitalizedMapFiles.TryGetValue(filenameLC, out capitalizedFile))
-            {
-                capitalizedFile = Util.GetCapitalizedPath(file);
-                s_capitalizedMapFiles.TryAdd(filenameLC, capitalizedFile);
-            }
-            return capitalizedFile;
+            return Util.GetCapitalizedPath(file);
         }
 
         #endregion
