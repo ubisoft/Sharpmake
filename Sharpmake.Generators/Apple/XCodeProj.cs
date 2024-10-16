@@ -483,6 +483,8 @@ namespace Sharpmake.Generators.Apple
         {
             Project project = context.Project;
 
+            Project.Configuration defaultConfiguration = configurations.Where(conf => conf.UseAsDefaultForXCode == true).FirstOrDefault() ?? configurations[0];
+
             //TODO: add support for multiple targets with the same outputtype. Would need a mechanism to define a default configuration per target and associate it with non-default conf with different optimization.
             //At the moment it only supports target with different output type (e.g:lib, app, test bundle)
             //Note that we also separate FastBuild configurations
@@ -601,16 +603,17 @@ namespace Sharpmake.Generators.Apple
 
                 string masterBffFilePath = null;
 
+                if (canIncludeSourceFiles)
+                    PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, defaultConfiguration, forUnitTest: false, workspacePath);
+
+                if (createUnitTestTarget)
+                {
+                    PrepareSourceFiles(xCodeUnitTestTargetName, project.XcodeUnitTestSourceFiles, project, defaultConfiguration, forUnitTest: true, workspacePath);
+                }
+                PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, defaultConfiguration);
+
                 foreach (var conf in targetConfigurations)
                 {
-                    if (canIncludeSourceFiles)
-                        PrepareSourceFiles(xCodeTargetName, sourceFiles.SortedValues, project, conf, forUnitTest: false, workspacePath);
-
-                    if (createUnitTestTarget)
-                    {
-                        PrepareSourceFiles(xCodeUnitTestTargetName, project.XcodeUnitTestSourceFiles, project, conf, forUnitTest: true, workspacePath);
-                    }
-                    PrepareResourceFiles(xCodeTargetName, resourceFiles.SortedValues, project, conf);
                     PrepareExternalResourceFiles(xCodeTargetName, project, conf);
 
                     // AppleApp project for fastbuild, append fastbuild script into conf.EventPreBuild, so xcode will start fastbuild after all PreBuild phase and before build phase(resources, plist build etc.).
@@ -731,7 +734,7 @@ popd";
                         var testFrameworkItem = new ProjectDeveloperFrameworkFile(_unitTestFramework);
                         var buildFileItem = new ProjectBuildFile(testFrameworkItem);
                         if (_frameworksFolder != null)
-                            _frameworksFolder.Children.Add(testFrameworkItem);
+                            _frameworksFolder.AddChildren(testFrameworkItem);
                         _projectItems.Add(testFrameworkItem);
                         _projectItems.Add(buildFileItem);
                         _frameworksBuildPhases[xCodeTargetName].Files.Add(buildFileItem);
@@ -743,7 +746,7 @@ popd";
                     var testFrameworkItem = new ProjectDeveloperFrameworkFile(_unitTestFramework);
                     var buildFileItem = new ProjectBuildFile(testFrameworkItem);
                     if (_frameworksFolder != null)
-                        _frameworksFolder.Children.Add(testFrameworkItem);
+                        _frameworksFolder.AddChildren(testFrameworkItem);
                     _projectItems.Add(testFrameworkItem);
                     _projectItems.Add(buildFileItem);
                     _frameworksBuildPhases[xCodeUnitTestTargetName].Files.Add(buildFileItem);
@@ -751,7 +754,7 @@ popd";
 
                 // use the first conf as file, but the target name
                 var targetOutputFile = new ProjectOutputFile(firstConf, xCodeTargetName);
-                _productsGroup.Children.Add(targetOutputFile);
+                _productsGroup.AddChildren(targetOutputFile);
 
                 _projectItems.Add(targetOutputFile);
 
@@ -759,7 +762,7 @@ popd";
                 if (createUnitTestTarget)
                 {
                     targetUnitTestOutputFile = new ProjectOutputFile(firstConf, xCodeUnitTestTargetName, forTestBundle : true);
-                    _productsGroup.Children.Add(targetUnitTestOutputFile);
+                    _productsGroup.AddChildren(targetUnitTestOutputFile);
 
                     _projectItems.Add(targetUnitTestOutputFile);
                 }
@@ -1065,9 +1068,8 @@ popd";
             {
                 var frameworkItem = createProjectSystemFileType(framework);
                 var buildFileItem = new ProjectBuildFile(frameworkItem as ProjectFileBase);
-                if (!frameworksFolder.Children.Exists(item => item.FullPath == frameworkItem.FullPath))
+                if (frameworksFolder.AddChildren(frameworkItem))
                 {
-                    frameworksFolder.Children.Add(frameworkItem);
                     _projectItems.Add(frameworkItem);
                     buildFiles.Add(frameworkItem);
                 }
@@ -1097,10 +1099,7 @@ popd";
             {
                 // add second entry for copy (Xcode does this as well)
                 var buildFileItem2 = new ProjectBuildFile(frameworkItem, settings: @"{ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }");
-                if (!frameworksFolder.Children.Exists(item => item.FullPath == frameworkItem.FullPath))
-                {
-                    frameworksFolder.Children.Add(frameworkItem);
-                }
+                frameworksFolder.AddChildren(frameworkItem);
 
                 if (!_projectItems.Contains(buildFileItem2))
                 {
@@ -1282,7 +1281,7 @@ popd";
             {
                 _frameworksFolder = new ProjectFolder("Frameworks", true);
                 _projectItems.Add(_frameworksFolder);
-                _mainGroup.Children.Add(_frameworksFolder);
+                _mainGroup.AddChildren(_frameworksFolder);
             }
 
             if (configuration.XcodeEmbeddedFrameworks.Any() ||
@@ -1291,13 +1290,13 @@ popd";
             {
                 _embedFrameworksFolder = new ProjectFolder("Embed Frameworks", true);
                 _projectItems.Add(_embedFrameworksFolder);
-                _mainGroup.Children.Add(_embedFrameworksFolder);
+                _mainGroup.AddChildren(_embedFrameworksFolder);
             }
 
             _projectItems.Add(_mainGroup);
 
             _productsGroup = new ProjectFolder("Products", true);
-            _mainGroup.Children.Add(_productsGroup);
+            _mainGroup.AddChildren(_productsGroup);
             _projectItems.Add(_productsGroup);
 
             // add source root folders to make sure the folder hierarchy created correctly.
@@ -1327,7 +1326,7 @@ popd";
                         continue;
                     }
 
-                    GetEmptyProjectFolders(folderItem.Children, emptyProjectFolders);
+                    GetEmptyProjectFolders(folderItem.Children.Values, emptyProjectFolders);
                 }
             }
         }
@@ -1399,7 +1398,7 @@ popd";
             // Not found in existing root, create a new root for this item.
             ProjectFolder projectFolder = workspacePath != null ? new ProjectExternalFolder(folder, workspacePath) : new ProjectFolder(folder);
             _projectItems.Add(projectFolder);
-            _mainGroup.Children.Insert(0, projectFolder);
+            _mainGroup.AddChildren(projectFolder);
             return projectFolder;
         }
 
@@ -1410,7 +1409,7 @@ popd";
             {
                 bool found = false;
                 string remainingPathPart = remainingPathParts[i];
-                foreach (ProjectFolder item in parent.Children.Where(item => item is ProjectFolder))
+                foreach (ProjectFolder item in parent.Children.Values.Where(item => item is ProjectFolder))
                 {
                     if (remainingPathPart == item.Name)
                     {
@@ -1425,7 +1424,7 @@ popd";
                     string fullPath = parent.FullPath + FolderSeparator + remainingPathPart;
                     ProjectFolder folder = workspacePath != null ? new ProjectExternalFolder(fullPath, workspacePath) : new ProjectFolder(fullPath);
                     _projectItems.Add(folder);
-                    parent.Children.Add(folder);
+                    parent.AddChildren(folder);
                     parent = folder;
                 }
             }
@@ -1453,7 +1452,7 @@ popd";
                 }
 
                 _projectItems.Add(candidateFile);
-                _mainGroup.Children.Add(candidateFile);
+                _mainGroup.AddChildren(candidateFile);
                 return candidateFile;
             }
 
@@ -1464,7 +1463,7 @@ popd";
 
         private ProjectFileSystemItem AddInFileSystem(ProjectFolder parent, out bool alreadyPresent, string fileName, string workspacePath)
         {
-            ProjectFileSystemItem file = parent.Children.FirstOrDefault(item => item.FileName.Equals(fileName));
+            parent.Children.TryGetValue(fileName, out var file);
             alreadyPresent = file != null;
             if (alreadyPresent)
             {
@@ -1474,7 +1473,7 @@ popd";
             string fullPath = parent.FullPath + FolderSeparator + fileName;
             file = workspacePath != null ? new ProjectExternalFile(fullPath, workspacePath) : new ProjectFile(fullPath);
             _projectItems.Add(file);
-            parent.Children.Add(file);
+            parent.AddChildren(file);
             return file;
         }
 
@@ -1485,11 +1484,11 @@ popd";
             ProjectFileSystemItem itemToSearch = fileSystemItem;
             while (itemToSearch != null)
             {
-                ProjectFileSystemItem parentItemToSearch = _projectItems.Where(item => item is ProjectFileSystemItem).Cast<ProjectFileSystemItem>().FirstOrDefault(item => item.Children.Contains(itemToSearch));
+                ProjectFileSystemItem parentItemToSearch = _projectItems.Where(item => item is ProjectFileSystemItem).Cast<ProjectFileSystemItem>().FirstOrDefault(item => item.Children.ContainsKey(itemToSearch.FullPath));
                 if (parentItemToSearch == null)
                     break;
 
-                parentItemToSearch.Children.Remove(itemToSearch);
+                parentItemToSearch.RemoveChildren(itemToSearch);
                 if (parentItemToSearch.Children.Count != 0)
                     break;
 
@@ -1771,12 +1770,23 @@ popd";
             protected ProjectFileSystemItem(ItemSection section, string fullPath)
                 : base(section, fullPath)
             {
-                Children = new List<ProjectFileSystemItem>();
                 FullPath = fullPath;
                 Name = System.IO.Path.GetFileName(fullPath);
             }
 
-            public List<ProjectFileSystemItem> Children { get; protected set; }
+            private Dictionary<string, ProjectFileSystemItem> _children = new Dictionary<string, ProjectFileSystemItem>();
+
+            public IReadOnlyDictionary<string, ProjectFileSystemItem> Children { get { return _children; } }
+
+            public bool AddChildren(ProjectFileSystemItem item)
+            {
+                return _children.TryAdd(item.FullPath, item);
+            }
+            public void RemoveChildren(ProjectFileSystemItem item)
+            {
+                _children.Remove(item.FullPath);
+            }
+            
             public abstract bool Build { get; set; }
             public abstract bool Source { get; set; }
 
@@ -1787,7 +1797,6 @@ popd";
             /// </summary>
             public bool IsHeader { get => Extension == ".h" || Extension == ".hpp" || Extension == ".hxx" || Extension == ".inl"; }
             public string FullPath { get; protected set; }
-            public string FileName => System.IO.Path.GetFileName(FullPath);
             public virtual string Name { get; protected set; }
             public virtual string Path
             {
@@ -2127,17 +2136,17 @@ popd";
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectFolder folderItem = (ProjectFolder)item;
-                var children = folderItem.Children.OrderByDescending(c => c.Section).ThenBy(c => c.Name);
-                string childrenList = "";
+                var children = folderItem.Children.Values.OrderByDescending(c => c.Section).ThenBy(c => c.Name).ThenBy(c=>c.FullPath);
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectFileSystemItem childItem in children)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
         }
 
@@ -2187,16 +2196,16 @@ popd";
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectBuildPhase folderItem = (ProjectBuildPhase)item;
-                string childrenList = "";
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectBuildFile childItem in folderItem.Files.SortedValues)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
 
             public UniqueList<ProjectBuildFile> Files { get; }
@@ -2534,16 +2543,16 @@ popd";
                     throw new Error("Trying to compute dependencies on incomplete native target. ");
 
                 ProjectNativeTarget folderItem = (ProjectNativeTarget)item;
-                string childrenList = "";
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectTargetDependency childItem in folderItem.Dependencies)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
 
             public List<ProjectTargetDependency> Dependencies { get; }
@@ -2703,16 +2712,16 @@ popd";
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
                 ProjectConfigurationList configurationList = (ProjectConfigurationList)item;
-                string childrenList = "";
+                StringBuilder childrenList = new StringBuilder();
                 foreach (ProjectBuildConfiguration childItem in configurationList.Configurations)
                 {
                     using (resolver.NewScopedParameter("item", childItem))
                     {
-                        childrenList += resolver.Resolve(Template.SectionSubItem);
+                        childrenList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
 
-                resolverParameters.Add("itemChildren", childrenList);
+                resolverParameters.Add("itemChildren", childrenList.ToString());
             }
 
             public HashSet<ProjectBuildConfiguration> Configurations { get { return _configurations; } }
@@ -2802,38 +2811,37 @@ popd";
 
             public override void GetAdditionalResolverParameters(ProjectItem item, Resolver resolver, ref Dictionary<string, string> resolverParameters)
             {
-                //ProjectMain mainItem = (ProjectMain)item;
-                string targetList = "";
+                StringBuilder targetList = new StringBuilder();
                 foreach (ProjectTarget target in _targets)
                 {
                     using (resolver.NewScopedParameter("item", target))
                     {
-                        targetList += resolver.Resolve(Template.SectionSubItem);
+                        targetList.Append(resolver.Resolve(Template.SectionSubItem));
                     }
                 }
-                resolverParameters.Add("itemTargets", targetList);
+                resolverParameters.Add("itemTargets", targetList.ToString());
 
-                string dependenciesList = "";
+                StringBuilder dependenciesList = new StringBuilder();
                 foreach (KeyValuePair<ProjectFolder, ProjectReference> projectReference in _projectReferences)
                 {
                     using (resolver.NewScopedParameter("group", projectReference.Key))
                     using (resolver.NewScopedParameter("project", projectReference.Value))
                     {
-                        dependenciesList += resolver.Resolve(Template.ProjectReferenceSubItem);
+                        dependenciesList.Append(resolver.Resolve(Template.ProjectReferenceSubItem));
                     }
                 }
-                resolverParameters.Add("itemProjectReferences", dependenciesList);
+                resolverParameters.Add("itemProjectReferences", dependenciesList.ToString());
 
-                string targetAttributes = "";
+                StringBuilder targetAttributes = new StringBuilder();
                 foreach (ProjectTarget target in _targets)
                 {
                     using (resolver.NewScopedParameter("item", target))
                     using (resolver.NewScopedParameter("project", this))
                     {
-                        targetAttributes += resolver.Resolve(Template.ProjectTargetAttribute);
+                        targetAttributes.Append(resolver.Resolve(Template.ProjectTargetAttribute));
                     }
                 }
-                resolverParameters.Add("itemTargetAttributes", targetAttributes);
+                resolverParameters.Add("itemTargetAttributes", targetAttributes.ToString());
             }
 
             public ProjectTarget Target { get { return _target; } }
