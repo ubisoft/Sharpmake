@@ -756,12 +756,6 @@ namespace Sharpmake.Generators.FastBuild
                         string compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsClang +
                                                         Template.ConfigurationFile.CompilerOptionsCommon;
 
-                        string compilerOptionsClangDeoptimized = FileGeneratorUtilities.RemoveLineTag;
-                        if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                            compilerOptionsClangDeoptimized =
-                                Template.ConfigurationFile.ClangCompilerOptionsDeoptimize +
-                                Template.ConfigurationFile.CompilerOptionsCommon;
-
                         string fastBuildDeoptimizationWritableFiles = null;
                         string fastBuildDeoptimizationWritableFilesWithToken = null;
                         Project.Configuration.DeoptimizationWritableFiles deoptimizeSetting = conf.FastBuildDeoptimization;
@@ -1195,10 +1189,9 @@ namespace Sharpmake.Generators.FastBuild
                                                     bffGenerator.Write(compilerOptionsClang);
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
-                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
@@ -1247,7 +1240,7 @@ namespace Sharpmake.Generators.FastBuild
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
@@ -1344,7 +1337,7 @@ namespace Sharpmake.Generators.FastBuild
                                                         {
                                                             if (isUsePrecomp)
                                                                 bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                            bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                            bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                             bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                         }
                                                         if (!useObjectLists)
