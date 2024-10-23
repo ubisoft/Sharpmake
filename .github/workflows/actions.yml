@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
 
       - name: Download sharpmake ${{ matrix.framework }} ${{ runner.os }}-release binaries
         uses: actions/download-artifact@v4
@@ -58,7 +58,7 @@ jobs:
           matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
 
       - name: Generate samples matrix
         id: set-matrix
@@ -79,7 +79,7 @@ jobs:
       matrix: ${{fromJSON(needs.generate_samples_matrix.outputs.matrix)}}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
 
       # Setting a VS_VERSION_SUFFIX variable for use by steps that are using solutions specific to VS2019 or VS2022
       - name: SetVSVersionSuffix-VS2019
