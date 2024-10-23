@@ -18,18 +18,18 @@ namespace Sharpmake
         [DebuggerDisplay("{Name} {Version}")]
         public class PackageReference : IResolverHelper, IComparable<PackageReference>
         {
-            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string targetsPath, string referenceType)
+            internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string referenceType, string targetsPath)
             {
                 Name = name;
                 Version = version;
                 DotNetHint = dotNetHint;
                 PrivateAssets = privateAssets;
-                TargetsPath = targetsPath;
                 ReferenceType = referenceType;
+                TargetsPath = targetsPath;
             }
 
             internal PackageReference(string name, string version, string dotNetHint, AssetsDependency privateAssets, string targetsPath)
-                : this(name, version, dotNetHint, privateAssets, targetsPath, null)
+                : this(name, version, dotNetHint, privateAssets, null, targetsPath)
             {
             }
 
@@ -144,13 +144,13 @@ namespace Sharpmake
 
         private readonly UniqueList<PackageReference> _packageReferences = new UniqueList<PackageReference>();
 
-        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string targetsPath = null, string referenceType = null)
+        public void Add(string packageName, string version, string dotNetHint = null, AssetsDependency privateAssets = DefaultPrivateAssets, string referenceType = null, string targetsPath = null)
         {
             // check package unicity
             var existingPackage = _packageReferences.FirstOrDefault(pr => pr.Name == packageName);
             if (existingPackage == null)
             {
-                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, targetsPath, referenceType));
+                _packageReferences.Add(new PackageReference(packageName, version, null, privateAssets, referenceType, targetsPath));
                 return;
             }
 
