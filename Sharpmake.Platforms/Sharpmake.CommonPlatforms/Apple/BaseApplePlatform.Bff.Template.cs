@@ -52,6 +52,8 @@ namespace Sharpmake
             + ' [cmdLineOptions.CppExceptions]'
             + ' [cmdLineOptions.ObjCExceptions]'
             + ' [cmdLineOptions.ObjCARCExceptions]'
+            + ' [cmdLineOptions.DisableExceptions]'
+            + ' [cmdLineOptions.PrivateInlines]'
 ";
 
         private const string _compilerExtraOptionsAdditional = @"

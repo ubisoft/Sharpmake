@@ -40,11 +40,6 @@ namespace Sharpmake
             }
             #endregion
 
-            protected override void WriteCompilerExtraOptionsGeneral(IFileGenerator generator)
-            {
-                base.WriteCompilerExtraOptionsGeneral(generator);
-            }
-
             public override void SelectCompilerOptions(IGenerationContext context)
             {
                 base.SelectCompilerOptions(context);

@@ -356,7 +356,7 @@ namespace Sharpmake
                 string vsDir = visualVersion.GetVisualStudioDir();
                 if (visualVersion > DevEnv.vs2015)
                 {
-                    return Path.Combine(vsDir, @"VC\Tools\MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
+                    return Path.Combine(vsDir, "VC", "Tools", "MSVC", visualVersion.GetVisualStudioVCToolsVersion().ToString());
                 }
                 else
                 {
