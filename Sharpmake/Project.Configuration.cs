@@ -3362,44 +3362,49 @@ namespace Sharpmake
             }
             public CsprojUserFileSettings CsprojUserFile = null;
 
-            internal class PropagationSettings
+
+            internal struct PropagationSettings : IEquatable<PropagationSettings>
             {
-                internal PropagationSettings(
-                    DependencySetting inDependencySetting,
-                    bool inIsImmediate,
-                    bool inHasPublicPathToRoot,
-                    bool inHasPublicPathToImmediate,
-                    bool inGoesThroughDLL,
+                public PropagationSettings(
+                    DependencySetting dependencySetting,
+                    bool isImmediate,
+                    bool hasPublicPathToRoot,
+                    bool hasPublicPathToImmediate,
+                    bool goesThroughDLL,
                     bool isDotnetReferenceSwappedWithOutputAssembly,
                     bool hasProjectReference)
                 {
-                    _dependencySetting = inDependencySetting;
-                    _isImmediate = inIsImmediate;
-                    _hasPublicPathToRoot = inHasPublicPathToRoot;
-                    _hasPublicPathToImmediate = inHasPublicPathToImmediate;
-                    _goesThroughDLL = inGoesThroughDLL;
-                    _isDotnetReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly;
-                    _hasProjectReference = hasProjectReference;
+                    DependencySetting = dependencySetting;
+                    IsImmediate = isImmediate;
+                    HasPublicPathToRoot = hasPublicPathToRoot;
+                    HasPublicPathToImmediate = hasPublicPathToImmediate;
+                    GoesThroughDLL = goesThroughDLL;
+                    IsDotnetReferenceSwappedWithOutputAssembly = isDotnetReferenceSwappedWithOutputAssembly;
+                    HasProjectReference = hasProjectReference;
                 }
+
+                public DependencySetting DependencySetting { get; }
+                public bool IsImmediate { get; }
+                public bool HasPublicPathToRoot { get; }
+                public bool HasPublicPathToImmediate { get; }
+                public bool GoesThroughDLL { get; }
+                public bool IsDotnetReferenceSwappedWithOutputAssembly { get; }
+                public bool HasProjectReference { get; }
 
                 public override bool Equals(object obj)
                 {
-                    if (ReferenceEquals(null, obj))
-                        return false;
-                    if (ReferenceEquals(this, obj))
-                        return true;
-                    if (obj.GetType() != GetType())
-                        return false;
+                    return obj is PropagationSettings other && Equals(other);
+                }
 
-                    PropagationSettings other = (PropagationSettings)obj;
-
-                    return _dependencySetting == other._dependencySetting &&
-                           _isImmediate == other._isImmediate &&
-                           _hasPublicPathToRoot == other._hasPublicPathToRoot &&
-                           _hasPublicPathToImmediate == other._hasPublicPathToImmediate &&
-                           _goesThroughDLL == other._goesThroughDLL &&
-                           _isDotnetReferenceSwappedWithOutputAssembly == other._isDotnetReferenceSwappedWithOutputAssembly &&
-                           _hasProjectReference == other._hasProjectReference;
+                public bool Equals(PropagationSettings other)
+                {
+                    return DependencySetting == other.DependencySetting &&
+                           IsImmediate == other.IsImmediate &&
+                           HasPublicPathToRoot == other.HasPublicPathToRoot &&
+                           HasPublicPathToImmediate == other.HasPublicPathToImmediate &&
+                           GoesThroughDLL == other.GoesThroughDLL &&
+                           IsDotnetReferenceSwappedWithOutputAssembly == other.IsDotnetReferenceSwappedWithOutputAssembly &&
+                           HasProjectReference == other.HasProjectReference;
                 }
 
                 public override int GetHashCode()
@@ -3407,24 +3412,16 @@ namespace Sharpmake
                     unchecked // Overflow is fine, just wrap
                     {
                         int hash = 17;
-                        hash = hash * 23 + _dependencySetting.GetHashCode();
-                        hash = hash * 23 + _isImmediate.GetHashCode();
-                        hash = hash * 23 + _hasPublicPathToRoot.GetHashCode();
-                        hash = hash * 23 + _hasPublicPathToImmediate.GetHashCode();
-                        hash = hash * 23 + _goesThroughDLL.GetHashCode();
-                        hash = hash * 23 + _isDotnetReferenceSwappedWithOutputAssembly.GetHashCode();
-                        hash = hash * 23 + _hasProjectReference.GetHashCode();
+                        hash = hash * 23 + DependencySetting.GetHashCode();
+                        hash = hash * 23 + IsImmediate.GetHashCode();
+                        hash = hash * 23 + HasPublicPathToRoot.GetHashCode();
+                        hash = hash * 23 + HasPublicPathToImmediate.GetHashCode();
+                        hash = hash * 23 + GoesThroughDLL.GetHashCode();
+                        hash = hash * 23 + IsDotnetReferenceSwappedWithOutputAssembly.GetHashCode();
+                        hash = hash * 23 + HasProjectReference.GetHashCode();
                         return hash;
                     }
                 }
-
-                internal readonly DependencySetting _dependencySetting;
-                internal readonly bool _isImmediate;
-                internal readonly bool _hasPublicPathToRoot;
-                internal readonly bool _hasPublicPathToImmediate;
-                internal readonly bool _goesThroughDLL;
-                internal readonly bool _isDotnetReferenceSwappedWithOutputAssembly;
-                internal readonly bool _hasProjectReference;
             }
 
             internal void Link(Builder builder)
@@ -3471,10 +3468,10 @@ namespace Sharpmake
                         rootNode,
                         new PropagationSettings(
                             DependencySetting.Default,
-                            inIsImmediate: true,
-                            inHasPublicPathToRoot: true,
-                            inHasPublicPathToImmediate: true,
-                            inGoesThroughDLL: false,
+                            isImmediate: true,
+                            hasPublicPathToRoot: true,
+                            hasPublicPathToImmediate: true,
+                            goesThroughDLL: false,
                             isDotnetReferenceSwappedWithOutputAssembly: false,
                             hasProjectReference: true)));
 
@@ -3512,19 +3509,19 @@ namespace Sharpmake
                     Configuration dependency = visitedNode._configuration;
 
                     bool isRoot = visitedNode == rootNode;
-                    bool isImmediate = propagationSetting._isImmediate;
-                    bool hasPublicPathToRoot = propagationSetting._hasPublicPathToRoot;
-                    bool hasPublicPathToImmediate = propagationSetting._hasPublicPathToImmediate;
-                    bool goesThroughDLL = propagationSetting._goesThroughDLL;
-                    bool isDotnetReferenceSwappedWithOutputAssembly = propagationSetting._isDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput);
-                    bool hasProjectReference = propagationSetting._hasProjectReference && !visitedNode._dependencySetting.HasFlag(DependencySetting.NoProjectReference);
+                    bool isImmediate = propagationSetting.IsImmediate;
+                    bool hasPublicPathToRoot = propagationSetting.HasPublicPathToRoot;
+                    bool hasPublicPathToImmediate = propagationSetting.HasPublicPathToImmediate;
+                    bool goesThroughDLL = propagationSetting.GoesThroughDLL;
+                    bool isDotnetReferenceSwappedWithOutputAssembly = propagationSetting.IsDotnetReferenceSwappedWithOutputAssembly || visitedNode._dependencySetting.HasFlag(DependencySetting.DependOnAssemblyOutput);
+                    bool hasProjectReference = propagationSetting.HasProjectReference && !visitedNode._dependencySetting.HasFlag(DependencySetting.NoProjectReference);
 
                     foreach (var childNode in visitedNode._childNodes)
                     {
                         var childTuple = Tuple.Create(
                             childNode.Item1,
                             new PropagationSettings(
-                                isRoot ? childNode.Item1._dependencySetting : (propagationSetting._dependencySetting & childNode.Item1._dependencySetting), // propagate the parent setting by masking it
+                                isRoot ? childNode.Item1._dependencySetting : (propagationSetting.DependencySetting & childNode.Item1._dependencySetting), // propagate the parent setting by masking it
                                 isRoot, // only children of root are immediate
                                 (isRoot || hasPublicPathToRoot) && childNode.Item2 == DependencyType.Public,
                                 (isImmediate || hasPublicPathToImmediate) && childNode.Item2 == DependencyType.Public,
@@ -3554,7 +3551,7 @@ namespace Sharpmake
                     bool compile = dependency.Project.SharpmakeProjectType == ProjectTypeAttribute.Generate ||
                                    dependency.Project.SharpmakeProjectType == ProjectTypeAttribute.Compile;
 
-                    var dependencySetting = propagationSetting._dependencySetting;
+                    var dependencySetting = propagationSetting.DependencySetting;
                     if (dependencySetting != DependencySetting.OnlyBuildOrder)
                     {
                         _resolvedEventPreBuildExe.AddRange(dependency.EventPreBuildExe);
