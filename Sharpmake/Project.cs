@@ -1614,7 +1614,6 @@ namespace Sharpmake
             foreach (Project.Configuration conf in Configurations)
             {
                 dependencies.UnionWith(conf.UnResolvedPublicDependencies.Keys);
-                dependencies.UnionWith(conf.UnResolvedProtectedDependencies.Keys);
                 dependencies.UnionWith(conf.UnResolvedPrivateDependencies.Keys);
             }
             return dependencies;
