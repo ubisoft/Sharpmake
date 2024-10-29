@@ -75,5 +75,36 @@ namespace Sharpmake
             + ' [cmdLineOptions.GenerateDebuggingSymbols]'
             + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
+
+        private const string _swiftCompilerExtraOptionsGeneral = @"
+    .CompilerExtraOptions   = ''
+            // General options
+            // -------------------------
+            + ' -parse-as-library'
+            + ' -module-name [cmdLineOptions.SwiftModuleName]'
+            + ' [cmdLineOptions.SwiftLanguageVersion]'
+            + ' [cmdLineOptions.SwiftAdditionalIncludeDirectories]'
+            + ' [cmdLineOptions.SwiftDeploymentTarget]'
+            + ' -Xcc [cmdLineOptions.RuntimeTypeInfo]'
+            + ' -Xcc [cmdLineOptions.CppExceptions]'
+            + ' -Xcc [cmdLineOptions.ObjCExceptions]'
+            + ' -Xcc [cmdLineOptions.ObjCARCExceptions]'
+            + ' -Xcc [cmdLineOptions.DisableExceptions]'
+";
+
+        private const string _swiftCompilerExtraOptionsAdditional = @"
+            // Additional compiler options
+            //--------------------------
+            + ' [cmdLineOptions.SwiftAdditionalCompilerOptions]'
+";
+
+        private const string _swiftCompilerOptimizationOptions =
+                @"
+    // Optimizations options
+    // ---------------------
+    .CompilerOptimizations = ''
+            + ' [cmdLineOptions.SwiftOptimizationLevel]'
+            + ' [cmdLineOptions.GenerateDebuggingSymbols]'
+";
     }
 }

@@ -43,6 +43,7 @@ namespace Sharpmake.Generators.FastBuild
         string CppConfigName(Configuration conf);
 
         void SelectPreprocessorDefinitionsBff(IBffGenerationContext context);
+        void SelectAdditionalCompilerOptionsBff(IBffGenerationContext context);
 
         /// <summary>
         /// Setups extra linker settings for linking with that platform.

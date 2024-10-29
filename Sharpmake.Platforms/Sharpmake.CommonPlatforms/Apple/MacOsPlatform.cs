@@ -14,6 +14,7 @@ namespace Sharpmake
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IClangPlatformBff),
+            typeof(IApplePlatformBff),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed class MacOsPlatform : BaseApplePlatform
@@ -35,6 +36,11 @@ namespace Sharpmake
             public override string CppConfigName(Configuration conf)
             {
                 return ".osxppConfig";
+            }
+
+            public override string SwiftConfigName(Configuration conf)
+            {
+                return ".osxswiftConfig";
             }
             #endregion
 
@@ -59,12 +65,15 @@ namespace Sharpmake
                 if (macOsDeploymentTarget != null)
                 {
                     options["MacOSDeploymentTarget"] = macOsDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? $"{GetDeploymentTargetPrefix(conf)}{macOsDeploymentTarget.MinimumVersion}" : FileGeneratorUtilities.RemoveLineTag;
+                    string deploymentTarget = $"{GetDeploymentTargetPrefix(conf)}{macOsDeploymentTarget.MinimumVersion}";
+                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? deploymentTarget : FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["SwiftDeploymentTarget"] = deploymentTarget;
                 }
                 else
                 {
                     options["MacOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                     cmdLineOptions["DeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["SwiftDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;

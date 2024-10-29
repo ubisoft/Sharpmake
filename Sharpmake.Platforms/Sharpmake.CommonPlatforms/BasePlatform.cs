@@ -94,6 +94,9 @@ namespace Sharpmake
                 context.CommandLineOptions["ResourcePreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
             }
         }
+        public virtual void SelectAdditionalCompilerOptionsBff(IBffGenerationContext context)
+        {
+        }
 
         public virtual void SetupExtraLinkerSettings(IFileGenerator fileGenerator, Project.Configuration configuration, string fastBuildOutputFile)
         {
