@@ -418,7 +418,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
     .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'
                             + ' [fastBuildCompilerPCHOptionsClang]'
                             + ' $CompilerExtraOptions$'
-                            + ' -O0'
+                            + ' [fastBuildCompilerDeoptimizeOptionClang]'
 ";
                 public static string DeOptimizeOption = @"
     .DeoptimizeWritableFiles = [fastBuildDeoptimizationWritableFiles]

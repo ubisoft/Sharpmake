@@ -1172,14 +1172,25 @@ namespace Sharpmake
 
             string libDir = Path.Combine(llvmInstallDir, "lib", "clang");
 
-            var versionFolder = DirectoryGetDirectories(libDir);
-            if (versionFolder.Length == 0)
+            // We expect folder lib/clang to contain only one subfolder which name is the clang version
+            // However in some cases like MacOS, there can be both "16" and "16.0.0", the latter being a symlink.
+            // In that case return the shorter one, which matches what we find on other platforms.
+            var versionFolder = DirectoryGetDirectories(libDir)
+                                .Select(s => Path.GetFileName(s))
+                                .Where(s => Regex.IsMatch(s, @"^\d+?(\.\d+?\.\d+?)?$", RegexOptions.Singleline | RegexOptions.CultureInvariant))
+                                .OrderBy(s => s.Length)
+                                .ToList();
+
+            if (!versionFolder.Any())
                 throw new Error($"Couldn't find a version number folder for clang in {llvmInstallDir}");
 
-            if (versionFolder.Length != 1)
+            if (versionFolder.Count > 1 && versionFolder[1].StartsWith(versionFolder[0] + "."))
+                versionFolder.RemoveAt(1);
+
+            if (versionFolder.Count != 1)
                 throw new NotImplementedException($"More than one version folder found in {llvmInstallDir}, the code doesn't handle that (yet).");
 
-            return Path.GetFileName(versionFolder[0]);
+            return versionFolder[0];
         }
 
         public class VsInstallation

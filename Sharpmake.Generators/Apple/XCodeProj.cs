@@ -1861,6 +1861,8 @@ popd";
                         return "sourcecode.c.objc";
                     case ".mm":
                         return "sourcecode.cpp.objcpp";
+                    case ".swift":
+                        return "sourcecode.swift";
                     case ".metal":
                         return "sourcecode.metal";
 
