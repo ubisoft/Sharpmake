@@ -709,20 +709,16 @@ popd";
                     {
                         // master bff path
                         // we only support projects in one or no master bff, but in that last case just output a warning
-                        var masterBffList = conf.FastBuildMasterBffList.Distinct().ToArray();
-                        if (masterBffList.Length == 0)
+                        foreach (string confMasterBff in conf.FastBuildMasterBffList)
                         {
-                            Builder.Instance.LogWarningLine("Bff {0} doesn't appear in any master bff, it won't be buildable.", conf.BffFullFileName + FastBuildSettings.FastBuildConfigFileExtension);
-                        }
-                        else if (masterBffList.Length > 1)
-                        {
-                            throw new Error("Bff {0} appears in {1} master bff, sharpmake only supports 1.", conf.BffFullFileName + FastBuildSettings.FastBuildConfigFileExtension, masterBffList.Length);
-                        }
-                        else
-                        {
-                            if (masterBffFilePath != null && masterBffFilePath != masterBffList[0])
+                            if (masterBffFilePath == null)
+                            {
+                                masterBffFilePath = confMasterBff;
+                            }
+                            else if (masterBffFilePath != confMasterBff)
+                            {
                                 throw new Error("Project {0} has a fastbuild target that has distinct master bff, sharpmake only supports 1.", conf);
-                            masterBffFilePath = masterBffList[0];
+                            }
                         }
 
                         // Make the commandline written in the bff available, except the master bff -config
