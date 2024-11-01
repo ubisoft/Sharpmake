@@ -180,7 +180,8 @@ namespace Sharpmake.Generators.FastBuild
             C = 2,
             CPP = 4,
             ObjC = 8,
-            ObjCPP = 16
+            ObjCPP = 16,
+            Swift = 32
         }
 
         [Flags]
@@ -283,6 +284,8 @@ namespace Sharpmake.Generators.FastBuild
 
             var allFileCustomBuild = new Dictionary<string, Project.Configuration.CustomFileBuildStepData>();
 
+            Dictionary<string, bool> confBffHasMasters = new Dictionary<string, bool>();
+
             var configurationsToBuild = confSourceFiles.Keys.OrderBy(x => x.Platform).ToList();
             foreach (Project.Configuration conf in configurationsToBuild)
             {
@@ -291,8 +294,14 @@ namespace Sharpmake.Generators.FastBuild
 
                 var platformBff = PlatformRegistry.Get<IPlatformBff>(conf.Platform);
                 var clangPlatformBff = PlatformRegistry.Query<IClangPlatformBff>(conf.Platform);
+                var applePlatformBff = PlatformRegistry.Query<IApplePlatformBff>(conf.Platform);
                 var microsoftPlatformBff = PlatformRegistry.Query<IMicrosoftPlatformBff>(conf.Platform);
                 var dotNetConf = Util.IsDotNet(conf);
+
+                if (conf.FastBuildMasterBffList.Any())
+                    confBffHasMasters[conf.BffFullFileName] = true;
+                else
+                    confBffHasMasters.TryAdd(conf.BffFullFileName, false);
 
                 // TODO: really not ideal, refactor and move the properties we need from it someplace else
                 var vcxprojPlatform = PlatformRegistry.Query<IPlatformVcxproj>(conf.Platform);
@@ -346,6 +355,7 @@ namespace Sharpmake.Generators.FastBuild
                         bool isCompileAsCPPFile = subConfig.Languages.HasFlag(Languages.CPP);
                         bool isCompileAsObjCFile = subConfig.Languages.HasFlag(Languages.ObjC);
                         bool isCompileAsObjCPPFile = subConfig.Languages.HasFlag(Languages.ObjCPP);
+                        bool isCompileAsSwiftFile = subConfig.Languages.HasFlag(Languages.Swift);
                         bool isASMFileSection = subConfig.Languages.HasFlag(Languages.Asm);
                         bool isCompileAsCLRFile = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.CLR);
                         bool isCompileAsNonCLRFile = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.NonCLR);
@@ -533,6 +543,7 @@ namespace Sharpmake.Generators.FastBuild
                         string fastBuildPCHForceInclude = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptions = isUsePrecomp ? Template.ConfigurationFile.UsePrecomp : FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildCompilerPCHOptionsClang = isUsePrecomp ? Template.ConfigurationFile.UsePrecompClang : FileGeneratorUtilities.RemoveLineTag;
+                        string fastBuildCompilerDeoptimizeOptionClang = isCompileAsSwiftFile ? "-Onone" : "-O0";
                         string fastBuildLinkerOutputFile = fastBuildOutputFile;
                         string fastBuildStampExecutable = FileGeneratorUtilities.RemoveLineTag;
                         string fastBuildStampArguments = FileGeneratorUtilities.RemoveLineTag;
@@ -722,6 +733,12 @@ namespace Sharpmake.Generators.FastBuild
 
                             fastBuildSourceFileType = "";
                         }
+                        else if (isCompileAsSwiftFile)
+                        {
+                            clangFileLanguage = "";
+                            fastBuildUsingPlatformConfig = applePlatformBff.SwiftConfigName(conf);
+                            fastBuildSourceFileType = "";
+                        }
                         else
                         {
                             // Do not take C Language conformance into account while compiling in Cpp
@@ -755,12 +772,6 @@ namespace Sharpmake.Generators.FastBuild
 
                         string compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsClang +
                                                         Template.ConfigurationFile.CompilerOptionsCommon;
-
-                        string compilerOptionsClangDeoptimized = FileGeneratorUtilities.RemoveLineTag;
-                        if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
-                            compilerOptionsClangDeoptimized =
-                                Template.ConfigurationFile.ClangCompilerOptionsDeoptimize +
-                                Template.ConfigurationFile.CompilerOptionsCommon;
 
                         string fastBuildDeoptimizationWritableFiles = null;
                         string fastBuildDeoptimizationWritableFilesWithToken = null;
@@ -1124,6 +1135,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildObjectListEmbeddedResources", fastBuildObjectListEmbeddedResources))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptions", fastBuildCompilerPCHOptions))
                                     using (bffGenerator.Declare("fastBuildCompilerPCHOptionsClang", fastBuildCompilerPCHOptionsClang))
+                                    using (bffGenerator.Declare("fastBuildCompilerDeoptimizeOptionClang", fastBuildCompilerDeoptimizeOptionClang))
                                     using (bffGenerator.Declare("fastBuildPCHForceInclude", isUsePrecomp ? fastBuildPCHForceInclude : FileGeneratorUtilities.RemoveLineTag))
                                     using (bffGenerator.Declare("fastBuildConsumeWinRTExtension", fastBuildConsumeWinRTExtension))
                                     using (bffGenerator.Declare("fastBuildOutputType", outputType))
@@ -1183,10 +1195,10 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                             else
                                             {
-                                                //  CLANG Specific
-
-                                                // TODO: This checks twice if the platform supports Clang -- fix?
-                                                clangPlatformBff?.SetupClangOptions(bffGenerator);
+                                                if (isCompileAsSwiftFile)
+                                                    applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                else
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator); // TODO: This checks twice if the platform supports Clang -- fix?
 
                                                 if (conf.Platform.IsUsingClang())
                                                 {
@@ -1195,10 +1207,9 @@ namespace Sharpmake.Generators.FastBuild
                                                     bffGenerator.Write(compilerOptionsClang);
                                                     if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                     {
-                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
@@ -1232,10 +1243,10 @@ namespace Sharpmake.Generators.FastBuild
                                             }
                                             else
                                             {
-                                                // CLANG Specific
-
-                                                // TODO: This checks twice if the platform supports Clang -- fix?
-                                                clangPlatformBff?.SetupClangOptions(bffGenerator);
+                                                if (isCompileAsSwiftFile)
+                                                    applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                else
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator); // TODO: This checks twice if the platform supports Clang -- fix?
 
                                                 if (conf.Platform.IsUsingClang())
                                                 {
@@ -1247,7 +1258,7 @@ namespace Sharpmake.Generators.FastBuild
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                        bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                        bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                         bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                     }
                                                 }
@@ -1330,8 +1341,10 @@ namespace Sharpmake.Generators.FastBuild
                                                 }
                                                 else
                                                 {
-                                                    // TODO: This checks twice if the platform supports Clang -- fix?
-                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);
+                                                    if (isCompileAsSwiftFile)
+                                                        applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                    else
+                                                        clangPlatformBff?.SetupClangOptions(bffGenerator);  // TODO: This checks twice if the platform supports Clang -- fix?
 
                                                     if (conf.Platform.IsUsingClang())
                                                     {
@@ -1344,7 +1357,7 @@ namespace Sharpmake.Generators.FastBuild
                                                         {
                                                             if (isUsePrecomp)
                                                                 bffGenerator.Write(Template.ConfigurationFile.PCHOptionsDeoptimize);
-                                                            bffGenerator.Write(compilerOptionsClangDeoptimized);
+                                                            bffGenerator.Write(Template.ConfigurationFile.ClangCompilerOptionsDeoptimize);
                                                             bffGenerator.Write(Template.ConfigurationFile.DeOptimizeOption);
                                                         }
                                                         if (!useObjectLists)
@@ -1440,6 +1453,9 @@ namespace Sharpmake.Generators.FastBuild
                 ++configIndex;
             }
 
+            foreach (string masterlessBff in confBffHasMasters.Where(x => !x.Value).Select(x => x.Key))
+                Builder.Instance.LogWarningLine("Bff {0} doesn't appear in any master bff, it won't be buildable.", masterlessBff + FastBuildSettings.FastBuildConfigFileExtension);
+
             // Write all unity sections together at the beginning of the .bff just after the header.
             if (_unities.Any())
             {
@@ -1534,6 +1550,7 @@ namespace Sharpmake.Generators.FastBuild
             context.EnvironmentVariableResolver = platformDescriptor.GetPlatformEnvironmentResolver(resolverParams);
             projectOptionsGen.GenerateOptions(context);
             platformBff.SelectPreprocessorDefinitionsBff(context);
+            platformBff.SelectAdditionalCompilerOptionsBff(context);
 
             FillIncludeDirectoriesOptions(context);
 
@@ -1743,6 +1760,7 @@ namespace Sharpmake.Generators.FastBuild
             var resourceIncludePaths = new OrderableStrings(platformVcxproj.GetResourceIncludePaths(context));
             var assemblyIncludePaths = new OrderableStrings(platformVcxproj.GetAssemblyIncludePaths(context));
             context.CommandLineOptions["AdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            context.CommandLineOptions["SwiftAdditionalIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalResourceIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalUsingDirectories"] = FileGeneratorUtilities.RemoveLineTag;
             context.CommandLineOptions["AdditionalAssemblyIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
@@ -1753,14 +1771,24 @@ namespace Sharpmake.Generators.FastBuild
                 string defaultCmdLineIncludePrefix = platformDescriptor.IsUsingClang ? "-I " : "/I";
 
                 // Fill include dirs
+                var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
+
                 var dirs = new List<string>();
                 dirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
-
-                var platformIncludePaths = platformVcxproj.GetPlatformIncludePathsWithPrefix(context);
-                var platformIncludePathsPrefixed = platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)).ToList();
-                dirs.AddRange(platformIncludePathsPrefixed);
+                dirs.AddRange(platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, p.CmdLinePrefix)));
                 if (dirs.Any())
                     context.CommandLineOptions["AdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", dirs);
+
+                var applePlatformBff = PlatformRegistry.Query<IApplePlatformBff>(context.Configuration.Platform);
+                if (applePlatformBff != null && applePlatformBff.IsSwiftSupported())
+                {
+                    string swifttCmdLineIncludePrefix = "-Xcc " + defaultCmdLineIncludePrefix.Replace(" ", " -Xcc ");
+                    var swiftDirs = new List<string>();
+                    swiftDirs.AddRange(includePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, swifttCmdLineIncludePrefix)));
+                    swiftDirs.AddRange(platformIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p.Path, "-Xcc " + p.CmdLinePrefix.Replace(" ", " -Xcc "))));
+                    if (swiftDirs.Any())
+                        context.CommandLineOptions["SwiftAdditionalIncludeDirectories"] = string.Join($"'{Environment.NewLine}            + ' ", swiftDirs);
+                }
 
                 // Fill resource include dirs
                 var resourceDirs = new List<string>();
@@ -2297,6 +2325,8 @@ namespace Sharpmake.Generators.FastBuild
                                                         !(conf.ExcludeWinRTExtensions.Contains(file.FileName) ||
                                                         conf.ResolvedSourceFilesWithExcludeAsWinRTOption.Contains(file.FileName));
                         bool isASMFile = string.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
+                        bool isSwiftFile = string.Compare(file.FileExtension, ".swift", StringComparison.OrdinalIgnoreCase) == 0 &&
+                                           (PlatformRegistry.Query<IApplePlatformBff>(conf.Platform)?.IsSwiftSupported() ?? false);
 
                         Options.Vc.Compiler.Exceptions exceptionSetting = conf.GetExceptionSettingForFile(file.FileName);
 
@@ -2307,7 +2337,7 @@ namespace Sharpmake.Generators.FastBuild
                             isDontUsePrecomp = true;
                             isCompileAsCFile = true;
                         }
-                        else if (isCompileAsObjCFile || isCompileAsObjCPPFile)
+                        else if (isCompileAsObjCFile || isCompileAsObjCPPFile || isSwiftFile)
                         {
                             isDontUsePrecomp = true;
                         }
@@ -2320,6 +2350,8 @@ namespace Sharpmake.Generators.FastBuild
                             languageKind |= Languages.ObjC;
                         if (isCompileAsObjCPPFile)
                             languageKind |= Languages.ObjCPP;
+                        if (isSwiftFile)
+                            languageKind |= Languages.Swift;
                         if (isASMFile)
                             languageKind |= Languages.Asm;
 

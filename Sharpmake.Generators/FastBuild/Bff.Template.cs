@@ -355,6 +355,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
             + ' [cmdLineOptions.IgnoreStandardIncludePath]'
             + ' [cmdLineOptions.GeneratePreprocessedFile]'
             + ' [cmdLineOptions.KeepComments]'
+            + ' [cmdLineOptions.UseStandardConformingPreprocessor]'
             + ' [cmdLineOptions.StringPooling]'
             + ' [cmdLineOptions.MinimalRebuild]'
             + ' [cmdLineOptions.ExceptionHandling]'
@@ -418,7 +419,7 @@ Compiler( '[fastBuildMasmCompilerName]' )
     .CompilerOptionsDeoptimized = '[fastBuildClangFileLanguage]""%1"" -o ""%2"" -c'
                             + ' [fastBuildCompilerPCHOptionsClang]'
                             + ' $CompilerExtraOptions$'
-                            + ' -O0'
+                            + ' [fastBuildCompilerDeoptimizeOptionClang]'
 ";
                 public static string DeOptimizeOption = @"
     .DeoptimizeWritableFiles = [fastBuildDeoptimizationWritableFiles]

@@ -4,7 +4,6 @@
 using Sharpmake.Generators;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
-using static Sharpmake.Options.XCode.Compiler;
 
 namespace Sharpmake
 {
@@ -15,6 +14,7 @@ namespace Sharpmake
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IClangPlatformBff),
+            typeof(IApplePlatformBff),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed partial class watchOsPlatform : BaseApplePlatform
@@ -36,6 +36,11 @@ namespace Sharpmake
             public override string CppConfigName(Configuration conf)
             {
                 return ".watchosppConfig";
+            }
+
+            public override string SwiftConfigName(Configuration conf)
+            {
+                return ".watchosswiftConfig";
             }
             #endregion
 
@@ -60,12 +65,15 @@ namespace Sharpmake
                 if (watchosDeploymentTarget != null)
                 {
                     options["WatchOSDeploymentTarget"] = watchosDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? $"{GetDeploymentTargetPrefix(conf)}{watchosDeploymentTarget.MinimumVersion}" : FileGeneratorUtilities.RemoveLineTag;
+                    string deploymentTarget = $"{GetDeploymentTargetPrefix(conf)}{watchosDeploymentTarget.MinimumVersion}";
+                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? deploymentTarget : FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["SwiftDeploymentTarget"] = deploymentTarget;
                 }
                 else
                 {
                     options["WatchOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                     cmdLineOptions["DeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["SwiftDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;

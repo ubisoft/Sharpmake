@@ -184,6 +184,16 @@ namespace Sharpmake
                     SWIFT6_0
                 }
 
+                public class SwiftModuleName : StringOption
+                {
+                    public SwiftModuleName(string value) : base(value) { }
+                    public static readonly string Default = "[project.LowerName]";
+                }
+
+                public class SwiftAdditionalCompilerOptions : OrderableStrings
+                {
+                }
+
                 public enum DeadStrip
                 {
                     Disable,

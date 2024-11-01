@@ -2,10 +2,8 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using Sharpmake.Generators;
-using Sharpmake.Generators.Apple;
 using Sharpmake.Generators.FastBuild;
 using Sharpmake.Generators.VisualStudio;
-using static Sharpmake.Options.XCode.Compiler;
 
 namespace Sharpmake
 {
@@ -16,6 +14,7 @@ namespace Sharpmake
             typeof(IFastBuildCompilerSettings),
             typeof(IPlatformBff),
             typeof(IClangPlatformBff),
+            typeof(IApplePlatformBff),
             typeof(IPlatformVcxproj),
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed partial class tvOsPlatform : BaseApplePlatform
@@ -37,6 +36,11 @@ namespace Sharpmake
             public override string CppConfigName(Configuration conf)
             {
                 return ".tvosppConfig";
+            }
+
+            public override string SwiftConfigName(Configuration conf)
+            {
+                return ".tvosswiftConfig";
             }
             #endregion
 
@@ -61,12 +65,15 @@ namespace Sharpmake
                 if (tvosDeploymentTarget != null)
                 {
                     options["TvOSDeploymentTarget"] = tvosDeploymentTarget.MinimumVersion;
-                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? $"{GetDeploymentTargetPrefix(conf)}{tvosDeploymentTarget.MinimumVersion}" : FileGeneratorUtilities.RemoveLineTag;
+                    string deploymentTarget = $"{GetDeploymentTargetPrefix(conf)}{tvosDeploymentTarget.MinimumVersion}";
+                    cmdLineOptions["DeploymentTarget"] = IsLinkerInvokedViaCompiler ? deploymentTarget : FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["SwiftDeploymentTarget"] = deploymentTarget;
                 }
                 else
                 {
                     options["TvOSDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                     cmdLineOptions["DeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
+                    cmdLineOptions["SwiftDeploymentTarget"] = FileGeneratorUtilities.RemoveLineTag;
                 }
 
                 options["SupportsMaccatalyst"] = FileGeneratorUtilities.RemoveLineTag;

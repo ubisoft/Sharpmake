@@ -76,6 +76,7 @@ namespace Sharpmake
                     v10_0_20348_0, // 2104/21H1
                     v10_0_22000_0, // Windows 11
                     v10_0_22621_0, // Windows 11 22H2
+                    v10_0_26100_0, // Windows 11 24H2
                     Latest,        // latest available in host machine
                 }
 
@@ -675,6 +676,17 @@ namespace Sharpmake
                 public enum KeepComment
                 {
                     [Default]
+                    Disable,
+                    Enable
+                }
+
+                /// <summary>
+                /// Enables a token-based preprocessor that conforms to C99 and C++11 and later standards.
+                /// </summary>
+                public enum UseStandardConformingPreprocessor
+                {
+                    [Default]
+                    Default,
                     Disable,
                     Enable
                 }
