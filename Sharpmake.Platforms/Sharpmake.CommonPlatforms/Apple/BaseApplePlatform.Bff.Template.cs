@@ -37,6 +37,7 @@ namespace Sharpmake
     .CompilerExtraOptions   = ''
             // General options
             // -------------------------
+            + ' [cmdLineOptions.GenerateDebuggingSymbols]'
             + ' [cmdLineOptions.AdditionalIncludeDirectories]'
             + ' [cmdLineOptions.AdditionalUsingDirectories]'
             + ' [cmdLineOptions.PreprocessorDefinitions]'
@@ -72,7 +73,6 @@ namespace Sharpmake
     // ---------------------
     .CompilerOptimizations = ''
             + ' [cmdLineOptions.OptimizationLevel]'
-            + ' [cmdLineOptions.GenerateDebuggingSymbols]'
             + ' [options.AdditionalCompilerOptimizeOptions]'
 ";
 
