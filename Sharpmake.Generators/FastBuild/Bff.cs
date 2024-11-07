@@ -181,7 +181,8 @@ namespace Sharpmake.Generators.FastBuild
             CPP = 4,
             ObjC = 8,
             ObjCPP = 16,
-            Swift = 32
+            Swift = 32,
+            Nasm = 64
         }
 
         [Flags]
@@ -357,6 +358,7 @@ namespace Sharpmake.Generators.FastBuild
                         bool isCompileAsObjCPPFile = subConfig.Languages.HasFlag(Languages.ObjCPP);
                         bool isCompileAsSwiftFile = subConfig.Languages.HasFlag(Languages.Swift);
                         bool isASMFileSection = subConfig.Languages.HasFlag(Languages.Asm);
+                        bool isNASMFileSection = subConfig.Languages.HasFlag(Languages.Nasm);
                         bool isCompileAsCLRFile = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.CLR);
                         bool isCompileAsNonCLRFile = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.NonCLR);
                         bool isConsumeWinRTExtensions = subConfig.LanguageFeatures.HasFlag(LanguageFeatures.ConsumeWinRTExtensions) || (Options.GetObject<Options.Vc.Compiler.CompileAsWinRT>(conf) == Options.Vc.Compiler.CompileAsWinRT.Enable);
@@ -757,21 +759,47 @@ namespace Sharpmake.Generators.FastBuild
                             fastBuildUsingPlatformConfig = platformBff.CppConfigName(conf);
                         }
 
+                        // TODOANT: Add nasm/masm change
                         if (isASMFileSection)
                         {
                             fastBuildUsingPlatformConfig += Template.ConfigurationFile.MasmConfigNameSuffix;
                         }
+                        if (isNASMFileSection)
+                        {
+                            fastBuildUsingPlatformConfig += Template.ConfigurationFile.NasmConfigNameSuffix;
+                        }
 
-                        string fastBuildCompilerExtraOptions = !isASMFileSection ? Template.ConfigurationFile.CPPCompilerExtraOptions : Template.ConfigurationFile.MasmCompilerExtraOptions;
+                        string fastBuildCompilerExtraOptions = Template.ConfigurationFile.CPPCompilerExtraOptions;
+                        if (isASMFileSection)
+                        {
+                            fastBuildCompilerExtraOptions = Template.ConfigurationFile.MasmCompilerExtraOptions;
+                        }
+                        if (isNASMFileSection)
+                        {
+                            fastBuildCompilerExtraOptions = Template.ConfigurationFile.NasmCompilerExtraOptions;
+                        }
+
                         string fastBuildCompilerOptionsDeoptimize = FileGeneratorUtilities.RemoveLineTag;
                         if (!isASMFileSection && conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                             fastBuildCompilerOptionsDeoptimize = Template.ConfigurationFile.CPPCompilerOptionsDeoptimize;
 
-                        string compilerOptions = !isASMFileSection ? Template.ConfigurationFile.CompilerOptionsCPP : Template.ConfigurationFile.CompilerOptionsMasm;
+                        string compilerOptions = Template.ConfigurationFile.CompilerOptionsCPP;
+                        if (isASMFileSection)
+                        {
+                            compilerOptions = Template.ConfigurationFile.CompilerOptionsMasm;
+                        }
+                        if (isNASMFileSection)
+                        {
+                            compilerOptions = Template.ConfigurationFile.CompilerOptionsNasm;
+                        }
                         compilerOptions += Template.ConfigurationFile.CompilerOptionsCommon;
 
-                        string compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsClang +
-                                                        Template.ConfigurationFile.CompilerOptionsCommon;
+                        string compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsClang;
+                        if (isNASMFileSection)
+                        {
+                            compilerOptionsClang = Template.ConfigurationFile.CompilerOptionsNasm;
+                        }
+                        compilerOptionsClang += Template.ConfigurationFile.CompilerOptionsCommon;
 
                         string fastBuildDeoptimizationWritableFiles = null;
                         string fastBuildDeoptimizationWritableFilesWithToken = null;
@@ -1197,8 +1225,10 @@ namespace Sharpmake.Generators.FastBuild
                                             {
                                                 if (isCompileAsSwiftFile)
                                                     applePlatformBff?.SetupSwiftOptions(bffGenerator);
-                                                else
+                                                else  if (!isNASMFileSection)
                                                     clangPlatformBff?.SetupClangOptions(bffGenerator); // TODO: This checks twice if the platform supports Clang -- fix?
+                                                else
+                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
 
                                                 if (conf.Platform.IsUsingClang())
                                                 {
@@ -1245,8 +1275,10 @@ namespace Sharpmake.Generators.FastBuild
                                             {
                                                 if (isCompileAsSwiftFile)
                                                     applePlatformBff?.SetupSwiftOptions(bffGenerator);
+                                                else if (!isNASMFileSection)
+                                                    clangPlatformBff?.SetupClangOptions(bffGenerator);  // TODO: This checks twice if the platform supports Clang -- fix?
                                                 else
-                                                    clangPlatformBff?.SetupClangOptions(bffGenerator); // TODO: This checks twice if the platform supports Clang -- fix?
+                                                    bffGenerator.Write(fastBuildCompilerExtraOptions);
 
                                                 if (conf.Platform.IsUsingClang())
                                                 {
@@ -1343,16 +1375,17 @@ namespace Sharpmake.Generators.FastBuild
                                                 {
                                                     if (isCompileAsSwiftFile)
                                                         applePlatformBff?.SetupSwiftOptions(bffGenerator);
-                                                    else
+                                                    else if (!isNASMFileSection)
                                                         clangPlatformBff?.SetupClangOptions(bffGenerator);  // TODO: This checks twice if the platform supports Clang -- fix?
+                                                    else
+                                                        bffGenerator.Write(fastBuildCompilerExtraOptions);;
 
                                                     if (conf.Platform.IsUsingClang())
                                                     {
                                                         if (isUsePrecomp)
                                                             bffGenerator.Write(Template.ConfigurationFile.PCHOptionsClang);
 
-                                                        bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsCommon);
-                                                        bffGenerator.Write(Template.ConfigurationFile.CompilerOptionsClang);
+                                                        bffGenerator.Write(compilerOptionsClang);
                                                         if (conf.FastBuildDeoptimization != Project.Configuration.DeoptimizationWritableFiles.NoDeoptimization)
                                                         {
                                                             if (isUsePrecomp)
@@ -1558,6 +1591,8 @@ namespace Sharpmake.Generators.FastBuild
 
             var dependenciesInfo = FillLibrariesOptions(context);
             dependenciesInfoPerConf.Add(context.Configuration, dependenciesInfo);
+
+            FillNasmOptions(context);
         }
 
         internal enum CompilerVersionForClangClType
@@ -1805,7 +1840,6 @@ namespace Sharpmake.Generators.FastBuild
                 // Fill Assembly include dirs
                 var assemblyDirs = new List<string>();
                 assemblyDirs.AddRange(assemblyIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, defaultCmdLineIncludePrefix)));
-
                 if (assemblyDirs.Any())
                     context.CommandLineOptions["AdditionalAssemblyIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", assemblyDirs);
 
@@ -1928,6 +1962,54 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             return dependenciesInfo;
+        }
+
+        private static void FillNasmOptions(BffGenerationContext context)
+        {
+            // Compiler path for nasm
+            context.CommandLineOptions["PathExe"] = context.Project.NasmExePath;
+
+            // Pre included files for NASM syntax
+            var preIncludedFiles = new List<string>();
+            preIncludedFiles.AddRange(context.Project.NasmPreIncludedFiles.Select(p => "-P\"" + p + "\""));
+            string preIncludedFilesJoined = string.Join(' ', preIncludedFiles);
+            context.CommandLineOptions["PreIncludedFiles"] = preIncludedFilesJoined;
+
+            // Fill Assembly include dirs in nasm syntax
+            var nasmAssemblyDirs = new List<string>();
+            var platformVcxproj = PlatformRegistry.Query<IPlatformVcxproj>(context.Configuration.Platform);
+            var assemblyIncludePaths = new OrderableStrings(platformVcxproj.GetAssemblyIncludePaths(context));
+            nasmAssemblyDirs.AddRange(assemblyIncludePaths.Select(p => CmdLineConvertIncludePathsFunc(context, context.EnvironmentVariableResolver, p, "-I ")));
+
+            if (nasmAssemblyDirs.Any())
+            {
+                context.CommandLineOptions["AdditionalAssemblyNasmIncludeDirectories"] = string.Join($"'{Environment.NewLine}                                    + ' ", nasmAssemblyDirs);
+            }
+            else
+            {
+                context.CommandLineOptions["AdditionalAssemblyNasmIncludeDirectories"] = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            // Defines in NASM syntax
+            var defines = new Strings();
+            defines.AddRange(context.Options.ExplicitDefines);
+            defines.AddRange(context.Configuration.Defines);
+
+            if (defines.Count > 0)
+            {
+                var fastBuildNasmDefines = new List<string>();
+
+                foreach (string define in defines.SortedValues)
+                {
+                    if (!string.IsNullOrWhiteSpace(define))
+                        fastBuildNasmDefines.Add(string.Format(@"{0}{1}{2}{1}", "-D", Util.DoubleQuotes, define.Replace(Util.DoubleQuotes, Util.EscapedDoubleQuotes)));
+                }
+                context.CommandLineOptions["NasmPreprocessorDefinitions"] = string.Join($"'{Environment.NewLine}            + ' ", fastBuildNasmDefines);
+            }
+            else
+            {
+                context.CommandLineOptions["NasmPreprocessorDefinitions"] = FileGeneratorUtilities.RemoveLineTag;
+            }
         }
 
         private static void SelectAdditionalLibraryDirectoriesOption(BffGenerationContext context)
@@ -2324,9 +2406,11 @@ namespace Sharpmake.Generators.FastBuild
                                                         conf.ResolvedSourceFilesWithCompileAsWinRTOption.Contains(file.FileName)) &&
                                                         !(conf.ExcludeWinRTExtensions.Contains(file.FileName) ||
                                                         conf.ResolvedSourceFilesWithExcludeAsWinRTOption.Contains(file.FileName));
+                        // TODOANT: Also trigger on .nasm files
                         bool isASMFile = string.Compare(file.FileExtension, ".asm", StringComparison.OrdinalIgnoreCase) == 0;
                         bool isSwiftFile = string.Compare(file.FileExtension, ".swift", StringComparison.OrdinalIgnoreCase) == 0 &&
                                            (PlatformRegistry.Query<IApplePlatformBff>(conf.Platform)?.IsSwiftSupported() ?? false);
+                        bool isNASMFile = string.Compare(file.FileExtension, ".nasm", StringComparison.OrdinalIgnoreCase) == 0;
 
                         Options.Vc.Compiler.Exceptions exceptionSetting = conf.GetExceptionSettingForFile(file.FileName);
 
@@ -2354,6 +2438,8 @@ namespace Sharpmake.Generators.FastBuild
                             languageKind |= Languages.Swift;
                         if (isASMFile)
                             languageKind |= Languages.Asm;
+                        if (isNASMFile)
+                            languageKind |= Languages.Nasm;
 
                         LanguageFeatures languageFeatures = LanguageFeatures.None;
                         if (isCompileAsCLRFile)

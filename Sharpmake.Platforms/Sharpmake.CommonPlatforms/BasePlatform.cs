@@ -339,6 +339,21 @@ namespace Sharpmake
         {
         }
 
+        public virtual void GenerateProjectNasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+            // Fill Assembly include dirs
+            var preIncludedFiles = new List<string>();
+            preIncludedFiles.AddRange(context.Project.NasmPreIncludedFiles.AsEnumerable<string>());
+
+            string preIncludedFilesJoined = string.Join(';', preIncludedFiles);
+
+            using (generator.Declare("ExePath", context.Project.NasmExePath))
+            using (generator.Declare("PreIncludedFiles", preIncludedFilesJoined))
+            {
+                generator.Write(_projectConfigurationsNasmTemplate);
+            }
+        }
+
         public virtual void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator)
         {
             generator.Write(_userFileConfigurationGeneralTemplate);

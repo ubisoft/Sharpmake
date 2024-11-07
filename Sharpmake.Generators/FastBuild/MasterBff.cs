@@ -746,6 +746,11 @@ namespace Sharpmake.Generators.FastBuild
                         using (masterBffGenerator.Declare("fastBuildResourceCompilerName", compConf.ResourceCompiler != FileGeneratorUtilities.RemoveLineTag ? "RC" + compilerConfiguration.Key : FileGeneratorUtilities.RemoveLineTag))
                         using (masterBffGenerator.Declare("fastBuildMasmCompiler", compConf.Masm))
                         using (masterBffGenerator.Declare("fastBuildMasmCompilerName", "ML" + compilerConfiguration.Key))
+
+                        // TODOANT make sure we have nasm compiler found and used.
+                        using (masterBffGenerator.Declare("fastBuildNasmCompiler", compConf.Nasm))
+                        using (masterBffGenerator.Declare("fastBuildNasmCompilerName", "Nasm" + compilerConfiguration.Key))
+
                         using (masterBffGenerator.Declare("fastBuildCompilerName", compConf.Compiler != FileGeneratorUtilities.RemoveLineTag ? compConf.Compiler : compiler.Key))
                         using (masterBffGenerator.Declare("fastBuildLibrarian", compConf.Librarian))
                         using (masterBffGenerator.Declare("fastBuildLinker", compConf.Linker))
@@ -759,6 +764,10 @@ namespace Sharpmake.Generators.FastBuild
 
                             if (!string.IsNullOrEmpty(compConf.Masm))
                                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.MasmCompilerSettings);
+
+                            // TODOANT
+                            if (!string.IsNullOrEmpty(compConf.Nasm))
+                                masterBffGenerator.Write(Bff.Template.ConfigurationFile.NasmCompilerSettings);
 
                             masterBffGenerator.Write(Bff.Template.ConfigurationFile.CompilerConfiguration);
                         }

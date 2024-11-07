@@ -1433,6 +1433,11 @@ namespace Sharpmake
             throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
+        public void GenerateProjectNasmVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
+        {
+            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+        }
+
         public void GenerateUserConfigurationFile(Project.Configuration conf, IFileGenerator generator)
         {
             throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");

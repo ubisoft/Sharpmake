@@ -59,6 +59,7 @@ namespace Sharpmake.Generators
             public string Linker { get; set; }
             public string PlatformLibPaths { get; set; }
             public string Masm { get; set; }
+            public string Nasm { get; set; }
             public string Executable { get; set; }
             public string UsingOtherConfiguration { get; set; }
             public Platform Platform { get; private set; }

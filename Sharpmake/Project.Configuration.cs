@@ -876,7 +876,7 @@ namespace Sharpmake
             #endregion
 
             /// <summary>
-            /// Include paths for Microsoft Macro Assembler compilation.
+            /// Include paths for Assembly compilation.
             /// </summary>
             /// <remarks>
             /// The maximum number of these paths is 10.

@@ -330,6 +330,19 @@ namespace Sharpmake
                     masmConfigurationName,
                     masmConfiguration
                 );
+
+                string nasmConfigurationName = configName + "Nasm";
+                var nasmConfiguration = new CompilerSettings.Configuration(
+                    Platform.win64,
+                    compiler: "Nasm" + nasmConfigurationName,
+                    usingOtherConfiguration: configName
+                );
+                nasmConfiguration.Nasm = conf.Project.NasmExePath;
+
+                configurations.Add(
+                    nasmConfigurationName,
+                    nasmConfiguration
+                );
             }
             #endregion
 
@@ -348,6 +361,7 @@ namespace Sharpmake
             {
                 context.Options["TargetMachine"] = "MachineX64";
                 context.CommandLineOptions["TargetMachine"] = "/MACHINE:X64";
+                context.CommandLineOptions["NasmCompilerFormat"] = "-fwin64";
             }
 
             public override void SelectPlatformAdditionalDependenciesOptions(IGenerationContext context)

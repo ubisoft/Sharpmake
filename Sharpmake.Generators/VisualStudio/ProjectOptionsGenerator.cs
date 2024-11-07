@@ -260,8 +260,10 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Options["ForcedIncludeFilesVanilla"] = context.Configuration.ForcedIncludes.JoinStrings(";");
 
                 StringBuilder result = new StringBuilder();
+                var platformDescriptor = PlatformRegistry.Get<IPlatformDescriptor>(context.Configuration.Platform);
+                string defaultCmdLineForceIncludePrefix = platformDescriptor.IsUsingClang ? @"-include""" : @"/FI""";
                 foreach (var forcedInclude in forcedIncludes)
-                    result.Append(@"/FI""" + forcedInclude + @""" ");
+                    result.Append(defaultCmdLineForceIncludePrefix + forcedInclude + @""" ");
                 result.Remove(result.Length - 1, 1);
                 context.CommandLineOptions["ForcedIncludeFiles"] = result.ToString();
             }
