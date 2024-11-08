@@ -16,7 +16,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.Win32;
@@ -278,16 +277,16 @@ namespace Sharpmake
 
         public static List<string> FilesAlternatesAutoCleanupDBSuffixes = new List<string>(); // The alternates db suffixes using by other context
         private static List<string> _FilesAlternatesAutoCleanupDBFullPaths = new List<string>();
-        public static string FilesAutoCleanupDBPath = string.Empty;
-        public static string FilesAutoCleanupDBSuffix = string.Empty;   // Current auto-cleanup suffix for the database.
+        public static string FilesAutoCleanupDBPath { get; set; } = string.Empty;
+        public static string FilesAutoCleanupDBSuffix { get; set; } = string.Empty;   // Current auto-cleanup suffix for the database.
         internal static bool s_forceFilesCleanup = false;
         internal static string s_overrideFilesAutoCleanupDBPath;
-        public static bool FilesAutoCleanupActive = false;
-        public static TimeSpan FilesAutoCleanupDelay = TimeSpan.Zero;
+
+        public static bool FilesAutoCleanupActive { get; set; }
+        public static TimeSpan FilesAutoCleanupDelay { get; set; } = TimeSpan.Zero;
         public static HashSet<string> FilesToBeExplicitlyRemovedFromDB = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         public static HashSet<string> FilesAutoCleanupIgnoredEndings = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private const string s_filesAutoCleanupDBPrefix = "sharpmakeautocleanupdb";
-        private enum DBVersion { Version = 3 };
 
         private static JsonSerializerOptions GetCleanupDatabaseJsonSerializerOptions()
         {
@@ -295,48 +294,95 @@ namespace Sharpmake
             {
                 AllowTrailingCommas = true,
                 PropertyNamingPolicy = null,
-                WriteIndented = false,
+                WriteIndented = true,
             };
+        }
+
+        private class CleanupDatabaseContent
+        {
+            public enum DBVersions 
+            {
+                BinaryFormatterVersion = 3, // Json in a binary formatter - Deprecated - Support will be removed in the first version released after dec 31th 2024
+                JsonVersion = 4, // New format - simple json
+                CurrentVersion = JsonVersion
+            };
+
+            public DBVersions DBVersion { get; set; }
+            public object Data { get; set; }
         }
 
         private static Dictionary<string, DateTime> ReadCleanupDatabase(string databaseFilename)
         {
-            Dictionary<string, DateTime> dbFiles = null;
-            if (File.Exists(databaseFilename))
+            // DEPRECATED CODE - TO BE REMOVED AFTER DEC 31TH 2024
+            string oldDatabaseFormatFilename = Path.ChangeExtension(databaseFilename, ".bin");
+            if (File.Exists(oldDatabaseFormatFilename))
             {
                 try
                 {
                     // Read database - This is simply a simple binary file containing the list of file and a version number.
-                    using (Stream readStream = new FileStream(databaseFilename, FileMode.Open, FileAccess.Read, FileShare.None))
+                    using (Stream readStream = new FileStream(oldDatabaseFormatFilename, FileMode.Open, FileAccess.Read, FileShare.None))
                     using (BinaryReader binReader = new BinaryReader(readStream))
                     {
                         // Validate version number
                         int version = binReader.ReadInt32();
-                        if (version == (int)DBVersion.Version)
+                        if (version == (int)CleanupDatabaseContent.DBVersions.BinaryFormatterVersion)
                         {
                             // Read the list of files.
                             IFormatter formatter = new BinaryFormatter();
                             string dbAsJson = binReader.ReadString();
 
                             var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(dbAsJson, GetCleanupDatabaseJsonSerializerOptions());
-                            dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+                            var dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+
+                            // Converting to new format.
+                            WriteCleanupDatabase(databaseFilename, dbFiles);
+                            return dbFiles;
                         }
                         else
                         {
                             LogWrite("Warning: found cleanup database in incompatible format v{0}, skipped.", version);
                         }
-
-                        readStream.Close();
                     }
                 }
                 catch
                 {
-                    // File is likely corrupted.
-                    // This is no big deal except that cleanup won't occur.
-                    dbFiles = null;
+                    // nothing to do.
+                }
+                finally
+                {
+                    TryDeleteFile(oldDatabaseFormatFilename);
                 }
             }
-            return dbFiles;
+            // END DEPRECATED CODE
+
+            if (File.Exists(databaseFilename))
+            {
+                try
+                {
+                    string jsonString = File.ReadAllText(databaseFilename);
+                    var versionedDB = System.Text.Json.JsonSerializer.Deserialize<CleanupDatabaseContent>(jsonString);
+                    if (versionedDB.DBVersion == CleanupDatabaseContent.DBVersions.JsonVersion)
+                    {
+                        // Deserialize the Database to a dictionary
+                        var tmpDbFiles = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTime>>(versionedDB.Data.ToString(), GetCleanupDatabaseJsonSerializerOptions());
+
+                        // Convert the dictionary to a case insensitive dictionary
+                        var dbFiles = tmpDbFiles.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+
+                        return dbFiles;
+                    }
+                    else
+                    {
+                        LogWrite($"Cleanup database version {versionedDB.DBVersion} is not supported. Ignoring database"); 
+                    }
+                }
+                catch
+                {
+                    // DB File is likely corrupted.
+                    // This is no big deal except that cleanup won't occur and this could result in files not written by the current Sharpmake run to not being deleted.
+                }
+            }
+            return null;
         }
 
         private static string GetDatabaseFilename(string dbSuffix)
@@ -344,7 +390,7 @@ namespace Sharpmake
             if (!string.IsNullOrWhiteSpace(s_overrideFilesAutoCleanupDBPath))
                 return s_overrideFilesAutoCleanupDBPath;
 
-            string databaseFilename = Path.Combine(FilesAutoCleanupDBPath, $"{s_filesAutoCleanupDBPrefix}{dbSuffix}.bin");
+            string databaseFilename = Path.Combine(FilesAutoCleanupDBPath, $"{s_filesAutoCleanupDBPrefix}{dbSuffix}.json");
             return databaseFilename;
         }
 
@@ -475,33 +521,24 @@ namespace Sharpmake
                 }
             }
 
-            // Write database if needed
-            if (newDbFiles.Count > 0)
-            {
-                using (Stream writeStream = new FileStream(databaseFilename, FileMode.Create, FileAccess.Write, FileShare.None))
-                using (BinaryWriter binWriter = new BinaryWriter(writeStream))
-                {
-                    // Write version number
-                    int version = (int)DBVersion.Version;
-                    binWriter.Write(version);
-
-                    // Write the list of files.
-                    string dbAsJson = System.Text.Json.JsonSerializer.Serialize(newDbFiles, GetCleanupDatabaseJsonSerializerOptions());
-                    binWriter.Write(dbAsJson);
-                    binWriter.Flush();
-                }
-
-                if (addDBToAlternateDB)
-                    _FilesAlternatesAutoCleanupDBFullPaths.Add(databaseFilename);
-            }
-            else
-            {
-                TryDeleteFile(databaseFilename);
-            }
+            WriteCleanupDatabase(databaseFilename, newDbFiles);
+            if (addDBToAlternateDB)
+                _FilesAlternatesAutoCleanupDBFullPaths.Add(databaseFilename);
 
             // We are done! Clear the list of files to avoid problems as this context is now considered as complete.
             // For example if generating debug solution and then executing normal generation
             s_writtenFiles.Clear();
+        }
+
+        private static void WriteCleanupDatabase(string databaseFilename, Dictionary<string, DateTime> generatedFiles)
+        {
+            CleanupDatabaseContent dbContent = new CleanupDatabaseContent
+            {
+                DBVersion = CleanupDatabaseContent.DBVersions.CurrentVersion,
+                Data = generatedFiles
+            };
+            string jsonString = System.Text.Json.JsonSerializer.Serialize(dbContent, GetCleanupDatabaseJsonSerializerOptions());
+            File.WriteAllText(databaseFilename, jsonString);
         }
 
         public static string WinFormSubTypesDbPath = string.Empty;
