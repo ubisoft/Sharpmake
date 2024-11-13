@@ -2586,8 +2586,6 @@ namespace Sharpmake
 
             // These dependencies will not be propagated to other projects that depend on us
             internal IDictionary<Type, ITarget> UnResolvedPrivateDependencies { get; } = new Dictionary<Type, ITarget>();
-            // These dependencies will be propagated to other dependent projects, but not across dll dependencies.
-            internal IDictionary<Type, ITarget> UnResolvedProtectedDependencies { get; } = new Dictionary<Type, ITarget>();
             // These dependencies are always propagated to other dependent projects.
             internal Dictionary<Type, ITarget> UnResolvedPublicDependencies { get; } = new Dictionary<Type, ITarget>();
 
@@ -3056,7 +3054,7 @@ namespace Sharpmake
 
             public bool HaveDependency(Type projectType)
             {
-                return UnResolvedPrivateDependencies.ContainsKey(projectType) || UnResolvedProtectedDependencies.ContainsKey(projectType) || UnResolvedPublicDependencies.ContainsKey(projectType);
+                return UnResolvedPrivateDependencies.ContainsKey(projectType) || UnResolvedPublicDependencies.ContainsKey(projectType);
             }
 
             /// <summary>
