@@ -452,25 +452,35 @@ namespace Sharpmake
             return assemblyInfo;
         }
 
+        private ConcurrentDictionary<string, string> _buildReferenceFullNames = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         private HashSet<string> GetReferencesForBuild()
         {
-            HashSet<string> references = new HashSet<string>();
+            // First find the assembly
+            Parallel.ForEach(_buildReferences, (buildAssemblyfile) =>
+            {
+                string fullPath = AssemblyName.GetAssemblyName(buildAssemblyfile).FullName;
+                _buildReferenceFullNames.TryAdd(fullPath, buildAssemblyfile);
+            });
+
+            var references = new ConcurrentDictionary<string, bool>();
 
             // Search if we have a more suitable build reference for each runtime reference
-            foreach (string assemblyFile in _references)
+            Parallel.ForEach(_references, (assemblyFile) =>
             {
                 var assemblyFullName = AssemblyName.GetAssemblyName(assemblyFile).FullName;
-                var buildAssemblyFile = _buildReferences.SingleOrDefault(buildAssemblyfile => string.Equals(assemblyFullName, AssemblyName.GetAssemblyName(buildAssemblyfile).FullName, StringComparison.OrdinalIgnoreCase));
-                references.Add(buildAssemblyFile ?? assemblyFile);
-            }
+                string buildAssemblyFile = null;
+                _buildReferenceFullNames.TryGetValue(assemblyFullName, out buildAssemblyFile);
+                references.TryAdd(buildAssemblyFile ?? assemblyFile, true);
+            });
 
             foreach (Assembly assembly in _assemblies)
             {
                 if (!assembly.IsDynamic)
-                    references.Add(assembly.Location);
+                    references.TryAdd(assembly.Location, true);
             }
 
-            return references;
+            return references.Keys.ToHashSet<string>();
         }
 
         private SourceText ReadSourceCode(string path)
