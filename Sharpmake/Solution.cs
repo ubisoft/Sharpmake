@@ -117,7 +117,7 @@ namespace Sharpmake
             public string ProjectFile;
 
             // Resolved Project dependencies
-            public List<ResolvedProject> Dependencies = new List<ResolvedProject>();
+            public HashSet<ResolvedProject> Dependencies = new HashSet<ResolvedProject>();
 
             // User data, may be use by generator to attach user data
             public Dictionary<string, object> UserData = new Dictionary<string, object>();
@@ -191,8 +191,7 @@ namespace Sharpmake
                     resolvedProject.Configurations.Add(includedProjectInfo.Configuration);
                     resolvedProject.SolutionConfigurationsBuild.Add(solutionConfiguration, includedProjectInfo.ToBuild);
 
-                    if (!configurationsToProjects.ContainsKey(includedProjectInfo.Configuration))
-                        configurationsToProjects[includedProjectInfo.Configuration] = resolvedProject;
+                    configurationsToProjects.TryAdd(includedProjectInfo.Configuration, resolvedProject);
                 }
             }
 
@@ -219,12 +218,11 @@ namespace Sharpmake
 
                     foreach (Project.Configuration dependencyConfiguration in resolvedProjectConf.ResolvedDependencies)
                     {
-                        if (configurationsToProjects.ContainsKey(dependencyConfiguration))
-                        {
-                            var resolvedProjectToAdd = configurationsToProjects[dependencyConfiguration];
+                        ResolvedProject resolvedProjectToAdd;
 
-                            if (!resolvedProject.Dependencies.Contains(resolvedProjectToAdd))
-                                resolvedProject.Dependencies.Add(resolvedProjectToAdd);
+                        if (configurationsToProjects.TryGetValue(dependencyConfiguration, out resolvedProjectToAdd))
+                        {
+                            resolvedProject.Dependencies.Add(resolvedProjectToAdd);
                         }
                     }
                 }
