@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 License. See LICENSE.md in the project root for license information.
 
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -144,27 +145,41 @@ namespace Sharpmake
         /// <returns>true=equal, false=not equal</returns>
         private static bool AreStreamsEqual(Stream stream1, Stream stream2)
         {
-            Span<byte> buffer1 = new byte[_FileStreamBufferSize];
-            Span<byte> buffer2 = new byte[_FileStreamBufferSize];
-
-            stream1.Position = 0;
-            stream2.Position = 0;
-
-            while (true)
+            byte[] buffer1=null;
+            byte[] buffer2=null;
+            try
             {
-                // Read from both streams
-                int count1 = stream1.Read(buffer1);
-                int count2 = stream2.Read(buffer2);
+                // Request buffers from shared pool to reduce pressure on GC.
+                buffer1 = ArrayPool<byte>.Shared.Rent(_FileStreamBufferSize);
+                buffer2 = ArrayPool<byte>.Shared.Rent(_FileStreamBufferSize);
 
-                if (count1 != count2)
-                    return false;
+                stream1.Position = 0;
+                stream2.Position = 0;
 
-                if (count1 == 0)
-                    return true;
+                while (true)
+                {
+                    // Read from both streams
+                    int count1 = stream1.Read(buffer1, 0, buffer1.Length);
+                    int count2 = stream2.Read(buffer2, 0, buffer2.Length);
 
-                // Compare the streams efficiently without any copy.
-                if (!buffer1.SequenceEqual(buffer2))
-                    return false;
+                    if (count1 != count2)
+                        return false;
+
+                    if (count1 == 0)
+                        return true;
+
+                    Span<byte> span1 = new Span<byte>(buffer1, 0, count1);
+                    Span<byte> span2 = new Span<byte>(buffer2, 0, count2);
+
+                    // Compare the streams efficiently without any copy.
+                    if (!span1.SequenceEqual(span2))
+                        return false;
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer1);
+                ArrayPool<byte>.Shared.Return(buffer2);
             }
         }
 
