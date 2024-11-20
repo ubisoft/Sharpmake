@@ -2322,7 +2322,10 @@ namespace Sharpmake
                 {
                     var relativeData = new CustomFileBuildStepData();
                     relativeData.KeyInput = MakeRelativeTool(KeyInput, true);
-                    relativeData.Executable = MakeRelativeTool(Executable, true);
+                    if (!UseExecutableFromSystemPath)
+                        relativeData.Executable = MakeRelativeTool(Executable, true);
+                    else
+                        relativeData.Executable = Executable;
                     relativeData.Output = MakeRelativeTool(Output, true);
                     using (resolver.NewScopedParameter("input", relativeData.KeyInput))
                     using (resolver.NewScopedParameter("output", relativeData.Output))
