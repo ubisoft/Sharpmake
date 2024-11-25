@@ -149,6 +149,12 @@
       "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
       "commandLineArgs": "/sources(@'main.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)\\vcpkg\\sharpmake"
+    },
+    "Sample (XCodeProjects)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources(@'XCodeProjects.Main.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\XCodeProjects"
     }
   }
 }

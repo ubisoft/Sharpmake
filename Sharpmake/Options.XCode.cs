@@ -1027,29 +1027,17 @@ namespace Sharpmake
                        : base(value) { }
                 }
 
-                public class UISupportedInterfaceOrientations : UniqueList<UIInterfaceOrientation>
+                public class UISupportedInterfaceOrientations
                 {
+                    private UIInterfaceOrientation[] _uIInterfaceOrientations;
                     public UISupportedInterfaceOrientations(params UIInterfaceOrientation[] values)
-                        : base(EqualityComparer<UIInterfaceOrientation>.Default, values) { }
+                    {
+                        _uIInterfaceOrientations = values;
+                    }
 
                     public override string ToString()
                     {
-                        StringBuilder builder = new StringBuilder(Count * 128);
-                        bool first = true;
-                        foreach (UIInterfaceOrientation value in _hash)
-                        {
-                            if (!first)
-                                builder.Append(' ');
-                            else
-                                first = false;
-
-                            builder.Append(value.ToString());
-                        }
-
-                        if (_hash.Count > 1)
-                            return @$"""{builder.ToString()}""";
-
-                        return builder.ToString();
+                        return "\"" + string.Join(" ", _uIInterfaceOrientations) + "\"";
                     }
                 }
 

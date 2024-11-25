@@ -507,6 +507,9 @@ namespace Sharpmake.UnitTests
             }
             public UniqueList<string> List = new UniqueList<string>();
             public IEnumerable<string> SortedList => List.SortedValues;
+
+            public long IterationCount = 0;
+            public long NonEmptyCount = 0;
         }
 
         /// <summary>
@@ -516,10 +519,14 @@ namespace Sharpmake.UnitTests
         /// exception when multiple threads were accessing the property.
         /// </summary>
         [Test]
-        public static void MultithreadEmptyValuesSorted()
+        [TestCase("")]
+        [TestCase("Test")]
+        public static void MultithreadEmptyValuesSorted(string initialContent)
         {
             int nbrThreads = Environment.ProcessorCount;
             var container = new ListContainer();
+            if (!string.IsNullOrEmpty(initialContent))
+                container.List.Add(initialContent);
 
             int TOTAL_TEST_COUNT = 100000;
             long nbrThreadsFinished = 0;
@@ -527,16 +534,17 @@ namespace Sharpmake.UnitTests
             Exception taskTestException = null;
 
             // Note: Using a Barrier to synchronize all the threads at each iteration
-            using (Barrier barrier = new Barrier(nbrThreads, (b) =>
+            using (Barrier barrier = new Barrier(0, (b) =>
              {
+                 container.List.SetDirty();
                  Interlocked.Increment(ref nbrThreadsGate1);
-                 container.List.AddRange(new List<string> { }); // Adding an empty collection makes the UniqueList dirty
              }))
             {
                 ThreadPool.TaskCallback taskLambda = (object taskParams) =>
                 {
                     var listContainersTask = (ListContainer)taskParams;
-
+                    int count = 0;
+                    int nonEmptyCount = 0;
                     try
                     {
                         for (int i = 0; i < TOTAL_TEST_COUNT; ++i)
@@ -547,11 +555,15 @@ namespace Sharpmake.UnitTests
                             if (taskTestException != null)
                                 break; // Abort once we got an exception
 
-                            // Attempt to access the SortedList property from multiple threads. 
-                            // It must not create any exception!
-                            foreach (var s in container.SortedList)
+                            for (int j = 0; j < 5; ++j)
                             {
-                                Console.WriteLine(s);
+                                // Attempt to access the SortedList property from multiple threads. 
+                                // It must not create any exception!
+                                foreach (var s in container.SortedList)
+                                {
+                                    ++nonEmptyCount;
+                                }
+                                ++count;
                             }
                         }
                     }
@@ -562,8 +574,10 @@ namespace Sharpmake.UnitTests
                     }
                     finally
                     {
-                        barrier.RemoveParticipant(); // Must remove the participant to unblock all the other threads.
                         Interlocked.Increment(ref nbrThreadsFinished);
+                        Interlocked.Add(ref listContainersTask.IterationCount, count);
+                        Interlocked.Add(ref listContainersTask.IterationCount, nonEmptyCount);
+                        barrier.RemoveParticipant();
                     }
                 };
 
@@ -572,6 +586,7 @@ namespace Sharpmake.UnitTests
                 {
                     // Add 1 task per thread
                     pool.Start(nbrThreads);
+                    barrier.AddParticipants(nbrThreads);
                     for (int i = 0; i < nbrThreads; ++i)
                     {
                         pool.AddTask(taskLambda, container);
@@ -582,6 +597,7 @@ namespace Sharpmake.UnitTests
 
                     // Check the results.
                     TestContext.Out.WriteLine("nbr Finished: {0}, nbr Gate1: {1}", nbrThreadsFinished, nbrThreadsGate1);
+                    TestContext.Out.WriteLine($"IterationCount : {container.IterationCount}");
                     if (taskTestException != null)
                     {
                         throw taskTestException;

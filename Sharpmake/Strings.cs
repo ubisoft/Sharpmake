@@ -13,14 +13,12 @@ namespace Sharpmake
     public class Strings : UniqueList<string>
     {
         public Strings(IEqualityComparer<string> hashComparer, IComparer<string> sortComparer)
-            : base(hashComparer)
+            : base(hashComparer, sortComparer)
         {
-            SortComparer = sortComparer;
         }
         public Strings()
-            : base(StringComparer.OrdinalIgnoreCase)
+            : base(StringComparer.OrdinalIgnoreCase, StringComparer.OrdinalIgnoreCase)
         {
-            SortComparer = StringComparer.OrdinalIgnoreCase;
         }
 
         public Strings(IEnumerable<string> other) : base(StringComparer.OrdinalIgnoreCase, other) { }

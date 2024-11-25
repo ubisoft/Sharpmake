@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 
 namespace Sharpmake
 {
@@ -16,21 +17,80 @@ namespace Sharpmake
     [DebuggerDisplay("Size: {_hash.Count}")]
     public class UniqueList<T> : IEnumerable<T>
     {
-        protected HashSet<T> _hash; // key is the string
-        protected List<T> _values = new List<T>();  // Sorted keys are sorted on demand.
-        private bool _readOnly = false;
-        private bool _isDirty = false; // Does _values needs to be reconstructed ?
-        private bool _isSorted = true; // Does _values is sorted ?
+        private HashSet<T> _hash; // key is the string
+        private List<T> _values = new List<T>();  // Sorted keys are sorted on demand.
+
+        [Flags]
+        enum ModifierBits
+        {
+            DirtyBit = 1, // Does _values need to be reconstructed ?
+            SortedBit = 2,  // Is _values sorted ?
+            ReadOnlyBit = 4, // Is the container read only ?
+        }
+
+        // Note: Sadly we have to use Int64 because Interlocked.Read only accepts a 64 bits value
+        private Int64 _modifierBits = (Int64) ModifierBits.SortedBit; 
+
+        private bool IsDirty
+        {
+            get
+            {
+                Int64 modifierBits = Interlocked.Read(ref _modifierBits);
+                return (modifierBits & (Int64)ModifierBits.DirtyBit) != 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    Interlocked.Or(ref _modifierBits, (Int64)ModifierBits.DirtyBit);
+                }
+                else
+                {
+                    Interlocked.And(ref _modifierBits, ~(Int64)ModifierBits.DirtyBit);
+                }
+            }
+        }
+
+        private bool IsSorted
+        {
+            get
+            {
+                Int64 modifierBits = Interlocked.Read(ref _modifierBits);
+                return (modifierBits & (Int64)ModifierBits.SortedBit) != 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    Interlocked.Or(ref _modifierBits, (Int64)ModifierBits.SortedBit);
+                }
+                else
+                {
+                    Interlocked.And(ref _modifierBits, ~(Int64)ModifierBits.DirtyBit);
+                }
+            }
+        }
+
         private IComparer<T> _sortComparer = Comparer<T>.Default;
 
         public UniqueList()
             : this(EqualityComparer<T>.Default)
         {
         }
+        public UniqueList(IComparer<T> sortComparer)
+            : this(EqualityComparer<T>.Default)
+        {
+            _sortComparer = sortComparer;
+        }
 
         public UniqueList(IEqualityComparer<T> comparer)
         {
             _hash = new HashSet<T>(comparer);
+        }
+        public UniqueList(IEqualityComparer<T> comparer, IComparer<T> sortComparer)
+            : this(comparer)
+        {
+            _sortComparer = sortComparer;
         }
 
         public UniqueList(IEqualityComparer<T> comparer, IEnumerable<T> other)
@@ -49,7 +109,7 @@ namespace Sharpmake
             : this(comparer)
         {
             _hash = new HashSet<T>(other._hash, comparer);
-            _isDirty = true;
+            IsDirty = other.Count > 0;
         }
 
         public void UpdateValue(T oldValue, T newValue)
@@ -58,7 +118,7 @@ namespace Sharpmake
             {
                 _hash.Remove(oldValue);
                 _hash.Add(newValue);
-                _isDirty = true;
+                IsDirty = true;
             }
         }
 
@@ -76,7 +136,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             AddCore(value1);
-            _isDirty = true;
+            IsDirty = true;
         }
 
         public void Add(T value1, T value2)
@@ -84,7 +144,7 @@ namespace Sharpmake
             ValidateReadOnly();
             AddCore(value1);
             AddCore(value2);
-            _isDirty = true;
+            IsDirty = true;
         }
 
         public void Add(T value1, T value2, T value3)
@@ -93,7 +153,7 @@ namespace Sharpmake
             AddCore(value1);
             AddCore(value2);
             AddCore(value3);
-            _isDirty = true;
+            IsDirty = true;
         }
 
         public void Add(T value1, T value2, T value3, T value4)
@@ -103,7 +163,7 @@ namespace Sharpmake
             AddCore(value2);
             AddCore(value3);
             AddCore(value4);
-            _isDirty = true;
+            IsDirty = true;
         }
 
         public void Add(T value1, T value2, T value3, T value4, T value5)
@@ -114,45 +174,56 @@ namespace Sharpmake
             AddCore(value3);
             AddCore(value4);
             AddCore(value5);
-            _isDirty = true;
+            IsDirty = true;
         }
 
         public void Add(params T[] values)
         {
-            AddRange(values);
+            if (values.Length > 0)
+            {
+                AddRange(values);
+            }
         }
 
         public void AddRange(IEnumerable<T> collection)
         {
             ValidateReadOnly();
+            int countBeforeUnion = _hash.Count;
             _hash.UnionWith(collection);
-            _isDirty = true;
+            if (_hash.Count != countBeforeUnion)
+                IsDirty = true;
         }
 
         public void AddRange(UniqueList<T> other)
         {
             ValidateReadOnly();
-            GrowCapacity(other.Count);
-
-            foreach (T value in other._hash)
+            if (other.Count > 0)
             {
-                AddCore(value);
-            }
+                GrowCapacity(other.Count);
 
-            _isDirty = true;
+                foreach (T value in other._hash)
+                {
+                    AddCore(value);
+                }
+
+                IsDirty = true;
+            }
         }
 
         public void AddRange(IReadOnlyList<T> collection)
         {
             ValidateReadOnly();
-            GrowCapacity(collection.Count);
-
-            for (int i = 0; i < collection.Count; i++)
+            if (collection.Count > 0)
             {
-                AddCore(collection[i]);
-            }
+                GrowCapacity(collection.Count);
 
-            _isDirty = true;
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    AddCore(collection[i]);
+                }
+
+                IsDirty = true;
+            }
         }
 
         public void IntersectWith(UniqueList<T> otherList)
@@ -170,7 +241,7 @@ namespace Sharpmake
                 }
             }
             _hash = intersect;
-            _isDirty = true;
+            IsDirty = true;
         }
 
         /// <param name="otherList">the other container to intersect with</param>
@@ -203,7 +274,7 @@ namespace Sharpmake
 
 
             _hash = intersect;
-            _isDirty = true;
+            IsDirty = true;
         }
 
 
@@ -211,7 +282,7 @@ namespace Sharpmake
         {
             ValidateReadOnly();
             int result = _hash.RemoveWhere(match);
-            _isDirty |= result > 0;
+            IsDirty |= result > 0;
             return result;
         }
 
@@ -223,7 +294,7 @@ namespace Sharpmake
             {
                 isDirty |= _hash.Remove(item);
             }
-            _isDirty |= isDirty;
+            IsDirty |= isDirty;
         }
 
         public void Remove(params T[] values)
@@ -237,23 +308,21 @@ namespace Sharpmake
             {
                 return _sortComparer;
             }
-            set
-            {
-                _sortComparer = value;
-                _isDirty = true;
-            }
         }
 
         private void UpdateValues()
         {
             lock (_values)
             {
-                if (_isDirty)
+                if (IsDirty)
                 {
-                    _values.Clear();
-                    _values.AddRange(_hash);
-                    _isSorted = false;
-                    _isDirty = false;
+                    if (_values.Count > 0)
+                        _values.Clear();
+                    if (_hash.Count > 0)
+                        _values.AddRange(_hash);
+
+                    // Clear boths bits in one operation
+                    Interlocked.And(ref _modifierBits, ~((Int64)ModifierBits.DirtyBit | (Int64)ModifierBits.SortedBit));
                 }
             }
             Debug.Assert(Count == _values.Count);
@@ -263,20 +332,28 @@ namespace Sharpmake
         {
             lock (_values)
             {
-                if (_isDirty)
+                // Directly check the modifiers bits to save one interlocked read
+                Int64 modifiers = Interlocked.Read(ref _modifierBits);
+
+                if ((modifiers & (Int64)ModifierBits.DirtyBit) != 0)
                 {
-                    _isSorted = false;
-                    _values.Clear();
-                    _values.AddRange(_hash);
+                    modifiers &= ~(Int64)ModifierBits.SortedBit; // Clear sorted bits locally
+                    if (_values.Count > 0)
+                       _values.Clear();
+                    if (_hash.Count > 0)
+                       _values.AddRange(_hash);
                 }
 
-                if (!_isSorted)
+                if ((modifiers & (Int64)ModifierBits.SortedBit) == 0)
                 {
-                    _values.Sort(_sortComparer);
-                    _isSorted = true;
+                    if (_values.Count > 0)
+                        _values.Sort(_sortComparer);
+                    IsSorted = true;
                 }
                 Debug.Assert(Count == _values.Count);
-                _isDirty = false;
+
+                if ((modifiers & (Int64)ModifierBits.DirtyBit) != 0)
+                    IsDirty = false; // Only clear the dirty bit if it was set
             }
         }
 
@@ -285,7 +362,7 @@ namespace Sharpmake
         {
             get
             {
-                if (_isDirty)
+                if (IsDirty)
                     UpdateValues();
                 return _values;
             }
@@ -296,8 +373,13 @@ namespace Sharpmake
         {
             get
             {
-                if (_isDirty || !_isSorted)
+                // Directly check the modifiers bits to save one interlocked read
+                Int64 modifiers = Interlocked.Read(ref _modifierBits);
+                if ((modifiers & (Int64)ModifierBits.DirtyBit) != 0 ||
+                    (modifiers & (Int64)ModifierBits.SortedBit) == 0)
+                {
                     UpdateAndSortValues();
+                }
                 return _values;
             }
         }
@@ -306,7 +388,7 @@ namespace Sharpmake
         {
             List<T> items = new List<T>(Count);
 
-            if (!_isDirty)
+            if (!IsDirty)
             {
                 // If the sorted values is up to date, get the keys from there.
                 Debug.Assert(Count == _values.Count);
@@ -346,8 +428,11 @@ namespace Sharpmake
         public void Clear()
         {
             ValidateReadOnly();
-            _isDirty = true;
-            _hash.Clear();
+            if (_hash.Count > 0)
+            {
+                IsDirty = true;
+                _hash.Clear();
+            }
         }
 
         public bool Contains(T item)
@@ -358,7 +443,7 @@ namespace Sharpmake
 
         public bool Remove(T item)
         {
-            _isDirty = true;
+            IsDirty = true;
             return _hash.Remove(item);
         }
 
@@ -369,12 +454,15 @@ namespace Sharpmake
 
         internal void SetReadOnly(bool readOnly)
         {
-            _readOnly = readOnly;
+            if (readOnly)
+                Interlocked.Or(ref _modifierBits, (Int64)ModifierBits.ReadOnlyBit);
+            else
+                Interlocked.And(ref _modifierBits, ~(Int64)ModifierBits.ReadOnlyBit);
         }
 
         protected void ValidateReadOnly()
         {
-            if (_readOnly)
+            if (IsReadOnly)
             {
                 throw new Error("Error: The list is readonly. Cannot modify the list during configuration.");
             }
@@ -382,7 +470,10 @@ namespace Sharpmake
 
         public bool IsReadOnly
         {
-            get { return _readOnly; }
+            get
+            {
+                return (Interlocked.Read(ref _modifierBits) & (Int64)ModifierBits.ReadOnlyBit) != 0;
+            }
         }
 
         #endregion
@@ -403,5 +494,12 @@ namespace Sharpmake
 
             return builder.ToString();
         }
+
+        #region Internals
+        internal void SetDirty()
+        {
+            IsDirty = true;
+        }
+        #endregion
     }
 }

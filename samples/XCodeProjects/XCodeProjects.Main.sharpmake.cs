@@ -81,6 +81,12 @@ namespace XCodeProjects
             FastBuildSettings.FastBuildMonitor = true;
             FastBuildSettings.FastBuildAllowDBMigration = true;
 
+            if (Util.GetExecutingPlatform() != Platform.mac)
+            {
+                // Hack to be able to generate projects on other platforms than macos
+                ApplePlatform.Settings.XCodeDeveloperPath = "/FakePath";
+            }
+
             // for the purpose of this sample, we'll reuse the FastBuild executables that live in the sharpmake source repo
             string sharpmakeFastBuildDir = Util.PathGetAbsolute(
                 Globals.RootDirectory,
