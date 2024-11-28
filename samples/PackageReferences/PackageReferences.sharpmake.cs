@@ -40,6 +40,10 @@ namespace PackageReference
 
             conf.Options.Add(Options.CSharp.TreatWarningsAsErrors.Enabled);
 
+            // Avoid NuGet security vulnerabilities audit warnings breaks the build.
+            // .NET Framework 4.x has known vulnerabilities.
+            conf.Options.Add(new Options.CSharp.WarningsNotAsErrors("NU1901", "NU1902", "NU1903", "NU1904"));
+
             conf.ReferencesByNuGetPackage.Add("NUnit", "3.6.0");
             conf.ReferencesByNuGetPackage.Add("Newtonsoft.Json", "13.0.1");
             conf.ReferencesByNuGetPackage.Add("Mono.Cecil", "0.9.6.4", privateAssets: Sharpmake.PackageReferences.AssetsDependency.All);
