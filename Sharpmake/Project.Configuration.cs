@@ -2395,7 +2395,20 @@ namespace Sharpmake
             /// <remarks>
             /// This property only applies to Visual Studio projects.
             /// </remarks>
-            public bool DeployProject = false;
+            [Obsolete("DeployProject is obsolete, use DeployProjectType instead (DeployType.OnlyIfBuild for the case where DeployProject == true)", false)]
+            public bool DeployProject
+            {
+                get => DeployProjectType != DeployType.NoDeploy;
+                set => DeployProjectType = value ? DeployType.OnlyIfBuild : DeployType.NoDeploy;
+            }
+
+            /// <summary>
+            /// Gets or sets whether this project is deployed and in which cases.
+            /// </summary>
+            /// <remarks>
+            /// This property only applies to Visual Studio projects.
+            /// </remarks>
+            public DeployType DeployProjectType {get; set; } = DeployType.NoDeploy;
 
             /// <summary>
             /// Gets or sets whether blobbing is enabled for this configuration.
