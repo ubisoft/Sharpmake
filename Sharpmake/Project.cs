@@ -374,11 +374,29 @@ namespace Sharpmake
             }
         }
 
-        private bool _deployProject = false;
+        [Obsolete("DeployProject is obsolete, use DeployProjectType instead (DeployType.OnlyIfBuild for the case where DeployProject == true)", false)]
         public bool DeployProject
         {
-            get { return _deployProject; }
-            set { SetProperty(ref _deployProject, value); }
+            get { return DeployProjectType != DeployType.NoDeploy; }
+            set { SetProperty(ref _deployProjectType, value ? DeployType.OnlyIfBuild : DeployType.NoDeploy); }
+        }
+
+        public enum DeployType
+        {
+            // The project would not be deployed.
+            NoDeploy,
+            // The project will be deployed only if it explicitly marked for build in visual studio
+            // (which is true for exe, but could be turned off automatically if FastBuildAll project is generated). 
+            OnlyIfBuild,
+            // The project will be always deployed.
+            AlwaysDeploy
+        }
+
+        private DeployType _deployProjectType = DeployType.NoDeploy;
+        public DeployType DeployProjectType
+        {
+            get { return _deployProjectType; }
+            set { SetProperty(ref _deployProjectType, value); }
         }
 
         public static int BlobCleaned { get; private set; }

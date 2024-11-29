@@ -585,6 +585,7 @@ namespace Sharpmake.Generators.VisualStudio
                     using (fileGenerator.Declare("configurationName", configurationName))
                     {
                         bool build = false;
+                        bool forceDeploy = false;
                         if (solution is PythonSolution)
                         {
                             // nothing is built in python solutions
@@ -592,6 +593,7 @@ namespace Sharpmake.Generators.VisualStudio
                         else if (perfectMatch)
                         {
                             build = includedProject.ToBuild == Solution.Configuration.IncludedProjectInfo.Build.Yes;
+                            forceDeploy = includedProject.Project.DeployProjectType == Project.DeployType.AlwaysDeploy || includedProject.Configuration.DeployProjectType == Project.DeployType.AlwaysDeploy;
 
                             // for fastbuild, only build the projects that cannot be built through dependency chain
                             if (!projectConf.IsFastBuild)
@@ -604,13 +606,16 @@ namespace Sharpmake.Generators.VisualStudio
                         }
 
                         fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationActive);
+                        bool buildDeploy = false;
                         if (build)
                         {
+                            buildDeploy = includedProject.Project.DeployProjectType == Project.DeployType.OnlyIfBuild || includedProject.Configuration.DeployProjectType == Project.DeployType.OnlyIfBuild;
                             fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationBuild);
+                        }
 
-                            bool deployProject = includedProject.Project.DeployProject || includedProject.Configuration.DeployProject;
-                            if (deployProject)
-                                fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationDeploy);
+                        if (forceDeploy || buildDeploy)
+                        {
+                            fileGenerator.Write(Template.Solution.GlobalSectionProjectConfigurationDeploy);
                         }
                     }
                 }
