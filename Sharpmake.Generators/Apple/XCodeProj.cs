@@ -546,6 +546,12 @@ namespace Sharpmake.Generators.Apple
                 }
 
                 var firstConf = targetConfigurations.First();
+                // Adjust fastbuild target
+                if (firstConf.IsFastBuild)
+                {
+                    // Handle cases where a configuration is using fastbuild but not all configurations are using it(and the first one is not using it)
+                    firstConf = targetConfigurations.FirstOrDefault(conf => conf.FastBuildMasterBffList.Any(), targetConfigurations[0]);
+                }
 
                 bool canIncludeSourceFiles = !firstConf.IsFastBuild || firstConf.Output != Project.Configuration.OutputType.AppleApp || !firstConf.XcodeUseNativeProjectForFastBuildApp;
                 if (canIncludeSourceFiles)
