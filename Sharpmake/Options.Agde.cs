@@ -437,6 +437,14 @@ namespace Sharpmake
                     Cpp17,
 
                     /// <summary>
+                    /// C++20
+                    /// </summary>
+                    /// <remarks>
+                    /// C++20 Language Standard.
+                    /// </remarks>
+                    Cpp20,
+
+                    /// <summary>
                     /// C++98 (GNU Dialect)
                     /// </summary>
                     /// <remarks>
@@ -482,7 +490,15 @@ namespace Sharpmake
                     /// <remarks>
                     /// C++17 (GNU Dialect) Language Standard.
                     /// </remarks>
-                    Gnupp17
+                    Gnupp17,
+
+                    /// <summary>
+                    /// C++20 (GNU Dialect)
+                    /// </summary>
+                    /// <remarks>
+                    /// C++20 (GNU Dialect) Language Standard.
+                    /// </remarks>
+                    Gnupp20
                 }
 
                 /// <summary>
