@@ -93,6 +93,17 @@ namespace Sharpmake
     /// </summary>
     public class Resolver
     {
+        /// <summary>
+        /// This enumeration can be used to implement conditions or validations based on the resolve state.
+        /// </summary>
+        public enum ResolveStates
+        {
+            NotResolved, // The object is not resolved
+            InProgress, // The object is currently being resolved
+            Resolved // The object has been resolved.
+        };
+
+
         private class TypeWrapper
         {
             public List<MemberInfo> MemberInfos;
