@@ -236,6 +236,7 @@ namespace Sharpmake.Generators.VisualStudio
         {
             var forcedIncludes = new Strings();
 
+            bool useClang = context.Configuration.Platform.IsUsingClang();
             bool useClangCl = Options.GetObject<Options.Vc.General.PlatformToolset>(context.Configuration).IsLLVMToolchain() &&
                               Options.GetObject<Options.Vc.LLVM.UseClangCl>(context.Configuration) == Options.Vc.LLVM.UseClangCl.Enable;
 
@@ -365,46 +366,6 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.Compiler.CLanguageStandard.C11, () => { context.Options["LanguageStandard_C"] = "stdc11"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c11"; }),
                 Options.Option(Options.Vc.Compiler.CLanguageStandard.C17, () => { context.Options["LanguageStandard_C"] = "stdc17"; context.CommandLineOptions["LanguageStandard_C"] = "/std:c17"; })
                 );
-            }
-
-            // MSVC NMake IntelliSence options
-
-            context.Options["AdditionalOptions"] = (context.Configuration.CustomBuildSettings is null) ? FileGeneratorUtilities.RemoveLineTag : context.Configuration.CustomBuildSettings.AdditionalOptions;
-
-            string cppLanguageStd = null;
-            if (context.Configuration.CustomBuildSettings is null || context.Configuration.CustomBuildSettings.AutoConfigure)
-            {
-                context.SelectOption
-                (
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP98, () => { }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP11, () => { }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP14, () => { cppLanguageStd = "/std:c++14"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP17, () => { cppLanguageStd = "/std:c++17"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.CPP20, () => { cppLanguageStd = "/std:c++20"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU98, () => { }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU11, () => { }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU14, () => { cppLanguageStd = "/std:c++14"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.GNU17, () => { cppLanguageStd = "/std:c++17"; }),
-                Options.Option(Options.Vc.Compiler.CppLanguageStandard.Latest, () => { cppLanguageStd = "/std:c++latest"; })
-                );
-            }
-
-            if (!string.IsNullOrEmpty(cppLanguageStd))
-            {
-                if (string.IsNullOrEmpty(context.Options["AdditionalOptions"]) || context.Options["AdditionalOptions"] == FileGeneratorUtilities.RemoveLineTag)
-                    context.Options["AdditionalOptions"] = cppLanguageStd;
-                else
-                    context.Options["AdditionalOptions"] += $" {cppLanguageStd}";
-            }
-            else if (string.IsNullOrEmpty(context.Options["AdditionalOptions"]))
-            {
-                context.Options["AdditionalOptions"] = FileGeneratorUtilities.RemoveLineTag;
-            }
-
-            if (useClangCl && context.Options["AdditionalOptions"] != FileGeneratorUtilities.RemoveLineTag)
-            {
-                // need to use a special syntax when compiler is clang or Visual Studio will generate intellisense errors
-                context.Options["AdditionalOptions"] = context.Options["AdditionalOptions"].Replace("/std:c++", "/Clangstdc++");
             }
 
             // Compiler section
@@ -1208,6 +1169,43 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             optionsContext.HasClrSupport = clrSupport;
+
+            //--------------------------------
+            // MSVC NMake IntelliSence options
+            //--------------------------------
+
+            // Handle C++ language version option
+            string intellisenseCppLanguageStandard;
+            if (!context.CommandLineOptions.TryGetValue("LanguageStandard", out intellisenseCppLanguageStandard) || intellisenseCppLanguageStandard == FileGeneratorUtilities.RemoveLineTag)
+            {
+                if (!context.CommandLineOptions.TryGetValue("CppLanguageStd", out intellisenseCppLanguageStandard))
+                    intellisenseCppLanguageStandard = FileGeneratorUtilities.RemoveLineTag;
+            }
+
+            if (intellisenseCppLanguageStandard != FileGeneratorUtilities.RemoveLineTag)
+            {
+                if (useClangCl || useClang)
+                {
+                    // need to use a special syntax when compiler is clang/clangcl or Visual Studio will generate intellisense errors
+                    intellisenseCppLanguageStandard = intellisenseCppLanguageStandard.Replace("/std:c++", "/Clangstdc++");
+                    intellisenseCppLanguageStandard = intellisenseCppLanguageStandard.Replace("-std=c++", "/Clangstdc++");
+                }
+            }
+
+            // Merge the intellisense language option with additional intellisense command line options
+            string intellisenseCommandLineOptions = intellisenseCppLanguageStandard;
+            Strings intellisenseAdditionalCommandlineOptions = context.Configuration.IntellisenseAdditionalCommandLineOptions;
+            if (intellisenseAdditionalCommandlineOptions != null)
+            {
+                if (intellisenseCommandLineOptions != FileGeneratorUtilities.RemoveLineTag)
+                    intellisenseCommandLineOptions += " ";
+                intellisenseCommandLineOptions += string.Join(' ', intellisenseAdditionalCommandlineOptions);
+            }
+            context.Options["IntellisenseCommandLineOptions"] = intellisenseCommandLineOptions;
+
+            // Add additional defines for intellisense to the default ones set for that target.
+            Strings intellisenseDefines = context.Configuration.IntellisenseAdditionalDefines;
+            context.Options["IntellisenseAdditionalDefines"] = intellisenseDefines != null ? ";" + String.Join(';', intellisenseDefines) : "";
         }
 
         public static List<KeyValuePair<string, string>> ConvertPostBuildCopiesToRelative(Project.Configuration conf, string relativeTo)

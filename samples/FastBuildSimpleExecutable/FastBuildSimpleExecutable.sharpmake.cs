@@ -50,6 +50,9 @@ namespace FastBuild
 
             // Force writing to pdb from different cl.exe process to go through the pdb server
             conf.AdditionalCompilerOptions.Add("/FS");
+            
+            conf.IntellisenseAdditionalDefines.Add("MY_INTELLISENSE_DEFINE", "MY_INTELLISENSE_DEFINE2");
+            conf.IntellisenseAdditionalCommandLineOptions.Add("/MY_INTELLISENSE_OPTION", "/MY_INTELLISENSE_OPTION2"); // Dummy options just to validate the output
         }
 
         [Configure(Optimization.Release)]

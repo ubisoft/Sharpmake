@@ -1681,6 +1681,37 @@ namespace Sharpmake
             /// </summary>
             public FastBuildClangMscVersionDetectionType FastBuildClangMscVersionDetectionInfo = FastBuildClangMscVersionDetectionType.FullVersion;
 
+            private Strings _intellisenseAdditionalDefines;
+
+            /// <summary>
+            /// This property is used to have a list of defines that are not used in the build 
+            /// but are used for intellisense in Visual Studio.
+            /// This is only used for fastbuild project(implemented using nmake project)
+            /// </summary>
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            public Strings IntellisenseAdditionalDefines
+            {
+                get
+                {
+                    return GetDynamicPropertyField(ref _intellisenseAdditionalDefines, () => new Strings());
+                }
+            }
+
+            private Strings _intellisenseAdditionalCommandLineOptions;
+            /// <summary>
+            /// This property is used to have a list of additional command line options that are not used in the build 
+            /// but are used for intellisense in Visual Studio.
+            /// This is only used for fastbuild project(implemented using nmake project)
+            /// </summary>
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            public Strings IntellisenseAdditionalCommandLineOptions
+            {
+                get
+                {
+                    return GetDynamicPropertyField(ref _intellisenseAdditionalCommandLineOptions, () => new Strings());
+                }
+            }
+
             /// <summary>
             /// Gets or sets whether to generate a FASTBuild (.bff) file when using FASTBuild.
             /// </summary>
@@ -2792,12 +2823,28 @@ namespace Sharpmake
                     Output = OutputType.None;
             }
 
-            private bool _isResolved = false;
+            private Resolver.ResolveStates _resolveState = Resolver.ResolveStates.NotResolved;
+
+            /// <summary>
+            ///  This helper function is used to implement properties that can only be allocated before resolving takes place. This will
+            ///  be useful to reduce the number of allocations as we can now have a bunch of null container fields for unused properties.
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <param name="propertyField">The internal property field associated with the property</param>
+            /// <param name="creator">Simple functor used to allocate the field when the field is accessed(only when we are in configure phase, before resolve)</param>
+            /// <returns>T: The backing field or null</returns>
+            private T GetDynamicPropertyField<T>(ref T propertyField, Func<T> creator)
+            {
+                if (propertyField == null && _resolveState == Resolver.ResolveStates.NotResolved)
+                    propertyField = creator();
+                return propertyField;
+            }
 
             internal void Resolve(Resolver resolver)
             {
-                if (_isResolved)
+                if (_resolveState != Resolver.ResolveStates.NotResolved)
                     throw new Error("Can't resolve twice!");
+                _resolveState = Resolver.ResolveStates.InProgress;
 
                 if (PrecompHeader == null && PrecompSource != null)
                     throw new Error("Incoherent settings for {0} : PrecompHeader is null but PrecompSource is not", ToString());
@@ -2979,7 +3026,7 @@ namespace Sharpmake
                 resolver.RemoveParameter("conf");
                 resolver.RemoveParameter("target");
 
-                _isResolved = true;
+                _resolveState = Resolver.ResolveStates.Resolved;
             }
 
             private void SetDependency(
