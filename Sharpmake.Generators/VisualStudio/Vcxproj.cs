@@ -370,6 +370,20 @@ namespace Sharpmake.Generators.VisualStudio
                 fileGenerator.Write(Template.Project.ProjectBegin);
             }
 
+            var firstConf = context.ProjectConfigurations.First();
+
+            // add .props files imported from nuget packages
+            // it must be at the top of project files.
+            // why? https://github.com/NuGet/Home/issues/10125#issuecomment-721400495
+            foreach (var package in firstConf.ReferencesByNuGetPackage)
+            {
+                using (fileGenerator.Declare("fileExtension", "props"))
+                {
+                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceImport));
+                }
+            }
+
+
             VsProjCommon.WriteCustomProperties(context.Project.CustomProperties, fileGenerator);
 
             foreach (var platformVcxproj in context.PresentPlatforms.Values)
@@ -387,7 +401,7 @@ namespace Sharpmake.Generators.VisualStudio
                     hasNonFastBuildConfig = true;
             }
 
-            var firstConf = context.ProjectConfigurations.First();
+       
 
             //checking only the first one, having one with CLR support and others without would be an error
             bool clrSupport = Util.IsDotNet(firstConf);
@@ -713,10 +727,13 @@ namespace Sharpmake.Generators.VisualStudio
                 }
             }
 
-            // add imports to nuget packages
+            // add .targets files imported from nuget packages
             foreach (var package in firstConf.ReferencesByNuGetPackage)
             {
-                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceTargetsImport));
+                using (fileGenerator.Declare("fileExtension", "targets"))
+                {
+                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceImport));
+                }
             }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
 
@@ -739,7 +756,14 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (var package in firstConf.ReferencesByNuGetPackage)
                 {
-                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceTargetsError));
+                    using (fileGenerator.Declare("fileExtension", "targets"))
+                    {
+                        fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceError));
+                    }
+                    using (fileGenerator.Declare("fileExtension", "props"))
+                    {
+                        fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceError));
+                    }
                 }
 
                 fileGenerator.Write(Template.Project.ProjectCustomTargetsEnd);

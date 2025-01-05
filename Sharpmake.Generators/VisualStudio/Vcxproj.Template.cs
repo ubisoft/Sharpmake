@@ -160,13 +160,14 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 // Support both regular and native package types, whichever happens to exist
-                public static string ProjectNugetReferenceTargetsImport =
-@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" />
-    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets')"" />
+                // possible file extension: .targets and .props
+                public static string ProjectNugetReferenceImport =
+@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]')"" />
+    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].[fileExtension]"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].[fileExtension]')"" />
 ";
 
-                public static string ProjectNugetReferenceTargetsError =
-@"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets'))"" />
+                public static string ProjectNugetReferenceError =
+@"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].[fileExtension]') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].[fileExtension]'))"" />
 ";
 
                 public static string ProjectTargetsEnd =
