@@ -716,7 +716,7 @@ namespace Sharpmake.Generators.VisualStudio
             // add imports to nuget packages
             foreach (var package in firstConf.ReferencesByNuGetPackage)
             {
-                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceImport));
+                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceTargetsImport));
             }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
 
@@ -739,7 +739,7 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (var package in firstConf.ReferencesByNuGetPackage)
                 {
-                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceError));
+                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceTargetsError));
                 }
 
                 fileGenerator.Write(Template.Project.ProjectCustomTargetsEnd);

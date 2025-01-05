@@ -160,12 +160,12 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 // Support both regular and native package types, whichever happens to exist
-                public static string ProjectTargetsNugetReferenceImport =
-@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets')"" />
-    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" />
+                public static string ProjectNugetReferenceTargetsImport =
+@"    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" />
+    <Import Project=""$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets"" Condition=""Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets')"" />
 ";
 
-                public static string ProjectTargetsNugetReferenceError =
+                public static string ProjectNugetReferenceTargetsError =
 @"    <Error Condition=""!Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\[packageName].targets') and !Exists('$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets')"" Text=""$([[System.String]]::Format('$(ErrorText)', '$(SolutionDir)\packages\[packageName].[packageVersion]\build\native\[packageName].targets'))"" />
 ";
 
@@ -174,7 +174,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectCustomTargetsBegin =
-@"  <Target Name=""name"" BeforeTargets=""PrepareForBuild"">
+@"  <Target Name=""[targetName]"" BeforeTargets=""[beforeTargets]"">
 ";
 
                 public static string ProjectCustomTargetsEnd =
