@@ -1130,6 +1130,13 @@ namespace Sharpmake.Generators.FastBuild
                         fastBuildProjectDependencies.Add("[fastBuildOutputFileShortName]_objects");
                         string fastBuildObjectListEmbeddedResources = FormatListPartForTag(embeddedResourceFilesSections, 32, true);
 
+                        string fastBuildInputFilesRootPath = FileGeneratorUtilities.RemoveLineTag;
+
+                        if (conf.FastBuildInputFilesRootPath != null)
+                        {
+                            fastBuildInputFilesRootPath = CurrentBffPathKeyCombine(Util.PathGetRelative(context.ProjectDirectory, conf.FastBuildInputFilesRootPath));
+                        }
+
                         using (bffGenerator.Declare("conf", conf))
                         using (bffGenerator.Declare("project", project))
                         using (bffGenerator.Declare("target", conf.Target))
@@ -1170,6 +1177,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildLibrarianAdditionalInputs", librarianAdditionalInputs))
                                     using (bffGenerator.Declare("fastBuildCompileAsC", fastBuildCompileAsC))
                                     using (bffGenerator.Declare("fastBuildUnityName", fastBuildUnityName ?? FileGeneratorUtilities.RemoveLineTag))
+                                    using (bffGenerator.Declare("fastBuildInputFilesRootPath", fastBuildInputFilesRootPath))
                                     using (bffGenerator.Declare("fastBuildClangFileLanguage", clangFileLanguage))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFiles", fastBuildDeoptimizationWritableFiles))
                                     using (bffGenerator.Declare("fastBuildDeoptimizationWritableFilesWithToken", fastBuildDeoptimizationWritableFilesWithToken))

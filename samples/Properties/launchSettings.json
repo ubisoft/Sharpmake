@@ -54,6 +54,12 @@
       "commandLineArgs": "/sources(@'FastBuildSimpleExecutable.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)\\FastBuildSimpleExecutable"
     },
+    "Sample (FastBuildDuplicateFile)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+      "commandLineArgs": "/sources(@'FastBuildDuplicateFile.sharpmake.cs')",
+      "workingDirectory": "$(ProjectDir)\\FastBuildDuplicateFile"
+    },
     "Sample (HelloAndroid)": {
       "commandName": "Executable",
       "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
