@@ -191,7 +191,25 @@ namespace Sharpmake
                 fileGenerator.Write(_linkerOptionsTemplate);
         }
 
+        public IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
+        {
+            if (FastBuildSettings.FastBuildSupportLinkerStampList)
+            {
+                foreach (var step in GetStripDebugSymbolsSteps(configuration, fastBuildOutputFile, asStampSteps: true))
+                    yield return step;
+            }
+        }
+
         public IEnumerable<Project.Configuration.BuildStepBase> GetExtraPostBuildEvents(Project.Configuration configuration, string fastBuildOutputFile)
+        {
+            if (!FastBuildSettings.FastBuildSupportLinkerStampList)
+            {
+                foreach (var step in GetStripDebugSymbolsSteps(configuration, fastBuildOutputFile, asStampSteps: false))
+                    yield return step;
+            }
+        }
+
+        private IEnumerable<Project.Configuration.BuildStepExecutable> GetStripDebugSymbolsSteps(Project.Configuration configuration, string fastBuildOutputFile, bool asStampSteps)
         {
             if (Util.GetExecutingPlatform() == Platform.mac)
             {
@@ -207,20 +225,36 @@ namespace Sharpmake
                     if (debugFormat == Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym)
                     {
                         string outputPath = Path.Combine(configuration.TargetPath, configuration.TargetFileFullNameWithExtension + ".dSYM");
+                        string dsymutilSentinelFile = Path.Combine(configuration.IntermediatePath, configuration.TargetFileName + ".dsymdone");
                         yield return new Project.Configuration.BuildStepExecutable(
                             "/usr/bin/dsymutil",
-                            fastBuildOutputFile,
-                            Path.Combine(configuration.IntermediatePath, configuration.TargetFileName + ".dsymdone"),
+                            asStampSteps ? string.Empty : fastBuildOutputFile,
+                            asStampSteps ? string.Empty : dsymutilSentinelFile,
                             $"{fastBuildOutputFile} -o {outputPath}",
                             useStdOutAsOutput: true);
+
+                        var stripDebugSymbols = Options.GetObject<Options.XCode.Linker.StripLinkedProduct>(configuration);
+                        if (stripDebugSymbols == Options.XCode.Linker.StripLinkedProduct.Enable)
+                        {
+                            string strippedSentinelFile = Path.Combine(configuration.IntermediatePath, configuration.TargetFileName + ".stripped");
+                            yield return new Project.Configuration.BuildStepExecutable(
+                                "/usr/bin/strip",
+                                asStampSteps ? string.Empty : dsymutilSentinelFile,
+                                asStampSteps ? string.Empty : strippedSentinelFile,
+                                // From MacOS strip manual page:
+                                // -r : Save all symbols referenced dynamically.
+                                // -S : Remove the debuging symbol table entries (those created by the -g optin to cc and other compilers).
+                                // -T : The intent of this flag is to remove Swift symbols from the Mach-O symbol table,
+                                //      It removes the symbols whose names begin with '_$S' or '_$s' only when it finds an __objc_imageinfo section with and it has non-zero swift version.
+                                //      In the future the implementation of this flag may change to match the intent.
+                                // -x : Remove all local symbols (saving only global symbols)
+                                $"-rSTx {fastBuildOutputFile}",
+                                useStdOutAsOutput: true
+                            );
+                        }
                     }
                 }
             }
-        }
-
-        public IEnumerable<Project.Configuration.BuildStepExecutable> GetExtraStampEvents(Project.Configuration configuration, string fastBuildOutputFile)
-        {
-            return Enumerable.Empty<Project.Configuration.BuildStepExecutable>();
         }
 
         public string GetOutputFilename(Project.Configuration.OutputType outputType, string fastBuildOutputFile) => fastBuildOutputFile;
