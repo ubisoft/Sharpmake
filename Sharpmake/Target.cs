@@ -243,10 +243,12 @@ namespace Sharpmake
         netstandard2_0 = 1 << 28,
         netstandard2_1 = 1 << 29,
 
+        net9_0 = 1 << 30,
+
         [CompositeFragment]
         all_netframework = v3_5 | v3_5clientprofile | v4_5_2 | v4_6 | v4_6_1 | v4_6_2 | v4_7 | v4_7_1 | v4_7_2 | v4_8,
         [CompositeFragment]
-        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0 | net7_0 | net8_0,
+        all_netcore = netcore1_0 | netcore1_1 | netcore2_0 | netcore2_1 | netcore3_0 | netcore3_1 | net5_0 | net6_0 | net7_0 | net8_0 | net9_0,
         [CompositeFragment]
         all_netstandard = netstandard1_0 | netstandard1_1 | netstandard1_2 | netstandard1_3 | netstandard1_4 | netstandard1_5 | netstandard1_6 | netstandard2_0 | netstandard2_1,
 
