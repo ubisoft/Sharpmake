@@ -1187,6 +1187,7 @@ namespace Sharpmake.Generators.FastBuild
                                     using (bffGenerator.Declare("fastBuildStampExecutable", fastBuildStampExecutable))
                                     using (bffGenerator.Declare("fastBuildStampArguments", fastBuildStampArguments))
                                     using (bffGenerator.Declare("fastBuildEmbeddedOutputPrefix", fastBuildEmbeddedOutputPrefix))
+                                    using (bffGenerator.Declare("fastbuildConcurrencyGroupName", conf.FastBuildLinkConcurrencyGroup ?? FileGeneratorUtilities.RemoveLineTag))
                                     {
                                         if (projectHasResourceFiles)
                                         {

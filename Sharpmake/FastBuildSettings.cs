@@ -208,5 +208,50 @@ namespace Sharpmake
         /// Custom arguments pass to fastbuild
         /// </summary>
         public static string FastBuildCustomArguments = null;
+
+        /// <summary>
+        /// Enable the use of Fastbuild concurrency groups. You can only enable it if your fastbuild version supports this feature.
+        /// </summary>
+        public static bool EnableConcurrencyGroups { get; set; } = false;
+
+        /// <summary>
+        /// This struct is used to define concurrency groups. See fastbuild documentation for more details
+        /// </summary>
+        public struct ConcurrencyGroup
+        {
+            public int? ConcurrencyLimit; // Max number of concurrent job for this group
+            public int? ConcurrencyPerJobMiB; // Arbitrary limit of memory per job in MiB. This is used to limit the number of concurrent jobs based on memory usage.
+        }
+
+        private static Dictionary<string, ConcurrencyGroup> _concurrencyGroups = new Dictionary<string, ConcurrencyGroup>();
+
+        /// <summary>
+        /// List of concurrency groups used by sharpmake when defining the fastbuild configurations. 
+        /// Concurrency groups can be used to limit the number of parallel processes using the same concurrency group. See fastbuild documentation for more details.
+        /// It is an optional feature and will only be used when EnableConcurrencyGroups is set to true.
+        /// </summary>
+        public static IReadOnlyDictionary<string, ConcurrencyGroup> ConcurrencyGroups = _concurrencyGroups;
+
+        /// <summary>
+        /// Add a concurrency group to the list of concurrency groups.
+        /// </summary>
+        /// <param name="groupName">concurrency group name</param>
+        /// <param name="group">group params</param>
+        /// <exception cref="Error"></exception>
+        public static void AddConcurrencyGroup(string groupName, ConcurrencyGroup group)
+        {
+            // Validate the group name... We use the group name to build the concurrency struct identifier so it has to be a valid identifier.
+            if (!System.Text.RegularExpressions.Regex.IsMatch(groupName, "^[a-zA-Z0-9_\\-]+$"))
+            {
+                throw new Error($"Fastbuild concurrency group name must be a valid identifier. Name: {groupName}");
+            }
+
+            if (!group.ConcurrencyLimit.HasValue && !group.ConcurrencyPerJobMiB.HasValue)
+            {
+                throw new Error($"Concurrency group must have at least one of ConcurrencyLimit or ConcurrencyPerJobMiB set. Group: {groupName}");
+            }
+
+            _concurrencyGroups.Add(groupName, group);
+        }
     }
 }

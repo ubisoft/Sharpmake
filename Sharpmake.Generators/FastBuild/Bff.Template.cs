@@ -53,8 +53,18 @@ Settings
     [CachePath]
     [WorkerConnectionLimit]
     .AllowDBMigration_Experimental = [fastBuildAllowDBMigration]
+    .ConcurrencyGroups = [fastbuildConcurrencyGroupList]
 [AdditionalGlobalSettings]
 }
+";
+
+                public static string ConcurrencyGroup =
+@"[fastBuildConcurrencyGroupSectionName] =
+[
+    .ConcurrencyGroupName = '[fastBuildConcurrencyGroupName]'
+    .ConcurrencyLimit = [fastBuildConcurrencyLimit]
+    .ConcurrencyPerJobMiB = [fastBuildConcurrencyPerJobMiB]
+]
 ";
 
                 public const string WinEnvironment =
@@ -520,6 +530,7 @@ Copy( '[fastBuildCopyAlias]' )
     .LinkerLinkObjects      = [fastBuildLinkerLinkObjects]
     .LinkerStampExe         = [fastBuildStampExecutable]
     .LinkerStampExeArgs     = [fastBuildStampArguments]
+    .ConcurrencyGroupName   = '[fastbuildConcurrencyGroupName]'
 ";
 
                 public static string ResourcesBeginSection = @"
