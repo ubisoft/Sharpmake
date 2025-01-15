@@ -372,17 +372,6 @@ namespace Sharpmake.Generators.VisualStudio
 
             var firstConf = context.ProjectConfigurations.First();
 
-            // add .props files imported from nuget packages
-            // it must be at the top of project files.
-            // why? https://github.com/NuGet/Home/issues/10125#issuecomment-721400495
-            foreach (var package in firstConf.ReferencesByNuGetPackage)
-            {
-                using (fileGenerator.Declare("fileExtension", "props"))
-                {
-                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceImport));
-                }
-            }
-
 
             VsProjCommon.WriteCustomProperties(context.Project.CustomProperties, fileGenerator);
 
@@ -757,10 +746,6 @@ namespace Sharpmake.Generators.VisualStudio
                 foreach (var package in firstConf.ReferencesByNuGetPackage)
                 {
                     using (fileGenerator.Declare("fileExtension", "targets"))
-                    {
-                        fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceError));
-                    }
-                    using (fileGenerator.Declare("fileExtension", "props"))
                     {
                         fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectNugetReferenceError));
                     }
