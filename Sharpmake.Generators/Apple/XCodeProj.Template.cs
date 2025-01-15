@@ -305,6 +305,9 @@ namespace Sharpmake.Generators.Apple
 				PROVISIONING_PROFILE_SPECIFIER = ""[item.Options.ProvisioningProfile]"";
 				SKIP_INSTALL = [item.Options.SkipInstall];
 				STRIP_INSTALLED_PRODUCT = [item.Options.StripLinkedProduct];
+				STRIP_STYLE= [item.Options.StripStyle];
+				STRIPFLAGS = ""[item.Options.AdditionalStripFlags]"";
+				STRIP_SWIFT_SYMBOLS = [item.Options.StripSwiftSymbols];
 				SYMROOT = ""[item.Options.BuildDirectory]"";
 				VALID_ARCHS = ""[item.Options.ValidArchs]"";
 				GENERATE_MASTER_OBJECT_FILE = [item.Options.GenerateMasterObjectFile];

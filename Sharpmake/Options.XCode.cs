@@ -610,10 +610,15 @@ namespace Sharpmake
                     Enable
                 }
 
+                /// <summary>
+                /// Testability is used for automated tests in XCode.
+                /// Activating it will disable other options, like stripping and private symbols.
+                /// See https://developer.apple.com/documentation/xcode/build-settings-reference#Enable-Testability
+                /// </summary>
                 public enum Testability
                 {
-                    [Default]
                     Enable,
+                    [Default]
                     Disable
                 }
 
@@ -1119,11 +1124,48 @@ namespace Sharpmake
 
             public static class Linker
             {
+                /// <summary>
+                /// Enables symbols stripping after the binary is linked.
+                /// </summary>
                 public enum StripLinkedProduct
                 {
-                    Disable,
                     [Default]
+                    Disable,
                     Enable
+                }
+
+                /// <summary>
+                /// When stripping is enabled.
+                /// The level of symbol stripping to be performed on the linked product of the build.
+                /// </summary>
+                public enum StripStyle
+                {
+                    AllSymbols,           // Completely strips the binary, removing the symbol table and relocation information (strip option -s)
+                    NonGlobalSymbols,     // Strips non-global symbols, but saves external symbols (strip option -x)
+                    [Default]
+                    DebuggingSymbolsOnly  // Strips debugging symbols, but saves local and global symbols (strip option -S)
+                }
+
+                /// <summary>
+                /// When stripping is enabled.
+                /// Adjust the level of symbol stripping so that when the linked product of the build is stripped, all Swift symbols will be removed.
+                /// </summary>
+                public enum StripSwiftSymbols
+                {
+                    [Default]
+                    Disable,
+                    Enable
+                }
+
+                /// <summary>
+                /// Additional Strip Flags.
+                /// For a complete list, see documentation for /usr/bin/strip.
+                /// </summary>
+                public class AdditionalStripFlags : StringOption
+                {
+                    public AdditionalStripFlags(string value) : base(value)
+                    {
+                    }
                 }
 
                 /// <summary>

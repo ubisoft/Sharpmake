@@ -221,7 +221,7 @@ namespace Sharpmake
                    configuration.Output == Project.Configuration.OutputType.Dll
                    ))
                 {
-                    var debugFormat = Options.GetObject<Sharpmake.Options.XCode.Compiler.DebugInformationFormat>(configuration);
+                    var debugFormat = Options.GetObject<Options.XCode.Compiler.DebugInformationFormat>(configuration);
                     if (debugFormat == Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym)
                     {
                         string outputPath = Path.Combine(configuration.TargetPath, configuration.TargetFileFullNameWithExtension + ".dSYM");
@@ -233,22 +233,37 @@ namespace Sharpmake
                             $"{fastBuildOutputFile} -o {outputPath}",
                             useStdOutAsOutput: true);
 
-                        var stripDebugSymbols = Options.GetObject<Options.XCode.Linker.StripLinkedProduct>(configuration);
-                        if (stripDebugSymbols == Options.XCode.Linker.StripLinkedProduct.Enable)
+                        // Stripping
+                        if (Options.GetObject<Options.XCode.Linker.StripLinkedProduct>(configuration) == Options.XCode.Linker.StripLinkedProduct.Enable)
                         {
+                            List<string> stripOptionList = new List<string>();
+                            switch (Options.GetObject<Options.XCode.Linker.StripStyle>(configuration))
+                            {
+                                case Options.XCode.Linker.StripStyle.AllSymbols:
+                                    stripOptionList.Add("-s");
+                                    break;
+                                case Options.XCode.Linker.StripStyle.NonGlobalSymbols:
+                                    stripOptionList.Add("-x");
+                                    break;
+                                case Options.XCode.Linker.StripStyle.DebuggingSymbolsOnly:
+                                    stripOptionList.Add("-S");
+                                    break;
+                            }
+                            if (Options.GetObject<Options.XCode.Linker.StripSwiftSymbols>(configuration) == Options.XCode.Linker.StripSwiftSymbols.Enable)
+                                stripOptionList.Add("-T");
+
+                            var additionalStripFlags = Options.GetObject<Options.XCode.Linker.AdditionalStripFlags>(configuration);
+                            if (additionalStripFlags != null)
+                                stripOptionList.Add(XCodeUtil.ResolveProjectVariable(configuration.Project, additionalStripFlags.Value));
+
+                            string stripOptions = string.Join(" ", stripOptionList);
+
                             string strippedSentinelFile = Path.Combine(configuration.IntermediatePath, configuration.TargetFileName + ".stripped");
                             yield return new Project.Configuration.BuildStepExecutable(
                                 "/usr/bin/strip",
                                 asStampSteps ? string.Empty : dsymutilSentinelFile,
                                 asStampSteps ? string.Empty : strippedSentinelFile,
-                                // From MacOS strip manual page:
-                                // -r : Save all symbols referenced dynamically.
-                                // -S : Remove the debuging symbol table entries (those created by the -g optin to cc and other compilers).
-                                // -T : The intent of this flag is to remove Swift symbols from the Mach-O symbol table,
-                                //      It removes the symbols whose names begin with '_$S' or '_$s' only when it finds an __objc_imageinfo section with and it has non-zero swift version.
-                                //      In the future the implementation of this flag may change to match the intent.
-                                // -x : Remove all local symbols (saving only global symbols)
-                                $"-rSTx {fastBuildOutputFile}",
+                                $"{stripOptions} {fastBuildOutputFile}",
                                 useStdOutAsOutput: true
                             );
                         }
@@ -1371,6 +1386,19 @@ namespace Sharpmake
                 Options.Option(Options.XCode.Linker.StripLinkedProduct.Disable, () => options["StripLinkedProduct"] = "NO"),
                 Options.Option(Options.XCode.Linker.StripLinkedProduct.Enable, () => options["StripLinkedProduct"] = "YES")
             );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Linker.StripStyle.AllSymbols, () => options["StripStyle"] = "all"),
+                Options.Option(Options.XCode.Linker.StripStyle.NonGlobalSymbols, () => options["StripStyle"] = "non-global"),
+                Options.Option(Options.XCode.Linker.StripStyle.DebuggingSymbolsOnly, () => options["StripStyle"] = "debugging")
+            );
+
+            context.SelectOption(
+                Options.Option(Options.XCode.Linker.StripSwiftSymbols.Disable, () => options["StripSwiftSymbols"] = "NO"),
+                Options.Option(Options.XCode.Linker.StripSwiftSymbols.Enable, () => options["StripSwiftSymbols"] = "YES")
+            );
+
+            options["AdditionalStripFlags"] = XCodeUtil.ResolveProjectVariable(context.Project, Options.StringOption.Get<Options.XCode.Linker.AdditionalStripFlags>(conf));
 
             context.SelectOption(
                 Options.Option(Options.XCode.Linker.PerformSingleObjectPrelink.Disable, () => options["GenerateMasterObjectFile"] = "NO"),
