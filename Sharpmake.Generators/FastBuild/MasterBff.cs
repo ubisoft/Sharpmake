@@ -664,6 +664,34 @@ namespace Sharpmake.Generators.FastBuild
             }
 
             using (masterBffGenerator.Declare("fastBuildProjectName", "Master"))
+            {
+                masterBffGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
+            }
+
+            string concurrencyGroupList = FileGeneratorUtilities.RemoveLineTag;
+            if (FastBuildSettings.ConcurrencyGroups.Count > 0)
+            {
+                masterBffGenerator.WriteLine("//------------------------------");
+                masterBffGenerator.WriteLine("// Concurrency groups definition");
+                masterBffGenerator.WriteLine("//------------------------------");
+                List<string> groupSectionList = new List<string>();
+
+                foreach (var group in FastBuildSettings.ConcurrencyGroups)
+                {
+                    string groupSectionName = $".ConcurrencyGroup{group.Key}";
+                    groupSectionList.Add(groupSectionName); 
+
+                    using (masterBffGenerator.Declare("fastBuildConcurrencyGroupName", group.Key))
+                    using (masterBffGenerator.Declare("fastBuildConcurrencyGroupSectionName", groupSectionName))
+                    using (masterBffGenerator.Declare("fastBuildConcurrencyLimit", group.Value.ConcurrencyLimit.HasValue ? group.Value.ConcurrencyLimit.ToString() : FileGeneratorUtilities.RemoveLineTag))
+                    using (masterBffGenerator.Declare("fastBuildConcurrencyPerJobMiB", group.Value.ConcurrencyPerJobMiB.HasValue ? group.Value.ConcurrencyPerJobMiB : FileGeneratorUtilities.RemoveLineTag))
+                    {
+                        masterBffGenerator.Write(Bff.Template.ConfigurationFile.ConcurrencyGroup);
+                    }
+                }
+                concurrencyGroupList = UtilityMethods.FBuildFormatList(groupSectionList, 4, UtilityMethods.FBuildFormatListOptions.UseSingleElementShortFormat | UtilityMethods.FBuildFormatListOptions.UseCommaBetweenElements);
+            }
+
             using (masterBffGenerator.Declare("CachePath", cachePath))
             using (masterBffGenerator.Declare("CachePluginDLL", cachePluginDLL))
             using (masterBffGenerator.Declare("WorkerConnectionLimit", workerConnectionLimit))
@@ -674,8 +702,8 @@ namespace Sharpmake.Generators.FastBuild
             using (masterBffGenerator.Declare("fastBuildEnvironments", fastBuildEnvironments))
             using (masterBffGenerator.Declare("envRemoveGuards", envRemoveGuards))
             using (masterBffGenerator.Declare("envAdditionalVariables", envAdditionalVariables))
+            using (masterBffGenerator.Declare("fastbuildConcurrencyGroupList", concurrencyGroupList))
             {
-                masterBffGenerator.Write(Bff.Template.ConfigurationFile.HeaderFile);
                 masterBffGenerator.Write(Bff.Template.ConfigurationFile.GlobalSettings);
             }
         }

@@ -53,6 +53,7 @@ namespace FastBuild
             
             conf.IntellisenseAdditionalDefines.Add("MY_INTELLISENSE_DEFINE", "MY_INTELLISENSE_DEFINE2");
             conf.IntellisenseAdditionalCommandLineOptions.Add("/MY_INTELLISENSE_OPTION", "/MY_INTELLISENSE_OPTION2"); // Dummy options just to validate the output
+            conf.FastBuildLinkConcurrencyGroup = "Test1";
         }
 
         [Configure(Optimization.Release)]
@@ -119,6 +120,13 @@ namespace FastBuild
 
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2019, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
             KitsRootPaths.SetUseKitsRootForDevEnv(DevEnv.vs2022, KitsRootEnum.KitsRoot10, Options.Vc.General.WindowsTargetPlatformVersion.v10_0_19041_0);
+
+            // Defining several groups to insure that the generation is correct but only the first one is truly used.
+            // Compiling debug + release at same time while -monitor is specified on commandline will show that a single compilation is done at a time(see %TEMP%\FastBuildLog.Log).
+            FastBuildSettings.EnableConcurrencyGroups = true;
+            FastBuildSettings.AddConcurrencyGroup("Test1", new FastBuildSettings.ConcurrencyGroup { ConcurrencyLimit = 1 });
+            FastBuildSettings.AddConcurrencyGroup("Test2", new FastBuildSettings.ConcurrencyGroup { ConcurrencyPerJobMiB = 5000 });
+            FastBuildSettings.AddConcurrencyGroup("Test3", new FastBuildSettings.ConcurrencyGroup { ConcurrencyLimit = 42, ConcurrencyPerJobMiB = 5000 });
 
             arguments.Generate<FastBuildSolution>();
         }

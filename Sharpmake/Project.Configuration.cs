@@ -1683,6 +1683,28 @@ namespace Sharpmake
             /// </summary>
             public FastBuildClangMscVersionDetectionType FastBuildClangMscVersionDetectionInfo = FastBuildClangMscVersionDetectionType.FullVersion;
 
+            private string _fastBuildLinkConcurrencyGroup = null;
+            /// <summary>
+            /// Optional fastbuild concurrency group name. Concurrency groups are used to limit the number of parallel processes using the same concurrency group.
+            /// It can be used for example to limit the number of LTO link process to 1.
+            /// </summary>
+            public string FastBuildLinkConcurrencyGroup
+            {
+                get
+                {
+                    return _fastBuildLinkConcurrencyGroup;
+                }
+                set
+                {
+                    if (!FastBuildSettings.EnableConcurrencyGroups)
+                        throw new Error("Can't set FastBuildLinkConcurrencyGroup as FastBuildSettings.EnableConcurrencyGroups is false");
+                    if (!FastBuildSettings.ConcurrencyGroups.ContainsKey(value))
+                        throw new Error($"Can't set FastBuildLinkConcurrencyGroup to {value} as it is not defined in FastBuildSettings.ConcurrencyGroups");
+
+                    _fastBuildLinkConcurrencyGroup = value;
+                }
+            }
+
             private Strings _intellisenseAdditionalDefines;
 
             /// <summary>
