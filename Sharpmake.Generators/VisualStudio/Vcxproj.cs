@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Sharpmake.Generators.FastBuild;
-using static Sharpmake.DebugBreaks;
 
 namespace Sharpmake.Generators.VisualStudio
 {
