@@ -1544,6 +1544,8 @@ namespace Sharpmake
                 set { _fastBuildUnityPath = value; }
             }
 
+            public string FastBuildInputFilesRootPath = null;
+
             /// <summary>
             /// If specified, overrides <c>Project.DefaultBlobWorkFileHeader</c>.
             /// </summary>

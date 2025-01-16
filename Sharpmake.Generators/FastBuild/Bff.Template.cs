@@ -290,6 +290,7 @@ Compiler( '[fastBuildNasmCompilerName]' )
     .CompilerInputPattern     = [fastBuildCompilerInputPattern]
     .CompilerInputExcludedFiles = [fastBuildInputExcludedFiles]
     .CompilerInputFiles       = [fastBuildSourceFiles]
+    .CompilerInputFilesRoot   = '[fastBuildInputFilesRootPath]'
 
 ";
 
