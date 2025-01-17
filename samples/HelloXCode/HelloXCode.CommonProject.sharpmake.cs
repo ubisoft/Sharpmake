@@ -60,8 +60,13 @@ namespace HelloXCode
             conf.Output = Configuration.OutputType.Lib; // defaults to creating static libs
             conf.Options.Add(Options.XCode.Editor.Indent.Spaces);
 
-            if (target.Optimization == Optimization.Debug)
+            if (target.Optimization == Optimization.Release)
+            {
                 conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.DwarfWithDSym);
+                conf.Options.Add(Sharpmake.Options.XCode.Linker.StripLinkedProduct.Enable);
+                conf.Options.Add(Sharpmake.Options.XCode.Linker.StripStyle.DebuggingSymbolsOnly);
+                conf.Options.Add(Sharpmake.Options.XCode.Linker.StripSwiftSymbols.Enable);
+            }
             else
                 conf.Options.Add(Sharpmake.Options.XCode.Compiler.DebugInformationFormat.Dwarf);
         }
