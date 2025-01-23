@@ -689,7 +689,7 @@ namespace Sharpmake.Generators.FastBuild
                         masterBffGenerator.Write(Bff.Template.ConfigurationFile.ConcurrencyGroup);
                     }
                 }
-                concurrencyGroupList = UtilityMethods.FBuildFormatList(groupSectionList, 4, UtilityMethods.FBuildFormatListOptions.UseSingleElementShortFormat | UtilityMethods.FBuildFormatListOptions.UseCommaBetweenElements);
+                concurrencyGroupList = UtilityMethods.FBuildFormatList(groupSectionList, 4, UtilityMethods.FBuildFormatListOptions.UseCommaBetweenElements);
             }
 
             using (masterBffGenerator.Declare("CachePath", cachePath))
