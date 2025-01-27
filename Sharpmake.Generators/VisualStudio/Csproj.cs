@@ -3430,7 +3430,10 @@ namespace Sharpmake.Generators.VisualStudio
             Options.Option(Options.CSharp.LanguageVersion.CSharp7_3, () => { options["LanguageVersion"] = "7.3"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp8, () => { options["LanguageVersion"] = "8.0"; }),
             Options.Option(Options.CSharp.LanguageVersion.CSharp9, () => { options["LanguageVersion"] = "9.0"; }),
-            Options.Option(Options.CSharp.LanguageVersion.CSharp10, () => { options["LanguageVersion"] = "10.0"; })
+            Options.Option(Options.CSharp.LanguageVersion.CSharp10, () => { options["LanguageVersion"] = "10.0"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp11, () => { options["LanguageVersion"] = "11.0"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp12, () => { options["LanguageVersion"] = "12.0"; }),
+            Options.Option(Options.CSharp.LanguageVersion.CSharp13, () => { options["LanguageVersion"] = "13.0"; })
             );
 
             SelectOption(
