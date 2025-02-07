@@ -84,6 +84,14 @@ namespace Sharpmake
             set { SetProperty(ref _rootPath, value); }
         }
 
+
+        private NuGetPackageMode _nuGetReferenceType = NuGetPackageMode.VersionDefault;   // Determines the type of NuGet references generated for this project
+        public NuGetPackageMode NuGetReferenceType
+        {
+            get { return _nuGetReferenceType; }
+            set { SetProperty(ref _nuGetReferenceType, value); }
+        }
+
         private DependenciesCopyLocalTypes _dependenciesCopyLocal = DependenciesCopyLocalTypes.Default; //used primarily for the .Net Framework
         public DependenciesCopyLocalTypes DependenciesCopyLocal
         {
@@ -2394,9 +2402,6 @@ namespace Sharpmake
         public bool ConfigurationSpecificEvents = false;
 
         public GeneratedAssemblyConfig GeneratedAssemblyConfig = new GeneratedAssemblyConfig();
-
-        // Determines the type of NuGet references generated for this project
-        public NuGetPackageMode NuGetReferenceType = NuGetPackageMode.VersionDefault;
 
         public Options.CSharp.RunPostBuildEvent RunPostBuildEvent = Options.CSharp.RunPostBuildEvent.OnBuildSuccess;
 
