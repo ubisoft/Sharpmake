@@ -643,13 +643,12 @@ namespace Sharpmake.Generators.VisualStudio
                 GenerateBffFilesSection(context, fileGenerator);
 
             // Generate and add reference to packages.config file for project
-            if (firstConf.ReferencesByNuGetPackage.Count > 0)
+            if (firstConf.ReferencesByNuGetPackage.Count > 0 && hasFastBuildConfig)
             {
-                if (hasFastBuildConfig)
-                {
-                    throw new NotImplementedException("Nuget packages in c++ is not currently supported by FastBuild");
-                }
-
+                throw new NotImplementedException("Nuget packages in c++ is not currently supported by FastBuild");
+            }
+            else
+            {
                 var packagesConfig = new PackagesConfig();
                 packagesConfig.Generate(context.Builder, firstConf, "native", context.ProjectDirectory, generatedFiles, skipFiles);
                 if (packagesConfig.IsGenerated)
@@ -716,7 +715,8 @@ namespace Sharpmake.Generators.VisualStudio
             // add imports to nuget packages
             foreach (var package in firstConf.ReferencesByNuGetPackage)
             {
-                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceImport));
+                string customTemplate = string.IsNullOrEmpty(package.TargetsPath) ? Template.Project.ProjectTargetsNugetReferenceImport : Template.Project.ProjectTargetsNugetReferenceImportExplicitPath;
+                fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, customTemplate));
             }
             fileGenerator.Write(Template.Project.ProjectTargetsEnd);
 
@@ -739,7 +739,8 @@ namespace Sharpmake.Generators.VisualStudio
 
                 foreach (var package in firstConf.ReferencesByNuGetPackage)
                 {
-                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, Template.Project.ProjectTargetsNugetReferenceError));
+                    string customTemplate = string.IsNullOrEmpty(package.TargetsPath) ? Template.Project.ProjectTargetsNugetReferenceError : Template.Project.ProjectTargetsNugetReferenceErrorExplicitPath;
+                    fileGenerator.WriteVerbatim(package.Resolve(fileGenerator.Resolver, customTemplate));
                 }
 
                 fileGenerator.Write(Template.Project.ProjectCustomTargetsEnd);
