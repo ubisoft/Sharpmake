@@ -57,7 +57,7 @@ jobs:
         working-directory: downloads
 
       - name: 'Create GitHub release'
-        uses: ncipollo/release-action@v1.14.0
+        uses: ncipollo/release-action@v1.15.0
         with:
           bodyFile: 'changelog.md'
           artifacts: 'downloads/Sharpmake-net6.0-*-${{ github.ref_name }}.zip'

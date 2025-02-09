@@ -322,6 +322,10 @@ namespace Sharpmake
                     AndroidBuildTargets androidBuildtarget = Android.Util.GetAndroidBuildTarget(conf);
                     cmdLineOptions["ClangCompilerTarget"] = $"-target {Android.Util.GetTargetTripleWithVersionSuffix(androidBuildtarget, androidApiNum)}";
                 }
+                else
+                {
+                    cmdLineOptions["ClangCompilerTarget"] = RemoveLineTag;
+                }
 
                 context.SelectOptionWithFallback
                 (
