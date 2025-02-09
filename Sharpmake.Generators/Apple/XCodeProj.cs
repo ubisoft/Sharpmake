@@ -336,7 +336,7 @@ namespace Sharpmake.Generators.Apple
                 Options.Option(Options.XCode.Scheme.MetalAPIValidation.Disable, () => options["MetalAPIValidation"] = "1")
             );
 
-            string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
+            string targetName = $"{activeConfiguration.Target.Name}";
             string buildImplicitDependencies = activeConfiguration.IsFastBuild ? "NO" : "YES";
             bool useBuildableProductRunnableSection = true;
             string runnableFilePath = string.Empty;
@@ -370,11 +370,20 @@ namespace Sharpmake.Generators.Apple
                 environmentVariablesBuilder.Append(RemoveLineTag);
             }
 
+            var useCustomDirectory = "NO";
+            string customDirectoryPath = Options.PathOption.Get<Options.XCode.Scheme.CustomWorkingDirectory>(activeConfiguration);
+            if (customDirectoryPath != RemoveLineTag)
+            {
+                useCustomDirectory = "YES";
+            }
+
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
             using (fileGenerator.Declare("options", options))
             using (fileGenerator.Declare("testableElements", testableElements))
             using (fileGenerator.Declare("DefaultTarget", targetName))
+            using (fileGenerator.Declare("UseCustomDir", useCustomDirectory))
+            using (fileGenerator.Declare("CustomDirectory", customDirectoryPath))
             using (fileGenerator.Declare("commandLineArguments", commandLineArguments))
             using (fileGenerator.Declare("environmentVariables", environmentVariablesBuilder))
             using (fileGenerator.Declare("buildImplicitDependencies", buildImplicitDependencies))
