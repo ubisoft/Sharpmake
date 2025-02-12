@@ -373,7 +373,6 @@ namespace Sharpmake.Generators.Apple
                 environmentVariablesBuilder.Append(RemoveLineTag);
             }
 
-
             using (fileGenerator.Declare("projectFile", projectFile))
             using (fileGenerator.Declare("item", defaultTarget))
             using (fileGenerator.Declare("options", options))
