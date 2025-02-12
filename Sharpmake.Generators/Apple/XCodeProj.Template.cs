@@ -608,7 +608,7 @@ namespace Sharpmake.Generators.Apple
       selectedLauncherIdentifier = ""Xcode.DebuggerFoundation.Launcher.LLDB""
       launchStyle = ""0""
       useCustomWorkingDirectory = ""[UseCustomDir]""
-      customWorkingDirectory = ""[CustomDirectory]""
+      customWorkingDirectory = ""[options.CustomDirectory]""
       ignoresPersistentStateOnLaunch = ""NO""
       debugDocumentVersioning = ""YES""
       enableGPUFrameCaptureMode = ""[options.EnableGpuFrameCaptureMode]""
