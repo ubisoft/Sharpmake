@@ -336,6 +336,9 @@ namespace Sharpmake.Generators.Apple
                 Options.Option(Options.XCode.Scheme.MetalAPIValidation.Disable, () => options["MetalAPIValidation"] = "1")
             );
 
+            options["CustomDirectory"] = Options.PathOption.Get<Options.XCode.Scheme.CustomWorkingDirectory>(activeConfiguration);
+            var useCustomDirectory = options["CustomDirectory"] != RemoveLineTag ? "YES" : "NO";
+
             string targetName = $"&quot;{activeConfiguration.Target.Name}&quot;";
             string buildImplicitDependencies = activeConfiguration.IsFastBuild ? "NO" : "YES";
             bool useBuildableProductRunnableSection = true;
@@ -375,6 +378,7 @@ namespace Sharpmake.Generators.Apple
             using (fileGenerator.Declare("options", options))
             using (fileGenerator.Declare("testableElements", testableElements))
             using (fileGenerator.Declare("DefaultTarget", targetName))
+            using (fileGenerator.Declare("UseCustomDir", useCustomDirectory))
             using (fileGenerator.Declare("commandLineArguments", commandLineArguments))
             using (fileGenerator.Declare("environmentVariables", environmentVariablesBuilder))
             using (fileGenerator.Declare("buildImplicitDependencies", buildImplicitDependencies))
