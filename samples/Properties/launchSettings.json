@@ -18,6 +18,12 @@
       "commandLineArgs": "/sources(@'CLRTest.sharpmake.cs')",
       "workingDirectory": "$(ProjectDir)\\CPPCLI"
     },
+    "Sample (CPPForcePackageReference)": {
+        "commandName": "Executable",
+        "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
+        "commandLineArgs": "/sources(@'CPPForcePackageReference.sharpmake.cs')",
+        "workingDirectory": "$(ProjectDir)\\CPPForcePackageReference"
+    },
     "Sample (CSharpHelloWorld)": {
       "commandName": "Executable",
       "executablePath": "$(ProjectDir)\\..\\Sharpmake.Application\\bin\\$(Configuration)\\$(TargetFramework)\\Sharpmake.Application.exe",
