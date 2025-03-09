@@ -343,8 +343,8 @@
             "Commands":
             [
                 "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"ProjectReferencesExport.sharpmake.cs\" -framework {framework}",
-                "./Compile.ps1 -slnOrPrjFile \"ProjectReferencesExportSolution_{VsVersionSuffix}_win64.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
-                "&'./{testFolder}/projects/MainProject/output/{VsVersionSuffix}/{configuration}/MainProject.exe'"
+                "./Compile.ps1 -slnOrPrjFile \"projectreferencesexport_{VsVersionSuffix}_win64.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "&'./{testFolder}/projects/output/win64/{configuration}/mainproject.exe'"
             ]
         },
         {
