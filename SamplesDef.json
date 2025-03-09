@@ -334,6 +334,20 @@
             ]
         },
         {
+            "Name": "ProjectReferencesExport",
+            "CIs": [ "github", "gitlab" ],
+            "OSs": [ "windows-2022" ],
+            "Frameworks": [ "net6.0" ],
+            "Configurations": [ "debug", "release" ],
+            "TestFolder": "samples/ProjectReferencesExport",
+            "Commands":
+            [
+                "./RunSharpmake.ps1 -workingDirectory {testFolder} -sharpmakeFile \"ProjectReferencesExport.sharpmake.cs\" -framework {framework}",
+                "./Compile.ps1 -slnOrPrjFile \"ProjectReferencesExportSolution_{VsVersionSuffix}_win64.sln\" -configuration {configuration} -platform \"x64\" -WorkingDirectory \"{testFolder}/projects\" -VsVersion {os} -compiler MsBuild",
+                "&'./{testFolder}/projects/MainProject/output/{VsVersionSuffix}/{configuration}/MainProject.exe'"
+            ]
+        },
+        {
             "Name": "QTFileCustomBuild",
             "CIs": [],
             "OSs": [ "windows-2019" ],
